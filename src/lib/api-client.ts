@@ -1,0 +1,534 @@
+/**
+ * Direct API client for desktop mode.
+ * Replaces all /api/* proxy routes — calls external APIs directly from the client.
+ * API keys are read from localStorage via api-keys.ts.
+ */
+
+import { getCoachMode } from "@/lib/api-keys";
+import { parseAzureResult } from "@/lib/azure-speech";
+import { buildL1ErrorContext, matchL1Errors } from "@/lib/l1-error-patterns";
+import { buildFeedbackPrompt } from "@/lib/llm-prompt";
+import { parseMwStress } from "@/lib/syllable-stress";
+import { apiFetch } from "@/lib/tauri-http";
+import { isSentence } from "@/lib/utils";
+import type { AzureAssessmentResult } from "@/types/azure";
+
+// ─── Azure ──────────────────────────────────────────────
+
+/**
+ * Test Azure credentials by fetching an auth token.
+ */
+export async function testAzure(
+  key: string,
+  region: string,
+): Promise<{ success: boolean; error?: string }> {
+  const tokenUrl = `https://${region}.api.cognitive.microsoft.com/sts/v1.0/issueToken`;
+  const res = await apiFetch(tokenUrl, {
+    method: "POST",
+    headers: { "Ocp-Apim-Subscription-Key": key },
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    return {
+      success: false,
+      error: `Azure auth failed (${res.status}): ${text}`,
+    };
+  }
+  return { success: true };
+}
+
+/**
+ * Run pronunciation assessment via Azure Speech REST API.
+ * Uses the REST endpoint instead of the Node.js SDK.
+ */
+export async function assessPronunciation(
+  audioBlob: Blob,
+  referenceText: string,
+  key: string,
+  region: string,
+): Promise<AzureAssessmentResult> {
+  const language = "en-US";
+  const enableProsody = isSentence(referenceText);
+
+  // Build pronunciation assessment config as JSON, then base64-encode it
+  const pronConfig = {
+    ReferenceText: referenceText,
+    GradingSystem: "HundredMark",
+    Granularity: "Phoneme",
+    Dimension: "Comprehensive",
+    EnableMiscue: true,
+    ...(enableProsody ? { EnableProsodyAssessment: true } : {}),
+  };
+  const pronConfigBase64 = btoa(
+    unescape(encodeURIComponent(JSON.stringify(pronConfig))),
+  );
+
+  const url = `https://${region}.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language=${encodeURIComponent(language)}&format=detailed`;
+
+  // Route through apiFetch (Tauri plugin-http in desktop, native fetch in dev).
+  // plugin-http bypasses CORS via Rust reqwest; Azure STT does not advertise
+  // CORS for tauri://localhost origin, so native fetch from WebView would fail.
+  // Convert Blob → Uint8Array so the body survives IPC serialization.
+  const audioBytes = new Uint8Array(await audioBlob.arrayBuffer());
+  const res = await apiFetch(url, {
+    method: "POST",
+    headers: {
+      "Ocp-Apim-Subscription-Key": key,
+      "Content-Type": "audio/wav",
+      "Pronunciation-Assessment": pronConfigBase64,
+      Accept: "application/json",
+    },
+    body: audioBytes,
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    if (res.status === 400 && text.includes("No speech")) {
+      throw new Error("No speech detected. Please try again.");
+    }
+    throw new Error(`Azure assessment failed (${res.status}): ${text}`);
+  }
+
+  const raw = await res.json();
+
+  // Check for no-match
+  if (
+    raw.RecognitionStatus === "NoMatch" ||
+    raw.RecognitionStatus === "InitialSilenceTimeout"
+  ) {
+    throw new Error("No speech detected. Please try again.");
+  }
+
+  return parseAzureResult(raw);
+}
+
+// ─── ElevenLabs ─────────────────────────────────────────
+
+const ALLOWED_VOICE_IDS = new Set([
+  "RaFzMbMIfqBcIurH6XF9",
+  "cR39HTrtXbjvEP4CNYFx",
+  "XfNU2rGpBa01ckF309OY",
+  "wvk9Caj0nEx4l3I9LaR6",
+  "G0yjIg3xY8gEJZkHpjVm",
+  "ashjVK50jp28G73AUTnb",
+  "Gfpl8Yo74Is0W6cPUWWT",
+]);
+
+function buildElevenLabsBody(text: string, modelId: string, speed?: number) {
+  return {
+    text,
+    model_id: modelId || "eleven_flash_v2_5",
+    speed: Math.min(1.2, Math.max(0.7, speed ?? 0.85)),
+    voice_settings: {
+      stability: 0.65,
+      similarity_boost: 0.85,
+      style: 0.35,
+      use_speaker_boost: true,
+    },
+  };
+}
+
+/** Test ElevenLabs API key */
+export async function testElevenLabs(
+  apiKey: string,
+): Promise<{ success: boolean; error?: string }> {
+  const res = await apiFetch("https://api.elevenlabs.io/v1/voices", {
+    headers: { "xi-api-key": apiKey },
+  });
+  if (!res.ok) {
+    return { success: false, error: `ElevenLabs auth failed (${res.status})` };
+  }
+  return { success: true };
+}
+
+/** Fetch ElevenLabs usage/subscription info */
+export async function fetchElevenLabsUsage(apiKey: string): Promise<{
+  characterCount: number;
+  characterLimit: number;
+  nextResetUnix: number;
+}> {
+  const res = await apiFetch("https://api.elevenlabs.io/v1/user/subscription", {
+    headers: { "xi-api-key": apiKey },
+  });
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(`ElevenLabs usage error (${res.status}): ${errText}`);
+  }
+  const data = await res.json();
+  return {
+    characterCount: data.character_count ?? 0,
+    characterLimit: data.character_limit ?? 0,
+    nextResetUnix: data.next_character_count_reset_unix ?? 0,
+  };
+}
+
+/** Fetch ElevenLabs voices list */
+export async function fetchElevenLabsVoices(
+  apiKey: string,
+): Promise<{ voices: { voice_id: string; name: string }[] }> {
+  const res = await apiFetch("https://api.elevenlabs.io/v1/voices", {
+    headers: { "xi-api-key": apiKey },
+  });
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(`ElevenLabs voices error (${res.status}): ${errText}`);
+  }
+  const data = await res.json();
+  const voices = (data.voices ?? []).map(
+    (v: { voice_id: string; name: string }) => ({
+      voice_id: v.voice_id,
+      name: v.name,
+    }),
+  );
+  return { voices };
+}
+
+/** TTS — returns audio blob */
+export async function elevenLabsTts(
+  apiKey: string,
+  voiceId: string,
+  text: string,
+  modelId: string,
+  speed?: number,
+): Promise<Blob> {
+  if (!ALLOWED_VOICE_IDS.has(voiceId)) throw new Error("Invalid voice ID");
+  if (text.length > 500) throw new Error("Text too long (max 500 chars)");
+
+  const res = await apiFetch(
+    `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
+    {
+      method: "POST",
+      headers: {
+        "xi-api-key": apiKey,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(buildElevenLabsBody(text, modelId, speed)),
+    },
+  );
+
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(`ElevenLabs TTS error (${res.status}): ${errText}`);
+  }
+  return res.blob();
+}
+
+/** TTS with timestamps — returns JSON with audio_base64 and alignment */
+export async function elevenLabsTtsAligned(
+  apiKey: string,
+  voiceId: string,
+  text: string,
+  modelId: string,
+  speed?: number,
+): Promise<{ audio_base64: string; alignment: unknown }> {
+  if (!ALLOWED_VOICE_IDS.has(voiceId)) throw new Error("Invalid voice ID");
+  if (text.length > 500) throw new Error("Text too long (max 500 chars)");
+
+  const res = await apiFetch(
+    `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}/with-timestamps`,
+    {
+      method: "POST",
+      headers: {
+        "xi-api-key": apiKey,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(buildElevenLabsBody(text, modelId, speed)),
+    },
+  );
+
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(`ElevenLabs TTS aligned error (${res.status}): ${errText}`);
+  }
+  return res.json();
+}
+
+// ─── LLM ────────────────────────────────────────────────
+
+interface LlmConfig {
+  apiKey: string;
+  provider: string;
+  baseUrl: string;
+  model: string;
+}
+
+/** Test LLM connection */
+export async function testLlm(
+  config: LlmConfig,
+): Promise<{ success: boolean; reply?: string; error?: string }> {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${config.apiKey}`,
+  };
+  if (config.provider === "claude") {
+    headers["x-api-key"] = config.apiKey;
+    headers["anthropic-version"] = "2023-06-01";
+  }
+
+  const res = await apiFetch(`${config.baseUrl}/chat/completions`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({
+      model: config.model,
+      messages: [
+        { role: "user", content: "Say hello in Chinese, one sentence only." },
+      ],
+      max_tokens: 50,
+    }),
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    return {
+      success: false,
+      error: `LLM test failed (${res.status}): ${text}`,
+    };
+  }
+
+  const data = await res.json();
+  const reply = data.choices?.[0]?.message?.content ?? "";
+  return { success: true, reply };
+}
+
+/**
+ * Stream LLM feedback via SSE.
+ * Returns a ReadableStream that emits SSE lines identical to the old API route format.
+ */
+export function streamLlmFeedback(
+  config: LlmConfig,
+  target: string,
+  azureResult: AzureAssessmentResult,
+  mode: "phoneme" | "sentence" = "phoneme",
+  signal?: AbortSignal,
+): ReadableStream<Uint8Array> {
+  // Collect all phoneme scores across words for L1 error detection
+  const allPhonemes = azureResult.words.flatMap((w) =>
+    w.phonemes.map((p) => ({
+      phoneme: p.phoneme,
+      accuracyScore: p.accuracyScore,
+    })),
+  );
+  const l1Context = buildL1ErrorContext(matchL1Errors(allPhonemes));
+  const prompt =
+    buildFeedbackPrompt(target, azureResult, mode, getCoachMode()) + l1Context;
+  const encoder = new TextEncoder();
+
+  return new ReadableStream({
+    async start(controller) {
+      try {
+        const headers: Record<string, string> = {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${config.apiKey}`,
+        };
+        if (config.provider === "claude") {
+          headers["x-api-key"] = config.apiKey;
+          headers["anthropic-version"] = "2023-06-01";
+        }
+
+        const res = await apiFetch(`${config.baseUrl}/chat/completions`, {
+          method: "POST",
+          headers,
+          signal,
+          body: JSON.stringify({
+            model: config.model,
+            messages: [{ role: "user", content: prompt }],
+            stream: true,
+            stream_options: { include_usage: true },
+          }),
+        });
+
+        if (!res.ok) {
+          const text = await res.text();
+          controller.enqueue(
+            encoder.encode(`data: ${JSON.stringify({ error: text })}\n\n`),
+          );
+          controller.close();
+          return;
+        }
+
+        const reader = res.body?.getReader();
+        if (!reader) {
+          controller.close();
+          return;
+        }
+        const decoder = new TextDecoder();
+        let buffer = "";
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split("\n");
+          buffer = lines.pop() ?? "";
+
+          for (const line of lines) {
+            if (!line.startsWith("data: ")) continue;
+            const data = line.slice(6);
+            if (data === "[DONE]") {
+              controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+              continue;
+            }
+            try {
+              const parsed = JSON.parse(data);
+              const content = parsed.choices?.[0]?.delta?.content;
+              if (content) {
+                controller.enqueue(
+                  encoder.encode(`data: ${JSON.stringify({ content })}\n\n`),
+                );
+              }
+              if (parsed.usage) {
+                controller.enqueue(
+                  encoder.encode(
+                    `data: ${JSON.stringify({ usage: { prompt_tokens: parsed.usage.prompt_tokens, completion_tokens: parsed.usage.completion_tokens } })}\n\n`,
+                  ),
+                );
+              }
+            } catch {
+              // skip malformed chunks
+            }
+          }
+        }
+        controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+      } catch (err) {
+        const msg = String(err);
+        if (
+          (err instanceof DOMException && err.name === "AbortError") ||
+          msg.includes("cancelled") ||
+          msg.includes("aborted")
+        ) {
+          // expected — user navigated away or started new recording
+        } else {
+          console.error("[LLM Stream]", err);
+          controller.enqueue(
+            encoder.encode(`data: ${JSON.stringify({ error: msg })}\n\n`),
+          );
+        }
+      } finally {
+        controller.close();
+      }
+    },
+  });
+}
+
+// ─── Pronunciation (Youdao / Merriam-Webster) ───────────
+
+function getAudioSubdir(filename: string): string {
+  if (filename.startsWith("bix")) return "bix";
+  if (filename.startsWith("gg")) return "gg";
+  if (/^[0-9]/.test(filename) || /^[^a-zA-Z]/.test(filename)) return "number";
+  return filename.charAt(0);
+}
+
+/** Fetch pronunciation audio — returns blob */
+export async function fetchPronunciation(
+  word: string,
+  source: "youdao" | "merriam-webster",
+  mwKey?: string,
+): Promise<Blob> {
+  const w = word.trim().toLowerCase();
+  if (!w) throw new Error("Missing word");
+  if (w.length > 50) throw new Error("Word too long (max 50 chars)");
+  if (/\s/.test(w)) throw new Error("Only single words allowed");
+
+  if (source === "merriam-webster") {
+    if (!mwKey) throw new Error("Missing MW API key");
+    return fetchMwAudio(w, mwKey);
+  }
+  return fetchYoudaoAudio(w);
+}
+
+async function fetchYoudaoAudio(word: string): Promise<Blob> {
+  const url = `https://dict.youdao.com/dictvoice?type=0&audio=${encodeURIComponent(word)}`;
+  const res = await apiFetch(url);
+  if (!res.ok) throw new Error(`Youdao returned ${res.status}`);
+  return res.blob();
+}
+
+async function fetchMwAudio(word: string, mwKey: string): Promise<Blob> {
+  const apiUrl = `https://dictionaryapi.com/api/v3/references/collegiate/json/${encodeURIComponent(word)}?key=${mwKey}`;
+  const dictRes = await apiFetch(apiUrl);
+  if (!dictRes.ok) throw new Error(`MW API error: ${dictRes.status}`);
+
+  const data = await dictRes.json();
+  if (
+    !Array.isArray(data) ||
+    data.length === 0 ||
+    typeof data[0] === "string"
+  ) {
+    throw new Error("Word not found in dictionary");
+  }
+
+  const audioFilename = data[0]?.hwi?.prs?.[0]?.sound?.audio;
+  if (!audioFilename) throw new Error("No pronunciation audio available");
+
+  const subdir = getAudioSubdir(audioFilename);
+  const audioUrl = `https://media.merriam-webster.com/audio/prons/en/us/mp3/${subdir}/${audioFilename}.mp3`;
+  const audioRes = await apiFetch(audioUrl);
+  if (!audioRes.ok) throw new Error("Failed to fetch audio from MW");
+  return audioRes.blob();
+}
+
+// ─── Merriam-Webster Stress ─────────────────────────────
+
+/** Fetch stress pattern from MW dictionary */
+export async function fetchMwStress(
+  word: string,
+  mwKey: string,
+): Promise<{
+  stress: ReturnType<typeof parseMwStress> | null;
+  mw: string | null;
+}> {
+  const w = word.trim().toLowerCase();
+  if (!w || w.length > 50 || /\s/.test(w)) return { stress: null, mw: null };
+
+  const apiUrl = `https://dictionaryapi.com/api/v3/references/collegiate/json/${encodeURIComponent(w)}?key=${mwKey}`;
+  const res = await apiFetch(apiUrl);
+  if (!res.ok) return { stress: null, mw: null };
+
+  const data = await res.json();
+  if (
+    !Array.isArray(data) ||
+    data.length === 0 ||
+    typeof data[0] === "string"
+  ) {
+    return { stress: null, mw: null };
+  }
+
+  const mw = data[0]?.hwi?.prs?.[0]?.mw as string | undefined;
+  if (!mw) return { stress: null, mw: null };
+
+  const hasStress = mw.includes("ˈ") || mw.includes("ˌ");
+  return { stress: hasStress ? parseMwStress(mw) : null, mw };
+}
+
+/** Test MW API key */
+export async function testMw(mwKey: string): Promise<{
+  success: boolean;
+  word?: string;
+  hasAudio?: boolean;
+  error?: string;
+}> {
+  const apiUrl = `https://dictionaryapi.com/api/v3/references/collegiate/json/hello?key=${mwKey}`;
+  const res = await apiFetch(apiUrl);
+  if (!res.ok)
+    return { success: false, error: `MW API returned ${res.status}` };
+
+  const data = await res.json();
+  if (
+    !Array.isArray(data) ||
+    data.length === 0 ||
+    typeof data[0] === "string"
+  ) {
+    return { success: false, error: "Invalid API key or unexpected response" };
+  }
+
+  const entry = data[0];
+  if (entry?.meta?.id) {
+    return {
+      success: true,
+      word: entry.meta.id,
+      hasAudio: !!entry?.hwi?.prs?.[0]?.sound?.audio,
+    };
+  }
+  return { success: false, error: "Unexpected API response format" };
+}

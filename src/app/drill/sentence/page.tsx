@@ -1,0 +1,200 @@
+"use client";
+
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
+import { useCallback } from "react";
+import { DrillConfig } from "@/components/drill/drill-config";
+import { DrillFeedback } from "@/components/drill/drill-feedback";
+import { DrillPhonemeLesson } from "@/components/drill/drill-phoneme-lesson";
+import { DrillRecording } from "@/components/drill/drill-recording";
+import { DrillSummaryCard } from "@/components/drill/drill-summary";
+import { DrillTeaching } from "@/components/drill/drill-teaching";
+import { useDrillSession } from "@/hooks/use-drill-session";
+import { useMwPronunciation } from "@/hooks/use-mw-pronunciation";
+import { useTtsAligned } from "@/hooks/use-tts-aligned";
+import { buildSentenceDrillItems } from "@/lib/drill-utils";
+import { getPhonemeBySlug } from "@/lib/phoneme-data";
+import { SENTENCE_BANK } from "@/lib/sentence-bank";
+
+export default function SentenceDrillPage() {
+  const drill = useDrillSession();
+  const mw = useMwPronunciation();
+  const tts = useTtsAligned();
+
+  const handleStart = useCallback(
+    (phonemeSlug: string, itemCount: number, passThreshold: number) => {
+      const phoneme = getPhonemeBySlug(phonemeSlug);
+      const items = buildSentenceDrillItems(
+        SENTENCE_BANK,
+        phonemeSlug,
+        itemCount,
+        phoneme?.description,
+      );
+      drill.start(
+        { kind: "sentence", phonemeSlug, itemCount, passThreshold },
+        items,
+      );
+    },
+    [drill],
+  );
+
+  const handlePlayReference = useCallback(() => {
+    if (drill.phase.type === "teaching" || drill.phase.type === "feedback") {
+      const item = "item" in drill.phase ? drill.phase.item : null;
+      if (item) {
+        // For sentences use TTS, for single words use MW
+        if (item.text.split(/\s+/).length > 1) {
+          tts.speak(item.text, 0.85);
+        } else {
+          mw.playWord(item.text);
+        }
+      }
+    }
+  }, [drill.phase, mw, tts]);
+
+  const handleRestart = useCallback(() => {
+    if (!drill.config) return;
+    handleStart(
+      drill.config.phonemeSlug,
+      drill.config.itemCount,
+      drill.config.passThreshold,
+    );
+  }, [drill.config, handleStart]);
+
+  return (
+    <div className="h-full flex flex-col px-6 py-4 overflow-y-auto scrollbar-thin">
+      <div className="mb-4 flex items-center gap-3 shrink-0">
+        <Link
+          href="/drill"
+          className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-muted transition-colors cursor-pointer"
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </Link>
+        <h1 className="text-2xl font-bold">句子训练</h1>
+        {drill.config &&
+          drill.phase.type !== "configuring" &&
+          drill.phase.type !== "completed" && (
+            <span className="text-sm text-muted-foreground">
+              {getPhonemeBySlug(drill.config.phonemeSlug)?.ipa}
+            </span>
+          )}
+      </div>
+
+      <div className="flex-1 max-w-2xl mx-auto w-full">
+        {drill.phase.type === "configuring" && (
+          <DrillConfig kind="sentence" onStart={handleStart} />
+        )}
+
+        {drill.phase.type === "phonemeLesson" && drill.config && (
+          <SentenceLessonView
+            config={drill.config}
+            onReady={drill.finishPhonemeLesson}
+            mw={mw}
+          />
+        )}
+
+        {drill.phase.type === "teaching" && (
+          <DrillTeaching
+            item={drill.phase.item}
+            index={drill.phase.index}
+            total={drill.items.length}
+            isPlaying={mw.isPlaying || tts.isPlaying}
+            isLoading={mw.isLoading || tts.isLoading}
+            onPlay={handlePlayReference}
+            onReady={drill.finishTeaching}
+          />
+        )}
+
+        {(drill.phase.type === "readyToRecord" ||
+          drill.phase.type === "recording" ||
+          drill.phase.type === "assessing") && (
+          <DrillRecording
+            item={
+              drill.phase.type === "readyToRecord"
+                ? drill.phase.item
+                : drill.phase.type === "recording"
+                  ? drill.phase.item
+                  : drill.items[drill.currentIndex]
+            }
+            index={drill.currentIndex}
+            total={drill.items.length}
+            isRecording={drill.isRecording}
+            isAssessing={drill.isAssessing}
+            audioBlob={drill.audioBlob}
+            stream={drill.recorderStream}
+            onStartRecording={drill.startRecording}
+            onStopRecording={drill.stopRecording}
+          />
+        )}
+
+        {drill.phase.type === "feedback" && (
+          <DrillFeedback
+            item={drill.phase.item}
+            index={drill.phase.index}
+            total={drill.items.length}
+            attempt={drill.phase.attempt}
+            passed={drill.phase.passed}
+            attemptCount={drill.phase.attemptCount}
+            maxAttempts={drill.maxAttempts}
+            passThreshold={drill.config?.passThreshold ?? 70}
+            onNext={drill.nextItem}
+            onRetry={drill.retryItem}
+            onSkip={drill.skipItem}
+            onPlayReference={handlePlayReference}
+          />
+        )}
+
+        {drill.phase.type === "completed" && (
+          <DrillSummaryCard
+            summary={drill.phase.summary}
+            onRestart={handleRestart}
+            onBack={drill.reset}
+          />
+        )}
+
+        {drill.phase.type === "error" && (
+          <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-center dark:border-red-900 dark:bg-red-950/30">
+            <p className="text-red-700 dark:text-red-400">
+              {drill.phase.message}
+            </p>
+            <button
+              type="button"
+              onClick={drill.retryItem}
+              className="mt-3 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground cursor-pointer"
+            >
+              重试
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function SentenceLessonView({
+  config,
+  onReady,
+  mw,
+}: {
+  config: { phonemeSlug: string; itemCount: number };
+  onReady: () => void;
+  mw: {
+    playWord: (w: string, v?: "blue" | "pink") => void;
+    isPlaying: boolean;
+    isLoading: boolean;
+  };
+}) {
+  const phoneme = getPhonemeBySlug(config.phonemeSlug);
+  if (!phoneme) return null;
+  return (
+    <DrillPhonemeLesson
+      phoneme={phoneme}
+      itemCount={config.itemCount}
+      kind="sentence"
+      onReady={onReady}
+      onPlayExample={(word) => mw.playWord(word)}
+      isPlayingExample={mw.isPlaying}
+      isLoadingExample={mw.isLoading}
+    />
+  );
+}

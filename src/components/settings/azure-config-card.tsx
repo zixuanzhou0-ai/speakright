@@ -1,0 +1,100 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { testAzure } from "@/lib/api-client";
+import { getAzureConfig, setAzureConfig } from "@/lib/api-keys";
+import { type ConnectionState, ConnectionStatus } from "./connection-status";
+
+export function AzureConfigCard() {
+  const [key, setKey] = useState("");
+  const [region, setRegion] = useState("eastus");
+
+  useEffect(() => {
+    const saved = getAzureConfig();
+    if (saved) {
+      setKey(saved.subscriptionKey);
+      setRegion(saved.region);
+    }
+  }, []);
+  const [status, setStatus] = useState<ConnectionState>("idle");
+  const [statusMsg, setStatusMsg] = useState("");
+
+  const handleSave = () => {
+    if (!key.trim()) {
+      toast.error("请输入 Subscription Key");
+      return;
+    }
+    setAzureConfig({ subscriptionKey: key.trim(), region });
+    toast.success("Azure 配置已保存");
+  };
+
+  const handleTest = async () => {
+    if (!key.trim()) {
+      toast.error("请先填写 Subscription Key");
+      return;
+    }
+    setStatus("testing");
+    setStatusMsg("");
+
+    try {
+      const result = await testAzure(key.trim(), region);
+      if (result.success) {
+        setStatus("success");
+      } else {
+        setStatus("error");
+        setStatusMsg(result.error ?? "连接失败");
+      }
+    } catch {
+      setStatus("error");
+      setStatusMsg("网络错误");
+    }
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Azure Speech</CardTitle>
+        <CardDescription>用于发音评估打分</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="azure-key">Subscription Key</Label>
+          <Input
+            id="azure-key"
+            type="password"
+            placeholder="输入 Azure Speech 密钥"
+            value={key}
+            onChange={(e) => setKey(e.target.value)}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="azure-region">Region</Label>
+          <Input
+            id="azure-region"
+            placeholder="eastus"
+            value={region}
+            onChange={(e) => setRegion(e.target.value)}
+          />
+        </div>
+        <div className="flex items-center gap-3">
+          <Button onClick={handleSave}>保存</Button>
+          <Button variant="outline" onClick={handleTest}>
+            测试连接
+          </Button>
+          <ConnectionStatus state={status} message={statusMsg} />
+        </div>
+      </CardContent>
+    </Card>
+  );
+}

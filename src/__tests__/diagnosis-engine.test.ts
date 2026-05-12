@@ -1,0 +1,94 @@
+import { describe, expect, it } from "vitest";
+import { buildDiagnosisReport } from "@/lib/diagnosis-engine";
+import type { AssessmentRecording } from "@/types/diagnosis";
+
+function resultForWord(
+  word: string,
+  phonemes: Array<{ phoneme: string; accuracyScore: number }>,
+  overrides: Partial<{
+    pronunciationScore: number;
+    accuracyScore: number;
+    fluencyScore: number;
+    completenessScore: number;
+    prosodyScore: number;
+  }> = {},
+) {
+  return {
+    pronunciationScore: overrides.pronunciationScore ?? 70,
+    accuracyScore: overrides.accuracyScore ?? 70,
+    fluencyScore: overrides.fluencyScore ?? 82,
+    completenessScore: overrides.completenessScore ?? 100,
+    prosodyScore: overrides.prosodyScore,
+    words: [
+      {
+        word,
+        accuracyScore: overrides.accuracyScore ?? 70,
+        errorType: "None" as const,
+        phonemes,
+        syllables: [{ syllable: "test", accuracyScore: 80 }],
+      },
+    ],
+  };
+}
+
+describe("buildDiagnosisReport", () => {
+  it("aggregates phoneme scores and maps low /th/ to the s-th pack", () => {
+    const wordRecordings: AssessmentRecording[] = [
+      {
+        prompt: {
+          word: "think",
+          ipa: "/θɪŋk/",
+          targetPhonemes: ["th", "ih", "ng"],
+        },
+        source: "word",
+        result: resultForWord("think", [
+          { phoneme: "th", accuracyScore: 42 },
+          { phoneme: "ih", accuracyScore: 82 },
+          { phoneme: "ng", accuracyScore: 86 },
+        ]),
+      },
+    ];
+
+    const report = buildDiagnosisReport({
+      wordRecordings,
+      paragraphText: "I think this is useful.",
+      paragraphResult: resultForWord(
+        "paragraph",
+        [
+          { phoneme: "th", accuracyScore: 55 },
+          { phoneme: "s", accuracyScore: 90 },
+        ],
+        { prosodyScore: 88, fluencyScore: 86 },
+      ),
+    });
+
+    expect(report.version).toBe(2);
+    expect(report.phonemeScores.th.score).toBe(49);
+    expect(report.phonemeScores.th.sampleCount).toBe(2);
+    expect(report.issues[0].recommendedPackIds).toContain("s-th");
+    expect(report.issues[0].errorPatternIds).toContain("tongue-between-teeth");
+    expect(report.issues[0].confidence).toBe("medium");
+    expect(report.issues[0].nextLesson?.levelId).toBe("perception-abx");
+  });
+
+  it("creates a rhythm issue when paragraph prosody is weak", () => {
+    const report = buildDiagnosisReport({
+      wordRecordings: [],
+      paragraphText: "A cup of coffee is on the table.",
+      paragraphResult: resultForWord(
+        "paragraph",
+        [{ phoneme: "ax", accuracyScore: 80 }],
+        { prosodyScore: 52, fluencyScore: 58 },
+      ),
+    });
+
+    expect(report.issues.some((issue) => issue.id === "stress-rhythm")).toBe(
+      true,
+    );
+    expect(
+      report.prescription.days
+        .flatMap((day) => day.items)
+        .some((item) => item.packId === "stress-rhythm"),
+    ).toBe(true);
+  });
+});

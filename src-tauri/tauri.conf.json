@@ -1,0 +1,41 @@
+{
+  "$schema": "../../../node_modules/@tauri-apps/cli/config.schema.json",
+  "productName": "SpeakRight",
+  "version": "1.0.0",
+  "identifier": "com.speakright.app",
+  "build": {
+    "frontendDist": "../out",
+    "devUrl": "http://localhost:3002",
+    "beforeDevCommand": "npm run dev:web:desktop",
+    "beforeBuildCommand": "npm run build:desktop-frontend"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "title": "SpeakRight",
+        "decorations": false,
+        "width": 1280,
+        "height": 800,
+        "minWidth": 1024,
+        "minHeight": 800,
+        "resizable": true,
+        "fullscreen": false
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: asset: http://asset.localhost; connect-src 'self' ipc: http://ipc.localhost https://*.api.cognitive.microsoft.com https://*.stt.speech.microsoft.com https://api.elevenlabs.io https://api.openai.com https://api.anthropic.com https://api.deepseek.com https://api.moonshot.cn https://dashscope.aliyuncs.com https://open.bigmodel.cn https://generativelanguage.googleapis.com https://ark.cn-beijing.volces.com https://dictionaryapi.com https://media.merriam-webster.com https://dict.youdao.com https://fonts.googleapis.com https://fonts.gstatic.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' asset: http://asset.localhost blob: data: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; media-src 'self' blob: data: asset: http://asset.localhost"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ]
+  }
+}
