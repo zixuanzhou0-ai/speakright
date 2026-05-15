@@ -1,8 +1,14 @@
-import type { AzureAssessmentResult } from "@/types/azure";
 import type { AssessmentWord } from "@/types/assessment";
+import type { AzureAssessmentResult } from "@/types/azure";
 import type { TrainingPrescription } from "@/types/training";
 
 export type DiagnosisIssueSeverity = "critical" | "major" | "minor";
+export type EvidenceStrength = "invalid" | "thin" | "fair" | "strong";
+export type EvidenceRecommendedAction =
+  | "use-for-diagnosis"
+  | "use-with-caution"
+  | "request-more-samples"
+  | "request-retry";
 
 export type DiagnosisIssueType =
   | "phoneme"
@@ -19,7 +25,26 @@ export interface DiagnosisEvidence {
   detail: string;
   phoneme?: string;
   ipa?: string;
-  source: "word" | "paragraph" | "adaptive";
+  position?: "initial" | "medial" | "final" | "unknown";
+  evidenceStrength?: EvidenceStrength;
+  recommendedAction?: EvidenceRecommendedAction;
+  invalidationReason?: string;
+  source:
+    | "word"
+    | "paragraph"
+    | "adaptive"
+    | "coverage-segment"
+    | "coverage-probe";
+}
+
+export interface DiagnosisEvidenceSummary {
+  overallStrength: EvidenceStrength;
+  recommendedAction: EvidenceRecommendedAction;
+  usableRecordings: number;
+  invalidRecordings: number;
+  thinFeatureCount: number;
+  lowConfidenceFeatures: string[];
+  notes: string[];
 }
 
 export interface DiagnosisIssue {
@@ -45,6 +70,7 @@ export interface DiagnosisIssue {
 
 export interface DiagnosisReport {
   version: 2;
+  source?: "quick-word-check" | "coverage-passage";
   timestamp: number;
   overallScore: number;
   dimensions: {
@@ -59,6 +85,7 @@ export interface DiagnosisReport {
   issues: DiagnosisIssue[];
   prescription: TrainingPrescription;
   rawEvidence: DiagnosisEvidence[];
+  evidenceSummary?: DiagnosisEvidenceSummary;
 }
 
 export interface AssessmentRecording {
@@ -71,4 +98,15 @@ export interface DiagnosisBuildInput {
   wordRecordings: AssessmentRecording[];
   paragraphResult: AzureAssessmentResult;
   paragraphText: string;
+}
+
+export interface CoveragePassageRecording {
+  text: string;
+  result: AzureAssessmentResult;
+  source: "coverage-segment" | "coverage-probe";
+  label?: string;
+}
+
+export interface CoveragePassageBuildInput {
+  recordings: CoveragePassageRecording[];
 }

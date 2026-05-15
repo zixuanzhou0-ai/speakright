@@ -14,10 +14,10 @@ function session(overrides: Partial<TrainingSessionSummary> = {}) {
     completedAt: 2,
     perceptionCorrect: 5,
     perceptionTotal: 5,
-    targetScores: [82, 78, 80, 77],
-    wordScores: [82, 78, 80],
-    sentenceScores: [77],
-    mixedReviewScores: [78, 79, 80],
+    targetScores: [88, 85, 83, 82],
+    wordScores: [86, 83, 81],
+    sentenceScores: [84, 82],
+    mixedReviewScores: [90, 84, 82, 80],
     levelSummaries: [
       {
         levelId: "perception-abx",
@@ -32,23 +32,23 @@ function session(overrides: Partial<TrainingSessionSummary> = {}) {
         kind: "word",
         attempts: 8,
         passed: true,
-        bestScore: 82,
+        bestScore: 86,
         stuckCount: 0,
       },
       {
         levelId: "sentence-ladder",
         kind: "sentence",
-        attempts: 5,
+        attempts: 6,
         passed: true,
-        bestScore: 80,
+        bestScore: 84,
         stuckCount: 0,
       },
       {
         levelId: "mixed-review",
         kind: "mixed-review",
-        attempts: 4,
+        attempts: 5,
         passed: true,
-        bestScore: 80,
+        bestScore: 90,
         stuckCount: 0,
       },
     ],
@@ -61,9 +61,9 @@ function session(overrides: Partial<TrainingSessionSummary> = {}) {
 describe("mastery profile", () => {
   it("requires perception, recent word scores, and sentence scores", () => {
     expect(evaluateSessionMastery(session())).toBe(true);
-    expect(
-      evaluateSessionMastery(session({ perceptionCorrect: 3 })),
-    ).toBe(false);
+    expect(evaluateSessionMastery(session({ perceptionCorrect: 3 }))).toBe(
+      false,
+    );
     expect(evaluateSessionMastery(session({ wordScores: [60, 76, 62] }))).toBe(
       false,
     );
@@ -93,23 +93,23 @@ describe("mastery profile", () => {
               kind: "word",
               attempts: 8,
               passed: false,
-              bestScore: 82,
+              bestScore: 86,
               stuckCount: 0,
             },
             {
               levelId: "sentence-ladder",
               kind: "sentence",
-              attempts: 5,
+              attempts: 6,
               passed: true,
-              bestScore: 80,
+              bestScore: 84,
               stuckCount: 0,
             },
             {
               levelId: "mixed-review",
               kind: "mixed-review",
-              attempts: 4,
+              attempts: 5,
               passed: true,
-              bestScore: 80,
+              bestScore: 90,
               stuckCount: 0,
             },
           ],
@@ -119,16 +119,28 @@ describe("mastery profile", () => {
   });
 
   it("records pack and phoneme mastery", () => {
-    const profile = recordTrainingSession(createEmptyMasteryProfile(), session());
+    const profile = recordTrainingSession(
+      createEmptyMasteryProfile(),
+      session(),
+    );
 
     expect(profile.packs["s-th"].status).toBe("mastered");
+    expect(profile.packs["s-th"].masteryState).toBe("integrated");
+    expect(profile.packs["s-th"].stageCeiling).toBe(75);
+    expect(profile.packs["s-th"].nextRequiredLayer).toBe("guided");
     expect(profile.packs["s-th"].nextReviewAt).toBeGreaterThan(2);
-    expect(profile.packs["s-th"].levelProgress["word-ladder"].passed).toBe(true);
-    expect(profile.phonemes.th.bestScore).toBe(82);
+    expect(profile.packs["s-th"].levelProgress["word-ladder"].passed).toBe(
+      true,
+    );
+    expect(profile.phonemes.th.bestScore).toBe(88);
+    expect(profile.sessions[0].masteryStateAfter).toBe("integrated");
   });
 
   it("downgrades a due mastered pack after repeated review failure", () => {
-    const mastered = recordTrainingSession(createEmptyMasteryProfile(), session());
+    const mastered = recordTrainingSession(
+      createEmptyMasteryProfile(),
+      session(),
+    );
     const pack = mastered.packs["s-th"];
     pack.nextReviewAt = 1;
     pack.failureStreak = 1;
@@ -147,5 +159,43 @@ describe("mastery profile", () => {
 
     expect(failed.packs["s-th"].status).toBe("practicing");
     expect(failed.packs["s-th"].failureStreak).toBe(2);
+    expect(failed.packs["s-th"].masteryState).toBe("controlled");
+  });
+
+  it("records retained and transferred evidence without changing storage version", () => {
+    const first = recordTrainingSession(createEmptyMasteryProfile(), session());
+    first.packs["s-th"].nextReviewAt = 1;
+
+    const retained = recordTrainingSession(
+      first,
+      session({
+        id: "s2",
+        completedAt: 3,
+        isReviewSession: true,
+      }),
+    );
+    expect(retained.packs["s-th"].masteryState).toBe("retained");
+    expect(retained.packs["s-th"].retainedReviewCount).toBe(1);
+
+    const transferred = recordTrainingSession(
+      retained,
+      session({
+        id: "s3",
+        completedAt: 4,
+        transferEvidence: [
+          {
+            layer: "spontaneous",
+            prompt: "Tell me about your work.",
+            score: 88,
+            passed: true,
+            completedAt: 4,
+          },
+        ],
+      }),
+    );
+
+    expect(transferred.version).toBe(2);
+    expect(transferred.packs["s-th"].masteryState).toBe("transferred");
+    expect(transferred.packs["s-th"].transferEvidenceCount).toBe(1);
   });
 });

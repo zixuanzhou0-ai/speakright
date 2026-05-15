@@ -1,5 +1,5 @@
+import type { DiagnosisIssueType, EvidenceStrength } from "@/types/diagnosis";
 import type { DrillItem } from "@/types/drill";
-import type { DiagnosisIssueType } from "@/types/diagnosis";
 
 export type TrainingPackStatus =
   | "new"
@@ -8,6 +8,25 @@ export type TrainingPackStatus =
   | "stable"
   | "mastered"
   | "due";
+
+export type MasteryState =
+  | "unknown"
+  | "suspected"
+  | "learning"
+  | "controlled"
+  | "integrated"
+  | "retained"
+  | "transferred";
+
+export type MasteryTaskLayer =
+  | "isolated"
+  | "perception"
+  | "articulation"
+  | "word"
+  | "sentence"
+  | "connected"
+  | "guided"
+  | "spontaneous";
 
 export type TrainingLevelKind =
   | "perception"
@@ -146,6 +165,14 @@ export interface TrainingPrescriptionItem {
   reason: string;
   priority: "critical" | "major" | "maintenance";
   estimatedMinutes: number;
+  currentMasteryState?: MasteryState;
+  stageScore?: number;
+  stageCeiling?: number;
+  highestLayer?: MasteryTaskLayer;
+  nextRequiredLayer?: MasteryTaskLayer;
+  stageReason?: string;
+  evidenceStrength?: EvidenceStrength;
+  learningObjective?: string;
 }
 
 export interface TrainingPrescriptionDay {
@@ -163,6 +190,14 @@ export interface TrainingPrescription {
 export interface PackMastery {
   packId: string;
   status: Exclude<TrainingPackStatus, "recommended">;
+  masteryState?: MasteryState;
+  stageScore?: number;
+  stageCeiling?: number;
+  highestLayer?: MasteryTaskLayer;
+  nextRequiredLayer?: MasteryTaskLayer;
+  stateRationale?: string;
+  retainedReviewCount?: number;
+  transferEvidenceCount?: number;
   levelProgress: Record<string, TrainingLevelProgress>;
   bestTargetScore: number;
   perceptionBestRate: number;
@@ -226,6 +261,23 @@ export interface RemediationResult {
   passed: boolean;
 }
 
+export interface TransferEvidence {
+  layer: "guided" | "spontaneous";
+  prompt: string;
+  score: number;
+  passed: boolean;
+  completedAt: number;
+}
+
+export interface MasteryStageSnapshot {
+  state: MasteryState;
+  stageScore: number;
+  stageCeiling: number;
+  highestLayer: MasteryTaskLayer;
+  nextRequiredLayer: MasteryTaskLayer;
+  rationale: string;
+}
+
 export type ReviewQueueSource =
   | "due-review"
   | "stuck-pattern"
@@ -262,6 +314,10 @@ export interface TrainingSessionSummary {
   recommendedNextLevelId?: string;
   failedItems?: TrainingEvidenceItem[];
   remediationResults?: RemediationResult[];
+  transferEvidence?: TransferEvidence[];
+  isReviewSession?: boolean;
+  masteryStateAfter?: MasteryState;
+  masteryStageScore?: number;
   reviewItems?: ReviewQueueItem[];
 }
 

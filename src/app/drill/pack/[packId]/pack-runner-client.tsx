@@ -1,25 +1,26 @@
 "use client";
 
 import {
+  AlertTriangle,
   ArrowLeft,
+  ArrowRight,
   Check,
   Ear,
+  ListChecks,
   Loader2,
   Mic,
   RotateCcw,
   Sparkles,
+  Target,
   Volume2,
   X,
-  ArrowRight,
-  AlertTriangle,
-  ListChecks,
-  Target,
 } from "lucide-react";
 import { motion } from "motion/react";
 import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
 import { useMemo, useRef, useState } from "react";
 import { RecordButton } from "@/components/audio/record-button";
+import { RecordingQualityPanel } from "@/components/audio/recording-quality-panel";
 import { WaveformDisplay } from "@/components/audio/waveform-display";
 import { FeedbackDisplay } from "@/components/feedback/feedback-display";
 import { Badge } from "@/components/ui/badge";
@@ -28,15 +29,15 @@ import { useAzureAssessment } from "@/hooks/use-azure-assessment";
 import { useLlmFeedback } from "@/hooks/use-llm-feedback";
 import { useMwPronunciation } from "@/hooks/use-mw-pronunciation";
 import { useRecorder } from "@/hooks/use-recorder";
+import { useRecordingQuality } from "@/hooks/use-recording-quality";
 import { useTtsAligned } from "@/hooks/use-tts-aligned";
-import {
-  evaluateSessionMastery,
-  loadMasteryProfile,
-  recordTrainingSession,
-  saveMasteryProfile,
-} from "@/lib/mastery-profile";
 import { analyzeAttempt } from "@/lib/attempt-analysis";
-import { buildReviewQueue, buildSessionReviewItems } from "@/lib/review-queue";
+import {
+  buildCourseMap,
+  type CourseLevelMapItem,
+  type CourseLevelMapStatus,
+  type CourseMapSummary,
+} from "@/lib/course-map";
 import {
   buildFocusedReviewItems,
   createCourseStartPosition,
@@ -45,31 +46,36 @@ import {
   getCourseItemReference,
 } from "@/lib/course-runner";
 import {
-  nextCoursePosition,
-  shouldAppendPerceptionReview,
-  shouldEnterRemediation,
-  shouldMarkStuck,
-  toLevelSummary,
-  type CourseAttemptSnapshot,
-  type CoursePosition,
-} from "@/lib/training-course-session";
-import { getRemediationPath, TRAINING_ERROR_PATTERNS } from "@/lib/training-error-patterns";
-import { getTrainingPack } from "@/lib/training-packs";
+  buildDeepPracticeCoach,
+  type DeepPracticeCoach,
+} from "@/lib/deep-practice-coach";
 import {
   buildLessonBrief,
   buildSessionDebrief,
   type LessonBrief,
 } from "@/lib/lesson-brief";
 import {
-  buildCourseMap,
-  type CourseLevelMapItem,
-  type CourseLevelMapStatus,
-  type CourseMapSummary,
-} from "@/lib/course-map";
+  evaluateSessionMastery,
+  loadMasteryProfile,
+  recordTrainingSession,
+  saveMasteryProfile,
+} from "@/lib/mastery-profile";
+import type { RecordingQualityReport } from "@/lib/recording-quality";
+import { buildReviewQueue, buildSessionReviewItems } from "@/lib/review-queue";
 import {
-  buildDeepPracticeCoach,
-  type DeepPracticeCoach,
-} from "@/lib/deep-practice-coach";
+  type CourseAttemptSnapshot,
+  type CoursePosition,
+  nextCoursePosition,
+  shouldAppendPerceptionReview,
+  shouldEnterRemediation,
+  shouldMarkStuck,
+  toLevelSummary,
+} from "@/lib/training-course-session";
+import {
+  getRemediationPath,
+  TRAINING_ERROR_PATTERNS,
+} from "@/lib/training-error-patterns";
+import { getTrainingPack } from "@/lib/training-packs";
 import { cn } from "@/lib/utils";
 import type { AzureAssessmentResult } from "@/types/azure";
 import type {
@@ -125,11 +131,17 @@ function emptySnapshot(level: TrainingLevel): CourseAttemptSnapshot {
 
 function average(scores: number[]): number {
   if (scores.length === 0) return 0;
-  return Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length);
+  return Math.round(
+    scores.reduce((sum, score) => sum + score, 0) / scores.length,
+  );
 }
 
-function fallbackPath(patterns: ErrorPattern[], pack: TrainingPack): RemediationPath | null {
-  const pathId = patterns[0]?.remediationPathId ?? pack.course?.remediation[0]?.id;
+function fallbackPath(
+  patterns: ErrorPattern[],
+  pack: TrainingPack,
+): RemediationPath | null {
+  const pathId =
+    patterns[0]?.remediationPathId ?? pack.course?.remediation[0]?.id;
   return pathId ? getRemediationPath(pathId) : null;
 }
 
@@ -166,7 +178,9 @@ function itemFromRemediationStep(
 export default function TrainingPackPage() {
   const params = useParams<{ packId: string }>();
   const searchParams = useSearchParams();
-  const packId = Array.isArray(params.packId) ? params.packId[0] : params.packId;
+  const packId = Array.isArray(params.packId)
+    ? params.packId[0]
+    : params.packId;
   const pack = getTrainingPack(packId);
   const requestedLevelId = searchParams.get("level");
 
@@ -176,19 +190,27 @@ export default function TrainingPackPage() {
   const [perceptionCorrect, setPerceptionCorrect] = useState(0);
   const [perceptionTotal, setPerceptionTotal] = useState(0);
   const [perceptionExtraRemaining, setPerceptionExtraRemaining] = useState(0);
-  const [perceptionAnswer, setPerceptionAnswer] = useState<boolean | null>(null);
+  const [perceptionAnswer, setPerceptionAnswer] = useState<boolean | null>(
+    null,
+  );
   const [failedAttempts, setFailedAttempts] = useState(0);
   const [lastAttempt, setLastAttempt] = useState<AttemptResult | null>(null);
   const [results, setResults] = useState<AttemptResult[]>([]);
   const [worstAttempt, setWorstAttempt] = useState<AttemptResult | null>(null);
-  const [levelStats, setLevelStats] = useState<Record<string, CourseAttemptSnapshot>>({});
+  const [levelStats, setLevelStats] = useState<
+    Record<string, CourseAttemptSnapshot>
+  >({});
   const [stuckPatternIds, setStuckPatternIds] = useState<string[]>([]);
-  const [focusedReviewItems, setFocusedReviewItems] = useState<TrainingCourseItem[]>([]);
+  const [focusedReviewItems, setFocusedReviewItems] = useState<
+    TrainingCourseItem[]
+  >([]);
   const [remediationStepIndex, setRemediationStepIndex] = useState(0);
   const [remediationAttempt, setRemediationAttempt] =
     useState<RemediationAttemptResult | null>(null);
   const [failedItems, setFailedItems] = useState<TrainingEvidenceItem[]>([]);
-  const [remediationResults, setRemediationResults] = useState<RemediationResult[]>([]);
+  const [remediationResults, setRemediationResults] = useState<
+    RemediationResult[]
+  >([]);
 
   const startedAtRef = useRef(Date.now());
   const recorder = useRecorder();
@@ -216,6 +238,20 @@ export default function TrainingPackPage() {
           phase.position.itemIndex + 1
         }/${currentItems.length}`
       : "";
+  const recordingQuality = useRecordingQuality(recorder.audioBlob, {
+    expectedMode:
+      currentLevel?.kind === "sentence" ||
+      currentLevel?.kind === "shadowing" ||
+      currentLevel?.kind === "mixed-review"
+        ? "sentence"
+        : "word",
+    minDurationMs:
+      currentLevel?.kind === "sentence" ||
+      currentLevel?.kind === "shadowing" ||
+      currentLevel?.kind === "mixed-review"
+        ? 800
+        : 500,
+  });
 
   const currentSnapshot = useMemo(() => {
     if (!currentLevel) return null;
@@ -224,7 +260,7 @@ export default function TrainingPackPage() {
   const savedProfile = useMemo(() => {
     if (!pack || !course) return null;
     return loadMasteryProfile();
-  }, [pack, course, phase.type]);
+  }, [pack, course]);
   const savedReviewQueue = useMemo(
     () => buildReviewQueue(savedProfile),
     [savedProfile],
@@ -274,7 +310,10 @@ export default function TrainingPackPage() {
     );
   }
 
-  const resetSession = (levelId = requestedLevelId) => {
+  const defaultStartLevelId =
+    lessonBrief?.startLevelId ?? courseMap?.startLevelId ?? requestedLevelId;
+
+  const resetSession = (levelId = defaultStartLevelId) => {
     startedAtRef.current = Date.now();
     setActiveSlot(null);
     setXIsA(Math.random() > 0.5);
@@ -294,6 +333,7 @@ export default function TrainingPackPage() {
     setFailedItems([]);
     setRemediationResults([]);
     recorder.reset();
+    recordingQuality.reset();
     azure.reset();
     llm.reset();
     setPhase({
@@ -328,6 +368,7 @@ export default function TrainingPackPage() {
     const nextItem = phase.position.itemIndex + 1;
     const next = nextCoursePosition(course, phase.position);
     recorder.reset();
+    recordingQuality.reset();
     azure.reset();
     setLastAttempt(null);
     setFailedAttempts(0);
@@ -351,7 +392,10 @@ export default function TrainingPackPage() {
       if (nextLevel >= course.levels.length) {
         completeSession();
       } else {
-        setPhase({ type: "course", position: { levelIndex: nextLevel, itemIndex: 0 } });
+        setPhase({
+          type: "course",
+          position: { levelIndex: nextLevel, itemIndex: 0 },
+        });
       }
       return;
     } else if (!["perception", "articulation"].includes(currentLevel.kind)) {
@@ -393,10 +437,14 @@ export default function TrainingPackPage() {
       perceptionTotal,
       targetScores,
       wordScores: levelSummaries
-        .filter((level) => level.kind === "word" || level.kind === "minimal-pair")
+        .filter(
+          (level) => level.kind === "word" || level.kind === "minimal-pair",
+        )
         .flatMap((level) => levelStats[level.levelId]?.scores ?? []),
       sentenceScores: levelSummaries
-        .filter((level) => level.kind === "sentence" || level.kind === "shadowing")
+        .filter(
+          (level) => level.kind === "sentence" || level.kind === "shadowing",
+        )
         .flatMap((level) => levelStats[level.levelId]?.scores ?? []),
       mixedReviewScores: levelStats["mixed-review"]?.scores ?? [],
       levelSummaries,
@@ -413,7 +461,10 @@ export default function TrainingPackPage() {
     summary.reviewItems = buildSessionReviewItems(summary);
     const mastered = evaluateSessionMastery(summary);
     const completedSummary = { ...summary, mastered };
-    const profile = recordTrainingSession(loadMasteryProfile(), completedSummary);
+    const profile = recordTrainingSession(
+      loadMasteryProfile(),
+      completedSummary,
+    );
     saveMasteryProfile(profile);
     setPhase({ type: "completed", summary: completedSummary });
   };
@@ -440,9 +491,13 @@ export default function TrainingPackPage() {
     if (!currentItem || !slot) return;
     const wordA = currentItem.text;
     const wordB = currentItem.contrastText ?? currentItem.text;
-    const word = slot === "A" ? wordA : slot === "B" ? wordB : xIsA ? wordA : wordB;
+    const word =
+      slot === "A" ? wordA : slot === "B" ? wordB : xIsA ? wordA : wordB;
     setActiveSlot(slot);
-    mw.playWord(word.toLowerCase(), slot === "B" || (slot === "X" && !xIsA) ? "pink" : "blue");
+    mw.playWord(
+      word.toLowerCase(),
+      slot === "B" || (slot === "X" && !xIsA) ? "pink" : "blue",
+    );
   };
 
   const answerPerception = (answeredA: boolean) => {
@@ -510,12 +565,21 @@ export default function TrainingPackPage() {
   };
 
   const submitRecording = async () => {
-    if (!currentLevel || !currentItem || !recorder.audioBlob || azure.isLoading) {
+    if (
+      !currentLevel ||
+      !currentItem ||
+      !recorder.audioBlob ||
+      recordingQuality.isAnalyzing ||
+      !recordingQuality.report?.canSubmit ||
+      azure.isLoading
+    ) {
       return;
     }
     const reference = getCourseItemReference(currentItem);
     const result = await azure.assess(recorder.audioBlob, reference);
     if (!result) return;
+    recorder.reset();
+    recordingQuality.reset();
     setRemediationStepIndex(0);
     setRemediationAttempt(null);
 
@@ -566,7 +630,10 @@ export default function TrainingPackPage() {
       ]);
     }
     if (stuck) {
-      const ids = patterns.length > 0 ? patterns.map((pattern) => pattern.id) : ["target-low-overall-high"];
+      const ids =
+        patterns.length > 0
+          ? patterns.map((pattern) => pattern.id)
+          : ["target-low-overall-high"];
       setStuckPatternIds((current) => [...current, ...ids]);
     }
   };
@@ -576,11 +643,13 @@ export default function TrainingPackPage() {
     setRemediationStepIndex(0);
     setRemediationAttempt(null);
     recorder.reset();
+    recordingQuality.reset();
     azure.reset();
   };
 
   const startRemediationRecording = () => {
     recorder.reset();
+    recordingQuality.reset();
     azure.reset();
     setRemediationAttempt(null);
     recorder.startRecording();
@@ -590,6 +659,8 @@ export default function TrainingPackPage() {
     if (
       !currentItem ||
       !recorder.audioBlob ||
+      recordingQuality.isAnalyzing ||
+      !recordingQuality.report?.canSubmit ||
       azure.isLoading ||
       !remediation.steps[remediationStepIndex]
     ) {
@@ -604,6 +675,8 @@ export default function TrainingPackPage() {
     const reference = getCourseItemReference(stepItem);
     const result = await azure.assess(recorder.audioBlob, reference);
     if (!result) return;
+    recorder.reset();
+    recordingQuality.reset();
     const analysis = analyzeAttempt({
       pack,
       item: stepItem,
@@ -640,6 +713,7 @@ export default function TrainingPackPage() {
     setRemediationStepIndex((current) => current + 1);
     setRemediationAttempt(null);
     recorder.reset();
+    recordingQuality.reset();
     azure.reset();
   };
 
@@ -649,6 +723,7 @@ export default function TrainingPackPage() {
     setRemediationStepIndex(0);
     setRemediationAttempt(null);
     recorder.reset();
+    recordingQuality.reset();
     azure.reset();
   };
 
@@ -749,7 +824,9 @@ export default function TrainingPackPage() {
                 threshold={pack.masteryRule.targetPassScore}
                 failedAttempts={failedAttempts}
                 lastAttempt={lastAttempt}
-                remediation={lastAttempt ? fallbackPath(lastAttempt.patterns, pack) : null}
+                remediation={
+                  lastAttempt ? fallbackPath(lastAttempt.patterns, pack) : null
+                }
                 remediationStepIndex={remediationStepIndex}
                 remediationAttempt={remediationAttempt}
                 isRecording={recorder.isRecording}
@@ -758,10 +835,13 @@ export default function TrainingPackPage() {
                 isLoadingReference={mw.isLoading || tts.isLoading}
                 audioBlob={recorder.audioBlob}
                 stream={recorder.stream}
+                qualityReport={recordingQuality.report}
+                isAnalyzingQuality={recordingQuality.isAnalyzing}
                 onPlayReference={playReference}
                 onPlayRemediationText={playRemediationText}
                 onStartRecording={() => {
                   recorder.reset();
+                  recordingQuality.reset();
                   azure.reset();
                   recorder.startRecording();
                 }}
@@ -811,6 +891,7 @@ function IntroCard({
   const requestedLevel = pack.course?.levels.find(
     (level) => level.id === requestedLevelId,
   );
+  const redirected = courseMap?.redirectedByGate;
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -824,9 +905,14 @@ function IntroCard({
           </Badge>
         ))}
         <Badge variant="outline">{pack.estimatedMinutes} 分钟</Badge>
-        <Badge variant="outline">{pack.course?.levels.length ?? 0} 个关卡</Badge>
-        {requestedLevel && (
+        <Badge variant="outline">
+          {pack.course?.levels.length ?? 0} 个关卡
+        </Badge>
+        {requestedLevel && !redirected && (
           <Badge variant="default">从 {requestedLevel.title} 开始</Badge>
+        )}
+        {redirected && (
+          <Badge variant="secondary">先补 {courseMap.startLevelTitle}</Badge>
         )}
       </div>
       <h2 className="mt-4 text-xl font-bold">
@@ -836,6 +922,12 @@ function IntroCard({
         {brief?.reason ??
           "听辨 → 动作 → 音节 → 单词 → 对比 → 句子 → 影子跟读 → 混合复测。失败会进入慢速拆解，训练总结会记录 stuck 错因。"}
       </p>
+      {courseMap?.redirectedByGate && (
+        <div className="mt-3 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-950 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-100">
+          <p className="font-semibold">已自动回到前置关卡</p>
+          <p className="mt-1">{courseMap.gateReason}</p>
+        </div>
+      )}
       {brief && (
         <div className="mt-4 grid gap-3 lg:grid-cols-[1fr_0.9fr]">
           <div className="rounded-lg border bg-background p-4">
@@ -905,6 +997,7 @@ function courseMapStatusLabel(status: CourseLevelMapStatus): string {
     due: "复习",
     "needs-work": "卡点",
     passed: "已过",
+    locked: "先补",
     new: "未练",
   };
   return labels[status];
@@ -916,6 +1009,7 @@ function courseMapStatusClass(status: CourseLevelMapStatus): string {
     due: "border-amber-300 bg-amber-50 text-amber-950 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-100",
     "needs-work": "border-destructive/30 bg-destructive/5",
     passed: "border-primary/25 bg-primary/5",
+    locked: "border-dashed bg-muted/35 text-muted-foreground",
     new: "bg-background",
   };
   return classes[status];
@@ -949,7 +1043,9 @@ function CourseMapPanel({
         </div>
         <div className="min-w-[160px]">
           <div className="flex items-center justify-between text-xs text-muted-foreground">
-            <span>{map.passedLevels}/{map.totalLevels} 已过</span>
+            <span>
+              {map.passedLevels}/{map.totalLevels} 已过
+            </span>
             <span>{map.completionPercent}%</span>
           </div>
           <div className="mt-2 h-2 rounded-full bg-muted">
@@ -991,12 +1087,15 @@ function CourseMapLevelCard({
   compact: boolean;
   onStartLevel?: (levelId: string) => void;
 }) {
-  const hasWarning = level.status === "due" || level.status === "needs-work";
+  const hasWarning =
+    level.status === "due" ||
+    level.status === "needs-work" ||
+    level.status === "locked";
 
   return (
     <button
       type="button"
-      onClick={() => onStartLevel?.(level.id)}
+      onClick={() => onStartLevel?.(level.startLevelId)}
       className={cn(
         "min-h-[116px] rounded-lg border p-3 text-left transition-all hover:-translate-y-0.5 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary cursor-pointer",
         compact && "min-h-[104px] p-2.5",
@@ -1026,6 +1125,7 @@ function CourseMapLevelCard({
         {level.attempts > 0 && <span>{level.attempts} 次</span>}
         {level.dueTaskCount > 0 && <span>复习 {level.dueTaskCount}</span>}
         {level.stuckCount > 0 && <span>卡点 {level.stuckCount}</span>}
+        {level.lockedByLevelId && <span>先补 #{level.lockedByLevelId}</span>}
       </div>
       {!compact && (
         <div className="mt-2 flex gap-1.5 text-xs text-muted-foreground">
@@ -1035,7 +1135,7 @@ function CourseMapLevelCard({
             <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
           )}
           <p className="line-clamp-2">
-            {level.reviewReason ?? level.coachCue}
+            {level.lockReason ?? level.reviewReason ?? level.coachCue}
           </p>
         </div>
       )}
@@ -1067,9 +1167,13 @@ function CourseHeader({
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {brief && (
-            <Badge variant="outline">预计剩余 {brief.estimatedMinutes} 分钟</Badge>
+            <Badge variant="outline">
+              预计剩余 {brief.estimatedMinutes} 分钟
+            </Badge>
           )}
-          <Badge variant="secondary">{pack.masteryRule.targetPassScore}+ 目标音素</Badge>
+          <Badge variant="secondary">
+            {pack.masteryRule.targetPassScore}+ 目标音素
+          </Badge>
         </div>
       </div>
       <div className="mt-4 grid grid-cols-4 gap-2 md:grid-cols-8">
@@ -1234,10 +1338,18 @@ function PerceptionStep({
       </div>
       {answer === null ? (
         <div className="mt-6 flex gap-3">
-          <Button onClick={() => onAnswer(true)} variant="outline" className="flex-1 cursor-pointer">
+          <Button
+            onClick={() => onAnswer(true)}
+            variant="outline"
+            className="flex-1 cursor-pointer"
+          >
             X = A
           </Button>
-          <Button onClick={() => onAnswer(false)} variant="outline" className="flex-1 cursor-pointer">
+          <Button
+            onClick={() => onAnswer(false)}
+            variant="outline"
+            className="flex-1 cursor-pointer"
+          >
             X = B
           </Button>
         </div>
@@ -1283,16 +1395,22 @@ function ArticulationStep({
       className="rounded-xl border bg-card p-6 shadow-sm"
     >
       <Badge variant="secondary">{level.title}</Badge>
-      <h2 className="mt-4 text-2xl font-bold">{item.displayText ?? item.text}</h2>
+      <h2 className="mt-4 text-2xl font-bold">
+        {item.displayText ?? item.text}
+      </h2>
       <p className="mt-3 text-base leading-relaxed">{item.focusPoint}</p>
       <div className="mt-4 grid gap-3 md:grid-cols-2">
         <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-4">
           <p className="text-sm font-semibold text-red-600">常见错误</p>
-          <p className="mt-1 text-sm text-muted-foreground">{item.commonMistake}</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {item.commonMistake}
+          </p>
         </div>
         <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">
           <p className="text-sm font-semibold text-primary">通过感觉</p>
-          <p className="mt-1 text-sm text-muted-foreground">{item.successCue}</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {item.successCue}
+          </p>
         </div>
       </div>
       <Button onClick={onNext} className="mt-5 cursor-pointer">
@@ -1318,6 +1436,8 @@ function RecordingStep({
   isLoadingReference,
   audioBlob,
   stream,
+  qualityReport,
+  isAnalyzingQuality,
   onPlayReference,
   onPlayRemediationText,
   onStartRecording,
@@ -1345,6 +1465,8 @@ function RecordingStep({
   isLoadingReference: boolean;
   audioBlob: Blob | null;
   stream: MediaStream | null;
+  qualityReport: RecordingQualityReport | null;
+  isAnalyzingQuality: boolean;
   onPlayReference: () => void;
   onPlayRemediationText: (text: string) => void;
   onStartRecording: () => void;
@@ -1358,13 +1480,17 @@ function RecordingStep({
   onContinue: () => void;
 }) {
   const showRemediation =
-    lastAttempt && !lastAttempt.passed && shouldEnterRemediation(failedAttempts);
+    lastAttempt &&
+    !lastAttempt.passed &&
+    shouldEnterRemediation(failedAttempts);
   const canContinue = lastAttempt?.passed || failedAttempts >= 3;
   const currentRemediationStep = remediation?.steps[remediationStepIndex];
   const remediationDone =
     !!remediation &&
     remediationAttempt?.passed &&
     remediationStepIndex >= remediation.steps.length - 1;
+  const scoreDisabled =
+    !!audioBlob && (isAnalyzingQuality || !qualityReport?.canSubmit);
   const deepCoach = lastAttempt
     ? buildDeepPracticeCoach({
         pack,
@@ -1381,9 +1507,13 @@ function RecordingStep({
       className="rounded-xl border bg-card p-6 text-center shadow-sm"
     >
       <Badge variant="secondary">{level.title}</Badge>
-      <h2 className="mt-4 text-3xl font-bold">{item.displayText ?? item.text}</h2>
+      <h2 className="mt-4 text-3xl font-bold">
+        {item.displayText ?? item.text}
+      </h2>
       {item.ipa && (
-        <p className="mt-2 font-mono text-sm text-muted-foreground">{item.ipa}</p>
+        <p className="mt-2 font-mono text-sm text-muted-foreground">
+          {item.ipa}
+        </p>
       )}
       <p className="mx-auto mt-3 max-w-xl text-sm text-muted-foreground">
         {item.focusPoint}
@@ -1409,22 +1539,32 @@ function RecordingStep({
 
       {!showRemediation && (
         <div className="mt-5 flex flex-col items-center gap-3">
-        <RecordButton
-          isRecording={isRecording}
-          onStart={onStartRecording}
-          onStop={onStopRecording}
-          disabled={isAssessing}
-        />
-        <WaveformDisplay audioBlob={audioBlob} stream={stream} />
-        {audioBlob && !isRecording && !isAssessing && !lastAttempt && (
-          <Button onClick={onSubmit} className="gap-2 cursor-pointer">
-            <Mic className="h-4 w-4" />
-            提交评分
-          </Button>
-        )}
-        {isAssessing && (
-          <p className="text-sm text-muted-foreground">正在按目标音素评分...</p>
-        )}
+          <RecordButton
+            isRecording={isRecording}
+            onStart={onStartRecording}
+            onStop={onStopRecording}
+            disabled={isAssessing}
+          />
+          <WaveformDisplay audioBlob={audioBlob} stream={stream} />
+          {isAnalyzingQuality && (
+            <p className="text-xs text-muted-foreground">正在检查录音质量...</p>
+          )}
+          <RecordingQualityPanel report={qualityReport} compact />
+          {audioBlob && !isRecording && !isAssessing && !lastAttempt && (
+            <Button
+              onClick={onSubmit}
+              disabled={scoreDisabled}
+              className="gap-2 cursor-pointer"
+            >
+              <Mic className="h-4 w-4" />
+              提交评分
+            </Button>
+          )}
+          {isAssessing && (
+            <p className="text-sm text-muted-foreground">
+              正在按目标音素评分...
+            </p>
+          )}
         </div>
       )}
 
@@ -1448,7 +1588,8 @@ function RecordingStep({
             </p>
           ) : (
             <div className="mt-3 text-sm font-medium text-red-500">
-              未达标：目标音素需要 {threshold} 分。第 {failedAttempts}/3 次尝试。
+              未达标：目标音素需要 {threshold} 分。第 {failedAttempts}/3
+              次尝试。
             </div>
           )}
           {lastAttempt.patterns.length > 0 && (
@@ -1462,8 +1603,8 @@ function RecordingStep({
               </p>
               {lastAttempt.analysis.scoreGap >= 12 && (
                 <p className="mt-1 text-xs text-muted-foreground">
-                  整体分比目标音高 {lastAttempt.analysis.scoreGap} 分，说明句子能听懂，
-                  但关键动作还没稳定。
+                  整体分比目标音高 {lastAttempt.analysis.scoreGap}{" "}
+                  分，说明句子能听懂， 但关键动作还没稳定。
                 </p>
               )}
             </div>
@@ -1471,7 +1612,9 @@ function RecordingStep({
           {!lastAttempt.passed && lastAttempt.patterns.length === 0 && (
             <div className="mt-4 rounded-lg border bg-background p-3 text-left text-sm">
               <p className="font-semibold">下一次只改一个动作</p>
-              <p className="mt-1 text-primary">{lastAttempt.analysis.nextCue}</p>
+              <p className="mt-1 text-primary">
+                {lastAttempt.analysis.nextCue}
+              </p>
             </div>
           )}
           {deepCoach && <DeepPracticeCoachPanel coach={deepCoach} />}
@@ -1516,16 +1659,28 @@ function RecordingStep({
                     />
                   </div>
                   <WaveformDisplay audioBlob={audioBlob} stream={stream} />
-                  {audioBlob && !isRecording && !isAssessing && !remediationAttempt && (
-                    <Button
-                      onClick={() => onSubmitRemediationStep(remediation)}
-                      size="sm"
-                      className="mt-2 gap-2 cursor-pointer"
-                    >
-                      <Mic className="h-4 w-4" />
-                      给这一步评分
-                    </Button>
+                  {isAnalyzingQuality && (
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      正在检查录音质量...
+                    </p>
                   )}
+                  <div className="mt-2">
+                    <RecordingQualityPanel report={qualityReport} compact />
+                  </div>
+                  {audioBlob &&
+                    !isRecording &&
+                    !isAssessing &&
+                    !remediationAttempt && (
+                      <Button
+                        onClick={() => onSubmitRemediationStep(remediation)}
+                        disabled={scoreDisabled}
+                        size="sm"
+                        className="mt-2 gap-2 cursor-pointer"
+                      >
+                        <Mic className="h-4 w-4" />
+                        给这一步评分
+                      </Button>
+                    )}
                   {isAssessing && (
                     <p className="mt-2 text-xs text-muted-foreground">
                       正在检查补救动作...
@@ -1634,7 +1789,9 @@ function DeepPracticeCoachPanel({ coach }: { coach: DeepPracticeCoach }) {
           <p className="font-semibold">{coach.title}</p>
           <p className="mt-1 text-muted-foreground">{coach.diagnosis}</p>
         </div>
-        <Badge variant={coach.status === "stuck-prep" ? "destructive" : "secondary"}>
+        <Badge
+          variant={coach.status === "stuck-prep" ? "destructive" : "secondary"}
+        >
           深度练习
         </Badge>
       </div>
@@ -1660,7 +1817,10 @@ function DeepPracticeCoachPanel({ coach }: { coach: DeepPracticeCoach }) {
         </p>
         <div className="mt-2 grid gap-2 md:grid-cols-3">
           {coach.microDrill.map((step, index) => (
-            <div key={`${step.label}-${index}`} className="rounded-md bg-muted/40 p-2">
+            <div
+              key={`${step.label}-${step.text}`}
+              className="rounded-md bg-muted/40 p-2"
+            >
               <div className="flex items-center gap-2">
                 <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
                   {index + 1}
@@ -1710,7 +1870,9 @@ function CompletedStep({
   onStartLevel: (levelId: string) => void;
 }) {
   const nextLevel = summary.recommendedNextLevelId
-    ? pack.course?.levels.find((level) => level.id === summary.recommendedNextLevelId)
+    ? pack.course?.levels.find(
+        (level) => level.id === summary.recommendedNextLevelId,
+      )
     : null;
   const nextReview = loadMasteryProfile().packs[pack.id]?.nextReviewAt;
   const evidencePrompt = buildCoachSummaryPrompt(pack, summary, worstAttempt);
@@ -1727,36 +1889,45 @@ function CompletedStep({
           {summary.mastered ? "训练包已达标" : "训练完成，继续巩固"}
         </h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          听辨 {summary.perceptionCorrect}/{summary.perceptionTotal}，目标音素平均{" "}
-          {average(summary.targetScores)} 分，stuck{" "}
+          听辨 {summary.perceptionCorrect}/{summary.perceptionTotal}
+          ，目标音素平均 {average(summary.targetScores)} 分，stuck{" "}
           {summary.stuckPatternIds?.length ?? 0} 个。
         </p>
         <div className="mt-4 grid gap-2 md:grid-cols-3">
           <div className="rounded-lg border bg-background p-3">
             <p className="text-xs text-muted-foreground">失败证据</p>
-            <p className="text-lg font-bold">{summary.failedItems?.length ?? 0}</p>
+            <p className="text-lg font-bold">
+              {summary.failedItems?.length ?? 0}
+            </p>
           </div>
           <div className="rounded-lg border bg-background p-3">
             <p className="text-xs text-muted-foreground">补救步骤</p>
             <p className="text-lg font-bold">
-              {summary.remediationResults?.filter((item) => item.passed).length ?? 0}/
-              {summary.remediationResults?.length ?? 0}
+              {summary.remediationResults?.filter((item) => item.passed)
+                .length ?? 0}
+              /{summary.remediationResults?.length ?? 0}
             </p>
           </div>
           <div className="rounded-lg border bg-background p-3">
             <p className="text-xs text-muted-foreground">复习任务</p>
-            <p className="text-lg font-bold">{summary.reviewItems?.length ?? 0}</p>
+            <p className="text-lg font-bold">
+              {summary.reviewItems?.length ?? 0}
+            </p>
           </div>
         </div>
         {(summary.remediationResults?.length ?? 0) > 0 && (
           <div className="mt-3 rounded-lg border bg-background p-3 text-left text-sm">
             <p className="font-semibold">补救效果</p>
             <div className="mt-2 grid gap-2 md:grid-cols-2">
-              {summary.remediationResults?.slice(-4).map((item, index) => (
-                <div key={`${item.pathId}-${item.stepIndex}-${index}`} className="rounded-md bg-muted/40 p-2">
+              {summary.remediationResults?.slice(-4).map((item) => (
+                <div
+                  key={`${item.pathId}-${item.stepIndex}-${item.text}-${item.targetScore}`}
+                  className="rounded-md bg-muted/40 p-2"
+                >
                   <p className="font-medium">{item.text}</p>
                   <p className="text-xs text-muted-foreground">
-                    {item.beforeTargetScore} → {item.targetScore} · {item.passed ? "有效" : "继续拆解"}
+                    {item.beforeTargetScore} → {item.targetScore} ·{" "}
+                    {item.passed ? "有效" : "继续拆解"}
                   </p>
                 </div>
               ))}
@@ -1765,9 +1936,17 @@ function CompletedStep({
         )}
         <div className="mt-5 grid gap-2 md:grid-cols-4">
           {(summary.levelSummaries ?? []).map((level) => (
-            <div key={level.levelId} className="rounded-lg border bg-background p-3">
+            <div
+              key={level.levelId}
+              className="rounded-lg border bg-background p-3"
+            >
               <p className="text-xs text-muted-foreground">{level.kind}</p>
-              <p className={cn("font-bold", level.passed ? "text-primary" : "text-red-500")}>
+              <p
+                className={cn(
+                  "font-bold",
+                  level.passed ? "text-primary" : "text-red-500",
+                )}
+              >
                 {level.passed ? "通过" : "待加强"}
               </p>
               <p className="text-xs text-muted-foreground">
@@ -1785,7 +1964,9 @@ function CompletedStep({
               </p>
             </div>
             {debrief.nextLevelTitle && (
-              <Badge variant="secondary">下一关：{debrief.nextLevelTitle}</Badge>
+              <Badge variant="secondary">
+                下一关：{debrief.nextLevelTitle}
+              </Badge>
             )}
           </div>
           <p className="mt-3 text-sm font-medium text-primary">
@@ -1794,7 +1975,9 @@ function CompletedStep({
           <div className="mt-3 grid gap-2 md:grid-cols-3">
             {debrief.reviewPlan.map((step, index) => (
               <div key={step} className="rounded-md bg-muted/40 p-2 text-sm">
-                <span className="mr-2 font-semibold text-primary">{index + 1}</span>
+                <span className="mr-2 font-semibold text-primary">
+                  {index + 1}
+                </span>
                 <span className="text-muted-foreground">{step}</span>
               </div>
             ))}
@@ -1817,7 +2000,11 @@ function CompletedStep({
               </Button>
             </Link>
           )}
-          <Button variant="outline" onClick={onRestart} className="gap-2 cursor-pointer">
+          <Button
+            variant="outline"
+            onClick={onRestart}
+            className="gap-2 cursor-pointer"
+          >
             <RotateCcw className="h-4 w-4" />
             再练一轮
           </Button>
@@ -1907,7 +2094,12 @@ function ScoreTile({
       )}
     >
       <p className="text-xs text-muted-foreground">{label}</p>
-      <p className={cn("text-3xl font-bold", passed ? "text-primary" : "text-red-500")}>
+      <p
+        className={cn(
+          "text-3xl font-bold",
+          passed ? "text-primary" : "text-red-500",
+        )}
+      >
         {value}
       </p>
     </div>

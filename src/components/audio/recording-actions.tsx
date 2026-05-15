@@ -17,6 +17,8 @@ interface RecordingActionsProps {
   onReplay: () => void;
   onClear: () => void;
   onAssess: () => void;
+  assessDisabled?: boolean;
+  assessDisabledReason?: string;
 }
 
 const springTransition = {
@@ -64,8 +66,11 @@ export function RecordingActions({
   onReplay,
   onClear,
   onAssess,
+  assessDisabled = false,
+  assessDisabledReason = "当前录音暂时不能评分",
 }: RecordingActionsProps) {
   const disabled = !hasRecording;
+  const scoreDisabled = disabled || isAssessing || assessDisabled;
 
   const buttons = (
     <div className="flex items-center justify-center gap-4">
@@ -84,7 +89,7 @@ export function RecordingActions({
         <Trash2 className="h-5 w-5" />
       </ActionButton>
       <ActionButton
-        disabled={disabled || isAssessing}
+        disabled={scoreDisabled}
         onClick={onAssess}
         variant="primary"
       >
@@ -103,6 +108,17 @@ export function RecordingActions({
         <Tooltip>
           <TooltipTrigger render={<div />}>{buttons}</TooltipTrigger>
           <TooltipContent>请先开始录音哦</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    );
+  }
+
+  if (assessDisabled) {
+    return (
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger render={<div />}>{buttons}</TooltipTrigger>
+          <TooltipContent>{assessDisabledReason}</TooltipContent>
         </Tooltip>
       </TooltipProvider>
     );

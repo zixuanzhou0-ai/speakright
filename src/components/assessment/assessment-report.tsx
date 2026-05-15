@@ -9,13 +9,22 @@ import {
 } from "lucide-react";
 import { motion } from "motion/react";
 import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getDiagnosisSummary } from "@/lib/diagnosis-engine";
+import { loadMasteryProfile } from "@/lib/mastery-profile";
 import { getScoreBg } from "@/lib/score-utils";
 import { getTrainingPack } from "@/lib/training-packs";
+import { buildTrainingPrescription } from "@/lib/training-prescription";
 import { cn } from "@/lib/utils";
 import type { DiagnosisIssue, DiagnosisReport } from "@/types/diagnosis";
+import type {
+  MasteryProfile,
+  MasteryState,
+  MasteryTaskLayer,
+  TrainingPrescriptionItem,
+} from "@/types/training";
 import { PhonemeHealthMap } from "./phoneme-health-map";
 
 interface AssessmentReportProps {
@@ -23,12 +32,50 @@ interface AssessmentReportProps {
   onRetake: () => void;
 }
 
+const MASTERY_STATE_LABELS: Record<MasteryState, string> = {
+  unknown: "未建档",
+  suspected: "疑似弱点",
+  learning: "正在建立",
+  controlled: "可控",
+  integrated: "句中整合",
+  retained: "已保持",
+  transferred: "已迁移",
+};
+
+const LAYER_LABELS: Record<MasteryTaskLayer, string> = {
+  isolated: "单音动作",
+  perception: "听辨",
+  articulation: "发音动作",
+  word: "单词控制",
+  sentence: "句子整合",
+  connected: "自然语流",
+  guided: "半自由表达",
+  spontaneous: "自由表达",
+};
+
 export function AssessmentReport({ result, onRetake }: AssessmentReportProps) {
+  const [profile, setProfile] = useState<MasteryProfile | null>(null);
+  useEffect(() => {
+    setProfile(loadMasteryProfile());
+  }, []);
+
+  const displayPrescription = useMemo(
+    () =>
+      profile
+        ? buildTrainingPrescription(result.issues, "diagnosis", profile)
+        : result.prescription,
+    [profile, result],
+  );
+  const prescriptionItems = displayPrescription.days.flatMap(
+    (day) => day.items,
+  );
   const dims = result.dimensions;
   const primaryPackId =
-    result.issues[0]?.nextLesson?.packId ?? result.prescription.days[0]?.items[0]?.packId;
+    result.issues[0]?.nextLesson?.packId ??
+    displayPrescription.days[0]?.items[0]?.packId;
   const primaryLevelId =
-    result.issues[0]?.nextLesson?.levelId ?? result.prescription.days[0]?.items[0]?.levelId;
+    result.issues[0]?.nextLesson?.levelId ??
+    displayPrescription.days[0]?.items[0]?.levelId;
   const primaryPack = primaryPackId ? getTrainingPack(primaryPackId) : null;
   const primaryHref = primaryPack
     ? `/drill/pack/${primaryPack.id}${
@@ -62,14 +109,37 @@ export function AssessmentReport({ result, onRetake }: AssessmentReportProps) {
           <div className="space-y-4">
             <div>
               <Badge variant="secondary" className="mb-2">
-                诊断 + 训练处方
+                {result.source === "coverage-passage"
+                  ? "全音覆盖朗读诊断"
+                  : "诊断 + 训练处方"}
               </Badge>
               <h2 className="text-xl font-bold">
                 {getDiagnosisSummary(result)}
               </h2>
               <p className="mt-2 text-sm text-muted-foreground">
-                报告基于基础筛查、短文朗读和必要的自适应补测生成。先处理最影响清晰度的问题，再按处方进入训练包。
+                {result.source === "coverage-passage"
+                  ? "报告基于覆盖短文、多段语流和必要补测生成。它更适合做阶段性体检，先处理最影响清晰度和自然度的问题。"
+                  : "报告基于基础筛查、短文朗读和必要的自适应补测生成。先处理最影响清晰度的问题，再按处方进入训练包。"}
               </p>
+              {result.evidenceSummary && (
+                <div className="mt-3 flex flex-wrap gap-1.5">
+                  <Badge variant="outline">
+                    总证据 {result.evidenceSummary.overallStrength}
+                  </Badge>
+                  <Badge variant="outline">
+                    可用录音 {result.evidenceSummary.usableRecordings}
+                  </Badge>
+                  {result.evidenceSummary.invalidRecordings > 0 && (
+                    <Badge variant="destructive">
+                      无效录音 {result.evidenceSummary.invalidRecordings}
+                    </Badge>
+                  )}
+                  {result.evidenceSummary.recommendedAction ===
+                    "request-more-samples" && (
+                    <Badge variant="secondary">建议补测薄弱证据</Badge>
+                  )}
+                </div>
+              )}
             </div>
             <div className="flex flex-wrap gap-2">
               {result.issues.slice(0, 3).map((issue) => (
@@ -104,13 +174,23 @@ export function AssessmentReport({ result, onRetake }: AssessmentReportProps) {
           <div className="flex items-center gap-2">
             <Target className="h-4 w-4 text-primary" />
             <h2 className="text-sm font-semibold text-muted-foreground">
-              Top 3 发音问题
+              Top 3 学习处方
             </h2>
           </div>
           <div className="grid gap-3 md:grid-cols-3">
-            {result.issues.slice(0, 3).map((issue) => (
-              <IssueCard key={issue.id} issue={issue} />
-            ))}
+            {result.issues.slice(0, 3).map((issue) => {
+              const prescriptionItem = prescriptionItems.find((item) =>
+                issue.recommendedPackIds.includes(item.packId),
+              );
+              return (
+                <IssueCard
+                  key={issue.id}
+                  issue={issue}
+                  prescriptionItem={prescriptionItem}
+                  profile={profile}
+                />
+              );
+            })}
           </div>
         </motion.div>
       )}
@@ -184,9 +264,9 @@ export function AssessmentReport({ result, onRetake }: AssessmentReportProps) {
             诊断证据
           </h2>
           <div className="grid gap-2 md:grid-cols-2">
-            {result.rawEvidence.slice(0, 8).map((entry, index) => (
+            {result.rawEvidence.slice(0, 8).map((entry) => (
               <div
-                key={`${entry.text}-${entry.detail}-${index}`}
+                key={`${entry.source}-${entry.text}-${entry.detail}-${entry.score}`}
                 className="flex items-start justify-between gap-3 rounded-lg bg-muted/40 px-3 py-2"
               >
                 <div>
@@ -222,7 +302,7 @@ export function AssessmentReport({ result, onRetake }: AssessmentReportProps) {
           </h2>
         </div>
         <div className="grid gap-3 md:grid-cols-4">
-          {result.prescription.days.map((day) => (
+          {displayPrescription.days.map((day) => (
             <div key={day.day} className="rounded-lg bg-muted/40 p-3">
               <div className="mb-2 flex items-center gap-2">
                 <CalendarDays className="h-4 w-4 text-primary" />
@@ -236,7 +316,9 @@ export function AssessmentReport({ result, onRetake }: AssessmentReportProps) {
                     <Link
                       key={`${day.day}-${item.packId}`}
                       href={`/drill/pack/${item.packId}${
-                        item.levelId ? `?level=${encodeURIComponent(item.levelId)}` : ""
+                        item.levelId
+                          ? `?level=${encodeURIComponent(item.levelId)}`
+                          : ""
                       }`}
                       className="block rounded-md bg-background px-3 py-2 text-sm transition-colors hover:bg-primary/10"
                     >
@@ -244,6 +326,11 @@ export function AssessmentReport({ result, onRetake }: AssessmentReportProps) {
                       <span className="mt-0.5 block text-xs text-muted-foreground">
                         {item.estimatedMinutes} 分钟 · {item.priority}
                       </span>
+                      {item.learningObjective && (
+                        <span className="mt-1 block text-xs text-muted-foreground">
+                          {item.learningObjective}
+                        </span>
+                      )}
                     </Link>
                   );
                 })}
@@ -273,9 +360,35 @@ export function AssessmentReport({ result, onRetake }: AssessmentReportProps) {
   );
 }
 
-function IssueCard({ issue }: { issue: DiagnosisIssue }) {
-  const packId = issue.recommendedPackIds[0];
+function IssueCard({
+  issue,
+  prescriptionItem,
+  profile,
+}: {
+  issue: DiagnosisIssue;
+  prescriptionItem?: TrainingPrescriptionItem;
+  profile?: MasteryProfile | null;
+}) {
+  const packId = prescriptionItem?.packId ?? issue.recommendedPackIds[0];
   const pack = packId ? getTrainingPack(packId) : null;
+  const mastery = packId ? profile?.packs[packId] : undefined;
+  const masteryState: MasteryState =
+    prescriptionItem?.currentMasteryState ??
+    mastery?.masteryState ??
+    "suspected";
+  const nextLayer =
+    prescriptionItem?.nextRequiredLayer ?? mastery?.nextRequiredLayer;
+  const stageScore = prescriptionItem?.stageScore ?? mastery?.stageScore;
+  const stageCeiling = prescriptionItem?.stageCeiling ?? mastery?.stageCeiling;
+  const levelId = prescriptionItem?.levelId ?? issue.nextLesson?.levelId;
+  const levelTitle =
+    pack?.course?.levels.find((level) => level.id === levelId)?.title ??
+    levelId;
+  const packHref = pack
+    ? `/drill/pack/${pack.id}${
+        levelId ? `?level=${encodeURIComponent(levelId)}` : ""
+      }`
+    : "/drill";
 
   return (
     <div
@@ -302,6 +415,17 @@ function IssueCard({ issue }: { issue: DiagnosisIssue }) {
       <p className="text-sm text-muted-foreground">{issue.impact}</p>
       <p className="mt-3 text-sm font-medium">{issue.fixCue}</p>
       <div className="mt-3 flex flex-wrap gap-1.5">
+        <Badge variant="outline">
+          阶段 {MASTERY_STATE_LABELS[masteryState]}
+        </Badge>
+        {nextLayer && (
+          <Badge variant="outline">下一层 {LAYER_LABELS[nextLayer]}</Badge>
+        )}
+        {stageScore != null && stageCeiling != null && (
+          <Badge variant="outline">
+            阶段分 {stageScore}/{stageCeiling}
+          </Badge>
+        )}
         {issue.confidence && (
           <Badge variant="outline">置信度 {issue.confidence}</Badge>
         )}
@@ -314,12 +438,26 @@ function IssueCard({ issue }: { issue: DiagnosisIssue }) {
           </Badge>
         ))}
       </div>
-      {issue.nextLesson && (
+      {(prescriptionItem?.learningObjective || levelTitle) && (
         <div className="mt-3 rounded-lg border border-primary/20 bg-primary/5 p-2 text-xs">
           <p className="font-semibold text-primary">
-            下一关：{issue.nextLesson.levelId}
+            今天从：{levelTitle ?? "训练处方"}
           </p>
-          <p className="mt-1 text-muted-foreground">{issue.nextLesson.reason}</p>
+          {prescriptionItem?.learningObjective && (
+            <p className="mt-1 text-muted-foreground">
+              {prescriptionItem.learningObjective}
+            </p>
+          )}
+          {issue.nextLesson?.reason && !prescriptionItem?.learningObjective && (
+            <p className="mt-1 text-muted-foreground">
+              {issue.nextLesson.reason}
+            </p>
+          )}
+          {prescriptionItem?.stageReason && (
+            <p className="mt-1 text-muted-foreground">
+              {prescriptionItem.stageReason}
+            </p>
+          )}
         </div>
       )}
       {issue.evidence[0] && (
@@ -332,16 +470,9 @@ function IssueCard({ issue }: { issue: DiagnosisIssue }) {
         </div>
       )}
       {pack && (
-        <Link
-          href={`/drill/pack/${pack.id}${
-            issue.nextLesson?.levelId
-              ? `?level=${encodeURIComponent(issue.nextLesson.levelId)}`
-              : ""
-          }`}
-          className="mt-3 inline-flex"
-        >
+        <Link href={packHref} className="mt-3 inline-flex">
           <Button size="sm" variant="outline" className="gap-2 cursor-pointer">
-            进入训练包
+            进入这一关
             <ArrowRight className="h-3.5 w-3.5" />
           </Button>
         </Link>

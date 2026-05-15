@@ -23,7 +23,7 @@ export interface CourseAttemptSnapshot {
 export function shouldAppendPerceptionReview(
   correct: number,
   total: number,
-  requiredRate = 0.8,
+  requiredRate = 0.85,
 ): boolean {
   return total > 0 && correct / total < requiredRate;
 }
@@ -56,7 +56,11 @@ export function hasLevelPassed(
     const average =
       snapshot.scores.reduce((sum, score) => sum + score, 0) /
       snapshot.scores.length;
-    return average >= rule.minAverageScore;
+    if (average < rule.minAverageScore) return false;
+    if (rule.requiredPasses != null) {
+      return snapshot.passedCount >= rule.requiredPasses;
+    }
+    return true;
   }
   if (rule.requiredPasses != null) {
     return snapshot.passedCount >= rule.requiredPasses;

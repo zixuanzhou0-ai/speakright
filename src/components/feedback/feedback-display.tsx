@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, MessageSquareText } from "lucide-react";
+import { ChevronDown, Dumbbell, MessageSquareText } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
@@ -92,7 +92,11 @@ export function FeedbackDisplay({
     );
   }
 
-  const hasContent = feedback.summary || feedback.topIssues || isStreaming;
+  const hasContent =
+    feedback.summary ||
+    feedback.topIssues ||
+    feedback.practiceNow ||
+    isStreaming;
 
   if (!hasContent) return null;
 
@@ -133,6 +137,23 @@ export function FeedbackDisplay({
                   <span>{line.replace(/^-\s*/, "")}</span>
                 </div>
               ))}
+          </div>
+        )}
+
+        {feedback.practiceNow && (
+          <div className="mt-4 rounded-lg border border-primary/20 bg-primary/5 p-4">
+            <div className="mb-2 flex items-center gap-2">
+              <Dumbbell className="h-4 w-4 text-primary" />
+              <h4 className="text-sm font-semibold">马上练 3 次</h4>
+            </div>
+            <div className="prose prose-sm dark:prose-invert max-w-none prose-p:my-1.5 prose-li:my-1 prose-strong:text-primary">
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                components={markdownComponents}
+              >
+                {feedback.practiceNow}
+              </ReactMarkdown>
+            </div>
           </div>
         )}
 

@@ -2,8 +2,10 @@
 
 import { RecordButton } from "@/components/audio/record-button";
 import { RecordingActions } from "@/components/audio/recording-actions";
+import { RecordingQualityPanel } from "@/components/audio/recording-quality-panel";
 import { WaveformDisplay } from "@/components/audio/waveform-display";
 import { ScoreSummary } from "@/components/scoring/score-summary";
+import type { RecordingQualityReport } from "@/lib/recording-quality";
 import { isSentence } from "@/lib/utils";
 import type { AzureAssessmentResult } from "@/types/azure";
 
@@ -15,6 +17,8 @@ interface SentenceRecordingCardProps {
   maxDurationSeconds: number;
   audioBlob: Blob | null;
   stream: MediaStream | null;
+  qualityReport: RecordingQualityReport | null;
+  isAnalyzingQuality?: boolean;
   recorderError: string | null;
   onRecordStart: () => void;
   onRecordStop: () => void;
@@ -36,6 +40,8 @@ export function SentenceRecordingCard({
   maxDurationSeconds,
   audioBlob,
   stream,
+  qualityReport,
+  isAnalyzingQuality = false,
   recorderError,
   onRecordStart,
   onRecordStop,
@@ -50,6 +56,11 @@ export function SentenceRecordingCard({
   const remaining = maxDurationSeconds - elapsedSeconds;
   const progressPct = (elapsedSeconds / maxDurationSeconds) * 100;
   const trimmed = sentence.trim();
+  const assessDisabled =
+    !!audioBlob && (isAnalyzingQuality || qualityReport?.canSubmit === false);
+  const assessDisabledReason = isAnalyzingQuality
+    ? "录音质量检查完成后再评分"
+    : "这段录音无效，请先重录";
 
   return (
     <div className="shrink-0 rounded-xl border bg-card px-4 py-4 shadow-sm">
@@ -85,6 +96,12 @@ export function SentenceRecordingCard({
 
         <WaveformDisplay audioBlob={audioBlob} stream={stream} />
 
+        {isAnalyzingQuality && (
+          <p className="text-xs text-muted-foreground">正在检查录音质量...</p>
+        )}
+
+        <RecordingQualityPanel report={qualityReport} />
+
         <RecordingActions
           hasRecording={!!audioBlob && !isRecording}
           isPlaying={isPlaying}
@@ -92,6 +109,8 @@ export function SentenceRecordingCard({
           onReplay={onReplay}
           onClear={onClear}
           onAssess={onAssess}
+          assessDisabled={assessDisabled}
+          assessDisabledReason={assessDisabledReason}
         />
 
         {recorderError && (

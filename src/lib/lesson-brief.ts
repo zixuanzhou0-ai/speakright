@@ -5,6 +5,7 @@ import type {
   TrainingPack,
   TrainingSessionSummary,
 } from "@/types/training";
+import { resolveCourseStartGate } from "./course-gates";
 import { TRAINING_ERROR_PATTERNS } from "./training-error-patterns";
 
 export interface LessonRisk {
@@ -46,21 +47,18 @@ interface LessonBriefInput {
 }
 
 function levelTitle(pack: TrainingPack, levelId: string): string {
-  return pack.course?.levels.find((level) => level.id === levelId)?.title ?? levelId;
+  return (
+    pack.course?.levels.find((level) => level.id === levelId)?.title ?? levelId
+  );
 }
 
-function isKnownLevel(pack: TrainingPack, levelId?: string | null): levelId is string {
-  return !!levelId && !!pack.course?.levels.some((level) => level.id === levelId);
-}
-
-function firstLevelId(pack: TrainingPack): string {
-  return pack.course?.levels[0]?.id ?? "perception-abx";
-}
-
-function firstUnpassedLevel(pack: TrainingPack, profile?: MasteryProfile | null): string | null {
-  const progress = profile?.packs[pack.id]?.levelProgress;
-  if (!progress || !pack.course) return null;
-  return pack.course.levels.find((level) => !progress[level.id]?.passed)?.id ?? null;
+function isKnownLevel(
+  pack: TrainingPack,
+  levelId?: string | null,
+): levelId is string {
+  return (
+    !!levelId && !!pack.course?.levels.some((level) => level.id === levelId)
+  );
 }
 
 function matchingReviewTask(
@@ -68,7 +66,9 @@ function matchingReviewTask(
   reviewQueue?: ReviewQueueItem[],
 ): ReviewQueueItem | undefined {
   return reviewQueue
-    ?.filter((task) => task.packId === pack.id && isKnownLevel(pack, task.levelId))
+    ?.filter(
+      (task) => task.packId === pack.id && isKnownLevel(pack, task.levelId),
+    )
     .sort((a, b) => a.dueAt - b.dueAt)[0];
 }
 
@@ -79,31 +79,21 @@ function latestSession(
   return profile?.sessions.find((session) => session.packId === pack.id);
 }
 
-function chooseStartLevel(
-  pack: TrainingPack,
-  requestedLevelId?: string | null,
-  profile?: MasteryProfile | null,
-  reviewQueue?: ReviewQueueItem[],
-): string {
-  if (isKnownLevel(pack, requestedLevelId)) return requestedLevelId;
-  const reviewTask = matchingReviewTask(pack, reviewQueue);
-  if (reviewTask) return reviewTask.levelId;
-  const recent = latestSession(pack, profile);
-  if (isKnownLevel(pack, recent?.recommendedNextLevelId)) {
-    return recent.recommendedNextLevelId;
-  }
-  return firstUnpassedLevel(pack, profile) ?? firstLevelId(pack);
-}
-
 function lessonReason(
   pack: TrainingPack,
   startLevelId: string,
+  gateReason?: string,
+  redirected = false,
   requestedLevelId?: string | null,
   profile?: MasteryProfile | null,
   reviewQueue?: ReviewQueueItem[],
 ): string {
+  if (redirected && gateReason) return gateReason;
   if (requestedLevelId === startLevelId) {
-    return `这次按处方直接进入「${levelTitle(pack, startLevelId)}」，少绕路，先处理最具体的训练点。`;
+    return (
+      gateReason ??
+      `这次按处方直接进入「${levelTitle(pack, startLevelId)}」，少绕路，先处理最具体的训练点。`
+    );
   }
   const reviewTask = matchingReviewTask(pack, reviewQueue);
   if (reviewTask?.levelId === startLevelId) return reviewTask.reason;
@@ -134,8 +124,13 @@ function activePatterns(
 ): ErrorPattern[] {
   return Object.entries(profile?.errorPatterns ?? {})
     .filter(([, mastery]) => mastery.status !== "cleared")
-    .sort(([, a], [, b]) => b.stuckCount + b.seenCount - (a.stuckCount + a.seenCount))
-    .map(([patternId]) => TRAINING_ERROR_PATTERNS.find((pattern) => pattern.id === patternId))
+    .sort(
+      ([, a], [, b]) =>
+        b.stuckCount + b.seenCount - (a.stuckCount + a.seenCount),
+    )
+    .map(([patternId]) =>
+      TRAINING_ERROR_PATTERNS.find((pattern) => pattern.id === patternId),
+    )
     .filter(
       (pattern): pattern is ErrorPattern =>
         !!pattern && pattern.appliesToPackIds.includes(pack.id),
@@ -146,14 +141,18 @@ function coursePatterns(pack: TrainingPack): ErrorPattern[] {
   return pack.course?.errorPatterns ?? [];
 }
 
-function buildRisks(pack: TrainingPack, profile?: MasteryProfile | null): LessonRisk[] {
+function buildRisks(
+  pack: TrainingPack,
+  profile?: MasteryProfile | null,
+): LessonRisk[] {
   const active = activePatterns(pack, profile);
   const merged = new Map<string, { pattern: ErrorPattern; active: boolean }>();
   for (const pattern of active) {
     merged.set(pattern.id, { pattern, active: true });
   }
   for (const pattern of coursePatterns(pack)) {
-    if (!merged.has(pattern.id)) merged.set(pattern.id, { pattern, active: false });
+    if (!merged.has(pattern.id))
+      merged.set(pattern.id, { pattern, active: false });
   }
   return Array.from(merged.values())
     .slice(0, 3)
@@ -166,7 +165,10 @@ function buildRisks(pack: TrainingPack, profile?: MasteryProfile | null): Lesson
     }));
 }
 
-function successCriteria(pack: TrainingPack, startLevelTitle: string): string[] {
+function successCriteria(
+  pack: TrainingPack,
+  startLevelTitle: string,
+): string[] {
   return [
     `本轮从「${startLevelTitle}」开始，不追求快，先追目标动作稳定。`,
     `目标音素达到 ${pack.masteryRule.targetPassScore} 分以上才算过线，整词分只做辅助参考。`,
@@ -188,16 +190,27 @@ export function buildLessonBrief({
   profile,
   reviewQueue,
 }: LessonBriefInput): LessonBrief {
-  const startLevelId = chooseStartLevel(
+  const gate = resolveCourseStartGate({
     pack,
     requestedLevelId,
     profile,
     reviewQueue,
-  );
+  });
+  const reviewTask = matchingReviewTask(pack, reviewQueue);
+  const recent = latestSession(pack, profile);
+  const startLevelId =
+    !gate.requestedLevelId && reviewTask
+      ? reviewTask.levelId
+      : !gate.requestedLevelId &&
+          isKnownLevel(pack, recent?.recommendedNextLevelId)
+        ? recent.recommendedNextLevelId
+        : gate.effectiveLevelId;
   const startLevelTitle = levelTitle(pack, startLevelId);
   const reason = lessonReason(
     pack,
     startLevelId,
+    gate.reason,
+    gate.redirected,
     requestedLevelId,
     profile,
     reviewQueue,
@@ -225,7 +238,9 @@ export function buildSessionDebrief(
   const failedCount = summary.failedItems?.length ?? 0;
   const stuckCount = summary.stuckPatternIds?.length ?? 0;
   const nextLevel = summary.recommendedNextLevelId
-    ? pack.course?.levels.find((level) => level.id === summary.recommendedNextLevelId)
+    ? pack.course?.levels.find(
+        (level) => level.id === summary.recommendedNextLevelId,
+      )
     : undefined;
   const averageTarget =
     summary.targetScores.length > 0
@@ -239,13 +254,19 @@ export function buildSessionDebrief(
     return {
       headline: "本轮已经进入可复习状态",
       mainFinding: `平均目标音 ${averageTarget} 分，已经满足本训练包的掌握规则。`,
-      nextActionReason: "下一步不是继续硬刷，而是按间隔复习防止回到旧发音习惯。",
-      reviewPlan: ["24 小时后做一次短复测", "复习仍过线再延长到 3 天", "复习失败就回到本轮最低分关卡"],
+      nextActionReason:
+        "下一步不是继续硬刷，而是按间隔复习防止回到旧发音习惯。",
+      reviewPlan: [
+        "24 小时后做一次短复测",
+        "复习仍过线再延长到 3 天",
+        "复习失败就回到本轮最低分关卡",
+      ],
     };
   }
 
   return {
-    headline: stuckCount > 0 ? "本轮最大的价值是定位了卡点" : "本轮还需要补一层稳定性",
+    headline:
+      stuckCount > 0 ? "本轮最大的价值是定位了卡点" : "本轮还需要补一层稳定性",
     mainFinding:
       failedCount > 0
         ? `留下 ${failedCount} 条失败证据，说明问题已经具体到词和动作。`

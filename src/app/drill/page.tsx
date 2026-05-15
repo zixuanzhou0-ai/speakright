@@ -2,13 +2,16 @@
 
 import {
   AlertTriangle,
+  AudioLines,
   BookOpen,
+  BriefcaseBusiness,
   CalendarClock,
   CheckCircle2,
   ClipboardList,
   GitCompareArrows,
   Headphones,
   MessageSquareText,
+  PanelsTopLeft,
   Target,
   TrendingUp,
 } from "lucide-react";
@@ -17,18 +20,15 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  isReviewDue,
-  loadMasteryProfile,
-} from "@/lib/mastery-profile";
+import { isReviewDue, loadMasteryProfile } from "@/lib/mastery-profile";
+import { buildReviewQueue } from "@/lib/review-queue";
+import { buildTrainingMemory } from "@/lib/training-memory";
+import { TRAINING_PACKS } from "@/lib/training-packs";
 import {
   buildDefaultPrescription,
   buildTrainingPrescription,
 } from "@/lib/training-prescription";
-import { TRAINING_PACKS } from "@/lib/training-packs";
 import { cn } from "@/lib/utils";
-import { buildReviewQueue } from "@/lib/review-queue";
-import { buildTrainingMemory } from "@/lib/training-memory";
 import type { DiagnosisReport } from "@/types/diagnosis";
 import type {
   MasteryProfile,
@@ -38,6 +38,19 @@ import type {
 } from "@/types/training";
 
 const REPORT_STORAGE_KEY = "speakright_assessment_result_v2";
+
+const STATE_LABELS = {
+  unknown: "未建档",
+  suspected: "疑似弱点",
+  learning: "正在建立",
+  controlled: "可控",
+  integrated: "句中整合",
+  retained: "已保持",
+  transferred: "已迁移",
+} satisfies Record<
+  NonNullable<TrainingPrescriptionItem["currentMasteryState"]>,
+  string
+>;
 
 const FREE_MODES = [
   {
@@ -61,8 +74,26 @@ const FREE_MODES = [
   {
     href: "/drill/perception",
     icon: Headphones,
-    title: "辨音训练",
-    description: "ABX 听音辨别，先听准再说准",
+    title: "高变异听辨",
+    description: "多说话人 ABX，建立英语听觉边界",
+  },
+  {
+    href: "/drill/prosody",
+    icon: AudioLines,
+    title: "韵律重音",
+    description: "内容词突出、弱读、停顿和连读",
+  },
+  {
+    href: "/drill/scenarios",
+    icon: BriefcaseBusiness,
+    title: "场景迁移",
+    description: "把弱点迁移到面试、会议和表达",
+  },
+  {
+    href: "/progress",
+    icon: PanelsTopLeft,
+    title: "进步档案",
+    description: "复测记录、before/after 和阶段变化",
   },
 ];
 
@@ -77,7 +108,10 @@ function loadReport(): DiagnosisReport | null {
 }
 
 function levelTitle(pack: TrainingPack, levelId?: string): string {
-  return pack.course?.levels.find((level) => level.id === levelId)?.title ?? "听辨 ABX";
+  return (
+    pack.course?.levels.find((level) => level.id === levelId)?.title ??
+    "听辨 ABX"
+  );
 }
 
 function packHref(packId: string, levelId?: string): string {
@@ -90,7 +124,9 @@ function packTitleFromId(packId: string): string {
   return TRAINING_PACKS.find((pack) => pack.id === packId)?.title ?? packId;
 }
 
-function prescriptionFromReviewTask(task: ReviewQueueItem): TrainingPrescriptionItem {
+function prescriptionFromReviewTask(
+  task: ReviewQueueItem,
+): TrainingPrescriptionItem {
   const pack = TRAINING_PACKS.find((item) => item.id === task.packId);
   return {
     packId: task.packId,
@@ -132,7 +168,11 @@ export default function DrillPage() {
   const recommendedIds = useMemo(
     () =>
       Array.from(
-        new Set(prescription.days.flatMap((day) => day.items.map((item) => item.packId))),
+        new Set(
+          prescription.days.flatMap((day) =>
+            day.items.map((item) => item.packId),
+          ),
+        ),
       ),
     [prescription],
   );
@@ -151,7 +191,8 @@ export default function DrillPage() {
   const todayItems = [
     ...reviewItems,
     ...(prescription.days[0]?.items ?? []).filter(
-      (item) => !reviewItems.some((reviewItem) => reviewItem.packId === item.packId),
+      (item) =>
+        !reviewItems.some((reviewItem) => reviewItem.packId === item.packId),
     ),
   ].slice(0, 2);
 
@@ -197,7 +238,9 @@ export default function DrillPage() {
         {reviewQueue.length > 0 && (
           <div className="mb-4 grid gap-2 md:grid-cols-2">
             {reviewQueue.slice(0, 2).map((task) => {
-              const pack = TRAINING_PACKS.find((item) => item.id === task.packId);
+              const pack = TRAINING_PACKS.find(
+                (item) => item.id === task.packId,
+              );
               if (!pack) return null;
               return (
                 <Link key={task.id} href={packHref(task.packId, task.levelId)}>
@@ -208,7 +251,9 @@ export default function DrillPage() {
                         {sourceLabel(task.source)}
                       </Badge>
                     </div>
-                    <p className="mt-1 text-xs text-muted-foreground">{task.reason}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {task.reason}
+                    </p>
                   </div>
                 </Link>
               );
@@ -230,13 +275,34 @@ export default function DrillPage() {
                 >
                   <div className="flex items-center justify-between gap-3">
                     <h3 className="font-bold">{pack.title}</h3>
-                    <Badge variant={item.priority === "critical" ? "destructive" : "outline"}>
+                    <Badge
+                      variant={
+                        item.priority === "critical" ? "destructive" : "outline"
+                      }
+                    >
                       {item.estimatedMinutes} 分钟
                     </Badge>
+                  </div>
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {item.currentMasteryState && (
+                      <Badge variant="secondary">
+                        {STATE_LABELS[item.currentMasteryState]}
+                      </Badge>
+                    )}
+                    {item.stageScore != null && item.stageCeiling != null && (
+                      <Badge variant="outline">
+                        阶段 {item.stageScore}/{item.stageCeiling}
+                      </Badge>
+                    )}
                   </div>
                   <p className="mt-2 text-sm text-muted-foreground">
                     {item.reason}
                   </p>
+                  {item.learningObjective && (
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      今天只做：{item.learningObjective}
+                    </p>
+                  )}
                   <p className="mt-3 text-sm font-medium text-primary">
                     目标：{pack.focus}
                     {` · 从 ${levelTitle(pack, item.levelId)} 开始`}
@@ -257,7 +323,13 @@ export default function DrillPage() {
                 训练记忆
               </h2>
             </div>
-            <Badge variant={trainingMemory.activeWeaknesses.length > 0 ? "secondary" : "outline"}>
+            <Badge
+              variant={
+                trainingMemory.activeWeaknesses.length > 0
+                  ? "secondary"
+                  : "outline"
+              }
+            >
               {trainingMemory.totalSessions} 轮记录
             </Badge>
           </div>
@@ -265,11 +337,15 @@ export default function DrillPage() {
           <div className="mb-4 grid grid-cols-2 gap-2 md:grid-cols-4">
             <div className="rounded-lg border bg-background px-3 py-2">
               <p className="text-xs text-muted-foreground">已练专项</p>
-              <p className="text-lg font-bold">{trainingMemory.practicedPacks}</p>
+              <p className="text-lg font-bold">
+                {trainingMemory.practicedPacks}
+              </p>
             </div>
             <div className="rounded-lg border bg-background px-3 py-2">
               <p className="text-xs text-muted-foreground">已掌握</p>
-              <p className="text-lg font-bold">{trainingMemory.masteredPacks}</p>
+              <p className="text-lg font-bold">
+                {trainingMemory.masteredPacks}
+              </p>
             </div>
             <div className="rounded-lg border bg-background px-3 py-2">
               <p className="text-xs text-muted-foreground">待复习</p>
@@ -295,7 +371,9 @@ export default function DrillPage() {
                   <div className="rounded-lg border bg-background p-3 transition-colors hover:border-primary/50 cursor-pointer">
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <p className="text-sm font-semibold">{weakness.title}</p>
+                        <p className="text-sm font-semibold">
+                          {weakness.title}
+                        </p>
                         <p className="mt-1 text-xs text-muted-foreground">
                           {weakness.packTitle} · {weakness.reason}
                         </p>
@@ -336,17 +414,23 @@ export default function DrillPage() {
               return (
                 <div key={window.id}>
                   <div className="mb-1 flex items-center justify-between text-xs">
-                    <span className="text-muted-foreground">{window.label}</span>
+                    <span className="text-muted-foreground">
+                      {window.label}
+                    </span>
                     <span className="font-medium">
                       {window.count} 项
-                      {window.priorityCount > 0 ? ` · ${window.priorityCount} 个重点` : ""}
+                      {window.priorityCount > 0
+                        ? ` · ${window.priorityCount} 个重点`
+                        : ""}
                     </span>
                   </div>
                   <div className="h-2 rounded-full bg-muted">
                     <div
                       className={cn(
                         "h-2 rounded-full",
-                        window.priorityCount > 0 ? "bg-primary" : "bg-muted-foreground/40",
+                        window.priorityCount > 0
+                          ? "bg-primary"
+                          : "bg-muted-foreground/40",
                       )}
                       style={{ width: `${width}%` }}
                     />
@@ -368,9 +452,7 @@ export default function DrillPage() {
               </p>
             </div>
             {trainingMemory.recentTrend.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                暂无趋势数据
-              </p>
+              <p className="text-sm text-muted-foreground">暂无趋势数据</p>
             ) : (
               <div className="space-y-2">
                 {trainingMemory.recentTrend.map((point) => (
@@ -381,7 +463,9 @@ export default function DrillPage() {
                       </span>
                       <span className="font-medium">
                         {point.averageTargetScore}
-                        {point.stuckCount > 0 ? ` · 卡 ${point.stuckCount}` : ""}
+                        {point.stuckCount > 0
+                          ? ` · 卡 ${point.stuckCount}`
+                          : ""}
                       </span>
                     </div>
                     <div className="h-1.5 rounded-full bg-muted">
@@ -442,7 +526,7 @@ export default function DrillPage() {
         <h2 className="mb-3 text-sm font-semibold text-muted-foreground">
           自由专项
         </h2>
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
           {FREE_MODES.map((mode) => (
             <Link key={mode.href} href={mode.href}>
               <div className="h-full rounded-xl border bg-card p-4 shadow-sm transition-colors hover:border-primary/50 cursor-pointer">
@@ -473,7 +557,9 @@ function PackCard({
 }) {
   const mastery = profile?.packs[pack.id];
   const due = isReviewDue(mastery);
-  const status = due ? "due" : mastery?.status ?? (recommended ? "recommended" : "new");
+  const status = due
+    ? "due"
+    : (mastery?.status ?? (recommended ? "recommended" : "new"));
   const levels = pack.course?.levels ?? [];
   const passedLevels = levels.filter(
     (level) => mastery?.levelProgress[level.id]?.passed,
@@ -549,8 +635,7 @@ function PackCard({
         {mastery && (
           <p className="mt-3 text-xs text-muted-foreground">
             最佳目标音素分 {mastery.bestTargetScore} · 完成{" "}
-            {mastery.completedSessions} 轮
-            {due ? " · 到期复习" : ""}
+            {mastery.completedSessions} 轮{due ? " · 到期复习" : ""}
           </p>
         )}
         {activePattern && (

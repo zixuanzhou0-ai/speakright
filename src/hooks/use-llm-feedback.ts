@@ -9,6 +9,7 @@ import type { AzureAssessmentResult } from "@/types/azure";
 export interface FeedbackData {
   summary: string;
   topIssues: string;
+  practiceNow: string;
   priorityFixes: string;
   dimensions: string;
   details: string;
@@ -17,12 +18,13 @@ export interface FeedbackData {
 const EMPTY_FEEDBACK: FeedbackData = {
   summary: "",
   topIssues: "",
+  practiceNow: "",
   priorityFixes: "",
   dimensions: "",
   details: "",
 };
 
-function parseFeedback(raw: string, streaming: boolean): FeedbackData {
+export function parseFeedback(raw: string, streaming: boolean): FeedbackData {
   const extract = (tag: string): string => {
     const openTag = `<${tag}>`;
     const closeTag = `</${tag}>`;
@@ -40,6 +42,7 @@ function parseFeedback(raw: string, streaming: boolean): FeedbackData {
   const result = {
     summary: extract("summary"),
     topIssues: extract("top_issues"),
+    practiceNow: extract("practice_now"),
     priorityFixes: extract("priority_fixes"),
     dimensions: extract("dimensions"),
     details: extract("details"),
@@ -51,6 +54,7 @@ function parseFeedback(raw: string, streaming: boolean): FeedbackData {
     raw.trim().length > 0 &&
     !result.summary &&
     !result.topIssues &&
+    !result.practiceNow &&
     !result.priorityFixes &&
     !result.dimensions &&
     !result.details
@@ -85,6 +89,7 @@ export function useLlmFeedback(): UseLlmFeedbackReturn {
   const hasFeedback =
     feedback.summary.length > 0 ||
     feedback.topIssues.length > 0 ||
+    feedback.practiceNow.length > 0 ||
     feedback.priorityFixes.length > 0 ||
     feedback.dimensions.length > 0 ||
     feedback.details.length > 0;

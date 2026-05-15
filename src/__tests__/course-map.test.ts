@@ -95,7 +95,11 @@ function reviewTask(overrides: Partial<ReviewQueueItem> = {}): ReviewQueueItem {
 
 describe("course map", () => {
   it("builds a stable empty-start map", () => {
-    const map = buildCourseMap({ pack: pack(), profile: null, reviewQueue: [] });
+    const map = buildCourseMap({
+      pack: pack(),
+      profile: null,
+      reviewQueue: [],
+    });
 
     expect(map.totalLevels).toBeGreaterThanOrEqual(6);
     expect(map.passedLevels).toBe(0);
@@ -104,11 +108,15 @@ describe("course map", () => {
   });
 
   it("marks passed and needs-work levels from mastery progress", () => {
-    const map = buildCourseMap({ pack: pack(), profile: profile(), reviewQueue: [] });
+    const map = buildCourseMap({
+      pack: pack(),
+      profile: profile(),
+      reviewQueue: [],
+    });
 
-    expect(map.levels.find((level) => level.id === "perception-abx")?.status).toBe(
-      "passed",
-    );
+    expect(
+      map.levels.find((level) => level.id === "perception-abx")?.status,
+    ).toBe("passed");
     expect(map.levels.find((level) => level.id === "word-ladder")?.status).toBe(
       "needs-work",
     );
@@ -125,7 +133,9 @@ describe("course map", () => {
 
     expect(map.nextLevelId).toBe(dueLevelId);
     expect(map.dueLevels).toBe(1);
-    expect(map.levels.find((level) => level.id === dueLevelId)?.status).toBe("due");
+    expect(map.levels.find((level) => level.id === dueLevelId)?.status).toBe(
+      "due",
+    );
   });
 
   it("keeps the current level visually active even if it has a due task", () => {
@@ -137,8 +147,44 @@ describe("course map", () => {
       currentLevelId,
     });
 
-    expect(map.levels.find((level) => level.id === currentLevelId)?.status).toBe(
-      "current",
-    );
+    expect(
+      map.levels.find((level) => level.id === currentLevelId)?.status,
+    ).toBe("current");
+  });
+
+  it("redirects a deep requested level to the first unpassed prerequisite", () => {
+    const map = buildCourseMap({
+      pack: pack(),
+      profile: profile(),
+      reviewQueue: [],
+      requestedLevelId: "sentence-ladder",
+    });
+
+    expect(map.redirectedByGate).toBe(true);
+    expect(map.nextLevelId).toBe("syllable-bridge");
+    expect(map.startLevelId).toBe("syllable-bridge");
+    expect(map.gateReason).toContain("还没有过线");
+    expect(
+      map.levels.find((level) => level.id === "sentence-ladder"),
+    ).toMatchObject({
+      status: "locked",
+      startLevelId: "syllable-bridge",
+      lockedByLevelId: "syllable-bridge",
+    });
+  });
+
+  it("does not lock a requested level when it has due review evidence", () => {
+    const map = buildCourseMap({
+      pack: pack(),
+      profile: profile(),
+      reviewQueue: [reviewTask({ levelId: "sentence-ladder" })],
+      requestedLevelId: "sentence-ladder",
+    });
+
+    expect(map.redirectedByGate).toBe(false);
+    expect(map.nextLevelId).toBe("sentence-ladder");
+    expect(
+      map.levels.find((level) => level.id === "sentence-ladder")?.status,
+    ).toBe("due");
   });
 });

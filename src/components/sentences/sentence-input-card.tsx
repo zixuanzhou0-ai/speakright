@@ -1,11 +1,13 @@
 "use client";
 
-import { Loader2, RotateCcw, Volume2 } from "lucide-react";
+import { Loader2, RotateCcw, Target, Volume2 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { ReadAlongText } from "@/components/audio/read-along-text";
+import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
 import { getPronunciationConfig } from "@/lib/api-keys";
+import type { FreePracticeTargetPreview } from "@/lib/free-practice-transfer";
 
 const MAX_CHARS = 150;
 const WARN_CHARS = 120;
@@ -30,6 +32,7 @@ interface SentenceInputCardProps {
   ttsWordTimings: { word: string; start: number; end: number }[];
   ttsCurrentTime: number;
   onTtsReplay: () => void;
+  targetPreview?: FreePracticeTargetPreview | null;
   // Actions
   onListen: () => void;
 }
@@ -52,6 +55,7 @@ export function SentenceInputCard({
   ttsWordTimings,
   ttsCurrentTime,
   onTtsReplay,
+  targetPreview,
   onListen,
 }: SentenceInputCardProps) {
   const charCount = sentence.length;
@@ -169,6 +173,10 @@ export function SentenceInputCard({
         </p>
       )}
 
+      {trimmedText && targetPreview && (
+        <TargetPreviewPanel preview={targetPreview} />
+      )}
+
       <AnimatePresence>
         {!isWordMode && (
           <motion.div
@@ -284,6 +292,73 @@ export function SentenceInputCard({
           )}
         </AnimatePresence>
       )}
+    </div>
+  );
+}
+
+function TargetPreviewPanel({
+  preview,
+}: {
+  preview: FreePracticeTargetPreview;
+}) {
+  if (preview.targets.length === 0 && preview.suggestions.length === 0) {
+    return null;
+  }
+
+  if (preview.targets.length > 0) {
+    return (
+      <div className="rounded-lg border bg-primary/5 p-3">
+        <div className="mb-2 flex items-center gap-2">
+          <Target className="h-3.5 w-3.5 text-primary" />
+          <p className="text-xs font-semibold text-muted-foreground">
+            这句话命中当前目标
+          </p>
+        </div>
+        <div className="space-y-2">
+          {preview.targets.map((target) => (
+            <div key={target.packId} className="text-sm">
+              <div className="flex flex-wrap items-center gap-1.5">
+                <Badge
+                  variant={target.source === "review" ? "default" : "secondary"}
+                >
+                  {target.packTitle}
+                </Badge>
+                <span className="text-xs text-muted-foreground">
+                  目标音 {target.targetPhonemes.join(" / ")}
+                </span>
+              </div>
+              <p className="mt-1 text-xs text-muted-foreground">
+                命中词：{target.matchedWords.join(", ")}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  const suggestion = preview.suggestions[0];
+  if (!suggestion) return null;
+
+  return (
+    <div className="rounded-lg border border-dashed bg-muted/30 p-3">
+      <div className="mb-2 flex items-center gap-2">
+        <Target className="h-3.5 w-3.5 text-muted-foreground" />
+        <p className="text-xs font-semibold text-muted-foreground">
+          当前句子还没命中今日目标
+        </p>
+      </div>
+      <div className="flex flex-wrap items-center gap-1.5">
+        <Badge variant="outline">{suggestion.packTitle}</Badge>
+        {suggestion.words.slice(0, 4).map((word) => (
+          <Badge key={word} variant="secondary">
+            {word}
+          </Badge>
+        ))}
+      </div>
+      <p className="mt-2 text-xs text-muted-foreground">
+        可参考：{suggestion.prompt}
+      </p>
     </div>
   );
 }

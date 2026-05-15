@@ -2,6 +2,7 @@
 
 import {
   ArrowRight,
+  BookOpenCheck,
   ClipboardList,
   Loader2,
   Mic,
@@ -9,6 +10,7 @@ import {
   Volume2,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
+import Link from "next/link";
 import { useCallback, useRef, useState } from "react";
 import { AssessmentReport } from "@/components/assessment/assessment-report";
 import { RecordButton } from "@/components/audio/record-button";
@@ -31,14 +33,11 @@ import { getPhonemeBySlug } from "@/lib/phoneme-data";
 import { buildTrainingPrescription } from "@/lib/training-prescription";
 import type {
   AssessmentPhase,
-  AssessmentResult as LegacyAssessmentResult,
   AssessmentWord,
+  AssessmentResult as LegacyAssessmentResult,
 } from "@/types/assessment";
 import type { AzureAssessmentResult } from "@/types/azure";
-import type {
-  AssessmentRecording,
-  DiagnosisReport,
-} from "@/types/diagnosis";
+import type { AssessmentRecording, DiagnosisReport } from "@/types/diagnosis";
 
 const STORAGE_KEY_V2 = "speakright_assessment_result_v2";
 const LEGACY_STORAGE_KEY = "speakright_assessment_result";
@@ -94,7 +93,9 @@ function loadSavedReport(): DiagnosisReport | null {
 
     const legacyRaw = localStorage.getItem(LEGACY_STORAGE_KEY);
     if (legacyRaw) {
-      return migrateLegacyResult(JSON.parse(legacyRaw) as LegacyAssessmentResult);
+      return migrateLegacyResult(
+        JSON.parse(legacyRaw) as LegacyAssessmentResult,
+      );
     }
   } catch {
     return null;
@@ -262,7 +263,9 @@ export default function AssessmentPage() {
                 <div>
                   <h2 className="text-xl font-bold">快速诊断</h2>
                   <p className="mt-2 text-sm text-muted-foreground">
-                    先读 10 个筛查词，再读一段短文；如果证据不足，系统会自动补测最多 4 个词。完成后直接给训练处方。
+                    先读 10
+                    个筛查词，再读一段短文；如果证据不足，系统会自动补测最多 4
+                    个词。完成后直接给训练处方。
                   </p>
                 </div>
                 <div className="flex flex-wrap justify-center gap-3">
@@ -274,6 +277,16 @@ export default function AssessmentPage() {
                     开始快速诊断
                     <ArrowRight className="h-4 w-4" />
                   </Button>
+                  <Link href="/assessment/passage">
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="gap-2 cursor-pointer"
+                    >
+                      <BookOpenCheck className="h-4 w-4" />
+                      全音覆盖朗读
+                    </Button>
+                  </Link>
                   {savedReport && (
                     <Button
                       onClick={() =>
@@ -294,98 +307,100 @@ export default function AssessmentPage() {
 
           {(phase.type === "words" || phase.type === "adaptive") &&
             currentWord && (
-            <motion.div
-              key={`${phase.type}-${currentWord.word}`}
-              initial={{ opacity: 0, x: 40 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -40 }}
-              className="max-w-lg mx-auto space-y-4"
-            >
-              <div className="flex items-center justify-between text-sm text-muted-foreground">
-                <span>
-                  {phase.type === "words"
-                    ? `筛查 ${phase.index + 1} / ${ASSESSMENT_WORDS.length}`
-                    : `补测 ${phase.index + 1} / ${phase.words.length}`}
-                </span>
-                <span>{phase.type === "words" ? "第一部分" : "自适应补测"}</span>
-              </div>
-              <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
-                <div
-                  className="h-full bg-primary transition-all duration-300"
-                  style={{
-                    width:
-                      phase.type === "words"
-                        ? `${(phase.index / (ASSESSMENT_WORDS.length + 1)) * 100}%`
-                        : `${((phase.index + 1) / phase.words.length) * 100}%`,
-                  }}
-                />
-              </div>
-
-              <div className="rounded-xl border bg-card p-8 shadow-sm text-center space-y-4">
-                <div className="flex flex-wrap justify-center gap-1.5">
-                  {targetLabels(currentWord).map((label) => (
-                    <Badge key={label} variant="secondary">
-                      {label}
-                    </Badge>
-                  ))}
+              <motion.div
+                key={`${phase.type}-${currentWord.word}`}
+                initial={{ opacity: 0, x: 40 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -40 }}
+                className="max-w-lg mx-auto space-y-4"
+              >
+                <div className="flex items-center justify-between text-sm text-muted-foreground">
+                  <span>
+                    {phase.type === "words"
+                      ? `筛查 ${phase.index + 1} / ${ASSESSMENT_WORDS.length}`
+                      : `补测 ${phase.index + 1} / ${phase.words.length}`}
+                  </span>
+                  <span>
+                    {phase.type === "words" ? "第一部分" : "自适应补测"}
+                  </span>
                 </div>
-                <span className="text-4xl font-bold">{currentWord.word}</span>
-                <span className="block font-mono text-lg text-muted-foreground">
-                  {currentWord.ipa}
-                </span>
-                {currentWord.purpose && (
-                  <p className="text-xs text-muted-foreground">
-                    {currentWord.purpose}
-                  </p>
-                )}
+                <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
+                  <div
+                    className="h-full bg-primary transition-all duration-300"
+                    style={{
+                      width:
+                        phase.type === "words"
+                          ? `${(phase.index / (ASSESSMENT_WORDS.length + 1)) * 100}%`
+                          : `${((phase.index + 1) / phase.words.length) * 100}%`,
+                    }}
+                  />
+                </div>
 
-                <motion.button
-                  type="button"
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={() => mw.playWord(currentWord.word)}
-                  disabled={mw.isLoading}
-                  className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary cursor-pointer disabled:opacity-50"
-                >
-                  {mw.isLoading ? (
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                  ) : (
-                    <Volume2 className="h-5 w-5" />
+                <div className="rounded-xl border bg-card p-8 shadow-sm text-center space-y-4">
+                  <div className="flex flex-wrap justify-center gap-1.5">
+                    {targetLabels(currentWord).map((label) => (
+                      <Badge key={label} variant="secondary">
+                        {label}
+                      </Badge>
+                    ))}
+                  </div>
+                  <span className="text-4xl font-bold">{currentWord.word}</span>
+                  <span className="block font-mono text-lg text-muted-foreground">
+                    {currentWord.ipa}
+                  </span>
+                  {currentWord.purpose && (
+                    <p className="text-xs text-muted-foreground">
+                      {currentWord.purpose}
+                    </p>
                   )}
-                </motion.button>
 
-                <RecordButton
-                  isRecording={recorder.isRecording}
-                  onStart={() => {
-                    recorder.reset();
-                    azure.reset();
-                    recorder.startRecording();
-                  }}
-                  onStop={handleRecordStop}
-                  disabled={azure.isLoading}
-                />
+                  <motion.button
+                    type="button"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => mw.playWord(currentWord.word)}
+                    disabled={mw.isLoading}
+                    className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary cursor-pointer disabled:opacity-50"
+                  >
+                    {mw.isLoading ? (
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                    ) : (
+                      <Volume2 className="h-5 w-5" />
+                    )}
+                  </motion.button>
 
-                <WaveformDisplay
-                  audioBlob={recorder.audioBlob}
-                  stream={recorder.stream}
-                />
+                  <RecordButton
+                    isRecording={recorder.isRecording}
+                    onStart={() => {
+                      recorder.reset();
+                      azure.reset();
+                      recorder.startRecording();
+                    }}
+                    onStop={handleRecordStop}
+                    disabled={azure.isLoading}
+                  />
 
-                {recorder.audioBlob &&
-                  !recorder.isRecording &&
-                  !azure.isLoading && (
-                    <Button
-                      onClick={handleWordRecorded}
-                      className="cursor-pointer"
-                    >
-                      确认，继续
-                    </Button>
+                  <WaveformDisplay
+                    audioBlob={recorder.audioBlob}
+                    stream={recorder.stream}
+                  />
+
+                  {recorder.audioBlob &&
+                    !recorder.isRecording &&
+                    !azure.isLoading && (
+                      <Button
+                        onClick={handleWordRecorded}
+                        className="cursor-pointer"
+                      >
+                        确认，继续
+                      </Button>
+                    )}
+                  {azure.isLoading && (
+                    <p className="text-sm text-muted-foreground">评分中...</p>
                   )}
-                {azure.isLoading && (
-                  <p className="text-sm text-muted-foreground">评分中...</p>
-                )}
-              </div>
-            </motion.div>
-          )}
+                </div>
+              </motion.div>
+            )}
 
           {phase.type === "paragraph" && (
             <motion.div

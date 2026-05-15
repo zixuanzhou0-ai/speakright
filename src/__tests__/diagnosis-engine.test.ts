@@ -51,7 +51,7 @@ describe("buildDiagnosisReport", () => {
 
     const report = buildDiagnosisReport({
       wordRecordings,
-      paragraphText: "I think this is useful.",
+      paragraphText: "paragraph",
       paragraphResult: resultForWord(
         "paragraph",
         [
@@ -63,6 +63,7 @@ describe("buildDiagnosisReport", () => {
     });
 
     expect(report.version).toBe(2);
+    expect(report.source).toBe("quick-word-check");
     expect(report.phonemeScores.th.score).toBe(49);
     expect(report.phonemeScores.th.sampleCount).toBe(2);
     expect(report.issues[0].recommendedPackIds).toContain("s-th");
@@ -74,7 +75,7 @@ describe("buildDiagnosisReport", () => {
   it("creates a rhythm issue when paragraph prosody is weak", () => {
     const report = buildDiagnosisReport({
       wordRecordings: [],
-      paragraphText: "A cup of coffee is on the table.",
+      paragraphText: "paragraph",
       paragraphResult: resultForWord(
         "paragraph",
         [{ phoneme: "ax", accuracyScore: 80 }],
@@ -90,5 +91,38 @@ describe("buildDiagnosisReport", () => {
         .flatMap((day) => day.items)
         .some((item) => item.packId === "stress-rhythm"),
     ).toBe(true);
+  });
+
+  it("does not turn an invalid low-quality recording into a pronunciation issue", () => {
+    const report = buildDiagnosisReport({
+      wordRecordings: [
+        {
+          prompt: {
+            word: "think",
+            ipa: "/θɪŋk/",
+            targetPhonemes: ["th", "ih", "ng"],
+          },
+          source: "word",
+          result: resultForWord(
+            "think",
+            [
+              { phoneme: "th", accuracyScore: 35 },
+              { phoneme: "ih", accuracyScore: 40 },
+            ],
+            { completenessScore: 18, fluencyScore: 0 },
+          ),
+        },
+      ],
+      paragraphText: "paragraph",
+      paragraphResult: resultForWord(
+        "paragraph",
+        [{ phoneme: "th", accuracyScore: 88 }],
+        { prosodyScore: 88, fluencyScore: 86 },
+      ),
+    });
+
+    expect(report.issues.some((issue) => issue.id === "s-th")).toBe(false);
+    expect(report.evidenceSummary?.invalidRecordings).toBe(1);
+    expect(report.rawEvidence[0]?.recommendedAction).toBe("request-retry");
   });
 });

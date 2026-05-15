@@ -8,6 +8,7 @@ import type {
   TrainingLevelProgress,
   TrainingSessionSummary,
 } from "@/types/training";
+import { evaluateMasteryStage } from "./mastery-state";
 import { getTrainingPack } from "./training-packs";
 
 export const MASTERY_STORAGE_KEY = "speakright_mastery_profile_v2";
@@ -89,7 +90,9 @@ export function loadMasteryProfile(): MasteryProfile {
   if (typeof window === "undefined") return createEmptyMasteryProfile();
   const current = parseProfile(localStorage.getItem(MASTERY_STORAGE_KEY));
   if (current) return current;
-  const migrated = migrateLegacyProfile(localStorage.getItem(LEGACY_MASTERY_STORAGE_KEY));
+  const migrated = migrateLegacyProfile(
+    localStorage.getItem(LEGACY_MASTERY_STORAGE_KEY),
+  );
   if (migrated) {
     saveMasteryProfile(migrated);
     return migrated;
@@ -99,13 +102,19 @@ export function loadMasteryProfile(): MasteryProfile {
 
 export function saveMasteryProfile(profile: MasteryProfile): void {
   if (typeof window === "undefined") return;
-  const nextProfile = { ...profile, version: 2 as const, updatedAt: Date.now() };
+  const nextProfile = {
+    ...profile,
+    version: 2 as const,
+    updatedAt: Date.now(),
+  };
   localStorage.setItem(MASTERY_STORAGE_KEY, JSON.stringify(nextProfile));
   localStorage.setItem(
     TRAINING_SESSIONS_STORAGE_KEY,
     JSON.stringify(nextProfile.sessions),
   );
-  window.dispatchEvent(new StorageEvent("storage", { key: MASTERY_STORAGE_KEY }));
+  window.dispatchEvent(
+    new StorageEvent("storage", { key: MASTERY_STORAGE_KEY }),
+  );
 }
 
 export function isReviewDue(mastery?: PackMastery, now = Date.now()): boolean {
@@ -117,7 +126,9 @@ function scoreAverage(scores: number[]): number {
   return scores.reduce((sum, score) => sum + score, 0) / scores.length;
 }
 
-export function evaluateSessionMastery(session: TrainingSessionSummary): boolean {
+export function evaluateSessionMastery(
+  session: TrainingSessionSummary,
+): boolean {
   const pack = getTrainingPack(session.packId);
   if (!pack) return false;
   const rule = pack.masteryRule;
@@ -134,11 +145,18 @@ export function evaluateSessionMastery(session: TrainingSessionSummary): boolean
   ).length;
   const mixedAverage = scoreAverage(session.mixedReviewScores ?? []);
   const stuckCount = session.stuckPatternIds?.length ?? 0;
-  const requiredKinds = new Set(["perception", "word", "sentence", "mixed-review"]);
+  const requiredKinds = new Set([
+    "perception",
+    "word",
+    "sentence",
+    "mixed-review",
+  ]);
   const requiredLevelsPassed =
     !session.levelSummaries ||
     [...requiredKinds].every((kind) =>
-      session.levelSummaries?.some((level) => level.kind === kind && level.passed),
+      session.levelSummaries?.some(
+        (level) => level.kind === kind && level.passed,
+      ),
     );
 
   return (
@@ -237,8 +255,15 @@ export function recordTrainingSession(
       ? session.perceptionCorrect / session.perceptionTotal
       : 0;
   const wasDueMastered =
-    existing?.status === "mastered" && isReviewDue(existing, session.completedAt);
+    existing?.status === "mastered" &&
+    isReviewDue(existing, session.completedAt);
   const failureStreak = mastered ? 0 : (existing?.failureStreak ?? 0) + 1;
+  const stage = evaluateMasteryStage(
+    existing,
+    session,
+    mastered,
+    failureStreak,
+  );
   const status: PackMastery["status"] = mastered
     ? "mastered"
     : wasDueMastered && failureStreak >= 2
@@ -255,6 +280,8 @@ export function recordTrainingSession(
       {
         ...session,
         mastered,
+        masteryStateAfter: stage.state,
+        masteryStageScore: stage.stageScore,
         reviewItems: session.reviewItems ?? [],
       },
       ...profile.sessions,
@@ -264,6 +291,19 @@ export function recordTrainingSession(
       [session.packId]: {
         packId: session.packId,
         status,
+        masteryState: stage.state,
+        stageScore: stage.stageScore,
+        stageCeiling: stage.stageCeiling,
+        highestLayer: stage.highestLayer,
+        nextRequiredLayer: stage.nextRequiredLayer,
+        stateRationale: stage.rationale,
+        retainedReviewCount:
+          stage.state === "retained"
+            ? (existing?.retainedReviewCount ?? 0) + 1
+            : (existing?.retainedReviewCount ?? 0),
+        transferEvidenceCount:
+          (existing?.transferEvidenceCount ?? 0) +
+          (session.transferEvidence?.filter((item) => item.passed).length ?? 0),
         levelProgress: buildLevelProgress(existing?.levelProgress, session),
         bestTargetScore,
         perceptionBestRate: Math.max(

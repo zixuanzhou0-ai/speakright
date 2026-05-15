@@ -41,6 +41,15 @@ function levelFromPattern(patternId: string): string {
   return "articulation";
 }
 
+function levelFromMasteryLayer(layer: string): string {
+  if (layer === "perception") return "perception-abx";
+  if (layer === "articulation" || layer === "isolated") return "articulation";
+  if (layer === "word") return "word-ladder";
+  if (layer === "sentence") return "sentence-ladder";
+  if (layer === "connected" || layer === "guided") return "shadowing-transfer";
+  return "mixed-review";
+}
+
 function recentFailedItemTask(
   session: TrainingSessionSummary,
   now: number,
@@ -127,12 +136,15 @@ export function buildReviewQueue(
 
   for (const [packId, mastery] of Object.entries(profile.packs)) {
     if (mastery.nextReviewAt && mastery.nextReviewAt <= now) {
+      const layer = mastery.nextRequiredLayer ?? "connected";
       addUnique(tasks, seen, {
         id: `due-${packId}-${mastery.nextReviewAt}`,
         packId,
-        levelId: "mixed-review",
+        levelId: levelFromMasteryLayer(layer),
         source: "due-review",
-        reason: "已掌握内容到期复习，防止回到旧习惯。",
+        reason: mastery.masteryState
+          ? `${mastery.masteryState} 阶段内容到期复习，防止回到旧习惯。`
+          : "已掌握内容到期复习，防止回到旧习惯。",
         priority: "maintenance",
         dueAt: mastery.nextReviewAt,
       });
@@ -141,15 +153,19 @@ export function buildReviewQueue(
 
   for (const [patternId, mastery] of Object.entries(profile.errorPatterns)) {
     if (mastery.status !== "active") continue;
-    const pattern = TRAINING_ERROR_PATTERNS.find((item) => item.id === patternId);
-    const packId = pattern?.appliesToPackIds.find((id) => getTrainingPack(id)) ?? "";
+    const pattern = TRAINING_ERROR_PATTERNS.find(
+      (item) => item.id === patternId,
+    );
+    const packId =
+      pattern?.appliesToPackIds.find((id) => getTrainingPack(id)) ?? "";
     if (!packId) continue;
     addUnique(tasks, seen, {
       id: `active-pattern-${patternId}-${mastery.lastSeenAt ?? now}`,
       packId,
       levelId: levelFromPattern(patternId),
       source: "stuck-pattern",
-      reason: pattern?.coachExplanation ?? "这个错因近期反复出现，需要优先复练。",
+      reason:
+        pattern?.coachExplanation ?? "这个错因近期反复出现，需要优先复练。",
       priority: mastery.stuckCount >= 2 ? "critical" : "major",
       dueAt: mastery.lastSeenAt ?? now,
       errorPatternId: patternId,
@@ -157,7 +173,8 @@ export function buildReviewQueue(
   }
 
   for (const session of profile.sessions.slice(0, 8)) {
-    for (const task of session.reviewItems ?? buildSessionReviewItems(session, now)) {
+    for (const task of session.reviewItems ??
+      buildSessionReviewItems(session, now)) {
       addUnique(tasks, seen, task);
     }
   }

@@ -13,24 +13,24 @@ import type {
 } from "@/types/training";
 
 const DEFAULT_RULE: MasteryRule = {
-  perceptionCorrectRate: 0.8,
-  targetPassScore: 75,
+  perceptionCorrectRate: 0.85,
+  targetPassScore: 82,
   wordRecentPasses: 2,
   wordRecentWindow: 3,
-  sentencePasses: 1,
-  mixedReviewAverage: 75,
+  sentencePasses: 2,
+  mixedReviewAverage: 82,
   maxStuckCount: 0,
 };
 
 const PASS_RULES: Record<string, LevelPassRule> = {
-  perception: { minCorrectRate: 0.8 },
+  perception: { minCorrectRate: 0.85 },
   articulation: { requiredPasses: 1 },
-  syllable: { minTargetScore: 72, requiredPasses: 4 },
-  word: { minTargetScore: 75, requiredPasses: 8 },
-  "minimal-pair": { minTargetScore: 75, requiredPasses: 5 },
-  sentence: { minTargetScore: 75, requiredPasses: 5 },
-  shadowing: { minTargetScore: 75, requiredPasses: 2 },
-  "mixed-review": { minAverageScore: 75, requiredPasses: 4 },
+  syllable: { minTargetScore: 78, requiredPasses: 5 },
+  word: { minTargetScore: 82, requiredPasses: 9 },
+  "minimal-pair": { minTargetScore: 82, requiredPasses: 6 },
+  sentence: { minTargetScore: 82, requiredPasses: 6 },
+  shadowing: { minTargetScore: 82, requiredPasses: 2 },
+  "mixed-review": { minAverageScore: 82, requiredPasses: 5 },
 };
 
 function item(

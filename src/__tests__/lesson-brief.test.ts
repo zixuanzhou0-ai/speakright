@@ -99,7 +99,7 @@ function session(
 }
 
 describe("lesson brief", () => {
-  it("uses the requested level when a prescription deep-links into a course", () => {
+  it("redirects a deep requested level back to the first unpassed prerequisite", () => {
     const brief = buildLessonBrief({
       pack: pack(),
       requestedLevelId: "sentence-ladder",
@@ -107,9 +107,39 @@ describe("lesson brief", () => {
       reviewQueue: [reviewTask()],
     });
 
-    expect(brief.startLevelId).toBe("sentence-ladder");
-    expect(brief.reason).toContain("处方");
+    expect(brief.startLevelId).toBe("syllable-bridge");
+    expect(brief.reason).toContain("前置层");
     expect(brief.nextActionLabel).toContain(brief.startLevelTitle);
+  });
+
+  it("allows a requested level when it is the current mastery next layer", () => {
+    const brief = buildLessonBrief({
+      pack: pack(),
+      requestedLevelId: "sentence-ladder",
+      profile: profile({
+        packs: {
+          "s-th": {
+            packId: "s-th",
+            status: "practicing",
+            masteryState: "controlled",
+            nextRequiredLayer: "sentence",
+            levelProgress: {
+              "perception-abx": { passed: true, bestScore: 100, attempts: 8 },
+              articulation: { passed: true, bestScore: 100, attempts: 3 },
+              "word-ladder": { passed: true, bestScore: 84, attempts: 4 },
+            },
+            bestTargetScore: 84,
+            perceptionBestRate: 0.88,
+            completedSessions: 2,
+            failureStreak: 0,
+          },
+        },
+      }),
+      reviewQueue: [],
+    });
+
+    expect(brief.startLevelId).toBe("sentence-ladder");
+    expect(brief.reason).toContain("当前掌握阶段");
   });
 
   it("uses due review evidence before generic unpassed levels", () => {
@@ -121,9 +151,9 @@ describe("lesson brief", () => {
 
     expect(brief.startLevelId).toBe("word-ladder");
     expect(brief.reason).toContain("think");
-    expect(brief.successCriteria.some((item) => item.includes("目标音素"))).toBe(
-      true,
-    );
+    expect(
+      brief.successCriteria.some((item) => item.includes("目标音素")),
+    ).toBe(true);
   });
 
   it("surfaces active error patterns as risk cards", () => {

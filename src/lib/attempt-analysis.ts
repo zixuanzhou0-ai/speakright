@@ -43,7 +43,7 @@ export function analyzeAttempt({
   const score = getPassScore(result, item.targetPhonemes);
   const threshold =
     levelKind === "syllable"
-      ? 72
+      ? 78
       : levelKind === "mixed-review"
         ? pack.masteryRule.mixedReviewAverage ?? pack.masteryRule.targetPassScore
         : pack.masteryRule.targetPassScore;

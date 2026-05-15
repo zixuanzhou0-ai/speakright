@@ -3,7 +3,9 @@
 import { FeedbackDisplay } from "@/components/feedback/feedback-display";
 import { PhonemeHighlight } from "@/components/scoring/phoneme-highlight";
 import { WordHighlight } from "@/components/scoring/word-highlight";
+import { Badge } from "@/components/ui/badge";
 import type { FeedbackData } from "@/hooks/use-llm-feedback";
+import type { FreePracticeTransferSummary } from "@/lib/free-practice-transfer";
 import type {
   AzureAssessmentResult,
   AzureSyllable,
@@ -22,6 +24,7 @@ interface SentenceResultsColumnProps {
   hasFeedback: boolean;
   llmError: string | null;
   onRetryFeedback?: () => void;
+  transferSummary?: FreePracticeTransferSummary | null;
 }
 
 export function SentenceResultsColumn({
@@ -35,6 +38,7 @@ export function SentenceResultsColumn({
   hasFeedback,
   llmError,
   onRetryFeedback,
+  transferSummary,
 }: SentenceResultsColumnProps) {
   if (!hasResult) {
     return (
@@ -81,6 +85,10 @@ export function SentenceResultsColumn({
         ) : null}
       </div>
 
+      {transferSummary && transferSummary.evidences.length > 0 && (
+        <TransferEvidenceCard summary={transferSummary} />
+      )}
+
       {/* LLM Feedback */}
       {(hasFeedback || isStreaming || llmError) && (
         <div className="flex-1 min-h-0">
@@ -93,5 +101,69 @@ export function SentenceResultsColumn({
         </div>
       )}
     </>
+  );
+}
+
+function TransferEvidenceCard({
+  summary,
+}: {
+  summary: FreePracticeTransferSummary;
+}) {
+  return (
+    <div className="shrink-0 rounded-xl border bg-card px-4 py-4 shadow-sm">
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <h2 className="text-sm font-semibold text-muted-foreground">
+            迁移证据已回流
+          </h2>
+          <p className="mt-1 text-xs text-muted-foreground">
+            这次自由练习命中了当前训练目标，已写入学习记忆和复习队列。
+          </p>
+        </div>
+        <Badge variant={summary.recorded ? "default" : "secondary"}>
+          {summary.recorded ? "已记录" : "仅分析"}
+        </Badge>
+      </div>
+      <div className="grid gap-2">
+        {summary.evidences.map((item) => (
+          <div
+            key={`${item.packId}-${item.levelId}`}
+            className="rounded-lg border bg-background p-3"
+          >
+            <div className="flex flex-wrap items-start justify-between gap-2">
+              <div>
+                <p className="text-sm font-semibold">{item.packTitle}</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {item.reason}
+                </p>
+              </div>
+              <Badge variant={item.passed ? "default" : "destructive"}>
+                目标音 {item.targetScore}/{item.threshold}
+              </Badge>
+            </div>
+            <div className="mt-2 grid gap-2 md:grid-cols-[0.9fr_1.1fr]">
+              <div className="rounded-md bg-muted/40 p-2">
+                <p className="text-xs font-semibold text-muted-foreground">
+                  命中词
+                </p>
+                <p className="mt-1 text-sm">
+                  {item.matchedWords.slice(0, 6).join(", ")}
+                </p>
+              </div>
+              <div className="rounded-md bg-primary/5 p-2">
+                <p className="text-xs font-semibold text-muted-foreground">
+                  下一次只改
+                </p>
+                <p className="mt-1 text-sm font-medium text-primary">
+                  {item.passed
+                    ? "这次能迁移到自己的句子里，下一轮换新句子复测。"
+                    : item.nextCue}
+                </p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }

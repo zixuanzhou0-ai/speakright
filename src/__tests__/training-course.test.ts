@@ -9,6 +9,7 @@ import {
 } from "@/lib/course-runner";
 import {
   shouldAppendPerceptionReview,
+  hasLevelPassed,
   shouldEnterRemediation,
   shouldMarkStuck,
 } from "@/lib/training-course-session";
@@ -139,6 +140,48 @@ describe("training course v2.6 quality gates", () => {
     expect(analysis.nextCue).toContain("舌");
   });
 
+  it("uses stricter pass thresholds for target phoneme attempts", () => {
+    const pack = TRAINING_PACKS.find((item) => item.id === "s-th")!;
+    const level = pack.course!.levels.find((item) => item.kind === "word")!;
+    const item = level.items.find((entry) => entry.targetPhonemes.includes("th"))!;
+
+    const nearMiss = analyzeAttempt({
+      pack,
+      levelKind: level.kind,
+      item,
+      result: result({
+        words: [
+          {
+            word: "think",
+            accuracyScore: 90,
+            errorType: "None",
+            phonemes: [{ phoneme: "th", accuracyScore: 81 }],
+            syllables: [],
+          },
+        ],
+      }),
+    });
+    const pass = analyzeAttempt({
+      pack,
+      levelKind: level.kind,
+      item,
+      result: result({
+        words: [
+          {
+            word: "think",
+            accuracyScore: 90,
+            errorType: "None",
+            phonemes: [{ phoneme: "th", accuracyScore: 82 }],
+            syllables: [],
+          },
+        ],
+      }),
+    });
+
+    expect(nearMiss.passed).toBe(false);
+    expect(pass.passed).toBe(true);
+  });
+
   it("builds focused review when a level gate is not passed", () => {
     const pack = TRAINING_PACKS.find((item) => item.id === "v-w");
     const level = pack?.course?.levels.find((item) => item.kind === "word") as TrainingLevel;
@@ -158,6 +201,33 @@ describe("training course v2.6 quality gates", () => {
     expect(gate.passed).toBe(false);
     expect(gate.focusedReviewItems).toHaveLength(3);
     expect(gate.focusedReviewItems[0].focusPoint).toContain("专项复练");
+  });
+
+  it("requires both average score and enough passed items in mixed review", () => {
+    const pack = TRAINING_PACKS.find((item) => item.id === "s-th")!;
+    const level = pack.course!.levels.find((item) => item.kind === "mixed-review")!;
+
+    expect(
+      hasLevelPassed(level, {
+        levelId: level.id,
+        kind: level.kind,
+        scores: [90, 88, 86, 84, 60, 58],
+        attempts: 6,
+        passedCount: 4,
+        stuckCount: 0,
+      }),
+    ).toBe(false);
+
+    expect(
+      hasLevelPassed(level, {
+        levelId: level.id,
+        kind: level.kind,
+        scores: [90, 88, 86, 84, 83, 61],
+        attempts: 6,
+        passedCount: 5,
+        stuckCount: 0,
+      }),
+    ).toBe(true);
   });
 
   it("pure runner enters remediation after two failures and records stuck after three", () => {

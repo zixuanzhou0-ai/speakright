@@ -1,6 +1,7 @@
 import type { DiagnosisIssue } from "@/types/diagnosis";
 import type {
   MasteryProfile,
+  MasteryTaskLayer,
   TrainingPrescription,
   TrainingPrescriptionItem,
 } from "@/types/training";
@@ -15,7 +16,10 @@ const SEVERITY_WEIGHT: Record<DiagnosisIssue["severity"], number> = {
   minor: 2,
 };
 
-function isPackDue(profile: MasteryProfile | null | undefined, packId: string): boolean {
+function isPackDue(
+  profile: MasteryProfile | null | undefined,
+  packId: string,
+): boolean {
   const nextReviewAt = profile?.packs[packId]?.nextReviewAt;
   return nextReviewAt != null && nextReviewAt <= Date.now();
 }
@@ -33,15 +37,29 @@ function itemForPack(
   reason: string,
   priority: TrainingPrescriptionItem["priority"],
   levelId?: string,
+  profile?: MasteryProfile | null,
+  issue?: DiagnosisIssue,
 ): TrainingPrescriptionItem | null {
   const pack = getTrainingPack(packId);
   if (!pack) return null;
+  const mastery = profile?.packs[packId];
+  const inferredLayer = layerFromLevelId(levelId);
+  const nextRequiredLayer = mastery?.nextRequiredLayer ?? inferredLayer;
   return {
     packId,
     levelId,
     reason,
     priority,
     estimatedMinutes: pack.estimatedMinutes,
+    currentMasteryState:
+      mastery?.masteryState ?? (issue ? "suspected" : undefined),
+    stageScore: mastery?.stageScore,
+    stageCeiling: mastery?.stageCeiling,
+    highestLayer: mastery?.highestLayer,
+    nextRequiredLayer,
+    stageReason: mastery?.stateRationale,
+    evidenceStrength: issue?.evidenceStrength,
+    learningObjective: objectiveForLayer(nextRequiredLayer),
   };
 }
 
@@ -55,7 +73,65 @@ function pushUnique(
   target.push(item);
 }
 
-function levelForIssue(issue: DiagnosisIssue, packId: string): string | undefined {
+function levelFromMasteryLayer(layer: MasteryTaskLayer): string {
+  switch (layer) {
+    case "perception":
+      return "perception-abx";
+    case "articulation":
+    case "isolated":
+      return "articulation";
+    case "word":
+      return "word-ladder";
+    case "sentence":
+      return "sentence-ladder";
+    case "connected":
+    case "guided":
+    case "spontaneous":
+      return "shadowing-transfer";
+  }
+}
+
+function layerFromLevelId(levelId?: string): MasteryTaskLayer | undefined {
+  if (!levelId) return undefined;
+  if (levelId.includes("perception")) return "perception";
+  if (levelId.includes("articulation")) return "articulation";
+  if (levelId.includes("word")) return "word";
+  if (levelId.includes("sentence")) return "sentence";
+  if (levelId.includes("shadowing") || levelId.includes("transfer")) {
+    return "connected";
+  }
+  if (levelId.includes("mixed")) return "connected";
+  return undefined;
+}
+
+function objectiveForLayer(layer?: MasteryTaskLayer): string | undefined {
+  switch (layer) {
+    case "isolated":
+      return "先把单音和关键发音动作做稳，不急着追求句子速度。";
+    case "perception":
+      return "先听出目标差异，避免靠拼写和猜测进入发音练习。";
+    case "articulation":
+      return "建立一个可重复的口腔动作，让下一次尝试只改一个动作。";
+    case "word":
+      return "把动作放进真实单词，重点看目标音素是否保住。";
+    case "sentence":
+      return "把目标音放进短句，检查一有语速和重音负荷是否会掉。";
+    case "connected":
+      return "进入自然语流，在弱读、连读和停顿中保持清晰度。";
+    case "guided":
+      return "用半开放回答做迁移，开始脱离逐字朗读。";
+    case "spontaneous":
+      return "在自由表达里复测，不提醒时也要保住这个目标。";
+  }
+}
+
+function levelForIssue(
+  issue: DiagnosisIssue,
+  packId: string,
+  profile?: MasteryProfile | null,
+): string | undefined {
+  const nextLayer = profile?.packs[packId]?.nextRequiredLayer;
+  if (nextLayer) return levelFromMasteryLayer(nextLayer);
   if (issue.nextLesson?.packId === packId) return issue.nextLesson.levelId;
   if (issue.type === "contrast") return "perception-abx";
   if (
@@ -73,6 +149,8 @@ function dueReviewLevel(
   profile: MasteryProfile | null | undefined,
   packId: string,
 ): string | undefined {
+  const nextLayer = profile?.packs[packId]?.nextRequiredLayer;
+  if (nextLayer) return levelFromMasteryLayer(nextLayer);
   const recentSession = profile?.sessions.find(
     (session) => session.packId === packId && session.recommendedNextLevelId,
   );
@@ -103,7 +181,9 @@ export function buildTrainingPrescription(
           packId,
           `${issue.title}：${issue.impact}`,
           issue.severity === "critical" ? "critical" : "major",
-          levelForIssue(issue, packId),
+          levelForIssue(issue, packId, profile),
+          profile,
+          issue,
         ),
       );
     }
@@ -120,6 +200,7 @@ export function buildTrainingPrescription(
             "已掌握内容到期复习，防止回到旧习惯",
             "maintenance",
             dueReviewLevel(profile, packId),
+            profile,
           ),
         );
       }
@@ -137,6 +218,7 @@ export function buildTrainingPrescription(
           "中国学习者高频问题，适合作为默认训练起点",
           "maintenance",
           "perception-abx",
+          profile,
         ),
       );
     }

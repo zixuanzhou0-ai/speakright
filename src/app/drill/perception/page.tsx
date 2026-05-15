@@ -1,117 +1,164 @@
 "use client";
 
-import { ArrowLeft, Check, Headphones, Volume2, X } from "lucide-react";
+import {
+  ArrowLeft,
+  Check,
+  Headphones,
+  RotateCcw,
+  TrendingUp,
+  Volume2,
+  X,
+} from "lucide-react";
 import { motion } from "motion/react";
 import Link from "next/link";
-import { useCallback, useRef, useState } from "react";
+import { useMemo, useState } from "react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useAudioPlayer } from "@/hooks/use-audio-player";
-import type { PerceptionPair } from "@/lib/perception-pairs";
-import { PERCEPTION_PAIRS } from "@/lib/perception-pairs";
+import { useMwPronunciation } from "@/hooks/use-mw-pronunciation";
+import {
+  buildHvptSession,
+  getHvptContrast,
+  HVPT_CONTRASTS,
+  type HvptAnswer,
+  type HvptContrast,
+  type HvptResponse,
+  type HvptSpeaker,
+  type HvptSummary,
+  type HvptTrial,
+  recommendedHvptContrastIds,
+  summarizeHvptSession,
+} from "@/lib/hvpt-training";
+import { loadMasteryProfile } from "@/lib/mastery-profile";
 
 type PlayingSlot = "A" | "B" | "X" | null;
 
 type PerceptionPhase =
   | { type: "select" }
-  | { type: "playing"; questionIndex: number; xIsA: boolean }
-  | { type: "answered"; questionIndex: number; xIsA: boolean; correct: boolean }
-  | { type: "completed"; correct: number; total: number };
+  | { type: "playing"; questionIndex: number }
+  | { type: "answered"; questionIndex: number; correct: boolean }
+  | { type: "focused-review"; trials: HvptTrial[] }
+  | { type: "completed"; summary: HvptSummary };
 
-const QUESTIONS_PER_SESSION = 10;
+const QUESTIONS_PER_SESSION = 12;
+
+function speakerLabel(speaker: HvptSpeaker): string {
+  return speaker === "blue" ? "Max" : "Nichalia";
+}
+
+function answerIsCorrect(trial: HvptTrial, answer: HvptAnswer): boolean {
+  return (answer === "A") === trial.xIsA;
+}
 
 export default function PerceptionDrillPage() {
-  const [selectedPair, setSelectedPair] = useState<PerceptionPair | null>(null);
+  const [selectedContrast, setSelectedContrast] = useState<HvptContrast | null>(
+    null,
+  );
   const [phase, setPhase] = useState<PerceptionPhase>({ type: "select" });
-  const [correctCount, setCorrectCount] = useState(0);
-  // Single audio player shared across A/B/X buttons enforces mutual exclusion
-  // (play() cleanup unloads the previous Howl). Tracks which slot is active
-  // for UI highlighting.
-  const player = useAudioPlayer();
+  const [responses, setResponses] = useState<HvptResponse[]>([]);
+  const [trials, setTrials] = useState<HvptTrial[]>([]);
   const [activeSlot, setActiveSlot] = useState<PlayingSlot>(null);
-  const questionsRef = useRef<Array<{ itemIndex: number; xIsA: boolean }>>([]);
+  const pronunciation = useMwPronunciation();
 
-  const handleSelectPair = (pair: PerceptionPair) => {
-    setSelectedPair(pair);
-    setCorrectCount(0);
-
-    // Generate random questions
-    const questions: Array<{ itemIndex: number; xIsA: boolean }> = [];
-    for (let i = 0; i < QUESTIONS_PER_SESSION; i++) {
-      questions.push({
-        itemIndex: i % pair.items.length,
-        xIsA: Math.random() > 0.5,
-      });
-    }
-    questionsRef.current = questions;
-    setPhase({ type: "playing", questionIndex: 0, xIsA: questions[0].xIsA });
-  };
-
-  const currentQuestion =
-    selectedPair && phase.type !== "select" && phase.type !== "completed"
-      ? questionsRef.current[phase.questionIndex]
-      : null;
-
-  const currentItem =
-    selectedPair && currentQuestion
-      ? selectedPair.items[currentQuestion.itemIndex]
-      : null;
-
-  const handlePlayA = () => {
-    if (!currentItem) return;
-    setActiveSlot("A");
-    player.play(currentItem.audioA);
-  };
-
-  const handlePlayB = () => {
-    if (!currentItem) return;
-    setActiveSlot("B");
-    player.play(currentItem.audioB);
-  };
-
-  const handlePlayX = () => {
-    if (!currentItem || !currentQuestion) return;
-    const xAudio = currentQuestion.xIsA
-      ? currentItem.audioA
-      : currentItem.audioB;
-    setActiveSlot("X");
-    player.play(xAudio);
-  };
-
-  const handleAnswer = useCallback(
-    (answeredA: boolean) => {
-      if (phase.type !== "playing") return;
-      const correct = answeredA === phase.xIsA;
-      if (correct) setCorrectCount((c) => c + 1);
-      setPhase({
-        type: "answered",
-        questionIndex: phase.questionIndex,
-        xIsA: phase.xIsA,
-        correct,
-      });
-    },
-    [phase],
+  const recommendedIds = useMemo(
+    () =>
+      typeof window === "undefined"
+        ? ["ee-ih", "eh-ae", "s-th", "v-w", "l-r"]
+        : recommendedHvptContrastIds(loadMasteryProfile()),
+    [],
   );
 
-  const handleNext = () => {
-    if (phase.type !== "answered" || !selectedPair) return;
-    const nextIndex = phase.questionIndex + 1;
-    if (nextIndex >= QUESTIONS_PER_SESSION) {
-      setPhase({
-        type: "completed",
-        correct: correctCount,
-        total: QUESTIONS_PER_SESSION,
-      });
-    } else {
-      const q = questionsRef.current[nextIndex];
-      setPhase({ type: "playing", questionIndex: nextIndex, xIsA: q.xIsA });
-    }
+  const startSession = (contrast: HvptContrast, reviewTrials?: HvptTrial[]) => {
+    setSelectedContrast(contrast);
+    const nextTrials =
+      reviewTrials && reviewTrials.length > 0
+        ? reviewTrials
+        : buildHvptSession(contrast.id, QUESTIONS_PER_SESSION);
+    setTrials(nextTrials);
+    setResponses([]);
+    setActiveSlot(null);
+    setPhase({ type: "playing", questionIndex: 0 });
   };
 
-  const handleReset = () => {
-    setSelectedPair(null);
-    setPhase({ type: "select" });
-    setCorrectCount(0);
+  const currentTrial =
+    (phase.type === "playing" || phase.type === "answered") &&
+    trials[phase.questionIndex]
+      ? trials[phase.questionIndex]
+      : null;
+
+  const playSlot = (slot: Exclude<PlayingSlot, null>) => {
+    if (!currentTrial) return;
+    setActiveSlot(slot);
+    const word =
+      slot === "A"
+        ? currentTrial.wordA
+        : slot === "B"
+          ? currentTrial.wordB
+          : currentTrial.xWord;
+    const speaker =
+      slot === "A"
+        ? currentTrial.speakerA
+        : slot === "B"
+          ? currentTrial.speakerB
+          : currentTrial.speakerX;
+    pronunciation.playWord(word, speaker);
   };
+
+  const answer = (answerValue: HvptAnswer) => {
+    if (phase.type !== "playing" || !currentTrial) return;
+    const nextResponse = { trialId: currentTrial.id, answer: answerValue };
+    setResponses((prev) => [...prev, nextResponse]);
+    setPhase({
+      type: "answered",
+      questionIndex: phase.questionIndex,
+      correct: answerIsCorrect(currentTrial, answerValue),
+    });
+  };
+
+  const completeSession = (nextResponses: HvptResponse[]) => {
+    if (!selectedContrast) return;
+    const summary = summarizeHvptSession(
+      selectedContrast,
+      trials,
+      nextResponses,
+    );
+    if (!summary.passed && summary.focusedReviewTrials.length > 0) {
+      setPhase({ type: "focused-review", trials: summary.focusedReviewTrials });
+      return;
+    }
+    setPhase({ type: "completed", summary });
+  };
+
+  const next = () => {
+    if (phase.type !== "answered" || !selectedContrast) return;
+    const nextIndex = phase.questionIndex + 1;
+    if (nextIndex >= trials.length) {
+      completeSession(responses);
+      return;
+    }
+    setActiveSlot(null);
+    setPhase({ type: "playing", questionIndex: nextIndex });
+  };
+
+  const finishFocusedReview = () => {
+    if (!selectedContrast) return;
+    setPhase({
+      type: "completed",
+      summary: summarizeHvptSession(selectedContrast, trials, responses),
+    });
+  };
+
+  const reset = () => {
+    setSelectedContrast(null);
+    setTrials([]);
+    setResponses([]);
+    setActiveSlot(null);
+    setPhase({ type: "select" });
+  };
+
+  const correctCount = responses.filter((response) => {
+    const trial = trials.find((item) => item.id === response.trialId);
+    return trial ? answerIsCorrect(trial, response.answer) : false;
+  }).length;
 
   return (
     <div className="h-full flex flex-col px-6 py-4 overflow-y-auto scrollbar-thin">
@@ -122,44 +169,73 @@ export default function PerceptionDrillPage() {
         >
           <ArrowLeft className="h-4 w-4" />
         </Link>
-        <h1 className="text-2xl font-bold">辨音训练</h1>
-        {selectedPair && (
-          <span className="text-sm text-muted-foreground">
-            {selectedPair.label}
-          </span>
+        <div>
+          <h1 className="text-2xl font-bold">高变异听辨训练</h1>
+          <p className="text-sm text-muted-foreground">
+            多说话人、多语境 ABX，先重建听觉边界再发音
+          </p>
+        </div>
+        {selectedContrast && (
+          <Badge variant="secondary">{selectedContrast.label}</Badge>
         )}
       </div>
 
-      <div className="flex-1 max-w-lg mx-auto w-full">
-        {/* Select */}
+      <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col">
         {phase.type === "select" && (
-          <div className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              选择一组音标，训练你的听力辨别能力。系统播放 A、B、X
-              三个音，你判断 X 是 A 还是 B。
-            </p>
-            <div className="grid grid-cols-2 gap-3">
-              {PERCEPTION_PAIRS.map((pair) => (
+          <div className="space-y-5">
+            <div className="rounded-xl border bg-card p-5 shadow-sm">
+              <div className="mb-2 flex items-center gap-2">
+                <TrendingUp className="h-4 w-4 text-primary" />
+                <h2 className="font-semibold">系统推荐先练</h2>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {recommendedIds.map((id) => {
+                  const contrast = getHvptContrast(id);
+                  if (!contrast) return null;
+                  return (
+                    <Button
+                      key={id}
+                      type="button"
+                      variant="secondary"
+                      className="cursor-pointer"
+                      onClick={() => startSession(contrast)}
+                    >
+                      {contrast.label}
+                    </Button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+              {HVPT_CONTRASTS.map((contrast) => (
                 <motion.button
-                  key={`${pair.phonemeA}-${pair.phonemeB}`}
+                  key={contrast.id}
                   type="button"
-                  whileHover={{ scale: 1.02 }}
+                  whileHover={{ y: -2 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={() => handleSelectPair(pair)}
-                  className="rounded-xl border bg-card p-4 text-center shadow-sm hover:border-primary/50 cursor-pointer"
+                  onClick={() => startSession(contrast)}
+                  className="rounded-xl border bg-card p-4 text-left shadow-sm hover:border-primary/50 cursor-pointer"
                 >
-                  <Headphones className="mx-auto mb-2 h-6 w-6 text-primary" />
-                  <span className="font-mono text-lg font-bold">
-                    {pair.label}
-                  </span>
+                  <div className="mb-2 flex items-center justify-between gap-3">
+                    <Headphones className="h-5 w-5 text-primary" />
+                    <Badge variant="outline">
+                      通过线 {Math.round(contrast.passRate * 100)}%
+                    </Badge>
+                  </div>
+                  <p className="font-mono text-xl font-bold">
+                    {contrast.label}
+                  </p>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    {contrast.learnerRisk}
+                  </p>
                 </motion.button>
               ))}
             </div>
           </div>
         )}
 
-        {/* Playing */}
-        {phase.type === "playing" && currentItem && selectedPair && (
+        {phase.type === "playing" && currentTrial && selectedContrast && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -167,68 +243,73 @@ export default function PerceptionDrillPage() {
           >
             <div className="flex items-center justify-between text-sm text-muted-foreground">
               <span>
-                第 {phase.questionIndex + 1} / {QUESTIONS_PER_SESSION} 题
+                第 {phase.questionIndex + 1} / {trials.length} 题
               </span>
               <span>正确 {correctCount}</span>
             </div>
 
             <div className="rounded-xl border bg-card p-8 shadow-sm space-y-6">
-              <p className="text-center text-sm text-muted-foreground">
-                听 A、B、X 三个音，判断 X 是哪一个
-              </p>
-
-              <div className="grid grid-cols-3 gap-4">
-                {[
-                  {
-                    label: "A",
-                    play: handlePlayA,
-                    playing: player.isPlaying && activeSlot === "A",
-                  },
-                  {
-                    label: "B",
-                    play: handlePlayB,
-                    playing: player.isPlaying && activeSlot === "B",
-                  },
-                  {
-                    label: "X",
-                    play: handlePlayX,
-                    playing: player.isPlaying && activeSlot === "X",
-                  },
-                ].map((btn) => (
-                  <motion.button
-                    key={btn.label}
-                    type="button"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={btn.play}
-                    className={`flex flex-col items-center gap-2 rounded-xl border p-4 cursor-pointer ${
-                      btn.playing
-                        ? "border-primary bg-primary/5"
-                        : "hover:border-primary/30"
-                    }`}
-                  >
-                    <Volume2
-                      className={`h-6 w-6 ${btn.playing ? "text-primary" : "text-muted-foreground"}`}
-                    />
-                    <span className="text-lg font-bold">{btn.label}</span>
-                  </motion.button>
-                ))}
+              <div className="text-center">
+                <p className="text-sm font-medium text-primary">
+                  这一题只练：{selectedContrast.label} 的听觉边界
+                </p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  场景：{currentTrial.context} · 难度 {currentTrial.difficulty}
+                  /5
+                </p>
               </div>
 
-              <div className="flex justify-center gap-4">
+              <div className="grid grid-cols-3 gap-4">
+                {(["A", "B", "X"] as const).map((slot) => {
+                  const speaker =
+                    slot === "A"
+                      ? currentTrial.speakerA
+                      : slot === "B"
+                        ? currentTrial.speakerB
+                        : currentTrial.speakerX;
+                  return (
+                    <motion.button
+                      key={slot}
+                      type="button"
+                      whileHover={{ scale: 1.04 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => playSlot(slot)}
+                      className={`flex flex-col items-center gap-2 rounded-xl border p-4 cursor-pointer ${
+                        activeSlot === slot && pronunciation.isPlaying
+                          ? "border-primary bg-primary/5"
+                          : "hover:border-primary/30"
+                      }`}
+                    >
+                      <Volume2
+                        className={`h-6 w-6 ${
+                          activeSlot === slot && pronunciation.isPlaying
+                            ? "text-primary"
+                            : "text-muted-foreground"
+                        }`}
+                      />
+                      <span className="text-lg font-bold">{slot}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {speakerLabel(speaker)}
+                      </span>
+                    </motion.button>
+                  );
+                })}
+              </div>
+
+              <div className="grid gap-3 md:grid-cols-2">
                 <Button
-                  onClick={() => handleAnswer(true)}
+                  onClick={() => answer("A")}
                   variant="outline"
                   size="lg"
-                  className="flex-1 cursor-pointer"
+                  className="cursor-pointer"
                 >
                   X = A
                 </Button>
                 <Button
-                  onClick={() => handleAnswer(false)}
+                  onClick={() => answer("B")}
                   variant="outline"
                   size="lg"
-                  className="flex-1 cursor-pointer"
+                  className="cursor-pointer"
                 >
                   X = B
                 </Button>
@@ -237,85 +318,203 @@ export default function PerceptionDrillPage() {
           </motion.div>
         )}
 
-        {/* Answered */}
-        {phase.type === "answered" && (
+        {phase.type === "answered" && currentTrial && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
+            initial={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="rounded-xl border bg-card p-8 shadow-sm text-center space-y-4"
+            className="rounded-xl border bg-card p-8 text-center shadow-sm"
           >
-            {phase.correct ? (
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10"
-              >
-                <Check className="h-8 w-8 text-primary" />
-              </motion.div>
-            ) : (
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-100 dark:bg-red-950/30"
-              >
-                <X className="h-8 w-8 text-red-500" />
-              </motion.div>
-            )}
-            <p className="text-lg font-bold">
-              {phase.correct ? "正确！" : "不对"}
+            <div
+              className={`mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full ${
+                phase.correct
+                  ? "bg-primary/10 text-primary"
+                  : "bg-red-100 text-red-500 dark:bg-red-950/30"
+              }`}
+            >
+              {phase.correct ? (
+                <Check className="h-8 w-8" />
+              ) : (
+                <X className="h-8 w-8" />
+              )}
+            </div>
+            <h2 className="text-xl font-bold">
+              {phase.correct ? "听对了" : "这次混淆了"}
+            </h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              X 是 {currentTrial.xIsA ? "A" : "B"} · 词是 {currentTrial.xWord}
             </p>
-            <p className="text-sm text-muted-foreground">
-              X = {phase.xIsA ? "A" : "B"}
-            </p>
-            <Button onClick={handleNext} className="cursor-pointer">
-              下一题
-            </Button>
+            <div className="mt-5 flex justify-center gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => playSlot("X")}
+                className="gap-2 cursor-pointer"
+              >
+                <Volume2 className="h-4 w-4" />
+                再听 X
+              </Button>
+              <Button type="button" onClick={next} className="cursor-pointer">
+                下一题
+              </Button>
+            </div>
           </motion.div>
         )}
 
-        {/* Completed */}
-        {phase.type === "completed" && (
+        {phase.type === "focused-review" && selectedContrast && (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="rounded-xl border bg-card p-6 shadow-sm"
+          >
+            <div className="mb-4 flex items-center gap-2">
+              <RotateCcw className="h-5 w-5 text-primary" />
+              <h2 className="text-xl font-bold">追加错项复听</h2>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              听辨低于通过线时，先复听刚才错过的具体对比，不直接进入发音。
+            </p>
+            <div className="mt-5 grid gap-3 md:grid-cols-2">
+              {phase.trials.map((trial) => (
+                <div key={trial.id} className="rounded-lg border p-3">
+                  <p className="text-sm font-semibold">
+                    {trial.wordA} / {trial.wordB}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {trial.context}
+                  </p>
+                  <div className="mt-3 flex gap-2">
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() =>
+                        pronunciation.playWord(trial.wordA, trial.speakerA)
+                      }
+                      className="cursor-pointer"
+                    >
+                      听 A
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() =>
+                        pronunciation.playWord(trial.wordB, trial.speakerB)
+                      }
+                      className="cursor-pointer"
+                    >
+                      听 B
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 flex justify-end gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => startSession(selectedContrast, phase.trials)}
+                className="cursor-pointer"
+              >
+                用错题再测
+              </Button>
+              <Button
+                type="button"
+                onClick={finishFocusedReview}
+                className="cursor-pointer"
+              >
+                查看总结
+              </Button>
+            </div>
+          </motion.div>
+        )}
+
+        {phase.type === "completed" && selectedContrast && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="rounded-xl border bg-card p-8 shadow-sm text-center space-y-4"
+            className="rounded-xl border bg-card p-8 text-center shadow-sm"
           >
             <Headphones className="mx-auto h-12 w-12 text-primary" />
-            <h2 className="text-2xl font-bold">辨音训练完成</h2>
+            <h2 className="mt-3 text-2xl font-bold">听辨训练完成</h2>
             <div
-              className={`inline-flex h-20 w-20 items-center justify-center rounded-2xl text-white ${
-                phase.correct >= 8
+              className={`mx-auto mt-5 inline-flex h-24 w-24 items-center justify-center rounded-2xl text-white ${
+                phase.summary.passed
                   ? "bg-primary"
-                  : phase.correct >= 6
-                    ? "bg-yellow-500"
+                  : phase.summary.accuracy >= 0.7
+                    ? "bg-amber-500"
                     : "bg-red-500"
               }`}
             >
               <span className="text-3xl font-bold">
-                {correctCount}/{phase.total}
+                {Math.round(phase.summary.accuracy * 100)}%
               </span>
             </div>
-            <p className="text-sm text-muted-foreground">
-              {correctCount >= 8
-                ? "听力辨别能力很强！可以进入发音训练。"
-                : correctCount >= 6
-                  ? "还不错，建议多听几遍标准发音再练。"
-                  : "建议先多听对比音频，建立听觉靶点后再练发音。"}
+            <p className="mt-4 text-sm text-muted-foreground">
+              {phase.summary.nextAction}
             </p>
-            <div className="flex justify-center gap-3">
+            {phase.summary.biasDirection && (
+              <p className="mt-2 text-sm font-medium text-primary">
+                偏误方向：{phase.summary.biasDirection}
+              </p>
+            )}
+            <div className="mx-auto mt-5 grid max-w-md grid-cols-2 gap-2 text-sm">
+              <div className="rounded-lg border p-3">
+                <p className="text-muted-foreground">
+                  {selectedContrast.targetA} 听成自己
+                </p>
+                <p className="text-xl font-bold">
+                  {phase.summary.confusionMatrix.aAsA}
+                </p>
+              </div>
+              <div className="rounded-lg border p-3">
+                <p className="text-muted-foreground">
+                  {selectedContrast.targetA} 听成 {selectedContrast.targetB}
+                </p>
+                <p className="text-xl font-bold">
+                  {phase.summary.confusionMatrix.aAsB}
+                </p>
+              </div>
+              <div className="rounded-lg border p-3">
+                <p className="text-muted-foreground">
+                  {selectedContrast.targetB} 听成 {selectedContrast.targetA}
+                </p>
+                <p className="text-xl font-bold">
+                  {phase.summary.confusionMatrix.bAsA}
+                </p>
+              </div>
+              <div className="rounded-lg border p-3">
+                <p className="text-muted-foreground">
+                  {selectedContrast.targetB} 听成自己
+                </p>
+                <p className="text-xl font-bold">
+                  {phase.summary.confusionMatrix.bAsB}
+                </p>
+              </div>
+            </div>
+            <div className="mt-6 flex justify-center gap-3">
               <Button
+                type="button"
                 variant="outline"
-                onClick={handleReset}
+                onClick={reset}
                 className="cursor-pointer"
               >
                 返回
               </Button>
               <Button
-                onClick={() => selectedPair && handleSelectPair(selectedPair)}
+                type="button"
+                onClick={() => startSession(selectedContrast)}
                 className="cursor-pointer"
               >
                 再练一轮
               </Button>
+              {phase.summary.passed && (
+                <Link href={`/drill/pack/${selectedContrast.packId}`}>
+                  <Button type="button" className="cursor-pointer">
+                    进入发音课
+                  </Button>
+                </Link>
+              )}
             </div>
           </motion.div>
         )}

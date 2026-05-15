@@ -176,6 +176,18 @@ ${highScoreExtras}
 - 最关键的改进建议2（不超过两句话，如果只有一个问题可以省略）
 </top_issues>
 
+<practice_now>
+给用户 3 个马上能做的短练习。每条必须很具体，且只改一个动作：
+1. 先慢速读/听哪个词或短语
+2. 这次只改哪个动作（舌头、嘴唇、气流、声带、重音或停顿中的一个）
+3. 重复几遍，达到什么感觉再继续
+
+格式示例：
+1. **think** 慢读 3 遍：这次只做“舌尖轻碰上齿边缘往外吹气”，不要管速度。
+2. **sink / think** 交替 5 组：每组只听自己有没有把舌头缩回去。
+3. **I think so** 分块读 3 遍：先停在 think 后面，确认 /th/ 干净，再连成整句。
+</practice_now>
+
 <priority_fixes>
 ## 🔴 优先改（重灾区）
 
@@ -219,8 +231,9 @@ ${highScoreExtras}
 </details>
 
 重要规则：
-- 必须按照 summary → top_issues → priority_fixes → dimensions → details 的顺序输出
+- 必须按照 summary → top_issues → practice_now → priority_fixes → dimensions → details 的顺序输出
 - 每个 XML 标签必须成对出现
+- practice_now 永远要写，除非 summary 是"完美。没有问题。"
 - priority_fixes 是用户最先看到的详细内容，必须最实用、最具可操作性
 - 所有分数都满分时，summary 写"完美。没有问题。"，其余标签内容留空`;
 }

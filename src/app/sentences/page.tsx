@@ -1,7 +1,7 @@
 "use client";
 
 import { Trash2 } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { SentenceInputCard } from "@/components/sentences/sentence-input-card";
 import { SentenceRecordingCard } from "@/components/sentences/sentence-recording-card";
 import { SentenceResultsColumn } from "@/components/sentences/sentence-results-column";
@@ -11,6 +11,7 @@ import type { FeedbackData } from "@/hooks/use-llm-feedback";
 import { useLlmFeedback } from "@/hooks/use-llm-feedback";
 import { useMwPronunciation } from "@/hooks/use-mw-pronunciation";
 import { useRecorder } from "@/hooks/use-recorder";
+import { useRecordingQuality } from "@/hooks/use-recording-quality";
 import {
   clearSessionPrefix,
   loadSession,
@@ -20,9 +21,17 @@ import {
 import { useSyllableStress } from "@/hooks/use-syllable-stress";
 import { useTtsAligned } from "@/hooks/use-tts-aligned";
 import { useWordIpa } from "@/hooks/use-word-ipa";
+import {
+  analyzeFreePracticeTransfer,
+  buildFreePracticeTargetPreview,
+  type FreePracticeTransferSummary,
+  recordFreePracticeTransfer,
+} from "@/lib/free-practice-transfer";
+import { loadMasteryProfile, saveMasteryProfile } from "@/lib/mastery-profile";
 import { addScore } from "@/lib/score-history";
 import { isSentence } from "@/lib/utils";
 import type { AzureAssessmentResult, AzureWord } from "@/types/azure";
+import type { MasteryProfile } from "@/types/training";
 
 const SESSION_PREFIX = "sentences";
 
@@ -30,6 +39,9 @@ export default function SentencesPage() {
   const [sentence, setSentence] = useSessionState(`${SESSION_PREFIX}:text`, "");
   const [speed, setSpeed] = useSessionState(`${SESSION_PREFIX}:speed`, 0.85);
   const [selectedWord, setSelectedWord] = useState<AzureWord | null>(null);
+  const [transferSummary, setTransferSummary] =
+    useState<FreePracticeTransferSummary | null>(null);
+  const [profile, setProfile] = useState<MasteryProfile | null>(null);
 
   const isWordMode = !isSentence(sentence);
   const trimmedText = sentence.trim();
@@ -47,11 +59,26 @@ export default function SentencesPage() {
   // Free-practice page allows up to 150-char sentences; bump cap to 60s so
   // paragraph-length input isn't cut off mid-read.
   const recorder = useRecorder({ maxDurationMs: 60_000 });
+  const recordingQuality = useRecordingQuality(recorder.audioBlob, {
+    expectedMode: isWordMode ? "word" : "sentence",
+    minDurationMs: isWordMode ? 500 : 800,
+  });
   const azure = useAzureAssessment();
   const llm = useLlmFeedback();
   const playback = useAudioPlayer();
   const autoAssessTriggered = useRef(false);
   const restoredRef = useRef(false);
+  const targetPreview = useMemo(
+    () =>
+      trimmedText
+        ? buildFreePracticeTargetPreview({
+            profile,
+            text: trimmedText,
+            mode: isWordMode ? "word" : "sentence",
+          })
+        : null,
+    [profile, trimmedText, isWordMode],
+  );
 
   // ── Session restore/save ──
 
@@ -77,6 +104,13 @@ export default function SentencesPage() {
     }
     if (savedFeedback) llm.restore(savedFeedback);
   }, [azure.restore, llm.restore]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    const refreshProfile = () => setProfile(loadMasteryProfile());
+    refreshProfile();
+    window.addEventListener("storage", refreshProfile);
+    return () => window.removeEventListener("storage", refreshProfile);
+  }, []);
 
   useEffect(() => {
     if (!restoredRef.current) return;
@@ -110,8 +144,10 @@ export default function SentencesPage() {
     llm.reset();
     recorder.reset();
     playback.stop();
+    setTransferSummary(null);
+    recordingQuality.reset();
     autoAssessTriggered.current = false;
-  }, [azure, llm, recorder, playback, setSentence, setSpeed]);
+  }, [azure, llm, recorder, playback, recordingQuality, setSentence, setSpeed]);
 
   useEffect(() => {
     if (mw.isPlaying) setHasPlayedWord(true);
@@ -137,8 +173,10 @@ export default function SentencesPage() {
     llm.reset();
     azure.reset();
     setSelectedWord(null);
+    setTransferSummary(null);
+    recordingQuality.reset();
     recorder.startRecording();
-  }, [llm, azure, recorder]);
+  }, [llm, azure, recorder, recordingQuality]);
 
   const handleRecordStop = useCallback(() => {
     recorder.stopRecording();
@@ -146,6 +184,9 @@ export default function SentencesPage() {
 
   const handleAssess = useCallback(async () => {
     if (!recorder.audioBlob || !sentence.trim()) return;
+    if (recordingQuality.isAnalyzing || !recordingQuality.report?.canSubmit) {
+      return;
+    }
 
     setSelectedWord(null);
     const result = await azure.assess(recorder.audioBlob, sentence.trim());
@@ -154,24 +195,46 @@ export default function SentencesPage() {
       const text = sentence.trim();
       const histKey = `${text.slice(0, 50)}:${text.length}`;
       addScore(histKey, result.pronunciationScore);
+      const profile = loadMasteryProfile();
+      const transfer = analyzeFreePracticeTransfer({
+        profile,
+        result,
+        text,
+        mode: isSentence(text) ? "sentence" : "word",
+      });
+      if (transfer.evidences.length > 0) {
+        const recorded = recordFreePracticeTransfer(profile, transfer);
+        saveMasteryProfile(recorded.profile);
+        setProfile(recorded.profile);
+        setTransferSummary(recorded.summary);
+      } else {
+        setTransferSummary(transfer);
+      }
       llm.requestFeedback(
         text,
         result,
         isSentence(text) ? "sentence" : "phoneme",
       );
     }
-  }, [recorder.audioBlob, sentence, azure, llm]);
+  }, [recorder.audioBlob, sentence, azure, llm, recordingQuality]);
 
   useEffect(() => {
     if (
       recorder.autoStopped &&
       recorder.audioBlob &&
+      recordingQuality.report &&
+      !recordingQuality.isAnalyzing &&
       !autoAssessTriggered.current
     ) {
       autoAssessTriggered.current = true;
       handleAssess();
     }
-  }, [recorder.autoStopped, recorder.audioBlob, handleAssess]);
+  }, [
+    recorder.autoStopped,
+    recorder.audioBlob,
+    recordingQuality,
+    handleAssess,
+  ]);
 
   useEffect(() => {
     if (recorder.isRecording) {
@@ -203,8 +266,10 @@ export default function SentencesPage() {
     azure.reset();
     llm.reset();
     setSelectedWord(null);
+    setTransferSummary(null);
+    recordingQuality.reset();
     autoAssessTriggered.current = false;
-  }, [playback, recorder, azure, llm]);
+  }, [playback, recorder, azure, llm, recordingQuality]);
 
   const handleMwPlay = useCallback(
     (word: string) => {
@@ -274,6 +339,7 @@ export default function SentencesPage() {
             ttsWordTimings={tts.wordTimings}
             ttsCurrentTime={tts.currentTime}
             onTtsReplay={() => tts.replay()}
+            targetPreview={targetPreview}
             onListen={handleListen}
           />
 
@@ -284,6 +350,8 @@ export default function SentencesPage() {
             maxDurationSeconds={recorder.maxDurationSeconds}
             audioBlob={recorder.audioBlob}
             stream={recorder.stream}
+            qualityReport={recordingQuality.report}
+            isAnalyzingQuality={recordingQuality.isAnalyzing}
             recorderError={recorder.error}
             onRecordStart={handleRecordStart}
             onRecordStop={handleRecordStop}
@@ -310,6 +378,7 @@ export default function SentencesPage() {
             hasFeedback={llm.hasFeedback}
             llmError={llm.error}
             onRetryFeedback={handleRetryFeedback}
+            transferSummary={transferSummary}
           />
         </div>
       </div>

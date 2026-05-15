@@ -95,8 +95,9 @@ describe("training prescription", () => {
     expect(packIds).not.toContain("s-th");
     expect(packIds).toContain("v-w");
     expect(
-      prescription.days.flatMap((day) => day.items).find((item) => item.packId === "v-w")
-        ?.levelId,
+      prescription.days
+        .flatMap((day) => day.items)
+        .find((item) => item.packId === "v-w")?.levelId,
     ).toBe("mixed-review");
   });
 
@@ -114,5 +115,93 @@ describe("training prescription", () => {
       packId: "stress-rhythm",
       levelId: "shadowing-transfer",
     });
+  });
+
+  it("routes diagnosis items through the current mastery stage", () => {
+    const diagnosisIssue = issue("thin", "critical", "s-th");
+    diagnosisIssue.evidenceStrength = "strong";
+    const profile: MasteryProfile = {
+      version: 2,
+      updatedAt: 1,
+      packs: {
+        "s-th": {
+          packId: "s-th",
+          status: "practicing",
+          masteryState: "learning",
+          stageScore: 30,
+          stageCeiling: 35,
+          highestLayer: "articulation",
+          nextRequiredLayer: "word",
+          stateRationale: "动作已建立，下一步要放进真实单词。",
+          levelProgress: {},
+          bestTargetScore: 76,
+          perceptionBestRate: 0.86,
+          completedSessions: 1,
+          failureStreak: 0,
+        },
+      },
+      phonemes: {},
+      errorPatterns: {},
+      sessions: [],
+    };
+
+    const prescription = buildTrainingPrescription(
+      [diagnosisIssue],
+      "diagnosis",
+      profile,
+    );
+
+    expect(prescription.days[0].items[0]).toMatchObject({
+      packId: "s-th",
+      levelId: "word-ladder",
+      currentMasteryState: "learning",
+      stageScore: 30,
+      stageCeiling: 35,
+      highestLayer: "articulation",
+      nextRequiredLayer: "word",
+      evidenceStrength: "strong",
+    });
+    expect(prescription.days[0].items[0].learningObjective).toContain(
+      "真实单词",
+    );
+  });
+
+  it("routes due reviews to the next required mastery layer", () => {
+    const profile: MasteryProfile = {
+      version: 2,
+      updatedAt: 1,
+      packs: {
+        "v-w": {
+          packId: "v-w",
+          status: "mastered",
+          masteryState: "retained",
+          stageScore: 78,
+          stageCeiling: 85,
+          highestLayer: "connected",
+          nextRequiredLayer: "guided",
+          levelProgress: {},
+          bestTargetScore: 91,
+          perceptionBestRate: 1,
+          completedSessions: 3,
+          failureStreak: 0,
+          nextReviewAt: Date.now() - 1000,
+        },
+      },
+      phonemes: {},
+      errorPatterns: {},
+      sessions: [],
+    };
+
+    const prescription = buildTrainingPrescription([], "review", profile);
+
+    expect(prescription.days[0].items[0]).toMatchObject({
+      packId: "v-w",
+      levelId: "shadowing-transfer",
+      currentMasteryState: "retained",
+      nextRequiredLayer: "guided",
+    });
+    expect(prescription.days[0].items[0].learningObjective).toContain(
+      "半开放回答",
+    );
   });
 });
