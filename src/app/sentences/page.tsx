@@ -28,6 +28,7 @@ import {
   recordFreePracticeTransfer,
 } from "@/lib/free-practice-transfer";
 import { loadMasteryProfile, saveMasteryProfile } from "@/lib/mastery-profile";
+import { reliabilityFromRecordingQuality } from "@/lib/recording-quality";
 import { addScore } from "@/lib/score-history";
 import { isSentence } from "@/lib/utils";
 import type { AzureAssessmentResult, AzureWord } from "@/types/azure";
@@ -68,6 +69,7 @@ export default function SentencesPage() {
   const playback = useAudioPlayer();
   const autoAssessTriggered = useRef(false);
   const restoredRef = useRef(false);
+  const previousTrimmedTextRef = useRef(trimmedText);
   const targetPreview = useMemo(
     () =>
       trimmedText
@@ -143,11 +145,32 @@ export default function SentencesPage() {
     azure.reset();
     llm.reset();
     recorder.reset();
+    tts.reset();
+    mw.stop();
     playback.stop();
     setTransferSummary(null);
     recordingQuality.reset();
     autoAssessTriggered.current = false;
-  }, [azure, llm, recorder, playback, recordingQuality, setSentence, setSpeed]);
+  }, [
+    azure,
+    llm,
+    recorder,
+    tts,
+    mw,
+    playback,
+    recordingQuality,
+    setSentence,
+    setSpeed,
+  ]);
+
+  useEffect(() => {
+    if (previousTrimmedTextRef.current === trimmedText) return;
+    previousTrimmedTextRef.current = trimmedText;
+    tts.reset();
+    mw.stop();
+    playback.stop();
+    setHasPlayedWord(false);
+  }, [trimmedText, tts, mw, playback]);
 
   useEffect(() => {
     if (mw.isPlaying) setHasPlayedWord(true);
@@ -161,7 +184,7 @@ export default function SentencesPage() {
     if (!trimmedText) return;
     playback.stop();
     if (isWordMode) {
-      tts.stop();
+      tts.reset();
       mw.playWord(trimmedText);
     } else {
       mw.stop();
@@ -203,7 +226,22 @@ export default function SentencesPage() {
         mode: isSentence(text) ? "sentence" : "word",
       });
       if (transfer.evidences.length > 0) {
-        const recorded = recordFreePracticeTransfer(profile, transfer);
+        const reliability = reliabilityFromRecordingQuality(
+          recordingQuality.report,
+          {
+            evidenceStrength:
+              transfer.evidences.length >= 2 ? "strong" : "fair",
+            note:
+              recordingQuality.report?.issues.length === 0
+                ? "自由练习命中当前目标且录音质量稳定，可计入迁移证据。"
+                : "自由练习录音存在质量提示，本次只作为观察，不提升掌握度。",
+          },
+        );
+        const recorded = recordFreePracticeTransfer(
+          profile,
+          transfer,
+          reliability,
+        );
         saveMasteryProfile(recorded.profile);
         setProfile(recorded.profile);
         setTransferSummary(recorded.summary);
@@ -246,7 +284,7 @@ export default function SentencesPage() {
     (word: AzureWord) => {
       setSelectedWord(word);
       playback.stop();
-      tts.stop();
+      tts.reset();
       mw.playWord(word.word);
     },
     [playback, tts, mw],
@@ -255,13 +293,15 @@ export default function SentencesPage() {
   const handlePlayRecording = useCallback(() => {
     if (recorder.audioBlob) {
       mw.stop();
-      tts.stop();
+      tts.reset();
       playback.playBlob(recorder.audioBlob);
     }
   }, [recorder.audioBlob, mw, tts, playback]);
 
   const handleClear = useCallback(() => {
     playback.stop();
+    tts.reset();
+    mw.stop();
     recorder.reset();
     azure.reset();
     llm.reset();
@@ -269,14 +309,15 @@ export default function SentencesPage() {
     setTransferSummary(null);
     recordingQuality.reset();
     autoAssessTriggered.current = false;
-  }, [playback, recorder, azure, llm, recordingQuality]);
+  }, [playback, tts, mw, recorder, azure, llm, recordingQuality]);
 
   const handleMwPlay = useCallback(
     (word: string) => {
       playback.stop();
+      tts.reset();
       mw.playWord(word);
     },
-    [playback, mw],
+    [playback, tts, mw],
   );
 
   const handleRetryFeedback = useCallback(() => {

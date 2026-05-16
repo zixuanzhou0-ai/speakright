@@ -34,6 +34,9 @@ export interface ProsodyAnalysis {
   completenessScore: number;
   missingFocusWords: string[];
   overHeavyFunctionWords: string[];
+  missingExpectedPauses: string[];
+  unexpectedPauses: string[];
+  evidenceConfidence: "low" | "medium" | "high";
   likelyIssue:
     | "unclear-text"
     | "flat-prosody"
@@ -139,6 +142,64 @@ function normalizedWords(text: string): string[] {
   );
 }
 
+function wordKey(word: string): string {
+  return word
+    .toLowerCase()
+    .replace(/[^a-z']/g, "")
+    .replace(/'s$/, "");
+}
+
+function breakErrors(word: AzureAssessmentResult["words"][number]): string[] {
+  return word.feedback?.prosody?.break?.errorTypes ?? [];
+}
+
+function hasBreakFeedback(result: AzureAssessmentResult): boolean {
+  return result.words.some((word) => breakErrors(word).length > 0);
+}
+
+function boundaryKey(left: string, right: string): string {
+  return `${wordKey(left)}|${wordKey(right)}`;
+}
+
+function pauseEvidence(
+  exercise: ProsodyExercise,
+  result: AzureAssessmentResult,
+): {
+  missingExpectedPauses: string[];
+  unexpectedPauses: string[];
+  confidence: "low" | "medium" | "high";
+} {
+  const expected = new Set(
+    exercise.expectedPauses.map((item) => item.toLowerCase()),
+  );
+  const missingExpectedPauses: string[] = [];
+  const unexpectedPauses: string[] = [];
+  const feedbackAvailable = hasBreakFeedback(result);
+
+  for (let index = 0; index < result.words.length - 1; index += 1) {
+    const current = result.words[index];
+    const next = result.words[index + 1];
+    const key = boundaryKey(current.word, next.word);
+    const errors = breakErrors(current);
+    if (expected.has(key) && errors.includes("MissingBreak")) {
+      missingExpectedPauses.push(key);
+    }
+    if (!expected.has(key) && errors.includes("UnexpectedBreak")) {
+      unexpectedPauses.push(key);
+    }
+  }
+
+  return {
+    missingExpectedPauses,
+    unexpectedPauses,
+    confidence: feedbackAvailable
+      ? missingExpectedPauses.length > 0 || unexpectedPauses.length > 0
+        ? "high"
+        : "medium"
+      : "low",
+  };
+}
+
 export function getProsodyExercise(id: string): ProsodyExercise | undefined {
   return PROSODY_EXERCISES.find((exercise) => exercise.id === id);
 }
@@ -153,16 +214,20 @@ export function analyzeProsodyAttempt(
   const missingFocusWords = exercise.focusWords.filter(
     (word) => !spokenWords.has(word.toLowerCase()),
   );
-  const overHeavyFunctionWords = exercise.weakWords.filter((word) => {
-    const azureWord = result.words.find(
-      (item) => item.word.toLowerCase() === word.toLowerCase(),
-    );
-    return (
-      (azureWord?.accuracyScore ?? 0) >= 92 &&
-      result.prosodyScore != null &&
-      result.prosodyScore < exercise.pass.minProsody
-    );
-  });
+  const pause = pauseEvidence(exercise, result);
+  const breakFeedbackAvailable = pause.confidence !== "low";
+  const overHeavyFunctionWords = breakFeedbackAvailable
+    ? []
+    : exercise.weakWords.filter((word) => {
+        const azureWord = result.words.find(
+          (item) => item.word.toLowerCase() === word.toLowerCase(),
+        );
+        return (
+          (azureWord?.accuracyScore ?? 0) >= 92 &&
+          result.prosodyScore != null &&
+          result.prosodyScore < exercise.pass.minProsody
+        );
+      });
 
   const prosodyScore = result.prosodyScore ?? result.fluencyScore;
   const passed =
@@ -170,18 +235,23 @@ export function analyzeProsodyAttempt(
     result.fluencyScore >= exercise.pass.minFluency &&
     result.accuracyScore >= exercise.pass.minAccuracy &&
     result.completenessScore >= 75 &&
-    missingFocusWords.length === 0;
+    missingFocusWords.length === 0 &&
+    pause.missingExpectedPauses.length === 0 &&
+    pause.unexpectedPauses.length === 0;
 
   const likelyIssue: ProsodyAnalysis["likelyIssue"] =
     result.completenessScore < 75 || missingFocusWords.length > 0
       ? "unclear-text"
-      : prosodyScore < exercise.pass.minProsody
-        ? overHeavyFunctionWords.length > 0
-          ? "over-heavy-function-words"
-          : "flat-prosody"
-        : result.fluencyScore < exercise.pass.minFluency
-          ? "choppy-rhythm"
-          : "good-control";
+      : pause.missingExpectedPauses.length > 0 ||
+          pause.unexpectedPauses.length > 0
+        ? "choppy-rhythm"
+        : prosodyScore < exercise.pass.minProsody
+          ? overHeavyFunctionWords.length > 0
+            ? "over-heavy-function-words"
+            : "flat-prosody"
+          : result.fluencyScore < exercise.pass.minFluency
+            ? "choppy-rhythm"
+            : "good-control";
 
   const nextCueByIssue: Record<ProsodyAnalysis["likelyIssue"], string> = {
     "unclear-text": "先把原句读完整；漏词时不要急着练节奏。",
@@ -201,6 +271,9 @@ export function analyzeProsodyAttempt(
     completenessScore: result.completenessScore,
     missingFocusWords,
     overHeavyFunctionWords,
+    missingExpectedPauses: pause.missingExpectedPauses,
+    unexpectedPauses: pause.unexpectedPauses,
+    evidenceConfidence: pause.confidence,
     likelyIssue,
     nextCue: nextCueByIssue[likelyIssue],
   };

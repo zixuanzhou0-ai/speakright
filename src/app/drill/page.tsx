@@ -188,21 +188,22 @@ export default function DrillPage() {
     [profile, reviewQueue],
   );
   const reviewItems = reviewQueue.slice(0, 2).map(prescriptionFromReviewTask);
-  const todayItems = [
-    ...reviewItems,
-    ...(prescription.days[0]?.items ?? []).filter(
-      (item) =>
-        !reviewItems.some((reviewItem) => reviewItem.packId === item.packId),
-    ),
-  ].slice(0, 2);
+  const todayItems = Array.from(
+    new Map(
+      [...reviewItems, ...(prescription.days[0]?.items ?? [])].map((item) => [
+        item.packId,
+        item,
+      ]),
+    ).values(),
+  ).slice(0, 2);
 
   return (
     <div className="h-full flex flex-col px-6 py-4 overflow-y-auto scrollbar-thin">
       <div className="mb-5 flex items-start justify-between gap-4 shrink-0">
         <div>
-          <h1 className="text-2xl font-bold">刻意练习</h1>
+          <h1 className="text-2xl font-bold">今日学习计划</h1>
           <p className="mt-1 text-muted-foreground">
-            按诊断处方训练，不再只做浅层刷题
+            今天建议完成 2 个任务：先做到期复习，再做一个主训练
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -235,6 +236,15 @@ export default function DrillPage() {
                 : "默认高频问题"}
           </Badge>
         </div>
+        {!report && (
+          <div className="mb-4 rounded-lg border border-dashed bg-muted/30 p-3 text-sm">
+            <p className="font-medium">还没有诊断报告</p>
+            <p className="mt-1 text-muted-foreground">
+              可以先做 3 分钟快速诊断；如果你想直接开始，系统会从 final
+              consonants、核心元音和重音节奏这些高影响问题开始。
+            </p>
+          </div>
+        )}
         {reviewQueue.length > 0 && (
           <div className="mb-4 grid gap-2 md:grid-cols-2">
             {reviewQueue.slice(0, 2).map((task) => {

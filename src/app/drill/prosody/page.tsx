@@ -239,6 +239,9 @@ export default function ProsodyPage() {
                 <Badge variant={analysis.passed ? "default" : "secondary"}>
                   {analysis.likelyIssue}
                 </Badge>
+                <Badge variant="outline">
+                  证据 {analysis.evidenceConfidence}
+                </Badge>
               </div>
               <div className="grid gap-3 md:grid-cols-4">
                 <Metric label="韵律" value={analysis.prosodyScore} />
@@ -262,6 +265,24 @@ export default function ProsodyPage() {
                 <p className="mt-2 text-sm text-muted-foreground">
                   可能过重的功能词：
                   {analysis.overHeavyFunctionWords.join(", ")}
+                </p>
+              )}
+              {analysis.missingExpectedPauses.length > 0 && (
+                <p className="mt-2 text-sm text-muted-foreground">
+                  缺少停顿的位置：
+                  {analysis.missingExpectedPauses.join(", ")}
+                </p>
+              )}
+              {analysis.unexpectedPauses.length > 0 && (
+                <p className="mt-2 text-sm text-muted-foreground">
+                  不该断开的地方：
+                  {analysis.unexpectedPauses.join(", ")}
+                </p>
+              )}
+              {analysis.evidenceConfidence === "low" && (
+                <p className="mt-2 text-xs text-muted-foreground">
+                  本次没有拿到词级 break
+                  feedback，韵律判断主要参考总分，只作为低置信度提示。
                 </p>
               )}
             </section>

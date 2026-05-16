@@ -15,6 +15,7 @@ import type {
   DiagnosisIssue,
   DiagnosisIssueSeverity,
   DiagnosisReport,
+  RecordingQualitySnapshot,
 } from "@/types/diagnosis";
 
 const VOWELS = new Set(
@@ -166,12 +167,14 @@ function collectPhonemes(
   phonemeBuckets: Record<string, number[]>,
   rawEvidence: DiagnosisEvidence[],
   referenceText = label,
+  recordingQuality?: RecordingQualitySnapshot,
 ): AssessmentEvidenceAnalysis {
   const analysis = analyzeAssessmentEvidence({
     result,
     referenceText,
     label,
     source,
+    recordingQuality,
   });
 
   if (!analysis.usable) {
@@ -396,6 +399,14 @@ function evidenceStrength(
   issue: DiagnosisIssue,
   phonemeScores: DiagnosisReport["phonemeScores"],
 ): "thin" | "fair" | "strong" {
+  if (
+    issue.type === "rhythm" ||
+    issue.type === "stress" ||
+    issue.type === "fluency" ||
+    issue.type === "connected-speech"
+  ) {
+    return issue.evidence.length >= 2 ? "strong" : "fair";
+  }
   const sampleCount = issue.targetPhonemes.reduce(
     (sum, phoneme) => sum + (phonemeScores[phoneme]?.sampleCount ?? 0),
     0,
@@ -474,6 +485,7 @@ export function buildDiagnosisReport({
   wordRecordings,
   paragraphResult,
   paragraphText,
+  paragraphRecordingQuality,
 }: DiagnosisBuildInput): DiagnosisReport {
   const phonemeBuckets: Record<string, number[]> = {};
   const rawEvidence: DiagnosisEvidence[] = [];
@@ -488,6 +500,7 @@ export function buildDiagnosisReport({
       phonemeBuckets,
       rawEvidence,
       recording.prompt.word,
+      recording.recordingQuality,
     );
     analyses.push(analysis);
     if (analysis.usable) usableWordRecordings.push(recording);
@@ -499,6 +512,7 @@ export function buildDiagnosisReport({
     phonemeBuckets,
     rawEvidence,
     paragraphText,
+    paragraphRecordingQuality,
   );
   analyses.push(paragraphAnalysis);
   const usableParagraphResult = paragraphAnalysis.usable
@@ -604,6 +618,7 @@ export function buildCoveragePassageDiagnosisReport({
       phonemeBuckets,
       rawEvidence,
       recording.text,
+      recording.recordingQuality,
     );
     analyses.push(analysis);
     if (analysis.usable) usableRecordings.push(recording);

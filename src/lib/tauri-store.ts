@@ -4,11 +4,8 @@
  * In browser: falls back to localStorage.
  */
 
+import { isTauriEnvironment } from "@/lib/tauri-runtime";
 import type { LazyStore } from "@tauri-apps/plugin-store";
-
-const isTauri = () =>
-  typeof window !== "undefined" &&
-  ("__TAURI__" in window || "__TAURI_INTERNALS__" in window);
 
 let storeInstance: LazyStore | null = null;
 
@@ -24,7 +21,7 @@ async function getStore(): Promise<LazyStore> {
  * Get a value by key. Returns null if not found.
  */
 export async function storeGet<T>(key: string): Promise<T | null> {
-  if (!isTauri()) {
+  if (!isTauriEnvironment()) {
     try {
       const raw = localStorage.getItem(key);
       return raw ? (JSON.parse(raw) as T) : null;
@@ -46,7 +43,7 @@ export async function storeGet<T>(key: string): Promise<T | null> {
  * Set a value by key.
  */
 export async function storeSet<T>(key: string, value: T): Promise<void> {
-  if (!isTauri()) {
+  if (!isTauriEnvironment()) {
     localStorage.setItem(key, JSON.stringify(value));
     window.dispatchEvent(new StorageEvent("storage", { key }));
     return;
@@ -69,7 +66,7 @@ export async function storeSet<T>(key: string, value: T): Promise<void> {
  * Delete a key.
  */
 export async function storeDelete(key: string): Promise<void> {
-  if (!isTauri()) {
+  if (!isTauriEnvironment()) {
     localStorage.removeItem(key);
     return;
   }
@@ -88,7 +85,7 @@ export async function storeDelete(key: string): Promise<void> {
  * Call once on app startup in Tauri mode.
  */
 export async function migrateFromLocalStorage(keys: string[]): Promise<void> {
-  if (!isTauri()) return;
+  if (!isTauriEnvironment()) return;
 
   const store = await getStore();
   for (const key of keys) {

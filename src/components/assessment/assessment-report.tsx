@@ -13,6 +13,10 @@ import { useEffect, useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getDiagnosisSummary } from "@/lib/diagnosis-engine";
+import {
+  buildDiagnosisReviewPackage,
+  type DiagnosisReviewItem,
+} from "@/lib/diagnosis-review-package";
 import { loadMasteryProfile } from "@/lib/mastery-profile";
 import { getScoreBg } from "@/lib/score-utils";
 import { getTrainingPack } from "@/lib/training-packs";
@@ -69,13 +73,16 @@ export function AssessmentReport({ result, onRetake }: AssessmentReportProps) {
   const prescriptionItems = displayPrescription.days.flatMap(
     (day) => day.items,
   );
+  const reviewPackage = useMemo(
+    () => buildDiagnosisReviewPackage(result),
+    [result],
+  );
+  const reviewByIssueId = new Map(
+    reviewPackage.reviewItems.map((item) => [item.issueId, item]),
+  );
   const dims = result.dimensions;
-  const primaryPackId =
-    result.issues[0]?.nextLesson?.packId ??
-    displayPrescription.days[0]?.items[0]?.packId;
-  const primaryLevelId =
-    result.issues[0]?.nextLesson?.levelId ??
-    displayPrescription.days[0]?.items[0]?.levelId;
+  const primaryPackId = displayPrescription.days[0]?.items[0]?.packId;
+  const primaryLevelId = displayPrescription.days[0]?.items[0]?.levelId;
   const primaryPack = primaryPackId ? getTrainingPack(primaryPackId) : null;
   const primaryHref = primaryPack
     ? `/drill/pack/${primaryPack.id}${
@@ -174,7 +181,7 @@ export function AssessmentReport({ result, onRetake }: AssessmentReportProps) {
           <div className="flex items-center gap-2">
             <Target className="h-4 w-4 text-primary" />
             <h2 className="text-sm font-semibold text-muted-foreground">
-              Top 3 学习处方
+              Top 3 学习处方与补测
             </h2>
           </div>
           <div className="grid gap-3 md:grid-cols-3">
@@ -187,6 +194,7 @@ export function AssessmentReport({ result, onRetake }: AssessmentReportProps) {
                   key={issue.id}
                   issue={issue}
                   prescriptionItem={prescriptionItem}
+                  reviewItem={reviewByIssueId.get(issue.id)}
                   profile={profile}
                 />
               );
@@ -363,14 +371,20 @@ export function AssessmentReport({ result, onRetake }: AssessmentReportProps) {
 function IssueCard({
   issue,
   prescriptionItem,
+  reviewItem,
   profile,
 }: {
   issue: DiagnosisIssue;
   prescriptionItem?: TrainingPrescriptionItem;
+  reviewItem?: DiagnosisReviewItem;
   profile?: MasteryProfile | null;
 }) {
   const packId = prescriptionItem?.packId ?? issue.recommendedPackIds[0];
   const pack = packId ? getTrainingPack(packId) : null;
+  const retestFirst =
+    reviewItem?.suggestedAction === "retest" ||
+    issue.confidence === "low" ||
+    issue.evidenceStrength === "thin";
   const mastery = packId ? profile?.packs[packId] : undefined;
   const masteryState: MasteryState =
     prescriptionItem?.currentMasteryState ??
@@ -384,11 +398,13 @@ function IssueCard({
   const levelTitle =
     pack?.course?.levels.find((level) => level.id === levelId)?.title ??
     levelId;
-  const packHref = pack
-    ? `/drill/pack/${pack.id}${
-        levelId ? `?level=${encodeURIComponent(levelId)}` : ""
-      }`
-    : "/drill";
+  const packHref = retestFirst
+    ? "/assessment"
+    : pack
+      ? `/drill/pack/${pack.id}${
+          levelId ? `?level=${encodeURIComponent(levelId)}` : ""
+        }`
+      : "/drill";
 
   return (
     <div
@@ -439,21 +455,35 @@ function IssueCard({
         ))}
       </div>
       {(prescriptionItem?.learningObjective || levelTitle) && (
-        <div className="mt-3 rounded-lg border border-primary/20 bg-primary/5 p-2 text-xs">
+        <div
+          className={cn(
+            "mt-3 rounded-lg border p-2 text-xs",
+            retestFirst
+              ? "border-amber-300 bg-amber-50 text-amber-950 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-100"
+              : "border-primary/20 bg-primary/5",
+          )}
+        >
           <p className="font-semibold text-primary">
-            今天从：{levelTitle ?? "训练处方"}
+            {retestFirst
+              ? "先补测，不直接训练"
+              : `今天从：${levelTitle ?? "训练处方"}`}
           </p>
-          {prescriptionItem?.learningObjective && (
+          {retestFirst && reviewItem && (
+            <p className="mt-1 text-muted-foreground">{reviewItem.reason}</p>
+          )}
+          {!retestFirst && prescriptionItem?.learningObjective && (
             <p className="mt-1 text-muted-foreground">
               {prescriptionItem.learningObjective}
             </p>
           )}
-          {issue.nextLesson?.reason && !prescriptionItem?.learningObjective && (
-            <p className="mt-1 text-muted-foreground">
-              {issue.nextLesson.reason}
-            </p>
-          )}
-          {prescriptionItem?.stageReason && (
+          {!retestFirst &&
+            issue.nextLesson?.reason &&
+            !prescriptionItem?.learningObjective && (
+              <p className="mt-1 text-muted-foreground">
+                {issue.nextLesson.reason}
+              </p>
+            )}
+          {!retestFirst && prescriptionItem?.stageReason && (
             <p className="mt-1 text-muted-foreground">
               {prescriptionItem.stageReason}
             </p>
@@ -472,7 +502,7 @@ function IssueCard({
       {pack && (
         <Link href={packHref} className="mt-3 inline-flex">
           <Button size="sm" variant="outline" className="gap-2 cursor-pointer">
-            进入这一关
+            {retestFirst ? "先补测这个问题" : "进入这一关"}
             <ArrowRight className="h-3.5 w-3.5" />
           </Button>
         </Link>

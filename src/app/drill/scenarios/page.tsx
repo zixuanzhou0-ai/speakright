@@ -28,6 +28,7 @@ import {
   recordFreePracticeTransfer,
 } from "@/lib/free-practice-transfer";
 import { loadMasteryProfile, saveMasteryProfile } from "@/lib/mastery-profile";
+import { reliabilityFromRecordingQuality } from "@/lib/recording-quality";
 import {
   buildTransferPromptPlan,
   TRANSFER_SCENARIOS,
@@ -86,7 +87,19 @@ export default function ScenariosPage() {
     });
     setSummary(transferSummary);
     if (profile && transferSummary.evidences.length > 0) {
-      const recorded = recordFreePracticeTransfer(profile, transferSummary);
+      const reliability = reliabilityFromRecordingQuality(quality.report, {
+        evidenceStrength:
+          transferSummary.evidences.length >= 2 ? "strong" : "fair",
+        note:
+          quality.report?.issues.length === 0
+            ? "场景迁移命中当前目标且录音质量稳定，可计入迁移证据。"
+            : "场景迁移录音存在质量提示，本次只作为观察，不提升掌握度。",
+      });
+      const recorded = recordFreePracticeTransfer(
+        profile,
+        transferSummary,
+        reliability,
+      );
       saveMasteryProfile(recorded.profile);
       setProfile(recorded.profile);
       setSummary(recorded.summary);

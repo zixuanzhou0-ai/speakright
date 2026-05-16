@@ -97,6 +97,22 @@ export function listBenchmarkRecordings(): BenchmarkRecordingMeta[] {
   return readMeta().sort((a, b) => b.createdAt - a.createdAt);
 }
 
+export function normalizeBenchmarkText(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9'\s]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+export function benchmarkGroupKey(item: BenchmarkRecordingMeta): string {
+  return [
+    item.source,
+    item.targetLabel,
+    normalizeBenchmarkText(item.text),
+  ].join(":");
+}
+
 export function summarizeBenchmarkTrend(items: BenchmarkRecordingMeta[]): {
   latestScore: number;
   bestScore: number;
@@ -115,4 +131,40 @@ export function summarizeBenchmarkTrend(items: BenchmarkRecordingMeta[]): {
     deltaFromFirst: latest.score - first.score,
     count: items.length,
   };
+}
+
+export interface BenchmarkRecordingGroup {
+  key: string;
+  source: BenchmarkRecordingMeta["source"];
+  targetLabel: string;
+  text: string;
+  title: string;
+  recordings: BenchmarkRecordingMeta[];
+  trend: ReturnType<typeof summarizeBenchmarkTrend>;
+}
+
+export function summarizeBenchmarkGroups(
+  items: BenchmarkRecordingMeta[],
+): BenchmarkRecordingGroup[] {
+  const groups = new Map<string, BenchmarkRecordingMeta[]>();
+  for (const item of items) {
+    const key = benchmarkGroupKey(item);
+    groups.set(key, [...(groups.get(key) ?? []), item]);
+  }
+
+  return Array.from(groups.entries())
+    .map(([key, recordings]) => {
+      const sorted = [...recordings].sort((a, b) => b.createdAt - a.createdAt);
+      const latest = sorted[0];
+      return {
+        key,
+        source: latest.source,
+        targetLabel: latest.targetLabel,
+        text: latest.text,
+        title: latest.title,
+        recordings: sorted,
+        trend: summarizeBenchmarkTrend(sorted),
+      };
+    })
+    .sort((a, b) => b.recordings[0].createdAt - a.recordings[0].createdAt);
 }

@@ -14,12 +14,14 @@ import Link from "next/link";
 import { useCallback, useRef, useState } from "react";
 import { AssessmentReport } from "@/components/assessment/assessment-report";
 import { RecordButton } from "@/components/audio/record-button";
+import { RecordingQualityPanel } from "@/components/audio/recording-quality-panel";
 import { WaveformDisplay } from "@/components/audio/waveform-display";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useAzureAssessment } from "@/hooks/use-azure-assessment";
 import { useMwPronunciation } from "@/hooks/use-mw-pronunciation";
 import { useRecorder } from "@/hooks/use-recorder";
+import { useRecordingQuality } from "@/hooks/use-recording-quality";
 import {
   ADAPTIVE_ASSESSMENT_WORDS,
   ASSESSMENT_PARAGRAPH,
@@ -37,7 +39,11 @@ import type {
   AssessmentResult as LegacyAssessmentResult,
 } from "@/types/assessment";
 import type { AzureAssessmentResult } from "@/types/azure";
-import type { AssessmentRecording, DiagnosisReport } from "@/types/diagnosis";
+import type {
+  AssessmentRecording,
+  DiagnosisReport,
+  RecordingQualitySnapshot,
+} from "@/types/diagnosis";
 
 const STORAGE_KEY_V2 = "speakright_assessment_result_v2";
 const LEGACY_STORAGE_KEY = "speakright_assessment_result";
@@ -120,9 +126,16 @@ export default function AssessmentPage() {
   const recorder = useRecorder({ maxDurationMs: 60_000 });
   const azure = useAzureAssessment();
   const mw = useMwPronunciation();
+  const recordingQuality = useRecordingQuality(recorder.audioBlob, {
+    expectedMode: phase.type === "paragraph" ? "paragraph" : "word",
+    minDurationMs: phase.type === "paragraph" ? 1200 : 500,
+  });
 
   const wordRecordingsRef = useRef<AssessmentRecording[]>([]);
   const paragraphResultRef = useRef<AzureAssessmentResult | null>(null);
+  const paragraphQualityRef = useRef<RecordingQualitySnapshot | undefined>(
+    undefined,
+  );
 
   const finalizeReport = useCallback(
     (paragraphResult: AzureAssessmentResult) => {
@@ -130,6 +143,7 @@ export default function AssessmentPage() {
         wordRecordings: wordRecordingsRef.current,
         paragraphResult,
         paragraphText: ASSESSMENT_PARAGRAPH,
+        paragraphRecordingQuality: paragraphQualityRef.current,
       });
       saveReport(report);
       setSavedReport(report);
@@ -141,7 +155,9 @@ export default function AssessmentPage() {
   const handleStart = () => {
     wordRecordingsRef.current = [];
     paragraphResultRef.current = null;
+    paragraphQualityRef.current = undefined;
     recorder.reset();
+    recordingQuality.reset();
     azure.reset();
     setPhase({ type: "words", index: 0 });
   };
@@ -149,6 +165,10 @@ export default function AssessmentPage() {
   const handleWordRecorded = useCallback(async () => {
     if (!recorder.audioBlob) return;
     if (phase.type !== "words" && phase.type !== "adaptive") return;
+    const qualityReport = recordingQuality.report;
+    if (recordingQuality.isAnalyzing || !qualityReport?.canSubmit) {
+      return;
+    }
 
     const word =
       phase.type === "words"
@@ -161,9 +181,11 @@ export default function AssessmentPage() {
       prompt: word,
       result,
       source: phase.type === "words" ? "word" : "adaptive",
+      recordingQuality: qualityReport,
     });
 
     recorder.reset();
+    recordingQuality.reset();
     azure.reset();
 
     if (phase.type === "words") {
@@ -183,10 +205,21 @@ export default function AssessmentPage() {
       setPhase({ type: "analyzing" });
       finalizeReport(paragraphResultRef.current);
     }
-  }, [recorder.audioBlob, phase, azure, recorder, finalizeReport]);
+  }, [
+    recorder.audioBlob,
+    phase,
+    azure,
+    recorder,
+    recordingQuality,
+    finalizeReport,
+  ]);
 
   const handleParagraphRecorded = useCallback(async () => {
     if (!recorder.audioBlob) return;
+    const qualityReport = recordingQuality.report;
+    if (recordingQuality.isAnalyzing || !qualityReport?.canSubmit) {
+      return;
+    }
 
     const result = await azure.assess(recorder.audioBlob, ASSESSMENT_PARAGRAPH);
     if (!result) {
@@ -195,12 +228,14 @@ export default function AssessmentPage() {
     }
 
     paragraphResultRef.current = result;
+    paragraphQualityRef.current = qualityReport;
     setPhase({ type: "analyzing" });
 
     const preliminaryReport = buildDiagnosisReport({
       wordRecordings: wordRecordingsRef.current,
       paragraphResult: result,
       paragraphText: ASSESSMENT_PARAGRAPH,
+      paragraphRecordingQuality: qualityReport,
     });
     const adaptiveWords = selectAdaptiveAssessmentWords(
       preliminaryReport,
@@ -209,6 +244,7 @@ export default function AssessmentPage() {
     );
 
     recorder.reset();
+    recordingQuality.reset();
     azure.reset();
 
     if (adaptiveWords.length > 0) {
@@ -216,7 +252,7 @@ export default function AssessmentPage() {
     } else {
       finalizeReport(result);
     }
-  }, [recorder.audioBlob, azure, recorder, finalizeReport]);
+  }, [recorder.audioBlob, azure, recorder, recordingQuality, finalizeReport]);
 
   const handleRecordStop = useCallback(() => {
     recorder.stopRecording();
@@ -226,6 +262,7 @@ export default function AssessmentPage() {
     localStorage.removeItem(STORAGE_KEY_V2);
     setSavedReport(null);
     recorder.reset();
+    recordingQuality.reset();
     azure.reset();
     setPhase({ type: "intro" });
   };
@@ -384,12 +421,20 @@ export default function AssessmentPage() {
                     audioBlob={recorder.audioBlob}
                     stream={recorder.stream}
                   />
+                  <RecordingQualityPanel
+                    report={recordingQuality.report}
+                    compact
+                  />
 
                   {recorder.audioBlob &&
                     !recorder.isRecording &&
                     !azure.isLoading && (
                       <Button
                         onClick={handleWordRecorded}
+                        disabled={
+                          recordingQuality.isAnalyzing ||
+                          !recordingQuality.report?.canSubmit
+                        }
                         className="cursor-pointer"
                       >
                         确认，继续
@@ -446,12 +491,20 @@ export default function AssessmentPage() {
                     audioBlob={recorder.audioBlob}
                     stream={recorder.stream}
                   />
+                  <RecordingQualityPanel
+                    report={recordingQuality.report}
+                    compact
+                  />
 
                   {recorder.audioBlob &&
                     !recorder.isRecording &&
                     !azure.isLoading && (
                       <Button
                         onClick={handleParagraphRecorded}
+                        disabled={
+                          recordingQuality.isAnalyzing ||
+                          !recordingQuality.report?.canSubmit
+                        }
                         className="cursor-pointer"
                       >
                         提交，生成报告

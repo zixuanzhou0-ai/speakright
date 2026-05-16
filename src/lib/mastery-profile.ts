@@ -129,6 +129,9 @@ function scoreAverage(scores: number[]): number {
 export function evaluateSessionMastery(
   session: TrainingSessionSummary,
 ): boolean {
+  if (session.assessmentReliability?.canPromoteMastery === false) {
+    return false;
+  }
   const pack = getTrainingPack(session.packId);
   if (!pack) return false;
   const rule = pack.masteryRule;
@@ -212,6 +215,30 @@ function buildLevelProgress(
   return progress;
 }
 
+function reliabilityAllowsPromotion(session: TrainingSessionSummary): boolean {
+  return session.assessmentReliability?.canPromoteMastery !== false;
+}
+
+function nonPromotingStage(
+  existing: PackMastery | undefined,
+  session: TrainingSessionSummary,
+): ReturnType<typeof evaluateMasteryStage> {
+  return {
+    state:
+      existing?.masteryState ??
+      (session.failedItems?.length || session.stuckPatternIds?.length
+        ? "learning"
+        : "suspected"),
+    stageScore: existing?.stageScore ?? 0,
+    stageCeiling: existing?.stageCeiling ?? 30,
+    highestLayer: existing?.highestLayer ?? "isolated",
+    nextRequiredLayer: existing?.nextRequiredLayer ?? "perception",
+    rationale:
+      session.assessmentReliability?.note ??
+      "本次证据可靠性不足，只作为观察记录，不提升掌握度。",
+  };
+}
+
 function updateErrorPatterns(
   current: Record<string, ErrorPatternMastery>,
   session: TrainingSessionSummary,
@@ -242,28 +269,33 @@ export function recordTrainingSession(
   session: TrainingSessionSummary,
 ): MasteryProfile {
   const pack = getTrainingPack(session.packId);
+  const canPromote = reliabilityAllowsPromotion(session);
   const mastered = evaluateSessionMastery(session);
   const existing = profile.packs[session.packId];
   const completedSessions = (existing?.completedSessions ?? 0) + 1;
   const bestTargetScore = Math.max(
     existing?.bestTargetScore ?? 0,
-    ...session.targetScores,
+    ...(canPromote ? session.targetScores : []),
     0,
   );
   const perceptionRate =
-    session.perceptionTotal > 0
+    canPromote && session.perceptionTotal > 0
       ? session.perceptionCorrect / session.perceptionTotal
       : 0;
   const wasDueMastered =
     existing?.status === "mastered" &&
     isReviewDue(existing, session.completedAt);
-  const failureStreak = mastered ? 0 : (existing?.failureStreak ?? 0) + 1;
-  const stage = evaluateMasteryStage(
-    existing,
-    session,
-    mastered,
-    failureStreak,
-  );
+  const observableFailure =
+    (session.failedItems?.length ?? 0) > 0 ||
+    (session.stuckPatternIds?.length ?? 0) > 0;
+  const failureStreak = mastered
+    ? 0
+    : canPromote || observableFailure
+      ? (existing?.failureStreak ?? 0) + 1
+      : (existing?.failureStreak ?? 0);
+  const stage = canPromote
+    ? evaluateMasteryStage(existing, session, mastered, failureStreak)
+    : nonPromotingStage(existing, session);
   const status: PackMastery["status"] = mastered
     ? "mastered"
     : wasDueMastered && failureStreak >= 2
@@ -303,8 +335,13 @@ export function recordTrainingSession(
             : (existing?.retainedReviewCount ?? 0),
         transferEvidenceCount:
           (existing?.transferEvidenceCount ?? 0) +
-          (session.transferEvidence?.filter((item) => item.passed).length ?? 0),
-        levelProgress: buildLevelProgress(existing?.levelProgress, session),
+          (canPromote
+            ? (session.transferEvidence?.filter((item) => item.passed).length ??
+              0)
+            : 0),
+        levelProgress: canPromote
+          ? buildLevelProgress(existing?.levelProgress, session)
+          : (existing?.levelProgress ?? {}),
         bestTargetScore,
         perceptionBestRate: Math.max(
           existing?.perceptionBestRate ?? 0,
@@ -313,16 +350,17 @@ export function recordTrainingSession(
         completedSessions,
         failureStreak,
         lastPracticedAt: session.completedAt,
-        nextReviewAt: mastered
-          ? session.completedAt + nextReviewDelay(completedSessions)
-          : existing?.nextReviewAt,
+        nextReviewAt:
+          mastered && canPromote
+            ? session.completedAt + nextReviewDelay(completedSessions)
+            : existing?.nextReviewAt,
       },
     },
     phonemes: { ...profile.phonemes },
     errorPatterns: updateErrorPatterns(profile.errorPatterns, session),
   };
 
-  if (pack) {
+  if (pack && canPromote) {
     for (const phoneme of pack.targetPhonemes) {
       nextProfile.phonemes[phoneme] = updatePhoneme(
         profile.phonemes[phoneme],

@@ -1,5 +1,6 @@
-import type { MasteryProfile } from "@/types/training";
-import { buildReviewQueue } from "./review-queue";
+import type { MasteryProfile, TrainingSessionSummary } from "@/types/training";
+import { buildReviewQueue, buildSessionReviewItems } from "./review-queue";
+import { getTrainingPack } from "./training-packs";
 
 export type HvptSpeaker = "blue" | "pink";
 export type HvptAnswer = "A" | "B";
@@ -453,6 +454,74 @@ export function summarizeHvptSession(
     nextAction: passed
       ? "听觉边界基本稳定，可以进入发音动作和句子整合。"
       : "先追加错过的具体对比，不急着录音；听不稳时发音会回到中文默认类别。",
+  };
+}
+
+export function buildHvptTrainingSession(
+  contrast: HvptContrast,
+  summary: HvptSummary,
+  now = Date.now(),
+): TrainingSessionSummary {
+  const score = Math.round(summary.accuracy * 100);
+  const pack = getTrainingPack(contrast.packId);
+  const targetPhonemes =
+    pack?.targetPhonemes ??
+    [contrast.targetA, contrast.targetB].map((item) => item.replace(/\//g, ""));
+  const failedItems = summary.focusedReviewTrials.map((trial) => ({
+    itemId: `hvpt-${trial.id}`,
+    levelId: "perception-abx",
+    levelKind: "perception" as const,
+    text: `${trial.wordA} / ${trial.wordB}`,
+    targetPhonemes,
+    targetScore: score,
+    overallScore: score,
+    patternIds: [`hvpt-${contrast.id}`],
+    nextCue: summary.biasDirection ?? contrast.learnerRisk,
+    passed: false,
+    assessmentReliability: {
+      alignment: "good" as const,
+      evidenceStrength: "strong" as const,
+      canPromoteMastery: true,
+      note: "听辨题不依赖录音质量，可作为 perception 层证据。",
+    },
+  }));
+  const session: TrainingSessionSummary = {
+    id: `hvpt-${contrast.id}-${now}`,
+    packId: contrast.packId,
+    startedAt: now,
+    completedAt: now,
+    perceptionCorrect: summary.correct,
+    perceptionTotal: summary.total,
+    targetScores: [score],
+    wordScores: [],
+    sentenceScores: [],
+    mixedReviewScores: [],
+    levelSummaries: [
+      {
+        levelId: "perception-abx",
+        kind: "perception",
+        attempts: summary.total,
+        passed: summary.passed,
+        bestScore: score,
+        stuckCount: summary.passed ? 0 : 1,
+      },
+    ],
+    stuckPatternIds: [],
+    recommendedNextLevelId: summary.passed ? "articulation" : "perception-abx",
+    failedItems,
+    remediationResults: [],
+    assessmentReliability: {
+      alignment: "good",
+      evidenceStrength: "strong",
+      canPromoteMastery: true,
+      note: "高变异听辨结果已计入 perception 层。",
+    },
+    mastered: false,
+  };
+
+  return {
+    ...session,
+    reviewItems: buildSessionReviewItems(session, now),
   };
 }
 

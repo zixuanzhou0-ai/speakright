@@ -84,6 +84,58 @@ describe("prosody training", () => {
     expect(analysis.passed).toBe(false);
     expect(analysis.likelyIssue).toBe("over-heavy-function-words");
     expect(analysis.overHeavyFunctionWords).toContain("a");
+    expect(analysis.evidenceConfidence).toBe("low");
+  });
+
+  it("uses Azure break feedback to detect missing expected pauses", () => {
+    const exercise = getProsodyExercise("content-word-stress-1");
+    if (!exercise) throw new Error("missing exercise");
+
+    const analysis = analyzeProsodyAttempt(
+      exercise,
+      result({
+        words: result().words.map((word) =>
+          word.word.toLowerCase() === "update"
+            ? {
+                ...word,
+                feedback: {
+                  prosody: { break: { errorTypes: ["MissingBreak"] } },
+                },
+              }
+            : word,
+        ),
+      }),
+    );
+
+    expect(analysis.passed).toBe(false);
+    expect(analysis.likelyIssue).toBe("choppy-rhythm");
+    expect(analysis.missingExpectedPauses).toContain("update|before");
+    expect(analysis.evidenceConfidence).toBe("high");
+  });
+
+  it("uses Azure break feedback to detect unexpected pauses", () => {
+    const exercise = getProsodyExercise("content-word-stress-1");
+    if (!exercise) throw new Error("missing exercise");
+
+    const analysis = analyzeProsodyAttempt(
+      exercise,
+      result({
+        words: result().words.map((word) =>
+          word.word.toLowerCase() === "quick"
+            ? {
+                ...word,
+                feedback: {
+                  prosody: { break: { errorTypes: ["UnexpectedBreak"] } },
+                },
+              }
+            : word,
+        ),
+      }),
+    );
+
+    expect(analysis.passed).toBe(false);
+    expect(analysis.likelyIssue).toBe("choppy-rhythm");
+    expect(analysis.unexpectedPauses).toContain("quick|update");
   });
 
   it("contains a focused set of prosody exercise types", () => {
@@ -109,6 +161,9 @@ describe("prosody training", () => {
         completenessScore: 90,
         missingFocusWords: [],
         overHeavyFunctionWords: [],
+        missingExpectedPauses: [],
+        unexpectedPauses: [],
+        evidenceConfidence: "low",
         likelyIssue: "choppy-rhythm",
         nextCue: "link",
       },

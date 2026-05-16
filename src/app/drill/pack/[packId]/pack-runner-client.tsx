@@ -60,7 +60,10 @@ import {
   recordTrainingSession,
   saveMasteryProfile,
 } from "@/lib/mastery-profile";
-import type { RecordingQualityReport } from "@/lib/recording-quality";
+import {
+  type RecordingQualityReport,
+  reliabilityFromRecordingQuality,
+} from "@/lib/recording-quality";
 import { buildReviewQueue, buildSessionReviewItems } from "@/lib/review-queue";
 import {
   type CourseAttemptSnapshot,
@@ -204,6 +207,9 @@ export default function TrainingPackPage() {
   const [focusedReviewItems, setFocusedReviewItems] = useState<
     TrainingCourseItem[]
   >([]);
+  const [gateBlockedReason, setGateBlockedReason] = useState<string | null>(
+    null,
+  );
   const [remediationStepIndex, setRemediationStepIndex] = useState(0);
   const [remediationAttempt, setRemediationAttempt] =
     useState<RemediationAttemptResult | null>(null);
@@ -213,6 +219,7 @@ export default function TrainingPackPage() {
   >([]);
 
   const startedAtRef = useRef(Date.now());
+  const qualityReportsRef = useRef<RecordingQualityReport[]>([]);
   const recorder = useRecorder();
   const azure = useAzureAssessment();
   const mw = useMwPronunciation();
@@ -328,10 +335,12 @@ export default function TrainingPackPage() {
     setLevelStats({});
     setStuckPatternIds([]);
     setFocusedReviewItems([]);
+    setGateBlockedReason(null);
     setRemediationStepIndex(0);
     setRemediationAttempt(null);
     setFailedItems([]);
     setRemediationResults([]);
+    qualityReportsRef.current = [];
     recorder.reset();
     recordingQuality.reset();
     azure.reset();
@@ -377,6 +386,7 @@ export default function TrainingPackPage() {
     setXIsA(Math.random() > 0.5);
     setRemediationStepIndex(0);
     setRemediationAttempt(null);
+    setGateBlockedReason(null);
 
     if (nextItem < currentItems.length) {
       setPhase({
@@ -387,7 +397,22 @@ export default function TrainingPackPage() {
     }
 
     if (focusedReviewItems.length > 0) {
+      const gate = evaluateLevelGate(
+        currentLevel,
+        levelStats[currentLevel.id] ?? emptySnapshot(currentLevel),
+        currentItem,
+      );
       setFocusedReviewItems([]);
+      if (!gate.passed) {
+        setGateBlockedReason(
+          `${gate.reason} 这次先停在本关，避免把还没稳的动作带进下一层。`,
+        );
+        setPhase({
+          type: "course",
+          position: { ...phase.position, itemIndex: 0 },
+        });
+        return;
+      }
       const nextLevel = phase.position.levelIndex + 1;
       if (nextLevel >= course.levels.length) {
         completeSession();
@@ -423,11 +448,33 @@ export default function TrainingPackPage() {
     }
   };
 
+  const skipBlockedGate = () => {
+    if (phase.type !== "course") return;
+    setGateBlockedReason(null);
+    const nextLevel = phase.position.levelIndex + 1;
+    if (nextLevel >= course.levels.length) {
+      completeSession();
+      return;
+    }
+    setPhase({
+      type: "course",
+      position: { levelIndex: nextLevel, itemIndex: 0 },
+    });
+  };
+
   const completeSession = () => {
     const levelSummaries = course.levels.map((level) =>
       toLevelSummary(level, levelStats[level.id] ?? emptySnapshot(level)),
     );
     const targetScores = results.map((result) => result.targetScore);
+    const qualityIssues = qualityReportsRef.current.flatMap((report) =>
+      report.issues.map((issue) => issue.title),
+    );
+    const minQualityScore =
+      qualityReportsRef.current.length > 0
+        ? Math.min(...qualityReportsRef.current.map((report) => report.score))
+        : undefined;
+    const uniqueQualityIssues = Array.from(new Set(qualityIssues));
     const summary: TrainingSessionSummary = {
       id: `${pack.id}-${Date.now()}`,
       packId: pack.id,
@@ -456,6 +503,21 @@ export default function TrainingPackPage() {
           : undefined),
       failedItems,
       remediationResults,
+      assessmentReliability:
+        qualityReportsRef.current.length > 0
+          ? {
+              ...reliabilityFromRecordingQuality(null, {
+                evidenceStrength: targetScores.length >= 3 ? "strong" : "fair",
+                note:
+                  uniqueQualityIssues.length > 0
+                    ? "本轮存在录音质量提示，结果只作为观察，不提升掌握度。"
+                    : "本轮录音质量稳定，可计入掌握度。",
+              }),
+              audioQualityScore: minQualityScore,
+              audioQualityIssues: uniqueQualityIssues,
+              canPromoteMastery: uniqueQualityIssues.length === 0,
+            }
+          : undefined,
       mastered: false,
     };
     summary.reviewItems = buildSessionReviewItems(summary);
@@ -575,6 +637,10 @@ export default function TrainingPackPage() {
     ) {
       return;
     }
+    const qualityReport = recordingQuality.report;
+    if (qualityReport) {
+      qualityReportsRef.current = [...qualityReportsRef.current, qualityReport];
+    }
     const reference = getCourseItemReference(currentItem);
     const result = await azure.assess(recorder.audioBlob, reference);
     if (!result) return;
@@ -626,6 +692,7 @@ export default function TrainingPackPage() {
           patternIds: analysis.detectedPatternIds,
           nextCue: analysis.nextCue,
           passed: false,
+          assessmentReliability: reliabilityFromRecordingQuality(qualityReport),
         },
       ]);
     }
@@ -667,6 +734,10 @@ export default function TrainingPackPage() {
       return;
     }
     const step = remediation.steps[remediationStepIndex];
+    const qualityReport = recordingQuality.report;
+    if (qualityReport) {
+      qualityReportsRef.current = [...qualityReportsRef.current, qualityReport];
+    }
     const stepItem = itemFromRemediationStep(
       currentItem,
       step,
@@ -791,6 +862,32 @@ export default function TrainingPackPage() {
               lastAttempt={lastAttempt}
               isFocusedReview={focusedReviewItems.length > 0}
             />
+
+            {gateBlockedReason && (
+              <div className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-100">
+                <p className="font-semibold">本关还没有真正过线</p>
+                <p className="mt-1">{gateBlockedReason}</p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={() => setGateBlockedReason(null)}
+                    className="cursor-pointer"
+                  >
+                    继续补本关
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={skipBlockedGate}
+                    className="cursor-pointer"
+                  >
+                    暂时跳过，不计入掌握
+                  </Button>
+                </div>
+              </div>
+            )}
 
             {currentLevel.kind === "perception" && (
               <PerceptionStep

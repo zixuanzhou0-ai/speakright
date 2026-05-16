@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { useMwPronunciation } from "@/hooks/use-mw-pronunciation";
 import {
   buildHvptSession,
+  buildHvptTrainingSession,
   getHvptContrast,
   HVPT_CONTRASTS,
   type HvptAnswer,
@@ -28,7 +29,11 @@ import {
   recommendedHvptContrastIds,
   summarizeHvptSession,
 } from "@/lib/hvpt-training";
-import { loadMasteryProfile } from "@/lib/mastery-profile";
+import {
+  loadMasteryProfile,
+  recordTrainingSession,
+  saveMasteryProfile,
+} from "@/lib/mastery-profile";
 
 type PlayingSlot = "A" | "B" | "X" | null;
 
@@ -125,6 +130,17 @@ export default function PerceptionDrillPage() {
       setPhase({ type: "focused-review", trials: summary.focusedReviewTrials });
       return;
     }
+    finishWithSummary(summary);
+  };
+
+  const finishWithSummary = (summary: HvptSummary) => {
+    if (!selectedContrast || typeof window === "undefined") {
+      setPhase({ type: "completed", summary });
+      return;
+    }
+    const session = buildHvptTrainingSession(selectedContrast, summary);
+    const nextProfile = recordTrainingSession(loadMasteryProfile(), session);
+    saveMasteryProfile(nextProfile);
     setPhase({ type: "completed", summary });
   };
 
@@ -141,10 +157,9 @@ export default function PerceptionDrillPage() {
 
   const finishFocusedReview = () => {
     if (!selectedContrast) return;
-    setPhase({
-      type: "completed",
-      summary: summarizeHvptSession(selectedContrast, trials, responses),
-    });
+    finishWithSummary(
+      summarizeHvptSession(selectedContrast, trials, responses),
+    );
   };
 
   const reset = () => {

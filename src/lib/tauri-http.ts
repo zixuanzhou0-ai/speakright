@@ -4,15 +4,13 @@
  * In browser: uses native fetch (for dev mode).
  */
 
-const isTauri = () =>
-  typeof window !== "undefined" &&
-  ("__TAURI__" in window || "__TAURI_INTERNALS__" in window);
+import { isTauriEnvironment } from "@/lib/tauri-runtime";
 
 export async function apiFetch(
   url: string,
   options?: RequestInit,
 ): Promise<Response> {
-  if (isTauri()) {
+  if (isTauriEnvironment()) {
     const { fetch: tauriFetch } = await import("@tauri-apps/plugin-http");
     return tauriFetch(url, options as Parameters<typeof tauriFetch>[1]);
   }

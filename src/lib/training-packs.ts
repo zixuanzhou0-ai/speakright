@@ -43,11 +43,11 @@ function item(
 }
 
 export const DEFAULT_RECOMMENDED_PACK_IDS = [
-  "s-th",
+  "final-consonants",
   "ee-ih",
   "eh-ae",
+  "stress-rhythm",
   "v-w",
-  "l-r",
 ];
 
 export const TRAINING_PACKS: TrainingPack[] = [
@@ -1806,7 +1806,7 @@ function buildSentenceLevel(pack: TrainingPack): TrainingLevel {
         .map((source, index) => courseItemFromSeed("sentence", index, source)),
     };
   }
-  const generated = pack.minimalPairs.slice(0, 5).map((pair, index) =>
+  const generated = pack.minimalPairs.slice(0, 5).map((pair, _index) =>
     item(
       `Say ${pair.wordA}, then ${pair.wordB}, and keep them clear.`,
       "",

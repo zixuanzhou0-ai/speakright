@@ -136,6 +136,30 @@ describe("mastery profile", () => {
     expect(profile.sessions[0].masteryStateAfter).toBe("integrated");
   });
 
+  it("does not promote mastery from warning-quality evidence", () => {
+    const profile = recordTrainingSession(
+      createEmptyMasteryProfile(),
+      session({
+        assessmentReliability: {
+          alignment: "good",
+          evidenceStrength: "strong",
+          canPromoteMastery: false,
+          audioQualityScore: 72,
+          audioQualityIssues: ["音量偏低"],
+          note: "测试用 warning，不提升掌握度。",
+        },
+      }),
+    );
+
+    expect(profile.packs["s-th"].status).toBe("practicing");
+    expect(profile.packs["s-th"].masteryState).toBe("suspected");
+    expect(profile.packs["s-th"].levelProgress["word-ladder"]).toBeUndefined();
+    expect(profile.phonemes.th).toBeUndefined();
+    expect(profile.sessions[0].assessmentReliability?.canPromoteMastery).toBe(
+      false,
+    );
+  });
+
   it("downgrades a due mastered pack after repeated review failure", () => {
     const mastered = recordTrainingSession(
       createEmptyMasteryProfile(),

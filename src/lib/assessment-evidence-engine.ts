@@ -5,6 +5,7 @@ import type {
   DiagnosisEvidenceSummary,
   EvidenceRecommendedAction,
   EvidenceStrength,
+  RecordingQualitySnapshot,
 } from "@/types/diagnosis";
 
 export interface EvidenceQualityCheck {
@@ -64,6 +65,7 @@ interface AnalyzeAssessmentEvidenceInput {
   referenceText: string;
   label: string;
   source: DiagnosisEvidence["source"];
+  recordingQuality?: RecordingQualitySnapshot;
 }
 
 const AZURE_TO_SLUG: Record<string, string> = {
@@ -156,6 +158,7 @@ function positionFor(index: number, total: number): EvidenceToken["position"] {
 
 function qualityFromCompleteness(
   result: AzureAssessmentResult,
+  recordingQuality?: RecordingQualitySnapshot,
 ): EvidenceQualityCheck {
   const reasons: string[] = [];
   const wordCount = result.words.length;
@@ -166,10 +169,25 @@ function qualityFromCompleteness(
   if (completeness < 70 && completeness >= 45) {
     reasons.push("完整度偏低，诊断结论需要谨慎");
   }
+  if (recordingQuality) {
+    for (const issue of recordingQuality.issues) {
+      reasons.push(`录音质量：${issue.title}`);
+    }
+  }
+  const qualityScore =
+    recordingQuality != null
+      ? Math.min(wordCount === 0 ? 0 : completeness, recordingQuality.score)
+      : wordCount === 0
+        ? 0
+        : completeness;
+
   return {
-    score: wordCount === 0 ? 0 : completeness,
-    tier: tierFromScore(wordCount === 0 ? 0 : completeness),
-    invalid: wordCount === 0 || completeness < 45,
+    score: qualityScore,
+    tier: tierFromScore(qualityScore),
+    invalid:
+      wordCount === 0 ||
+      completeness < 45 ||
+      recordingQuality?.canSubmit === false,
     reasons,
   };
 }
@@ -317,8 +335,9 @@ export function analyzeAssessmentEvidence({
   referenceText,
   label,
   source,
+  recordingQuality,
 }: AnalyzeAssessmentEvidenceInput): AssessmentEvidenceAnalysis {
-  const audioQuality = qualityFromCompleteness(result);
+  const audioQuality = qualityFromCompleteness(result, recordingQuality);
   const alignment = alignmentFromWords(result, referenceText);
   const usable = !audioQuality.invalid && !alignment.invalid;
   const invalidationReason = usable

@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { summarizeBenchmarkTrend } from "@/lib/benchmark-archive";
+import {
+  benchmarkGroupKey,
+  summarizeBenchmarkGroups,
+  summarizeBenchmarkTrend,
+} from "@/lib/benchmark-archive";
 
 describe("benchmark archive", () => {
   it("summarizes before/after score trend", () => {
@@ -37,5 +41,47 @@ describe("benchmark archive", () => {
       deltaFromFirst: 0,
       count: 0,
     });
+  });
+
+  it("groups trends by source, target and normalized text", () => {
+    const groups = summarizeBenchmarkGroups([
+      {
+        id: "a",
+        createdAt: 1000,
+        source: "prosody",
+        title: "first",
+        text: "Hello, world!",
+        score: 70,
+        targetLabel: "stress",
+      },
+      {
+        id: "b",
+        createdAt: 2000,
+        source: "prosody",
+        title: "second",
+        text: "hello world",
+        score: 80,
+        targetLabel: "stress",
+      },
+      {
+        id: "c",
+        createdAt: 3000,
+        source: "scenario",
+        title: "scenario",
+        text: "hello world",
+        score: 95,
+        targetLabel: "stress",
+      },
+    ]);
+
+    expect(groups).toHaveLength(2);
+    expect(
+      groups.find((group) => group.source === "prosody")?.trend,
+    ).toMatchObject({
+      latestScore: 80,
+      deltaFromFirst: 10,
+      count: 2,
+    });
+    expect(benchmarkGroupKey(groups[0].recordings[0])).toContain("stress");
   });
 });

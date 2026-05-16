@@ -32,6 +32,10 @@ function shouldDeferMastered(
   return mastery?.status === "mastered" && !isPackDue(profile, packId);
 }
 
+function shouldRetestFirst(issue: DiagnosisIssue): boolean {
+  return issue.confidence === "low" || issue.evidenceStrength === "thin";
+}
+
 function itemForPack(
   packId: string,
   reason: string,
@@ -170,8 +174,14 @@ export function buildTrainingPrescription(
   });
   const selected: TrainingPrescriptionItem[] = [];
   const seen = new Set<string>();
+  const retestPackIds = new Set(
+    sorted
+      .filter(shouldRetestFirst)
+      .flatMap((issue) => issue.recommendedPackIds),
+  );
 
   for (const issue of sorted) {
+    if (shouldRetestFirst(issue)) continue;
     for (const packId of issue.recommendedPackIds) {
       if (shouldDeferMastered(profile, packId)) continue;
       pushUnique(
@@ -209,6 +219,7 @@ export function buildTrainingPrescription(
 
   if (selected.length === 0) {
     for (const packId of DEFAULT_RECOMMENDED_PACK_IDS) {
+      if (retestPackIds.has(packId)) continue;
       if (shouldDeferMastered(profile, packId)) continue;
       pushUnique(
         selected,

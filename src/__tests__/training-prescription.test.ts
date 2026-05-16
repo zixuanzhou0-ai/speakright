@@ -46,10 +46,23 @@ describe("training prescription", () => {
       .flatMap((day) => day.items)
       .map((item) => item.packId);
 
-    expect(packIds).toContain("s-th");
+    expect(packIds).toContain("final-consonants");
     expect(packIds).toContain("ee-ih");
     expect(prescription.days[0].items[0].levelId).toBe("perception-abx");
     expect(prescription.source).toBe("default");
+  });
+
+  it("routes low-confidence issues to retest instead of primary training", () => {
+    const thinIssue = issue("thin-th", "critical", "s-th");
+    thinIssue.confidence = "low";
+    thinIssue.evidenceStrength = "thin";
+
+    const prescription = buildTrainingPrescription([thinIssue]);
+    const firstDayPackIds = prescription.days[0].items.map(
+      (item) => item.packId,
+    );
+
+    expect(firstDayPackIds).not.toContain("s-th");
   });
 
   it("defers mastered packs unless review is due", () => {

@@ -1,3 +1,5 @@
+import type { AssessmentReliability } from "@/types/training";
+
 export type RecordingQualitySeverity = "blocker" | "warning" | "info";
 
 export type RecordingQualityIssueCode =
@@ -287,5 +289,40 @@ export function buildRecordingQualityReportFromMetrics({
   return {
     ...reportWithoutScore,
     score: scoreFromMetrics(reportWithoutScore),
+  };
+}
+
+export function reliabilityFromRecordingQuality(
+  report: RecordingQualityReport | null | undefined,
+  options: {
+    alignment?: AssessmentReliability["alignment"];
+    evidenceStrength?: AssessmentReliability["evidenceStrength"];
+    note?: string;
+  } = {},
+): AssessmentReliability {
+  const alignment = options.alignment ?? "good";
+  const evidenceStrength = options.evidenceStrength ?? "strong";
+  const issues = report?.issues ?? [];
+  const hasWarning = issues.some((item) => item.severity === "warning");
+  const hasBlocker = issues.some((item) => item.severity === "blocker");
+  const canPromoteMastery =
+    !!report?.canSubmit &&
+    !hasWarning &&
+    !hasBlocker &&
+    alignment === "good" &&
+    evidenceStrength !== "thin" &&
+    evidenceStrength !== "invalid";
+
+  return {
+    audioQualityScore: report?.score,
+    audioQualityIssues: issues.map((item) => item.title),
+    alignment,
+    evidenceStrength,
+    canPromoteMastery,
+    note:
+      options.note ??
+      (canPromoteMastery
+        ? "录音质量和对齐足够稳定，可计入掌握度。"
+        : "这次评分可作为观察，但不会提升掌握度。"),
   };
 }

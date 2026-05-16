@@ -128,6 +128,10 @@ function buildElevenLabsBody(text: string, modelId: string, speed?: number) {
   };
 }
 
+async function audioBlobFromResponse(res: Response): Promise<Blob> {
+  return new Blob([await res.arrayBuffer()], { type: "audio/mpeg" });
+}
+
 /** Test ElevenLabs API key */
 export async function testElevenLabs(
   apiKey: string,
@@ -210,7 +214,7 @@ export async function elevenLabsTts(
     const errText = await res.text();
     throw new Error(`ElevenLabs TTS error (${res.status}): ${errText}`);
   }
-  return res.blob();
+  return audioBlobFromResponse(res);
 }
 
 /** TTS with timestamps — returns JSON with audio_base64 and alignment */
@@ -441,7 +445,7 @@ async function fetchYoudaoAudio(word: string): Promise<Blob> {
   const url = `https://dict.youdao.com/dictvoice?type=0&audio=${encodeURIComponent(word)}`;
   const res = await apiFetch(url);
   if (!res.ok) throw new Error(`Youdao returned ${res.status}`);
-  return res.blob();
+  return audioBlobFromResponse(res);
 }
 
 async function fetchMwAudio(word: string, mwKey: string): Promise<Blob> {
@@ -465,7 +469,7 @@ async function fetchMwAudio(word: string, mwKey: string): Promise<Blob> {
   const audioUrl = `https://media.merriam-webster.com/audio/prons/en/us/mp3/${subdir}/${audioFilename}.mp3`;
   const audioRes = await apiFetch(audioUrl);
   if (!audioRes.ok) throw new Error("Failed to fetch audio from MW");
-  return audioRes.blob();
+  return audioBlobFromResponse(audioRes);
 }
 
 // ─── Merriam-Webster Stress ─────────────────────────────

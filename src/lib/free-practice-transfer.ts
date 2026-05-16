@@ -1,5 +1,6 @@
 import type { AzureAssessmentResult, AzureWord } from "@/types/azure";
 import type {
+  AssessmentReliability,
   MasteryProfile,
   ReviewQueueItem,
   TrainingCourseItem,
@@ -41,6 +42,7 @@ export interface FreePracticeTransferSummary {
   mode: "word" | "sentence";
   recorded: boolean;
   evidences: FreePracticeTransferEvidence[];
+  assessmentReliability?: AssessmentReliability;
 }
 
 export interface FreePracticeTargetPreviewTarget {
@@ -463,6 +465,7 @@ function buildFailedItem(
     patternIds: evidence.patternIds,
     nextCue: evidence.nextCue,
     passed: false,
+    assessmentReliability: summary.assessmentReliability,
   };
 }
 
@@ -505,6 +508,7 @@ function buildTransferSession(
     stuckPatternIds: [],
     recommendedNextLevelId: evidence.passed ? undefined : evidence.levelId,
     transferEvidence: [transferEvidence],
+    assessmentReliability: summary.assessmentReliability,
     isReviewSession: evidence.source === "review",
   };
 
@@ -517,14 +521,20 @@ function buildTransferSession(
 export function recordFreePracticeTransfer(
   profile: MasteryProfile,
   summary: FreePracticeTransferSummary,
+  assessmentReliability?: AssessmentReliability,
 ): {
   profile: MasteryProfile;
   summary: FreePracticeTransferSummary;
   sessions: TrainingSessionSummary[];
 } {
   let nextProfile = profile;
-  const sessions = summary.evidences.map((evidence) =>
-    buildTransferSession(summary, evidence),
+  const reliableSummary = {
+    ...summary,
+    assessmentReliability:
+      assessmentReliability ?? summary.assessmentReliability,
+  };
+  const sessions = reliableSummary.evidences.map((evidence) =>
+    buildTransferSession(reliableSummary, evidence),
   );
 
   for (const session of sessions) {
@@ -533,7 +543,7 @@ export function recordFreePracticeTransfer(
 
   return {
     profile: nextProfile,
-    summary: { ...summary, recorded: sessions.length > 0 },
+    summary: { ...reliableSummary, recorded: sessions.length > 0 },
     sessions,
   };
 }

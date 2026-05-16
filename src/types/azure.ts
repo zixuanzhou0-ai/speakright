@@ -18,6 +18,14 @@ export interface AzureWord {
   errorType: "None" | "Omission" | "Insertion" | "Mispronunciation";
   phonemes: AzurePhoneme[];
   syllables: AzureSyllable[];
+  feedback?: {
+    prosody?: {
+      break?: {
+        errorTypes?: string[];
+        breakLength?: number;
+      };
+    };
+  };
 }
 
 export interface AzureAssessmentResult {

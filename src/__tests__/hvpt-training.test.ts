@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   buildHvptSession,
+  buildHvptTrainingSession,
   getHvptContrast,
   HVPT_CONTRASTS,
   recommendedHvptContrastIds,
@@ -87,5 +88,27 @@ describe("hvpt training", () => {
         "n-ng",
       ]),
     );
+  });
+
+  it("turns HVPT summary into perception-layer mastery evidence", () => {
+    const contrast = getHvptContrast("ee-ih");
+    if (!contrast) throw new Error("missing contrast");
+    const trials = buildHvptSession("ee-ih", 10, 12);
+    const responses = trials.map((trial) => {
+      const answer: "A" | "B" = trial.xIsA ? "A" : "B";
+      return { trialId: trial.id, answer };
+    });
+    const summary = summarizeHvptSession(contrast, trials, responses);
+    const session = buildHvptTrainingSession(contrast, summary, 1000);
+
+    expect(session.packId).toBe("ee-ih");
+    expect(session.perceptionCorrect).toBe(10);
+    expect(session.levelSummaries?.[0]).toMatchObject({
+      levelId: "perception-abx",
+      kind: "perception",
+      passed: true,
+      bestScore: 100,
+    });
+    expect(session.assessmentReliability?.canPromoteMastery).toBe(true);
   });
 });

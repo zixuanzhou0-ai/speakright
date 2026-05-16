@@ -16,6 +16,7 @@ interface UseTtsAlignedReturn {
   speak: (text: string, speed?: number) => Promise<void>;
   replay: () => void;
   stop: () => void;
+  reset: () => void;
   isLoading: boolean;
   isPlaying: boolean;
   error: string | null;
@@ -159,6 +160,17 @@ export function useTtsAligned(): UseTtsAlignedReturn {
     setCurrentTime(0);
   }, [cleanup]);
 
+  const reset = useCallback(() => {
+    cleanup();
+    setIsLoading(false);
+    setIsPlaying(false);
+    setError(null);
+    setWordTimings([]);
+    setCurrentTime(0);
+    lastAudioBlobRef.current = null;
+    lastWordTimingsRef.current = [];
+  }, [cleanup]);
+
   const speak = useCallback(
     async (text: string, speed = 0.85) => {
       const config = getElevenLabsConfig();
@@ -245,6 +257,7 @@ export function useTtsAligned(): UseTtsAlignedReturn {
     speak,
     replay,
     stop,
+    reset,
     isLoading,
     isPlaying,
     error,

@@ -47,6 +47,17 @@ export interface DiagnosisEvidenceSummary {
   notes: string[];
 }
 
+export interface RecordingQualitySnapshot {
+  score: number;
+  canSubmit: boolean;
+  issues: Array<{
+    code: string;
+    severity: "blocker" | "warning" | "info";
+    title: string;
+    detail: string;
+  }>;
+}
+
 export interface DiagnosisIssue {
   id: string;
   severity: DiagnosisIssueSeverity;
@@ -92,12 +103,14 @@ export interface AssessmentRecording {
   prompt: AssessmentWord;
   result: AzureAssessmentResult;
   source: "word" | "adaptive";
+  recordingQuality?: RecordingQualitySnapshot;
 }
 
 export interface DiagnosisBuildInput {
   wordRecordings: AssessmentRecording[];
   paragraphResult: AzureAssessmentResult;
   paragraphText: string;
+  paragraphRecordingQuality?: RecordingQualitySnapshot;
 }
 
 export interface CoveragePassageRecording {
@@ -105,6 +118,7 @@ export interface CoveragePassageRecording {
   result: AzureAssessmentResult;
   source: "coverage-segment" | "coverage-probe";
   label?: string;
+  recordingQuality?: RecordingQualitySnapshot;
 }
 
 export interface CoveragePassageBuildInput {

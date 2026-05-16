@@ -17,6 +17,7 @@ import {
   type BenchmarkRecordingMeta,
   getBenchmarkAudioBlob,
   listBenchmarkRecordings,
+  summarizeBenchmarkGroups,
   summarizeBenchmarkTrend,
 } from "@/lib/benchmark-archive";
 import { loadMasteryProfile } from "@/lib/mastery-profile";
@@ -26,9 +27,13 @@ import type { MasteryProfile } from "@/types/training";
 export default function ProgressPage() {
   const [recordings, setRecordings] = useState<BenchmarkRecordingMeta[]>([]);
   const [profile, setProfile] = useState<MasteryProfile | null>(null);
-  const trend = useMemo(
-    () => summarizeBenchmarkTrend(recordings),
+  const benchmarkGroups = useMemo(
+    () => summarizeBenchmarkGroups(recordings),
     [recordings],
+  );
+  const trend = useMemo(
+    () => benchmarkGroups[0]?.trend ?? summarizeBenchmarkTrend([]),
+    [benchmarkGroups],
   );
 
   useEffect(() => {
@@ -77,7 +82,7 @@ export default function ProgressPage() {
         <Metric
           icon={BarChart3}
           label="Benchmark"
-          value={trend.count.toString()}
+          value={recordings.length.toString()}
         />
         <Metric
           icon={TrendingUp}
@@ -102,7 +107,7 @@ export default function ProgressPage() {
             <div>
               <h2 className="text-lg font-bold">Before / After 录音</h2>
               <p className="text-sm text-muted-foreground">
-                目前韵律专项会自动保存录音；后续阶段复测也会进入这里。
+                只按同一材料、同一目标比较趋势，不把不同任务混算。
               </p>
             </div>
             <Badge
@@ -120,31 +125,55 @@ export default function ProgressPage() {
             </div>
           ) : (
             <div className="space-y-3">
-              {recordings.map((item) => (
-                <div key={item.id} className="rounded-xl border p-4">
-                  <div className="flex items-start justify-between gap-3">
+              {benchmarkGroups.map((group) => (
+                <div key={group.key} className="rounded-xl border p-4">
+                  <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
                     <div>
-                      <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="font-semibold">{item.title}</h3>
-                        <Badge variant="outline">{item.targetLabel}</Badge>
-                        <Badge variant="secondary">{item.score}</Badge>
-                      </div>
-                      <p className="mt-2 text-sm text-muted-foreground">
-                        {item.text}
-                      </p>
-                      <p className="mt-2 text-xs text-muted-foreground">
-                        {new Date(item.createdAt).toLocaleString()}
+                      <h3 className="font-semibold">{group.title}</h3>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {group.source} · {group.targetLabel} ·{" "}
+                        {group.trend.count} 次同材料
                       </p>
                     </div>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      onClick={() => playRecording(item.id)}
-                      className="shrink-0 cursor-pointer"
+                    <Badge
+                      variant={
+                        group.trend.deltaFromFirst >= 0
+                          ? "default"
+                          : "secondary"
+                      }
                     >
-                      <Play className="h-4 w-4" />
-                    </Button>
+                      {group.trend.deltaFromFirst >= 0 ? "+" : ""}
+                      {group.trend.deltaFromFirst}
+                    </Badge>
+                  </div>
+                  <p className="mb-3 text-sm text-muted-foreground">
+                    {group.text}
+                  </p>
+                  <div className="space-y-2">
+                    {group.recordings.map((item) => (
+                      <div
+                        key={item.id}
+                        className="flex items-center justify-between gap-3 rounded-lg bg-muted/40 px-3 py-2"
+                      >
+                        <div>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <Badge variant="secondary">{item.score}</Badge>
+                            <span className="text-xs text-muted-foreground">
+                              {new Date(item.createdAt).toLocaleString()}
+                            </span>
+                          </div>
+                        </div>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          onClick={() => playRecording(item.id)}
+                          className="shrink-0 cursor-pointer"
+                        >
+                          <Play className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
                   </div>
                 </div>
               ))}

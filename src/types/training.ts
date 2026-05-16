@@ -162,6 +162,7 @@ export interface TrainingPack {
 export interface TrainingPrescriptionItem {
   packId: string;
   levelId?: string;
+  action?: "train" | "retest";
   reason: string;
   priority: "critical" | "major" | "maintenance";
   estimatedMinutes: number;
@@ -248,6 +249,7 @@ export interface TrainingEvidenceItem {
   patternIds: string[];
   nextCue: string;
   passed: boolean;
+  assessmentReliability?: AssessmentReliability;
 }
 
 export interface RemediationResult {
@@ -267,6 +269,15 @@ export interface TransferEvidence {
   score: number;
   passed: boolean;
   completedAt: number;
+}
+
+export interface AssessmentReliability {
+  audioQualityScore?: number;
+  audioQualityIssues?: string[];
+  alignment: "good" | "caution" | "invalid";
+  evidenceStrength: "thin" | "fair" | "strong" | "invalid";
+  canPromoteMastery: boolean;
+  note?: string;
 }
 
 export interface MasteryStageSnapshot {
@@ -315,6 +326,7 @@ export interface TrainingSessionSummary {
   failedItems?: TrainingEvidenceItem[];
   remediationResults?: RemediationResult[];
   transferEvidence?: TransferEvidence[];
+  assessmentReliability?: AssessmentReliability;
   isReviewSession?: boolean;
   masteryStateAfter?: MasteryState;
   masteryStageScore?: number;
