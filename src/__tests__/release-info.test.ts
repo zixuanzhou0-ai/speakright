@@ -21,6 +21,10 @@ describe("desktop release info", () => {
 
   it("documents the unsigned installer status", () => {
     expect(DESKTOP_RELEASE_INFO.build.signed).toBe(false);
+    expect(DESKTOP_RELEASE_INFO.build.signatureStatus).toBe("NotSigned");
+    expect(DESKTOP_RELEASE_INFO.build.releaseReportFileName).toBe(
+      `SpeakRight_${DESKTOP_RELEASE_VERSION}_release-report.json`,
+    );
     expect(DESKTOP_RELEASE_INFO.notes.unsigned).toContain("未知发布者");
   });
 });

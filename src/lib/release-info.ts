@@ -17,6 +17,8 @@ export const DESKTOP_RELEASE_INFO = {
     framework: "Tauri 2 + Next.js 16 static export",
     target: "Windows x64",
     signed: false,
+    signatureStatus: "NotSigned",
+    releaseReportFileName: `SpeakRight_${DESKTOP_RELEASE_VERSION}_release-report.json`,
   },
   installers: [
     {

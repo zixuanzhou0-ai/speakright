@@ -44,7 +44,7 @@ export function ReleaseCard() {
       </CardHeader>
 
       <CardContent className="space-y-4">
-        <div className="grid gap-3 sm:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
           <ReleaseFact
             icon={<MonitorCog className="size-4" />}
             label="构建目标"
@@ -59,6 +59,16 @@ export function ReleaseCard() {
             icon={<PackageCheck className="size-4" />}
             label="技术栈"
             value={release.build.framework}
+          />
+          <ReleaseFact
+            icon={<ShieldAlert className="size-4" />}
+            label="签名状态"
+            value={release.build.signatureStatus}
+          />
+          <ReleaseFact
+            icon={<PackageCheck className="size-4" />}
+            label="发布报告"
+            value={release.build.releaseReportFileName}
           />
         </div>
 
