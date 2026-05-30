@@ -15,8 +15,10 @@
     "format:check": "biome format .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "tauri:check": "cargo check --manifest-path src-tauri/Cargo.toml",
     "validate": "npm run lint && npm run typecheck && npm run test",
-    "validate:release": "npm run validate && npm run build:desktop-frontend"
+    "validate:desktop": "npm run validate && npm run tauri:check && npm run desktop:build",
+    "validate:release": "npm run validate:desktop"
   },
   "dependencies": {
     "@base-ui/react": "^1.3.0",
