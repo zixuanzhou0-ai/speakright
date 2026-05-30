@@ -13,6 +13,8 @@ import {
   MessageSquareText,
   Mic2,
   PanelsTopLeft,
+  PlayCircle,
+  Settings,
   Target,
   TrendingUp,
 } from "lucide-react";
@@ -21,6 +23,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { getAzureConfig, subscribeToStorage } from "@/lib/api-keys";
 import { isReviewDue, loadMasteryProfile } from "@/lib/mastery-profile";
 import { buildReviewQueue } from "@/lib/review-queue";
 import { buildTrainingMemory } from "@/lib/training-memory";
@@ -162,10 +165,17 @@ function priorityVariant(priority: ReviewQueueItem["priority"]) {
 export default function DrillPage() {
   const [report, setReport] = useState<DiagnosisReport | null>(null);
   const [profile, setProfile] = useState<MasteryProfile | null>(null);
+  const [azureReady, setAzureReady] = useState(false);
 
   useEffect(() => {
     setReport(loadReport());
     setProfile(loadMasteryProfile());
+    const refreshAzureState = () => {
+      const config = getAzureConfig();
+      setAzureReady(!!config?.subscriptionKey && !!config.region);
+    };
+    refreshAzureState();
+    return subscribeToStorage(refreshAzureState);
   }, []);
 
   const prescription =
@@ -203,6 +213,17 @@ export default function DrillPage() {
       ]),
     ).values(),
   ).slice(0, 2);
+  const primaryItem = todayItems[0];
+  const primaryPack = primaryItem
+    ? TRAINING_PACKS.find((pack) => pack.id === primaryItem.packId)
+    : null;
+  const primaryHref =
+    azureReady && primaryItem
+      ? packHref(primaryItem.packId, primaryItem.levelId)
+      : azureReady
+        ? "/drill/word"
+        : "/settings";
+  const primaryLabel = azureReady ? "开始今天训练" : "配置评分密钥";
 
   return (
     <div className="h-full flex flex-col px-6 py-4 overflow-y-auto scrollbar-thin">
@@ -228,6 +249,57 @@ export default function DrillPage() {
           </Link>
         </div>
       </div>
+
+      <section className="mb-5 rounded-xl border bg-primary/5 p-5 shadow-sm">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="min-w-0">
+            <div className="mb-2 flex flex-wrap items-center gap-2">
+              <Badge variant={azureReady ? "default" : "destructive"}>
+                {azureReady ? "评分已就绪" : "需要配置"}
+              </Badge>
+              <Badge variant="secondary">今日 10 分钟</Badge>
+              {primaryItem?.priority === "critical" && (
+                <Badge variant="destructive">优先</Badge>
+              )}
+            </div>
+            <h2 className="text-xl font-bold">
+              {primaryPack?.title ?? "从一个高影响发音开始"}
+            </h2>
+            <p className="mt-1 max-w-3xl text-sm text-muted-foreground">
+              {azureReady
+                ? (primaryItem?.learningObjective ??
+                  primaryItem?.reason ??
+                  primaryPack?.focus ??
+                  "先完成一组目标音训练，再进入复习或自由专项。")
+                : "Azure Speech 配置完成后，桌面端才能进行录音评分和训练证据记录。"}
+            </p>
+          </div>
+          <div className="flex shrink-0 flex-wrap gap-2">
+            <Link href={primaryHref}>
+              <Button size="lg" className="gap-2 cursor-pointer">
+                {azureReady ? (
+                  <PlayCircle className="h-5 w-5" />
+                ) : (
+                  <Settings className="h-5 w-5" />
+                )}
+                {primaryLabel}
+              </Button>
+            </Link>
+            {!report && azureReady && (
+              <Link href="/assessment">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="gap-2 cursor-pointer"
+                >
+                  <ClipboardList className="h-5 w-5" />
+                  先做诊断
+                </Button>
+              </Link>
+            )}
+          </div>
+        </div>
+      </section>
 
       <section className="mb-6 rounded-xl border bg-card p-5 shadow-sm">
         <div className="mb-4 flex items-center gap-2">
