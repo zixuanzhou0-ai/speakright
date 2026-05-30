@@ -16,8 +16,9 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "tauri:check": "cargo check --manifest-path src-tauri/Cargo.toml",
+    "desktop:smoke": "node scripts/desktop-smoke.mjs",
     "validate": "npm run lint && npm run typecheck && npm run test",
-    "validate:desktop": "npm run validate && npm run tauri:check && npm run desktop:build",
+    "validate:desktop": "npm run validate && npm run tauri:check && npm run desktop:build && npm run desktop:smoke",
     "validate:release": "npm run validate:desktop"
   },
   "dependencies": {
