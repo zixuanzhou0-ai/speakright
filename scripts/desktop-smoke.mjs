@@ -357,6 +357,93 @@ async function waitForBodyText(cdp, expectedText) {
   );
 }
 
+async function clickVisibleButtonByText(
+  cdp,
+  text,
+  { withinSelector = null, timeoutMs = 8_000 } = {},
+) {
+  const deadline = Date.now() + timeoutMs;
+  let lastResult = null;
+  while (Date.now() < deadline) {
+    lastResult = await evaluate(
+      cdp,
+      `
+(() => {
+  const root = ${
+    withinSelector
+      ? `document.querySelector(${JSON.stringify(withinSelector)})`
+      : "document"
+  };
+  if (!root) {
+    return {
+      ok: false,
+      reason: "scope missing",
+      bodyText: document.body.innerText.slice(0, 1200)
+    };
+  }
+  const candidates = [...root.querySelectorAll("button")].filter((button) => {
+    const rect = button.getBoundingClientRect();
+    const style = window.getComputedStyle(button);
+    return (
+      (button.textContent || "").trim() === ${JSON.stringify(text)} &&
+      button.disabled !== true &&
+      rect.width > 0 &&
+      rect.height > 0 &&
+      style.display !== "none" &&
+      style.visibility !== "hidden"
+    );
+  });
+  const button = candidates[0];
+  if (!button) {
+    return {
+      ok: false,
+      reason: "button missing or disabled",
+      bodyText: document.body.innerText.slice(0, 1200)
+    };
+  }
+  button.scrollIntoView({ block: "center", inline: "center" });
+  const rect = button.getBoundingClientRect();
+  return {
+    ok: true,
+    x: rect.left + rect.width / 2,
+    y: rect.top + rect.height / 2,
+    text: (button.textContent || "").trim()
+  };
+})()
+`,
+    );
+    if (lastResult?.ok) {
+      await cdp.send("Input.dispatchMouseEvent", {
+        type: "mouseMoved",
+        x: lastResult.x,
+        y: lastResult.y,
+        buttons: 0,
+      });
+      await cdp.send("Input.dispatchMouseEvent", {
+        type: "mousePressed",
+        x: lastResult.x,
+        y: lastResult.y,
+        button: "left",
+        buttons: 1,
+        clickCount: 1,
+      });
+      await cdp.send("Input.dispatchMouseEvent", {
+        type: "mouseReleased",
+        x: lastResult.x,
+        y: lastResult.y,
+        button: "left",
+        buttons: 0,
+        clickCount: 1,
+      });
+      return lastResult;
+    }
+    await delay(100);
+  }
+  throw new Error(
+    `Could not click visible button "${text}": ${lastResult?.reason ?? "unknown"} ${lastResult?.bodyText ?? ""}`,
+  );
+}
+
 async function captureInteractiveEvidence(debuggingPort) {
   if (!debuggingPort || process.platform !== "win32") return null;
 
@@ -691,12 +778,97 @@ async function captureInteractiveEvidence(debuggingPort) {
       throw new Error("Desktop learning data export filename is not versioned.");
     }
 
+    await evaluate(
+      cdp,
+      `
+(() => {
+  localStorage.setItem(
+    "speakright_mastery_profile_v2",
+    JSON.stringify({ version: 2, desktopSmokeDelete: true })
+  );
+  localStorage.setItem("speakright_score_history", JSON.stringify({ th: [82] }));
+  localStorage.setItem("speakright_ipa_cache", JSON.stringify({ th: true }));
+  localStorage.setItem(
+    "speakright_azure_config",
+    JSON.stringify({ subscriptionKey: "desktop-smoke-preserve-key" })
+  );
+  return true;
+})()
+`,
+    );
+
+    let learningDelete = null;
+    try {
+      await clickVisibleButtonByText(cdp, "删除学习数据", {
+        timeoutMs: 10_000,
+      });
+      await waitForBodyText(cdp, "删除本机学习数据？");
+      await clickVisibleButtonByText(cdp, "删除学习数据", {
+        withinSelector: '[data-slot="dialog-content"]',
+      });
+      learningDelete = await evaluate(
+        cdp,
+        `
+(async () => {
+  const deleteDeadline = Date.now() + 10000;
+  while (
+    localStorage.getItem("speakright_mastery_profile_v2") !== null &&
+    Date.now() < deleteDeadline
+  ) {
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+
+  return {
+    ok: true,
+    deletedLearning:
+      localStorage.getItem("speakright_mastery_profile_v2") === null &&
+      localStorage.getItem("speakright_score_history") === null,
+    deletedCache: localStorage.getItem("speakright_ipa_cache") === null,
+    preservedApiKey:
+      localStorage.getItem("speakright_azure_config")?.includes(
+        "desktop-smoke-preserve-key"
+      ) === true
+  };
+})()
+`,
+      );
+    } finally {
+      await evaluate(
+        cdp,
+        `
+(() => {
+  localStorage.removeItem("speakright_mastery_profile_v2");
+  localStorage.removeItem("speakright_score_history");
+  localStorage.removeItem("speakright_ipa_cache");
+  localStorage.removeItem("speakright_azure_config");
+  return true;
+})()
+`,
+      );
+    }
+
+    if (!learningDelete?.ok) {
+      throw new Error(
+        `Desktop learning data delete failed in release window: ${learningDelete?.reason ?? "unknown"} ${learningDelete?.bodyText ?? ""}`,
+      );
+    }
+    if (!learningDelete.deletedLearning) {
+      throw new Error("Desktop learning data delete did not clear learning data.");
+    }
+    if (!learningDelete.deletedCache) {
+      throw new Error("Desktop learning data delete did not clear local caches.");
+    }
+    if (!learningDelete.preservedApiKey) {
+      throw new Error("Desktop learning data delete removed an API key slot.");
+    }
+
     return {
       route: "/settings",
       diagnosticsDownload: diagnostics.download.download,
       learningDataDownload: learningExport.download.download,
       appIdentifier: diagnostics.bundle.appIdentifier,
       llmCustomDisabled: llmPolicy.customButtonDisabled,
+      learningDeletePreservedKey: learningDelete.preservedApiKey,
       logPath: diagnostics.bundle.logPath,
       logBytes: diagnostics.bundle.logBytes,
       screenshot,
@@ -794,7 +966,7 @@ async function smoke() {
               ? `runtimeLog="${runtimeLog.path}" bytes=${runtimeLog.bytes}`
               : "",
             interactiveEvidence
-              ? `diagnostics="${interactiveEvidence.diagnosticsDownload}" learningData="${interactiveEvidence.learningDataDownload}" route=${interactiveEvidence.route} appIdentifier=${interactiveEvidence.appIdentifier} llmCustomDisabled=${interactiveEvidence.llmCustomDisabled}`
+              ? `diagnostics="${interactiveEvidence.diagnosticsDownload}" learningData="${interactiveEvidence.learningDataDownload}" learningDeletePreservedKey=${interactiveEvidence.learningDeletePreservedKey} route=${interactiveEvidence.route} appIdentifier=${interactiveEvidence.appIdentifier} llmCustomDisabled=${interactiveEvidence.llmCustomDisabled}`
               : "",
           ]
             .filter(Boolean)
