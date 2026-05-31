@@ -221,6 +221,11 @@ async function assertStaticExportPolicy() {
     "fonts.googleapis.com",
     "fonts.gstatic.com",
     "http://dict.youdao.com",
+    "/api/azure",
+    "/api/elevenlabs",
+    "/api/llm",
+    "/api/pronunciation",
+    "/api/merriam-webster",
   ];
 
   for (const filePath of textArtifactFiles(outDir)) {
