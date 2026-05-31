@@ -1,0 +1,132 @@
+import { existsSync, readdirSync, statSync } from "node:fs";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
+
+const root = process.cwd();
+const outDir = path.join(root, "out");
+const tauriConfigPath = path.join(root, "src-tauri", "tauri.conf.json");
+
+function fail(message) {
+  throw new Error(`Desktop artifact smoke failed: ${message}`);
+}
+
+function assertFile(filePath, { minBytes = 1 } = {}) {
+  if (!existsSync(filePath)) {
+    fail(`missing file ${path.relative(root, filePath)}`);
+  }
+  const size = statSync(filePath).size;
+  if (size < minBytes) {
+    fail(
+      `${path.relative(root, filePath)} is too small (${size} bytes, expected at least ${minBytes})`,
+    );
+  }
+}
+
+async function assertTextFile(filePath, options = {}) {
+  assertFile(filePath, options);
+  const text = await readFile(filePath, "utf8");
+  for (const marker of options.markers ?? []) {
+    if (!text.includes(marker)) {
+      fail(`${path.relative(root, filePath)} does not contain "${marker}"`);
+    }
+  }
+  return text;
+}
+
+function countFiles(dirPath) {
+  if (!existsSync(dirPath)) return 0;
+  let count = 0;
+  for (const entry of readdirSync(dirPath, { withFileTypes: true })) {
+    const itemPath = path.join(dirPath, entry.name);
+    if (entry.isDirectory()) {
+      count += countFiles(itemPath);
+    } else {
+      count += 1;
+    }
+  }
+  return count;
+}
+
+async function readJson(filePath) {
+  return JSON.parse(await readFile(filePath, "utf8"));
+}
+
+async function assertTauriConfig() {
+  const config = await readJson(tauriConfigPath);
+  if (config.productName !== "SpeakRight") {
+    fail("Tauri productName is not SpeakRight");
+  }
+  if (config.build?.frontendDist !== "../out") {
+    fail("Tauri frontendDist must point at ../out");
+  }
+  if (config.app?.withGlobalTauri !== false) {
+    fail("Tauri global API must remain disabled");
+  }
+  const mainWindow = config.app?.windows?.[0];
+  if (mainWindow?.title !== "SpeakRight") {
+    fail("Tauri main window title is not SpeakRight");
+  }
+  if ((mainWindow?.minWidth ?? 0) < 1024 || (mainWindow?.minHeight ?? 0) < 800) {
+    fail("Tauri main window minimum size is below the desktop layout floor");
+  }
+}
+
+async function assertStaticExport() {
+  if (!existsSync(outDir)) {
+    fail("Next static export directory out/ is missing");
+  }
+
+  const requiredPages = [
+    {
+      file: "drill.html",
+      markers: ["今日学习计划", "桌面端准备状态", "配置评分密钥"],
+    },
+    {
+      file: "settings.html",
+      markers: ["设置", "数据与隐私中心", "Azure Speech"],
+    },
+    {
+      file: "assessment.html",
+      markers: ["DOCTYPE"],
+    },
+    {
+      file: path.join("drill", "pack", "ee-ih.html"),
+      markers: ["DOCTYPE"],
+    },
+    {
+      file: path.join("phonemes", "ee.html"),
+      markers: ["DOCTYPE"],
+    },
+  ];
+
+  for (const page of requiredPages) {
+    await assertTextFile(path.join(outDir, page.file), {
+      minBytes: 1000,
+      markers: page.markers,
+    });
+  }
+
+  const nextStaticCount = countFiles(path.join(outDir, "_next", "static"));
+  if (nextStaticCount < 10) {
+    fail(`expected Next static chunks, found ${nextStaticCount}`);
+  }
+
+  assertFile(path.join(outDir, "favicon.ico"), { minBytes: 1000 });
+  assertFile(path.join(outDir, "audio", "ipa", "normal", "sheep.mp3"), {
+    minBytes: 1000,
+  });
+  assertFile(path.join(outDir, "images", "ipa", "sheep.png"), {
+    minBytes: 1000,
+  });
+}
+
+async function main() {
+  await assertTauriConfig();
+  await assertStaticExport();
+  console.log("Desktop artifact smoke passed: Tauri config, static export, routes, chunks and core assets are present.");
+}
+
+main().catch((error) => {
+  console.error(error instanceof Error ? error.message : error);
+  process.exit(1);
+});
