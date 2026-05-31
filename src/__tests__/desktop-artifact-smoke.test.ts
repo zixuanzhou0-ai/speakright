@@ -71,6 +71,9 @@ describe("desktop artifact smoke wiring", () => {
     expect(smokeScript).toContain("speakright-webview.png");
     expect(smokeScript).toContain("createSmokeProfileRoot");
     expect(smokeScript).toContain("WEBVIEW2_USER_DATA_FOLDER");
+    expect(smokeScript).toContain("桌面端准备状态");
+    expect(smokeScript).toContain("检测麦克风");
+    expect(smokeScript).toContain("建立诊断");
     expect(smokeScript).toContain("com.speakright.desktop");
     expect(smokeScript).toContain("speakright.log");
     expect(smokeScript).toContain("SpeakRight desktop runtime initialized");
