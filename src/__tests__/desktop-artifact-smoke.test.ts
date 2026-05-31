@@ -22,6 +22,13 @@ describe("desktop artifact smoke wiring", () => {
     expect(desktopValidation.indexOf("desktop:artifact-smoke")).toBeLessThan(
       desktopValidation.indexOf("desktop:smoke"),
     );
+    expect(desktopValidation).toContain("desktop:release-report");
+    expect(desktopValidation).toContain("desktop:installer-smoke");
+    expect(desktopValidation.indexOf("desktop:release-report")).toBeLessThan(
+      desktopValidation.indexOf("desktop:installer-smoke"),
+    );
+    const desktopCiValidation = packageJson.scripts["validate:desktop-ci"];
+    expect(desktopCiValidation).toContain("desktop:installer-smoke");
   });
 
   it("checks the desktop static export and core local assets", () => {
@@ -37,5 +44,19 @@ describe("desktop artifact smoke wiring", () => {
     expect(smokeScript).toContain("_next");
     expect(smokeScript).toContain("sheep.mp3");
     expect(smokeScript).toContain("sheep.png");
+  });
+
+  it("checks Windows installer metadata before artifacts are trusted", () => {
+    const installerSmokeScript = readFileSync(
+      join(projectRoot, "scripts/desktop-installer-smoke.mjs"),
+      "utf8",
+    );
+
+    expect(installerSmokeScript).toContain("ProductName");
+    expect(installerSmokeScript).toContain("ProductVersion");
+    expect(installerSmokeScript).toContain("Manufacturer");
+    expect(installerSmokeScript).toContain("ProductCode");
+    expect(installerSmokeScript).toContain("UpgradeCode");
+    expect(installerSmokeScript).toContain("SHA-256");
   });
 });

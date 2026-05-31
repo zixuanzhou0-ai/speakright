@@ -20,10 +20,11 @@
     "desktop:artifact-smoke": "node scripts/desktop-artifact-smoke.mjs",
     "desktop:smoke": "node scripts/desktop-smoke.mjs",
     "desktop:release-report": "node scripts/desktop-release-report.mjs",
+    "desktop:installer-smoke": "node scripts/desktop-installer-smoke.mjs",
     "desktop:release-gate": "node scripts/desktop-release-gate.mjs",
     "validate": "npm run lint && npm run typecheck && npm run test",
-    "validate:desktop-ci": "npm run validate && npm run tauri:check && npm run tauri:test && npm run desktop:build && npm run desktop:artifact-smoke && npm run desktop:release-report",
-    "validate:desktop": "npm run validate && npm run tauri:check && npm run tauri:test && npm run desktop:build && npm run desktop:artifact-smoke && npm run desktop:smoke && npm run desktop:release-report",
+    "validate:desktop-ci": "npm run validate && npm run tauri:check && npm run tauri:test && npm run desktop:build && npm run desktop:artifact-smoke && npm run desktop:release-report && npm run desktop:installer-smoke",
+    "validate:desktop": "npm run validate && npm run tauri:check && npm run tauri:test && npm run desktop:build && npm run desktop:artifact-smoke && npm run desktop:smoke && npm run desktop:release-report && npm run desktop:installer-smoke",
     "validate:release": "npm run validate:desktop",
     "validate:public-release": "npm run validate:desktop && npm run desktop:release-gate"
   },
