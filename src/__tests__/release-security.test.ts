@@ -264,6 +264,24 @@ describe("release security configuration", () => {
     expect(imgDirective).toContain("data:");
   });
 
+  it("does not allow remote font hosts in the desktop CSP", () => {
+    const config = readJson<{
+      app?: { security?: { csp?: string } };
+    }>("src-tauri/tauri.conf.json");
+    const csp = config.app?.security?.csp ?? "";
+
+    expect(csp).not.toContain("fonts.googleapis.com");
+    expect(csp).not.toContain("fonts.gstatic.com");
+    expect(cspDirectives().get("font-src")?.split(/\s+/)).toEqual([
+      "'self'",
+      "data:",
+    ]);
+    expect(cspDirectives().get("style-src")?.split(/\s+/)).toEqual([
+      "'self'",
+      "'unsafe-inline'",
+    ]);
+  });
+
   it("does not allow plaintext external hosts in the desktop CSP", () => {
     const config = readJson<{
       app?: { security?: { csp?: string } };
