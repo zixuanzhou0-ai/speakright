@@ -34,13 +34,9 @@
         { "url": "https://dict.youdao.com/**" }
       ]
     },
-    "store:default",
     "store:allow-get",
     "store:allow-set",
     "store:allow-delete",
-    "store:allow-keys",
-    "store:allow-has",
-    "store:allow-clear",
     "store:allow-save",
     "store:allow-load"
   ]

@@ -49,6 +49,31 @@ describe("release security configuration", () => {
     expect(urls.every((url) => !url.startsWith("http://"))).toBe(true);
   });
 
+  it("keeps Tauri store permissions limited to the settings store operations in use", () => {
+    const capability = readJson<{
+      permissions: Array<string | Record<string, unknown>>;
+    }>("src-tauri/capabilities/default.json");
+    const permissions = capability.permissions.filter(
+      (permission): permission is string => typeof permission === "string",
+    );
+
+    expect(permissions).toContain("store:allow-load");
+    expect(permissions).toContain("store:allow-get");
+    expect(permissions).toContain("store:allow-set");
+    expect(permissions).toContain("store:allow-delete");
+    expect(permissions).toContain("store:allow-save");
+    expect(permissions).not.toContain("store:default");
+    expect(permissions).not.toContain("store:allow-clear");
+    expect(permissions).not.toContain("store:allow-reset");
+    expect(permissions).not.toContain("store:allow-keys");
+    expect(permissions).not.toContain("store:allow-has");
+    expect(permissions).not.toContain("store:allow-values");
+    expect(permissions).not.toContain("store:allow-entries");
+    expect(permissions).not.toContain("store:allow-length");
+    expect(permissions).not.toContain("store:allow-reload");
+    expect(permissions).not.toContain("store:allow-get-store");
+  });
+
   it("does not ship Tauri devtools in the release dependency feature set", () => {
     const cargoToml = readFileSync(
       join(projectRoot, "src-tauri/Cargo.toml"),
