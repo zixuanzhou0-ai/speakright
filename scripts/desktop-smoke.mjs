@@ -659,7 +659,10 @@ async function captureInteractiveEvidence(debuggingPort) {
     if (learningExport.snapshot?.product !== "SpeakRight Desktop") {
       throw new Error("Desktop learning data export product marker is wrong.");
     }
-    if (learningExport.snapshot?.schemaVersion < 4) {
+    if (
+      typeof learningExport.snapshot?.schemaVersion !== "number" ||
+      learningExport.snapshot.schemaVersion < 4
+    ) {
       throw new Error(
         `Desktop learning data export schema is too old: ${learningExport.snapshot?.schemaVersion}.`,
       );
