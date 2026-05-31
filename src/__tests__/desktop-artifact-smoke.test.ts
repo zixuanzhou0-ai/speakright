@@ -83,6 +83,8 @@ describe("desktop artifact smoke wiring", () => {
     expect(smokeScript).toContain("speakright-webview.png");
     expect(smokeScript).toContain("createSmokeProfileRoot");
     expect(smokeScript).toContain("WEBVIEW2_USER_DATA_FOLDER");
+    expect(smokeScript).toContain("tauriGlobalExposed");
+    expect(smokeScript).toContain("tauriInvokeAvailable");
     expect(smokeScript).toContain("桌面端准备状态");
     expect(smokeScript).toContain("检测麦克风");
     expect(smokeScript).toContain("建立诊断");
