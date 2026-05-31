@@ -91,6 +91,7 @@ describe("release security configuration", () => {
     expect(rustEntry).toContain("secure_store_get");
     expect(rustEntry).toContain("secure_store_set");
     expect(rustEntry).toContain("secure_store_delete");
+    expect(rustEntry).toContain("desktop_diagnostics");
   });
 
   it("keeps release desktop diagnostics enabled without logging secret values", () => {
@@ -104,6 +105,8 @@ describe("release security configuration", () => {
     expect(rustEntry).toContain('file_name: Some(LOG_FILE_NAME.into())');
     expect(rustEntry).toContain("RotationStrategy::KeepSome(LOG_ARCHIVE_COUNT)");
     expect(rustEntry).toContain("LOG_MAX_FILE_SIZE_BYTES");
+    expect(rustEntry).toContain("LOG_TAIL_LINE_COUNT");
+    expect(rustEntry).toContain("LOG_TAIL_MAX_LINE_CHARS");
     expect(rustEntry).toContain("LevelFilter::Info");
     expect(rustEntry).not.toMatch(/if\s+cfg!\(debug_assertions\)[\s\S]{0,160}tauri_plugin_log/);
 

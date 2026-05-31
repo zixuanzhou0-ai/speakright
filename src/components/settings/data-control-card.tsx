@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Bug,
   Database,
   Download,
   KeyRound,
@@ -29,6 +30,7 @@ import {
   downloadLocalDataExport,
   getLocalDataSummary,
 } from "@/lib/data-registry";
+import { downloadDesktopSupportBundle } from "@/lib/desktop-diagnostics";
 
 type ConfirmAction =
   | "learning"
@@ -88,6 +90,18 @@ export function DataControlCard() {
       toast.success("本地学习数据已导出");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "导出失败");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleDiagnosticsExport = async () => {
+    setBusy(true);
+    try {
+      await downloadDesktopSupportBundle();
+      toast.success("桌面诊断包已导出");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "诊断包导出失败");
     } finally {
       setBusy(false);
     }
@@ -168,6 +182,7 @@ export function DataControlCard() {
             Speech；标准示范会把练习文本发送到 ElevenLabs；AI
             教练会把文本、分数和错误摘要发送到你配置的 LLM provider。
             原始训练录音默认不长期保存，benchmark 录音只保存在本机并会随学习数据导出。
+            诊断包只包含版本信息、数据摘要和桌面运行日志尾部，不包含 API keys 或原始录音。
           </div>
 
           <div className="flex flex-wrap gap-2">
@@ -179,6 +194,16 @@ export function DataControlCard() {
             >
               <Download className="h-4 w-4" />
               导出学习数据
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleDiagnosticsExport}
+              disabled={busy}
+              className="gap-2"
+            >
+              <Bug className="h-4 w-4" />
+              导出诊断包
             </Button>
             <Button
               type="button"
