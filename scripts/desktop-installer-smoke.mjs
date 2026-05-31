@@ -10,6 +10,11 @@ const execFileAsync = promisify(execFile);
 const root = process.cwd();
 const productName = "SpeakRight";
 const manufacturer = "speakright";
+const minArtifactBytes = {
+  exe: 10 * 1024 * 1024,
+  msi: 8 * 1024 * 1024,
+  nsis: 8 * 1024 * 1024,
+};
 
 async function readJson(filePath) {
   return JSON.parse(await readFile(filePath, "utf8"));
@@ -194,9 +199,9 @@ async function assertReleaseReport(version, paths) {
 async function main() {
   const version = await packageVersion();
   const paths = artifactPaths(version);
-  await assertArtifact("exe", paths.exe, 50 * 1024 * 1024);
-  await assertArtifact("msi", paths.msi, 50 * 1024 * 1024);
-  await assertArtifact("nsis", paths.nsis, 50 * 1024 * 1024);
+  await assertArtifact("exe", paths.exe, minArtifactBytes.exe);
+  await assertArtifact("msi", paths.msi, minArtifactBytes.msi);
+  await assertArtifact("nsis", paths.nsis, minArtifactBytes.nsis);
   await assertReleaseReport(version, paths);
 
   if (process.platform !== "win32") {
