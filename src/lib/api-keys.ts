@@ -152,7 +152,7 @@ function setItem<T>(key: string, value: T): void {
 }
 
 /**
- * Remove a key from both localStorage and Tauri store.
+ * Remove a key from every runtime and persistent backend.
  */
 export async function clearItem(key: string): Promise<void> {
   if (typeof window === "undefined") return;
@@ -178,17 +178,18 @@ export async function clearItem(key: string): Promise<void> {
 }
 
 /**
- * Hydrate localStorage from Tauri store on app startup.
+ * Hydrate app settings from the persistent desktop backends on startup.
  *
  * Behavior:
- * - If Tauri store has a value for a key → copy to localStorage (hot read cache)
- * - If Tauri store is empty but localStorage has a value → migrate localStorage → store
- * - After each write, dispatch a storage event so useSyncExternalStore consumers
- *   re-render with the freshly hydrated data.
+ * - In Tauri, secret keys load from the OS credential store into runtimeCache.
+ * - In Tauri, non-secret settings load from the Tauri settings store.
+ * - Legacy localStorage values are promoted to the right persistent backend and
+ *   then removed from localStorage when the app is running under Tauri.
+ * - Each changed key dispatches a storage event so useSyncExternalStore
+ *   consumers re-render with the freshly hydrated data.
  *
  * Safe to call multiple times — idempotent by key.
- * In non-Tauri (browser dev) mode this is a no-op because storeGet returns
- * the same localStorage it's reading.
+ * In non-Tauri (browser dev) mode localStorage remains the persistence backend.
  */
 export async function hydrateKeys(): Promise<void> {
   if (typeof window === "undefined") return;

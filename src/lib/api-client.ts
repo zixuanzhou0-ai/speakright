@@ -2,8 +2,8 @@
  * Direct API client for desktop mode.
  * Replaces all /api/* proxy routes — calls external APIs directly from the client.
  * API keys are read from api-keys.ts. In packaged Tauri builds, secrets are
- * kept in the Tauri store + in-memory cache rather than persisted in
- * localStorage.
+ * kept in the OS credential store + in-memory cache rather than persisted in
+ * localStorage or the general Tauri settings store.
  */
 
 import { getCoachMode } from "@/lib/api-keys";
