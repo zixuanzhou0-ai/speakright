@@ -14,10 +14,12 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  useMerriamWebsterConfig,
+  usePronunciationConfig,
+} from "@/hooks/use-api-keys";
 import { fetchPronunciation } from "@/lib/api-client";
 import {
-  getMerriamWebsterConfig,
-  getPronunciationConfig,
   setMerriamWebsterConfig,
   setPronunciationConfig,
 } from "@/lib/api-keys";
@@ -49,13 +51,16 @@ export function PronunciationConfigCard() {
   const [isTesting, setIsTesting] = useState(false);
   const howlRef = useRef<Howl | null>(null);
   const blobUrlRef = useRef<string | null>(null);
+  const pronunciationConfig = usePronunciationConfig();
+  const mwConfig = useMerriamWebsterConfig();
 
   useEffect(() => {
-    const config = getPronunciationConfig();
-    setSource(config.source);
-    const mw = getMerriamWebsterConfig();
-    if (mw) setMwKey(mw.apiKey);
-  }, []);
+    setSource(pronunciationConfig.source);
+  }, [pronunciationConfig.source]);
+
+  useEffect(() => {
+    setMwKey(mwConfig?.apiKey ?? "");
+  }, [mwConfig]);
 
   const handleSourceChange = (newSource: PronunciationSource) => {
     setSource(newSource);

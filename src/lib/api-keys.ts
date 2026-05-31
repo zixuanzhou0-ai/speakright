@@ -38,6 +38,7 @@ export const APP_PREFERENCE_STORAGE_KEYS = [
 export const API_KEY_STORAGE_ERROR_EVENT = "speakright:api-key-storage-error";
 const runtimeCache = new Map<string, unknown>();
 const SECRET_STORAGE_KEYS = new Set<string>(API_KEY_STORAGE_KEYS);
+const DEFAULT_PRONUNCIATION_CONFIG: PronunciationConfig = { source: "youdao" };
 
 export interface ApiKeyStorageErrorDetail {
   key: string;
@@ -270,9 +271,8 @@ export function setMerriamWebsterConfig(config: MerriamWebsterConfig): void {
 // Pronunciation source
 export function getPronunciationConfig(): PronunciationConfig {
   return (
-    getItem<PronunciationConfig>(STORAGE_KEYS.pronunciation) ?? {
-      source: "youdao",
-    }
+    getItem<PronunciationConfig>(STORAGE_KEYS.pronunciation) ??
+    DEFAULT_PRONUNCIATION_CONFIG
   );
 }
 

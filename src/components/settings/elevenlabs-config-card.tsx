@@ -19,8 +19,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useElevenLabsConfig } from "@/hooks/use-api-keys";
 import { testElevenLabs } from "@/lib/api-client";
-import { getElevenLabsConfig, setElevenLabsConfig } from "@/lib/api-keys";
+import { setElevenLabsConfig } from "@/lib/api-keys";
 import { type ConnectionState, ConnectionStatus } from "./connection-status";
 
 const ELEVENLABS_VOICES = [
@@ -43,15 +44,19 @@ export function ElevenLabsConfigCard() {
   const [apiKey, setApiKey] = useState("");
   const [voiceId, setVoiceId] = useState("");
   const [modelId, setModelId] = useState("eleven_flash_v2_5");
+  const saved = useElevenLabsConfig();
 
   useEffect(() => {
-    const saved = getElevenLabsConfig();
     if (saved) {
       setApiKey(saved.apiKey);
       setVoiceId(saved.voiceId);
       if (saved.modelId) setModelId(saved.modelId);
+    } else {
+      setApiKey("");
+      setVoiceId("");
+      setModelId("eleven_flash_v2_5");
     }
-  }, []);
+  }, [saved]);
   const [status, setStatus] = useState<ConnectionState>("idle");
   const [statusMsg, setStatusMsg] = useState("");
 

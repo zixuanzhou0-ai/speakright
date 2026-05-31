@@ -12,8 +12,9 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useAzureConfig } from "@/hooks/use-api-keys";
 import { testAzure } from "@/lib/api-client";
-import { getAzureConfig, setAzureConfig } from "@/lib/api-keys";
+import { setAzureConfig } from "@/lib/api-keys";
 import {
   getAzureRegionValidationError,
   normalizeAzureRegion,
@@ -23,14 +24,17 @@ import { type ConnectionState, ConnectionStatus } from "./connection-status";
 export function AzureConfigCard() {
   const [key, setKey] = useState("");
   const [region, setRegion] = useState("eastus");
+  const saved = useAzureConfig();
 
   useEffect(() => {
-    const saved = getAzureConfig();
     if (saved) {
       setKey(saved.subscriptionKey);
       setRegion(saved.region);
+    } else {
+      setKey("");
+      setRegion("eastus");
     }
-  }, []);
+  }, [saved]);
   const [status, setStatus] = useState<ConnectionState>("idle");
   const [statusMsg, setStatusMsg] = useState("");
 

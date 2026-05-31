@@ -12,22 +12,22 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useMerriamWebsterConfig } from "@/hooks/use-api-keys";
 import { testMw } from "@/lib/api-client";
-import {
-  getMerriamWebsterConfig,
-  setMerriamWebsterConfig,
-} from "@/lib/api-keys";
+import { setMerriamWebsterConfig } from "@/lib/api-keys";
 import { type ConnectionState, ConnectionStatus } from "./connection-status";
 
 export function MwConfigCard() {
   const [key, setKey] = useState("");
+  const saved = useMerriamWebsterConfig();
 
   useEffect(() => {
-    const saved = getMerriamWebsterConfig();
     if (saved) {
       setKey(saved.apiKey);
+    } else {
+      setKey("");
     }
-  }, []);
+  }, [saved]);
 
   const [status, setStatus] = useState<ConnectionState>("idle");
   const [statusMsg, setStatusMsg] = useState("");

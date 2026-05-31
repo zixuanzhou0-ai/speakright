@@ -13,8 +13,9 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useLlmConfig } from "@/hooks/use-api-keys";
 import { testLlm } from "@/lib/api-client";
-import { getLlmConfig, setLlmConfig } from "@/lib/api-keys";
+import { setLlmConfig } from "@/lib/api-keys";
 import {
   DESKTOP_LLM_POLICY_MESSAGE,
   normalizeStoredProvider,
@@ -32,23 +33,31 @@ export function LlmConfigCard() {
   const [baseUrl, setBaseUrl] = useState(PRESET_PROVIDERS.claude.baseUrl);
   const [model, setModel] = useState(PRESET_PROVIDERS.claude.models[0] ?? "");
   const [isDesktop, setIsDesktop] = useState(false);
+  const saved = useLlmConfig();
 
   useEffect(() => {
-    const desktop = isTauriEnvironment();
-    setIsDesktop(desktop);
-    const saved = getLlmConfig();
+    setIsDesktop(isTauriEnvironment());
+  }, []);
+
+  useEffect(() => {
     if (saved) {
-      const nextProvider = normalizeStoredProvider(saved.provider, desktop);
+      const nextProvider = normalizeStoredProvider(saved.provider, isDesktop);
       const nextPreset = PRESET_PROVIDERS[nextProvider];
-      const canUseSavedEndpoint = nextProvider === "custom" && !desktop;
+      const canUseSavedEndpoint = nextProvider === "custom" && !isDesktop;
       setProvider(nextProvider);
       setApiKey(saved.apiKey ?? "");
       setBaseUrl(
         canUseSavedEndpoint ? (saved.baseUrl ?? "") : nextPreset.baseUrl,
       );
       setModel(saved.model || nextPreset.models[0] || "");
+    } else {
+      const nextPreset = PRESET_PROVIDERS.claude;
+      setProvider("claude");
+      setApiKey("");
+      setBaseUrl(nextPreset.baseUrl);
+      setModel(nextPreset.models[0] ?? "");
     }
-  }, []);
+  }, [saved, isDesktop]);
   const [status, setStatus] = useState<ConnectionState>("idle");
   const [statusMsg, setStatusMsg] = useState("");
 
