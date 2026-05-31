@@ -32,6 +32,7 @@ type MicStatus =
   | "unsupported"
   | "denied"
   | "low-signal"
+  | "too-short"
   | "error";
 
 const STEP_ICONS = {
@@ -70,6 +71,7 @@ function micStatusText(status: MicStatus, check: DesktopMicCheck | null): string
   if (status === "unsupported") return "不可用";
   if (status === "denied") return "未授权";
   if (status === "low-signal") return "输入太低";
+  if (status === "too-short") return "样本太短";
   if (status === "error") return "检测失败";
   return "待检测";
 }
@@ -167,12 +169,20 @@ export function DesktopReadinessCard({
       });
       const deviceLabel = stream.getAudioTracks()[0]?.label;
       const signal = await measureMicSignal(stream);
-      if (signal && !evaluateDesktopMicSignal(signal).passed) {
+      if (!signal) {
         setMicCheck(null);
-        setMicStatus("low-signal");
+        setMicStatus("unsupported");
         return;
       }
-      const saved = saveDesktopMicCheck({ deviceLabel, ...(signal ?? {}) });
+      const evaluation = evaluateDesktopMicSignal(signal);
+      if (!evaluation.passed) {
+        setMicCheck(null);
+        setMicStatus(
+          evaluation.reason === "too-short" ? "too-short" : "low-signal",
+        );
+        return;
+      }
+      const saved = saveDesktopMicCheck({ deviceLabel, ...signal });
       setMicCheck(saved);
       setMicStatus("ready");
     } catch (error) {
@@ -236,7 +246,9 @@ export function DesktopReadinessCard({
             <Button
               type="button"
               variant={
-                micStatus === "denied" || micStatus === "low-signal"
+                micStatus === "denied" ||
+                micStatus === "low-signal" ||
+                micStatus === "too-short"
                   ? "destructive"
                   : "outline"
               }
@@ -248,6 +260,7 @@ export function DesktopReadinessCard({
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : micStatus === "denied" ||
                 micStatus === "low-signal" ||
+                micStatus === "too-short" ||
                 micStatus === "error" ? (
                 <AlertTriangle className="h-4 w-4" />
               ) : (
