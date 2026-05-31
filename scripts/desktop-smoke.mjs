@@ -1,6 +1,6 @@
 import { execFile, spawn } from "node:child_process";
 import { existsSync } from "node:fs";
-import { mkdir, readFile, stat } from "node:fs/promises";
+import { mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import net from "node:net";
 import path from "node:path";
 import { promisify } from "node:util";
@@ -130,109 +130,74 @@ async function getWindowTitle(pid) {
   return stdout.trim();
 }
 
-async function captureWindowEvidence(pid) {
-  if (process.platform !== "win32") return null;
-
-  const outputDir = path.join(root, "src-tauri", "target", "release", "smoke");
-  await mkdir(outputDir, { recursive: true });
-  const outputPath = path.join(outputDir, "speakright-window.png");
+async function analyzePngFile(outputPath) {
   const script = `
-param([int]$TargetPid, [string]$OutputPath)
+param([string]$ImagePath)
 $ErrorActionPreference = "Stop"
 Add-Type -AssemblyName System.Drawing
-Add-Type -AssemblyName System.Windows.Forms
-$nativeSource = @"
-using System;
-using System.Runtime.InteropServices;
-
-public struct RECT {
-  public int Left;
-  public int Top;
-  public int Right;
-  public int Bottom;
-}
-
-public static class NativeWindow {
-  [DllImport("user32.dll")]
-  public static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
-
-  [DllImport("user32.dll")]
-  public static extern bool SetForegroundWindow(IntPtr hWnd);
-
-  [DllImport("user32.dll")]
-  public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-}
-"@
-Add-Type -TypeDefinition $nativeSource
-$process = Get-Process -Id $TargetPid -ErrorAction Stop
-$handle = $process.MainWindowHandle
-if ($handle -eq [IntPtr]::Zero) {
-  throw "Main window handle is not available."
-}
-[NativeWindow]::ShowWindow($handle, 5) | Out-Null
-[NativeWindow]::SetForegroundWindow($handle) | Out-Null
-Start-Sleep -Milliseconds 800
-$rect = New-Object RECT
-if (-not [NativeWindow]::GetWindowRect($handle, [ref]$rect)) {
-  throw "GetWindowRect failed."
-}
-$width = $rect.Right - $rect.Left
-$height = $rect.Bottom - $rect.Top
-if ($width -lt 300 -or $height -lt 300) {
-  throw ("Window bounds are too small: {0}x{1}." -f $width, $height)
-}
-$bitmap = New-Object System.Drawing.Bitmap $width, $height
-$graphics = [System.Drawing.Graphics]::FromImage($bitmap)
-$graphics.CopyFromScreen($rect.Left, $rect.Top, 0, 0, $bitmap.Size)
-[System.IO.Directory]::CreateDirectory([System.IO.Path]::GetDirectoryName($OutputPath)) | Out-Null
-$bitmap.Save($OutputPath, [System.Drawing.Imaging.ImageFormat]::Png)
-
-$clientTop = [Math]::Min(80, [Math]::Max(0, $height - 1))
-$step = [Math]::Max(1, [Math]::Floor([Math]::Min($width, $height) / 120))
-$total = 0
-$nonWhite = 0
-$distinct = New-Object 'System.Collections.Generic.HashSet[string]'
-for ($y = $clientTop; $y -lt $height; $y += $step) {
-  for ($x = 0; $x -lt $width; $x += $step) {
-    $pixel = $bitmap.GetPixel($x, $y)
-    $total += 1
-    if (-not ($pixel.R -ge 248 -and $pixel.G -ge 248 -and $pixel.B -ge 248)) {
-      $nonWhite += 1
+$bitmap = [System.Drawing.Bitmap]::FromFile($ImagePath)
+try {
+  $width = $bitmap.Width
+  $height = $bitmap.Height
+  $step = [Math]::Max(1, [Math]::Floor([Math]::Min($width, $height) / 120))
+  $total = 0
+  $nonWhite = 0
+  $distinct = New-Object 'System.Collections.Generic.HashSet[string]'
+  for ($y = 0; $y -lt $height; $y += $step) {
+    for ($x = 0; $x -lt $width; $x += $step) {
+      $pixel = $bitmap.GetPixel($x, $y)
+      $total += 1
+      if (-not ($pixel.R -ge 248 -and $pixel.G -ge 248 -and $pixel.B -ge 248)) {
+        $nonWhite += 1
+      }
+      $null = $distinct.Add("$($pixel.R),$($pixel.G),$($pixel.B)")
     }
-    $null = $distinct.Add("$($pixel.R),$($pixel.G),$($pixel.B)")
   }
+  [pscustomobject]@{
+    Path = $ImagePath
+    Width = $width
+    Height = $height
+    SampledPixels = $total
+    NonWhiteRatio = if ($total -gt 0) { $nonWhite / $total } else { 0 }
+    DistinctColors = $distinct.Count
+  } | ConvertTo-Json -Compress
+} finally {
+  $bitmap.Dispose()
 }
-$graphics.Dispose()
-$bitmap.Dispose()
-
-[pscustomobject]@{
-  Path = $OutputPath
-  Width = $width
-  Height = $height
-  SampledPixels = $total
-  NonWhiteRatio = if ($total -gt 0) { $nonWhite / $total } else { 0 }
-  DistinctColors = $distinct.Count
-  ClientTop = $clientTop
-} | ConvertTo-Json -Compress
 `;
 
   const { stdout } = await execFileAsync("powershell.exe", [
     "-NoProfile",
     "-Command",
     `& { ${script} }`,
-    String(pid),
     outputPath,
   ]);
-  const evidence = JSON.parse(stdout.trim());
+  return JSON.parse(stdout.trim());
+}
+
+async function captureWebviewEvidence(cdp) {
+  const outputDir = path.join(root, "src-tauri", "target", "release", "smoke");
+  await mkdir(outputDir, { recursive: true });
+  const outputPath = path.join(outputDir, "speakright-webview.png");
+  const screenshot = await cdp.send("Page.captureScreenshot", {
+    format: "png",
+    fromSurface: true,
+  });
+  if (!screenshot?.data) {
+    throw new Error("CDP did not return a WebView screenshot.");
+  }
+  await writeFile(outputPath, Buffer.from(screenshot.data, "base64"));
+
+  const evidence = await analyzePngFile(outputPath);
   if (evidence.Width < 800 || evidence.Height < 600) {
     throw new Error(
-      `Desktop smoke screenshot is too small: ${evidence.Width}x${evidence.Height}.`,
+      `Desktop WebView screenshot is too small: ${evidence.Width}x${evidence.Height}.`,
     );
   }
   if (evidence.NonWhiteRatio < 0.005 || evidence.DistinctColors < 12) {
     throw new Error(
       [
-        "Desktop smoke screenshot looks blank.",
+        "Desktop WebView screenshot looks blank.",
         `nonWhiteRatio=${evidence.NonWhiteRatio}`,
         `distinctColors=${evidence.DistinctColors}`,
         `path=${evidence.Path}`,
@@ -387,6 +352,7 @@ async function captureInteractiveEvidence(debuggingPort) {
     await cdp.send("Runtime.enable");
     await cdp.send("Page.enable");
     await waitForBodyText(cdp, "今日学习计划");
+    const screenshot = await captureWebviewEvidence(cdp);
 
     await evaluate(
       cdp,
@@ -549,6 +515,7 @@ async function captureInteractiveEvidence(debuggingPort) {
       llmCustomDisabled: llmPolicy.customButtonDisabled,
       logPath: diagnostics.bundle.logPath,
       logBytes: diagnostics.bundle.logBytes,
+      screenshot,
     };
   } finally {
     cdp.close();
@@ -625,18 +592,16 @@ async function smoke() {
       observedTitle = await getWindowTitle(child.pid);
       if (process.platform !== "win32" || observedTitle === expectedTitle) {
         await delay(1_000);
-        const [evidence, runtimeLog] = await Promise.all([
-          captureWindowEvidence(child.pid),
+        const [runtimeLog, interactiveEvidence] = await Promise.all([
           captureRuntimeLogEvidence(smokeStartedAt),
+          captureInteractiveEvidence(debuggingPort),
         ]);
-        const interactiveEvidence =
-          await captureInteractiveEvidence(debuggingPort);
         console.log(
           [
             `Desktop smoke test passed: pid=${child.pid}`,
             observedTitle ? `title="${observedTitle}"` : "",
-            evidence
-              ? `screenshot="${evidence.Path}" ${evidence.Width}x${evidence.Height} nonWhiteRatio=${evidence.NonWhiteRatio.toFixed(4)} distinctColors=${evidence.DistinctColors}`
+            interactiveEvidence?.screenshot
+              ? `webviewScreenshot="${interactiveEvidence.screenshot.Path}" ${interactiveEvidence.screenshot.Width}x${interactiveEvidence.screenshot.Height} nonWhiteRatio=${interactiveEvidence.screenshot.NonWhiteRatio.toFixed(4)} distinctColors=${interactiveEvidence.screenshot.DistinctColors}`
               : "",
             runtimeLog
               ? `runtimeLog="${runtimeLog.path}" bytes=${runtimeLog.bytes}`
