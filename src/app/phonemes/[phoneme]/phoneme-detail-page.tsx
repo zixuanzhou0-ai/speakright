@@ -13,6 +13,7 @@ import { ScoreSummary } from "@/components/scoring/score-summary";
 import { Button } from "@/components/ui/button";
 import { useAudioPlayer } from "@/hooks/use-audio-player";
 import { useAzureAssessment } from "@/hooks/use-azure-assessment";
+import { useMerriamWebsterConfig } from "@/hooks/use-api-keys";
 import type { FeedbackData } from "@/hooks/use-llm-feedback";
 import { useLlmFeedback } from "@/hooks/use-llm-feedback";
 import { useMwPronunciation } from "@/hooks/use-mw-pronunciation";
@@ -23,7 +24,6 @@ import {
   useSessionState,
 } from "@/hooks/use-session-state";
 import { useSyllableStress } from "@/hooks/use-syllable-stress";
-import { getMerriamWebsterConfig } from "@/lib/api-keys";
 import { getPhonemeBySlug } from "@/lib/phoneme-data";
 import { getPracticedWords, markWordPracticed } from "@/lib/practice-tracker";
 import { addScore } from "@/lib/score-history";
@@ -42,6 +42,7 @@ export function PhonemeDetailPage() {
   const playback = useAudioPlayer();
   const chartAudio = useAudioPlayer();
   const mw = useMwPronunciation();
+  const mwConfig = useMerriamWebsterConfig();
   const [lastChartPlay, setLastChartPlay] = useState<"normal" | "slow">("slow");
   const [wordDirection, setWordDirection] = useState<number>(1);
   const autoAssessTriggered = useRef(false);
@@ -108,9 +109,9 @@ export function PhonemeDetailPage() {
   const [hasMwConfig, setHasMwConfig] = useState(false);
   const [practicedCount, setPracticedCount] = useState(0);
   useEffect(() => {
-    setHasMwConfig(!!getMerriamWebsterConfig()?.apiKey);
+    setHasMwConfig(!!mwConfig?.apiKey);
     setPracticedCount(getPracticedWords(phoneme?.slug ?? "").length);
-  }, [phoneme?.slug]);
+  }, [phoneme?.slug, mwConfig?.apiKey]);
 
   // Pick first random word on mount
   useEffect(() => {

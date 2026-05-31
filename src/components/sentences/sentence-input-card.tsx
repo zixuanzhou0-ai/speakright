@@ -6,7 +6,7 @@ import { ReadAlongText } from "@/components/audio/read-along-text";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
-import { getPronunciationConfig } from "@/lib/api-keys";
+import { usePronunciationConfig } from "@/hooks/use-api-keys";
 import type { FreePracticeTargetPreview } from "@/lib/free-practice-transfer";
 
 const MAX_CHARS = 150;
@@ -58,6 +58,7 @@ export function SentenceInputCard({
   targetPreview,
   onListen,
 }: SentenceInputCardProps) {
+  const pronunciationConfig = usePronunciationConfig();
   const charCount = sentence.length;
 
   return (
@@ -168,7 +169,7 @@ export function SentenceInputCard({
       {trimmedText && (
         <p className="text-xs text-muted-foreground/70">
           {isWordMode
-            ? `单词模式 · 发音来自${getPronunciationConfig().source === "merriam-webster" ? "韦氏词典" : "有道词典"}`
+            ? `单词模式 · 发音来自${pronunciationConfig.source === "merriam-webster" ? "韦氏词典" : "有道词典"}`
             : "句子模式 · 发音来自 ElevenLabs"}
         </p>
       )}

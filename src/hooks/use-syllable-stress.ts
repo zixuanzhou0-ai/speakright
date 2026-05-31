@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { fetchMwStress as fetchMwStressApi } from "@/lib/api-client";
-import { getMerriamWebsterConfig } from "@/lib/api-keys";
+import { useMerriamWebsterConfig } from "./use-api-keys";
 import {
   buildStaticStressMap,
   getCachedStress,
@@ -25,6 +25,7 @@ export function useSyllableStress(
 ): AzureSyllable[] {
   const staticMap = useMemo(() => buildStaticStressMap(), []);
   const [mwStress, setMwStress] = useState<StressLevel[] | null>(null);
+  const mwConfig = useMerriamWebsterConfig();
 
   const syllableCount = syllables.length;
   const lowerWord = word?.toLowerCase() ?? "";
@@ -46,8 +47,6 @@ export function useSyllableStress(
       return;
     }
 
-    // 检查 MW 是否配置
-    const mwConfig = getMerriamWebsterConfig();
     if (!mwConfig?.apiKey) return;
 
     try {
@@ -59,7 +58,7 @@ export function useSyllableStress(
     } catch {
       // 静默失败，降级为无重音
     }
-  }, [lowerWord, syllableCount, staticStress]);
+  }, [lowerWord, mwConfig?.apiKey, syllableCount, staticStress]);
 
   useEffect(() => {
     setMwStress(null);

@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { fetchMwStress } from "@/lib/api-client";
-import { getMerriamWebsterConfig } from "@/lib/api-keys";
 import { getStaticIpaMap } from "@/lib/static-ipa-map";
+import { useMerriamWebsterConfig } from "./use-api-keys";
 
 const IPA_CACHE_KEY = "speakright_ipa_cache";
 const DEBOUNCE_MS = 300;
@@ -44,6 +44,7 @@ export function useWordIpa(word: string): string | null {
   const staticMap = useMemo(() => getStaticIpaMap(), []);
   const [mwIpa, setMwIpa] = useState<string | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const mwConfig = useMerriamWebsterConfig();
   const lowerWord = word.trim().toLowerCase();
 
   // Static lookup (sync)
@@ -66,7 +67,6 @@ export function useWordIpa(word: string): string | null {
     if (timerRef.current) clearTimeout(timerRef.current);
 
     timerRef.current = setTimeout(async () => {
-      const mwConfig = getMerriamWebsterConfig();
       if (!mwConfig?.apiKey) return;
 
       try {
@@ -84,7 +84,7 @@ export function useWordIpa(word: string): string | null {
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, [lowerWord, staticIpa]);
+  }, [lowerWord, mwConfig?.apiKey, staticIpa]);
 
   return staticIpa ?? mwIpa;
 }

@@ -13,8 +13,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useElevenLabsConfig } from "@/hooks/use-api-keys";
 import { fetchElevenLabsUsage } from "@/lib/api-client";
-import { getElevenLabsConfig } from "@/lib/api-keys";
 import {
   AZURE_FREE_TIER_SECONDS,
   getAzureUsage,
@@ -86,9 +86,9 @@ function ElevenLabsUsageCard() {
   const [data, setData] = useState<ElevenLabsData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const config = useElevenLabsConfig();
 
   const fetchUsage = useCallback(async () => {
-    const config = getElevenLabsConfig();
     if (!config?.apiKey) {
       setError("未配置 API Key");
       return;
@@ -109,7 +109,7 @@ function ElevenLabsUsageCard() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [config?.apiKey]);
 
   useEffect(() => {
     fetchUsage();
