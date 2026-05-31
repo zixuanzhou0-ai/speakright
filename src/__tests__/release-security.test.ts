@@ -200,4 +200,21 @@ describe("release security configuration", () => {
     expect(csp).not.toMatch(/default-src[^;]*\sblob:/);
     expect(csp).not.toMatch(/connect-src[^;]*\sblob:/);
   });
+
+  it("does not allow plaintext external hosts in the desktop CSP", () => {
+    const config = readJson<{
+      app?: { security?: { csp?: string } };
+    }>("src-tauri/tauri.conf.json");
+    const csp = config.app?.security?.csp ?? "";
+    const plaintextOrigins = csp.match(/http:\/\/[^\s;]+/g) ?? [];
+
+    expect(plaintextOrigins).not.toContain("http://dict.youdao.com");
+    expect(
+      plaintextOrigins.every(
+        (origin) =>
+          origin === "http://asset.localhost" ||
+          origin === "http://ipc.localhost",
+      ),
+    ).toBe(true);
+  });
 });
