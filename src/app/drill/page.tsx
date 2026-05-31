@@ -21,6 +21,7 @@ import {
 import { motion } from "motion/react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { DesktopReadinessCard } from "@/components/drill/desktop-readiness-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getAzureConfig, subscribeToStorage } from "@/lib/api-keys";
@@ -249,6 +250,8 @@ export default function DrillPage() {
           </Link>
         </div>
       </div>
+
+      <DesktopReadinessCard hasDiagnosis={!!report} />
 
       <section className="mb-5 rounded-xl border bg-primary/5 p-5 shadow-sm">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">

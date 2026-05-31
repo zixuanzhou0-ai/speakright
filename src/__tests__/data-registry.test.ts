@@ -115,6 +115,26 @@ describe("data registry", () => {
     ]);
   });
 
+  it("exports desktop device readiness state with the learning snapshot", async () => {
+    const { buildLocalDataExport } = await import("@/lib/data-registry");
+    localStorage.setItem(
+      "speakright_desktop_mic_check_v1",
+      JSON.stringify({
+        version: 1,
+        passedAt: 2000,
+        deviceLabel: "USB Mic",
+      }),
+    );
+
+    const snapshot = await buildLocalDataExport();
+
+    expect(snapshot.localStorage.speakright_desktop_mic_check_v1).toEqual({
+      version: 1,
+      passedAt: 2000,
+      deviceLabel: "USB Mic",
+    });
+  });
+
   it("deletes learning data and caches while preserving app settings and keys", async () => {
     const { deleteLearningData } = await import("@/lib/data-registry");
     localStorage.setItem("speakright_mastery_profile_v2", "{}");

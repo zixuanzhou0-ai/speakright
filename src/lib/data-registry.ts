@@ -12,6 +12,7 @@ import {
   LOCAL_DATA_MIGRATED_AT_KEY,
   LOCAL_DATA_SCHEMA_VERSION_KEY,
 } from "@/lib/local-data-migrations";
+import { DESKTOP_MIC_CHECK_KEY } from "@/lib/desktop-readiness";
 import { clearTtsCache } from "@/lib/tts-cache";
 
 const ASSESSMENT_STORAGE_KEYS = [
@@ -36,6 +37,8 @@ const CACHE_STORAGE_KEYS = [
   "speakright_ipa_cache",
   "speakright_stress_cache",
 ] as const;
+
+const DEVICE_STORAGE_KEYS = [DESKTOP_MIC_CHECK_KEY] as const;
 
 const CACHE_STORAGE_PREFIXES = ["speakright_mw_words_"] as const;
 
@@ -111,6 +114,7 @@ export async function buildLocalDataExport(): Promise<LocalDataExport> {
     localStorage: {
       ...collectKeys(LEARNING_STORAGE_KEYS),
       ...collectKeys(CACHE_STORAGE_KEYS),
+      ...collectKeys(DEVICE_STORAGE_KEYS),
       ...collectKeys(cacheKeys),
       ...collectKeys([
         LOCAL_DATA_SCHEMA_VERSION_KEY,
