@@ -1,6 +1,13 @@
 import { execFile, spawn } from "node:child_process";
 import { existsSync } from "node:fs";
-import { mkdir, mkdtemp, readFile, rm, stat, writeFile } from "node:fs/promises";
+import {
+  mkdir,
+  mkdtemp,
+  readFile,
+  rm,
+  stat,
+  writeFile,
+} from "node:fs/promises";
 import net from "node:net";
 import os from "node:os";
 import path from "node:path";
@@ -342,6 +349,83 @@ async function evaluate(cdp, expression) {
   return result.result?.value;
 }
 
+async function secureStoreSnapshot(cdp, keys) {
+  return evaluate(
+    cdp,
+    `
+(async () => {
+  const invoke = window.__TAURI_INTERNALS__?.invoke;
+  if (typeof invoke !== "function") {
+    return {
+      ok: false,
+      reason: "Tauri invoke bridge is unavailable"
+    };
+  }
+  const snapshot = {};
+  for (const key of ${JSON.stringify(keys)}) {
+    snapshot[key] = await invoke("secure_store_get", { key });
+  }
+  return {
+    ok: true,
+    snapshot
+  };
+})()
+`,
+  );
+}
+
+async function setSecureStoreValues(cdp, values) {
+  const result = await evaluate(
+    cdp,
+    `
+(async () => {
+  const invoke = window.__TAURI_INTERNALS__?.invoke;
+  if (typeof invoke !== "function") {
+    return {
+      ok: false,
+      reason: "Tauri invoke bridge is unavailable"
+    };
+  }
+  const values = ${JSON.stringify(values)};
+  for (const [key, value] of Object.entries(values)) {
+    if (value === null || value === undefined) {
+      await invoke("secure_store_delete", { key });
+    } else {
+      await invoke("secure_store_set", { key, value });
+    }
+    localStorage.removeItem(key);
+  }
+  return { ok: true };
+})()
+`,
+  );
+  if (!result?.ok) {
+    throw new Error(
+      `Could not seed desktop secure store: ${result?.reason ?? "unknown"}`,
+    );
+  }
+}
+
+async function restoreSecureStoreSnapshot(cdp, snapshot) {
+  await setSecureStoreValues(cdp, snapshot);
+}
+
+async function withSecureStoreValues(cdp, values, action) {
+  const keys = Object.keys(values);
+  const backup = await secureStoreSnapshot(cdp, keys);
+  if (!backup?.ok) {
+    throw new Error(
+      `Could not back up desktop secure store: ${backup?.reason ?? "unknown"}`,
+    );
+  }
+  try {
+    await setSecureStoreValues(cdp, values);
+    return await action();
+  } finally {
+    await restoreSecureStoreSnapshot(cdp, backup.snapshot);
+  }
+}
+
 async function waitForBodyText(cdp, expectedText) {
   const deadline = Date.now() + 8_000;
   let bodyText = "";
@@ -643,9 +727,18 @@ async function captureInteractiveEvidence(debuggingPort) {
       );
     }
 
-    const learningExport = await evaluate(
+    const learningExport = await withSecureStoreValues(
       cdp,
-      `
+      {
+        speakright_azure_config: JSON.stringify({
+          subscriptionKey: "desktop-smoke-secret",
+          region: "eastus",
+        }),
+      },
+      () =>
+        evaluate(
+          cdp,
+          `
 (async () => {
   const button = [...document.querySelectorAll("button")].find((item) =>
     (item.textContent || "").includes("导出学习数据")
@@ -680,10 +773,6 @@ async function captureInteractiveEvidence(debuggingPort) {
     localStorage.setItem(
       "speakright_mastery_profile_v2",
       JSON.stringify({ version: 2, desktopSmokeExport: true })
-    );
-    localStorage.setItem(
-      "speakright_azure_config",
-      JSON.stringify({ subscriptionKey: "desktop-smoke-secret" })
     );
 
     const deadline = Date.now() + 10000;
@@ -730,7 +819,8 @@ async function captureInteractiveEvidence(debuggingPort) {
           Object.prototype.hasOwnProperty.call(
             snapshot.appSettings ?? {},
             "speakright_azure_config"
-          ),
+          ) ||
+          localStorage.getItem("speakright_azure_config") !== null,
         benchmarkAudioIsArray: Array.isArray(
           snapshot.indexedDb?.benchmarkRecordings?.audio
         ),
@@ -744,13 +834,13 @@ async function captureInteractiveEvidence(debuggingPort) {
     };
   } finally {
     localStorage.removeItem("speakright_mastery_profile_v2");
-    localStorage.removeItem("speakright_azure_config");
     URL.createObjectURL = originalCreateObjectUrl;
     URL.revokeObjectURL = originalRevokeObjectUrl;
     HTMLAnchorElement.prototype.click = originalClick;
   }
 })()
 `,
+        ),
     );
 
     if (!learningExport?.ok) {
@@ -787,10 +877,10 @@ async function captureInteractiveEvidence(debuggingPort) {
         "Desktop learning data export does not document API key exclusion.",
       );
     }
-    if (
-      !learningExport.download?.download?.startsWith("speakright-data-")
-    ) {
-      throw new Error("Desktop learning data export filename is not versioned.");
+    if (!learningExport.download?.download?.startsWith("speakright-data-")) {
+      throw new Error(
+        "Desktop learning data export filename is not versioned.",
+      );
     }
 
     await evaluate(
@@ -803,28 +893,40 @@ async function captureInteractiveEvidence(debuggingPort) {
   );
   localStorage.setItem("speakright_score_history", JSON.stringify({ th: [82] }));
   localStorage.setItem("speakright_ipa_cache", JSON.stringify({ th: true }));
-  localStorage.setItem(
-    "speakright_azure_config",
-    JSON.stringify({ subscriptionKey: "desktop-smoke-preserve-key" })
-  );
   return true;
 })()
 `,
     );
 
-    let learningDelete = null;
-    try {
-      await clickVisibleButtonByText(cdp, "删除学习数据", {
-        timeoutMs: 10_000,
-      });
-      await waitForBodyText(cdp, "删除本机学习数据？");
-      await clickVisibleButtonByText(cdp, "删除学习数据", {
-        withinSelector: '[data-slot="dialog-content"]',
-      });
-      learningDelete = await evaluate(
-        cdp,
-        `
+    const learningDelete = await withSecureStoreValues(
+      cdp,
+      {
+        speakright_azure_config: JSON.stringify({
+          subscriptionKey: "desktop-smoke-preserve-key",
+          region: "eastus",
+        }),
+      },
+      async () => {
+        let result = null;
+        try {
+          await clickVisibleButtonByText(cdp, "删除学习数据", {
+            timeoutMs: 10_000,
+          });
+          await waitForBodyText(cdp, "删除本机学习数据？");
+          await clickVisibleButtonByText(cdp, "删除学习数据", {
+            withinSelector: '[data-slot="dialog-content"]',
+          });
+          result = await evaluate(
+            cdp,
+            `
 (async () => {
+  const invoke = window.__TAURI_INTERNALS__?.invoke;
+  if (typeof invoke !== "function") {
+    return {
+      ok: false,
+      reason: "Tauri invoke bridge is unavailable"
+    };
+  }
   const deleteDeadline = Date.now() + 10000;
   while (
     localStorage.getItem("speakright_mastery_profile_v2") !== null &&
@@ -839,28 +941,30 @@ async function captureInteractiveEvidence(debuggingPort) {
       localStorage.getItem("speakright_mastery_profile_v2") === null &&
       localStorage.getItem("speakright_score_history") === null,
     deletedCache: localStorage.getItem("speakright_ipa_cache") === null,
-    preservedApiKey:
-      localStorage.getItem("speakright_azure_config")?.includes(
-        "desktop-smoke-preserve-key"
-      ) === true
+    preservedApiKey: (
+      await invoke("secure_store_get", { key: "speakright_azure_config" })
+    )?.includes("desktop-smoke-preserve-key") === true &&
+      localStorage.getItem("speakright_azure_config") === null
   };
 })()
 `,
-      );
-    } finally {
-      await evaluate(
-        cdp,
-        `
+          );
+        } finally {
+          await evaluate(
+            cdp,
+            `
 (() => {
   localStorage.removeItem("speakright_mastery_profile_v2");
   localStorage.removeItem("speakright_score_history");
   localStorage.removeItem("speakright_ipa_cache");
-  localStorage.removeItem("speakright_azure_config");
   return true;
 })()
 `,
-      );
-    }
+          );
+        }
+        return result;
+      },
+    );
 
     if (!learningDelete?.ok) {
       throw new Error(
@@ -868,57 +972,59 @@ async function captureInteractiveEvidence(debuggingPort) {
       );
     }
     if (!learningDelete.deletedLearning) {
-      throw new Error("Desktop learning data delete did not clear learning data.");
+      throw new Error(
+        "Desktop learning data delete did not clear learning data.",
+      );
     }
     if (!learningDelete.deletedCache) {
-      throw new Error("Desktop learning data delete did not clear local caches.");
+      throw new Error(
+        "Desktop learning data delete did not clear local caches.",
+      );
     }
     if (!learningDelete.preservedApiKey) {
       throw new Error("Desktop learning data delete removed an API key slot.");
     }
 
-    await evaluate(
+    const apiKeysDelete = await withSecureStoreValues(
       cdp,
-      `
-(() => {
-  localStorage.setItem(
-    "speakright_azure_config",
-    JSON.stringify({ subscriptionKey: "desktop-smoke-azure-key", region: "eastus" })
-  );
-  localStorage.setItem(
-    "speakright_elevenlabs_config",
-    JSON.stringify({ apiKey: "desktop-smoke-elevenlabs-key" })
-  );
-  localStorage.setItem(
-    "speakright_llm_config",
-    JSON.stringify({
-      provider: "openai",
-      apiKey: "desktop-smoke-llm-key",
-      model: "gpt-4o-mini"
-    })
-  );
-  localStorage.setItem(
-    "speakright_mw_config",
-    JSON.stringify({ apiKey: "desktop-smoke-mw-key" })
-  );
-  return true;
-})()
-`,
-    );
-
-    let apiKeysDelete = null;
-    try {
-      await clickVisibleButtonByText(cdp, "删除 API keys", {
-        timeoutMs: 10_000,
-      });
-      await waitForBodyText(cdp, "删除所有 API keys？");
-      await clickVisibleButtonByText(cdp, "删除 API keys", {
-        withinSelector: '[data-slot="dialog-content"]',
-      });
-      apiKeysDelete = await evaluate(
-        cdp,
-        `
+      {
+        speakright_azure_config: JSON.stringify({
+          subscriptionKey: "desktop-smoke-azure-key",
+          region: "eastus",
+        }),
+        speakright_elevenlabs_config: JSON.stringify({
+          apiKey: "desktop-smoke-elevenlabs-key",
+        }),
+        speakright_llm_config: JSON.stringify({
+          provider: "openai",
+          apiKey: "desktop-smoke-llm-key",
+          model: "gpt-4o-mini",
+        }),
+        speakright_mw_config: JSON.stringify({
+          apiKey: "desktop-smoke-mw-key",
+        }),
+      },
+      async () => {
+        let result = null;
+        try {
+          await clickVisibleButtonByText(cdp, "删除 API keys", {
+            timeoutMs: 10_000,
+          });
+          await waitForBodyText(cdp, "删除所有 API keys？");
+          await clickVisibleButtonByText(cdp, "删除 API keys", {
+            withinSelector: '[data-slot="dialog-content"]',
+          });
+          result = await evaluate(
+            cdp,
+            `
 (async () => {
+  const invoke = window.__TAURI_INTERNALS__?.invoke;
+  if (typeof invoke !== "function") {
+    return {
+      ok: false,
+      reason: "Tauri invoke bridge is unavailable"
+    };
+  }
   const keys = [
     "speakright_azure_config",
     "speakright_elevenlabs_config",
@@ -927,22 +1033,29 @@ async function captureInteractiveEvidence(debuggingPort) {
   ];
   const deleteDeadline = Date.now() + 10000;
   while (
-    keys.some((key) => localStorage.getItem(key) !== null) &&
+    (await Promise.all(keys.map((key) => invoke("secure_store_get", { key })))).some(
+      (value) => value !== null
+    ) &&
     Date.now() < deleteDeadline
   ) {
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
+  const secureValues = await Promise.all(
+    keys.map((key) => invoke("secure_store_get", { key }))
+  );
   return {
     ok: true,
-    deletedApiKeys: keys.every((key) => localStorage.getItem(key) === null)
+    deletedApiKeys:
+      secureValues.every((value) => value === null) &&
+      keys.every((key) => localStorage.getItem(key) === null)
   };
 })()
 `,
-      );
-    } finally {
-      await evaluate(
-        cdp,
-        `
+          );
+        } finally {
+          await evaluate(
+            cdp,
+            `
 (() => {
   for (const key of [
     "speakright_azure_config",
@@ -955,8 +1068,11 @@ async function captureInteractiveEvidence(debuggingPort) {
   return true;
 })()
 `,
-      );
-    }
+          );
+        }
+        return result;
+      },
+    );
 
     if (!apiKeysDelete?.ok) {
       throw new Error(
@@ -964,7 +1080,9 @@ async function captureInteractiveEvidence(debuggingPort) {
       );
     }
     if (!apiKeysDelete.deletedApiKeys) {
-      throw new Error("Desktop API key delete did not clear all API key slots.");
+      throw new Error(
+        "Desktop API key delete did not clear all API key slots.",
+      );
     }
 
     await evaluate(
@@ -990,28 +1108,40 @@ async function captureInteractiveEvidence(debuggingPort) {
   );
   localStorage.setItem("speakright_coach_mode", JSON.stringify("strict"));
   localStorage.setItem("theme", "dark");
-  localStorage.setItem(
-    "speakright_azure_config",
-    JSON.stringify({ subscriptionKey: "desktop-smoke-reset-preserve-key" })
-  );
   return true;
 })()
 `,
     );
 
-    let localReset = null;
-    try {
-      await clickVisibleButtonByText(cdp, "重置本机数据", {
-        timeoutMs: 10_000,
-      });
-      await waitForBodyText(cdp, "重置本机数据？");
-      await clickVisibleButtonByText(cdp, "重置本机数据", {
-        withinSelector: '[data-slot="dialog-content"]',
-      });
-      localReset = await evaluate(
-        cdp,
-        `
+    const localReset = await withSecureStoreValues(
+      cdp,
+      {
+        speakright_azure_config: JSON.stringify({
+          subscriptionKey: "desktop-smoke-reset-preserve-key",
+          region: "eastus",
+        }),
+      },
+      async () => {
+        let result = null;
+        try {
+          await clickVisibleButtonByText(cdp, "重置本机数据", {
+            timeoutMs: 10_000,
+          });
+          await waitForBodyText(cdp, "重置本机数据？");
+          await clickVisibleButtonByText(cdp, "重置本机数据", {
+            withinSelector: '[data-slot="dialog-content"]',
+          });
+          result = await evaluate(
+            cdp,
+            `
 (async () => {
+  const invoke = window.__TAURI_INTERNALS__?.invoke;
+  if (typeof invoke !== "function") {
+    return {
+      ok: false,
+      reason: "Tauri invoke bridge is unavailable"
+    };
+  }
   const removedKeys = [
     "speakright_mastery_profile_v2",
     "speakright_score_history",
@@ -1034,18 +1164,18 @@ async function captureInteractiveEvidence(debuggingPort) {
   return {
     ok: true,
     removedResetData: removedKeys.every((key) => localStorage.getItem(key) === null),
-    preservedApiKey:
-      localStorage.getItem("speakright_azure_config")?.includes(
-        "desktop-smoke-reset-preserve-key"
-      ) === true
+    preservedApiKey: (
+      await invoke("secure_store_get", { key: "speakright_azure_config" })
+    )?.includes("desktop-smoke-reset-preserve-key") === true &&
+      localStorage.getItem("speakright_azure_config") === null
   };
 })()
 `,
-      );
-    } finally {
-      await evaluate(
-        cdp,
-        `
+          );
+        } finally {
+          await evaluate(
+            cdp,
+            `
 (() => {
   for (const key of [
     "speakright_mastery_profile_v2",
@@ -1057,7 +1187,6 @@ async function captureInteractiveEvidence(debuggingPort) {
     "speakright_local_data_migrated_at",
     "speakright_pronunciation_config",
     "speakright_coach_mode",
-    "speakright_azure_config",
     "theme"
   ]) {
     localStorage.removeItem(key);
@@ -1065,8 +1194,11 @@ async function captureInteractiveEvidence(debuggingPort) {
   return true;
 })()
 `,
-      );
-    }
+          );
+        }
+        return result;
+      },
+    );
 
     if (!localReset?.ok) {
       throw new Error(
@@ -1074,10 +1206,14 @@ async function captureInteractiveEvidence(debuggingPort) {
       );
     }
     if (!localReset.removedResetData) {
-      throw new Error("Desktop local data reset did not clear reset-scoped data.");
+      throw new Error(
+        "Desktop local data reset did not clear reset-scoped data.",
+      );
     }
     if (!localReset.preservedApiKey) {
-      throw new Error("Desktop local data reset did not preserve API keys by default.");
+      throw new Error(
+        "Desktop local data reset did not preserve API keys by default.",
+      );
     }
 
     await evaluate(
