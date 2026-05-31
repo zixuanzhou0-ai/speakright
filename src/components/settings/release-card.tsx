@@ -11,6 +11,7 @@ import {
   ShieldAlert,
 } from "lucide-react";
 
+import { DesktopExternalLink } from "@/components/common/desktop-external-link";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import {
@@ -102,50 +103,46 @@ export function ReleaseCard() {
                 </p>
               </div>
 
-              <a
+              <DesktopExternalLink
                 className={cn(
                   buttonVariants({ size: "sm" }),
                   "w-fit justify-self-start sm:justify-self-end",
                 )}
+                copyMessage={`${installer.name}下载链接已复制，请在浏览器中打开`}
                 href={installer.downloadUrl}
-                rel="noreferrer"
-                target="_blank"
               >
                 <Download className="size-3.5" />
                 下载
-              </a>
+              </DesktopExternalLink>
             </div>
           ))}
         </div>
 
         <div className="flex flex-wrap gap-2 border-t pt-4">
-          <a
+          <DesktopExternalLink
             className={buttonVariants({ size: "sm", variant: "outline" })}
+            copyMessage="当前 Release 链接已复制，请在浏览器中打开"
             href={release.releaseUrl}
-            rel="noreferrer"
-            target="_blank"
           >
             <ExternalLink className="size-3.5" />
             当前 Release
-          </a>
-          <a
+          </DesktopExternalLink>
+          <DesktopExternalLink
             className={buttonVariants({ size: "sm", variant: "outline" })}
+            copyMessage="所有版本链接已复制，请在浏览器中打开"
             href={release.latestReleasesUrl}
-            rel="noreferrer"
-            target="_blank"
           >
             <Download className="size-3.5" />
             所有版本
-          </a>
-          <a
+          </DesktopExternalLink>
+          <DesktopExternalLink
             className={buttonVariants({ size: "sm", variant: "ghost" })}
+            copyMessage="源码仓库链接已复制，请在浏览器中打开"
             href={release.repositoryUrl}
-            rel="noreferrer"
-            target="_blank"
           >
             <Code2 className="size-3.5" />
             源码仓库
-          </a>
+          </DesktopExternalLink>
         </div>
 
         <p className="text-xs text-muted-foreground">

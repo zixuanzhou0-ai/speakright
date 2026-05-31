@@ -591,7 +591,6 @@ async function captureInteractiveEvidence(debuggingPort) {
       cdp,
       `
 (async () => {
-  const beforeHref = window.location.href;
   const merriamRadio = [...document.querySelectorAll('input[name="pronunciation-source"]')]
     .find((item) => item.value === "merriam-webster");
   if (!merriamRadio) {
@@ -608,15 +607,15 @@ async function captureInteractiveEvidence(debuggingPort) {
   }));
 
   const deadline = Date.now() + 5000;
-  let link = null;
-  while (!link && Date.now() < deadline) {
-    link = [...document.querySelectorAll('a[href="https://dictionaryapi.com/register/index"]')]
+  let dictionaryLink = null;
+  while (!dictionaryLink && Date.now() < deadline) {
+    dictionaryLink = [...document.querySelectorAll('a[href="https://dictionaryapi.com/register/index"]')]
       .find((item) => (item.textContent || "").includes("dictionaryapi.com"));
-    if (!link) {
+    if (!dictionaryLink) {
       await new Promise((resolve) => setTimeout(resolve, 100));
     }
   }
-  if (!link) {
+  if (!dictionaryLink) {
     return {
       ok: false,
       reason: "dictionary registration link missing",
@@ -624,24 +623,52 @@ async function captureInteractiveEvidence(debuggingPort) {
     };
   }
 
+  const releaseDownloadLink = [...document.querySelectorAll('a[href*="/releases/download/"]')]
+    .find((item) => (item.textContent || "").includes("下载"));
+  if (!releaseDownloadLink) {
+    return {
+      ok: false,
+      reason: "release download link missing",
+      bodyText: document.body.innerText.slice(0, 1200)
+    };
+  }
+
   const originalClipboard = navigator.clipboard;
-  let copiedHref = null;
-  Object.defineProperty(navigator, "clipboard", {
-    configurable: true,
-    value: {
-      writeText: async (value) => {
-        copiedHref = value;
+  const results = [];
+
+  async function clickAndCapture(name, link) {
+    const beforeHref = window.location.href;
+    let copiedHref = null;
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: {
+        writeText: async (value) => {
+          copiedHref = value;
+        }
       }
-    }
-  });
-  const clickEvent = new MouseEvent("click", {
-    bubbles: true,
-    cancelable: true,
-    view: window
-  });
-  try {
+    });
+    const clickEvent = new MouseEvent("click", {
+      bubbles: true,
+      cancelable: true,
+      view: window
+    });
     link.dispatchEvent(clickEvent);
     await new Promise((resolve) => setTimeout(resolve, 250));
+    return {
+      name,
+      href: link.getAttribute("href") || link.href,
+      defaultPrevented: clickEvent.defaultPrevented,
+      copiedHref,
+      beforeHref,
+      afterHref: window.location.href,
+      target: link.target,
+      rel: link.rel
+    };
+  }
+
+  try {
+    results.push(await clickAndCapture("dictionary", dictionaryLink));
+    results.push(await clickAndCapture("release-download", releaseDownloadLink));
   } finally {
     Object.defineProperty(navigator, "clipboard", {
       configurable: true,
@@ -658,12 +685,7 @@ async function captureInteractiveEvidence(debuggingPort) {
 
   return {
     ok: true,
-    defaultPrevented: clickEvent.defaultPrevented,
-    copiedHref,
-    beforeHref,
-    afterHref: window.location.href,
-    target: link.target,
-    rel: link.rel
+    results
   };
 })()
 `,
@@ -673,14 +695,27 @@ async function captureInteractiveEvidence(debuggingPort) {
         `Desktop external link policy could not be verified: ${externalLinkPolicy?.reason ?? "unknown"} ${externalLinkPolicy?.bodyText ?? ""}`,
       );
     }
+    const externalLinkResults = externalLinkPolicy.results ?? [];
+    const dictionaryLinkResult = externalLinkResults.find(
+      (result) => result.name === "dictionary",
+    );
+    const releaseDownloadLinkResult = externalLinkResults.find(
+      (result) => result.name === "release-download",
+    );
+    const failedExternalLink = externalLinkResults.find(
+      (result) =>
+        !result.defaultPrevented ||
+        result.copiedHref !== result.href ||
+        result.afterHref !== result.beforeHref ||
+        result.target !== "_blank" ||
+        !result.rel.includes("noopener") ||
+        !result.rel.includes("noreferrer"),
+    );
     if (
-      !externalLinkPolicy.defaultPrevented ||
-      externalLinkPolicy.copiedHref !==
+      failedExternalLink ||
+      dictionaryLinkResult?.href !==
         "https://dictionaryapi.com/register/index" ||
-      externalLinkPolicy.afterHref !== externalLinkPolicy.beforeHref ||
-      externalLinkPolicy.target !== "_blank" ||
-      !externalLinkPolicy.rel.includes("noopener") ||
-      !externalLinkPolicy.rel.includes("noreferrer")
+      !releaseDownloadLinkResult?.href.includes("/releases/download/")
     ) {
       throw new Error(
         `Desktop external link policy failed: ${JSON.stringify(externalLinkPolicy)}`,
@@ -1453,7 +1488,7 @@ async function captureInteractiveEvidence(debuggingPort) {
       learningDataDownload: learningExport.download.download,
       appIdentifier: diagnostics.bundle.appIdentifier,
       llmCustomDisabled: llmPolicy.customButtonDisabled,
-      externalLinkCopied: externalLinkPolicy.copiedHref,
+      externalLinksCopied: externalLinkResults.map((result) => result.name),
       learningDeletePreservedKey: learningDelete.preservedApiKey,
       apiKeysDeleted: apiKeysDelete.deletedApiKeys,
       localResetPreservedKey: localReset.preservedApiKey,
@@ -1556,7 +1591,7 @@ async function smoke() {
               ? `runtimeLog="${runtimeLog.path}" bytes=${runtimeLog.bytes}`
               : "",
             interactiveEvidence
-              ? `diagnostics="${interactiveEvidence.diagnosticsDownload}" learningData="${interactiveEvidence.learningDataDownload}" learningDeletePreservedKey=${interactiveEvidence.learningDeletePreservedKey} apiKeysDeleted=${interactiveEvidence.apiKeysDeleted} localResetPreservedKey=${interactiveEvidence.localResetPreservedKey} benchmarkAudioCleared=${interactiveEvidence.benchmarkAudioCleared} externalLinkCopied=${interactiveEvidence.externalLinkCopied === "https://dictionaryapi.com/register/index"} route=${interactiveEvidence.route} appIdentifier=${interactiveEvidence.appIdentifier} llmCustomDisabled=${interactiveEvidence.llmCustomDisabled}`
+              ? `diagnostics="${interactiveEvidence.diagnosticsDownload}" learningData="${interactiveEvidence.learningDataDownload}" learningDeletePreservedKey=${interactiveEvidence.learningDeletePreservedKey} apiKeysDeleted=${interactiveEvidence.apiKeysDeleted} localResetPreservedKey=${interactiveEvidence.localResetPreservedKey} benchmarkAudioCleared=${interactiveEvidence.benchmarkAudioCleared} externalLinksCopied=${interactiveEvidence.externalLinksCopied.join(",")} route=${interactiveEvidence.route} appIdentifier=${interactiveEvidence.appIdentifier} llmCustomDisabled=${interactiveEvidence.llmCustomDisabled}`
               : "",
           ]
             .filter(Boolean)

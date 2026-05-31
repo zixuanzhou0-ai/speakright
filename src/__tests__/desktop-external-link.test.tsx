@@ -120,4 +120,44 @@ describe("DesktopExternalLink", () => {
       );
     });
   });
+
+  it("keeps release card download links inside the desktop app", async () => {
+    const { ReleaseCard } = await import("@/components/settings/release-card");
+    const { DESKTOP_RELEASE_INFO } = await import("@/lib/release-info");
+
+    render(<ReleaseCard />);
+
+    const downloadLink = screen.getAllByRole("link", { name: /下载/ })[0];
+    const downloadEvent = new MouseEvent("click", {
+      bubbles: true,
+      cancelable: true,
+    });
+    downloadLink.dispatchEvent(downloadEvent);
+
+    expect(downloadLink).toHaveAttribute("target", "_blank");
+    expect(downloadLink).toHaveAttribute("rel", "noopener noreferrer");
+    expect(downloadEvent.defaultPrevented).toBe(true);
+    await waitFor(() => {
+      expect(mocks.writeText).toHaveBeenCalledWith(
+        DESKTOP_RELEASE_INFO.installers[0].downloadUrl,
+      );
+    });
+    expect(mocks.toastSuccess).toHaveBeenCalledWith(
+      "Windows 安装程序下载链接已复制，请在浏览器中打开",
+    );
+
+    const releaseLink = screen.getByRole("link", { name: /当前 Release/ });
+    const releaseEvent = new MouseEvent("click", {
+      bubbles: true,
+      cancelable: true,
+    });
+    releaseLink.dispatchEvent(releaseEvent);
+
+    expect(releaseEvent.defaultPrevented).toBe(true);
+    await waitFor(() => {
+      expect(mocks.writeText).toHaveBeenCalledWith(
+        DESKTOP_RELEASE_INFO.releaseUrl,
+      );
+    });
+  });
 });
