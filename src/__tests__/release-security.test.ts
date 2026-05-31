@@ -8,6 +8,23 @@ function readJson<T>(path: string): T {
   return JSON.parse(readFileSync(join(projectRoot, path), "utf8")) as T;
 }
 
+function cspDirectives(): Map<string, string> {
+  const config = readJson<{
+    app?: { security?: { csp?: string } };
+  }>("src-tauri/tauri.conf.json");
+  const csp = config.app?.security?.csp ?? "";
+  return new Map(
+    csp
+      .split(";")
+      .map((part) => part.trim())
+      .filter(Boolean)
+      .map((part) => {
+        const [name, ...tokens] = part.split(/\s+/);
+        return [name, tokens.join(" ")] as const;
+      }),
+  );
+}
+
 describe("release security configuration", () => {
   it("does not allow arbitrary HTTPS requests from Tauri HTTP", () => {
     const capability = readJson<{
@@ -199,6 +216,20 @@ describe("release security configuration", () => {
     expect(csp).toContain("media-src 'self' blob:");
     expect(csp).not.toMatch(/default-src[^;]*\sblob:/);
     expect(csp).not.toMatch(/connect-src[^;]*\sblob:/);
+  });
+
+  it("keeps unused document embedding and navigation sinks closed in the desktop CSP", () => {
+    const directives = cspDirectives();
+
+    expect(directives.get("default-src")?.split(/\s+/)).toEqual([
+      "'self'",
+      "asset:",
+      "http://asset.localhost",
+    ]);
+    expect(directives.get("object-src")).toBe("'none'");
+    expect(directives.get("frame-src")).toBe("'none'");
+    expect(directives.get("base-uri")).toBe("'none'");
+    expect(directives.get("form-action")).toBe("'none'");
   });
 
   it("does not allow arbitrary remote image beacons in the desktop CSP", () => {
