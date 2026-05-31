@@ -22,6 +22,7 @@
     "desktop:release-report": "node scripts/desktop-release-report.mjs",
     "desktop:release-gate": "node scripts/desktop-release-gate.mjs",
     "validate": "npm run lint && npm run typecheck && npm run test",
+    "validate:desktop-ci": "npm run validate && npm run tauri:check && npm run tauri:test && npm run desktop:build && npm run desktop:artifact-smoke && npm run desktop:release-report",
     "validate:desktop": "npm run validate && npm run tauri:check && npm run tauri:test && npm run desktop:build && npm run desktop:artifact-smoke && npm run desktop:smoke && npm run desktop:release-report",
     "validate:release": "npm run validate:desktop",
     "validate:public-release": "npm run validate:desktop && npm run desktop:release-gate"
