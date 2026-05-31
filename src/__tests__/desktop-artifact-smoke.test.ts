@@ -47,6 +47,10 @@ describe("desktop artifact smoke wiring", () => {
     expect(smokeScript).toContain("sheep.png");
     expect(smokeScript).toContain("findNewestGeneratedCapabilities");
     expect(smokeScript).toContain("generated Tauri capabilities.json");
+    expect(smokeScript).toContain("assertStaticExportPolicy");
+    expect(smokeScript).toContain("fonts.googleapis.com");
+    expect(smokeScript).toContain("fonts.gstatic.com");
+    expect(smokeScript).toContain("http://dict.youdao.com");
     expect(smokeScript).toContain("core:default");
     expect(smokeScript).toContain("store:default");
     expect(smokeScript).toContain("http://");

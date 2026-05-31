@@ -54,6 +54,20 @@ function countFiles(dirPath) {
   return count;
 }
 
+function textArtifactFiles(dirPath) {
+  if (!existsSync(dirPath)) return [];
+  const files = [];
+  for (const entry of readdirSync(dirPath, { withFileTypes: true })) {
+    const itemPath = path.join(dirPath, entry.name);
+    if (entry.isDirectory()) {
+      files.push(...textArtifactFiles(itemPath));
+    } else if ([".css", ".html", ".js", ".json", ".txt"].includes(path.extname(entry.name))) {
+      files.push(itemPath);
+    }
+  }
+  return files;
+}
+
 function findNewestGeneratedCapabilities() {
   if (!existsSync(tauriReleaseBuildDir)) {
     fail("Tauri release build directory is missing");
@@ -197,11 +211,31 @@ async function assertStaticExport() {
   });
 }
 
+async function assertStaticExportPolicy() {
+  const forbiddenMarkers = [
+    "fonts.googleapis.com",
+    "fonts.gstatic.com",
+    "http://dict.youdao.com",
+  ];
+
+  for (const filePath of textArtifactFiles(outDir)) {
+    const text = await readFile(filePath, "utf8");
+    for (const marker of forbiddenMarkers) {
+      if (text.includes(marker)) {
+        fail(
+          `${path.relative(root, filePath)} contains forbidden desktop remote marker "${marker}"`,
+        );
+      }
+    }
+  }
+}
+
 async function main() {
   await assertTauriConfig();
   await assertGeneratedCapabilities();
   await assertStaticExport();
-  console.log("Desktop artifact smoke passed: Tauri config, generated capabilities, static export, routes, chunks and core assets are present.");
+  await assertStaticExportPolicy();
+  console.log("Desktop artifact smoke passed: Tauri config, generated capabilities, static export policy, routes, chunks and core assets are present.");
 }
 
 main().catch((error) => {
