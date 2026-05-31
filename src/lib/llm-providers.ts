@@ -49,3 +49,27 @@ export const PRESET_PROVIDERS: Record<ProviderName, PresetProvider> = {
 };
 
 export const PROVIDER_NAMES = Object.keys(PRESET_PROVIDERS) as ProviderName[];
+
+const DESKTOP_ALLOWED_LLM_ORIGINS = new Set(
+  Object.entries(PRESET_PROVIDERS)
+    .filter(([provider]) => provider !== "custom")
+    .map(([, preset]) => new URL(preset.baseUrl).origin),
+);
+
+export const DESKTOP_LLM_POLICY_MESSAGE =
+  "桌面版出于安全只允许预设 LLM provider；Custom endpoint 需要先加入 Tauri allowlist 和 CSP 后才能启用。";
+
+export function getDesktopLlmPolicyError(
+  provider: string,
+  baseUrl: string,
+): string | null {
+  if (provider === "custom") return DESKTOP_LLM_POLICY_MESSAGE;
+  try {
+    const origin = new URL(baseUrl).origin;
+    return DESKTOP_ALLOWED_LLM_ORIGINS.has(origin)
+      ? null
+      : DESKTOP_LLM_POLICY_MESSAGE;
+  } catch {
+    return DESKTOP_LLM_POLICY_MESSAGE;
+  }
+}

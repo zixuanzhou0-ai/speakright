@@ -9,9 +9,11 @@
 import { getCoachMode } from "@/lib/api-keys";
 import { parseAzureResult } from "@/lib/azure-speech";
 import { buildL1ErrorContext, matchL1Errors } from "@/lib/l1-error-patterns";
+import { getDesktopLlmPolicyError } from "@/lib/llm-providers";
 import { buildFeedbackPrompt } from "@/lib/llm-prompt";
 import { parseMwStress } from "@/lib/syllable-stress";
 import { apiFetch } from "@/lib/tauri-http";
+import { isTauriEnvironment } from "@/lib/tauri-runtime";
 import { isSentence } from "@/lib/utils";
 import type { AzureAssessmentResult } from "@/types/azure";
 
@@ -301,10 +303,21 @@ interface LlmConfig {
   model: string;
 }
 
+function getBlockedDesktopLlmReason(config: LlmConfig): string | null {
+  return isTauriEnvironment()
+    ? getDesktopLlmPolicyError(config.provider, config.baseUrl)
+    : null;
+}
+
 /** Test LLM connection */
 export async function testLlm(
   config: LlmConfig,
 ): Promise<{ success: boolean; reply?: string; error?: string }> {
+  const blockedReason = getBlockedDesktopLlmReason(config);
+  if (blockedReason) {
+    return { success: false, error: blockedReason };
+  }
+
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     Authorization: `Bearer ${config.apiKey}`,
@@ -350,6 +363,21 @@ export function streamLlmFeedback(
   mode: "phoneme" | "sentence" = "phoneme",
   signal?: AbortSignal,
 ): ReadableStream<Uint8Array> {
+  const encoder = new TextEncoder();
+  const blockedReason = getBlockedDesktopLlmReason(config);
+  if (blockedReason) {
+    return new ReadableStream({
+      start(controller) {
+        controller.enqueue(
+          encoder.encode(
+            `data: ${JSON.stringify({ error: blockedReason })}\n\n`,
+          ),
+        );
+        controller.close();
+      },
+    });
+  }
+
   // Collect all phoneme scores across words for L1 error detection
   const allPhonemes = azureResult.words.flatMap((w) =>
     w.phonemes.map((p) => ({
@@ -360,8 +388,6 @@ export function streamLlmFeedback(
   const l1Context = buildL1ErrorContext(matchL1Errors(allPhonemes));
   const prompt =
     buildFeedbackPrompt(target, azureResult, mode, getCoachMode()) + l1Context;
-  const encoder = new TextEncoder();
-
   return new ReadableStream({
     async start(controller) {
       try {

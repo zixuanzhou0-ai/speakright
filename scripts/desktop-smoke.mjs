@@ -11,6 +11,7 @@ const root = process.cwd();
 const expectedTitle = "SpeakRight";
 const appIdentifier = "com.speakright.desktop";
 const expectedRuntimeLogLine = "SpeakRight desktop runtime initialized";
+const desktopLlmPolicyMarker = "桌面版出于安全只允许预设 LLM provider";
 const timeoutMs = Number(process.env.SPEAKRIGHT_SMOKE_TIMEOUT_MS ?? 15_000);
 
 function executablePath() {
@@ -392,6 +393,27 @@ async function captureInteractiveEvidence(debuggingPort) {
       'window.location.assign(new URL("/settings", window.location.href).href); "navigating";',
     );
     await waitForBodyText(cdp, "数据与隐私中心");
+    await waitForBodyText(cdp, desktopLlmPolicyMarker);
+
+    const llmPolicy = await evaluate(
+      cdp,
+      `
+(() => {
+  const customButton = [...document.querySelectorAll("button")].find((item) =>
+    (item.textContent || "").trim() === "Custom"
+  );
+  return {
+    customButtonDisabled: customButton?.disabled === true,
+    policyVisible: document.body.innerText.includes("${desktopLlmPolicyMarker}")
+  };
+})()
+`,
+    );
+    if (!llmPolicy?.policyVisible || !llmPolicy?.customButtonDisabled) {
+      throw new Error(
+        "Desktop LLM custom endpoint policy was not enforced in the settings UI.",
+      );
+    }
 
     const diagnostics = await evaluate(
       cdp,
@@ -524,6 +546,7 @@ async function captureInteractiveEvidence(debuggingPort) {
       route: "/settings",
       download: diagnostics.download.download,
       appIdentifier: diagnostics.bundle.appIdentifier,
+      llmCustomDisabled: llmPolicy.customButtonDisabled,
       logPath: diagnostics.bundle.logPath,
       logBytes: diagnostics.bundle.logBytes,
     };
@@ -619,7 +642,7 @@ async function smoke() {
               ? `runtimeLog="${runtimeLog.path}" bytes=${runtimeLog.bytes}`
               : "",
             interactiveEvidence
-              ? `diagnostics="${interactiveEvidence.download}" route=${interactiveEvidence.route} appIdentifier=${interactiveEvidence.appIdentifier}`
+              ? `diagnostics="${interactiveEvidence.download}" route=${interactiveEvidence.route} appIdentifier=${interactiveEvidence.appIdentifier} llmCustomDisabled=${interactiveEvidence.llmCustomDisabled}`
               : "",
           ]
             .filter(Boolean)
