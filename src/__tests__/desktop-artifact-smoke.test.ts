@@ -84,6 +84,8 @@ describe("desktop artifact smoke wiring", () => {
     expect(smokeScript).toContain("apiKeysDeleted");
     expect(smokeScript).toContain("desktop-smoke-reset-preserve-key");
     expect(smokeScript).toContain("localResetPreservedKey");
+    expect(smokeScript).toContain("desktop-smoke-benchmark-audio");
+    expect(smokeScript).toContain("benchmarkAudioCleared");
     expect(smokeScript).toContain("internal");
     expect(smokeScript).toContain("NotSigned");
     expect(smokeScript).toContain("可控内测");

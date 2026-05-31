@@ -1080,6 +1080,137 @@ async function captureInteractiveEvidence(debuggingPort) {
       throw new Error("Desktop local data reset did not preserve API keys by default.");
     }
 
+    await evaluate(
+      cdp,
+      `
+(async () => {
+  const id = "desktop-smoke-benchmark-audio";
+  localStorage.setItem(
+    "speakright_benchmark_recordings_v1",
+    JSON.stringify([
+      {
+        id,
+        createdAt: Date.now(),
+        source: "spontaneous",
+        title: "Desktop smoke benchmark",
+        text: "I think so.",
+        score: 83,
+        targetLabel: "/th/"
+      }
+    ])
+  );
+
+  const db = await new Promise((resolve, reject) => {
+    const request = indexedDB.open("speakright-benchmark-audio", 1);
+    request.onupgradeneeded = () => {
+      if (!request.result.objectStoreNames.contains("recordings")) {
+        request.result.createObjectStore("recordings");
+      }
+    };
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve(request.result);
+  });
+  try {
+    await new Promise((resolve, reject) => {
+      const tx = db.transaction("recordings", "readwrite");
+      tx.objectStore("recordings").put(
+        new Blob(["desktop-smoke-audio"], { type: "audio/webm" }),
+        id
+      );
+      tx.oncomplete = () => resolve(true);
+      tx.onerror = () => reject(tx.error);
+    });
+  } finally {
+    db.close();
+  }
+  return true;
+})()
+`,
+    );
+
+    let benchmarkAudioClear = null;
+    try {
+      await clickVisibleButtonByText(cdp, "清空 benchmark 音频", {
+        timeoutMs: 10_000,
+      });
+      await waitForBodyText(cdp, "清空 benchmark 音频？");
+      await clickVisibleButtonByText(cdp, "清空音频", {
+        withinSelector: '[data-slot="dialog-content"]',
+      });
+      benchmarkAudioClear = await evaluate(
+        cdp,
+        `
+(async () => {
+  const id = "desktop-smoke-benchmark-audio";
+  const deadline = Date.now() + 10000;
+  let meta = localStorage.getItem("speakright_benchmark_recordings_v1");
+  while (meta !== null && Date.now() < deadline) {
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    meta = localStorage.getItem("speakright_benchmark_recordings_v1");
+  }
+
+  const db = await new Promise((resolve, reject) => {
+    const request = indexedDB.open("speakright-benchmark-audio", 1);
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve(request.result);
+  });
+  try {
+    const blob = await new Promise((resolve, reject) => {
+      const tx = db.transaction("recordings", "readonly");
+      const request = tx.objectStore("recordings").get(id);
+      request.onsuccess = () => resolve(request.result ?? null);
+      request.onerror = () => reject(request.error);
+    });
+    return {
+      ok: true,
+      clearedMeta: meta === null,
+      clearedAudio: blob === null
+    };
+  } finally {
+    db.close();
+  }
+})()
+`,
+      );
+    } finally {
+      await evaluate(
+        cdp,
+        `
+(async () => {
+  const id = "desktop-smoke-benchmark-audio";
+  localStorage.removeItem("speakright_benchmark_recordings_v1");
+  const db = await new Promise((resolve, reject) => {
+    const request = indexedDB.open("speakright-benchmark-audio", 1);
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve(request.result);
+  });
+  try {
+    await new Promise((resolve, reject) => {
+      const tx = db.transaction("recordings", "readwrite");
+      tx.objectStore("recordings").delete(id);
+      tx.oncomplete = () => resolve(true);
+      tx.onerror = () => reject(tx.error);
+    });
+  } finally {
+    db.close();
+  }
+  return true;
+})()
+`,
+      );
+    }
+
+    if (!benchmarkAudioClear?.ok) {
+      throw new Error(
+        `Desktop benchmark audio clear failed in release window: ${benchmarkAudioClear?.reason ?? "unknown"} ${benchmarkAudioClear?.bodyText ?? ""}`,
+      );
+    }
+    if (!benchmarkAudioClear.clearedMeta || !benchmarkAudioClear.clearedAudio) {
+      throw new Error(
+        "Desktop benchmark audio clear did not remove both metadata and audio blob.",
+      );
+    }
+
     return {
       route: "/settings",
       diagnosticsDownload: diagnostics.download.download,
@@ -1089,6 +1220,8 @@ async function captureInteractiveEvidence(debuggingPort) {
       learningDeletePreservedKey: learningDelete.preservedApiKey,
       apiKeysDeleted: apiKeysDelete.deletedApiKeys,
       localResetPreservedKey: localReset.preservedApiKey,
+      benchmarkAudioCleared:
+        benchmarkAudioClear.clearedMeta && benchmarkAudioClear.clearedAudio,
       logPath: diagnostics.bundle.logPath,
       logBytes: diagnostics.bundle.logBytes,
       screenshot,
@@ -1186,7 +1319,7 @@ async function smoke() {
               ? `runtimeLog="${runtimeLog.path}" bytes=${runtimeLog.bytes}`
               : "",
             interactiveEvidence
-              ? `diagnostics="${interactiveEvidence.diagnosticsDownload}" learningData="${interactiveEvidence.learningDataDownload}" learningDeletePreservedKey=${interactiveEvidence.learningDeletePreservedKey} apiKeysDeleted=${interactiveEvidence.apiKeysDeleted} localResetPreservedKey=${interactiveEvidence.localResetPreservedKey} route=${interactiveEvidence.route} appIdentifier=${interactiveEvidence.appIdentifier} llmCustomDisabled=${interactiveEvidence.llmCustomDisabled}`
+              ? `diagnostics="${interactiveEvidence.diagnosticsDownload}" learningData="${interactiveEvidence.learningDataDownload}" learningDeletePreservedKey=${interactiveEvidence.learningDeletePreservedKey} apiKeysDeleted=${interactiveEvidence.apiKeysDeleted} localResetPreservedKey=${interactiveEvidence.localResetPreservedKey} benchmarkAudioCleared=${interactiveEvidence.benchmarkAudioCleared} route=${interactiveEvidence.route} appIdentifier=${interactiveEvidence.appIdentifier} llmCustomDisabled=${interactiveEvidence.llmCustomDisabled}`
               : "",
           ]
             .filter(Boolean)
