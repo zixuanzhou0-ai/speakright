@@ -191,4 +191,25 @@ describe("api key storage in Tauri", () => {
     expect(mocks.store.get("speakright_coach_mode")).toBe("normal");
     expect(localStorage.getItem("speakright_coach_mode")).toBeNull();
   });
+
+  it("clears desktop app preferences from the runtime cache and Tauri store", async () => {
+    const {
+      clearItem,
+      getCoachMode,
+      getPronunciationConfig,
+      setCoachMode,
+      setPronunciationConfig,
+    } = await import("@/lib/api-keys");
+    setCoachMode("strict");
+    setPronunciationConfig({ source: "merriam-webster" });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    await clearItem("speakright_coach_mode");
+    await clearItem("speakright_pronunciation_config");
+
+    expect(getCoachMode()).toBe("normal");
+    expect(getPronunciationConfig()).toEqual({ source: "youdao" });
+    expect(mocks.store.get("speakright_coach_mode")).toBeUndefined();
+    expect(mocks.store.get("speakright_pronunciation_config")).toBeUndefined();
+  });
 });

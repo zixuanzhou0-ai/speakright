@@ -18,7 +18,7 @@ import {
   LOCAL_DATA_SCHEMA_VERSION_KEY,
 } from "@/lib/local-data-migrations";
 import { DESKTOP_MIC_CHECK_KEY } from "@/lib/desktop-readiness";
-import { storeDelete, storeGet } from "@/lib/tauri-store";
+import { storeGet } from "@/lib/tauri-store";
 import { clearTtsCache } from "@/lib/tts-cache";
 
 const ASSESSMENT_STORAGE_KEYS = [
@@ -140,16 +140,7 @@ function removeLocalStorageKeys(keys: readonly string[]): void {
 
 async function removePersistentKeys(keys: readonly string[]): Promise<void> {
   if (typeof window === "undefined") return;
-  await Promise.all(
-    keys.map(async (key) => {
-      const previousLocalValue = localStorage.getItem(key);
-      await storeDelete(key);
-      if (previousLocalValue !== null) {
-        localStorage.removeItem(key);
-      }
-      window.dispatchEvent(new StorageEvent("storage", { key }));
-    }),
-  );
+  await Promise.all(keys.map((key) => clearItem(key)));
 }
 
 export async function buildLocalDataExport(): Promise<LocalDataExport> {
