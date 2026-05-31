@@ -562,13 +562,18 @@ async function captureInteractiveEvidence(debuggingPort) {
   tauriGlobalExposed: typeof window.__TAURI__ !== "undefined",
   tauriInvokeAvailable: typeof window.__TAURI_INTERNALS__?.invoke === "function",
   locationProtocol: window.location.protocol,
-  locationHostname: window.location.hostname
+  locationHostname: window.location.hostname,
+  locationPort: window.location.port,
+  releaseServedFromDevServer:
+    (window.location.protocol === "http:" || window.location.protocol === "https:") &&
+    ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname)
 }))()
 `,
     );
     if (
       runtimePolicy?.tauriGlobalExposed ||
-      runtimePolicy?.tauriInvokeAvailable !== true
+      runtimePolicy?.tauriInvokeAvailable !== true ||
+      runtimePolicy?.releaseServedFromDevServer
     ) {
       throw new Error(
         `Desktop Tauri runtime policy failed: ${JSON.stringify(runtimePolicy)}`,
@@ -1509,6 +1514,10 @@ async function captureInteractiveEvidence(debuggingPort) {
       llmCustomDisabled: llmPolicy.customButtonDisabled,
       tauriGlobalExposed: runtimePolicy.tauriGlobalExposed,
       tauriInvokeAvailable: runtimePolicy.tauriInvokeAvailable,
+      locationProtocol: runtimePolicy.locationProtocol,
+      locationHostname: runtimePolicy.locationHostname,
+      locationPort: runtimePolicy.locationPort,
+      releaseServedFromDevServer: runtimePolicy.releaseServedFromDevServer,
       externalLinksCopied: externalLinkResults.map((result) => result.name),
       learningDeletePreservedKey: learningDelete.preservedApiKey,
       apiKeysDeleted: apiKeysDelete.deletedApiKeys,
@@ -1612,7 +1621,7 @@ async function smoke() {
               ? `runtimeLog="${runtimeLog.path}" bytes=${runtimeLog.bytes}`
               : "",
             interactiveEvidence
-              ? `diagnostics="${interactiveEvidence.diagnosticsDownload}" learningData="${interactiveEvidence.learningDataDownload}" learningDeletePreservedKey=${interactiveEvidence.learningDeletePreservedKey} apiKeysDeleted=${interactiveEvidence.apiKeysDeleted} localResetPreservedKey=${interactiveEvidence.localResetPreservedKey} benchmarkAudioCleared=${interactiveEvidence.benchmarkAudioCleared} externalLinksCopied=${interactiveEvidence.externalLinksCopied.join(",")} route=${interactiveEvidence.route} appIdentifier=${interactiveEvidence.appIdentifier} llmCustomDisabled=${interactiveEvidence.llmCustomDisabled} tauriGlobalExposed=${interactiveEvidence.tauriGlobalExposed} tauriInvokeAvailable=${interactiveEvidence.tauriInvokeAvailable}`
+              ? `diagnostics="${interactiveEvidence.diagnosticsDownload}" learningData="${interactiveEvidence.learningDataDownload}" learningDeletePreservedKey=${interactiveEvidence.learningDeletePreservedKey} apiKeysDeleted=${interactiveEvidence.apiKeysDeleted} localResetPreservedKey=${interactiveEvidence.localResetPreservedKey} benchmarkAudioCleared=${interactiveEvidence.benchmarkAudioCleared} externalLinksCopied=${interactiveEvidence.externalLinksCopied.join(",")} route=${interactiveEvidence.route} appIdentifier=${interactiveEvidence.appIdentifier} llmCustomDisabled=${interactiveEvidence.llmCustomDisabled} tauriGlobalExposed=${interactiveEvidence.tauriGlobalExposed} tauriInvokeAvailable=${interactiveEvidence.tauriInvokeAvailable} location=${interactiveEvidence.locationProtocol}//${interactiveEvidence.locationHostname}${interactiveEvidence.locationPort ? `:${interactiveEvidence.locationPort}` : ""} releaseServedFromDevServer=${interactiveEvidence.releaseServedFromDevServer}`
               : "",
           ]
             .filter(Boolean)
