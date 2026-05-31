@@ -3,6 +3,7 @@
 import { MessageSquareText } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { feedbackMarkdownComponents } from "@/components/feedback/feedback-markdown-components";
 
 interface LlmFeedbackProps {
   feedback: string;
@@ -41,19 +42,7 @@ export function LlmFeedback({
         <div className="prose prose-sm dark:prose-invert max-w-none prose-headings:border-l-2 prose-headings:border-primary prose-headings:pl-3 prose-headings:mt-6 prose-headings:mb-3 prose-headings:text-base prose-headings:font-bold prose-p:my-2 prose-p:leading-relaxed prose-hr:my-5 prose-hr:border-border/50 prose-li:marker:text-primary prose-strong:text-foreground">
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
-            components={{
-              hr: () => <hr className="my-5 border-border/50" />,
-              h2: ({ children }) => (
-                <h2 className="mt-6 mb-3 text-base font-bold border-l-2 border-primary pl-3">
-                  {children}
-                </h2>
-              ),
-              h3: ({ children }) => (
-                <h3 className="mt-5 mb-2 text-sm font-bold border-l-2 border-primary pl-3">
-                  {children}
-                </h3>
-              ),
-            }}
+            components={feedbackMarkdownComponents}
           >
             {feedback}
           </ReactMarkdown>
