@@ -14,6 +14,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { testAzure } from "@/lib/api-client";
 import { getAzureConfig, setAzureConfig } from "@/lib/api-keys";
+import {
+  getAzureRegionValidationError,
+  normalizeAzureRegion,
+} from "@/lib/azure-config";
 import { type ConnectionState, ConnectionStatus } from "./connection-status";
 
 export function AzureConfigCard() {
@@ -35,13 +39,27 @@ export function AzureConfigCard() {
       toast.error("请输入 Subscription Key");
       return;
     }
-    setAzureConfig({ subscriptionKey: key.trim(), region });
+    const regionError = getAzureRegionValidationError(region);
+    if (regionError) {
+      toast.error(regionError);
+      return;
+    }
+    setAzureConfig({
+      subscriptionKey: key.trim(),
+      region: normalizeAzureRegion(region),
+    });
     toast.success("Azure 配置已保存");
   };
 
   const handleTest = async () => {
     if (!key.trim()) {
       toast.error("请先填写 Subscription Key");
+      return;
+    }
+    const regionError = getAzureRegionValidationError(region);
+    if (regionError) {
+      setStatus("error");
+      setStatusMsg(regionError);
       return;
     }
     setStatus("testing");

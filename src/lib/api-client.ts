@@ -7,6 +7,7 @@
  */
 
 import { getCoachMode } from "@/lib/api-keys";
+import { assertAzureRegion, getAzureRegionValidationError } from "@/lib/azure-config";
 import { parseAzureResult } from "@/lib/azure-speech";
 import { buildL1ErrorContext, matchL1Errors } from "@/lib/l1-error-patterns";
 import { getDesktopLlmPolicyError } from "@/lib/llm-providers";
@@ -26,7 +27,12 @@ export async function testAzure(
   key: string,
   region: string,
 ): Promise<{ success: boolean; error?: string }> {
-  const tokenUrl = `https://${region}.api.cognitive.microsoft.com/sts/v1.0/issueToken`;
+  const regionError = getAzureRegionValidationError(region);
+  if (regionError) {
+    return { success: false, error: regionError };
+  }
+  const normalizedRegion = assertAzureRegion(region);
+  const tokenUrl = `https://${normalizedRegion}.api.cognitive.microsoft.com/sts/v1.0/issueToken`;
   const res = await apiFetch(tokenUrl, {
     method: "POST",
     headers: { "Ocp-Apim-Subscription-Key": key },
@@ -51,6 +57,7 @@ export async function assessPronunciation(
   key: string,
   region: string,
 ): Promise<AzureAssessmentResult> {
+  const normalizedRegion = assertAzureRegion(region);
   const language = "en-US";
   const enableProsody = isSentence(referenceText);
 
@@ -67,7 +74,7 @@ export async function assessPronunciation(
     unescape(encodeURIComponent(JSON.stringify(pronConfig))),
   );
 
-  const url = `https://${region}.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language=${encodeURIComponent(language)}&format=detailed`;
+  const url = `https://${normalizedRegion}.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language=${encodeURIComponent(language)}&format=detailed`;
 
   // Route through apiFetch (Tauri plugin-http in desktop, native fetch in dev).
   // plugin-http bypasses CORS via Rust reqwest; Azure STT does not advertise
@@ -111,8 +118,9 @@ export async function transcribeSpeech(
   key: string,
   region: string,
 ): Promise<string> {
+  const normalizedRegion = assertAzureRegion(region);
   const language = "en-US";
-  const url = `https://${region}.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language=${encodeURIComponent(language)}&format=detailed`;
+  const url = `https://${normalizedRegion}.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language=${encodeURIComponent(language)}&format=detailed`;
   const audioBytes = new Uint8Array(await audioBlob.arrayBuffer());
   const res = await apiFetch(url, {
     method: "POST",

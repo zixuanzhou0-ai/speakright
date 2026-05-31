@@ -25,6 +25,7 @@ import { DesktopReadinessCard } from "@/components/drill/desktop-readiness-card"
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getAzureConfig, subscribeToStorage } from "@/lib/api-keys";
+import { isAzureConfigReady } from "@/lib/azure-config";
 import { isReviewDue, loadMasteryProfile } from "@/lib/mastery-profile";
 import { buildReviewQueue } from "@/lib/review-queue";
 import { buildTrainingMemory } from "@/lib/training-memory";
@@ -173,7 +174,7 @@ export default function DrillPage() {
     setProfile(loadMasteryProfile());
     const refreshAzureState = () => {
       const config = getAzureConfig();
-      setAzureReady(!!config?.subscriptionKey && !!config.region);
+      setAzureReady(isAzureConfigReady(config));
     };
     refreshAzureState();
     return subscribeToStorage(refreshAzureState);

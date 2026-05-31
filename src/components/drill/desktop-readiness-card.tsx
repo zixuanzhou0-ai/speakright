@@ -13,6 +13,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getAzureConfig, subscribeToStorage } from "@/lib/api-keys";
+import { isAzureConfigReady } from "@/lib/azure-config";
 import {
   buildDesktopReadinessSummary,
   DESKTOP_MIC_SAMPLE_MS,
@@ -131,7 +132,7 @@ export function DesktopReadinessCard({
   useEffect(() => {
     const refreshAzureState = () => {
       const config = getAzureConfig();
-      setAzureReady(!!config?.subscriptionKey && !!config.region);
+      setAzureReady(isAzureConfigReady(config));
     };
     const savedMicCheck = readDesktopMicCheck();
     setMicCheck(savedMicCheck);
