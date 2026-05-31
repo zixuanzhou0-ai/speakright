@@ -3,7 +3,7 @@
 import { motion } from "motion/react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { getCoachMode } from "@/lib/api-keys";
+import { useCoachMode } from "@/hooks/use-api-keys";
 import { getAvailableWordCount, getPassThreshold } from "@/lib/drill-utils";
 import { PHONEMES } from "@/lib/phoneme-data";
 import type { DrillKind } from "@/types/drill";
@@ -29,7 +29,7 @@ export function DrillConfig({ kind, onStart }: DrillConfigProps) {
   const consonants = PHONEMES.filter((p) => p.category === "consonant");
   const countOptions =
     kind === "word" ? WORD_COUNT_OPTIONS : SENTENCE_COUNT_OPTIONS;
-  const coachMode = getCoachMode();
+  const coachMode = useCoachMode();
   const threshold = getPassThreshold(coachMode);
 
   const selectedPhoneme = selectedSlug

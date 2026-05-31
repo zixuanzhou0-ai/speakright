@@ -1,4 +1,11 @@
-import { act, cleanup, render, screen, waitFor } from "@testing-library/react";
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
@@ -192,6 +199,31 @@ describe("settings key hydration", () => {
         "border-primary",
       );
     });
+  });
+
+  it("updates drill config pass threshold after coach mode hydration", async () => {
+    const { DrillConfig } = await import("@/components/drill/drill-config");
+    const { hydrateKeys } = await import("@/lib/api-keys");
+    const onStart = vi.fn();
+    mocks.store.set("speakright_coach_mode", "strict");
+
+    render(<DrillConfig kind="word" onStart={onStart} />);
+
+    fireEvent.click(screen.getByRole("button", { name: /see/ }));
+
+    expect(screen.getByText(/达标分数：70 分/)).toBeInTheDocument();
+
+    await act(async () => {
+      await hydrateKeys();
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText(/达标分数：85 分/)).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "开始训练" }));
+
+    expect(onStart).toHaveBeenCalledWith("ee", 10, 85);
   });
 
   it("updates the data privacy summary after desktop key hydration", async () => {

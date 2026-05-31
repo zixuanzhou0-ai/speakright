@@ -9,9 +9,9 @@ import { WaveformDisplay } from "@/components/audio/waveform-display";
 import { DrillSummaryCard } from "@/components/drill/drill-summary";
 import { Button } from "@/components/ui/button";
 import { useAzureAssessment } from "@/hooks/use-azure-assessment";
+import { useCoachMode } from "@/hooks/use-api-keys";
 import { useMwPronunciation } from "@/hooks/use-mw-pronunciation";
 import { useRecorder } from "@/hooks/use-recorder";
-import { getCoachMode } from "@/lib/api-keys";
 import { getPhonemeAccuracy } from "@/lib/azure-phoneme-map";
 import { computeDrillSummary, getPassThreshold } from "@/lib/drill-utils";
 import type { MinimalPairSet } from "@/lib/minimal-pairs";
@@ -46,10 +46,9 @@ export default function ContrastDrillPage() {
   const recorder = useRecorder();
   const azure = useAzureAssessment();
   const mw = useMwPronunciation();
+  const coachMode = useCoachMode();
 
-  // Read threshold on every render so coach mode switches take effect
-  // immediately. Cheap — localStorage read is O(1).
-  const threshold = getPassThreshold(getCoachMode());
+  const threshold = getPassThreshold(coachMode);
 
   // De-dupe assessment trigger: remember the blob we've already processed
   // so the effect doesn't re-assess the same audio if re-rendered.
