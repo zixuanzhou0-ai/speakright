@@ -227,6 +227,18 @@ describe("release security configuration", () => {
     expect(csp).not.toMatch(/connect-src[^;]*\sblob:/);
   });
 
+  it("does not allow data media sources in the desktop CSP", () => {
+    const directives = cspDirectives();
+
+    expect(directives.get("media-src")?.split(/\s+/)).toEqual([
+      "'self'",
+      "blob:",
+      "asset:",
+      "http://asset.localhost",
+    ]);
+    expect(directives.get("media-src")).not.toContain("data:");
+  });
+
   it("keeps unused document embedding and navigation sinks closed in the desktop CSP", () => {
     const directives = cspDirectives();
 
@@ -272,10 +284,7 @@ describe("release security configuration", () => {
 
     expect(csp).not.toContain("fonts.googleapis.com");
     expect(csp).not.toContain("fonts.gstatic.com");
-    expect(cspDirectives().get("font-src")?.split(/\s+/)).toEqual([
-      "'self'",
-      "data:",
-    ]);
+    expect(cspDirectives().get("font-src")?.split(/\s+/)).toEqual(["'self'"]);
     expect(cspDirectives().get("style-src")?.split(/\s+/)).toEqual([
       "'self'",
       "'unsafe-inline'",
