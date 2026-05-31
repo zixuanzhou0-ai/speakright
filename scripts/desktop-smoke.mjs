@@ -377,6 +377,9 @@ async function captureInteractiveEvidence(debuggingPort) {
     );
     await waitForBodyText(cdp, "数据与隐私中心");
     await waitForBodyText(cdp, desktopLlmPolicyMarker);
+    await waitForBodyText(cdp, "internal");
+    await waitForBodyText(cdp, "NotSigned");
+    await waitForBodyText(cdp, "可控内测");
 
     const llmPolicy = await evaluate(
       cdp,
