@@ -578,6 +578,10 @@ function getAudioSubdir(filename: string): string {
   return filename.charAt(0);
 }
 
+function buildMwDictionaryUrl(word: string, mwKey: string): string {
+  return `https://dictionaryapi.com/api/v3/references/collegiate/json/${encodeURIComponent(word)}?key=${encodeURIComponent(mwKey)}`;
+}
+
 /** Fetch pronunciation audio — returns blob */
 export async function fetchPronunciation(
   word: string,
@@ -604,7 +608,7 @@ async function fetchYoudaoAudio(word: string): Promise<Blob> {
 }
 
 async function fetchMwAudio(word: string, mwKey: string): Promise<Blob> {
-  const apiUrl = `https://dictionaryapi.com/api/v3/references/collegiate/json/${encodeURIComponent(word)}?key=${mwKey}`;
+  const apiUrl = buildMwDictionaryUrl(word, mwKey);
   const dictRes = await apiFetch(apiUrl);
   if (!dictRes.ok) throw new Error(`MW API error: ${dictRes.status}`);
 
@@ -640,7 +644,7 @@ export async function fetchMwStress(
   const w = word.trim().toLowerCase();
   if (!w || w.length > 50 || /\s/.test(w)) return { stress: null, mw: null };
 
-  const apiUrl = `https://dictionaryapi.com/api/v3/references/collegiate/json/${encodeURIComponent(w)}?key=${mwKey}`;
+  const apiUrl = buildMwDictionaryUrl(w, mwKey);
   const res = await apiFetch(apiUrl);
   if (!res.ok) return { stress: null, mw: null };
 
@@ -667,7 +671,7 @@ export async function testMw(mwKey: string): Promise<{
   hasAudio?: boolean;
   error?: string;
 }> {
-  const apiUrl = `https://dictionaryapi.com/api/v3/references/collegiate/json/hello?key=${mwKey}`;
+  const apiUrl = buildMwDictionaryUrl("hello", mwKey);
   const res = await apiFetch(apiUrl);
   if (!res.ok)
     return { success: false, error: `MW API returned ${res.status}` };
