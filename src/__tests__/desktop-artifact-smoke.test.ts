@@ -38,6 +38,7 @@ describe("desktop artifact smoke wiring", () => {
     );
 
     expect(smokeScript).toContain("frontendDist");
+    expect(smokeScript).toContain("dragDropEnabled");
     expect(smokeScript).toContain("drill.html");
     expect(smokeScript).toContain("settings.html");
     expect(smokeScript).toContain("assessment.html");

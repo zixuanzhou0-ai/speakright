@@ -165,6 +165,15 @@ describe("release security configuration", () => {
     expect(config.identifier).not.toMatch(/\.(app|exe|msi|dmg)$/);
   });
 
+  it("disables desktop webview drag and drop because the app has no file import flow", () => {
+    const config = readJson<{
+      app?: { windows?: Array<{ dragDropEnabled?: boolean }> };
+    }>("src-tauri/tauri.conf.json");
+    const mainWindow = config.app?.windows?.[0];
+
+    expect(mainWindow?.dragDropEnabled).toBe(false);
+  });
+
   it("stores desktop API keys through an OS credential store backend", () => {
     const cargoToml = readFileSync(
       join(projectRoot, "src-tauri/Cargo.toml"),

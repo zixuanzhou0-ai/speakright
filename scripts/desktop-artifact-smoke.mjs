@@ -110,6 +110,9 @@ async function assertTauriConfig() {
   if ((mainWindow?.minWidth ?? 0) < 1024 || (mainWindow?.minHeight ?? 0) < 800) {
     fail("Tauri main window minimum size is below the desktop layout floor");
   }
+  if (mainWindow?.dragDropEnabled !== false) {
+    fail("Tauri main window drag and drop must remain disabled");
+  }
 }
 
 async function assertGeneratedCapabilities() {
