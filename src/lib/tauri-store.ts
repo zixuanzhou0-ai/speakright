@@ -17,6 +17,11 @@ async function getStore(): Promise<LazyStore> {
   return storeInstance;
 }
 
+function toStoreError(operation: string, error: unknown): Error {
+  const message = error instanceof Error ? error.message : String(error);
+  return new Error(`Tauri store ${operation} failed: ${message}`);
+}
+
 /**
  * Get a value by key. Returns null if not found.
  */
@@ -34,8 +39,8 @@ export async function storeGet<T>(key: string): Promise<T | null> {
     const store = await getStore();
     const val = await store.get<T>(key);
     return val ?? null;
-  } catch {
-    return null;
+  } catch (error) {
+    throw toStoreError("read", error);
   }
 }
 
@@ -55,9 +60,9 @@ export async function storeSet<T>(key: string, value: T): Promise<void> {
     await store.save();
     // Also fire storage event for UI reactivity
     window.dispatchEvent(new StorageEvent("storage", { key }));
-  } catch {
-    // In Tauri, do not leak secrets back to localStorage if the store fails.
+  } catch (error) {
     window.dispatchEvent(new StorageEvent("storage", { key }));
+    throw toStoreError("write", error);
   }
 }
 
@@ -74,8 +79,8 @@ export async function storeDelete(key: string): Promise<void> {
     const store = await getStore();
     await store.delete(key);
     await store.save();
-  } catch {
-    localStorage.removeItem(key);
+  } catch (error) {
+    throw toStoreError("delete", error);
   }
 }
 

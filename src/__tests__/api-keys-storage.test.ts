@@ -79,10 +79,12 @@ describe("api key storage in Tauri", () => {
     await hydrateKeys();
 
     expect(localStorage.getItem("speakright_elevenlabs_config")).toBeNull();
-    expect(mocks.secureStore.get("speakright_elevenlabs_config")).toMatchObject({
-      apiKey: "eleven-secret",
-      voiceId: "voice",
-    });
+    expect(mocks.secureStore.get("speakright_elevenlabs_config")).toMatchObject(
+      {
+        apiKey: "eleven-secret",
+        voiceId: "voice",
+      },
+    );
     expect(mocks.store.get("speakright_elevenlabs_config")).toBeUndefined();
     expect(getElevenLabsConfig()?.apiKey).toBe("eleven-secret");
   });
@@ -106,7 +108,9 @@ describe("api key storage in Tauri", () => {
   });
 
   it("emits a visible storage error event when Tauri persistence fails", async () => {
-    mocks.secureStoreSet.mockRejectedValueOnce(new Error("keychain unavailable"));
+    mocks.secureStoreSet.mockRejectedValueOnce(
+      new Error("keychain unavailable"),
+    );
     const events: Array<{ operation: string; message: string }> = [];
     window.addEventListener("speakright:api-key-storage-error", (event) => {
       events.push({
@@ -121,6 +125,27 @@ describe("api key storage in Tauri", () => {
 
     expect(events).toEqual([
       { operation: "save", message: "keychain unavailable" },
+    ]);
+  });
+
+  it("emits a visible storage error event when app preference persistence fails", async () => {
+    mocks.storeSet.mockRejectedValueOnce(
+      new Error("settings store unavailable"),
+    );
+    const events: Array<{ operation: string; message: string }> = [];
+    window.addEventListener("speakright:api-key-storage-error", (event) => {
+      events.push({
+        operation: event.detail.operation,
+        message: event.detail.message,
+      });
+    });
+    const { setCoachMode } = await import("@/lib/api-keys");
+
+    setCoachMode("strict");
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(events).toEqual([
+      { operation: "save", message: "settings store unavailable" },
     ]);
   });
 });

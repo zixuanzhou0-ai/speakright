@@ -101,7 +101,9 @@ describe("data registry", () => {
       speakright_pronunciation_config: { source: "merriam-webster" },
       speakright_coach_mode: "hard",
     });
-    expect(snapshot.localStorage.speakright_pronunciation_config).toBeUndefined();
+    expect(
+      snapshot.localStorage.speakright_pronunciation_config,
+    ).toBeUndefined();
     expect(snapshot.localStorage.speakright_coach_mode).toBeUndefined();
   });
 
@@ -234,7 +236,9 @@ describe("data registry", () => {
     expect(
       localStorage.getItem("speakright_local_data_schema_version"),
     ).toBeNull();
-    expect(localStorage.getItem("speakright_local_data_migrated_at")).toBeNull();
+    expect(
+      localStorage.getItem("speakright_local_data_migrated_at"),
+    ).toBeNull();
     expect(localStorage.getItem("speakright_pronunciation_config")).toBeNull();
     expect(localStorage.getItem("speakright_coach_mode")).toBeNull();
     expect(localStorage.getItem("theme")).toBeNull();
@@ -246,6 +250,25 @@ describe("data registry", () => {
     );
     expect(mocks.storeDelete).toHaveBeenCalledWith("speakright_coach_mode");
     expect(mocks.secureStoreDelete).not.toHaveBeenCalled();
+  });
+
+  it("reports app setting delete failures and preserves the local fallback copy", async () => {
+    const { deleteAllLocalData } = await import("@/lib/data-registry");
+    localStorage.setItem(
+      "speakright_pronunciation_config",
+      '{"source":"merriam-webster"}',
+    );
+    mocks.storeDelete.mockRejectedValueOnce(
+      new Error("settings store delete failed"),
+    );
+
+    await expect(deleteAllLocalData({ includeApiKeys: false })).rejects.toThrow(
+      "settings store delete failed",
+    );
+
+    expect(localStorage.getItem("speakright_pronunciation_config")).toBe(
+      '{"source":"merriam-webster"}',
+    );
   });
 
   it("can include API keys in the full local reset", async () => {

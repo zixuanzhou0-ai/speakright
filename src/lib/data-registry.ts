@@ -61,9 +61,7 @@ export interface LocalDataExport {
   localStorage: Record<string, unknown>;
   appSettings: Record<string, unknown>;
   indexedDb: {
-    benchmarkRecordings: Awaited<
-      ReturnType<typeof exportBenchmarkRecordings>
-    >;
+    benchmarkRecordings: Awaited<ReturnType<typeof exportBenchmarkRecordings>>;
   };
   excluded: string[];
 }
@@ -142,8 +140,11 @@ async function removePersistentKeys(keys: readonly string[]): Promise<void> {
   if (typeof window === "undefined") return;
   await Promise.all(
     keys.map(async (key) => {
-      localStorage.removeItem(key);
+      const previousLocalValue = localStorage.getItem(key);
       await storeDelete(key);
+      if (previousLocalValue !== null) {
+        localStorage.removeItem(key);
+      }
       window.dispatchEvent(new StorageEvent("storage", { key }));
     }),
   );
@@ -170,11 +171,7 @@ export async function buildLocalDataExport(): Promise<LocalDataExport> {
     indexedDb: {
       benchmarkRecordings: await exportBenchmarkRecordings(),
     },
-    excluded: [
-      "API keys",
-      "ElevenLabs TTS audio cache",
-      "Theme preference",
-    ],
+    excluded: ["API keys", "ElevenLabs TTS audio cache", "Theme preference"],
   };
 }
 
