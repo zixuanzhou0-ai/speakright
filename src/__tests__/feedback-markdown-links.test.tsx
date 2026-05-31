@@ -91,15 +91,29 @@ describe("feedback markdown links", () => {
     });
   });
 
-  it("renders non-http markdown hrefs as text", () => {
+  it("renders non-https markdown hrefs as text", () => {
     render(
       <LlmFeedback
-        feedback="不要打开 [脚本链接](javascript:alert(1))。"
+        feedback="不要打开 [脚本链接](javascript:alert(1)) 或 [明文链接](http://example.com)。"
         isStreaming={false}
       />,
     );
 
     expect(screen.getByText("脚本链接")).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "脚本链接" })).toBeNull();
+    expect(screen.getByText("明文链接")).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "明文链接" })).toBeNull();
+  });
+
+  it("renders markdown images as alt text instead of loading image sources", () => {
+    render(
+      <LlmFeedback
+        feedback="这里不应该加载图片：![动作示意](https://example.com/cue.png)"
+        isStreaming={false}
+      />,
+    );
+
+    expect(screen.getByText("动作示意")).toBeInTheDocument();
+    expect(screen.queryByRole("img")).toBeNull();
   });
 });

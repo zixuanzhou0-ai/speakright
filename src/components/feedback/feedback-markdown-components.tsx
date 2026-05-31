@@ -3,10 +3,10 @@
 import type { ReactNode } from "react";
 import { DesktopExternalLink } from "@/components/common/desktop-external-link";
 
-function isHttpHref(href: string) {
+function isHttpsHref(href: string) {
   try {
     const url = new URL(href);
-    return url.protocol === "https:" || url.protocol === "http:";
+    return url.protocol === "https:";
   } catch {
     return false;
   }
@@ -33,7 +33,7 @@ export const feedbackMarkdownComponents = {
     children?: ReactNode;
     title?: string;
   }) => {
-    if (!href || !isHttpHref(href)) {
+    if (!href || !isHttpsHref(href)) {
       return <span title={title}>{children}</span>;
     }
 
@@ -47,5 +47,9 @@ export const feedbackMarkdownComponents = {
         {children}
       </DesktopExternalLink>
     );
+  },
+  img: ({ alt }: { alt?: string }) => {
+    if (!alt) return null;
+    return <span>{alt}</span>;
   },
 };
