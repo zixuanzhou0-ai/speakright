@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 const projectRoot = process.cwd();
 
 describe("desktop public release gate", () => {
-  it("is wired as an explicit signed-artifact gate separate from internal desktop validation", () => {
+  it("wires release validation to the signed-artifact gate while keeping internal validation separate", () => {
     const packageJson = JSON.parse(
       readFileSync(join(projectRoot, "package.json"), "utf8"),
     ) as { scripts: Record<string, string> };
@@ -16,11 +16,20 @@ describe("desktop public release gate", () => {
     expect(packageJson.scripts["validate:desktop"]).not.toContain(
       "desktop:release-gate",
     );
-    expect(packageJson.scripts["validate:public-release"]).toContain(
+    expect(packageJson.scripts["validate:internal-release"]).toContain(
       "validate:desktop",
     );
-    expect(packageJson.scripts["validate:public-release"]).toContain(
+    expect(packageJson.scripts["validate:internal-release"]).not.toContain(
       "desktop:release-gate",
+    );
+    expect(packageJson.scripts["validate:release"]).toContain(
+      "validate:desktop",
+    );
+    expect(packageJson.scripts["validate:release"]).toContain(
+      "desktop:release-gate",
+    );
+    expect(packageJson.scripts["validate:public-release"]).toBe(
+      "npm run validate:release",
     );
   });
 
