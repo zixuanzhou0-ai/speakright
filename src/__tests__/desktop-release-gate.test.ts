@@ -43,4 +43,23 @@ describe("desktop public release gate", () => {
     expect(gateScript).toContain("allValid");
     expect(gateScript).toContain("controlled internal testing only");
   });
+
+  it("requires the signed-artifact gate before uploading version-tag artifacts", () => {
+    const workflow = readFileSync(
+      join(projectRoot, ".github/workflows/build-windows.yml"),
+      "utf8",
+    );
+
+    const gateStepIndex = workflow.indexOf("Enforce public release signing");
+    const uploadStepIndex = workflow.indexOf("Upload artifacts");
+
+    expect(workflow).toContain("npm run desktop:release-gate");
+    expect(workflow).toContain("if: startsWith(github.ref, 'refs/tags/v')");
+    expect(workflow).toContain(
+      "if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/v')",
+    );
+    expect(gateStepIndex).toBeGreaterThan(-1);
+    expect(uploadStepIndex).toBeGreaterThan(-1);
+    expect(gateStepIndex).toBeLessThan(uploadStepIndex);
+  });
 });
