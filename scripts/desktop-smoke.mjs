@@ -967,6 +967,119 @@ async function captureInteractiveEvidence(debuggingPort) {
       throw new Error("Desktop API key delete did not clear all API key slots.");
     }
 
+    await evaluate(
+      cdp,
+      `
+(() => {
+  localStorage.setItem(
+    "speakright_mastery_profile_v2",
+    JSON.stringify({ version: 2, desktopSmokeReset: true })
+  );
+  localStorage.setItem("speakright_score_history", JSON.stringify({ th: [74] }));
+  localStorage.setItem("speakright_ipa_cache", JSON.stringify({ th: true }));
+  localStorage.setItem("speakright_mw_words_th", JSON.stringify({ value: "think" }));
+  localStorage.setItem(
+    "speakright_desktop_mic_check_v1",
+    JSON.stringify({ version: 1, passedAt: Date.now(), deviceLabel: "Smoke Mic" })
+  );
+  localStorage.setItem("speakright_local_data_schema_version", "4");
+  localStorage.setItem("speakright_local_data_migrated_at", String(Date.now()));
+  localStorage.setItem(
+    "speakright_pronunciation_config",
+    JSON.stringify({ source: "merriam-webster" })
+  );
+  localStorage.setItem("speakright_coach_mode", JSON.stringify("strict"));
+  localStorage.setItem("theme", "dark");
+  localStorage.setItem(
+    "speakright_azure_config",
+    JSON.stringify({ subscriptionKey: "desktop-smoke-reset-preserve-key" })
+  );
+  return true;
+})()
+`,
+    );
+
+    let localReset = null;
+    try {
+      await clickVisibleButtonByText(cdp, "重置本机数据", {
+        timeoutMs: 10_000,
+      });
+      await waitForBodyText(cdp, "重置本机数据？");
+      await clickVisibleButtonByText(cdp, "重置本机数据", {
+        withinSelector: '[data-slot="dialog-content"]',
+      });
+      localReset = await evaluate(
+        cdp,
+        `
+(async () => {
+  const removedKeys = [
+    "speakright_mastery_profile_v2",
+    "speakright_score_history",
+    "speakright_ipa_cache",
+    "speakright_mw_words_th",
+    "speakright_desktop_mic_check_v1",
+    "speakright_local_data_schema_version",
+    "speakright_local_data_migrated_at",
+    "speakright_pronunciation_config",
+    "speakright_coach_mode",
+    "theme"
+  ];
+  const deleteDeadline = Date.now() + 10000;
+  while (
+    removedKeys.some((key) => localStorage.getItem(key) !== null) &&
+    Date.now() < deleteDeadline
+  ) {
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+  return {
+    ok: true,
+    removedResetData: removedKeys.every((key) => localStorage.getItem(key) === null),
+    preservedApiKey:
+      localStorage.getItem("speakright_azure_config")?.includes(
+        "desktop-smoke-reset-preserve-key"
+      ) === true
+  };
+})()
+`,
+      );
+    } finally {
+      await evaluate(
+        cdp,
+        `
+(() => {
+  for (const key of [
+    "speakright_mastery_profile_v2",
+    "speakright_score_history",
+    "speakright_ipa_cache",
+    "speakright_mw_words_th",
+    "speakright_desktop_mic_check_v1",
+    "speakright_local_data_schema_version",
+    "speakright_local_data_migrated_at",
+    "speakright_pronunciation_config",
+    "speakright_coach_mode",
+    "speakright_azure_config",
+    "theme"
+  ]) {
+    localStorage.removeItem(key);
+  }
+  return true;
+})()
+`,
+      );
+    }
+
+    if (!localReset?.ok) {
+      throw new Error(
+        `Desktop local data reset failed in release window: ${localReset?.reason ?? "unknown"} ${localReset?.bodyText ?? ""}`,
+      );
+    }
+    if (!localReset.removedResetData) {
+      throw new Error("Desktop local data reset did not clear reset-scoped data.");
+    }
+    if (!localReset.preservedApiKey) {
+      throw new Error("Desktop local data reset did not preserve API keys by default.");
+    }
+
     return {
       route: "/settings",
       diagnosticsDownload: diagnostics.download.download,
@@ -975,6 +1088,7 @@ async function captureInteractiveEvidence(debuggingPort) {
       llmCustomDisabled: llmPolicy.customButtonDisabled,
       learningDeletePreservedKey: learningDelete.preservedApiKey,
       apiKeysDeleted: apiKeysDelete.deletedApiKeys,
+      localResetPreservedKey: localReset.preservedApiKey,
       logPath: diagnostics.bundle.logPath,
       logBytes: diagnostics.bundle.logBytes,
       screenshot,
@@ -1072,7 +1186,7 @@ async function smoke() {
               ? `runtimeLog="${runtimeLog.path}" bytes=${runtimeLog.bytes}`
               : "",
             interactiveEvidence
-              ? `diagnostics="${interactiveEvidence.diagnosticsDownload}" learningData="${interactiveEvidence.learningDataDownload}" learningDeletePreservedKey=${interactiveEvidence.learningDeletePreservedKey} apiKeysDeleted=${interactiveEvidence.apiKeysDeleted} route=${interactiveEvidence.route} appIdentifier=${interactiveEvidence.appIdentifier} llmCustomDisabled=${interactiveEvidence.llmCustomDisabled}`
+              ? `diagnostics="${interactiveEvidence.diagnosticsDownload}" learningData="${interactiveEvidence.learningDataDownload}" learningDeletePreservedKey=${interactiveEvidence.learningDeletePreservedKey} apiKeysDeleted=${interactiveEvidence.apiKeysDeleted} localResetPreservedKey=${interactiveEvidence.localResetPreservedKey} route=${interactiveEvidence.route} appIdentifier=${interactiveEvidence.appIdentifier} llmCustomDisabled=${interactiveEvidence.llmCustomDisabled}`
               : "",
           ]
             .filter(Boolean)
