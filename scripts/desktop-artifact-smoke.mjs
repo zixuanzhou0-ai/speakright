@@ -217,6 +217,10 @@ async function assertStaticExport() {
 }
 
 async function assertStaticExportPolicy() {
+  if (existsSync(path.join(outDir, "api"))) {
+    fail("Next static export must not contain out/api routes for the desktop bundle");
+  }
+
   const forbiddenMarkers = [
     "fonts.googleapis.com",
     "fonts.gstatic.com",
