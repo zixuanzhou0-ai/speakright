@@ -4,8 +4,6 @@ import type React from "react";
 import {
   Calendar,
   Code2,
-  Download,
-  ExternalLink,
   MonitorCog,
   PackageCheck,
   ShieldAlert,
@@ -23,7 +21,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { DESKTOP_RELEASE_INFO } from "@/lib/release-info";
-import { cn } from "@/lib/utils";
 
 export function ReleaseCard() {
   const release = DESKTOP_RELEASE_INFO;
@@ -36,7 +33,7 @@ export function ReleaseCard() {
           <CardTitle>桌面端版本与发布</CardTitle>
         </div>
         <CardDescription>
-          查看当前桌面端版本、安装包通道和发布来源。
+          查看当前已安装版本、更新通道和签名状态。
         </CardDescription>
         <CardAction className="flex items-center gap-2">
           <Badge variant="secondary">v{release.currentVersion}</Badge>
@@ -45,7 +42,7 @@ export function ReleaseCard() {
       </CardHeader>
 
       <CardContent className="space-y-4">
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           <ReleaseFact
             icon={<MonitorCog className="size-4" />}
             label="构建目标"
@@ -66,11 +63,6 @@ export function ReleaseCard() {
             label="签名状态"
             value={release.build.signatureStatus}
           />
-          <ReleaseFact
-            icon={<PackageCheck className="size-4" />}
-            label="发布报告"
-            value={release.build.releaseReportFileName}
-          />
         </div>
 
         <div className="rounded-lg border border-amber-500/25 bg-amber-500/10 p-3 text-sm text-amber-900 dark:text-amber-200">
@@ -80,61 +72,7 @@ export function ReleaseCard() {
           </div>
         </div>
 
-        <div className="space-y-3">
-          {release.installers.map((installer) => (
-            <div
-              className="grid gap-3 rounded-lg border bg-background/70 p-3 sm:grid-cols-[1fr_auto] sm:items-center"
-              key={installer.id}
-            >
-              <div className="min-w-0 space-y-1">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="font-medium">{installer.name}</span>
-                  <Badge variant="outline">{installer.kind}</Badge>
-                  <Badge variant="secondary">{installer.label}</Badge>
-                  <span className="text-xs text-muted-foreground">
-                    {installer.sizeLabel}
-                  </span>
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  {installer.description}
-                </p>
-                <p className="truncate font-mono text-xs text-muted-foreground">
-                  {installer.fileName}
-                </p>
-              </div>
-
-              <DesktopExternalLink
-                className={cn(
-                  buttonVariants({ size: "sm" }),
-                  "w-fit justify-self-start sm:justify-self-end",
-                )}
-                copyMessage={`${installer.name}下载链接已复制，请在浏览器中打开`}
-                href={installer.downloadUrl}
-              >
-                <Download className="size-3.5" />
-                下载
-              </DesktopExternalLink>
-            </div>
-          ))}
-        </div>
-
         <div className="flex flex-wrap gap-2 border-t pt-4">
-          <DesktopExternalLink
-            className={buttonVariants({ size: "sm", variant: "outline" })}
-            copyMessage="当前 Release 链接已复制，请在浏览器中打开"
-            href={release.releaseUrl}
-          >
-            <ExternalLink className="size-3.5" />
-            当前 Release
-          </DesktopExternalLink>
-          <DesktopExternalLink
-            className={buttonVariants({ size: "sm", variant: "outline" })}
-            copyMessage="所有版本链接已复制，请在浏览器中打开"
-            href={release.latestReleasesUrl}
-          >
-            <Download className="size-3.5" />
-            所有版本
-          </DesktopExternalLink>
           <DesktopExternalLink
             className={buttonVariants({ size: "sm", variant: "ghost" })}
             copyMessage="源码仓库链接已复制，请在浏览器中打开"
@@ -146,7 +84,7 @@ export function ReleaseCard() {
         </div>
 
         <p className="text-xs text-muted-foreground">
-          {release.notes.privateRepository} {release.notes.checksum}
+          {release.notes.artifacts} {release.notes.checksum}
         </p>
       </CardContent>
     </Card>

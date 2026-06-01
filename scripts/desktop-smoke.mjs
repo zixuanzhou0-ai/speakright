@@ -647,12 +647,11 @@ async function captureInteractiveEvidence(debuggingPort) {
     };
   }
 
-  const releaseDownloadLink = [...document.querySelectorAll('a[href*="/releases/download/"]')]
-    .find((item) => (item.textContent || "").includes("下载"));
-  if (!releaseDownloadLink) {
+  const releaseDownloadLinks = [...document.querySelectorAll('a[href*="/releases/download/"]')];
+  if (releaseDownloadLinks.length > 0 || document.body.innerText.includes("Windows 安装程序")) {
     return {
       ok: false,
-      reason: "release download link missing",
+      reason: "installed app should not show installer download links",
       bodyText: document.body.innerText.slice(0, 1200)
     };
   }
@@ -692,7 +691,6 @@ async function captureInteractiveEvidence(debuggingPort) {
 
   try {
     results.push(await clickAndCapture("dictionary", dictionaryLink));
-    results.push(await clickAndCapture("release-download", releaseDownloadLink));
   } finally {
     Object.defineProperty(navigator, "clipboard", {
       configurable: true,
@@ -723,9 +721,6 @@ async function captureInteractiveEvidence(debuggingPort) {
     const dictionaryLinkResult = externalLinkResults.find(
       (result) => result.name === "dictionary",
     );
-    const releaseDownloadLinkResult = externalLinkResults.find(
-      (result) => result.name === "release-download",
-    );
     const failedExternalLink = externalLinkResults.find(
       (result) =>
         !result.defaultPrevented ||
@@ -738,8 +733,7 @@ async function captureInteractiveEvidence(debuggingPort) {
     if (
       failedExternalLink ||
       dictionaryLinkResult?.href !==
-        "https://dictionaryapi.com/register/index" ||
-      !releaseDownloadLinkResult?.href.includes("/releases/download/")
+        "https://dictionaryapi.com/register/index"
     ) {
       throw new Error(
         `Desktop external link policy failed: ${JSON.stringify(externalLinkPolicy)}`,
