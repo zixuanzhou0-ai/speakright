@@ -551,6 +551,27 @@ async function captureInteractiveEvidence(debuggingPort) {
   try {
     await cdp.send("Runtime.enable");
     await cdp.send("Page.enable");
+    await evaluate(
+      cdp,
+      'window.location.assign(new URL("/settings", window.location.href).href); "navigating";',
+    );
+    await waitForBodyText(cdp, "训练语言");
+    await evaluate(
+      cdp,
+      `
+(async () => {
+  const englishButton = [...document.querySelectorAll("button")].find((item) =>
+    (item.textContent || "").includes("American English")
+  );
+  if (englishButton) {
+    englishButton.click();
+    await new Promise((resolve) => setTimeout(resolve, 500));
+  }
+  window.location.assign(new URL("/drill", window.location.href).href);
+  return "ok";
+})()
+`,
+    );
     await waitForBodyText(cdp, "今日学习计划");
     await waitForBodyText(cdp, "桌面端准备状态");
     await waitForBodyText(cdp, "检测麦克风");
@@ -590,6 +611,67 @@ async function captureInteractiveEvidence(debuggingPort) {
     await waitForBodyText(cdp, "internal");
     await waitForBodyText(cdp, "NotSigned");
     await waitForBodyText(cdp, "可控内测");
+    await waitForBodyText(cdp, "训练语言");
+    await waitForBodyText(cdp, "西班牙语");
+
+    const languageSwitch = await evaluate(
+      cdp,
+      `
+(async () => {
+  const spanishButton = [...document.querySelectorAll("button")].find((item) =>
+    (item.textContent || "").includes("Español")
+  );
+  if (!spanishButton) {
+    return {
+      ok: false,
+      reason: "Spanish language button missing",
+      bodyText: document.body.innerText.slice(0, 1200)
+    };
+  }
+  spanishButton.click();
+  await new Promise((resolve) => setTimeout(resolve, 500));
+  window.location.assign(new URL("/drill", window.location.href).href);
+  return { ok: true };
+})()
+`,
+    );
+    if (!languageSwitch?.ok) {
+      throw new Error(
+        `Desktop language switch failed: ${languageSwitch?.reason ?? "unknown"} ${languageSwitch?.bodyText ?? ""}`,
+      );
+    }
+    await waitForBodyText(cdp, "西班牙语训练准备中");
+    await waitForBodyText(cdp, "数据已按语言隔离");
+    await evaluate(
+      cdp,
+      'window.location.assign(new URL("/settings", window.location.href).href); "navigating";',
+    );
+    await waitForBodyText(cdp, "训练语言");
+    const languageReset = await evaluate(
+      cdp,
+      `
+(async () => {
+  const englishButton = [...document.querySelectorAll("button")].find((item) =>
+    (item.textContent || "").includes("American English")
+  );
+  if (!englishButton) {
+    return {
+      ok: false,
+      reason: "English language button missing",
+      bodyText: document.body.innerText.slice(0, 1200)
+    };
+  }
+  englishButton.click();
+  await new Promise((resolve) => setTimeout(resolve, 500));
+  return { ok: true };
+})()
+`,
+    );
+    if (!languageReset?.ok) {
+      throw new Error(
+        `Desktop language reset failed: ${languageReset?.reason ?? "unknown"} ${languageReset?.bodyText ?? ""}`,
+      );
+    }
 
     const llmPolicy = await evaluate(
       cdp,

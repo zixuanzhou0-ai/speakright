@@ -56,10 +56,10 @@ export async function assessPronunciation(
   referenceText: string,
   key: string,
   region: string,
+  language = "en-US",
 ): Promise<AzureAssessmentResult> {
   const normalizedRegion = assertAzureRegion(region);
-  const language = "en-US";
-  const enableProsody = isSentence(referenceText);
+  const enableProsody = language === "en-US" && isSentence(referenceText);
 
   // Build pronunciation assessment config as JSON, then base64-encode it
   const pronConfig = {
@@ -117,9 +117,9 @@ export async function transcribeSpeech(
   audioBlob: Blob,
   key: string,
   region: string,
+  language = "en-US",
 ): Promise<string> {
   const normalizedRegion = assertAzureRegion(region);
-  const language = "en-US";
   const url = `https://${normalizedRegion}.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language=${encodeURIComponent(language)}&format=detailed`;
   const audioBytes = new Uint8Array(await audioBlob.arrayBuffer());
   const res = await apiFetch(url, {

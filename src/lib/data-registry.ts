@@ -18,6 +18,10 @@ import {
   LOCAL_DATA_SCHEMA_VERSION_KEY,
 } from "@/lib/local-data-migrations";
 import { DESKTOP_MIC_CHECK_KEY } from "@/lib/desktop-readiness";
+import {
+  LANGUAGE_SCOPED_STORAGE_BASE_KEYS,
+  languageScopedStoragePrefix,
+} from "@/lib/language-storage";
 import { storeGet } from "@/lib/tauri-store";
 import { clearTtsCache } from "@/lib/tts-cache";
 
@@ -47,6 +51,8 @@ const CACHE_STORAGE_KEYS = [
 const DEVICE_STORAGE_KEYS = [DESKTOP_MIC_CHECK_KEY] as const;
 
 const CACHE_STORAGE_PREFIXES = ["speakright_mw_words_"] as const;
+const LANGUAGE_SCOPED_STORAGE_PREFIXES =
+  LANGUAGE_SCOPED_STORAGE_BASE_KEYS.map(languageScopedStoragePrefix);
 const RESET_ONLY_STORAGE_KEYS = [
   ...DEVICE_STORAGE_KEYS,
   LOCAL_DATA_SCHEMA_VERSION_KEY,
@@ -145,6 +151,9 @@ async function removePersistentKeys(keys: readonly string[]): Promise<void> {
 
 export async function buildLocalDataExport(): Promise<LocalDataExport> {
   const cacheKeys = prefixedLocalStorageKeys(CACHE_STORAGE_PREFIXES);
+  const languageScopedKeys = prefixedLocalStorageKeys(
+    LANGUAGE_SCOPED_STORAGE_PREFIXES,
+  );
   return {
     schemaVersion: 4,
     exportedAt: new Date().toISOString(),
@@ -155,6 +164,7 @@ export async function buildLocalDataExport(): Promise<LocalDataExport> {
       ...collectKeys(CACHE_STORAGE_KEYS),
       ...collectKeys(DEVICE_STORAGE_KEYS),
       ...collectKeys(cacheKeys),
+      ...collectKeys(languageScopedKeys),
       ...collectKeys([
         LOCAL_DATA_SCHEMA_VERSION_KEY,
         LOCAL_DATA_MIGRATED_AT_KEY,
@@ -173,9 +183,14 @@ export function getLocalDataSummary(): LocalDataSummary {
     ...CACHE_STORAGE_KEYS,
     ...prefixedLocalStorageKeys(CACHE_STORAGE_PREFIXES),
   ];
+  const languageScopedKeys = prefixedLocalStorageKeys(
+    LANGUAGE_SCOPED_STORAGE_PREFIXES,
+  );
   const apiKeys = getApiKeySummary();
   return {
-    learningKeys: Object.keys(collectKeys(LEARNING_STORAGE_KEYS)).length,
+    learningKeys: Object.keys(
+      collectKeys([...LEARNING_STORAGE_KEYS, ...languageScopedKeys]),
+    ).length,
     cacheKeys: Object.keys(collectKeys(cacheKeys)).length,
     configuredApiKeys: apiKeys.configured,
     apiKeySlots: apiKeys.totalSlots,
@@ -204,10 +219,14 @@ export async function downloadLocalDataExport(): Promise<void> {
 
 export async function deleteLearningData(): Promise<void> {
   const cacheKeys = prefixedLocalStorageKeys(CACHE_STORAGE_PREFIXES);
+  const languageScopedKeys = prefixedLocalStorageKeys(
+    LANGUAGE_SCOPED_STORAGE_PREFIXES,
+  );
   await clearBenchmarkRecordings();
   await clearTtsCache();
   removeLocalStorageKeys([
     ...LEARNING_STORAGE_KEYS,
+    ...languageScopedKeys,
     ...CACHE_STORAGE_KEYS,
     ...cacheKeys,
   ]);

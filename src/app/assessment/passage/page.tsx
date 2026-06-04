@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { useAzureAssessment } from "@/hooks/use-azure-assessment";
 import { useRecorder } from "@/hooks/use-recorder";
 import { useRecordingQuality } from "@/hooks/use-recording-quality";
+import { getCurrentLanguageId } from "@/lib/api-keys";
 import {
   type CoverageBenchmarkComparison,
   compareCoverageReportToHistory,
@@ -36,6 +37,8 @@ import {
   selectCoverageAdaptiveProbes,
 } from "@/lib/coverage-passage";
 import { buildCoveragePassageDiagnosisReport } from "@/lib/diagnosis-engine";
+import { languageScopedStorageKey } from "@/lib/language-storage";
+import { getLanguageProfile } from "@/lib/language-profiles";
 import { getTrainingPack } from "@/lib/training-packs";
 import type {
   CoveragePassageRecording,
@@ -70,14 +73,20 @@ type PassagePhase =
   | { type: "report"; result: DiagnosisReport }
   | { type: "error"; message: string; recoverTo?: ReadablePassagePhase };
 
-function saveReport(report: DiagnosisReport) {
-  localStorage.setItem(STORAGE_KEY_V2, JSON.stringify(report));
+function reportStorageKey(languageId = getCurrentLanguageId()): string {
+  return languageScopedStorageKey(STORAGE_KEY_V2, languageId);
 }
 
-function loadSavedCoverageReport(): DiagnosisReport | null {
+function saveReport(report: DiagnosisReport, languageId = getCurrentLanguageId()) {
+  localStorage.setItem(reportStorageKey(languageId), JSON.stringify(report));
+}
+
+function loadSavedCoverageReport(
+  languageId = getCurrentLanguageId(),
+): DiagnosisReport | null {
   if (typeof window === "undefined") return null;
   try {
-    const raw = localStorage.getItem(STORAGE_KEY_V2);
+    const raw = localStorage.getItem(reportStorageKey(languageId));
     if (!raw) return null;
     const report = JSON.parse(raw) as DiagnosisReport;
     return report.source === "coverage-passage" ? report : null;
@@ -111,8 +120,10 @@ function getPromptForPhase(
 }
 
 export default function CoveragePassageAssessmentPage() {
+  const languageId = getCurrentLanguageId();
+  const languageProfile = getLanguageProfile(languageId);
   const [savedReport, setSavedReport] = useState<DiagnosisReport | null>(() =>
-    loadSavedCoverageReport(),
+    loadSavedCoverageReport(languageId),
   );
   const [phase, setPhase] = useState<PassagePhase>({ type: "intro" });
   const [benchmarkComparison, setBenchmarkComparison] =
@@ -131,11 +142,11 @@ export default function CoveragePassageAssessmentPage() {
     const report = buildCoveragePassageDiagnosisReport({
       recordings: recordingsRef.current,
     });
-    saveReport(report);
+    saveReport(report, languageId);
     setBenchmarkComparison(saveCoverageBenchmark(report));
     setSavedReport(report);
     setPhase({ type: "report", result: report });
-  }, []);
+  }, [languageId]);
 
   const handleStart = () => {
     recordingsRef.current = [];
@@ -220,7 +231,7 @@ export default function CoveragePassageAssessmentPage() {
   }, [recorder, recordingQuality, phase, azure, finalizeReport]);
 
   const handleRetake = () => {
-    localStorage.removeItem(STORAGE_KEY_V2);
+    localStorage.removeItem(reportStorageKey(languageId));
     setSavedReport(null);
     recordingsRef.current = [];
     usedProbeIdsRef.current = [];
@@ -240,6 +251,32 @@ export default function CoveragePassageAssessmentPage() {
   const prompt = getPromptForPhase(phase);
   const progress = phaseProgress(phase);
   const passageText = getCoveragePassageText();
+
+  if (!languageProfile.readiness.diagnosis) {
+    return (
+      <div className="flex h-full flex-col overflow-y-auto px-6 py-4 scrollbar-thin">
+        <div className="mx-auto mt-10 max-w-2xl rounded-xl border bg-card p-8 text-center shadow-sm">
+          <BookOpenCheck className="mx-auto mb-4 h-10 w-10 text-muted-foreground" />
+          <h1 className="text-xl font-bold">
+            {languageProfile.displayName}全音覆盖准备中
+          </h1>
+          <p className="mt-3 text-sm text-muted-foreground">
+            这套覆盖短文目前只用于英语。当前语言需要先完成 Azure probe 和语言专属 coverage passage。
+          </p>
+          <div className="mt-5 flex justify-center gap-3">
+            <Link href="/settings">
+              <Button variant="outline" className="cursor-pointer">
+                切换训练语言
+              </Button>
+            </Link>
+            <Link href="/assessment">
+              <Button className="cursor-pointer">返回快速诊断</Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-full flex-col overflow-y-auto px-6 py-4 scrollbar-thin">

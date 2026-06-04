@@ -5,6 +5,7 @@ import {
   getAzureConfig,
   getCoachMode,
   getElevenLabsConfig,
+  getLanguageConfig,
   getLlmConfig,
   getMerriamWebsterConfig,
   getPronunciationConfig,
@@ -51,6 +52,14 @@ export function usePronunciationConfig() {
     typeof window !== "undefined" ? subscribeToStorage : emptySubscribe,
     getPronunciationConfig,
     getPronunciationConfig,
+  );
+}
+
+export function useLanguageConfig() {
+  return useSyncExternalStore(
+    typeof window !== "undefined" ? subscribeToStorage : emptySubscribe,
+    getLanguageConfig,
+    getLanguageConfig,
   );
 }
 

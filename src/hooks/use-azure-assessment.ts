@@ -2,7 +2,8 @@
 
 import { useCallback, useState } from "react";
 import { assessPronunciation } from "@/lib/api-client";
-import { getAzureConfig } from "@/lib/api-keys";
+import { getAzureConfig, getCurrentLanguageId } from "@/lib/api-keys";
+import { getLanguageProfile } from "@/lib/language-profiles";
 import { trackAzureUsage } from "@/lib/usage-tracker";
 import { isSentence } from "@/lib/utils";
 import type { AzureAssessmentResult } from "@/types/azure";
@@ -36,11 +37,13 @@ export function useAzureAssessment(): UseAzureAssessmentReturn {
     setIsLoading(true);
 
     try {
+      const language = getLanguageProfile(getCurrentLanguageId()).azureLocale;
       const assessed = await assessPronunciation(
         audioBlob,
         referenceText,
         config.subscriptionKey,
         config.region,
+        language,
       );
       if (!isSentence(referenceText)) {
         assessed.prosodyScore = undefined;

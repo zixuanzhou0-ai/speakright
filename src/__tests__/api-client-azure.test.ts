@@ -65,4 +65,29 @@ describe("Azure desktop API client", () => {
 
     expect(mocks.apiFetch).not.toHaveBeenCalled();
   });
+
+  it("passes the requested Azure speech locale to transcription", async () => {
+    mocks.apiFetch.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          RecognitionStatus: "Success",
+          NBest: [{ Display: "hola" }],
+        }),
+      ),
+    );
+
+    await expect(
+      transcribeSpeech(
+        new Blob(["audio"], { type: "audio/wav" }),
+        "secret",
+        "eastus",
+        "es-ES",
+      ),
+    ).resolves.toBe("hola");
+
+    expect(mocks.apiFetch).toHaveBeenCalledWith(
+      expect.stringContaining("language=es-ES"),
+      expect.objectContaining({ method: "POST" }),
+    );
+  });
 });

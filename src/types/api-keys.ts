@@ -1,3 +1,5 @@
+import type { LanguageId } from "@/types/language";
+
 export interface AzureConfig {
   subscriptionKey: string;
   region: string;
@@ -25,4 +27,8 @@ export type PronunciationSource = "youdao" | "merriam-webster";
 
 export interface PronunciationConfig {
   source: PronunciationSource;
+}
+
+export interface LanguageConfig {
+  targetLanguage: LanguageId;
 }

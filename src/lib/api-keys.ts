@@ -8,10 +8,16 @@ import { storeDelete, storeGet, storeSet } from "@/lib/tauri-store";
 import type {
   AzureConfig,
   ElevenLabsConfig,
+  LanguageConfig,
   LLMConfig,
   MerriamWebsterConfig,
   PronunciationConfig,
 } from "@/types/api-keys";
+import {
+  DEFAULT_LANGUAGE_ID,
+  isLanguageId,
+  type LanguageId,
+} from "@/types/language";
 
 export type CoachMode = "easy" | "normal" | "hard" | "strict";
 
@@ -21,6 +27,7 @@ const STORAGE_KEYS = {
   llm: "speakright_llm_config",
   merriamWebster: "speakright_mw_config",
   pronunciation: "speakright_pronunciation_config",
+  language: "speakright_language_config",
   coachMode: "speakright_coach_mode",
 } as const;
 
@@ -33,12 +40,17 @@ export const API_KEY_STORAGE_KEYS = [
 ] as const;
 export const APP_PREFERENCE_STORAGE_KEYS = [
   STORAGE_KEYS.pronunciation,
+  STORAGE_KEYS.language,
   STORAGE_KEYS.coachMode,
 ] as const;
 export const API_KEY_STORAGE_ERROR_EVENT = "speakright:api-key-storage-error";
 const runtimeCache = new Map<string, unknown>();
 const SECRET_STORAGE_KEYS = new Set<string>(API_KEY_STORAGE_KEYS);
 const DEFAULT_PRONUNCIATION_CONFIG: PronunciationConfig = { source: "youdao" };
+const DEFAULT_LANGUAGE_CONFIG: LanguageConfig = {
+  targetLanguage: DEFAULT_LANGUAGE_ID,
+};
+let languageConfigSnapshot: LanguageConfig = DEFAULT_LANGUAGE_CONFIG;
 
 export interface ApiKeyStorageErrorDetail {
   key: string;
@@ -303,6 +315,31 @@ export function setPronunciationConfig(config: PronunciationConfig): void {
   setItem(STORAGE_KEYS.pronunciation, config);
 }
 
+// Target language
+export function getLanguageConfig(): LanguageConfig {
+  const stored = getItem<Partial<LanguageConfig>>(STORAGE_KEYS.language);
+  const targetLanguage = isLanguageId(stored?.targetLanguage)
+    ? stored.targetLanguage
+    : DEFAULT_LANGUAGE_ID;
+  if (languageConfigSnapshot.targetLanguage === targetLanguage) {
+    return languageConfigSnapshot;
+  }
+  languageConfigSnapshot = { targetLanguage };
+  return languageConfigSnapshot;
+}
+
+export function getCurrentLanguageId(): LanguageId {
+  return getLanguageConfig().targetLanguage;
+}
+
+export function setLanguageConfig(config: LanguageConfig): void {
+  setItem(STORAGE_KEYS.language, {
+    targetLanguage: isLanguageId(config.targetLanguage)
+      ? config.targetLanguage
+      : DEFAULT_LANGUAGE_ID,
+  });
+}
+
 // Coach mode
 export function getCoachMode(): CoachMode {
   return getItem<CoachMode>(STORAGE_KEYS.coachMode) ?? "normal";
@@ -322,6 +359,7 @@ export function subscribeToStorage(callback: () => void): () => void {
       e.key === STORAGE_KEYS.llm ||
       e.key === STORAGE_KEYS.merriamWebster ||
       e.key === STORAGE_KEYS.pronunciation ||
+      e.key === STORAGE_KEYS.language ||
       e.key === STORAGE_KEYS.coachMode
     ) {
       callback();
