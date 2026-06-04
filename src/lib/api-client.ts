@@ -168,6 +168,7 @@ const ALLOWED_VOICE_IDS = new Set([
   "ashjVK50jp28G73AUTnb",
   "Gfpl8Yo74Is0W6cPUWWT",
 ]);
+const YOUDAO_PRONUNCIATION_TIMEOUT_MS = 5_000;
 
 function buildElevenLabsBody(text: string, modelId: string, speed?: number) {
   return {
@@ -185,6 +186,48 @@ function buildElevenLabsBody(text: string, modelId: string, speed?: number) {
 
 async function audioBlobFromResponse(res: Response): Promise<Blob> {
   return new Blob([await res.arrayBuffer()], { type: "audio/mpeg" });
+}
+
+function normalizeAudioMime(contentType: string | null): string {
+  return contentType?.split(";")[0]?.trim() || "audio/mpeg";
+}
+
+function hasMp3Header(bytes: Uint8Array): boolean {
+  return (
+    (bytes[0] === 0x49 && bytes[1] === 0x44 && bytes[2] === 0x33) ||
+    (bytes[0] === 0xff && (bytes[1] & 0xe0) === 0xe0)
+  );
+}
+
+async function pronunciationAudioBlobFromResponse(
+  res: Response,
+  sourceName: string,
+): Promise<Blob> {
+  const buffer = await res.arrayBuffer();
+  const bytes = new Uint8Array(buffer);
+  const contentType = normalizeAudioMime(res.headers.get("content-type"));
+  const contentLooksAudio = contentType.startsWith("audio/");
+
+  if (bytes.byteLength < 512) {
+    throw new Error(
+      `${sourceName} returned invalid audio (${bytes.byteLength} bytes)`,
+    );
+  }
+  if (!(contentLooksAudio || hasMp3Header(bytes))) {
+    throw new Error(`${sourceName} returned non-audio content`);
+  }
+  if (!hasMp3Header(bytes)) {
+    throw new Error(`${sourceName} returned audio without a valid MP3 header`);
+  }
+
+  return new Blob([buffer], { type: contentType });
+}
+
+function normalizePronunciationWord(word: string): string {
+  return word
+    .trim()
+    .toLowerCase()
+    .replace(/^[^a-z0-9]+|[^a-z0-9]+$/g, "");
 }
 
 /** Test ElevenLabs API key */
@@ -596,7 +639,7 @@ export async function fetchPronunciation(
   source: "youdao" | "merriam-webster",
   mwKey?: string,
 ): Promise<Blob> {
-  const w = word.trim().toLowerCase();
+  const w = normalizePronunciationWord(word);
   if (!w) throw new Error("Missing word");
   if (w.length > 50) throw new Error("Word too long (max 50 chars)");
   if (/\s/.test(w)) throw new Error("Only single words allowed");
@@ -609,10 +652,25 @@ export async function fetchPronunciation(
 }
 
 async function fetchYoudaoAudio(word: string): Promise<Blob> {
-  const url = `https://dict.youdao.com/dictvoice?type=0&audio=${encodeURIComponent(word)}`;
-  const res = await apiFetch(url);
-  if (!res.ok) throw new Error(`Youdao returned ${res.status}`);
-  return audioBlobFromResponse(res);
+  const url = `https://dict.youdao.com/dictvoice?type=2&audio=${encodeURIComponent(word)}`;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(
+    () => controller.abort(),
+    YOUDAO_PRONUNCIATION_TIMEOUT_MS,
+  );
+
+  try {
+    const res = await apiFetch(url, { signal: controller.signal });
+    if (!res.ok) throw new Error(`Youdao returned ${res.status}`);
+    return await pronunciationAudioBlobFromResponse(res, "Youdao");
+  } catch (error) {
+    if (controller.signal.aborted) {
+      throw new Error("Youdao request timed out");
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
+  }
 }
 
 async function fetchMwAudio(word: string, mwKey: string): Promise<Blob> {
@@ -636,7 +694,7 @@ async function fetchMwAudio(word: string, mwKey: string): Promise<Blob> {
   const audioUrl = `https://media.merriam-webster.com/audio/prons/en/us/mp3/${subdir}/${audioFilename}.mp3`;
   const audioRes = await apiFetch(audioUrl);
   if (!audioRes.ok) throw new Error("Failed to fetch audio from MW");
-  return audioBlobFromResponse(audioRes);
+  return pronunciationAudioBlobFromResponse(audioRes, "Merriam-Webster");
 }
 
 // ─── Merriam-Webster Stress ─────────────────────────────

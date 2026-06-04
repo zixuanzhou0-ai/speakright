@@ -165,6 +165,19 @@ async function assertGeneratedCapabilities() {
       `${path.relative(root, generatedCapabilitiesPath)} allows arbitrary HTTPS capability URLs`,
     );
   }
+
+  const requiredScopedUrls = [
+    "https://dict.youdao.com/**",
+    "https://dictionaryapi.com/**",
+    "https://media.merriam-webster.com/**",
+  ];
+  for (const url of requiredScopedUrls) {
+    if (!scopedUrls.includes(url)) {
+      fail(
+        `${path.relative(root, generatedCapabilitiesPath)} is missing required pronunciation capability URL "${url}"`,
+      );
+    }
+  }
 }
 
 async function assertStaticExport() {

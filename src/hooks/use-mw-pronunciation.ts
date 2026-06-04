@@ -86,6 +86,13 @@ export function useMwPronunciation(): UseMwPronunciationReturn {
             // Blob decode failed — try local fallback
             tryLocalFallback(word, fallbackVoice);
           },
+          onplayerror: () => {
+            setIsLoading(false);
+            setIsPlaying(false);
+            console.warn(
+              `[Pronunciation] Audio was downloaded for "${word}" but playback was blocked.`,
+            );
+          },
         });
         howlRef.current = howl;
         howl.play();

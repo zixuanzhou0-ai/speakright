@@ -828,6 +828,75 @@ async function captureInteractiveEvidence(debuggingPort) {
       );
     }
 
+    const youdaoPronunciation = await evaluate(
+      cdp,
+      `
+(async () => {
+  const youdaoRadio = [...document.querySelectorAll('input[name="pronunciation-source"]')]
+    .find((item) => item.value === "youdao");
+  if (!youdaoRadio) {
+    return {
+      ok: false,
+      reason: "Youdao pronunciation source radio missing",
+      bodyText: document.body.innerText.slice(0, 1200)
+    };
+  }
+  youdaoRadio.click();
+  youdaoRadio.checked = true;
+  youdaoRadio.dispatchEvent(new Event("input", { bubbles: true }));
+  youdaoRadio.dispatchEvent(new Event("change", { bubbles: true }));
+  await new Promise((resolve) => setTimeout(resolve, 300));
+
+  const testButton = [...document.querySelectorAll("button")].find((item) =>
+    (item.textContent || "").includes("测试发音")
+  );
+  if (!testButton) {
+    return {
+      ok: false,
+      reason: "pronunciation test button missing",
+      bodyText: document.body.innerText.slice(0, 1200)
+    };
+  }
+
+  testButton.click();
+  const successMarkers = ["音源可用", "音频已加载", "播放中", "发音正常"];
+  const failureMarkers = ["返回的音频无效", "返回的不是音频", "音频格式异常", "有道请求超时", "网络错误", "音频已获取，但本机播放失败", "请先填写 API Key"];
+  const deadline = Date.now() + 6500;
+  let bodyText = "";
+  while (Date.now() < deadline) {
+    bodyText = document.body.innerText;
+    const success = successMarkers.find((marker) => bodyText.includes(marker));
+    if (success) {
+      return {
+        ok: true,
+        marker: success
+      };
+    }
+    const failure = failureMarkers.find((marker) => bodyText.includes(marker));
+    if (failure) {
+      return {
+        ok: false,
+        reason: failure,
+        bodyText: bodyText.slice(0, 1200)
+      };
+    }
+    await new Promise((resolve) => setTimeout(resolve, 250));
+  }
+
+  return {
+    ok: false,
+    reason: "timeout waiting for Youdao pronunciation source test",
+    bodyText: bodyText.slice(0, 1200)
+  };
+})()
+`,
+    );
+    if (!youdaoPronunciation?.ok) {
+      throw new Error(
+        `Desktop Youdao pronunciation test failed: ${youdaoPronunciation?.reason ?? "unknown"} ${youdaoPronunciation?.bodyText ?? ""}`,
+      );
+    }
+
     const diagnostics = await evaluate(
       cdp,
       `
@@ -1601,6 +1670,7 @@ async function captureInteractiveEvidence(debuggingPort) {
       locationPort: runtimePolicy.locationPort,
       releaseServedFromDevServer: runtimePolicy.releaseServedFromDevServer,
       externalLinksCopied: externalLinkResults.map((result) => result.name),
+      youdaoPronunciation: youdaoPronunciation.marker,
       learningDeletePreservedKey: learningDelete.preservedApiKey,
       apiKeysDeleted: apiKeysDelete.deletedApiKeys,
       localResetPreservedKey: localReset.preservedApiKey,
@@ -1703,7 +1773,7 @@ async function smoke() {
               ? `runtimeLog="${runtimeLog.path}" bytes=${runtimeLog.bytes}`
               : "",
             interactiveEvidence
-              ? `diagnostics="${interactiveEvidence.diagnosticsDownload}" learningData="${interactiveEvidence.learningDataDownload}" learningDeletePreservedKey=${interactiveEvidence.learningDeletePreservedKey} apiKeysDeleted=${interactiveEvidence.apiKeysDeleted} localResetPreservedKey=${interactiveEvidence.localResetPreservedKey} benchmarkAudioCleared=${interactiveEvidence.benchmarkAudioCleared} externalLinksCopied=${interactiveEvidence.externalLinksCopied.join(",")} route=${interactiveEvidence.route} appIdentifier=${interactiveEvidence.appIdentifier} llmCustomDisabled=${interactiveEvidence.llmCustomDisabled} tauriGlobalExposed=${interactiveEvidence.tauriGlobalExposed} tauriInvokeAvailable=${interactiveEvidence.tauriInvokeAvailable} location=${interactiveEvidence.locationProtocol}//${interactiveEvidence.locationHostname}${interactiveEvidence.locationPort ? `:${interactiveEvidence.locationPort}` : ""} releaseServedFromDevServer=${interactiveEvidence.releaseServedFromDevServer}`
+              ? `diagnostics="${interactiveEvidence.diagnosticsDownload}" learningData="${interactiveEvidence.learningDataDownload}" learningDeletePreservedKey=${interactiveEvidence.learningDeletePreservedKey} apiKeysDeleted=${interactiveEvidence.apiKeysDeleted} localResetPreservedKey=${interactiveEvidence.localResetPreservedKey} benchmarkAudioCleared=${interactiveEvidence.benchmarkAudioCleared} youdaoPronunciation="${interactiveEvidence.youdaoPronunciation}" externalLinksCopied=${interactiveEvidence.externalLinksCopied.join(",")} route=${interactiveEvidence.route} appIdentifier=${interactiveEvidence.appIdentifier} llmCustomDisabled=${interactiveEvidence.llmCustomDisabled} tauriGlobalExposed=${interactiveEvidence.tauriGlobalExposed} tauriInvokeAvailable=${interactiveEvidence.tauriInvokeAvailable} location=${interactiveEvidence.locationProtocol}//${interactiveEvidence.locationHostname}${interactiveEvidence.locationPort ? `:${interactiveEvidence.locationPort}` : ""} releaseServedFromDevServer=${interactiveEvidence.releaseServedFromDevServer}`
               : "",
           ]
             .filter(Boolean)

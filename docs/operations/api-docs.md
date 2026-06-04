@@ -713,7 +713,7 @@ curl -X POST http://localhost:3000/api/llm/feedback \
 
 | 音源 | 说明 | 认证 |
 |------|------|------|
-| `youdao`（默认） | 有道词典 `http://dict.youdao.com/dictvoice?type=0&audio={word}`，无需 API key，国内访问快 | 无 |
+| `youdao`（默认） | 有道词典 `https://dict.youdao.com/dictvoice?type=2&audio={word}`，无需 API key，国内访问快 | 无 |
 | `merriam-webster` | 转发至 `/api/merriam-webster/pronunciation` 的相同逻辑 | 需要 `x-mw-key` |
 
 #### 请求

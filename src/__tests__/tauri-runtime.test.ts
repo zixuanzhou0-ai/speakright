@@ -26,9 +26,11 @@ describe("tauri runtime detection", () => {
     const response = new Response("ok");
     pluginFetch.mockResolvedValue(response);
 
-    await expect(apiFetch("https://dict.youdao.com/dictvoice?type=0&audio=hello")).resolves.toBe(response);
+    await expect(
+      apiFetch("https://dict.youdao.com/dictvoice?type=2&audio=hello"),
+    ).resolves.toBe(response);
     expect(pluginFetch).toHaveBeenCalledWith(
-      "https://dict.youdao.com/dictvoice?type=0&audio=hello",
+      "https://dict.youdao.com/dictvoice?type=2&audio=hello",
       undefined,
     );
   });

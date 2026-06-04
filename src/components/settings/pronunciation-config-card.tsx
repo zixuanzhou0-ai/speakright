@@ -44,6 +44,17 @@ const SOURCE_OPTIONS: {
   },
 ];
 
+function pronunciationErrorMessage(error: unknown): string {
+  if (!(error instanceof Error)) return "网络错误";
+  if (error.message.includes("invalid audio")) return "返回的音频无效";
+  if (error.message.includes("non-audio")) return "返回的不是音频";
+  if (error.message.includes("MP3")) return "返回的音频格式异常";
+  if (error.message.includes("timed out")) return "有道请求超时，请稍后重试";
+  if (error.message.includes("Missing MW API key")) return "缺少韦氏 API Key";
+  if (error.message.includes("Only single words")) return "只支持单词发音";
+  return error.message || "网络错误";
+}
+
 export function PronunciationConfigCard() {
   const [source, setSource] = useState<PronunciationSource>("youdao");
   const [mwKey, setMwKey] = useState("");
@@ -110,12 +121,18 @@ export function PronunciationConfigCard() {
         source,
         source === "merriam-webster" ? mwKey.trim() : undefined,
       );
+      setStatus("success");
+      setStatusMsg(`音源可用（${Math.round(blob.size / 1024)} KB），正在播放...`);
       const url = URL.createObjectURL(blob);
       blobUrlRef.current = url;
 
       const howl = new Howl({
         src: [url],
         format: ["mp3"],
+        onload: () => {
+          setStatus("success");
+          setStatusMsg("音频已加载，正在播放...");
+        },
         onplay: () => {
           setStatus("success");
           setStatusMsg("播放中...");
@@ -127,15 +144,20 @@ export function PronunciationConfigCard() {
         onstop: () => setIsTesting(false),
         onloaderror: () => {
           setStatus("error");
-          setStatusMsg("音频加载失败");
+          setStatusMsg("音频已获取，但本机播放失败");
+          setIsTesting(false);
+        },
+        onplayerror: () => {
+          setStatus("error");
+          setStatusMsg("音频已获取，但播放被系统拦截");
           setIsTesting(false);
         },
       });
       howlRef.current = howl;
       howl.play();
-    } catch {
+    } catch (error) {
       setStatus("error");
-      setStatusMsg("网络错误");
+      setStatusMsg(pronunciationErrorMessage(error));
       setIsTesting(false);
     }
   };

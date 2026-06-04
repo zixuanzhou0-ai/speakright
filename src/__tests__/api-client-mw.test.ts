@@ -13,9 +13,46 @@ vi.mock("@/lib/tauri-http", () => ({
   apiFetch: mocks.apiFetch,
 }));
 
+function mp3Response(): Response {
+  const body = new Uint8Array(1024);
+  body.set([0x49, 0x44, 0x33, 0x04, 0x00, 0x00]);
+  return new Response(body, {
+    headers: {
+      "Content-Type": "audio/mpeg",
+    },
+  });
+}
+
 describe("Merriam-Webster desktop API client", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+  });
+
+  it("fetches default Youdao pronunciation audio over HTTPS with American pronunciation", async () => {
+    mocks.apiFetch.mockResolvedValueOnce(mp3Response());
+
+    const blob = await fetchPronunciation("Hello,", "youdao");
+
+    expect(blob.type).toBe("audio/mpeg");
+    expect(blob.size).toBe(1024);
+    expect(mocks.apiFetch).toHaveBeenCalledWith(
+      "https://dict.youdao.com/dictvoice?type=2&audio=hello",
+      expect.objectContaining({ signal: expect.any(AbortSignal) }),
+    );
+  });
+
+  it("rejects a non-audio Youdao response before handing it to Howler", async () => {
+    mocks.apiFetch.mockResolvedValueOnce(
+      new Response("<html>blocked</html>", {
+        headers: {
+          "Content-Type": "text/html",
+        },
+      }),
+    );
+
+    await expect(fetchPronunciation("hello", "youdao")).rejects.toThrow(
+      "Youdao returned invalid audio",
+    );
   });
 
   it("encodes API keys before placing them in dictionary query URLs", async () => {
@@ -47,7 +84,7 @@ describe("Merriam-Webster desktop API client", () => {
           ]),
         ),
       )
-      .mockResolvedValueOnce(new Response("audio"));
+      .mockResolvedValueOnce(mp3Response());
 
     await fetchPronunciation("hello", "merriam-webster", mwKey);
 

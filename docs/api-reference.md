@@ -150,7 +150,7 @@ All providers use OpenAI-compatible `/v1/chat/completions` endpoint.
 **音源上游**:
 | Source | Upstream URL |
 |--------|-------------|
-| youdao | `http://dict.youdao.com/dictvoice?type=0&audio={word}` |
+| youdao | `https://dict.youdao.com/dictvoice?type=2&audio={word}` |
 | merriam-webster | MW Dictionary API → `media.merriam-webster.com` 音频文件 |
 
 **Response**: `audio/mpeg` 音频流，`Cache-Control: public, max-age=86400`
