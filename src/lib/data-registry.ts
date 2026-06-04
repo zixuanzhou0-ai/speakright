@@ -7,7 +7,7 @@ import {
   getApiKeySummary,
 } from "@/lib/api-keys";
 import {
-  clearBenchmarkRecordings,
+  clearAllBenchmarkRecordings,
   exportBenchmarkRecordings,
 } from "@/lib/benchmark-archive";
 import {
@@ -51,8 +51,9 @@ const CACHE_STORAGE_KEYS = [
 const DEVICE_STORAGE_KEYS = [DESKTOP_MIC_CHECK_KEY] as const;
 
 const CACHE_STORAGE_PREFIXES = ["speakright_mw_words_"] as const;
-const LANGUAGE_SCOPED_STORAGE_PREFIXES =
-  LANGUAGE_SCOPED_STORAGE_BASE_KEYS.map(languageScopedStoragePrefix);
+const LANGUAGE_SCOPED_STORAGE_PREFIXES = LANGUAGE_SCOPED_STORAGE_BASE_KEYS.map(
+  languageScopedStoragePrefix,
+);
 const RESET_ONLY_STORAGE_KEYS = [
   ...DEVICE_STORAGE_KEYS,
   LOCAL_DATA_SCHEMA_VERSION_KEY,
@@ -222,7 +223,7 @@ export async function deleteLearningData(): Promise<void> {
   const languageScopedKeys = prefixedLocalStorageKeys(
     LANGUAGE_SCOPED_STORAGE_PREFIXES,
   );
-  await clearBenchmarkRecordings();
+  await clearAllBenchmarkRecordings();
   await clearTtsCache();
   removeLocalStorageKeys([
     ...LEARNING_STORAGE_KEYS,
@@ -234,8 +235,15 @@ export async function deleteLearningData(): Promise<void> {
 }
 
 export async function deleteBenchmarkAudioData(): Promise<void> {
-  await clearBenchmarkRecordings();
-  removeLocalStorageKeys(["speakright_benchmark_recordings_v1"]);
+  await clearAllBenchmarkRecordings();
+  removeLocalStorageKeys([
+    "speakright_benchmark_recordings_v1",
+    ...prefixedLocalStorageKeys(
+      LANGUAGE_SCOPED_STORAGE_PREFIXES.filter((prefix) =>
+        prefix.startsWith("speakright_benchmark_recordings_v1:"),
+      ),
+    ),
+  ]);
 }
 
 export async function deleteApiKeys(): Promise<void> {

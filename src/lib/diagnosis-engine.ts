@@ -17,6 +17,7 @@ import type {
   DiagnosisReport,
   RecordingQualitySnapshot,
 } from "@/types/diagnosis";
+import { DEFAULT_LANGUAGE_ID } from "@/types/language";
 
 const VOWELS = new Set(
   PHONEMES.filter((phoneme) => phoneme.category === "vowel").map(
@@ -482,6 +483,7 @@ function enrichIssue(
 }
 
 export function buildDiagnosisReport({
+  languageId = DEFAULT_LANGUAGE_ID,
   wordRecordings,
   paragraphResult,
   paragraphText,
@@ -590,6 +592,7 @@ export function buildDiagnosisReport({
 
   return {
     version: 2,
+    languageId,
     source: "quick-word-check",
     timestamp: Date.now(),
     overallScore,
@@ -603,6 +606,7 @@ export function buildDiagnosisReport({
 }
 
 export function buildCoveragePassageDiagnosisReport({
+  languageId = DEFAULT_LANGUAGE_ID,
   recordings,
 }: CoveragePassageBuildInput): DiagnosisReport {
   const phonemeBuckets: Record<string, number[]> = {};
@@ -682,6 +686,7 @@ export function buildCoveragePassageDiagnosisReport({
 
   return {
     version: 2,
+    languageId,
     source: "coverage-passage",
     timestamp: Date.now(),
     overallScore,

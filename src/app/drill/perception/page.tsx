@@ -12,6 +12,7 @@ import {
 import { motion } from "motion/react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { withLanguageTrainingGate } from "@/components/drill/language-training-gate";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useMwPronunciation } from "@/hooks/use-mw-pronunciation";
@@ -54,7 +55,7 @@ function answerIsCorrect(trial: HvptTrial, answer: HvptAnswer): boolean {
   return (answer === "A") === trial.xIsA;
 }
 
-export default function PerceptionDrillPage() {
+function PerceptionDrillPage() {
   const [selectedContrast, setSelectedContrast] = useState<HvptContrast | null>(
     null,
   );
@@ -537,3 +538,5 @@ export default function PerceptionDrillPage() {
     </div>
   );
 }
+
+export default withLanguageTrainingGate(PerceptionDrillPage, "听辨训练");

@@ -7,6 +7,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { RecordButton } from "@/components/audio/record-button";
 import { WaveformDisplay } from "@/components/audio/waveform-display";
 import { DrillSummaryCard } from "@/components/drill/drill-summary";
+import { withLanguageTrainingGate } from "@/components/drill/language-training-gate";
 import { Button } from "@/components/ui/button";
 import { useAzureAssessment } from "@/hooks/use-azure-assessment";
 import { useCoachMode } from "@/hooks/use-api-keys";
@@ -36,7 +37,7 @@ type ContrastPhase =
     }
   | { type: "completed"; summary: DrillSummary };
 
-export default function ContrastDrillPage() {
+function ContrastDrillPage() {
   const [selectedSet, setSelectedSet] = useState<MinimalPairSet | null>(null);
   const [phase, setPhase] = useState<ContrastPhase>({ type: "select" });
   const [progress, setProgress] = useState<DrillProgressItem[]>([]);
@@ -452,3 +453,5 @@ export default function ContrastDrillPage() {
     </div>
   );
 }
+
+export default withLanguageTrainingGate(ContrastDrillPage, "对比训练");

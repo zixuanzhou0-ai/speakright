@@ -9,6 +9,7 @@ import { DrillPhonemeLesson } from "@/components/drill/drill-phoneme-lesson";
 import { DrillRecording } from "@/components/drill/drill-recording";
 import { DrillSummaryCard } from "@/components/drill/drill-summary";
 import { DrillTeaching } from "@/components/drill/drill-teaching";
+import { withLanguageTrainingGate } from "@/components/drill/language-training-gate";
 import { useDrillSession } from "@/hooks/use-drill-session";
 import { useMwPronunciation } from "@/hooks/use-mw-pronunciation";
 import { useTtsAligned } from "@/hooks/use-tts-aligned";
@@ -16,7 +17,7 @@ import { buildSentenceDrillItems } from "@/lib/drill-utils";
 import { getPhonemeBySlug } from "@/lib/phoneme-data";
 import { SENTENCE_BANK } from "@/lib/sentence-bank";
 
-export default function SentenceDrillPage() {
+function SentenceDrillPage() {
   const drill = useDrillSession();
   const mw = useMwPronunciation();
   const tts = useTtsAligned();
@@ -170,6 +171,8 @@ export default function SentenceDrillPage() {
     </div>
   );
 }
+
+export default withLanguageTrainingGate(SentenceDrillPage, "句子训练");
 
 function SentenceLessonView({
   config,

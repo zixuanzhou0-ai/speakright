@@ -75,6 +75,7 @@ function migrateLegacyResult(legacy: LegacyAssessmentResult): DiagnosisReport {
 
   return {
     version: 2,
+    languageId: "en-US",
     timestamp: legacy.timestamp,
     overallScore: legacy.overallScore,
     dimensions: {
@@ -90,6 +91,13 @@ function migrateLegacyResult(legacy: LegacyAssessmentResult): DiagnosisReport {
   };
 }
 
+function normalizeReportLanguage(
+  report: DiagnosisReport,
+  languageId = getCurrentLanguageId(),
+): DiagnosisReport {
+  return { ...report, languageId: report.languageId ?? languageId };
+}
+
 function reportStorageKey(languageId = getCurrentLanguageId()): string {
   return languageScopedStorageKey(STORAGE_KEY_V2, languageId);
 }
@@ -98,16 +106,24 @@ function legacyReportStorageKey(languageId = getCurrentLanguageId()): string {
   return languageScopedStorageKey(LEGACY_STORAGE_KEY, languageId);
 }
 
-function loadSavedReport(languageId = getCurrentLanguageId()): DiagnosisReport | null {
+function loadSavedReport(
+  languageId = getCurrentLanguageId(),
+): DiagnosisReport | null {
   if (typeof window === "undefined") return null;
   try {
     const raw = localStorage.getItem(reportStorageKey(languageId));
-    if (raw) return JSON.parse(raw) as DiagnosisReport;
+    if (raw) {
+      return normalizeReportLanguage(
+        JSON.parse(raw) as DiagnosisReport,
+        languageId,
+      );
+    }
 
     const legacyRaw = localStorage.getItem(legacyReportStorageKey(languageId));
     if (legacyRaw) {
-      return migrateLegacyResult(
-        JSON.parse(legacyRaw) as LegacyAssessmentResult,
+      return normalizeReportLanguage(
+        migrateLegacyResult(JSON.parse(legacyRaw) as LegacyAssessmentResult),
+        languageId,
       );
     }
   } catch {
@@ -116,7 +132,10 @@ function loadSavedReport(languageId = getCurrentLanguageId()): DiagnosisReport |
   return null;
 }
 
-function saveReport(report: DiagnosisReport, languageId = getCurrentLanguageId()) {
+function saveReport(
+  report: DiagnosisReport,
+  languageId = getCurrentLanguageId(),
+) {
   localStorage.setItem(reportStorageKey(languageId), JSON.stringify(report));
 }
 
@@ -159,6 +178,7 @@ export default function AssessmentPage() {
   const finalizeReport = useCallback(
     (paragraphResult: AzureAssessmentResult) => {
       const report = buildDiagnosisReport({
+        languageId,
         wordRecordings: wordRecordingsRef.current,
         paragraphResult,
         paragraphText: assessmentParagraph,
@@ -282,6 +302,7 @@ export default function AssessmentPage() {
     setPhase({ type: "analyzing" });
 
     const preliminaryReport = buildDiagnosisReport({
+      languageId,
       wordRecordings: wordRecordingsRef.current,
       paragraphResult: result,
       paragraphText: assessmentParagraph,
@@ -316,6 +337,7 @@ export default function AssessmentPage() {
     assessmentParagraph,
     adaptiveAssessmentWords,
     finalizeReport,
+    languageId,
   ]);
 
   const handleRecordStop = useCallback(() => {

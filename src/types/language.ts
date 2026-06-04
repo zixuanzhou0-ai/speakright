@@ -29,6 +29,24 @@ export interface StarterTrainingPlan {
   sentenceLadder?: string[];
 }
 
+export type AzureCapabilityStatus =
+  | "verified"
+  | "experimental"
+  | "not-probed"
+  | "blocked";
+
+export interface AzureCapabilityProfile {
+  status: AzureCapabilityStatus;
+  scriptedAssessment: boolean;
+  wordLevel: boolean;
+  phonemeLevel: boolean;
+  prosody: boolean;
+  spontaneousTranscription: boolean;
+  evidenceMasteryAllowed: boolean;
+  lastReviewed: string;
+  notes: string[];
+}
+
 export interface LanguageProfile {
   id: LanguageId;
   displayName: string;
@@ -42,6 +60,7 @@ export interface LanguageProfile {
     evidenceMastery: boolean;
     requiresAzureProbe: boolean;
   };
+  azureCapabilities: AzureCapabilityProfile;
   tokenizer: LanguageTokenizer;
   trackedPhonemes: string[];
   assessmentWords: AssessmentWord[];
@@ -55,7 +74,6 @@ export interface LanguageProfile {
 
 export function isLanguageId(value: unknown): value is LanguageId {
   return (
-    typeof value === "string" &&
-    LANGUAGE_IDS.includes(value as LanguageId)
+    typeof value === "string" && LANGUAGE_IDS.includes(value as LanguageId)
   );
 }

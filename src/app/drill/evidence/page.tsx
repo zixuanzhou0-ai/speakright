@@ -15,6 +15,7 @@ import {
 import { motion } from "motion/react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { withLanguageTrainingGate } from "@/components/drill/language-training-gate";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { loadMasteryProfile } from "@/lib/mastery-profile";
@@ -53,7 +54,7 @@ function formatDate(timestamp?: number): string {
   return new Date(timestamp).toLocaleDateString();
 }
 
-export default function TrainingEvidencePage() {
+function TrainingEvidencePage() {
   const [profile, setProfile] = useState<MasteryProfile | null>(null);
 
   useEffect(() => {
@@ -174,6 +175,8 @@ export default function TrainingEvidencePage() {
   );
 }
 
+export default withLanguageTrainingGate(TrainingEvidencePage, "训练证据库");
+
 function StatCard({
   icon,
   label,
@@ -217,7 +220,13 @@ function SectionTitle({
   );
 }
 
-function EvidenceCardRow({ card, index }: { card: EvidenceCard; index: number }) {
+function EvidenceCardRow({
+  card,
+  index,
+}: {
+  card: EvidenceCard;
+  index: number;
+}) {
   return (
     <Link href={packHref(card.packId, card.levelId)}>
       <motion.div
@@ -259,14 +268,17 @@ function EvidenceCardRow({ card, index }: { card: EvidenceCard; index: number })
                 : ""}
             </p>
             <p className="mt-1 text-xs text-muted-foreground">
-              首次 {formatDate(card.firstSeenAt)} · 最近 {formatDate(card.lastSeenAt)}
+              首次 {formatDate(card.firstSeenAt)} · 最近{" "}
+              {formatDate(card.lastSeenAt)}
             </p>
           </div>
           <div className="rounded-lg bg-primary/5 p-3">
             <p className="text-xs font-semibold uppercase text-muted-foreground">
               下一次只改
             </p>
-            <p className="mt-1 text-sm font-medium text-primary">{card.nextCue}</p>
+            <p className="mt-1 text-sm font-medium text-primary">
+              {card.nextCue}
+            </p>
             {card.patternTitles.length > 0 && (
               <p className="mt-1 text-xs text-muted-foreground">
                 错因：{card.patternTitles.join(" / ")}
@@ -287,14 +299,17 @@ function PatternRow({ pattern }: { pattern: PatternEvidence }) {
           <div>
             <p className="font-semibold">{pattern.title}</p>
             <p className="mt-1 text-xs text-muted-foreground">
-              {pattern.packTitle} · 出现 {pattern.seenCount} 次 · 卡住 {pattern.stuckCount} 次
+              {pattern.packTitle} · 出现 {pattern.seenCount} 次 · 卡住{" "}
+              {pattern.stuckCount} 次
             </p>
           </div>
           <Badge variant={severityVariant(pattern.severity)}>
             {severityLabel(pattern.severity)}
           </Badge>
         </div>
-        <p className="mt-3 text-sm text-muted-foreground">{pattern.explanation}</p>
+        <p className="mt-3 text-sm text-muted-foreground">
+          {pattern.explanation}
+        </p>
         <p className="mt-2 text-sm font-medium text-primary">
           下一次只改：{pattern.cue}
         </p>
@@ -304,7 +319,9 @@ function PatternRow({ pattern }: { pattern: PatternEvidence }) {
 }
 
 function RemediationRow({ item }: { item: RemediationEvidence }) {
-  const passRate = Math.round((item.passedCount / Math.max(1, item.attempts)) * 100);
+  const passRate = Math.round(
+    (item.passedCount / Math.max(1, item.attempts)) * 100,
+  );
   return (
     <div className="rounded-xl border bg-card p-4 shadow-sm">
       <div className="flex items-start justify-between gap-3">
@@ -328,7 +345,8 @@ function RemediationRow({ item }: { item: RemediationEvidence }) {
         />
       </div>
       <p className="mt-2 text-xs text-muted-foreground">
-        尝试 {item.attempts} 次 · 失败 {item.failedCount} 次 · 最近 {formatDate(item.lastSeenAt)}
+        尝试 {item.attempts} 次 · 失败 {item.failedCount} 次 · 最近{" "}
+        {formatDate(item.lastSeenAt)}
       </p>
     </div>
   );

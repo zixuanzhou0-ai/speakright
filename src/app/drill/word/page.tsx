@@ -9,12 +9,13 @@ import { DrillPhonemeLesson } from "@/components/drill/drill-phoneme-lesson";
 import { DrillRecording } from "@/components/drill/drill-recording";
 import { DrillSummaryCard } from "@/components/drill/drill-summary";
 import { DrillTeaching } from "@/components/drill/drill-teaching";
+import { withLanguageTrainingGate } from "@/components/drill/language-training-gate";
 import { useDrillSession } from "@/hooks/use-drill-session";
 import { useMwPronunciation } from "@/hooks/use-mw-pronunciation";
 import { buildWordDrillItems } from "@/lib/drill-utils";
 import { getPhonemeBySlug } from "@/lib/phoneme-data";
 
-export default function WordDrillPage() {
+function WordDrillPage() {
   const drill = useDrillSession();
   const mw = useMwPronunciation();
 
@@ -159,6 +160,8 @@ export default function WordDrillPage() {
     </div>
   );
 }
+
+export default withLanguageTrainingGate(WordDrillPage, "单词训练");
 
 function PhonemeLessonView({
   config,

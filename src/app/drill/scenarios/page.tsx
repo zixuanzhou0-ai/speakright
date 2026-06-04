@@ -15,6 +15,7 @@ import { RecordButton } from "@/components/audio/record-button";
 import { RecordingActions } from "@/components/audio/recording-actions";
 import { RecordingQualityPanel } from "@/components/audio/recording-quality-panel";
 import { WaveformDisplay } from "@/components/audio/waveform-display";
+import { withLanguageTrainingGate } from "@/components/drill/language-training-gate";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useAzureAssessment } from "@/hooks/use-azure-assessment";
@@ -35,7 +36,7 @@ import {
 } from "@/lib/transfer-scenarios";
 import type { MasteryProfile } from "@/types/training";
 
-export default function ScenariosPage() {
+function ScenariosPage() {
   const [profile, setProfile] = useState<MasteryProfile | null>(null);
   const [scenarioId, setScenarioId] = useState(TRANSFER_SCENARIOS[0].id);
   const [userText, setUserText] = useState("");
@@ -316,3 +317,5 @@ export default function ScenariosPage() {
     </div>
   );
 }
+
+export default withLanguageTrainingGate(ScenariosPage, "场景迁移训练");

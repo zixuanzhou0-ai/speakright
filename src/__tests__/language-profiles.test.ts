@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { getLanguageProfile, getLanguageProfiles } from "@/lib/language-profiles";
+import {
+  getLanguageProfile,
+  getLanguageProfiles,
+} from "@/lib/language-profiles";
 import { languageScopedStorageKey } from "@/lib/language-storage";
 
 describe("language profiles", () => {
@@ -13,6 +16,13 @@ describe("language profiles", () => {
       training: true,
       evidenceMastery: true,
       requiresAzureProbe: false,
+    });
+    expect(profile.azureCapabilities).toMatchObject({
+      status: "verified",
+      scriptedAssessment: true,
+      wordLevel: true,
+      phonemeLevel: true,
+      evidenceMasteryAllowed: true,
     });
     expect(profile.assessmentWords).toHaveLength(10);
   });
@@ -29,35 +39,40 @@ describe("language profiles", () => {
     expect(spanish.azureLocale).toBe("es-ES");
     expect(spanish.status).toBe("experimental");
     expect(spanish.readiness.training).toBe(false);
+    expect(spanish.azureCapabilities.evidenceMasteryAllowed).toBe(false);
     expect(spanish.starterTrainingPlans.map((plan) => plan.id)).toContain(
       "es-tap-trill-r",
     );
 
-    expect(getLanguageProfile("fr-FR").status).toBe("planned");
-    expect(getLanguageProfile("ru-RU").status).toBe("planned");
+    for (const languageId of ["fr-FR", "ru-RU"] as const) {
+      const profile = getLanguageProfile(languageId);
+      expect(profile.status).toBe("planned");
+      expect(profile.azureCapabilities).toMatchObject({
+        status: "not-probed",
+        wordLevel: false,
+        phonemeLevel: false,
+        evidenceMasteryAllowed: false,
+      });
+    }
   });
 
   it("preserves accents and Cyrillic tokens in profile tokenizers", () => {
-    expect(getLanguageProfile("es-ES").tokenizer.splitWords("año y jamón")).toEqual([
-      "año",
-      "y",
-      "jamón",
-    ]);
-    expect(getLanguageProfile("ru-RU").tokenizer.splitWords("мир и щётка")).toEqual([
-      "мир",
-      "и",
-      "щётка",
-    ]);
+    expect(
+      getLanguageProfile("es-ES").tokenizer.splitWords("año y jamón"),
+    ).toEqual(["año", "y", "jamón"]);
+    expect(
+      getLanguageProfile("ru-RU").tokenizer.splitWords("мир и щётка"),
+    ).toEqual(["мир", "и", "щётка"]);
   });
 });
 
 describe("language scoped storage keys", () => {
   it("keeps legacy English keys unchanged and scopes non-English keys", () => {
-    expect(languageScopedStorageKey("speakright_mastery_profile_v2", "en-US")).toBe(
-      "speakright_mastery_profile_v2",
-    );
-    expect(languageScopedStorageKey("speakright_mastery_profile_v2", "es-ES")).toBe(
-      "speakright_mastery_profile_v2:es-ES",
-    );
+    expect(
+      languageScopedStorageKey("speakright_mastery_profile_v2", "en-US"),
+    ).toBe("speakright_mastery_profile_v2");
+    expect(
+      languageScopedStorageKey("speakright_mastery_profile_v2", "es-ES"),
+    ).toBe("speakright_mastery_profile_v2:es-ES");
   });
 });

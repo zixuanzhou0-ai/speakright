@@ -644,6 +644,13 @@ async function captureInteractiveEvidence(debuggingPort) {
     await waitForBodyText(cdp, "数据已按语言隔离");
     await evaluate(
       cdp,
+      'window.location.assign(new URL("/drill/prosody", window.location.href).href); "navigating";',
+    );
+    await waitForBodyText(cdp, "西班牙语韵律训练准备中");
+    await waitForBodyText(cdp, "Capability probe");
+    await waitForBodyText(cdp, "Evidence mastery");
+    await evaluate(
+      cdp,
       'window.location.assign(new URL("/settings", window.location.href).href); "navigating";',
     );
     await waitForBodyText(cdp, "训练语言");
@@ -814,8 +821,7 @@ async function captureInteractiveEvidence(debuggingPort) {
     );
     if (
       failedExternalLink ||
-      dictionaryLinkResult?.href !==
-        "https://dictionaryapi.com/register/index"
+      dictionaryLinkResult?.href !== "https://dictionaryapi.com/register/index"
     ) {
       throw new Error(
         `Desktop external link policy failed: ${JSON.stringify(externalLinkPolicy)}`,

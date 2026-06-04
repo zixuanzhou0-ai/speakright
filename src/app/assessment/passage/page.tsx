@@ -77,8 +77,18 @@ function reportStorageKey(languageId = getCurrentLanguageId()): string {
   return languageScopedStorageKey(STORAGE_KEY_V2, languageId);
 }
 
-function saveReport(report: DiagnosisReport, languageId = getCurrentLanguageId()) {
+function saveReport(
+  report: DiagnosisReport,
+  languageId = getCurrentLanguageId(),
+) {
   localStorage.setItem(reportStorageKey(languageId), JSON.stringify(report));
+}
+
+function normalizeReportLanguage(
+  report: DiagnosisReport,
+  languageId = getCurrentLanguageId(),
+): DiagnosisReport {
+  return { ...report, languageId: report.languageId ?? languageId };
 }
 
 function loadSavedCoverageReport(
@@ -88,7 +98,10 @@ function loadSavedCoverageReport(
   try {
     const raw = localStorage.getItem(reportStorageKey(languageId));
     if (!raw) return null;
-    const report = JSON.parse(raw) as DiagnosisReport;
+    const report = normalizeReportLanguage(
+      JSON.parse(raw) as DiagnosisReport,
+      languageId,
+    );
     return report.source === "coverage-passage" ? report : null;
   } catch {
     return null;
@@ -140,10 +153,11 @@ export default function CoveragePassageAssessmentPage() {
 
   const finalizeReport = useCallback(() => {
     const report = buildCoveragePassageDiagnosisReport({
+      languageId,
       recordings: recordingsRef.current,
     });
     saveReport(report, languageId);
-    setBenchmarkComparison(saveCoverageBenchmark(report));
+    setBenchmarkComparison(saveCoverageBenchmark(report, languageId));
     setSavedReport(report);
     setPhase({ type: "report", result: report });
   }, [languageId]);
@@ -204,6 +218,7 @@ export default function CoveragePassageAssessmentPage() {
         message: "正在判断是否需要补测某些薄弱音...",
       });
       const preliminaryReport = buildCoveragePassageDiagnosisReport({
+        languageId,
         recordings: recordingsRef.current,
       });
       const probes = selectCoverageAdaptiveProbes(
@@ -228,7 +243,7 @@ export default function CoveragePassageAssessmentPage() {
         finalizeReport();
       }
     }
-  }, [recorder, recordingQuality, phase, azure, finalizeReport]);
+  }, [recorder, recordingQuality, phase, azure, finalizeReport, languageId]);
 
   const handleRetake = () => {
     localStorage.removeItem(reportStorageKey(languageId));
@@ -261,7 +276,8 @@ export default function CoveragePassageAssessmentPage() {
             {languageProfile.displayName}全音覆盖准备中
           </h1>
           <p className="mt-3 text-sm text-muted-foreground">
-            这套覆盖短文目前只用于英语。当前语言需要先完成 Azure probe 和语言专属 coverage passage。
+            这套覆盖短文目前只用于英语。当前语言需要先完成 Azure probe
+            和语言专属 coverage passage。
           </p>
           <div className="mt-5 flex justify-center gap-3">
             <Link href="/settings">

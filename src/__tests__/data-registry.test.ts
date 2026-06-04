@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
-  clearBenchmarkRecordings: vi.fn(async () => {}),
+  clearAllBenchmarkRecordings: vi.fn(async () => {}),
   exportBenchmarkRecordings: vi.fn(async () => ({
     meta: [] as Array<Record<string, unknown>>,
     audio: [] as Array<Record<string, unknown>>,
@@ -18,7 +18,7 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock("@/lib/benchmark-archive", () => ({
-  clearBenchmarkRecordings: mocks.clearBenchmarkRecordings,
+  clearAllBenchmarkRecordings: mocks.clearAllBenchmarkRecordings,
   exportBenchmarkRecordings: mocks.exportBenchmarkRecordings,
 }));
 
@@ -204,7 +204,7 @@ describe("data registry", () => {
     expect(localStorage.getItem("speakright_corrupt_data_v1")).toBeNull();
     expect(localStorage.getItem("speakright_azure_config")).toBe("{}");
     expect(localStorage.getItem("theme")).toBe("dark");
-    expect(mocks.clearBenchmarkRecordings).toHaveBeenCalledOnce();
+    expect(mocks.clearAllBenchmarkRecordings).toHaveBeenCalledOnce();
     expect(mocks.clearTtsCache).toHaveBeenCalledOnce();
   });
 

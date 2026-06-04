@@ -7,15 +7,20 @@ import {
 import { DEFAULT_RECOMMENDED_PACK_IDS } from "@/lib/training-packs";
 import {
   DEFAULT_LANGUAGE_ID,
+  type AzureCapabilityProfile,
   type LanguageId,
   type LanguageProfile,
 } from "@/types/language";
 
 const LATIN_WORD_PATTERN = /[\p{L}\p{M}]+(?:['’-][\p{L}\p{M}]+)*/gu;
-const CYRILLIC_WORD_PATTERN = /[\p{Script=Cyrillic}\p{M}]+(?:-[\p{Script=Cyrillic}\p{M}]+)*/gu;
+const CYRILLIC_WORD_PATTERN =
+  /[\p{Script=Cyrillic}\p{M}]+(?:-[\p{Script=Cyrillic}\p{M}]+)*/gu;
 
 function splitByPattern(pattern: RegExp, text: string): string[] {
-  return Array.from(text.normalize("NFC").matchAll(pattern), (match) => match[0]);
+  return Array.from(
+    text.normalize("NFC").matchAll(pattern),
+    (match) => match[0],
+  );
 }
 
 const latinTokenizer = {
@@ -200,6 +205,36 @@ const RUSSIAN_ASSESSMENT_WORDS = [
   },
 ];
 
+const ENGLISH_AZURE_CAPABILITIES: AzureCapabilityProfile = {
+  status: "verified",
+  scriptedAssessment: true,
+  wordLevel: true,
+  phonemeLevel: true,
+  prosody: true,
+  spontaneousTranscription: true,
+  evidenceMasteryAllowed: true,
+  lastReviewed: "2026-06-04",
+  notes: [
+    "Existing en-US evidence loop depends on word-level and phoneme-level Azure signals.",
+    "Prosody is only enabled for sentence assessment.",
+  ],
+};
+
+const UNPROBED_AZURE_CAPABILITIES: AzureCapabilityProfile = {
+  status: "not-probed",
+  scriptedAssessment: false,
+  wordLevel: false,
+  phonemeLevel: false,
+  prosody: false,
+  spontaneousTranscription: false,
+  evidenceMasteryAllowed: false,
+  lastReviewed: "2026-06-04",
+  notes: [
+    "No live Azure pronunciation-assessment probe has confirmed reliable scoring signals yet.",
+    "This language must stay outside evidence-driven mastery until scripted, word-level, and segment/phoneme-level signals are verified.",
+  ],
+};
+
 export const LANGUAGE_PROFILES: Record<LanguageId, LanguageProfile> = {
   "en-US": {
     id: "en-US",
@@ -214,6 +249,7 @@ export const LANGUAGE_PROFILES: Record<LanguageId, LanguageProfile> = {
       evidenceMastery: true,
       requiresAzureProbe: false,
     },
+    azureCapabilities: ENGLISH_AZURE_CAPABILITIES,
     tokenizer: latinTokenizer,
     trackedPhonemes: TRACKED_PHONEMES,
     assessmentWords: ASSESSMENT_WORDS,
@@ -236,6 +272,16 @@ export const LANGUAGE_PROFILES: Record<LanguageId, LanguageProfile> = {
       training: false,
       evidenceMastery: false,
       requiresAzureProbe: true,
+    },
+    azureCapabilities: {
+      ...UNPROBED_AZURE_CAPABILITIES,
+      status: "experimental",
+      scriptedAssessment: false,
+      lastReviewed: "2026-06-04",
+      notes: [
+        "Spanish content seed is ready, but the app has not confirmed stable Azure word-level and phoneme/segment-level signals for es-ES.",
+        "Keep the entry as an experimental preparation path until a live probe confirms reliable alignment.",
+      ],
     },
     tokenizer: latinTokenizer,
     trackedPhonemes: [...SPANISH_TRACKED_PHONEMES],
@@ -311,6 +357,13 @@ export const LANGUAGE_PROFILES: Record<LanguageId, LanguageProfile> = {
       evidenceMastery: false,
       requiresAzureProbe: true,
     },
+    azureCapabilities: {
+      ...UNPROBED_AZURE_CAPABILITIES,
+      notes: [
+        "French needs a live probe for nasal vowels, /y/-/u/, French /r/, liaison, and word-level alignment before mastery evidence is allowed.",
+        "Prosody and syllable feedback must not be assumed from en-US behavior.",
+      ],
+    },
     tokenizer: latinTokenizer,
     trackedPhonemes: [
       "fr-y",
@@ -379,6 +432,13 @@ export const LANGUAGE_PROFILES: Record<LanguageId, LanguageProfile> = {
       evidenceMastery: false,
       requiresAzureProbe: true,
     },
+    azureCapabilities: {
+      ...UNPROBED_AZURE_CAPABILITIES,
+      notes: [
+        "Russian needs a live probe for Cyrillic word alignment, stress, hard/soft consonants, and consonant clusters before mastery evidence is allowed.",
+        "Until verified, ru-RU remains a planned profile only.",
+      ],
+    },
     tokenizer: cyrillicTokenizer,
     trackedPhonemes: [
       "ru-stress",
@@ -425,7 +485,9 @@ export const LANGUAGE_PROFILES: Record<LanguageId, LanguageProfile> = {
 };
 
 export function getLanguageProfile(languageId: LanguageId): LanguageProfile {
-  return LANGUAGE_PROFILES[languageId] ?? LANGUAGE_PROFILES[DEFAULT_LANGUAGE_ID];
+  return (
+    LANGUAGE_PROFILES[languageId] ?? LANGUAGE_PROFILES[DEFAULT_LANGUAGE_ID]
+  );
 }
 
 export function getLanguageProfiles(): LanguageProfile[] {

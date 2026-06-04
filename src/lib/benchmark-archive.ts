@@ -1,7 +1,16 @@
 "use client";
 
+import { getCurrentLanguageId } from "@/lib/api-keys";
+import { languageScopedStorageKey } from "@/lib/language-storage";
+import {
+  DEFAULT_LANGUAGE_ID,
+  isLanguageId,
+  type LanguageId,
+} from "@/types/language";
+
 export interface BenchmarkRecordingMeta {
   id: string;
+  languageId: LanguageId;
   createdAt: number;
   source: "prosody" | "coverage" | "scenario" | "free-practice" | "spontaneous";
   title: string;
@@ -29,20 +38,96 @@ const DB_NAME = "speakright-benchmark-audio";
 const STORE_NAME = "recordings";
 const DB_VERSION = 1;
 
-function readMeta(): BenchmarkRecordingMeta[] {
+function metaStorageKey(languageId?: LanguageId): string {
+  return languageScopedStorageKey(META_KEY, languageId);
+}
+
+function languageIdFromMetaKey(key: string): LanguageId {
+  const suffix = key.startsWith(`${META_KEY}:`)
+    ? key.slice(META_KEY.length + 1)
+    : "";
+  return isLanguageId(suffix) ? suffix : DEFAULT_LANGUAGE_ID;
+}
+
+function benchmarkMetaKeys(): string[] {
+  if (typeof window === "undefined")
+    return [metaStorageKey(DEFAULT_LANGUAGE_ID)];
+  const keys = new Set<string>([metaStorageKey(DEFAULT_LANGUAGE_ID)]);
+  for (let index = 0; index < localStorage.length; index += 1) {
+    const key = localStorage.key(index);
+    if (key === META_KEY || key?.startsWith(`${META_KEY}:`)) {
+      keys.add(key);
+    }
+  }
+  return Array.from(keys);
+}
+
+function normalizeMeta(
+  item: Partial<BenchmarkRecordingMeta>,
+  fallbackLanguageId: LanguageId,
+): BenchmarkRecordingMeta | null {
+  if (
+    typeof item.id !== "string" ||
+    typeof item.createdAt !== "number" ||
+    typeof item.source !== "string" ||
+    typeof item.title !== "string" ||
+    typeof item.text !== "string" ||
+    typeof item.score !== "number" ||
+    typeof item.targetLabel !== "string"
+  ) {
+    return null;
+  }
+  return {
+    ...item,
+    languageId: isLanguageId(item.languageId)
+      ? item.languageId
+      : fallbackLanguageId,
+  } as BenchmarkRecordingMeta;
+}
+
+function readMeta(
+  languageId: LanguageId = getCurrentLanguageId(),
+): BenchmarkRecordingMeta[] {
   if (typeof window === "undefined") return [];
   try {
-    const raw = localStorage.getItem(META_KEY);
-    return raw ? (JSON.parse(raw) as BenchmarkRecordingMeta[]) : [];
+    const raw = localStorage.getItem(metaStorageKey(languageId));
+    const parsed = raw
+      ? (JSON.parse(raw) as Array<Partial<BenchmarkRecordingMeta>>)
+      : [];
+    return parsed
+      .map((item) => normalizeMeta(item, languageId))
+      .filter((item): item is BenchmarkRecordingMeta => item !== null);
   } catch {
     return [];
   }
 }
 
-function writeMeta(items: BenchmarkRecordingMeta[]): void {
+function readAllMeta(): BenchmarkRecordingMeta[] {
+  if (typeof window === "undefined") return [];
+  return benchmarkMetaKeys().flatMap((key) => {
+    try {
+      const raw = localStorage.getItem(key);
+      const languageId = languageIdFromMetaKey(key);
+      const parsed = raw
+        ? (JSON.parse(raw) as Array<Partial<BenchmarkRecordingMeta>>)
+        : [];
+      return parsed
+        .map((item) => normalizeMeta(item, languageId))
+        .filter((item): item is BenchmarkRecordingMeta => item !== null);
+    } catch {
+      return [];
+    }
+  });
+}
+
+function writeMeta(
+  items: BenchmarkRecordingMeta[],
+  languageId: LanguageId = getCurrentLanguageId(),
+): void {
   if (typeof window === "undefined") return;
-  localStorage.setItem(META_KEY, JSON.stringify(items.slice(0, 80)));
-  window.dispatchEvent(new StorageEvent("storage", { key: META_KEY }));
+  const key = metaStorageKey(languageId);
+  localStorage.setItem(key, JSON.stringify(items.slice(0, 80)));
+  window.dispatchEvent(new StorageEvent("storage", { key }));
 }
 
 function openDb(): Promise<IDBDatabase> {
@@ -109,13 +194,16 @@ export async function getBenchmarkAudioBlob(id: string): Promise<Blob | null> {
 
 export async function saveBenchmarkRecording(
   blob: Blob,
-  meta: Omit<BenchmarkRecordingMeta, "id" | "createdAt"> & {
+  meta: Omit<BenchmarkRecordingMeta, "id" | "createdAt" | "languageId"> & {
     id?: string;
     createdAt?: number;
+    languageId?: LanguageId;
   },
+  languageId: LanguageId = meta.languageId ?? getCurrentLanguageId(),
 ): Promise<BenchmarkRecordingMeta> {
   const item: BenchmarkRecordingMeta = {
     ...meta,
+    languageId,
     id:
       meta.id ??
       `benchmark-${Date.now()}-${Math.random().toString(36).slice(2)}`,
@@ -124,15 +212,20 @@ export async function saveBenchmarkRecording(
   if (typeof indexedDB !== "undefined") {
     await putBlob(item.id, blob);
   }
-  writeMeta([
-    item,
-    ...readMeta().filter((existing) => existing.id !== item.id),
-  ]);
+  writeMeta(
+    [
+      item,
+      ...readMeta(languageId).filter((existing) => existing.id !== item.id),
+    ],
+    languageId,
+  );
   return item;
 }
 
-export function listBenchmarkRecordings(): BenchmarkRecordingMeta[] {
-  return readMeta().sort((a, b) => b.createdAt - a.createdAt);
+export function listBenchmarkRecordings(
+  languageId: LanguageId = getCurrentLanguageId(),
+): BenchmarkRecordingMeta[] {
+  return readMeta(languageId).sort((a, b) => b.createdAt - a.createdAt);
 }
 
 function bytesToBase64(bytes: Uint8Array): string {
@@ -166,7 +259,7 @@ export async function encodeBenchmarkAudioBlob(
 }
 
 export async function exportBenchmarkRecordings(): Promise<BenchmarkArchiveExport> {
-  const meta = listBenchmarkRecordings();
+  const meta = readAllMeta().sort((a, b) => b.createdAt - a.createdAt);
   const audio: BenchmarkAudioExport[] = [];
   const missingAudioIds: string[] = [];
   const errors: string[] = [];
@@ -200,18 +293,36 @@ export async function exportBenchmarkRecordings(): Promise<BenchmarkArchiveExpor
 
 export async function deleteBenchmarkRecording(id: string): Promise<void> {
   await deleteBlob(id);
-  writeMeta(readMeta().filter((item) => item.id !== id));
+  const languageId =
+    readAllMeta().find((item) => item.id === id)?.languageId ??
+    getCurrentLanguageId();
+  writeMeta(
+    readMeta(languageId).filter((item) => item.id !== id),
+    languageId,
+  );
 }
 
-export async function clearBenchmarkRecordings(): Promise<void> {
+export async function clearBenchmarkRecordings(
+  languageId: LanguageId = getCurrentLanguageId(),
+): Promise<void> {
+  const items = readMeta(languageId);
+  await Promise.all(items.map((item) => deleteBlob(item.id)));
+  writeMeta([], languageId);
+}
+
+export async function clearAllBenchmarkRecordings(): Promise<void> {
   await clearBlobs();
-  writeMeta([]);
+  if (typeof window === "undefined") return;
+  for (const key of benchmarkMetaKeys()) {
+    localStorage.removeItem(key);
+    window.dispatchEvent(new StorageEvent("storage", { key }));
+  }
 }
 
 export function normalizeBenchmarkText(text: string): string {
   return text
     .toLowerCase()
-    .replace(/[^a-z0-9'\s]+/g, " ")
+    .replace(/[^\p{L}\p{M}\p{N}'\s]+/gu, " ")
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -227,6 +338,7 @@ function normalizeTargetLabel(label: string): string {
 
 export function benchmarkGroupKey(item: BenchmarkRecordingMeta): string {
   return [
+    item.languageId,
     item.source,
     normalizeTargetLabel(item.targetLabel),
     normalizeBenchmarkText(item.text),

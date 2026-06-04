@@ -3,6 +3,9 @@ import type {
   DiagnosisReport,
   EvidenceStrength,
 } from "@/types/diagnosis";
+import { getCurrentLanguageId } from "@/lib/api-keys";
+import { languageScopedStorageKey } from "@/lib/language-storage";
+import type { LanguageId } from "@/types/language";
 
 export const COVERAGE_BENCHMARKS_STORAGE_KEY =
   "speakright_coverage_benchmarks_v1";
@@ -28,6 +31,7 @@ export interface CoverageBenchmarkIssue {
 
 export interface CoverageBenchmarkSnapshot {
   id: string;
+  languageId: LanguageId;
   timestamp: number;
   overallScore: number;
   dimensions: DiagnosisReport["dimensions"];
@@ -49,6 +53,10 @@ export interface CoverageBenchmarkComparison {
   regressedPhonemes: CoverageBenchmarkWeakPhoneme[];
   summary: string;
   nextAction: string;
+}
+
+function storageKey(languageId?: LanguageId): string {
+  return languageScopedStorageKey(COVERAGE_BENCHMARKS_STORAGE_KEY, languageId);
 }
 
 function round(value: number): number {
@@ -84,9 +92,11 @@ function snapshotIssue(issue: DiagnosisIssue): CoverageBenchmarkIssue {
 
 export function createCoverageBenchmarkSnapshot(
   report: DiagnosisReport,
+  languageId: LanguageId = report.languageId ?? getCurrentLanguageId(),
 ): CoverageBenchmarkSnapshot {
   return {
     id: `coverage-${report.timestamp}`,
+    languageId,
     timestamp: report.timestamp,
     overallScore: round(report.overallScore),
     dimensions: {
@@ -124,16 +134,26 @@ function parseBenchmarks(raw: string | null): CoverageBenchmarkSnapshot[] {
 }
 
 export function loadCoverageBenchmarks(): CoverageBenchmarkSnapshot[] {
+  return loadCoverageBenchmarksForLanguage();
+}
+
+export function loadCoverageBenchmarksForLanguage(
+  languageId: LanguageId = getCurrentLanguageId(),
+): CoverageBenchmarkSnapshot[] {
   if (typeof window === "undefined") return [];
-  return parseBenchmarks(localStorage.getItem(COVERAGE_BENCHMARKS_STORAGE_KEY))
+  return parseBenchmarks(localStorage.getItem(storageKey(languageId)))
+    .map((item) => ({ ...item, languageId: item.languageId ?? languageId }))
     .sort((a, b) => b.timestamp - a.timestamp)
     .slice(0, MAX_BENCHMARKS);
 }
 
-function saveBenchmarks(benchmarks: CoverageBenchmarkSnapshot[]): void {
+function saveBenchmarks(
+  benchmarks: CoverageBenchmarkSnapshot[],
+  languageId: LanguageId = getCurrentLanguageId(),
+): void {
   if (typeof window === "undefined") return;
   localStorage.setItem(
-    COVERAGE_BENCHMARKS_STORAGE_KEY,
+    storageKey(languageId),
     JSON.stringify(benchmarks.slice(0, MAX_BENCHMARKS)),
   );
 }
@@ -279,9 +299,10 @@ export function compareCoverageBenchmarks(
 
 export function compareCoverageReportToHistory(
   report: DiagnosisReport,
-  benchmarks = loadCoverageBenchmarks(),
+  languageId: LanguageId = report.languageId ?? getCurrentLanguageId(),
+  benchmarks = loadCoverageBenchmarksForLanguage(languageId),
 ): CoverageBenchmarkComparison {
-  const current = createCoverageBenchmarkSnapshot(report);
+  const current = createCoverageBenchmarkSnapshot(report, languageId);
   return compareCoverageBenchmarks(
     current,
     matchingPrevious(current, benchmarks),
@@ -290,14 +311,15 @@ export function compareCoverageReportToHistory(
 
 export function saveCoverageBenchmark(
   report: DiagnosisReport,
+  languageId: LanguageId = report.languageId ?? getCurrentLanguageId(),
 ): CoverageBenchmarkComparison {
-  const current = createCoverageBenchmarkSnapshot(report);
-  const existing = loadCoverageBenchmarks();
+  const current = createCoverageBenchmarkSnapshot(report, languageId);
+  const existing = loadCoverageBenchmarksForLanguage(languageId);
   const previous = matchingPrevious(current, existing);
   const next = [
     current,
     ...existing.filter((item) => item.id !== current.id),
   ].sort((a, b) => b.timestamp - a.timestamp);
-  saveBenchmarks(next);
+  saveBenchmarks(next, languageId);
   return compareCoverageBenchmarks(current, previous);
 }

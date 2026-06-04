@@ -3,6 +3,7 @@ import {
   compareCoverageBenchmarks,
   createCoverageBenchmarkSnapshot,
   loadCoverageBenchmarks,
+  loadCoverageBenchmarksForLanguage,
   saveCoverageBenchmark,
 } from "@/lib/coverage-benchmark";
 import type { DiagnosisReport } from "@/types/diagnosis";
@@ -10,6 +11,7 @@ import type { DiagnosisReport } from "@/types/diagnosis";
 function report(overrides: Partial<DiagnosisReport> = {}): DiagnosisReport {
   return {
     version: 2,
+    languageId: "en-US",
     source: "coverage-passage",
     timestamp: 1_000,
     overallScore: 78,
@@ -65,6 +67,7 @@ describe("coverage benchmark", () => {
 
     expect(snapshot).toMatchObject({
       id: "coverage-1000",
+      languageId: "en-US",
       overallScore: 78,
       usableRecordings: 7,
       invalidRecordings: 0,
@@ -132,5 +135,23 @@ describe("coverage benchmark", () => {
       overallScore: 99,
     });
     expect(saved.filter((item) => item.id === "coverage-1009")).toHaveLength(1);
+  });
+
+  it("keeps coverage benchmark history isolated by language", () => {
+    saveCoverageBenchmark(report({ timestamp: 2_000 }), "en-US");
+    saveCoverageBenchmark(
+      report({ timestamp: 3_000, languageId: "es-ES", overallScore: 66 }),
+      "es-ES",
+    );
+
+    expect(loadCoverageBenchmarks()).toHaveLength(1);
+    expect(loadCoverageBenchmarks()[0]).toMatchObject({
+      languageId: "en-US",
+      overallScore: 78,
+    });
+    expect(loadCoverageBenchmarksForLanguage("es-ES")[0]).toMatchObject({
+      languageId: "es-ES",
+      overallScore: 66,
+    });
   });
 });
