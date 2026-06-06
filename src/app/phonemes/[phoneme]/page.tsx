@@ -1,8 +1,8 @@
-import { getAllSlugs } from "@/lib/phoneme-data";
+import { getAllLanguagePhonemeSlugs } from "@/lib/language-phonemes";
 import { PhonemeDetailPage } from "./phoneme-detail-page";
 
 export function generateStaticParams() {
-  return getAllSlugs().map((phoneme) => ({ phoneme }));
+  return getAllLanguagePhonemeSlugs().map((phoneme) => ({ phoneme }));
 }
 
 export default function Page() {

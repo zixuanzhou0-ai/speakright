@@ -8,9 +8,6 @@ import type {
   TrainingLevelProgress,
   TrainingSessionSummary,
 } from "@/types/training";
-import type { LanguageId } from "@/types/language";
-import { getCurrentLanguageId } from "./api-keys";
-import { languageScopedStorageKey } from "./language-storage";
 import { evaluateMasteryStage } from "./mastery-state";
 import { getTrainingPack } from "./training-packs";
 
@@ -19,18 +16,6 @@ export const TRAINING_SESSIONS_STORAGE_KEY = "speakright_training_sessions_v2";
 const LEGACY_MASTERY_STORAGE_KEY = "speakright_mastery_profile_v1";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
-
-function masteryStorageKey(languageId?: LanguageId): string {
-  return languageScopedStorageKey(MASTERY_STORAGE_KEY, languageId);
-}
-
-function sessionsStorageKey(languageId?: LanguageId): string {
-  return languageScopedStorageKey(TRAINING_SESSIONS_STORAGE_KEY, languageId);
-}
-
-function legacyMasteryStorageKey(languageId?: LanguageId): string {
-  return languageScopedStorageKey(LEGACY_MASTERY_STORAGE_KEY, languageId);
-}
 
 export function createEmptyMasteryProfile(): MasteryProfile {
   return {
@@ -101,38 +86,34 @@ function migrateLegacyProfile(raw: string | null): MasteryProfile | null {
   }
 }
 
-export function loadMasteryProfile(languageId?: LanguageId): MasteryProfile {
+export function loadMasteryProfile(): MasteryProfile {
   if (typeof window === "undefined") return createEmptyMasteryProfile();
-  const current = parseProfile(localStorage.getItem(masteryStorageKey(languageId)));
+  const current = parseProfile(localStorage.getItem(MASTERY_STORAGE_KEY));
   if (current) return current;
   const migrated = migrateLegacyProfile(
-    localStorage.getItem(legacyMasteryStorageKey(languageId)),
+    localStorage.getItem(LEGACY_MASTERY_STORAGE_KEY),
   );
   if (migrated) {
-    saveMasteryProfile(migrated, languageId);
+    saveMasteryProfile(migrated);
     return migrated;
   }
   return createEmptyMasteryProfile();
 }
 
-export function saveMasteryProfile(
-  profile: MasteryProfile,
-  languageId?: LanguageId,
-): void {
+export function saveMasteryProfile(profile: MasteryProfile): void {
   if (typeof window === "undefined") return;
   const nextProfile = {
     ...profile,
     version: 2 as const,
     updatedAt: Date.now(),
   };
-  const profileKey = masteryStorageKey(languageId);
-  localStorage.setItem(profileKey, JSON.stringify(nextProfile));
+  localStorage.setItem(MASTERY_STORAGE_KEY, JSON.stringify(nextProfile));
   localStorage.setItem(
-    sessionsStorageKey(languageId),
+    TRAINING_SESSIONS_STORAGE_KEY,
     JSON.stringify(nextProfile.sessions),
   );
   window.dispatchEvent(
-    new StorageEvent("storage", { key: profileKey }),
+    new StorageEvent("storage", { key: MASTERY_STORAGE_KEY }),
   );
 }
 
@@ -310,7 +291,6 @@ export function recordTrainingSession(
   session: TrainingSessionSummary,
 ): MasteryProfile {
   const pack = getTrainingPack(session.packId);
-  const sessionLanguageId = session.languageId ?? getCurrentLanguageId();
   const canPromote = reliabilityAllowsPromotion(session);
   const mastered = evaluateSessionMastery(session);
   const existing = profile.packs[session.packId];
@@ -355,7 +335,6 @@ export function recordTrainingSession(
     sessions: [
       {
         ...session,
-        languageId: sessionLanguageId,
         mastered,
         masteryStateAfter: stage.state,
         masteryStageScore: stage.stageScore,

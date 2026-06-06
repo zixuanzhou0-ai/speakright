@@ -104,7 +104,6 @@ describe("coverage passage", () => {
   it("selects adaptive probes from weak issues without repeating used probes", () => {
     const report: DiagnosisReport = {
       version: 2,
-      languageId: "en-US",
       source: "coverage-passage",
       timestamp: Date.now(),
       overallScore: 70,

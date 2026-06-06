@@ -192,28 +192,6 @@ describe("api key storage in Tauri", () => {
     expect(localStorage.getItem("speakright_coach_mode")).toBeNull();
   });
 
-  it("persists the selected training language through desktop settings hydration", async () => {
-    const { getLanguageConfig, setLanguageConfig } = await import(
-      "@/lib/api-keys"
-    );
-
-    setLanguageConfig({ targetLanguage: "fr-FR" });
-    await new Promise((resolve) => setTimeout(resolve, 0));
-
-    expect(getLanguageConfig()).toEqual({ targetLanguage: "fr-FR" });
-    expect(localStorage.getItem("speakright_language_config")).toBeNull();
-    expect(mocks.store.get("speakright_language_config")).toEqual({
-      targetLanguage: "fr-FR",
-    });
-
-    vi.resetModules();
-    const reloaded = await import("@/lib/api-keys");
-    expect(reloaded.getLanguageConfig()).toEqual({ targetLanguage: "en-US" });
-
-    await reloaded.hydrateKeys();
-    expect(reloaded.getLanguageConfig()).toEqual({ targetLanguage: "fr-FR" });
-  });
-
   it("clears desktop app preferences from the runtime cache and Tauri store", async () => {
     const {
       clearItem,

@@ -29,8 +29,8 @@ export default function SettingsPage() {
         </div>
 
         <div className="space-y-6">
-          <DataControlCard />
           <LanguageConfigCard />
+          <DataControlCard />
           <AzureConfigCard />
           <ElevenLabsConfigCard />
           <PronunciationConfigCard />

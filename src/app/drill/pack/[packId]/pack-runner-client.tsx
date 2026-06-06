@@ -22,7 +22,6 @@ import { useMemo, useRef, useState } from "react";
 import { RecordButton } from "@/components/audio/record-button";
 import { RecordingQualityPanel } from "@/components/audio/recording-quality-panel";
 import { WaveformDisplay } from "@/components/audio/waveform-display";
-import { withLanguageTrainingGate } from "@/components/drill/language-training-gate";
 import { FeedbackDisplay } from "@/components/feedback/feedback-display";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -179,7 +178,7 @@ function itemFromRemediationStep(
   };
 }
 
-function TrainingPackPage() {
+export default function TrainingPackPage() {
   const params = useParams<{ packId: string }>();
   const searchParams = useSearchParams();
   const packId = Array.isArray(params.packId)
@@ -983,8 +982,6 @@ function TrainingPackPage() {
     </div>
   );
 }
-
-export default withLanguageTrainingGate(TrainingPackPage, "训练包");
 
 function IntroCard({
   pack,

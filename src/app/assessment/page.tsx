@@ -16,20 +16,23 @@ import { AssessmentReport } from "@/components/assessment/assessment-report";
 import { RecordButton } from "@/components/audio/record-button";
 import { RecordingQualityPanel } from "@/components/audio/recording-quality-panel";
 import { WaveformDisplay } from "@/components/audio/waveform-display";
+import { LanguageModuleGate } from "@/components/common/language-module-gate";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useAzureAssessment } from "@/hooks/use-azure-assessment";
 import { useMwPronunciation } from "@/hooks/use-mw-pronunciation";
 import { useRecorder } from "@/hooks/use-recorder";
 import { useRecordingQuality } from "@/hooks/use-recording-quality";
-import { getCurrentLanguageId } from "@/lib/api-keys";
+import {
+  ADAPTIVE_ASSESSMENT_WORDS,
+  ASSESSMENT_PARAGRAPH,
+  ASSESSMENT_WORDS,
+} from "@/lib/assessment-texts";
 import {
   buildDiagnosisReport,
   selectAdaptiveAssessmentWords,
 } from "@/lib/diagnosis-engine";
 import { buildTargetedRetestWords } from "@/lib/diagnosis-review-package";
-import { languageScopedStorageKey } from "@/lib/language-storage";
-import { getLanguageProfile } from "@/lib/language-profiles";
 import { getPhonemeBySlug } from "@/lib/phoneme-data";
 import { buildTrainingPrescription } from "@/lib/training-prescription";
 import type {
@@ -75,7 +78,6 @@ function migrateLegacyResult(legacy: LegacyAssessmentResult): DiagnosisReport {
 
   return {
     version: 2,
-    languageId: "en-US",
     timestamp: legacy.timestamp,
     overallScore: legacy.overallScore,
     dimensions: {
@@ -91,39 +93,16 @@ function migrateLegacyResult(legacy: LegacyAssessmentResult): DiagnosisReport {
   };
 }
 
-function normalizeReportLanguage(
-  report: DiagnosisReport,
-  languageId = getCurrentLanguageId(),
-): DiagnosisReport {
-  return { ...report, languageId: report.languageId ?? languageId };
-}
-
-function reportStorageKey(languageId = getCurrentLanguageId()): string {
-  return languageScopedStorageKey(STORAGE_KEY_V2, languageId);
-}
-
-function legacyReportStorageKey(languageId = getCurrentLanguageId()): string {
-  return languageScopedStorageKey(LEGACY_STORAGE_KEY, languageId);
-}
-
-function loadSavedReport(
-  languageId = getCurrentLanguageId(),
-): DiagnosisReport | null {
+function loadSavedReport(): DiagnosisReport | null {
   if (typeof window === "undefined") return null;
   try {
-    const raw = localStorage.getItem(reportStorageKey(languageId));
-    if (raw) {
-      return normalizeReportLanguage(
-        JSON.parse(raw) as DiagnosisReport,
-        languageId,
-      );
-    }
+    const raw = localStorage.getItem(STORAGE_KEY_V2);
+    if (raw) return JSON.parse(raw) as DiagnosisReport;
 
-    const legacyRaw = localStorage.getItem(legacyReportStorageKey(languageId));
+    const legacyRaw = localStorage.getItem(LEGACY_STORAGE_KEY);
     if (legacyRaw) {
-      return normalizeReportLanguage(
-        migrateLegacyResult(JSON.parse(legacyRaw) as LegacyAssessmentResult),
-        languageId,
+      return migrateLegacyResult(
+        JSON.parse(legacyRaw) as LegacyAssessmentResult,
       );
     }
   } catch {
@@ -132,11 +111,8 @@ function loadSavedReport(
   return null;
 }
 
-function saveReport(
-  report: DiagnosisReport,
-  languageId = getCurrentLanguageId(),
-) {
-  localStorage.setItem(reportStorageKey(languageId), JSON.stringify(report));
+function saveReport(report: DiagnosisReport) {
+  localStorage.setItem(STORAGE_KEY_V2, JSON.stringify(report));
 }
 
 function targetLabels(word: AssessmentWord): string[] {
@@ -144,14 +120,9 @@ function targetLabels(word: AssessmentWord): string[] {
 }
 
 export default function AssessmentPage() {
-  const languageId = getCurrentLanguageId();
-  const languageProfile = getLanguageProfile(languageId);
-  const assessmentWords = languageProfile.assessmentWords;
-  const adaptiveAssessmentWords = languageProfile.adaptiveAssessmentWords;
-  const assessmentParagraph = languageProfile.assessmentParagraph;
   const [retestIssueId, setRetestIssueId] = useState<string | null>(null);
   const [savedReport, setSavedReport] = useState<DiagnosisReport | null>(() =>
-    loadSavedReport(languageId),
+    loadSavedReport(),
   );
   const [phase, setPhase] = useState<AssessmentPhase>({ type: "intro" });
 
@@ -178,17 +149,16 @@ export default function AssessmentPage() {
   const finalizeReport = useCallback(
     (paragraphResult: AzureAssessmentResult) => {
       const report = buildDiagnosisReport({
-        languageId,
         wordRecordings: wordRecordingsRef.current,
         paragraphResult,
-        paragraphText: assessmentParagraph,
+        paragraphText: ASSESSMENT_PARAGRAPH,
         paragraphRecordingQuality: paragraphQualityRef.current,
       });
-      saveReport(report, languageId);
+      saveReport(report);
       setSavedReport(report);
       setPhase({ type: "report", result: report });
     },
-    [assessmentParagraph, languageId],
+    [],
   );
 
   const handleStart = useCallback(() => {
@@ -204,7 +174,7 @@ export default function AssessmentPage() {
 
   const handleTargetedRetest = useCallback(
     (issueId: string) => {
-      const report = loadSavedReport(languageId);
+      const report = loadSavedReport();
       const issue = report?.issues.find((item) => item.id === issueId);
       const words = issue ? buildTargetedRetestWords(issue) : [];
       if (words.length === 0) {
@@ -220,7 +190,7 @@ export default function AssessmentPage() {
       azure.reset();
       setPhase({ type: "adaptive", index: 0, words });
     },
-    [azure, handleStart, languageId, recorder, recordingQuality],
+    [azure, handleStart, recorder, recordingQuality],
   );
 
   useEffect(() => {
@@ -239,7 +209,7 @@ export default function AssessmentPage() {
 
     const word =
       phase.type === "words"
-        ? assessmentWords[phase.index]
+        ? ASSESSMENT_WORDS[phase.index]
         : phase.words[phase.index];
     const result = await azure.assess(recorder.audioBlob, word.word);
 
@@ -257,7 +227,7 @@ export default function AssessmentPage() {
 
     if (phase.type === "words") {
       const nextIndex = phase.index + 1;
-      if (nextIndex < assessmentWords.length) {
+      if (nextIndex < ASSESSMENT_WORDS.length) {
         setPhase({ type: "words", index: nextIndex });
       } else {
         setPhase({ type: "paragraph" });
@@ -280,7 +250,6 @@ export default function AssessmentPage() {
     azure,
     recorder,
     recordingQuality,
-    assessmentWords,
     finalizeReport,
   ]);
 
@@ -291,7 +260,7 @@ export default function AssessmentPage() {
       return;
     }
 
-    const result = await azure.assess(recorder.audioBlob, assessmentParagraph);
+    const result = await azure.assess(recorder.audioBlob, ASSESSMENT_PARAGRAPH);
     if (!result) {
       setPhase({ type: "error", message: azure.error || "评估失败" });
       return;
@@ -302,15 +271,14 @@ export default function AssessmentPage() {
     setPhase({ type: "analyzing" });
 
     const preliminaryReport = buildDiagnosisReport({
-      languageId,
       wordRecordings: wordRecordingsRef.current,
       paragraphResult: result,
-      paragraphText: assessmentParagraph,
+      paragraphText: ASSESSMENT_PARAGRAPH,
       paragraphRecordingQuality: qualityReport,
     });
     const adaptiveWords = selectAdaptiveAssessmentWords(
       preliminaryReport,
-      adaptiveAssessmentWords,
+      ADAPTIVE_ASSESSMENT_WORDS,
       wordRecordingsRef.current.map((recording) => recording.prompt.word),
     );
 
@@ -329,23 +297,14 @@ export default function AssessmentPage() {
     } else {
       finalizeReport(result);
     }
-  }, [
-    recorder.audioBlob,
-    azure,
-    recorder,
-    recordingQuality,
-    assessmentParagraph,
-    adaptiveAssessmentWords,
-    finalizeReport,
-    languageId,
-  ]);
+  }, [recorder.audioBlob, azure, recorder, recordingQuality, finalizeReport]);
 
   const handleRecordStop = useCallback(() => {
     recorder.stopRecording();
   }, [recorder]);
 
   const handleRetake = () => {
-    localStorage.removeItem(reportStorageKey(languageId));
+    localStorage.removeItem(STORAGE_KEY_V2);
     setSavedReport(null);
     recorder.reset();
     recordingQuality.reset();
@@ -355,43 +314,14 @@ export default function AssessmentPage() {
 
   const currentWord =
     phase.type === "words"
-      ? assessmentWords[phase.index]
+      ? ASSESSMENT_WORDS[phase.index]
       : phase.type === "adaptive"
         ? phase.words[phase.index]
         : null;
 
-  if (!languageProfile.readiness.diagnosis) {
-    return (
-      <div className="h-full flex flex-col px-6 py-4 overflow-y-auto scrollbar-thin">
-        <h1 className="mb-2 text-2xl font-bold shrink-0">发音诊断</h1>
-        <div className="max-w-2xl mx-auto mt-10 rounded-xl border bg-card p-8 text-center shadow-sm">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
-            <Mic className="h-8 w-8 text-muted-foreground" />
-          </div>
-          <h2 className="text-xl font-bold">
-            {languageProfile.displayName}诊断准备中
-          </h2>
-          <p className="mt-3 text-sm text-muted-foreground">
-            当前语言需要先完成 Azure capability probe，确认 word-level 和
-            phoneme/segment 信号可用后再开放证据诊断。
-          </p>
-          <div className="mt-5 flex justify-center gap-3">
-            <Link href="/settings">
-              <Button variant="outline" className="cursor-pointer">
-                切换训练语言
-              </Button>
-            </Link>
-            <Link href="/drill">
-              <Button className="cursor-pointer">返回今日计划</Button>
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="h-full flex flex-col px-6 py-4 overflow-y-auto scrollbar-thin">
+    <LanguageModuleGate moduleName="发音诊断" readinessKey="diagnosis">
+      <div className="h-full flex flex-col px-6 py-4 overflow-y-auto scrollbar-thin">
       <h1 className="mb-2 text-2xl font-bold shrink-0">发音诊断</h1>
       <p className="mb-4 text-muted-foreground shrink-0">
         {phase.type === "report"
@@ -470,7 +400,7 @@ export default function AssessmentPage() {
                 <div className="flex items-center justify-between text-sm text-muted-foreground">
                   <span>
                     {phase.type === "words"
-                      ? `筛查 ${phase.index + 1} / ${assessmentWords.length}`
+                      ? `筛查 ${phase.index + 1} / ${ASSESSMENT_WORDS.length}`
                       : `补测 ${phase.index + 1} / ${phase.words.length}`}
                   </span>
                   <span>
@@ -483,7 +413,7 @@ export default function AssessmentPage() {
                     style={{
                       width:
                         phase.type === "words"
-                          ? `${(phase.index / (assessmentWords.length + 1)) * 100}%`
+                          ? `${(phase.index / (ASSESSMENT_WORDS.length + 1)) * 100}%`
                           : `${((phase.index + 1) / phase.words.length) * 100}%`,
                     }}
                   />
@@ -579,7 +509,7 @@ export default function AssessmentPage() {
                 <div
                   className="h-full bg-primary transition-all duration-300"
                   style={{
-                    width: `${(assessmentWords.length / (assessmentWords.length + 1)) * 100}%`,
+                    width: `${(ASSESSMENT_WORDS.length / (ASSESSMENT_WORDS.length + 1)) * 100}%`,
                   }}
                 />
               </div>
@@ -589,7 +519,7 @@ export default function AssessmentPage() {
                   请按自然语速朗读以下短文。这里主要检测重音、弱读、连读、停顿和流利度。
                 </p>
                 <p className="text-base leading-relaxed">
-                  {assessmentParagraph}
+                  {ASSESSMENT_PARAGRAPH}
                 </p>
 
                 <div className="flex flex-col items-center gap-3">
@@ -686,6 +616,7 @@ export default function AssessmentPage() {
           )}
         </AnimatePresence>
       </div>
-    </div>
+      </div>
+    </LanguageModuleGate>
   );
 }

@@ -7,9 +7,14 @@ import {
   getMerriamWebsterConfig,
   getPronunciationConfig,
 } from "@/lib/api-keys";
+import type { LanguageId } from "@/types/language";
 
 export interface UseMwPronunciationReturn {
-  playWord: (word: string, fallbackVoice?: "blue" | "pink") => void;
+  playWord: (
+    word: string,
+    fallbackVoice?: "blue" | "pink",
+    languageId?: LanguageId,
+  ) => void;
   isLoading: boolean;
   isPlaying: boolean;
   stop: () => void;
@@ -61,8 +66,14 @@ export function useMwPronunciation(): UseMwPronunciationReturn {
   );
 
   const playWord = useCallback(
-    async (word: string, fallbackVoice: "blue" | "pink" = "blue") => {
-      const { source } = getPronunciationConfig();
+    async (
+      word: string,
+      fallbackVoice: "blue" | "pink" = "blue",
+      languageId: LanguageId = "en-US",
+    ) => {
+      const configured = getPronunciationConfig();
+      const source =
+        languageId === "en-US" ? configured.source : ("youdao" as const);
       const mwConfig = getMerriamWebsterConfig();
 
       cleanup();
@@ -83,15 +94,13 @@ export function useMwPronunciation(): UseMwPronunciationReturn {
           onend: () => setIsPlaying(false),
           onstop: () => setIsPlaying(false),
           onloaderror: () => {
-            // Blob decode failed — try local fallback
-            tryLocalFallback(word, fallbackVoice);
-          },
-          onplayerror: () => {
-            setIsLoading(false);
-            setIsPlaying(false);
-            console.warn(
-              `[Pronunciation] Audio was downloaded for "${word}" but playback was blocked.`,
-            );
+            // Blob decode failed — only English has local word fallbacks.
+            if (languageId === "en-US") {
+              tryLocalFallback(word, fallbackVoice);
+            } else {
+              setIsLoading(false);
+              setIsPlaying(false);
+            }
           },
         });
         howlRef.current = howl;
@@ -104,7 +113,12 @@ export function useMwPronunciation(): UseMwPronunciationReturn {
       // API failed — attempt local pre-generated mp3 (only ~24% coverage of
       // minimal-pairs vocabulary). Missing files surface via onloaderror
       // instead of silent failure.
-      tryLocalFallback(word, fallbackVoice);
+      if (languageId === "en-US") {
+        tryLocalFallback(word, fallbackVoice);
+      } else {
+        setIsLoading(false);
+        setIsPlaying(false);
+      }
     },
     [cleanup, tryLocalFallback],
   );

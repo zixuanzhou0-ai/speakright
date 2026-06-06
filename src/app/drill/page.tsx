@@ -21,14 +21,12 @@ import {
 import { motion } from "motion/react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { LanguageModuleGate } from "@/components/common/language-module-gate";
 import { DesktopReadinessCard } from "@/components/drill/desktop-readiness-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useLanguageConfig } from "@/hooks/use-api-keys";
 import { getAzureConfig, subscribeToStorage } from "@/lib/api-keys";
 import { isAzureConfigReady } from "@/lib/azure-config";
-import { languageScopedStorageKey } from "@/lib/language-storage";
-import { getLanguageProfile } from "@/lib/language-profiles";
 import { isReviewDue, loadMasteryProfile } from "@/lib/mastery-profile";
 import { buildReviewQueue } from "@/lib/review-queue";
 import { buildTrainingMemory } from "@/lib/training-memory";
@@ -39,7 +37,6 @@ import {
 } from "@/lib/training-prescription";
 import { cn } from "@/lib/utils";
 import type { DiagnosisReport } from "@/types/diagnosis";
-import type { LanguageId } from "@/types/language";
 import type {
   MasteryProfile,
   ReviewQueueItem,
@@ -113,12 +110,10 @@ const FREE_MODES = [
   },
 ];
 
-function loadReport(languageId: LanguageId): DiagnosisReport | null {
+function loadReport(): DiagnosisReport | null {
   if (typeof window === "undefined") return null;
   try {
-    const raw = localStorage.getItem(
-      languageScopedStorageKey(REPORT_STORAGE_KEY, languageId),
-    );
+    const raw = localStorage.getItem(REPORT_STORAGE_KEY);
     return raw ? (JSON.parse(raw) as DiagnosisReport) : null;
   } catch {
     return null;
@@ -171,41 +166,25 @@ function priorityVariant(priority: ReviewQueueItem["priority"]) {
 }
 
 export default function DrillPage() {
-  const languageConfig = useLanguageConfig();
-  const languageProfile = getLanguageProfile(languageConfig.targetLanguage);
-  const currentTrainingPacks = languageProfile.readiness.training
-    ? TRAINING_PACKS
-    : [];
   const [report, setReport] = useState<DiagnosisReport | null>(null);
   const [profile, setProfile] = useState<MasteryProfile | null>(null);
   const [azureReady, setAzureReady] = useState(false);
 
   useEffect(() => {
-    setReport(loadReport(languageConfig.targetLanguage));
-    setProfile(loadMasteryProfile(languageConfig.targetLanguage));
+    setReport(loadReport());
+    setProfile(loadMasteryProfile());
     const refreshAzureState = () => {
       const config = getAzureConfig();
       setAzureReady(isAzureConfigReady(config));
     };
     refreshAzureState();
     return subscribeToStorage(refreshAzureState);
-  }, [languageConfig.targetLanguage]);
+  }, []);
 
   const prescription =
-    languageProfile.readiness.training && report && profile
+    report && profile
       ? buildTrainingPrescription(report.issues, "diagnosis", profile)
-      : languageProfile.readiness.training
-        ? (report?.prescription ?? buildDefaultPrescription())
-        : {
-            generatedAt: Date.now(),
-            source: "default" as const,
-            days: [
-              { day: 1, title: "当前语言训练准备中", items: [] },
-              { day: 2, title: "当前语言训练准备中", items: [] },
-              { day: 3, title: "当前语言训练准备中", items: [] },
-              { day: 7, title: "当前语言训练准备中", items: [] },
-            ],
-          };
+      : (report?.prescription ?? buildDefaultPrescription());
   const recommendedIds = useMemo(
     () =>
       Array.from(
@@ -218,9 +197,9 @@ export default function DrillPage() {
     [prescription],
   );
   const recommendedPacks = recommendedIds
-    .map((id) => currentTrainingPacks.find((pack) => pack.id === id))
+    .map((id) => TRAINING_PACKS.find((pack) => pack.id === id))
     .filter((pack): pack is TrainingPack => !!pack);
-  const otherPacks = currentTrainingPacks.filter(
+  const otherPacks = TRAINING_PACKS.filter(
     (pack) => !recommendedIds.includes(pack.id),
   );
   const reviewQueue = useMemo(() => buildReviewQueue(profile), [profile]);
@@ -239,7 +218,7 @@ export default function DrillPage() {
   ).slice(0, 2);
   const primaryItem = todayItems[0];
   const primaryPack = primaryItem
-    ? currentTrainingPacks.find((pack) => pack.id === primaryItem.packId)
+    ? TRAINING_PACKS.find((pack) => pack.id === primaryItem.packId)
     : null;
   const primaryHref =
     azureReady && primaryItem
@@ -249,90 +228,9 @@ export default function DrillPage() {
         : "/settings";
   const primaryLabel = azureReady ? "开始今天训练" : "配置评分密钥";
 
-  if (!languageProfile.readiness.training) {
-    return (
-      <div className="h-full overflow-y-auto px-6 py-4 scrollbar-thin">
-        <div className="mb-5 flex items-start justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold">
-              {languageProfile.displayName}训练准备中
-            </h1>
-            <p className="mt-1 text-muted-foreground">
-              {languageProfile.nativeName} ·{" "}
-              {languageProfile.status === "experimental" ? "实验版" : "准备中"}
-            </p>
-          </div>
-          <Link href="/settings">
-            <Button variant="outline" className="gap-2 cursor-pointer">
-              <Settings className="h-4 w-4" />
-              切换语言
-            </Button>
-          </Link>
-        </div>
-
-        <section className="mb-5 rounded-xl border bg-card p-5 shadow-sm">
-          <div className="mb-3 flex flex-wrap gap-2">
-            <Badge variant="secondary">Azure locale {languageProfile.azureLocale}</Badge>
-            {languageProfile.readiness.requiresAzureProbe && (
-              <Badge variant="outline">等待 capability probe</Badge>
-            )}
-            <Badge variant="outline">数据已按语言隔离</Badge>
-          </div>
-          <h2 className="text-xl font-bold">下一步先验证评分信号</h2>
-          <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
-            当前语言已有 profile seed，但还不能进入 evidence-driven mastery。
-            需要确认 Azure 的 word-level 和 phoneme/segment-level
-            返回稳定，再补齐语言专属听辨音频和训练包。
-          </p>
-        </section>
-
-        <section className="mb-6">
-          <h2 className="mb-3 text-sm font-semibold text-muted-foreground">
-            Starter plans
-          </h2>
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {languageProfile.starterTrainingPlans.map((plan) => (
-              <div
-                key={plan.id}
-                className="rounded-xl border bg-card p-5 shadow-sm"
-              >
-                <h3 className="font-bold">{plan.title}</h3>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  {plan.focus}
-                </p>
-                <div className="mt-4 flex flex-wrap gap-1.5">
-                  {plan.targetPhonemes.map((phoneme) => (
-                    <Badge key={phoneme} variant="outline">
-                      {phoneme}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section>
-          <h2 className="mb-3 text-sm font-semibold text-muted-foreground">
-            风险说明
-          </h2>
-          <div className="space-y-2">
-            {languageProfile.notes.map((note) => (
-              <p
-                key={note}
-                className="rounded-lg border bg-muted/30 px-4 py-3 text-sm text-muted-foreground"
-              >
-                {note}
-              </p>
-            ))}
-          </div>
-        </section>
-      </div>
-    );
-  }
-
   return (
-    <div className="h-full flex flex-col px-6 py-4 overflow-y-auto scrollbar-thin">
+    <LanguageModuleGate moduleName="刻意练习" readinessKey="wordPractice">
+      <div className="h-full flex flex-col px-6 py-4 overflow-y-auto scrollbar-thin">
       <div className="mb-5 flex items-start justify-between gap-4 shrink-0">
         <div>
           <h1 className="text-2xl font-bold">今日学习计划</h1>
@@ -435,7 +333,7 @@ export default function DrillPage() {
         {reviewQueue.length > 0 && (
           <div className="mb-4 grid gap-2 md:grid-cols-2">
             {reviewQueue.slice(0, 2).map((task) => {
-              const pack = currentTrainingPacks.find(
+              const pack = TRAINING_PACKS.find(
                 (item) => item.id === task.packId,
               );
               if (!pack) return null;
@@ -459,7 +357,7 @@ export default function DrillPage() {
         )}
         <div className="grid gap-3 md:grid-cols-2">
           {todayItems.map((item, index) => {
-            const pack = currentTrainingPacks.find((p) => p.id === item.packId);
+            const pack = TRAINING_PACKS.find((p) => p.id === item.packId);
             if (!pack) return null;
             return (
               <Link key={item.packId} href={packHref(pack.id, item.levelId)}>
@@ -737,7 +635,8 @@ export default function DrillPage() {
           ))}
         </div>
       </section>
-    </div>
+      </div>
+    </LanguageModuleGate>
   );
 }
 

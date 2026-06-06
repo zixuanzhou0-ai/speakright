@@ -1,5 +1,3 @@
-import type { LanguageId } from "@/types/language";
-
 export interface AzureConfig {
   subscriptionKey: string;
   region: string;
@@ -29,6 +27,4 @@ export interface PronunciationConfig {
   source: PronunciationSource;
 }
 
-export interface LanguageConfig {
-  targetLanguage: LanguageId;
-}
+export type { LanguageConfig } from "@/types/language";

@@ -15,7 +15,6 @@ import { RecordButton } from "@/components/audio/record-button";
 import { RecordingActions } from "@/components/audio/recording-actions";
 import { RecordingQualityPanel } from "@/components/audio/recording-quality-panel";
 import { WaveformDisplay } from "@/components/audio/waveform-display";
-import { withLanguageTrainingGate } from "@/components/drill/language-training-gate";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useAzureAssessment } from "@/hooks/use-azure-assessment";
@@ -35,7 +34,7 @@ import {
   type ProsodyAnalysis,
 } from "@/lib/prosody-training";
 
-function ProsodyPage() {
+export default function ProsodyPage() {
   const [selectedId, setSelectedId] = useState(PROSODY_EXERCISES[0].id);
   const [analysis, setAnalysis] = useState<ProsodyAnalysis | null>(null);
   const recorder = useRecorder({ maxDurationMs: 35_000 });
@@ -304,8 +303,6 @@ function ProsodyPage() {
     </div>
   );
 }
-
-export default withLanguageTrainingGate(ProsodyPage, "韵律训练");
 
 function Metric({ label, value }: { label: string; value: number }) {
   return (

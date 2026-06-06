@@ -16,6 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
+  useLanguageConfig,
   useMerriamWebsterConfig,
   usePronunciationConfig,
 } from "@/hooks/use-api-keys";
@@ -24,6 +25,7 @@ import {
   setMerriamWebsterConfig,
   setPronunciationConfig,
 } from "@/lib/api-keys";
+import { getLanguageProfile } from "@/lib/language-profiles";
 import type { PronunciationSource } from "@/types/api-keys";
 import { type ConnectionState, ConnectionStatus } from "./connection-status";
 
@@ -44,17 +46,6 @@ const SOURCE_OPTIONS: {
   },
 ];
 
-function pronunciationErrorMessage(error: unknown): string {
-  if (!(error instanceof Error)) return "网络错误";
-  if (error.message.includes("invalid audio")) return "返回的音频无效";
-  if (error.message.includes("non-audio")) return "返回的不是音频";
-  if (error.message.includes("MP3")) return "返回的音频格式异常";
-  if (error.message.includes("timed out")) return "有道请求超时，请稍后重试";
-  if (error.message.includes("Missing MW API key")) return "缺少韦氏 API Key";
-  if (error.message.includes("Only single words")) return "只支持单词发音";
-  return error.message || "网络错误";
-}
-
 export function PronunciationConfigCard() {
   const [source, setSource] = useState<PronunciationSource>("youdao");
   const [mwKey, setMwKey] = useState("");
@@ -65,6 +56,10 @@ export function PronunciationConfigCard() {
   const blobUrlRef = useRef<string | null>(null);
   const pronunciationConfig = usePronunciationConfig();
   const mwConfig = useMerriamWebsterConfig();
+  const languageConfig = useLanguageConfig();
+  const languageProfile = getLanguageProfile(languageConfig.languageId);
+  const isEnglish = languageConfig.languageId === "en-US";
+  const effectiveSource = isEnglish ? source : "youdao";
 
   useEffect(() => {
     setSource(pronunciationConfig.source);
@@ -105,7 +100,7 @@ export function PronunciationConfigCard() {
   }, []);
 
   const handleTest = async () => {
-    if (source === "merriam-webster" && !mwKey.trim()) {
+    if (effectiveSource === "merriam-webster" && !mwKey.trim()) {
       toast.error("请先填写 API Key");
       return;
     }
@@ -117,22 +112,16 @@ export function PronunciationConfigCard() {
 
     try {
       const blob = await fetchPronunciation(
-        "hello",
-        source,
-        source === "merriam-webster" ? mwKey.trim() : undefined,
+        languageProfile.pronunciationTestWord,
+        effectiveSource,
+        effectiveSource === "merriam-webster" ? mwKey.trim() : undefined,
       );
-      setStatus("success");
-      setStatusMsg(`音源可用（${Math.round(blob.size / 1024)} KB），正在播放...`);
       const url = URL.createObjectURL(blob);
       blobUrlRef.current = url;
 
       const howl = new Howl({
         src: [url],
         format: ["mp3"],
-        onload: () => {
-          setStatus("success");
-          setStatusMsg("音频已加载，正在播放...");
-        },
         onplay: () => {
           setStatus("success");
           setStatusMsg("播放中...");
@@ -144,20 +133,15 @@ export function PronunciationConfigCard() {
         onstop: () => setIsTesting(false),
         onloaderror: () => {
           setStatus("error");
-          setStatusMsg("音频已获取，但本机播放失败");
-          setIsTesting(false);
-        },
-        onplayerror: () => {
-          setStatus("error");
-          setStatusMsg("音频已获取，但播放被系统拦截");
+          setStatusMsg("音频加载失败");
           setIsTesting(false);
         },
       });
       howlRef.current = howl;
       howl.play();
-    } catch (error) {
+    } catch {
       setStatus("error");
-      setStatusMsg(pronunciationErrorMessage(error));
+      setStatusMsg("网络错误");
       setIsTesting(false);
     }
   };
@@ -167,7 +151,8 @@ export function PronunciationConfigCard() {
       <CardHeader>
         <CardTitle>发音音源</CardTitle>
         <CardDescription>
-          选择单词发音的音频来源，仅提供美式英语发音
+          当前测试 {languageProfile.displayName} 单词“
+          {languageProfile.pronunciationTestWord}”。韦氏词典仅用于美式英语。
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -176,6 +161,7 @@ export function PronunciationConfigCard() {
           {SOURCE_OPTIONS.map((opt) => (
             <label
               key={opt.value}
+              aria-disabled={!isEnglish && opt.value === "merriam-webster"}
               className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors ${
                 source === opt.value
                   ? "border-primary bg-primary/5"
@@ -186,14 +172,17 @@ export function PronunciationConfigCard() {
                 type="radio"
                 name="pronunciation-source"
                 value={opt.value}
-                checked={source === opt.value}
+                checked={effectiveSource === opt.value}
                 onChange={() => handleSourceChange(opt.value)}
+                disabled={!isEnglish && opt.value === "merriam-webster"}
                 className="mt-0.5 accent-[var(--primary)]"
               />
               <div>
                 <span className="font-medium">{opt.label}</span>
                 <p className="text-xs text-muted-foreground">
-                  {opt.description}
+                  {!isEnglish && opt.value === "merriam-webster"
+                    ? "英语专用；当前语言会自动使用有道实验音源"
+                    : opt.description}
                 </p>
               </div>
             </label>
@@ -201,7 +190,7 @@ export function PronunciationConfigCard() {
         </div>
 
         {/* MW API Key (conditional) */}
-        {source === "merriam-webster" && (
+        {isEnglish && source === "merriam-webster" && (
           <div className="space-y-2 rounded-lg border border-dashed p-3">
             <Label htmlFor="pron-mw-key">API Key</Label>
             <Input

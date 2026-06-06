@@ -1,79 +1,34 @@
-import type { AssessmentWord } from "@/types/assessment";
+import type { PhonemeData } from "@/types/phoneme";
 
-export const LANGUAGE_IDS = ["en-US", "es-ES", "fr-FR", "ru-RU"] as const;
+export type LanguageId = "en-US" | "es-ES" | "fr-FR" | "ru-RU";
+export type LanguageStatus = "stable" | "experimental" | "draft";
 
-export type LanguageId = (typeof LANGUAGE_IDS)[number];
-export type LanguageStatus = "active" | "experimental" | "planned";
-
-export const DEFAULT_LANGUAGE_ID: LanguageId = "en-US";
-
-export interface LanguageTokenizer {
-  wordPattern: RegExp;
-  splitWords: (text: string) => string[];
-}
-
-export interface LanguageErrorPattern {
-  id: string;
-  targetPhonemes: string[];
-  suspectedSubstitution: string;
-  example: string;
-  cue: string;
-}
-
-export interface StarterTrainingPlan {
-  id: string;
-  title: string;
-  targetPhonemes: string[];
-  focus: string;
-  minimalPairs?: Array<[string, string, string, string]>;
-  sentenceLadder?: string[];
-}
-
-export type AzureCapabilityStatus =
-  | "verified"
-  | "experimental"
-  | "not-probed"
-  | "blocked";
-
-export interface AzureCapabilityProfile {
-  status: AzureCapabilityStatus;
-  scriptedAssessment: boolean;
-  wordLevel: boolean;
-  phonemeLevel: boolean;
-  prosody: boolean;
-  spontaneousTranscription: boolean;
-  evidenceMasteryAllowed: boolean;
-  lastReviewed: string;
-  notes: string[];
+export interface LanguageReadiness {
+  phonemeInventory: boolean;
+  wordAudio: boolean;
+  wordPractice: boolean;
+  sentencePractice: boolean;
+  diagnosis: boolean;
+  evidenceMastery: boolean;
+  localVideos: boolean;
 }
 
 export interface LanguageProfile {
   id: LanguageId;
   displayName: string;
   nativeName: string;
-  learnerL1: "zh-CN";
+  shortLabel: string;
   azureLocale: string;
   status: LanguageStatus;
-  readiness: {
-    diagnosis: boolean;
-    training: boolean;
-    evidenceMastery: boolean;
-    requiresAzureProbe: boolean;
-  };
-  azureCapabilities: AzureCapabilityProfile;
-  tokenizer: LanguageTokenizer;
-  trackedPhonemes: string[];
-  assessmentWords: AssessmentWord[];
-  adaptiveAssessmentWords: AssessmentWord[];
-  assessmentParagraph: string;
-  recommendedPackIds: string[];
-  starterTrainingPlans: StarterTrainingPlan[];
-  errorPatterns: LanguageErrorPattern[];
-  notes: string[];
+  defaultPhonemeSlug: string;
+  soundUnitLabel: string;
+  pronunciationTestWord: string;
+  phonemeInventory: PhonemeData[];
+  readiness: LanguageReadiness;
+  learnerFocus: string[];
+  knownGaps: string[];
 }
 
-export function isLanguageId(value: unknown): value is LanguageId {
-  return (
-    typeof value === "string" && LANGUAGE_IDS.includes(value as LanguageId)
-  );
+export interface LanguageConfig {
+  languageId: LanguageId;
 }

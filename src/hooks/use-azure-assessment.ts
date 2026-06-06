@@ -2,8 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { assessPronunciation } from "@/lib/api-client";
-import { getAzureConfig, getCurrentLanguageId } from "@/lib/api-keys";
-import { getLanguageProfile } from "@/lib/language-profiles";
+import { getAzureConfig } from "@/lib/api-keys";
 import { trackAzureUsage } from "@/lib/usage-tracker";
 import { isSentence } from "@/lib/utils";
 import type { AzureAssessmentResult } from "@/types/azure";
@@ -12,6 +11,7 @@ interface UseAzureAssessmentReturn {
   assess: (
     audioBlob: Blob,
     referenceText: string,
+    language?: string,
   ) => Promise<AzureAssessmentResult | null>;
   result: AzureAssessmentResult | null;
   isLoading: boolean;
@@ -25,7 +25,11 @@ export function useAzureAssessment(): UseAzureAssessmentReturn {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const assess = useCallback(async (audioBlob: Blob, referenceText: string) => {
+  const assess = useCallback(async (
+    audioBlob: Blob,
+    referenceText: string,
+    language = "en-US",
+  ) => {
     const config = getAzureConfig();
     if (!config) {
       setError("请先在设置页面配置 Azure Speech API 密钥");
@@ -37,7 +41,6 @@ export function useAzureAssessment(): UseAzureAssessmentReturn {
     setIsLoading(true);
 
     try {
-      const language = getLanguageProfile(getCurrentLanguageId()).azureLocale;
       const assessed = await assessPronunciation(
         audioBlob,
         referenceText,

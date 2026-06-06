@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
+import { PhonemesRedirectClient } from "./phonemes-redirect-client";
 
 export default function PhonemesPage() {
-  redirect("/phonemes/ee");
+  return <PhonemesRedirectClient />;
 }

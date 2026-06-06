@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { RecordButton } from "@/components/audio/record-button";
 import { RecordingActions } from "@/components/audio/recording-actions";
@@ -13,7 +13,10 @@ import { ScoreSummary } from "@/components/scoring/score-summary";
 import { Button } from "@/components/ui/button";
 import { useAudioPlayer } from "@/hooks/use-audio-player";
 import { useAzureAssessment } from "@/hooks/use-azure-assessment";
-import { useMerriamWebsterConfig } from "@/hooks/use-api-keys";
+import {
+  useLanguageConfig,
+  useMerriamWebsterConfig,
+} from "@/hooks/use-api-keys";
 import type { FeedbackData } from "@/hooks/use-llm-feedback";
 import { useLlmFeedback } from "@/hooks/use-llm-feedback";
 import { useMwPronunciation } from "@/hooks/use-mw-pronunciation";
@@ -24,9 +27,16 @@ import {
   useSessionState,
 } from "@/hooks/use-session-state";
 import { useSyllableStress } from "@/hooks/use-syllable-stress";
-import { getPhonemeBySlug } from "@/lib/phoneme-data";
-import { getPracticedWords, markWordPracticed } from "@/lib/practice-tracker";
-import { addScore } from "@/lib/score-history";
+import { getLanguagePhonemeBySlug } from "@/lib/language-phonemes";
+import {
+  getDefaultPhonemeSlug,
+  getLanguageProfile,
+} from "@/lib/language-profiles";
+import {
+  getPracticedWordsForLanguage,
+  markWordPracticedForLanguage,
+} from "@/lib/practice-tracker";
+import { addScore, scoreHistoryKey } from "@/lib/score-history";
 import { getWordPool } from "@/lib/word-pool";
 import { selectNextWord } from "@/lib/word-selector";
 import type { AzureAssessmentResult } from "@/types/azure";
@@ -34,7 +44,10 @@ import type { KeywordEntry } from "@/types/phoneme";
 
 export function PhonemeDetailPage() {
   const params = useParams<{ phoneme: string }>();
-  const phoneme = getPhonemeBySlug(params.phoneme);
+  const router = useRouter();
+  const { languageId } = useLanguageConfig();
+  const languageProfile = getLanguageProfile(languageId);
+  const phoneme = getLanguagePhonemeBySlug(languageId, params.phoneme);
 
   const recorder = useRecorder();
   const azure = useAzureAssessment();
@@ -47,7 +60,7 @@ export function PhonemeDetailPage() {
   const [wordDirection, setWordDirection] = useState<number>(1);
   const autoAssessTriggered = useRef(false);
 
-  const sessionPrefix = `phonemes:${params.phoneme}`;
+  const sessionPrefix = `phonemes:${languageId}:${params.phoneme}`;
 
   const [currentWord, setCurrentWord] = useSessionState<KeywordEntry | null>(
     `${sessionPrefix}:currentWord`,
@@ -66,7 +79,7 @@ export function PhonemeDetailPage() {
 
   // Annotate syllables with stress data (static IPA lookup → MW API fallback)
   const stressedSyllables = useSyllableStress(
-    currentWord?.word ?? null,
+    languageId === "en-US" ? (currentWord?.word ?? null) : null,
     selectedWordSyllables,
   );
 
@@ -110,8 +123,16 @@ export function PhonemeDetailPage() {
   const [practicedCount, setPracticedCount] = useState(0);
   useEffect(() => {
     setHasMwConfig(!!mwConfig?.apiKey);
-    setPracticedCount(getPracticedWords(phoneme?.slug ?? "").length);
-  }, [phoneme?.slug, mwConfig?.apiKey]);
+    setPracticedCount(
+      getPracticedWordsForLanguage(languageId, phoneme?.slug ?? "").length,
+    );
+  }, [languageId, phoneme?.slug, mwConfig?.apiKey]);
+
+  useEffect(() => {
+    if (!phoneme) {
+      router.replace(`/phonemes/${getDefaultPhonemeSlug(languageId)}`);
+    }
+  }, [languageId, phoneme, router]);
 
   // Pick first random word on mount
   useEffect(() => {
@@ -184,7 +205,11 @@ export function PhonemeDetailPage() {
   const handleAssess = useCallback(async () => {
     if (!recorder.audioBlob || !currentWordStr) return;
 
-    const result = await azure.assess(recorder.audioBlob, currentWordStr);
+    const result = await azure.assess(
+      recorder.audioBlob,
+      currentWordStr,
+      languageProfile.azureLocale,
+    );
 
     if (result) {
       if (result.words[0]?.phonemes) {
@@ -193,13 +218,18 @@ export function PhonemeDetailPage() {
       if (result.words[0]?.syllables) {
         setSelectedWordSyllables(result.words[0].syllables);
       }
-      addScore(`${phoneme?.slug}:${currentWordStr}`, result.pronunciationScore);
+      addScore(
+        scoreHistoryKey(languageId, phoneme?.slug ?? "", currentWordStr),
+        result.pronunciationScore,
+      );
       if (phoneme) {
-        markWordPracticed(phoneme.slug, currentWordStr);
-        setPracticedCount(getPracticedWords(phoneme.slug).length);
+        markWordPracticedForLanguage(languageId, phoneme.slug, currentWordStr);
+        setPracticedCount(
+          getPracticedWordsForLanguage(languageId, phoneme.slug).length,
+        );
       }
       llm.requestFeedback(
-        `${phoneme?.ipa} — ${phoneme?.name}, example word: ${currentWordStr}`,
+        `${languageProfile.displayName} ${phoneme?.ipa} — ${phoneme?.name}, example word: ${currentWordStr}`,
         result,
         "phoneme",
       );
@@ -208,6 +238,9 @@ export function PhonemeDetailPage() {
     recorder.audioBlob,
     currentWordStr,
     phoneme,
+    languageId,
+    languageProfile.azureLocale,
+    languageProfile.displayName,
     azure,
     llm,
     setSelectedWordPhonemes,
@@ -244,11 +277,11 @@ export function PhonemeDetailPage() {
     if (!azure.result || !phoneme) return;
     llm.reset();
     llm.requestFeedback(
-      `${phoneme.ipa} — ${phoneme.name}, example word: ${currentWordStr}`,
+      `${languageProfile.displayName} ${phoneme.ipa} — ${phoneme.name}, example word: ${currentWordStr}`,
       azure.result,
       "phoneme",
     );
-  }, [azure.result, phoneme, currentWordStr, llm]);
+  }, [azure.result, phoneme, currentWordStr, languageProfile.displayName, llm]);
 
   const handleClear = () => {
     playback.stop();
@@ -274,6 +307,7 @@ export function PhonemeDetailPage() {
   }
 
   const isWordActive = mw.isPlaying || mw.isLoading;
+  const isExperimentalLanguage = languageProfile.status !== "stable";
 
   return (
     <div className="h-full flex flex-col px-6 py-4 overflow-hidden">
@@ -284,11 +318,12 @@ export function PhonemeDetailPage() {
           {/* ── 学习区 ── */}
           <PhonemeStudyCard
             phoneme={phoneme}
+            languageProfile={languageProfile}
             currentWord={currentWord}
             wordDirection={wordDirection}
             wordPoolSize={wordPool.length}
             practicedCount={practicedCount}
-            hasMwConfig={hasMwConfig}
+            hasMwConfig={languageId === "en-US" && hasMwConfig}
             isWordActive={isWordActive}
             mwIsLoading={mw.isLoading}
             lastChartPlay={lastChartPlay}
@@ -296,13 +331,22 @@ export function PhonemeDetailPage() {
             onNext={handleNext}
             onSetWordDirection={setWordDirection}
             onSetLastChartPlay={setLastChartPlay}
-            onPlayWord={(word, voice) => mw.playWord(word, voice)}
+            onPlayWord={(word, voice) => mw.playWord(word, voice, languageId)}
             onPlayChartAudio={(path) => chartAudio.play(path)}
             onStopPlayback={() => playback.stop()}
             onStopMw={() => mw.stop()}
             onStopChartAudio={() => chartAudio.stop()}
             wordHistoryLength={wordHistory.length}
           />
+
+          {isExperimentalLanguage && (
+            <div className="rounded-xl border border-yellow-500/30 bg-yellow-500/5 px-4 py-3 text-sm text-muted-foreground">
+              {languageProfile.displayName}当前是
+              {languageProfile.status === "experimental" ? "实验" : "草案"}
+              板块：发音单位和示例词已接入，诊断、系统训练、mastery
+              证据链和本地教学视频仍在补齐。
+            </div>
+          )}
 
           {/* ── 练习区 ── */}
           <div className="shrink-0 rounded-xl border bg-card px-4 py-4 shadow-sm">
@@ -346,7 +390,11 @@ export function PhonemeDetailPage() {
                 <ScoreSummary
                   result={azure.result}
                   showProsody={false}
-                  historyKey={`${phoneme.slug}:${currentWordStr}`}
+                  historyKey={scoreHistoryKey(
+                    languageId,
+                    phoneme.slug,
+                    currentWordStr,
+                  )}
                 />
               </div>
             )}

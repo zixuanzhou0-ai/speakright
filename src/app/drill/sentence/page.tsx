@@ -3,13 +3,13 @@
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useCallback } from "react";
+import { LanguageModuleGate } from "@/components/common/language-module-gate";
 import { DrillConfig } from "@/components/drill/drill-config";
 import { DrillFeedback } from "@/components/drill/drill-feedback";
 import { DrillPhonemeLesson } from "@/components/drill/drill-phoneme-lesson";
 import { DrillRecording } from "@/components/drill/drill-recording";
 import { DrillSummaryCard } from "@/components/drill/drill-summary";
 import { DrillTeaching } from "@/components/drill/drill-teaching";
-import { withLanguageTrainingGate } from "@/components/drill/language-training-gate";
 import { useDrillSession } from "@/hooks/use-drill-session";
 import { useMwPronunciation } from "@/hooks/use-mw-pronunciation";
 import { useTtsAligned } from "@/hooks/use-tts-aligned";
@@ -17,7 +17,7 @@ import { buildSentenceDrillItems } from "@/lib/drill-utils";
 import { getPhonemeBySlug } from "@/lib/phoneme-data";
 import { SENTENCE_BANK } from "@/lib/sentence-bank";
 
-function SentenceDrillPage() {
+export default function SentenceDrillPage() {
   const drill = useDrillSession();
   const mw = useMwPronunciation();
   const tts = useTtsAligned();
@@ -63,7 +63,8 @@ function SentenceDrillPage() {
   }, [drill.config, handleStart]);
 
   return (
-    <div className="h-full flex flex-col px-6 py-4 overflow-y-auto scrollbar-thin">
+    <LanguageModuleGate moduleName="句子训练" readinessKey="sentencePractice">
+      <div className="h-full flex flex-col px-6 py-4 overflow-y-auto scrollbar-thin">
       <div className="mb-4 flex items-center gap-3 shrink-0">
         <Link
           href="/drill"
@@ -168,11 +169,10 @@ function SentenceDrillPage() {
           </div>
         )}
       </div>
-    </div>
+      </div>
+    </LanguageModuleGate>
   );
 }
-
-export default withLanguageTrainingGate(SentenceDrillPage, "句子训练");
 
 function SentenceLessonView({
   config,

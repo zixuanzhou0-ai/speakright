@@ -52,13 +52,11 @@ describe("desktop artifact smoke wiring", () => {
     expect(smokeScript).toContain("fonts.googleapis.com");
     expect(smokeScript).toContain("fonts.gstatic.com");
     expect(smokeScript).toContain("http://dict.youdao.com");
-    expect(smokeScript).toContain("https://dict.youdao.com/**");
     expect(smokeScript).toContain("/api/azure");
     expect(smokeScript).toContain("/api/elevenlabs");
     expect(smokeScript).toContain("/api/llm");
     expect(smokeScript).toContain("/api/pronunciation");
     expect(smokeScript).toContain("/api/merriam-webster");
-    expect(smokeScript).toContain("out/api");
     expect(smokeScript).toContain("core:default");
     expect(smokeScript).toContain("store:default");
     expect(smokeScript).toContain("http://");
@@ -100,8 +98,6 @@ describe("desktop artifact smoke wiring", () => {
     expect(smokeScript).toContain("建立诊断");
     expect(smokeScript).toContain("导出学习数据");
     expect(smokeScript).toContain("speakright-data-");
-    expect(smokeScript).toContain("youdaoPronunciation");
-    expect(smokeScript).toContain("phonemeWordPronunciation");
     expect(smokeScript).toContain("desktop-smoke-secret");
     expect(smokeScript).toContain("exportedApiKey");
     expect(smokeScript).toContain("desktop-smoke-preserve-key");

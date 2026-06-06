@@ -6,10 +6,12 @@ import Image from "next/image";
 import { PhonemePlayButton } from "@/components/phoneme/phoneme-play-button";
 import { VideoPlayer } from "@/components/phoneme/video-player";
 import { Button } from "@/components/ui/button";
+import type { LanguageProfile } from "@/types/language";
 import type { KeywordEntry, PhonemeData } from "@/types/phoneme";
 
 interface PhonemeStudyCardProps {
   phoneme: PhonemeData;
+  languageProfile: LanguageProfile;
   currentWord: KeywordEntry | null;
   wordDirection: number;
   wordPoolSize: number;
@@ -32,6 +34,7 @@ interface PhonemeStudyCardProps {
 
 export function PhonemeStudyCard({
   phoneme,
+  languageProfile,
   currentWord,
   wordDirection,
   wordPoolSize,
@@ -51,19 +54,27 @@ export function PhonemeStudyCard({
   onStopChartAudio,
   wordHistoryLength,
 }: PhonemeStudyCardProps) {
+  const hasLocalPhonemeAssets = phoneme.languageId === "en-US";
+
   return (
     <div className="shrink-0 rounded-xl border bg-card shadow-sm overflow-hidden">
-      <VideoPlayer slug={phoneme.slug} />
+      <VideoPlayer
+        slug={phoneme.slug}
+        available={phoneme.video?.status === "ready"}
+        label={phoneme.video?.label}
+      />
       <div className="px-4 py-3">
         {/* IPA + play + emoji */}
         <div className="flex items-center gap-3">
           <h1 className="font-mono text-3xl font-bold">{phoneme.ipa}</h1>
-          <PhonemePlayButton chartWord={phoneme.chartWord} />
+          <PhonemePlayButton
+            chartWord={hasLocalPhonemeAssets ? phoneme.chartWord : undefined}
+          />
           <span className="text-muted-foreground/30">|</span>
           <p className="text-sm text-muted-foreground flex-1 truncate">
-            {phoneme.name}
+            {languageProfile.shortLabel} · {phoneme.name}
           </p>
-          {phoneme.chartImage && (
+          {hasLocalPhonemeAssets && phoneme.chartImage && (
             <motion.button
               type="button"
               whileHover={{ scale: 1.1 }}

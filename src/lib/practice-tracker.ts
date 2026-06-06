@@ -1,6 +1,3 @@
-import type { LanguageId } from "@/types/language";
-import { languageScopedStorageKey } from "./language-storage";
-
 const STORAGE_KEY = "speakright_practice_history";
 
 interface PracticeHistory {
@@ -10,43 +7,32 @@ interface PracticeHistory {
   };
 }
 
-function scopedKey(languageId?: LanguageId): string {
-  return languageScopedStorageKey(STORAGE_KEY, languageId);
-}
-
-function getHistory(languageId?: LanguageId): PracticeHistory {
+function getHistory(): PracticeHistory {
   if (typeof window === "undefined") return {};
   try {
-    const raw = localStorage.getItem(scopedKey(languageId));
+    const raw = localStorage.getItem(STORAGE_KEY);
     return raw ? JSON.parse(raw) : {};
   } catch {
     return {};
   }
 }
 
-function setHistory(history: PracticeHistory, languageId?: LanguageId): void {
+function setHistory(history: PracticeHistory): void {
   if (typeof window === "undefined") return;
   try {
-    localStorage.setItem(scopedKey(languageId), JSON.stringify(history));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
   } catch {
     // localStorage full — silently ignore
   }
 }
 
-export function getPracticedWords(
-  slug: string,
-  languageId?: LanguageId,
-): string[] {
-  const history = getHistory(languageId);
+export function getPracticedWords(slug: string): string[] {
+  const history = getHistory();
   return history[slug]?.words ?? [];
 }
 
-export function markWordPracticed(
-  slug: string,
-  word: string,
-  languageId?: LanguageId,
-): void {
-  const history = getHistory(languageId);
+export function markWordPracticed(slug: string, word: string): void {
+  const history = getHistory();
   const entry = history[slug] ?? { words: [], lastUpdated: 0 };
   const lower = word.toLowerCase();
   if (!entry.words.includes(lower)) {
@@ -54,5 +40,28 @@ export function markWordPracticed(
   }
   entry.lastUpdated = Date.now();
   history[slug] = entry;
-  setHistory(history, languageId);
+  setHistory(history);
+}
+
+export function practiceHistoryKey(languageId: string, slug: string): string {
+  return `${languageId}:${slug}`;
+}
+
+export function getPracticedWordsForLanguage(
+  languageId: string,
+  slug: string,
+): string[] {
+  const scoped = getPracticedWords(practiceHistoryKey(languageId, slug));
+  if (scoped.length === 0 && languageId === "en-US") {
+    return getPracticedWords(slug);
+  }
+  return scoped;
+}
+
+export function markWordPracticedForLanguage(
+  languageId: string,
+  slug: string,
+  word: string,
+): void {
+  markWordPracticed(practiceHistoryKey(languageId, slug), word);
 }

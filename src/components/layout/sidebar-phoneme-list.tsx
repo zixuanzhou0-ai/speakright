@@ -4,9 +4,12 @@ import { ChevronDown } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { getPhonemesByCategory } from "@/lib/phoneme-data";
-import { getBestScore } from "@/lib/score-history";
+import { useLanguageConfig } from "@/hooks/use-api-keys";
+import { getLanguagePhonemesByCategory } from "@/lib/language-phonemes";
+import { getLanguageProfile } from "@/lib/language-profiles";
+import { getBestScoreForPhoneme } from "@/lib/score-history";
 import { cn } from "@/lib/utils";
+import type { LanguageId } from "@/types/language";
 import type { PhonemeData } from "@/types/phoneme";
 
 interface SidebarPhonemeListProps {
@@ -38,11 +41,13 @@ function PhonemeGroup({
   phonemes,
   currentSlug,
   defaultOpen,
+  languageId,
 }: {
   label: string;
   phonemes: PhonemeData[];
   currentSlug: string | null;
   defaultOpen: boolean;
+  languageId: LanguageId;
 }) {
   const [open, setOpen] = useState(defaultOpen);
   const [scores, setScores] = useState<Record<string, number | null>>({});
@@ -50,10 +55,10 @@ function PhonemeGroup({
   useEffect(() => {
     const s: Record<string, number | null> = {};
     for (const p of phonemes) {
-      s[p.slug] = getBestScore(p.slug);
+      s[p.slug] = getBestScoreForPhoneme(languageId, p.slug);
     }
     setScores(s);
-  }, [phonemes]);
+  }, [languageId, phonemes]);
 
   return (
     <div>
@@ -111,10 +116,16 @@ function PhonemeGroup({
 }
 
 export function SidebarPhonemeList({ currentSlug }: SidebarPhonemeListProps) {
-  const vowels = getPhonemesByCategory("vowel");
-  const consonants = getPhonemesByCategory("consonant");
+  const { languageId } = useLanguageConfig();
+  const profile = getLanguageProfile(languageId);
+  const vowels = getLanguagePhonemesByCategory(languageId, "vowel");
+  const consonants = getLanguagePhonemesByCategory(languageId, "consonant");
+  const prosody = getLanguagePhonemesByCategory(languageId, "prosody");
+  const clusters = getLanguagePhonemesByCategory(languageId, "cluster");
 
   const currentIsVowel = vowels.some((p) => p.slug === currentSlug);
+  const currentIsProsody = prosody.some((p) => p.slug === currentSlug);
+  const currentIsCluster = clusters.some((p) => p.slug === currentSlug);
 
   return (
     <div className="flex flex-col gap-0.5">
@@ -123,13 +134,36 @@ export function SidebarPhonemeList({ currentSlug }: SidebarPhonemeListProps) {
         phonemes={vowels}
         currentSlug={currentSlug}
         defaultOpen={currentIsVowel || !currentSlug}
+        languageId={languageId}
       />
       <PhonemeGroup
         label="辅音"
         phonemes={consonants}
         currentSlug={currentSlug}
-        defaultOpen={!currentIsVowel && !!currentSlug}
+        defaultOpen={!currentIsVowel && !currentIsProsody && !currentIsCluster && !!currentSlug}
+        languageId={languageId}
       />
+      {prosody.length > 0 && (
+        <PhonemeGroup
+          label="重音/连读"
+          phonemes={prosody}
+          currentSlug={currentSlug}
+          defaultOpen={currentIsProsody}
+          languageId={languageId}
+        />
+      )}
+      {clusters.length > 0 && (
+        <PhonemeGroup
+          label="辅音丛"
+          phonemes={clusters}
+          currentSlug={currentSlug}
+          defaultOpen={currentIsCluster}
+          languageId={languageId}
+        />
+      )}
+      <div className="px-2 pt-2 text-[11px] text-muted-foreground/60">
+        {profile.shortLabel} · {profile.soundUnitLabel}
+      </div>
     </div>
   );
 }

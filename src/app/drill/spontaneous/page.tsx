@@ -18,14 +18,13 @@ import { Button } from "@/components/ui/button";
 import { useRecorder } from "@/hooks/use-recorder";
 import { useRecordingQuality } from "@/hooks/use-recording-quality";
 import { assessPronunciation, transcribeSpeech } from "@/lib/api-client";
-import { getAzureConfig, getCurrentLanguageId } from "@/lib/api-keys";
+import { getAzureConfig } from "@/lib/api-keys";
 import { saveBenchmarkRecording } from "@/lib/benchmark-archive";
 import {
   analyzeFreePracticeTransfer,
   type FreePracticeTransferSummary,
   recordFreePracticeTransfer,
 } from "@/lib/free-practice-transfer";
-import { getLanguageProfile } from "@/lib/language-profiles";
 import { loadMasteryProfile, saveMasteryProfile } from "@/lib/mastery-profile";
 import { reliabilityFromRecordingQuality } from "@/lib/recording-quality";
 import { buildReviewQueue } from "@/lib/review-queue";
@@ -51,8 +50,6 @@ const PROMPTS = [
 ];
 
 export default function SpontaneousPage() {
-  const languageId = getCurrentLanguageId();
-  const languageProfile = getLanguageProfile(languageId);
   const [profile, setProfile] = useState<MasteryProfile | null>(null);
   const [promptId, setPromptId] = useState(PROMPTS[0].id);
   const [transcript, setTranscript] = useState("");
@@ -68,8 +65,8 @@ export default function SpontaneousPage() {
   });
 
   useEffect(() => {
-    setProfile(loadMasteryProfile(languageId));
-  }, [languageId]);
+    setProfile(loadMasteryProfile());
+  }, []);
 
   const prompt = useMemo(
     () => PROMPTS.find((item) => item.id === promptId) ?? PROMPTS[0],
@@ -119,7 +116,6 @@ export default function SpontaneousPage() {
         recorder.audioBlob,
         config.subscriptionKey,
         config.region,
-        languageProfile.azureLocale,
       );
       setTranscript(nextTranscript);
       const result = await assessPronunciation(
@@ -127,7 +123,6 @@ export default function SpontaneousPage() {
         nextTranscript,
         config.subscriptionKey,
         config.region,
-        languageProfile.azureLocale,
       );
       const transferSummary = {
         ...analyzeFreePracticeTransfer({
@@ -152,7 +147,7 @@ export default function SpontaneousPage() {
           transferSummary,
           reliability,
         );
-        saveMasteryProfile(recorded.profile, languageId);
+        saveMasteryProfile(recorded.profile);
         setProfile(recorded.profile);
         setSummary(recorded.summary);
       } else {
@@ -175,32 +170,6 @@ export default function SpontaneousPage() {
 
   const qualityDisabled =
     !!recorder.audioBlob && (quality.isAnalyzing || !quality.report?.canSubmit);
-
-  if (!languageProfile.readiness.training) {
-    return (
-      <div className="h-full overflow-y-auto px-6 py-4 scrollbar-thin">
-        <div className="mx-auto mt-10 max-w-2xl rounded-xl border bg-card p-8 text-center shadow-sm">
-          <Mic className="mx-auto mb-4 h-10 w-10 text-muted-foreground" />
-          <h1 className="text-xl font-bold">
-            {languageProfile.displayName}即兴迁移准备中
-          </h1>
-          <p className="mt-3 text-sm text-muted-foreground">
-            自由表达证据需要先验证 Azure 转写和目标音命中规则，本轮不写入该语言 mastery。
-          </p>
-          <div className="mt-5 flex justify-center gap-3">
-            <Link href="/settings">
-              <Button variant="outline" className="cursor-pointer">
-                切换训练语言
-              </Button>
-            </Link>
-            <Link href="/drill">
-              <Button className="cursor-pointer">返回今日计划</Button>
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="h-full overflow-y-auto px-6 py-4 scrollbar-thin">

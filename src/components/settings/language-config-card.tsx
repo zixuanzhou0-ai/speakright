@@ -1,99 +1,106 @@
 "use client";
 
-import { Check, FlaskConical, Globe2, LockKeyhole } from "lucide-react";
+import { CheckCircle2, FlaskConical, Languages } from "lucide-react";
 import { toast } from "sonner";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLanguageConfig } from "@/hooks/use-api-keys";
 import { setLanguageConfig } from "@/lib/api-keys";
-import { getLanguageProfiles } from "@/lib/language-profiles";
+import { auditLanguageCoverage } from "@/lib/language-content-audit";
+import {
+  getEnabledLanguageProfiles,
+  getLanguageProfile,
+} from "@/lib/language-profiles";
 import { cn } from "@/lib/utils";
-import type { LanguageId, LanguageProfile } from "@/types/language";
+import type { LanguageId } from "@/types/language";
 
-function statusLabel(profile: LanguageProfile): string {
-  if (profile.status === "active") return "完整";
-  if (profile.status === "experimental") return "实验";
-  return "准备中";
-}
-
-function StatusIcon({ profile }: { profile: LanguageProfile }) {
-  if (profile.status === "active") return <Check className="h-4 w-4" />;
-  if (profile.status === "experimental") {
-    return <FlaskConical className="h-4 w-4" />;
-  }
-  return <LockKeyhole className="h-4 w-4" />;
+function statusLabel(status: string) {
+  if (status === "stable") return "基线";
+  if (status === "experimental") return "实验";
+  return "草案";
 }
 
 export function LanguageConfigCard() {
   const config = useLanguageConfig();
-  const profiles = getLanguageProfiles();
+  const activeProfile = getLanguageProfile(config.languageId);
+  const profiles = getEnabledLanguageProfiles();
 
-  const handleSelect = (targetLanguage: LanguageId) => {
-    const profile = profiles.find((item) => item.id === targetLanguage);
-    setLanguageConfig({ targetLanguage });
-    toast.success(`已切换到${profile?.displayName ?? targetLanguage}`);
+  const handleSelect = (languageId: LanguageId) => {
+    setLanguageConfig({ languageId });
+    const profile = getLanguageProfile(languageId);
+    toast.success(`已切换到${profile.displayName}学习板块`);
   };
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-base">
-          <Globe2 className="h-5 w-5" />
-          训练语言
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="grid gap-2 md:grid-cols-4">
-          {profiles.map((profile) => {
-            const selected = config.targetLanguage === profile.id;
-            return (
-              <button
-                key={profile.id}
-                type="button"
-                onClick={() => handleSelect(profile.id)}
-                className={cn(
-                  "flex min-h-28 flex-col justify-between rounded-lg border-2 p-3 text-left transition-all cursor-pointer",
-                  selected
-                    ? "border-primary bg-primary/5"
-                    : "border-transparent bg-muted/50 hover:bg-muted",
-                )}
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <p className="font-semibold">{profile.displayName}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {profile.nativeName}
-                    </p>
-                  </div>
-                  <span
-                    className={cn(
-                      "rounded-full p-1.5",
-                      selected ? "bg-primary text-primary-foreground" : "bg-background",
-                    )}
-                  >
-                    <StatusIcon profile={profile} />
-                  </span>
-                </div>
-                <div className="mt-3 flex flex-wrap gap-1.5">
-                  <Badge
-                    variant={
-                      profile.status === "active"
-                        ? "default"
-                        : profile.status === "experimental"
-                          ? "secondary"
-                          : "outline"
-                    }
-                  >
-                    {statusLabel(profile)}
-                  </Badge>
-                  {profile.readiness.requiresAzureProbe && (
-                    <Badge variant="outline">Azure probe</Badge>
-                  )}
-                </div>
-              </button>
-            );
-          })}
+        <div className="flex items-center gap-2">
+          <Languages className="h-4 w-4 text-primary" />
+          <CardTitle className="text-base">学习语言</CardTitle>
         </div>
+        <p className="text-sm text-muted-foreground">
+          当前：{activeProfile.displayName}。非英语板块仍按覆盖率逐步开放。
+        </p>
+      </CardHeader>
+      <CardContent className="grid gap-3 md:grid-cols-2">
+        {profiles.map((profile) => {
+          const selected = profile.id === config.languageId;
+          const audit = auditLanguageCoverage(profile.id);
+          const missingPreview = audit.missingCapabilities.slice(0, 3).join("、");
+          return (
+            <button
+              key={profile.id}
+              type="button"
+              onClick={() => handleSelect(profile.id)}
+              className={cn(
+                "rounded-lg border p-4 text-left transition-colors",
+                selected
+                  ? "border-primary bg-primary/5"
+                  : "border-border hover:border-primary/40",
+              )}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium">{profile.displayName}</span>
+                    <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">
+                      {statusLabel(profile.status)}
+                    </span>
+                  </div>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    {profile.nativeName} · Azure {profile.azureLocale}
+                  </p>
+                </div>
+                {selected ? (
+                  <CheckCircle2 className="h-4 w-4 shrink-0 text-primary" />
+                ) : (
+                  <FlaskConical className="h-4 w-4 shrink-0 text-muted-foreground" />
+                )}
+              </div>
+
+              <div className="mt-3 grid grid-cols-3 gap-2 text-xs">
+                <div className="rounded border bg-background px-2 py-1.5">
+                  <p className="text-muted-foreground">发音单位</p>
+                  <p className="font-semibold">{audit.soundUnits}</p>
+                </div>
+                <div className="rounded border bg-background px-2 py-1.5">
+                  <p className="text-muted-foreground">示例词</p>
+                  <p className="font-semibold">{audit.keywordTotal}</p>
+                </div>
+                <div className="rounded border bg-background px-2 py-1.5">
+                  <p className="text-muted-foreground">覆盖率</p>
+                  <p className="font-semibold">{audit.coverageScore}%</p>
+                </div>
+              </div>
+
+              {audit.missingCapabilities.length > 0 && (
+                <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">
+                  待补：{missingPreview}
+                  {audit.missingCapabilities.length > 3 ? "…" : ""}
+                </p>
+              )}
+            </button>
+          );
+        })}
       </CardContent>
     </Card>
   );

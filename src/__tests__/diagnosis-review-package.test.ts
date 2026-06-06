@@ -5,7 +5,6 @@ import type { DiagnosisReport } from "@/types/diagnosis";
 function report(): DiagnosisReport {
   return {
     version: 2,
-    languageId: "en-US",
     timestamp: 1000,
     overallScore: 72,
     dimensions: {

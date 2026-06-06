@@ -13,11 +13,7 @@ import type {
   MerriamWebsterConfig,
   PronunciationConfig,
 } from "@/types/api-keys";
-import {
-  DEFAULT_LANGUAGE_ID,
-  isLanguageId,
-  type LanguageId,
-} from "@/types/language";
+import { normalizeLanguageId } from "@/lib/language-profiles";
 
 export type CoachMode = "easy" | "normal" | "hard" | "strict";
 
@@ -47,10 +43,13 @@ export const API_KEY_STORAGE_ERROR_EVENT = "speakright:api-key-storage-error";
 const runtimeCache = new Map<string, unknown>();
 const SECRET_STORAGE_KEYS = new Set<string>(API_KEY_STORAGE_KEYS);
 const DEFAULT_PRONUNCIATION_CONFIG: PronunciationConfig = { source: "youdao" };
-const DEFAULT_LANGUAGE_CONFIG: LanguageConfig = {
-  targetLanguage: DEFAULT_LANGUAGE_ID,
-};
-let languageConfigSnapshot: LanguageConfig = DEFAULT_LANGUAGE_CONFIG;
+const LANGUAGE_CONFIG_SNAPSHOTS: Record<LanguageConfig["languageId"], LanguageConfig> =
+  {
+    "en-US": { languageId: "en-US" },
+    "es-ES": { languageId: "es-ES" },
+    "fr-FR": { languageId: "fr-FR" },
+    "ru-RU": { languageId: "ru-RU" },
+  };
 
 export interface ApiKeyStorageErrorDetail {
   key: string;
@@ -315,28 +314,18 @@ export function setPronunciationConfig(config: PronunciationConfig): void {
   setItem(STORAGE_KEYS.pronunciation, config);
 }
 
-// Target language
+// Learning language
 export function getLanguageConfig(): LanguageConfig {
-  const stored = getItem<Partial<LanguageConfig>>(STORAGE_KEYS.language);
-  const targetLanguage = isLanguageId(stored?.targetLanguage)
-    ? stored.targetLanguage
-    : DEFAULT_LANGUAGE_ID;
-  if (languageConfigSnapshot.targetLanguage === targetLanguage) {
-    return languageConfigSnapshot;
-  }
-  languageConfigSnapshot = { targetLanguage };
-  return languageConfigSnapshot;
-}
-
-export function getCurrentLanguageId(): LanguageId {
-  return getLanguageConfig().targetLanguage;
+  const saved =
+    getItem<LanguageConfig & { targetLanguage?: unknown }>(STORAGE_KEYS.language);
+  return LANGUAGE_CONFIG_SNAPSHOTS[
+    normalizeLanguageId(saved?.languageId ?? saved?.targetLanguage)
+  ];
 }
 
 export function setLanguageConfig(config: LanguageConfig): void {
   setItem(STORAGE_KEYS.language, {
-    targetLanguage: isLanguageId(config.targetLanguage)
-      ? config.targetLanguage
-      : DEFAULT_LANGUAGE_ID,
+    languageId: normalizeLanguageId(config.languageId),
   });
 }
 

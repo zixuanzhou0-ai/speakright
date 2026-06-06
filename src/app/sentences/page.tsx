@@ -2,6 +2,7 @@
 
 import { Trash2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { LanguageModuleGate } from "@/components/common/language-module-gate";
 import { SentenceInputCard } from "@/components/sentences/sentence-input-card";
 import { SentenceRecordingCard } from "@/components/sentences/sentence-recording-card";
 import { SentenceResultsColumn } from "@/components/sentences/sentence-results-column";
@@ -341,7 +342,8 @@ export default function SentencesPage() {
   // ── Render ──
 
   return (
-    <div className="h-full flex flex-col px-6 py-4 overflow-hidden">
+    <LanguageModuleGate moduleName="自由练习" readinessKey="sentencePractice">
+      <div className="h-full flex flex-col px-6 py-4 overflow-hidden">
       <div className="mb-2 flex shrink-0 items-center justify-between">
         <h1 className="text-2xl font-bold">自由练习</h1>
         {(azure.result || llm.hasFeedback) && (
@@ -423,6 +425,7 @@ export default function SentencesPage() {
           />
         </div>
       </div>
-    </div>
+      </div>
+    </LanguageModuleGate>
   );
 }

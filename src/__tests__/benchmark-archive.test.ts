@@ -1,24 +1,16 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import {
   benchmarkGroupKey,
   encodeBenchmarkAudioBlob,
-  exportBenchmarkRecordings,
-  listBenchmarkRecordings,
-  saveBenchmarkRecording,
   summarizeBenchmarkGroups,
   summarizeBenchmarkTrend,
 } from "@/lib/benchmark-archive";
 
 describe("benchmark archive", () => {
-  beforeEach(() => {
-    localStorage.clear();
-  });
-
   it("summarizes before/after score trend", () => {
     const trend = summarizeBenchmarkTrend([
       {
         id: "a",
-        languageId: "en-US",
         createdAt: 1000,
         source: "prosody",
         title: "first",
@@ -28,7 +20,6 @@ describe("benchmark archive", () => {
       },
       {
         id: "b",
-        languageId: "en-US",
         createdAt: 2000,
         source: "prosody",
         title: "second",
@@ -57,7 +48,6 @@ describe("benchmark archive", () => {
     const groups = summarizeBenchmarkGroups([
       {
         id: "a",
-        languageId: "en-US",
         createdAt: 1000,
         source: "prosody",
         title: "first",
@@ -67,7 +57,6 @@ describe("benchmark archive", () => {
       },
       {
         id: "b",
-        languageId: "en-US",
         createdAt: 2000,
         source: "prosody",
         title: "second",
@@ -77,7 +66,6 @@ describe("benchmark archive", () => {
       },
       {
         id: "c",
-        languageId: "en-US",
         createdAt: 3000,
         source: "scenario",
         title: "scenario",
@@ -101,7 +89,6 @@ describe("benchmark archive", () => {
   it("normalizes target label order for scenario trend grouping", () => {
     const first = benchmarkGroupKey({
       id: "a",
-      languageId: "en-US",
       createdAt: 1000,
       source: "scenario",
       title: "scenario",
@@ -111,7 +98,6 @@ describe("benchmark archive", () => {
     });
     const second = benchmarkGroupKey({
       id: "b",
-      languageId: "en-US",
       createdAt: 2000,
       source: "scenario",
       title: "scenario",
@@ -121,50 +107,6 @@ describe("benchmark archive", () => {
     });
 
     expect(first).toBe(second);
-  });
-
-  it("isolates benchmark recording metadata by language and exports all languages", async () => {
-    await saveBenchmarkRecording(
-      new Blob(["en"], { type: "audio/webm" }),
-      {
-        id: "bench-en",
-        createdAt: 1_000,
-        source: "spontaneous",
-        title: "English",
-        text: "I think so.",
-        score: 86,
-        targetLabel: "s-th",
-      },
-      "en-US",
-    );
-    await saveBenchmarkRecording(
-      new Blob(["es"], { type: "audio/webm" }),
-      {
-        id: "bench-es",
-        createdAt: 2_000,
-        source: "spontaneous",
-        title: "Spanish",
-        text: "pero perro",
-        score: 74,
-        targetLabel: "es-r",
-      },
-      "es-ES",
-    );
-
-    expect(listBenchmarkRecordings("en-US").map((item) => item.id)).toEqual([
-      "bench-en",
-    ]);
-    expect(listBenchmarkRecordings("es-ES").map((item) => item.id)).toEqual([
-      "bench-es",
-    ]);
-    expect(
-      exportBenchmarkRecordings().then((archive) =>
-        archive.meta.map((item) => [item.id, item.languageId]),
-      ),
-    ).resolves.toEqual([
-      ["bench-es", "es-ES"],
-      ["bench-en", "en-US"],
-    ]);
   });
 
   it("encodes benchmark audio blobs for data export", async () => {

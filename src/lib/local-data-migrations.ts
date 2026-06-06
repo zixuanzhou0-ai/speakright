@@ -6,10 +6,6 @@ import type {
   PhonemeMastery,
   TrainingSessionSummary,
 } from "@/types/training";
-import {
-  LANGUAGE_SCOPED_STORAGE_BASE_KEYS,
-  languageScopedStoragePrefix,
-} from "@/lib/language-storage";
 
 export const LOCAL_DATA_SCHEMA_VERSION = 2;
 export const LOCAL_DATA_SCHEMA_VERSION_KEY =
@@ -39,10 +35,7 @@ const KNOWN_JSON_STORAGE_KEYS = [
   "speakright_stress_cache",
 ] as const;
 
-const KNOWN_JSON_STORAGE_PREFIXES = [
-  "speakright_mw_words_",
-  ...LANGUAGE_SCOPED_STORAGE_BASE_KEYS.map(languageScopedStoragePrefix),
-] as const;
+const KNOWN_JSON_STORAGE_PREFIXES = ["speakright_mw_words_"] as const;
 
 export interface CorruptLocalDataItem {
   key: string;
