@@ -28,6 +28,7 @@ import {
   type FreePracticeTransferSummary,
   recordFreePracticeTransfer,
 } from "@/lib/free-practice-transfer";
+import { DEFAULT_LANGUAGE_ID } from "@/lib/language-profiles";
 import { loadMasteryProfile, saveMasteryProfile } from "@/lib/mastery-profile";
 import { reliabilityFromRecordingQuality } from "@/lib/recording-quality";
 import {
@@ -52,7 +53,7 @@ export default function ScenariosPage() {
   });
 
   useEffect(() => {
-    setProfile(loadMasteryProfile());
+    setProfile(loadMasteryProfile(DEFAULT_LANGUAGE_ID));
   }, []);
 
   const plan = useMemo(
@@ -101,7 +102,7 @@ export default function ScenariosPage() {
         transferSummary,
         reliability,
       );
-      saveMasteryProfile(recorded.profile);
+      saveMasteryProfile(recorded.profile, DEFAULT_LANGUAGE_ID);
       setProfile(recorded.profile);
       setSummary(recorded.summary);
     }

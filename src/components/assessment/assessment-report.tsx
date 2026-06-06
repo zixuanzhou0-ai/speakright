@@ -63,8 +63,8 @@ export function AssessmentReport({ result, onRetake }: AssessmentReportProps) {
   const isNonEnglishReport =
     result.languageId != null && result.languageId !== DEFAULT_LANGUAGE_ID;
   useEffect(() => {
-    setProfile(loadMasteryProfile());
-  }, []);
+    setProfile(loadMasteryProfile(result.languageId ?? DEFAULT_LANGUAGE_ID));
+  }, [result.languageId]);
 
   const displayPrescription = useMemo(
     () =>

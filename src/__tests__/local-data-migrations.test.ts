@@ -66,7 +66,9 @@ describe("local data migrations", () => {
     expect(profile.packs["th-s"].status).toBe("new");
     expect(profile.packs["th-s"].levelProgress).toEqual({});
     expect(profile.errorPatterns).toEqual({});
-    expect(sessions).toEqual([{ id: "s1", packId: "th-s" }]);
+    expect(sessions).toEqual([
+      { id: "s1", languageId: "en-US", packId: "th-s" },
+    ]);
   });
 
   it("backfills training session snapshots from existing mastery v2", async () => {

@@ -32,6 +32,15 @@ function resultForWords(
 }
 
 describe("coverage passage", () => {
+  it("rejects non-English coverage diagnosis at the engine boundary", () => {
+    expect(() =>
+      buildCoveragePassageDiagnosisReport({
+        languageId: "es-ES",
+        recordings: [],
+      }),
+    ).toThrow("en-US only");
+  });
+
   it("covers the ten core training packs with natural recordable text", () => {
     expect(COVERAGE_PASSAGE.segments.length).toBeGreaterThanOrEqual(7);
 

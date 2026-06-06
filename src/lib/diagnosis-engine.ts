@@ -738,8 +738,12 @@ export function buildDiagnosisReport({
 }
 
 export function buildCoveragePassageDiagnosisReport({
+  languageId = DEFAULT_LANGUAGE_ID,
   recordings,
 }: CoveragePassageBuildInput): DiagnosisReport {
+  if (languageId !== DEFAULT_LANGUAGE_ID) {
+    throw new Error("Coverage passage diagnosis is currently en-US only.");
+  }
   const phonemeBuckets: Record<string, number[]> = {};
   const rawEvidence: DiagnosisEvidence[] = [];
   const analyses: AssessmentEvidenceAnalysis[] = [];

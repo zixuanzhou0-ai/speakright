@@ -24,11 +24,13 @@ import {
   summarizeBenchmarkGroups,
   summarizeBenchmarkTrend,
 } from "@/lib/benchmark-archive";
+import { useLanguageConfig } from "@/hooks/use-api-keys";
 import { loadMasteryProfile } from "@/lib/mastery-profile";
 import { TRAINING_PACKS } from "@/lib/training-packs";
 import type { MasteryProfile } from "@/types/training";
 
 export default function ProgressPage() {
+  const { languageId } = useLanguageConfig();
   const [recordings, setRecordings] = useState<BenchmarkRecordingMeta[]>([]);
   const [profile, setProfile] = useState<MasteryProfile | null>(null);
   const benchmarkGroups = useMemo(
@@ -42,8 +44,8 @@ export default function ProgressPage() {
 
   useEffect(() => {
     setRecordings(listBenchmarkRecordings());
-    setProfile(loadMasteryProfile());
-  }, []);
+    setProfile(loadMasteryProfile(languageId));
+  }, [languageId]);
 
   const refreshRecordings = () => {
     setRecordings(listBenchmarkRecordings());

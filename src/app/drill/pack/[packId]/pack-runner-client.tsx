@@ -26,6 +26,7 @@ import { FeedbackDisplay } from "@/components/feedback/feedback-display";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useAzureAssessment } from "@/hooks/use-azure-assessment";
+import { useLanguageConfig } from "@/hooks/use-api-keys";
 import { useLlmFeedback } from "@/hooks/use-llm-feedback";
 import { useMwPronunciation } from "@/hooks/use-mw-pronunciation";
 import { useRecorder } from "@/hooks/use-recorder";
@@ -54,6 +55,10 @@ import {
   buildSessionDebrief,
   type LessonBrief,
 } from "@/lib/lesson-brief";
+import {
+  DEFAULT_LANGUAGE_ID,
+  getLanguageProfile,
+} from "@/lib/language-profiles";
 import {
   evaluateSessionMastery,
   loadMasteryProfile,
@@ -179,6 +184,37 @@ function itemFromRemediationStep(
 }
 
 export default function TrainingPackPage() {
+  const { languageId } = useLanguageConfig();
+  const profile = getLanguageProfile(languageId);
+
+  if (languageId !== DEFAULT_LANGUAGE_ID) {
+    return (
+      <div className="flex h-full items-center justify-center px-6 py-8">
+        <div className="w-full max-w-2xl rounded-xl border bg-card p-6 shadow-sm">
+          <h1 className="text-xl font-semibold">
+            {profile.displayName}训练包准备中
+          </h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            这条训练包是美式英语 evidence mastery 课程。当前语言只开放对应语言的
+            beta 单词/句子练习，不会进入英语训练包和 mastery。
+          </p>
+          <div className="mt-5 flex gap-2">
+            <Link href="/drill">
+              <Button>返回当前语言训练</Button>
+            </Link>
+            <Link href="/settings">
+              <Button variant="outline">切换语言</Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return <EnglishTrainingPackPage />;
+}
+
+function EnglishTrainingPackPage() {
   const params = useParams<{ packId: string }>();
   const searchParams = useSearchParams();
   const packId = Array.isArray(params.packId)
@@ -266,7 +302,7 @@ export default function TrainingPackPage() {
   }, [currentLevel, levelStats]);
   const savedProfile = useMemo(() => {
     if (!pack || !course) return null;
-    return loadMasteryProfile();
+    return loadMasteryProfile(DEFAULT_LANGUAGE_ID);
   }, [pack, course]);
   const savedReviewQueue = useMemo(
     () => buildReviewQueue(savedProfile),
@@ -485,6 +521,7 @@ export default function TrainingPackPage() {
     const uniqueQualityIssues = Array.from(new Set(qualityIssues));
     const summary: TrainingSessionSummary = {
       id: `${pack.id}-${Date.now()}`,
+      languageId: DEFAULT_LANGUAGE_ID,
       packId: pack.id,
       startedAt: startedAtRef.current,
       completedAt: Date.now(),
@@ -535,10 +572,10 @@ export default function TrainingPackPage() {
     const mastered = evaluateSessionMastery(summary);
     const completedSummary = { ...summary, mastered };
     const profile = recordTrainingSession(
-      loadMasteryProfile(),
+      loadMasteryProfile(DEFAULT_LANGUAGE_ID),
       completedSummary,
     );
-    saveMasteryProfile(profile);
+    saveMasteryProfile(profile, DEFAULT_LANGUAGE_ID);
     setPhase({ type: "completed", summary: completedSummary });
   };
 
@@ -1984,7 +2021,8 @@ function CompletedStep({
         (level) => level.id === summary.recommendedNextLevelId,
       )
     : null;
-  const nextReview = loadMasteryProfile().packs[pack.id]?.nextReviewAt;
+  const nextReview = loadMasteryProfile(DEFAULT_LANGUAGE_ID).packs[pack.id]
+    ?.nextReviewAt;
   const evidencePrompt = buildCoachSummaryPrompt(pack, summary, worstAttempt);
   const debrief = buildSessionDebrief(pack, summary);
   return (

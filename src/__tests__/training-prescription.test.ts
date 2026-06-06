@@ -68,6 +68,7 @@ describe("training prescription", () => {
   it("defers mastered packs unless review is due", () => {
     const profile: MasteryProfile = {
       version: 2,
+      languageId: "en-US",
       updatedAt: 1,
       packs: {
         "s-th": {
@@ -135,6 +136,7 @@ describe("training prescription", () => {
     diagnosisIssue.evidenceStrength = "strong";
     const profile: MasteryProfile = {
       version: 2,
+      languageId: "en-US",
       updatedAt: 1,
       packs: {
         "s-th": {
@@ -182,6 +184,7 @@ describe("training prescription", () => {
   it("routes due reviews to the next required mastery layer", () => {
     const profile: MasteryProfile = {
       version: 2,
+      languageId: "en-US",
       updatedAt: 1,
       packs: {
         "v-w": {

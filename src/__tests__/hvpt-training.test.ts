@@ -59,6 +59,7 @@ describe("hvpt training", () => {
   it("recommends weak profile contrasts before generic defaults", () => {
     const profile: MasteryProfile = {
       version: 2,
+      languageId: "en-US",
       updatedAt: 1000,
       packs: {
         "v-w": {

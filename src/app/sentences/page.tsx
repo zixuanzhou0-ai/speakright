@@ -122,11 +122,14 @@ export default function SentencesPage() {
   }, [azure.restore, llm.restore, sessionPrefix]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    const refreshProfile = () => setMasteryProfile(loadMasteryProfile());
+    const refreshProfile = () =>
+      setMasteryProfile(
+        canRecordTransfer ? loadMasteryProfile(DEFAULT_LANGUAGE_ID) : null,
+      );
     refreshProfile();
     window.addEventListener("storage", refreshProfile);
     return () => window.removeEventListener("storage", refreshProfile);
-  }, []);
+  }, [canRecordTransfer]);
 
   useEffect(() => {
     if (!restoredRef.current) return;
@@ -238,7 +241,7 @@ export default function SentencesPage() {
       const histKey = `${languageId}:${text.slice(0, 50)}:${text.length}`;
       addScore(histKey, result.pronunciationScore);
       if (canRecordTransfer) {
-        const currentProfile = loadMasteryProfile();
+        const currentProfile = loadMasteryProfile(DEFAULT_LANGUAGE_ID);
         const transfer = analyzeFreePracticeTransfer({
           profile: currentProfile,
           result,
@@ -262,7 +265,7 @@ export default function SentencesPage() {
             transfer,
             reliability,
           );
-          saveMasteryProfile(recorded.profile);
+          saveMasteryProfile(recorded.profile, DEFAULT_LANGUAGE_ID);
           setMasteryProfile(recorded.profile);
           setTransferSummary(recorded.summary);
         } else {

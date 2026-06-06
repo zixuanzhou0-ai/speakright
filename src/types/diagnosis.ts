@@ -125,5 +125,6 @@ export interface CoveragePassageRecording {
 }
 
 export interface CoveragePassageBuildInput {
+  languageId?: LanguageId;
   recordings: CoveragePassageRecording[];
 }

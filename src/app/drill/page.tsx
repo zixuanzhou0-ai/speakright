@@ -187,7 +187,7 @@ export default function DrillPage() {
 
   useEffect(() => {
     setReport(loadReport(languageId));
-    setProfile(loadMasteryProfile());
+    setProfile(loadMasteryProfile(languageId));
     const refreshAzureState = () => {
       const config = getAzureConfig();
       setAzureReady(isAzureConfigReady(config));

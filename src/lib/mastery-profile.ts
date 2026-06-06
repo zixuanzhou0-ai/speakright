@@ -8,6 +8,8 @@ import type {
   TrainingLevelProgress,
   TrainingSessionSummary,
 } from "@/types/training";
+import type { LanguageId } from "@/types/language";
+import { DEFAULT_LANGUAGE_ID } from "./language-profiles";
 import { evaluateMasteryStage } from "./mastery-state";
 import { getTrainingPack } from "./training-packs";
 
@@ -17,9 +19,24 @@ const LEGACY_MASTERY_STORAGE_KEY = "speakright_mastery_profile_v1";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-export function createEmptyMasteryProfile(): MasteryProfile {
+export function masteryStorageKey(
+  languageId: LanguageId = DEFAULT_LANGUAGE_ID,
+): string {
+  return `${MASTERY_STORAGE_KEY}:${languageId}`;
+}
+
+export function trainingSessionsStorageKey(
+  languageId: LanguageId = DEFAULT_LANGUAGE_ID,
+): string {
+  return `${TRAINING_SESSIONS_STORAGE_KEY}:${languageId}`;
+}
+
+export function createEmptyMasteryProfile(
+  languageId: LanguageId = DEFAULT_LANGUAGE_ID,
+): MasteryProfile {
   return {
     version: 2,
+    languageId,
     updatedAt: Date.now(),
     packs: {},
     phonemes: {},
@@ -28,7 +45,24 @@ export function createEmptyMasteryProfile(): MasteryProfile {
   };
 }
 
-function parseProfile(raw: string | null): MasteryProfile | null {
+function normalizeProfile(
+  profile: MasteryProfile,
+  languageId: LanguageId,
+): MasteryProfile {
+  return {
+    ...profile,
+    languageId,
+    sessions: (profile.sessions ?? []).map((session) => ({
+      ...session,
+      languageId: session.languageId ?? languageId,
+    })),
+  };
+}
+
+function parseProfile(
+  raw: string | null,
+  languageId: LanguageId,
+): MasteryProfile | null {
   if (!raw) return null;
   try {
     const parsed = JSON.parse(raw) as MasteryProfile;
@@ -40,13 +74,17 @@ function parseProfile(raw: string | null): MasteryProfile | null {
     ) {
       return null;
     }
-    return parsed;
+    if (parsed.languageId && parsed.languageId !== languageId) return null;
+    return normalizeProfile(parsed, languageId);
   } catch {
     return null;
   }
 }
 
-function migrateLegacyProfile(raw: string | null): MasteryProfile | null {
+function migrateLegacyProfile(
+  raw: string | null,
+  languageId: LanguageId,
+): MasteryProfile | null {
   if (!raw) return null;
   try {
     const legacy = JSON.parse(raw) as {
@@ -75,46 +113,75 @@ function migrateLegacyProfile(raw: string | null): MasteryProfile | null {
     }
     return {
       version: 2,
+      languageId,
       updatedAt: legacy.updatedAt ?? Date.now(),
       packs,
       phonemes: legacy.phonemes,
       errorPatterns: {},
-      sessions: legacy.sessions ?? [],
+      sessions: (legacy.sessions ?? []).map((session) => ({
+        ...session,
+        languageId: session.languageId ?? languageId,
+      })),
     };
   } catch {
     return null;
   }
 }
 
-export function loadMasteryProfile(): MasteryProfile {
-  if (typeof window === "undefined") return createEmptyMasteryProfile();
-  const current = parseProfile(localStorage.getItem(MASTERY_STORAGE_KEY));
-  if (current) return current;
-  const migrated = migrateLegacyProfile(
-    localStorage.getItem(LEGACY_MASTERY_STORAGE_KEY),
+export function loadMasteryProfile(
+  languageId: LanguageId = DEFAULT_LANGUAGE_ID,
+): MasteryProfile {
+  if (typeof window === "undefined") return createEmptyMasteryProfile(languageId);
+  const current = parseProfile(
+    localStorage.getItem(masteryStorageKey(languageId)),
+    languageId,
   );
+  if (current) return current;
+  const legacyCurrent =
+    languageId === DEFAULT_LANGUAGE_ID
+      ? parseProfile(localStorage.getItem(MASTERY_STORAGE_KEY), languageId)
+      : null;
+  if (legacyCurrent) {
+    saveMasteryProfile(legacyCurrent, languageId);
+    return legacyCurrent;
+  }
+  const migrated =
+    languageId === DEFAULT_LANGUAGE_ID
+      ? migrateLegacyProfile(
+          localStorage.getItem(LEGACY_MASTERY_STORAGE_KEY),
+          languageId,
+        )
+      : null;
   if (migrated) {
-    saveMasteryProfile(migrated);
+    saveMasteryProfile(migrated, languageId);
     return migrated;
   }
-  return createEmptyMasteryProfile();
+  return createEmptyMasteryProfile(languageId);
 }
 
-export function saveMasteryProfile(profile: MasteryProfile): void {
+export function saveMasteryProfile(
+  profile: MasteryProfile,
+  languageId: LanguageId = profile.languageId ?? DEFAULT_LANGUAGE_ID,
+): void {
   if (typeof window === "undefined") return;
   const nextProfile = {
     ...profile,
     version: 2 as const,
+    languageId,
     updatedAt: Date.now(),
+    sessions: profile.sessions.map((session) => ({
+      ...session,
+      languageId: session.languageId ?? languageId,
+    })),
   };
-  localStorage.setItem(MASTERY_STORAGE_KEY, JSON.stringify(nextProfile));
+  const profileKey = masteryStorageKey(languageId);
+  const sessionsKey = trainingSessionsStorageKey(languageId);
+  localStorage.setItem(profileKey, JSON.stringify(nextProfile));
   localStorage.setItem(
-    TRAINING_SESSIONS_STORAGE_KEY,
+    sessionsKey,
     JSON.stringify(nextProfile.sessions),
   );
-  window.dispatchEvent(
-    new StorageEvent("storage", { key: MASTERY_STORAGE_KEY }),
-  );
+  window.dispatchEvent(new StorageEvent("storage", { key: profileKey }));
 }
 
 export function isReviewDue(mastery?: PackMastery, now = Date.now()): boolean {
@@ -129,6 +196,7 @@ function scoreAverage(scores: number[]): number {
 export function evaluateSessionMastery(
   session: TrainingSessionSummary,
 ): boolean {
+  if (session.languageId !== DEFAULT_LANGUAGE_ID) return false;
   if (
     session.assessmentReliability?.canPromoteMastery === false ||
     hasPromotionBlockers(session)
@@ -290,16 +358,26 @@ export function recordTrainingSession(
   profile: MasteryProfile,
   session: TrainingSessionSummary,
 ): MasteryProfile {
+  const profileLanguageId = profile.languageId ?? DEFAULT_LANGUAGE_ID;
+  const sessionLanguageId = session.languageId ?? profileLanguageId;
+  if (
+    profileLanguageId !== DEFAULT_LANGUAGE_ID ||
+    sessionLanguageId !== DEFAULT_LANGUAGE_ID ||
+    profileLanguageId !== sessionLanguageId
+  ) {
+    return profile;
+  }
+  const normalizedSession = { ...session, languageId: sessionLanguageId };
   const pack = getTrainingPack(session.packId);
-  const canPromote = reliabilityAllowsPromotion(session);
-  const mastered = evaluateSessionMastery(session);
-  const existing = profile.packs[session.packId];
+  const canPromote = reliabilityAllowsPromotion(normalizedSession);
+  const mastered = evaluateSessionMastery(normalizedSession);
+  const existing = profile.packs[normalizedSession.packId];
   const contributesTargetScores =
     canPromote && session.modality !== "perception";
   const completedSessions = (existing?.completedSessions ?? 0) + 1;
   const bestTargetScore = Math.max(
     existing?.bestTargetScore ?? 0,
-    ...(contributesTargetScores ? session.targetScores : []),
+    ...(contributesTargetScores ? normalizedSession.targetScores : []),
     0,
   );
   const perceptionRate =
@@ -308,18 +386,18 @@ export function recordTrainingSession(
       : 0;
   const wasDueMastered =
     existing?.status === "mastered" &&
-    isReviewDue(existing, session.completedAt);
+    isReviewDue(existing, normalizedSession.completedAt);
   const observableFailure =
-    (session.failedItems?.length ?? 0) > 0 ||
-    (session.stuckPatternIds?.length ?? 0) > 0;
+    (normalizedSession.failedItems?.length ?? 0) > 0 ||
+    (normalizedSession.stuckPatternIds?.length ?? 0) > 0;
   const failureStreak = mastered
     ? 0
     : canPromote || observableFailure
       ? (existing?.failureStreak ?? 0) + 1
       : (existing?.failureStreak ?? 0);
   const stage = canPromote
-    ? evaluateMasteryStage(existing, session, mastered, failureStreak)
-    : nonPromotingStage(existing, session);
+    ? evaluateMasteryStage(existing, normalizedSession, mastered, failureStreak)
+    : nonPromotingStage(existing, normalizedSession);
   const status: PackMastery["status"] = mastered
     ? "mastered"
     : wasDueMastered && failureStreak >= 2
@@ -335,6 +413,7 @@ export function recordTrainingSession(
     sessions: [
       {
         ...session,
+        languageId: sessionLanguageId,
         mastered,
         masteryStateAfter: stage.state,
         masteryStageScore: stage.stageScore,
@@ -344,8 +423,8 @@ export function recordTrainingSession(
     ].slice(0, 80),
     packs: {
       ...profile.packs,
-      [session.packId]: {
-        packId: session.packId,
+      [normalizedSession.packId]: {
+        packId: normalizedSession.packId,
         status,
         masteryState: stage.state,
         stageScore: stage.stageScore,
@@ -360,11 +439,11 @@ export function recordTrainingSession(
         transferEvidenceCount:
           (existing?.transferEvidenceCount ?? 0) +
           (canPromote
-            ? (session.transferEvidence?.filter((item) => item.passed).length ??
+            ? (normalizedSession.transferEvidence?.filter((item) => item.passed).length ??
               0)
             : 0),
         levelProgress: canPromote
-          ? buildLevelProgress(existing?.levelProgress, session)
+          ? buildLevelProgress(existing?.levelProgress, normalizedSession)
           : (existing?.levelProgress ?? {}),
         bestTargetScore,
         perceptionBestRate: Math.max(
@@ -373,15 +452,15 @@ export function recordTrainingSession(
         ),
         completedSessions,
         failureStreak,
-        lastPracticedAt: session.completedAt,
+        lastPracticedAt: normalizedSession.completedAt,
         nextReviewAt:
           mastered && canPromote
-            ? session.completedAt + nextReviewDelay(completedSessions)
+            ? normalizedSession.completedAt + nextReviewDelay(completedSessions)
             : existing?.nextReviewAt,
       },
     },
     phonemes: { ...profile.phonemes },
-    errorPatterns: updateErrorPatterns(profile.errorPatterns, session),
+    errorPatterns: updateErrorPatterns(profile.errorPatterns, normalizedSession),
   };
 
   if (pack && canPromote && canUpdateProductionPhonemes(session)) {
@@ -389,7 +468,7 @@ export function recordTrainingSession(
       nextProfile.phonemes[phoneme] = updatePhoneme(
         profile.phonemes[phoneme],
         phoneme,
-        session.targetScores,
+        normalizedSession.targetScores,
       );
     }
   }

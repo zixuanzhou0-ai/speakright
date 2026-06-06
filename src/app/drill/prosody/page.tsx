@@ -15,6 +15,7 @@ import { RecordButton } from "@/components/audio/record-button";
 import { RecordingActions } from "@/components/audio/recording-actions";
 import { RecordingQualityPanel } from "@/components/audio/recording-quality-panel";
 import { WaveformDisplay } from "@/components/audio/waveform-display";
+import { LanguageModuleGate } from "@/components/common/language-module-gate";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useAzureAssessment } from "@/hooks/use-azure-assessment";
@@ -27,6 +28,7 @@ import {
   recordTrainingSession,
   saveMasteryProfile,
 } from "@/lib/mastery-profile";
+import { DEFAULT_LANGUAGE_ID } from "@/lib/language-profiles";
 import {
   analyzeProsodyAttempt,
   buildProsodyTrainingSession,
@@ -73,10 +75,10 @@ export default function ProsodyPage() {
     const nextAnalysis = analyzeProsodyAttempt(exercise, result);
     setAnalysis(nextAnalysis);
     const profile = recordTrainingSession(
-      loadMasteryProfile(),
+      loadMasteryProfile(DEFAULT_LANGUAGE_ID),
       buildProsodyTrainingSession(exercise, nextAnalysis),
     );
-    saveMasteryProfile(profile);
+    saveMasteryProfile(profile, DEFAULT_LANGUAGE_ID);
     try {
       await saveBenchmarkRecording(recorder.audioBlob, {
         source: "prosody",
@@ -94,7 +96,8 @@ export default function ProsodyPage() {
     !!recorder.audioBlob && (quality.isAnalyzing || !quality.report?.canSubmit);
 
   return (
-    <div className="h-full overflow-y-auto px-6 py-4 scrollbar-thin">
+    <LanguageModuleGate moduleName="韵律与重音训练" readinessKey="evidenceMastery">
+      <div className="h-full overflow-y-auto px-6 py-4 scrollbar-thin">
       <div className="mb-5 flex items-center gap-3">
         <Link
           href="/drill"
@@ -300,7 +303,8 @@ export default function ProsodyPage() {
           )}
         </main>
       </div>
-    </div>
+      </div>
+    </LanguageModuleGate>
   );
 }
 

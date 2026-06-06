@@ -6,6 +6,7 @@ import type {
   PhonemeMastery,
   TrainingSessionSummary,
 } from "@/types/training";
+import { DEFAULT_LANGUAGE_ID } from "@/lib/language-profiles";
 
 export const LOCAL_DATA_SCHEMA_VERSION = 2;
 export const LOCAL_DATA_SCHEMA_VERSION_KEY =
@@ -191,11 +192,17 @@ function migrateLegacyMasteryProfile(): string[] {
 
   const next: MasteryProfile = {
     version: 2,
+    languageId: DEFAULT_LANGUAGE_ID,
     updatedAt: legacy.updatedAt ?? Date.now(),
     packs,
     phonemes: legacy.phonemes,
     errorPatterns: {},
-    sessions: Array.isArray(legacy.sessions) ? legacy.sessions : [],
+    sessions: Array.isArray(legacy.sessions)
+      ? legacy.sessions.map((session) => ({
+          ...session,
+          languageId: session.languageId ?? DEFAULT_LANGUAGE_ID,
+        }))
+      : [],
   };
 
   localStorage.setItem(MASTERY_V2_KEY, JSON.stringify(next));

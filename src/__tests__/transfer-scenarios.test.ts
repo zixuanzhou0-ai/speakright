@@ -24,6 +24,7 @@ describe("transfer scenarios", () => {
   it("prioritizes active user weakness packs inside a scenario plan", () => {
     const profile: MasteryProfile = {
       version: 2,
+      languageId: "en-US",
       updatedAt: 1000,
       packs: {
         "s-th": {

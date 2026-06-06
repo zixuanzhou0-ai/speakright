@@ -12,9 +12,12 @@ import {
 import { motion } from "motion/react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { LanguageModuleGate } from "@/components/common/language-module-gate";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useLanguageConfig } from "@/hooks/use-api-keys";
 import { useMwPronunciation } from "@/hooks/use-mw-pronunciation";
+import { DEFAULT_LANGUAGE_ID } from "@/lib/language-profiles";
 import {
   buildHvptSession,
   buildHvptTrainingSession,
@@ -55,6 +58,7 @@ function answerIsCorrect(trial: HvptTrial, answer: HvptAnswer): boolean {
 }
 
 export default function PerceptionDrillPage() {
+  const { languageId } = useLanguageConfig();
   const [selectedContrast, setSelectedContrast] = useState<HvptContrast | null>(
     null,
   );
@@ -68,8 +72,10 @@ export default function PerceptionDrillPage() {
     () =>
       typeof window === "undefined"
         ? ["ee-ih", "eh-ae", "s-th", "v-w", "l-r"]
-        : recommendedHvptContrastIds(loadMasteryProfile()),
-    [],
+        : languageId === DEFAULT_LANGUAGE_ID
+          ? recommendedHvptContrastIds(loadMasteryProfile(DEFAULT_LANGUAGE_ID))
+          : ["ee-ih", "eh-ae", "s-th", "v-w", "l-r"],
+    [languageId],
   );
 
   const startSession = (contrast: HvptContrast, reviewTrials?: HvptTrial[]) => {
@@ -139,8 +145,11 @@ export default function PerceptionDrillPage() {
       return;
     }
     const session = buildHvptTrainingSession(selectedContrast, summary);
-    const nextProfile = recordTrainingSession(loadMasteryProfile(), session);
-    saveMasteryProfile(nextProfile);
+    const nextProfile = recordTrainingSession(
+      loadMasteryProfile(DEFAULT_LANGUAGE_ID),
+      session,
+    );
+    saveMasteryProfile(nextProfile, DEFAULT_LANGUAGE_ID);
     setPhase({ type: "completed", summary });
   };
 
@@ -176,7 +185,8 @@ export default function PerceptionDrillPage() {
   }).length;
 
   return (
-    <div className="h-full flex flex-col px-6 py-4 overflow-y-auto scrollbar-thin">
+    <LanguageModuleGate moduleName="高变异听辨" readinessKey="evidenceMastery">
+      <div className="h-full flex flex-col px-6 py-4 overflow-y-auto scrollbar-thin">
       <div className="mb-4 flex items-center gap-3 shrink-0">
         <Link
           href="/drill"
@@ -534,6 +544,7 @@ export default function PerceptionDrillPage() {
           </motion.div>
         )}
       </div>
-    </div>
+      </div>
+    </LanguageModuleGate>
   );
 }
