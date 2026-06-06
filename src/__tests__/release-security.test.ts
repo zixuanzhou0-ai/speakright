@@ -224,7 +224,16 @@ describe("release security configuration", () => {
     expect(csp).not.toContain("'unsafe-eval'");
     expect(csp).toContain("media-src 'self' blob:");
     expect(csp).not.toMatch(/default-src[^;]*\sblob:/);
-    expect(csp).not.toMatch(/connect-src[^;]*\sblob:/);
+    expect(csp).toMatch(/connect-src[^;]*\sblob:/);
+  });
+
+  it("allows blob audio reads only in desktop media and connect CSP sinks", () => {
+    const directives = cspDirectives();
+
+    expect(directives.get("default-src")).not.toContain("blob:");
+    expect(directives.get("script-src")).not.toContain("blob:");
+    expect(directives.get("connect-src")?.split(/\s+/)).toContain("blob:");
+    expect(directives.get("media-src")?.split(/\s+/)).toContain("blob:");
   });
 
   it("does not allow data media sources in the desktop CSP", () => {

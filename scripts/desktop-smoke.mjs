@@ -267,6 +267,7 @@ function createCdpClient(webSocketDebuggerUrl) {
   return new Promise((resolve, reject) => {
     const socket = new WebSocket(webSocketDebuggerUrl);
     const pending = new Map();
+    const events = [];
     let nextId = 1;
     let opened = false;
 
@@ -280,6 +281,7 @@ function createCdpClient(webSocketDebuggerUrl) {
     socket.addEventListener("open", () => {
       opened = true;
       resolve({
+        events,
         send(method, params = {}) {
           const id = nextId++;
           const payload = JSON.stringify({ id, method, params });
@@ -309,7 +311,10 @@ function createCdpClient(webSocketDebuggerUrl) {
 
     socket.addEventListener("message", (event) => {
       const message = JSON.parse(normalizeWebSocketData(event.data));
-      if (!message.id || !pending.has(message.id)) return;
+      if (!message.id || !pending.has(message.id)) {
+        if (message.method) events.push(message);
+        return;
+      }
       const command = pending.get(message.id);
       pending.delete(message.id);
       if (message.error) {
@@ -550,6 +555,8 @@ async function captureInteractiveEvidence(debuggingPort) {
   const cdp = await createCdpClient(target.webSocketDebuggerUrl);
   try {
     await cdp.send("Runtime.enable");
+    await cdp.send("Log.enable");
+    await cdp.send("Network.enable");
     await cdp.send("Page.enable");
     await evaluate(
       cdp,
@@ -896,6 +903,84 @@ async function captureInteractiveEvidence(debuggingPort) {
         `Desktop Youdao pronunciation test failed: ${youdaoPronunciation?.reason ?? "unknown"} ${youdaoPronunciation?.bodyText ?? ""}`,
       );
     }
+
+    const phonemeWordEventStart = cdp.events.length;
+    await evaluate(
+      cdp,
+      'window.location.assign(new URL("/phonemes/ee", window.location.href).href); "navigating";',
+    );
+    await waitForBodyText(cdp, "已练");
+    await waitForBodyText(cdp, "/20");
+    const phonemeWordPronunciation = await evaluate(
+      cdp,
+      `
+(async () => {
+  const wordDeadline = Date.now() + 5000;
+  let playButton = null;
+  while (!playButton && Date.now() < wordDeadline) {
+    playButton = [...document.querySelectorAll("button")].find((button) => {
+      const className = String(button.className || "");
+      const rect = button.getBoundingClientRect();
+      return !button.disabled && className.includes("h-8 w-8") &&
+        rect.width >= 28 && rect.width <= 36 && rect.height >= 28 && rect.height <= 36;
+    });
+    if (!playButton) {
+      await new Promise((resolve) => setTimeout(resolve, 200));
+    }
+  }
+
+  if (!playButton) {
+    return {
+      ok: false,
+      reason: "phoneme word play button missing",
+      bodyText: document.body.innerText.slice(0, 1200)
+    };
+  }
+
+  const lines = document.body.innerText.split("\\n").map((line) => line.trim());
+  const progressIndex = lines.findIndex((line) => line.startsWith("已练"));
+  let wordLine = "";
+  for (let index = progressIndex - 1; index >= 0; index -= 1) {
+    if (/^[a-z][a-z'-]*$/i.test(lines[index])) {
+      wordLine = lines[index];
+      break;
+    }
+  }
+  playButton.click();
+  await new Promise((resolve) => setTimeout(resolve, 3000));
+
+  return {
+    ok: true,
+    word: wordLine,
+    bodyText: document.body.innerText.slice(0, 1200)
+  };
+})()
+`,
+    );
+    if (!phonemeWordPronunciation?.ok) {
+      throw new Error(
+        `Desktop phoneme word pronunciation test failed: ${phonemeWordPronunciation?.reason ?? "unknown"} ${phonemeWordPronunciation?.bodyText ?? ""}`,
+      );
+    }
+    const phonemeWordEvents = cdp.events.slice(phonemeWordEventStart);
+    const cspBlockedBlob = phonemeWordEvents.find(
+      (event) =>
+        (event.method === "Log.entryAdded" &&
+          event.params?.entry?.text?.includes("violates") &&
+          event.params?.entry?.text?.includes("blob:")) ||
+        (event.method === "Network.loadingFailed" &&
+          event.params?.blockedReason === "csp"),
+    );
+    if (cspBlockedBlob) {
+      throw new Error(
+        `Desktop phoneme word audio was blocked by CSP: ${JSON.stringify(cspBlockedBlob.params)}`,
+      );
+    }
+    await evaluate(
+      cdp,
+      'window.location.assign(new URL("/settings", window.location.href).href); "navigating";',
+    );
+    await waitForBodyText(cdp, "数据与隐私中心");
 
     const diagnostics = await evaluate(
       cdp,
@@ -1671,6 +1756,7 @@ async function captureInteractiveEvidence(debuggingPort) {
       releaseServedFromDevServer: runtimePolicy.releaseServedFromDevServer,
       externalLinksCopied: externalLinkResults.map((result) => result.name),
       youdaoPronunciation: youdaoPronunciation.marker,
+      phonemeWordPronunciation: phonemeWordPronunciation.word,
       learningDeletePreservedKey: learningDelete.preservedApiKey,
       apiKeysDeleted: apiKeysDelete.deletedApiKeys,
       localResetPreservedKey: localReset.preservedApiKey,
@@ -1773,7 +1859,7 @@ async function smoke() {
               ? `runtimeLog="${runtimeLog.path}" bytes=${runtimeLog.bytes}`
               : "",
             interactiveEvidence
-              ? `diagnostics="${interactiveEvidence.diagnosticsDownload}" learningData="${interactiveEvidence.learningDataDownload}" learningDeletePreservedKey=${interactiveEvidence.learningDeletePreservedKey} apiKeysDeleted=${interactiveEvidence.apiKeysDeleted} localResetPreservedKey=${interactiveEvidence.localResetPreservedKey} benchmarkAudioCleared=${interactiveEvidence.benchmarkAudioCleared} youdaoPronunciation="${interactiveEvidence.youdaoPronunciation}" externalLinksCopied=${interactiveEvidence.externalLinksCopied.join(",")} route=${interactiveEvidence.route} appIdentifier=${interactiveEvidence.appIdentifier} llmCustomDisabled=${interactiveEvidence.llmCustomDisabled} tauriGlobalExposed=${interactiveEvidence.tauriGlobalExposed} tauriInvokeAvailable=${interactiveEvidence.tauriInvokeAvailable} location=${interactiveEvidence.locationProtocol}//${interactiveEvidence.locationHostname}${interactiveEvidence.locationPort ? `:${interactiveEvidence.locationPort}` : ""} releaseServedFromDevServer=${interactiveEvidence.releaseServedFromDevServer}`
+              ? `diagnostics="${interactiveEvidence.diagnosticsDownload}" learningData="${interactiveEvidence.learningDataDownload}" learningDeletePreservedKey=${interactiveEvidence.learningDeletePreservedKey} apiKeysDeleted=${interactiveEvidence.apiKeysDeleted} localResetPreservedKey=${interactiveEvidence.localResetPreservedKey} benchmarkAudioCleared=${interactiveEvidence.benchmarkAudioCleared} youdaoPronunciation="${interactiveEvidence.youdaoPronunciation}" phonemeWordPronunciation="${interactiveEvidence.phonemeWordPronunciation}" externalLinksCopied=${interactiveEvidence.externalLinksCopied.join(",")} route=${interactiveEvidence.route} appIdentifier=${interactiveEvidence.appIdentifier} llmCustomDisabled=${interactiveEvidence.llmCustomDisabled} tauriGlobalExposed=${interactiveEvidence.tauriGlobalExposed} tauriInvokeAvailable=${interactiveEvidence.tauriInvokeAvailable} location=${interactiveEvidence.locationProtocol}//${interactiveEvidence.locationHostname}${interactiveEvidence.locationPort ? `:${interactiveEvidence.locationPort}` : ""} releaseServedFromDevServer=${interactiveEvidence.releaseServedFromDevServer}`
               : "",
           ]
             .filter(Boolean)

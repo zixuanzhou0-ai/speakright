@@ -101,6 +101,7 @@ describe("desktop artifact smoke wiring", () => {
     expect(smokeScript).toContain("导出学习数据");
     expect(smokeScript).toContain("speakright-data-");
     expect(smokeScript).toContain("youdaoPronunciation");
+    expect(smokeScript).toContain("phonemeWordPronunciation");
     expect(smokeScript).toContain("desktop-smoke-secret");
     expect(smokeScript).toContain("exportedApiKey");
     expect(smokeScript).toContain("desktop-smoke-preserve-key");
