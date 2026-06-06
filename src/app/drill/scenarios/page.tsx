@@ -15,6 +15,7 @@ import { RecordButton } from "@/components/audio/record-button";
 import { RecordingActions } from "@/components/audio/recording-actions";
 import { RecordingQualityPanel } from "@/components/audio/recording-quality-panel";
 import { WaveformDisplay } from "@/components/audio/waveform-display";
+import { LanguageModuleGate } from "@/components/common/language-module-gate";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useAzureAssessment } from "@/hooks/use-azure-assessment";
@@ -121,7 +122,8 @@ export default function ScenariosPage() {
     !!recorder.audioBlob && (quality.isAnalyzing || !quality.report?.canSubmit);
 
   return (
-    <div className="h-full overflow-y-auto px-6 py-4 scrollbar-thin">
+    <LanguageModuleGate moduleName="场景迁移训练" readinessKey="evidenceMastery">
+      <div className="h-full overflow-y-auto px-6 py-4 scrollbar-thin">
       <div className="mb-5 flex items-center gap-3">
         <Link
           href="/drill"
@@ -313,6 +315,7 @@ export default function ScenariosPage() {
           )}
         </main>
       </div>
-    </div>
+      </div>
+    </LanguageModuleGate>
   );
 }

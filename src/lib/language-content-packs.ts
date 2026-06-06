@@ -97,33 +97,36 @@ const SPANISH_WORD_BANK: Record<string, KeywordEntry[]> = {
     { word: "cumpleaños", ipa: "/kumpleˈaɲos/" },
   ],
   "es-tap-r": [
-    { word: "arroz", ipa: "/aˈroθ/" },
     { word: "hermano", ipa: "/eɾˈmano/" },
     { word: "cierto", ipa: "/ˈθjeɾto/" },
     { word: "profesor", ipa: "/pɾofeˈsoɾ/" },
+    { word: "para", ipa: "/ˈpaɾa/" },
   ],
   "es-trill-r": [
     { word: "rata", ipa: "/ˈrata/" },
     { word: "reina", ipa: "/ˈreina/" },
     { word: "arriba", ipa: "/aˈriβa/" },
     { word: "carretera", ipa: "/kareˈteɾa/" },
+    { word: "arroz", ipa: "/aˈroθ/" },
   ],
 };
 
 const SPANISH_MINIMAL_PAIRS: LanguageMinimalPairSet[] = [
   {
     id: "es-e-i",
+    kind: "minimal-pair",
     phonemeA: "es-e",
     phonemeB: "es-i",
     label: "/e/ vs /i/",
     pairs: [
       { wordA: "peso", ipaA: "/ˈpeso/", wordB: "piso", ipaB: "/ˈpiso/" },
       { wordA: "mesa", ipaA: "/ˈmesa/", wordB: "misa", ipaB: "/ˈmisa/" },
-      { wordA: "leche", ipaA: "/ˈletʃe/", wordB: "litchi", ipaB: "/ˈlitʃi/" },
+      { wordA: "pesa", ipaA: "/ˈpesa/", wordB: "pisa", ipaB: "/ˈpisa/" },
     ],
   },
   {
     id: "es-o-u",
+    kind: "near-contrast",
     phonemeA: "es-o",
     phonemeB: "es-u",
     label: "/o/ vs /u/ near contrast",
@@ -135,6 +138,7 @@ const SPANISH_MINIMAL_PAIRS: LanguageMinimalPairSet[] = [
   },
   {
     id: "es-tap-trill-r",
+    kind: "minimal-pair",
     phonemeA: "es-tap-r",
     phonemeB: "es-trill-r",
     label: "/ɾ/ vs /r/",
@@ -146,6 +150,7 @@ const SPANISH_MINIMAL_PAIRS: LanguageMinimalPairSet[] = [
   },
   {
     id: "es-s-theta",
+    kind: "minimal-pair",
     phonemeA: "es-theta",
     phonemeB: "es-s",
     label: "/θ/ vs /s/ spelling contrast",
@@ -157,13 +162,14 @@ const SPANISH_MINIMAL_PAIRS: LanguageMinimalPairSet[] = [
   },
   {
     id: "es-n-ny",
+    kind: "minimal-pair",
     phonemeA: "es-n",
     phonemeB: "es-ny",
     label: "/n/ vs /ɲ/",
     pairs: [
       { wordA: "cana", ipaA: "/ˈkana/", wordB: "caña", ipaB: "/ˈkaɲa/" },
       { wordA: "una", ipaA: "/ˈuna/", wordB: "uña", ipaB: "/ˈuɲa/" },
-      { wordA: "ano", ipaA: "/ˈano/", wordB: "año", ipaB: "/ˈaɲo/" },
+      { wordA: "pena", ipaA: "/ˈpena/", wordB: "peña", ipaB: "/ˈpeɲa/" },
     ],
   },
 ];

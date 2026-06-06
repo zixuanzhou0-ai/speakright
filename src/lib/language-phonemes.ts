@@ -211,7 +211,7 @@ const SPANISH_PHONEMES: PhonemeData[] = [
       { word: "azul", ipa: "/aˈθul/" },
     ],
     difficulty: "medium",
-    description: "西班牙本土常用；舌尖轻触上下齿间送气。拉美西语常并入 /s/，后续需要做方言开关。",
+    description: "西班牙本土常用；舌尖轻触上下齿间，让气流从齿间形成清擦音。拉美西语常并入 /s/，后续需要做方言开关。",
     notes: ["当前按 es-ES 处理；拉美西语需要单独 profile。"],
   }),
   unit({

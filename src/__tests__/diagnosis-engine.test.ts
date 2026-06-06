@@ -125,4 +125,44 @@ describe("buildDiagnosisReport", () => {
     expect(report.evidenceSummary?.invalidRecordings).toBe(1);
     expect(report.rawEvidence[0]?.recommendedAction).toBe("request-retry");
   });
+
+  it("keeps non-English diagnosis in beta feedback mode without English prescriptions", () => {
+    const report = buildDiagnosisReport({
+      languageId: "es-ES",
+      wordRecordings: [
+        {
+          prompt: {
+            word: "casa",
+            ipa: "/ˈkasa/",
+            targetPhonemes: ["es-a", "es-s"],
+          },
+          source: "word",
+          result: resultForWord("casa", [
+            { phoneme: "th", accuracyScore: 42 },
+            { phoneme: "s", accuracyScore: 74 },
+          ]),
+        },
+      ],
+      paragraphText: "Cada manana estudio espanol.",
+      paragraphResult: resultForWord(
+        "paragraph",
+        [{ phoneme: "th", accuracyScore: 50 }],
+        { prosodyScore: 45, fluencyScore: 58 },
+      ),
+    });
+
+    expect(report.languageId).toBe("es-ES");
+    expect(report.issues.length).toBeGreaterThan(0);
+    expect(report.issues.every((issue) => issue.recommendedPackIds.length === 0)).toBe(
+      true,
+    );
+    expect(report.issues.map((issue) => issue.id).join(" ")).toContain("es-ES");
+    expect(report.issues.map((issue) => issue.title).join(" ")).not.toContain(
+      "/θ/ 容易读成 /s/",
+    );
+    expect(
+      report.prescription.days.flatMap((day) => day.items),
+    ).toHaveLength(0);
+    expect(report.prescription.days[0]?.title).toContain("不生成英语训练处方");
+  });
 });

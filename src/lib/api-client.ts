@@ -17,6 +17,7 @@ import { apiFetch } from "@/lib/tauri-http";
 import { isTauriEnvironment } from "@/lib/tauri-runtime";
 import { isSentence } from "@/lib/utils";
 import type { AzureAssessmentResult } from "@/types/azure";
+import type { LanguageId } from "@/types/language";
 
 // ─── Azure ──────────────────────────────────────────────
 
@@ -59,7 +60,7 @@ export async function assessPronunciation(
   language = "en-US",
 ): Promise<AzureAssessmentResult> {
   const normalizedRegion = assertAzureRegion(region);
-  const enableProsody = isSentence(referenceText);
+  const enableProsody = language === "en-US" && isSentence(referenceText);
 
   // Build pronunciation assessment config as JSON, then base64-encode it
   const pronConfig = {
@@ -443,6 +444,7 @@ export function streamLlmFeedback(
   azureResult: AzureAssessmentResult,
   mode: "phoneme" | "sentence" = "phoneme",
   signal?: AbortSignal,
+  languageId: LanguageId = "en-US",
 ): ReadableStream<Uint8Array> {
   const encoder = new TextEncoder();
   const blockedReason = getBlockedDesktopLlmReason(config);
@@ -468,7 +470,13 @@ export function streamLlmFeedback(
   );
   const l1Context = buildL1ErrorContext(matchL1Errors(allPhonemes));
   const prompt =
-    buildFeedbackPrompt(target, azureResult, mode, getCoachMode()) + l1Context;
+    buildFeedbackPrompt(
+      target,
+      azureResult,
+      mode,
+      getCoachMode(),
+      languageId,
+    ) + (languageId === "en-US" ? l1Context : "");
   return new ReadableStream({
     async start(controller) {
       try {

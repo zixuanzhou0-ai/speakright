@@ -172,12 +172,12 @@ export default function AssessmentPage() {
     (paragraphResult: AzureAssessmentResult) => {
       const report: DiagnosisReport = {
         ...buildDiagnosisReport({
+          languageId,
           wordRecordings: wordRecordingsRef.current,
           paragraphResult,
           paragraphText: assessment.paragraph,
           paragraphRecordingQuality: paragraphQualityRef.current,
         }),
-        languageId,
       };
       saveReport(report, languageId);
       setSavedReport(report);
@@ -311,6 +311,7 @@ export default function AssessmentPage() {
     setPhase({ type: "analyzing" });
 
     const preliminaryReport = buildDiagnosisReport({
+      languageId,
       wordRecordings: wordRecordingsRef.current,
       paragraphResult: result,
       paragraphText: assessment.paragraph,
@@ -346,6 +347,7 @@ export default function AssessmentPage() {
     assessment.paragraph,
     assessment.adaptiveWords,
     profile.azureLocale,
+    languageId,
   ]);
 
   const handleRecordStop = useCallback(() => {

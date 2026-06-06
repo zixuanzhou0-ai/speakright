@@ -30,7 +30,10 @@ import {
   recordFreePracticeTransfer,
 } from "@/lib/free-practice-transfer";
 import { loadMasteryProfile, saveMasteryProfile } from "@/lib/mastery-profile";
-import { getLanguageProfile } from "@/lib/language-profiles";
+import {
+  DEFAULT_LANGUAGE_ID,
+  getLanguageProfile,
+} from "@/lib/language-profiles";
 import { reliabilityFromRecordingQuality } from "@/lib/recording-quality";
 import { addScore } from "@/lib/score-history";
 import { isSentence } from "@/lib/utils";
@@ -78,16 +81,19 @@ export default function SentencesPage() {
   const autoAssessTriggered = useRef(false);
   const restoredRef = useRef(false);
   const previousTrimmedTextRef = useRef(trimmedText);
+  const canRecordTransfer =
+    languageId === DEFAULT_LANGUAGE_ID &&
+    languageProfile.readiness.evidenceMastery;
   const targetPreview = useMemo(
     () =>
-      trimmedText
+      trimmedText && canRecordTransfer
         ? buildFreePracticeTargetPreview({
             profile: masteryProfile,
             text: trimmedText,
             mode: isWordMode ? "word" : "sentence",
           })
         : null,
-    [masteryProfile, trimmedText, isWordMode],
+    [masteryProfile, trimmedText, isWordMode, canRecordTransfer],
   );
 
   // ── Session restore/save ──
@@ -231,40 +237,45 @@ export default function SentencesPage() {
       const text = sentence.trim();
       const histKey = `${languageId}:${text.slice(0, 50)}:${text.length}`;
       addScore(histKey, result.pronunciationScore);
-      const currentProfile = loadMasteryProfile();
-      const transfer = analyzeFreePracticeTransfer({
-        profile: currentProfile,
-        result,
-        text,
-        mode: isSentence(text) ? "sentence" : "word",
-      });
-      if (transfer.evidences.length > 0) {
-        const reliability = reliabilityFromRecordingQuality(
-          recordingQuality.report,
-          {
-            evidenceStrength:
-              transfer.evidences.length >= 2 ? "strong" : "fair",
-            note:
-              recordingQuality.report?.issues.length === 0
-                ? "自由练习命中当前目标且录音质量稳定，可计入迁移证据。"
-                : "自由练习录音存在质量提示，本次只作为观察，不提升掌握度。",
-          },
-        );
-        const recorded = recordFreePracticeTransfer(
-          currentProfile,
-          transfer,
-          reliability,
-        );
-        saveMasteryProfile(recorded.profile);
-        setMasteryProfile(recorded.profile);
-        setTransferSummary(recorded.summary);
+      if (canRecordTransfer) {
+        const currentProfile = loadMasteryProfile();
+        const transfer = analyzeFreePracticeTransfer({
+          profile: currentProfile,
+          result,
+          text,
+          mode: isSentence(text) ? "sentence" : "word",
+        });
+        if (transfer.evidences.length > 0) {
+          const reliability = reliabilityFromRecordingQuality(
+            recordingQuality.report,
+            {
+              evidenceStrength:
+                transfer.evidences.length >= 2 ? "strong" : "fair",
+              note:
+                recordingQuality.report?.issues.length === 0
+                  ? "自由练习命中当前目标且录音质量稳定，可计入迁移证据。"
+                  : "自由练习录音存在质量提示，本次只作为观察，不提升掌握度。",
+            },
+          );
+          const recorded = recordFreePracticeTransfer(
+            currentProfile,
+            transfer,
+            reliability,
+          );
+          saveMasteryProfile(recorded.profile);
+          setMasteryProfile(recorded.profile);
+          setTransferSummary(recorded.summary);
+        } else {
+          setTransferSummary(transfer);
+        }
       } else {
-        setTransferSummary(transfer);
+        setTransferSummary(null);
       }
       llm.requestFeedback(
         text,
         result,
         isSentence(text) ? "sentence" : "phoneme",
+        languageId,
       );
     }
   }, [
@@ -274,6 +285,7 @@ export default function SentencesPage() {
     llm,
     recordingQuality,
     languageProfile.azureLocale,
+    canRecordTransfer,
     languageId,
   ]);
 
@@ -349,8 +361,9 @@ export default function SentencesPage() {
       text,
       azure.result,
       isSentence(text) ? "sentence" : "phoneme",
+      languageId,
     );
-  }, [azure.result, sentence, llm]);
+  }, [azure.result, sentence, llm, languageId]);
 
   const hasResult = !!(
     azure.result ||

@@ -48,7 +48,7 @@ export function useAzureAssessment(): UseAzureAssessmentReturn {
         config.region,
         language,
       );
-      if (!isSentence(referenceText)) {
+      if (language !== "en-US" || !isSentence(referenceText)) {
         assessed.prosodyScore = undefined;
       }
       setResult(assessed);

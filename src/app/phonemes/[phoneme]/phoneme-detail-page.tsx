@@ -239,6 +239,7 @@ export function PhonemeDetailPage() {
         `${languageProfile.displayName} ${phoneme?.ipa} — ${phoneme?.name}, example word: ${currentWordStr}`,
         result,
         "phoneme",
+        languageId,
       );
     }
   }, [
@@ -287,8 +288,16 @@ export function PhonemeDetailPage() {
       `${languageProfile.displayName} ${phoneme.ipa} — ${phoneme.name}, example word: ${currentWordStr}`,
       azure.result,
       "phoneme",
+      languageId,
     );
-  }, [azure.result, phoneme, currentWordStr, languageProfile.displayName, llm]);
+  }, [
+    azure.result,
+    phoneme,
+    currentWordStr,
+    languageProfile.displayName,
+    llm,
+    languageId,
+  ]);
 
   const handleClear = () => {
     playback.stop();

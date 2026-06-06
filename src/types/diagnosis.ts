@@ -109,6 +109,7 @@ export interface AssessmentRecording {
 }
 
 export interface DiagnosisBuildInput {
+  languageId?: LanguageId;
   wordRecordings: AssessmentRecording[];
   paragraphResult: AzureAssessmentResult;
   paragraphText: string;

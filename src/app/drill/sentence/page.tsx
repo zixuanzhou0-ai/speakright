@@ -2,7 +2,7 @@
 
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { LanguageModuleGate } from "@/components/common/language-module-gate";
 import { DrillConfig } from "@/components/drill/drill-config";
 import { DrillFeedback } from "@/components/drill/drill-feedback";
@@ -25,6 +25,7 @@ export default function SentenceDrillPage() {
   const tts = useTtsAligned();
   const { languageId } = useLanguageConfig();
   const sentenceBank = getLanguageSentenceBank(languageId);
+  const [startError, setStartError] = useState<string | null>(null);
 
   const handleStart = useCallback(
     (phonemeSlug: string, itemCount: number, passThreshold: number) => {
@@ -35,6 +36,11 @@ export default function SentenceDrillPage() {
         itemCount,
         phoneme?.description,
       );
+      if (items.length === 0) {
+        setStartError("这个发音单位还没有句子训练内容，先换一个有句子的发音单位。");
+        return;
+      }
+      setStartError(null);
       drill.start(
         { kind: "sentence", languageId, phonemeSlug, itemCount, passThreshold },
         items,
@@ -88,7 +94,14 @@ export default function SentenceDrillPage() {
 
       <div className="flex-1 max-w-2xl mx-auto w-full">
         {drill.phase.type === "configuring" && (
-          <DrillConfig kind="sentence" onStart={handleStart} />
+          <div className="space-y-3">
+            {startError && (
+              <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-200">
+                {startError}
+              </div>
+            )}
+            <DrillConfig kind="sentence" onStart={handleStart} />
+          </div>
         )}
 
         {drill.phase.type === "phonemeLesson" && drill.config && (

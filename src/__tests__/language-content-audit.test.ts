@@ -4,6 +4,7 @@ import {
   countLanguageTrainingWords,
   getLanguageContentPack,
 } from "@/lib/language-content-packs";
+import { getLanguagePhonemeBySlug } from "@/lib/language-phonemes";
 import {
   getDefaultPhonemeSlug,
   getEnabledLanguageProfiles,
@@ -57,6 +58,25 @@ describe("language content audit", () => {
     expect(pack.sentenceBank.length).toBeGreaterThanOrEqual(12);
     expect(pack.minimalPairs.length).toBeGreaterThanOrEqual(5);
     expect(countLanguageTrainingWords("es-ES")).toBeGreaterThan(100);
+  });
+
+  it("keeps Spanish beta pronunciation references linguistically sane", () => {
+    const pack = getLanguageContentPack("es-ES");
+    const tapR = pack.wordBank["es-tap-r"]?.map((item) => item.word) ?? [];
+    const trillR = pack.wordBank["es-trill-r"]?.map((item) => item.word) ?? [];
+    const allMinimalPairWords = pack.minimalPairs.flatMap((set) =>
+      set.pairs.flatMap((pair) => [pair.wordA, pair.wordB]),
+    );
+    const oU = pack.minimalPairs.find((set) => set.id === "es-o-u");
+    const theta = getLanguagePhonemeBySlug("es-ES", "es-theta");
+
+    expect(tapR).not.toContain("arroz");
+    expect(trillR).toContain("arroz");
+    expect(allMinimalPairWords).not.toContain("ano");
+    expect(allMinimalPairWords).not.toContain("litchi");
+    expect(allMinimalPairWords).toContain("peña");
+    expect(oU?.kind).toBe("near-contrast");
+    expect(theta?.description).not.toContain("送气");
   });
 
   it("keeps Spanish diagnosis and contrast references inside the Spanish inventory", () => {

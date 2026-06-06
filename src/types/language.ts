@@ -46,6 +46,7 @@ export type LanguageEvidencePolicy =
 
 export interface LanguageMinimalPairSet {
   id: string;
+  kind?: "minimal-pair" | "near-contrast";
   phonemeA: string;
   phonemeB: string;
   label: string;
