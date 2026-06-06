@@ -1,10 +1,12 @@
 import type { CoachMode } from "@/lib/api-keys";
+import { DEFAULT_LANGUAGE_ID } from "@/lib/language-profiles";
 import type {
   DrillItem,
   DrillProgressItem,
   DrillSessionConfig,
   DrillSummary,
 } from "@/types/drill";
+import type { LanguageId } from "@/types/language";
 import type { PhonemeData } from "@/types/phoneme";
 import { getWordPool } from "./word-pool";
 
@@ -26,8 +28,9 @@ export function getPassThreshold(mode: CoachMode): number {
 export function buildWordDrillItems(
   phoneme: PhonemeData,
   count: number,
+  languageId: LanguageId = phoneme.languageId ?? DEFAULT_LANGUAGE_ID,
 ): DrillItem[] {
-  const pool = getWordPool(phoneme.slug, phoneme.keywords);
+  const pool = getWordPool(phoneme.slug, phoneme.keywords, languageId);
 
   // Shuffle and pick `count` items (or all if pool is smaller)
   const shuffled = [...pool].sort(() => Math.random() - 0.5);
@@ -115,5 +118,9 @@ export function computeDrillSummary(
 // ── Available word count per phoneme ──
 
 export function getAvailableWordCount(phoneme: PhonemeData): number {
-  return getWordPool(phoneme.slug, phoneme.keywords).length;
+  return getWordPool(
+    phoneme.slug,
+    phoneme.keywords,
+    phoneme.languageId ?? DEFAULT_LANGUAGE_ID,
+  ).length;
 }

@@ -53,9 +53,9 @@ export const LANGUAGE_PROFILES: Record<LanguageId, LanguageProfile> = {
     readiness: {
       phonemeInventory: true,
       wordAudio: false,
-      wordPractice: false,
-      sentencePractice: false,
-      diagnosis: false,
+      wordPractice: true,
+      sentencePractice: true,
+      diagnosis: true,
       evidenceMastery: false,
       localVideos: false,
     },
@@ -67,9 +67,9 @@ export const LANGUAGE_PROFILES: Record<LanguageId, LanguageProfile> = {
       "/x/",
     ],
     knownGaps: [
-      "现在只有发音单位和 starter word list，还没有西语最小对立、句子、诊断文本和 mastery gate。",
+      "西语已有第一版单词、句子、最小对立和诊断 beta，但还没有 native speaker Azure fixture 校准。",
       "当前 profile 是 es-ES；拉美西语 seseo、yeísmo 等变体需要单独 profile 或方言开关。",
-      "单词发音暂走有道实验音源，尚未建立西语专用 TTS/词典 provider。",
+      "单词发音暂走在线发音/TTS fallback，尚未建立西语专用本地缓存和 evidence mastery gate。",
     ],
   },
   "fr-FR": {

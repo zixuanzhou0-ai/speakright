@@ -1,4 +1,7 @@
 import type { KeywordEntry } from "@/types/phoneme";
+import type { LanguageId } from "@/types/language";
+import { DEFAULT_LANGUAGE_ID } from "@/lib/language-profiles";
+import { getLanguageExtendedWords } from "@/lib/language-content-packs";
 import { getExtendedWords } from "./word-bank";
 
 const CACHE_PREFIX = "speakright_mw_words_";
@@ -12,9 +15,13 @@ interface CachedWordPool {
 export function getWordPool(
   slug: string,
   staticKeywords: KeywordEntry[],
+  languageId: LanguageId = DEFAULT_LANGUAGE_ID,
 ): KeywordEntry[] {
-  const extended = getExtendedWords(slug);
-  const cached = getCachedWords(slug);
+  const extended =
+    languageId === DEFAULT_LANGUAGE_ID
+      ? getExtendedWords(slug)
+      : getLanguageExtendedWords(languageId, slug);
+  const cached = getCachedWords(slug, languageId);
 
   // Merge static + extended + cached, deduplicate by word (case-insensitive)
   const seen = new Set(staticKeywords.map((k) => k.word.toLowerCase()));
@@ -39,14 +46,21 @@ export function getWordPool(
   return result;
 }
 
-export function getCachedWords(slug: string): KeywordEntry[] | null {
+function cacheKey(slug: string, languageId: LanguageId): string {
+  return `${CACHE_PREFIX}${languageId}:${slug}`;
+}
+
+export function getCachedWords(
+  slug: string,
+  languageId: LanguageId = DEFAULT_LANGUAGE_ID,
+): KeywordEntry[] | null {
   if (typeof window === "undefined") return null;
   try {
-    const raw = localStorage.getItem(CACHE_PREFIX + slug);
+    const raw = localStorage.getItem(cacheKey(slug, languageId));
     if (!raw) return null;
     const cached: CachedWordPool = JSON.parse(raw);
     if (Date.now() - cached.fetchedAt > CACHE_TTL_MS) {
-      localStorage.removeItem(CACHE_PREFIX + slug);
+      localStorage.removeItem(cacheKey(slug, languageId));
       return null;
     }
     return cached.words;
@@ -55,23 +69,30 @@ export function getCachedWords(slug: string): KeywordEntry[] | null {
   }
 }
 
-export function setCachedWords(slug: string, words: KeywordEntry[]): void {
+export function setCachedWords(
+  slug: string,
+  words: KeywordEntry[],
+  languageId: LanguageId = DEFAULT_LANGUAGE_ID,
+): void {
   if (typeof window === "undefined") return;
   const entry: CachedWordPool = {
     words,
     fetchedAt: Date.now(),
   };
   try {
-    localStorage.setItem(CACHE_PREFIX + slug, JSON.stringify(entry));
+    localStorage.setItem(cacheKey(slug, languageId), JSON.stringify(entry));
   } catch {
     // localStorage full — silently ignore
   }
 }
 
-export function isCacheExpired(slug: string): boolean {
+export function isCacheExpired(
+  slug: string,
+  languageId: LanguageId = DEFAULT_LANGUAGE_ID,
+): boolean {
   if (typeof window === "undefined") return true;
   try {
-    const raw = localStorage.getItem(CACHE_PREFIX + slug);
+    const raw = localStorage.getItem(cacheKey(slug, languageId));
     if (!raw) return true;
     const cached: CachedWordPool = JSON.parse(raw);
     return Date.now() - cached.fetchedAt > CACHE_TTL_MS;

@@ -25,8 +25,13 @@ import { LanguageModuleGate } from "@/components/common/language-module-gate";
 import { DesktopReadinessCard } from "@/components/drill/desktop-readiness-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useLanguageConfig } from "@/hooks/use-api-keys";
 import { getAzureConfig, subscribeToStorage } from "@/lib/api-keys";
 import { isAzureConfigReady } from "@/lib/azure-config";
+import {
+  DEFAULT_LANGUAGE_ID,
+  getLanguageProfile,
+} from "@/lib/language-profiles";
 import { isReviewDue, loadMasteryProfile } from "@/lib/mastery-profile";
 import { buildReviewQueue } from "@/lib/review-queue";
 import { buildTrainingMemory } from "@/lib/training-memory";
@@ -110,10 +115,18 @@ const FREE_MODES = [
   },
 ];
 
-function loadReport(): DiagnosisReport | null {
+function reportStorageKey(languageId: string) {
+  return `${REPORT_STORAGE_KEY}:${languageId}`;
+}
+
+function loadReport(languageId = DEFAULT_LANGUAGE_ID): DiagnosisReport | null {
   if (typeof window === "undefined") return null;
   try {
-    const raw = localStorage.getItem(REPORT_STORAGE_KEY);
+    const raw =
+      localStorage.getItem(reportStorageKey(languageId)) ??
+      (languageId === DEFAULT_LANGUAGE_ID
+        ? localStorage.getItem(REPORT_STORAGE_KEY)
+        : null);
     return raw ? (JSON.parse(raw) as DiagnosisReport) : null;
   } catch {
     return null;
@@ -166,12 +179,14 @@ function priorityVariant(priority: ReviewQueueItem["priority"]) {
 }
 
 export default function DrillPage() {
+  const { languageId } = useLanguageConfig();
+  const languageProfile = getLanguageProfile(languageId);
   const [report, setReport] = useState<DiagnosisReport | null>(null);
   const [profile, setProfile] = useState<MasteryProfile | null>(null);
   const [azureReady, setAzureReady] = useState(false);
 
   useEffect(() => {
-    setReport(loadReport());
+    setReport(loadReport(languageId));
     setProfile(loadMasteryProfile());
     const refreshAzureState = () => {
       const config = getAzureConfig();
@@ -179,7 +194,7 @@ export default function DrillPage() {
     };
     refreshAzureState();
     return subscribeToStorage(refreshAzureState);
-  }, []);
+  }, [languageId]);
 
   const prescription =
     report && profile
@@ -227,6 +242,19 @@ export default function DrillPage() {
         ? "/drill/word"
         : "/settings";
   const primaryLabel = azureReady ? "开始今天训练" : "配置评分密钥";
+
+  if (languageId !== DEFAULT_LANGUAGE_ID) {
+    return (
+      <LanguageModuleGate moduleName="刻意练习" readinessKey="wordPractice">
+        <NonEnglishDrillDashboard
+          displayName={languageProfile.displayName}
+          shortLabel={languageProfile.shortLabel}
+          azureReady={azureReady}
+          hasDiagnosis={!!report}
+        />
+      </LanguageModuleGate>
+    );
+  }
 
   return (
     <LanguageModuleGate moduleName="刻意练习" readinessKey="wordPractice">
@@ -637,6 +665,96 @@ export default function DrillPage() {
       </section>
       </div>
     </LanguageModuleGate>
+  );
+}
+
+function NonEnglishDrillDashboard({
+  displayName,
+  shortLabel,
+  azureReady,
+  hasDiagnosis,
+}: {
+  displayName: string;
+  shortLabel: string;
+  azureReady: boolean;
+  hasDiagnosis: boolean;
+}) {
+  const modes = [
+    {
+      href: "/drill/word",
+      icon: BookOpen,
+      title: "单词训练",
+      description: `选择${shortLabel}发音单位，按词逐个录音评分。`,
+    },
+    {
+      href: "/drill/sentence",
+      icon: MessageSquareText,
+      title: "句子训练",
+      description: `使用${shortLabel}短句，把目标音迁移到自然表达。`,
+    },
+    {
+      href: "/assessment",
+      icon: ClipboardList,
+      title: hasDiagnosis ? "重新诊断" : "快速诊断",
+      description: `用${shortLabel}筛查词和短文生成 beta 诊断。`,
+    },
+    {
+      href: "/phonemes",
+      icon: Target,
+      title: "发音单位",
+      description: `查看${displayName}音系、示例词和口腔动作。`,
+    },
+  ];
+
+  return (
+    <div className="h-full flex flex-col px-6 py-4 overflow-y-auto scrollbar-thin">
+      <div className="mb-5 flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold">{displayName}刻意练习 beta</h1>
+          <p className="mt-1 text-muted-foreground">
+            这一版先开放语言化的音系页、单词训练、句子训练和快速诊断；证据
+            mastery 暂不开放。
+          </p>
+        </div>
+        <Badge variant={azureReady ? "default" : "destructive"}>
+          {azureReady ? "评分已就绪" : "需要配置 Azure"}
+        </Badge>
+      </div>
+
+      {!azureReady && (
+        <section className="mb-5 rounded-xl border bg-primary/5 p-5 shadow-sm">
+          <h2 className="text-lg font-bold">先配置评分密钥</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {displayName}训练会把 Azure locale 切到当前语言；没有 Azure 配置时只能查看内容，不能录音评分。
+          </p>
+          <Link href="/settings">
+            <Button className="mt-4 gap-2">
+              <Settings className="h-4 w-4" />
+              打开设置
+            </Button>
+          </Link>
+        </section>
+      )}
+
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {modes.map((mode) => (
+          <Link key={mode.href} href={mode.href}>
+            <div className="h-full rounded-xl border bg-card p-5 shadow-sm transition-colors hover:border-primary/50 cursor-pointer">
+              <mode.icon className="mb-3 h-5 w-5 text-primary" />
+              <h3 className="font-bold">{mode.title}</h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {mode.description}
+              </p>
+            </div>
+          </Link>
+        ))}
+      </div>
+
+      <div className="mt-5 rounded-xl border border-dashed bg-muted/30 p-4 text-sm text-muted-foreground">
+        当前 beta 不显示英语专项训练包、英语高变异听辨、英语韵律课和进步
+        mastery。等对应语言 Azure fixture 和课程包验证后再逐步开放。
+      </div>
+    </div>
   );
 }
 

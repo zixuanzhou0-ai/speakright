@@ -6,6 +6,7 @@ import { LanguageModuleGate } from "@/components/common/language-module-gate";
 import { SentenceInputCard } from "@/components/sentences/sentence-input-card";
 import { SentenceRecordingCard } from "@/components/sentences/sentence-recording-card";
 import { SentenceResultsColumn } from "@/components/sentences/sentence-results-column";
+import { useLanguageConfig } from "@/hooks/use-api-keys";
 import { useAudioPlayer } from "@/hooks/use-audio-player";
 import { useAzureAssessment } from "@/hooks/use-azure-assessment";
 import type { FeedbackData } from "@/hooks/use-llm-feedback";
@@ -29,6 +30,7 @@ import {
   recordFreePracticeTransfer,
 } from "@/lib/free-practice-transfer";
 import { loadMasteryProfile, saveMasteryProfile } from "@/lib/mastery-profile";
+import { getLanguageProfile } from "@/lib/language-profiles";
 import { reliabilityFromRecordingQuality } from "@/lib/recording-quality";
 import { addScore } from "@/lib/score-history";
 import { isSentence } from "@/lib/utils";
@@ -38,12 +40,17 @@ import type { MasteryProfile } from "@/types/training";
 const SESSION_PREFIX = "sentences";
 
 export default function SentencesPage() {
-  const [sentence, setSentence] = useSessionState(`${SESSION_PREFIX}:text`, "");
-  const [speed, setSpeed] = useSessionState(`${SESSION_PREFIX}:speed`, 0.85);
+  const { languageId } = useLanguageConfig();
+  const languageProfile = getLanguageProfile(languageId);
+  const sessionPrefix = `${SESSION_PREFIX}:${languageId}`;
+  const [sentence, setSentence] = useSessionState(`${sessionPrefix}:text`, "");
+  const [speed, setSpeed] = useSessionState(`${sessionPrefix}:speed`, 0.85);
   const [selectedWord, setSelectedWord] = useState<AzureWord | null>(null);
   const [transferSummary, setTransferSummary] =
     useState<FreePracticeTransferSummary | null>(null);
-  const [profile, setProfile] = useState<MasteryProfile | null>(null);
+  const [masteryProfile, setMasteryProfile] = useState<MasteryProfile | null>(
+    null,
+  );
 
   const isWordMode = !isSentence(sentence);
   const trimmedText = sentence.trim();
@@ -75,12 +82,12 @@ export default function SentencesPage() {
     () =>
       trimmedText
         ? buildFreePracticeTargetPreview({
-            profile,
+            profile: masteryProfile,
             text: trimmedText,
             mode: isWordMode ? "word" : "sentence",
           })
         : null,
-    [profile, trimmedText, isWordMode],
+    [masteryProfile, trimmedText, isWordMode],
   );
 
   // ── Session restore/save ──
@@ -90,13 +97,13 @@ export default function SentencesPage() {
     restoredRef.current = true;
 
     const savedResult = loadSession<AzureAssessmentResult>(
-      `${SESSION_PREFIX}:azureResult`,
+      `${sessionPrefix}:azureResult`,
     );
     const savedFeedback = loadSession<FeedbackData>(
-      `${SESSION_PREFIX}:llmFeedback`,
+      `${sessionPrefix}:llmFeedback`,
     );
     const savedWordIdx = loadSession<number>(
-      `${SESSION_PREFIX}:selectedWordIdx`,
+      `${sessionPrefix}:selectedWordIdx`,
     );
 
     if (savedResult) {
@@ -106,10 +113,10 @@ export default function SentencesPage() {
       }
     }
     if (savedFeedback) llm.restore(savedFeedback);
-  }, [azure.restore, llm.restore]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [azure.restore, llm.restore, sessionPrefix]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    const refreshProfile = () => setProfile(loadMasteryProfile());
+    const refreshProfile = () => setMasteryProfile(loadMasteryProfile());
     refreshProfile();
     window.addEventListener("storage", refreshProfile);
     return () => window.removeEventListener("storage", refreshProfile);
@@ -117,15 +124,15 @@ export default function SentencesPage() {
 
   useEffect(() => {
     if (!restoredRef.current) return;
-    saveSession(`${SESSION_PREFIX}:azureResult`, azure.result);
-  }, [azure.result]);
+    saveSession(`${sessionPrefix}:azureResult`, azure.result);
+  }, [azure.result, sessionPrefix]);
 
   useEffect(() => {
     if (!restoredRef.current) return;
     if (llm.hasFeedback && !llm.isStreaming) {
-      saveSession(`${SESSION_PREFIX}:llmFeedback`, llm.feedback);
+      saveSession(`${sessionPrefix}:llmFeedback`, llm.feedback);
     }
-  }, [llm.feedback, llm.hasFeedback, llm.isStreaming]);
+  }, [llm.feedback, llm.hasFeedback, llm.isStreaming, sessionPrefix]);
 
   useEffect(() => {
     if (!restoredRef.current) return;
@@ -133,13 +140,13 @@ export default function SentencesPage() {
       selectedWord && azure.result
         ? azure.result.words.indexOf(selectedWord)
         : null;
-    saveSession(`${SESSION_PREFIX}:selectedWordIdx`, idx);
-  }, [selectedWord, azure.result]);
+    saveSession(`${sessionPrefix}:selectedWordIdx`, idx);
+  }, [selectedWord, azure.result, sessionPrefix]);
 
   // ── Handlers ──
 
   const handleClearSession = useCallback(() => {
-    clearSessionPrefix(SESSION_PREFIX);
+    clearSessionPrefix(sessionPrefix);
     setSentence("");
     setSpeed(0.85);
     setSelectedWord(null);
@@ -160,6 +167,7 @@ export default function SentencesPage() {
     mw,
     playback,
     recordingQuality,
+    sessionPrefix,
     setSentence,
     setSpeed,
   ]);
@@ -186,12 +194,12 @@ export default function SentencesPage() {
     playback.stop();
     if (isWordMode) {
       tts.reset();
-      mw.playWord(trimmedText);
+      mw.playWord(trimmedText, "blue", languageId);
     } else {
       mw.stop();
       tts.speak(trimmedText, speed);
     }
-  }, [trimmedText, isWordMode, playback, tts, mw, speed]);
+  }, [trimmedText, isWordMode, playback, tts, mw, speed, languageId]);
 
   const handleRecordStart = useCallback(() => {
     llm.reset();
@@ -213,15 +221,19 @@ export default function SentencesPage() {
     }
 
     setSelectedWord(null);
-    const result = await azure.assess(recorder.audioBlob, sentence.trim());
+    const result = await azure.assess(
+      recorder.audioBlob,
+      sentence.trim(),
+      languageProfile.azureLocale,
+    );
 
     if (result) {
       const text = sentence.trim();
-      const histKey = `${text.slice(0, 50)}:${text.length}`;
+      const histKey = `${languageId}:${text.slice(0, 50)}:${text.length}`;
       addScore(histKey, result.pronunciationScore);
-      const profile = loadMasteryProfile();
+      const currentProfile = loadMasteryProfile();
       const transfer = analyzeFreePracticeTransfer({
-        profile,
+        profile: currentProfile,
         result,
         text,
         mode: isSentence(text) ? "sentence" : "word",
@@ -239,12 +251,12 @@ export default function SentencesPage() {
           },
         );
         const recorded = recordFreePracticeTransfer(
-          profile,
+          currentProfile,
           transfer,
           reliability,
         );
         saveMasteryProfile(recorded.profile);
-        setProfile(recorded.profile);
+        setMasteryProfile(recorded.profile);
         setTransferSummary(recorded.summary);
       } else {
         setTransferSummary(transfer);
@@ -255,7 +267,15 @@ export default function SentencesPage() {
         isSentence(text) ? "sentence" : "phoneme",
       );
     }
-  }, [recorder.audioBlob, sentence, azure, llm, recordingQuality]);
+  }, [
+    recorder.audioBlob,
+    sentence,
+    azure,
+    llm,
+    recordingQuality,
+    languageProfile.azureLocale,
+    languageId,
+  ]);
 
   useEffect(() => {
     if (
@@ -286,9 +306,9 @@ export default function SentencesPage() {
       setSelectedWord(word);
       playback.stop();
       tts.reset();
-      mw.playWord(word.word);
+      mw.playWord(word.word, "blue", languageId);
     },
-    [playback, tts, mw],
+    [playback, tts, mw, languageId],
   );
 
   const handlePlayRecording = useCallback(() => {
@@ -316,9 +336,9 @@ export default function SentencesPage() {
     (word: string) => {
       playback.stop();
       tts.reset();
-      mw.playWord(word);
+      mw.playWord(word, "blue", languageId);
     },
-    [playback, tts, mw],
+    [playback, tts, mw, languageId],
   );
 
   const handleRetryFeedback = useCallback(() => {

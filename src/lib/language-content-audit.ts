@@ -1,4 +1,5 @@
 import { LANGUAGE_PROFILES } from "@/lib/language-profiles";
+import { countLanguageTrainingWords } from "@/lib/language-content-packs";
 import type { LanguageId } from "@/types/language";
 import type { PhonemeData } from "@/types/phoneme";
 
@@ -47,6 +48,7 @@ export function auditLanguageCoverage(languageId: LanguageId): LanguageCoverageA
   const profile = LANGUAGE_PROFILES[languageId];
   const phonemes = profile.phonemeInventory;
   const unitAudit = auditUnits(phonemes);
+  const trainingWordTotal = countLanguageTrainingWords(languageId);
   const missingCapabilities = Object.entries(profile.readiness)
     .filter(([key, value]) => key !== "phonemeInventory" && !value)
     .map(([key]) => capabilityLabel(key));
@@ -64,7 +66,7 @@ export function auditLanguageCoverage(languageId: LanguageId): LanguageCoverageA
   return {
     languageId,
     soundUnits: phonemes.length,
-    keywordTotal: unitAudit.keywordTotal,
+    keywordTotal: trainingWordTotal || unitAudit.keywordTotal,
     averageKeywordsPerUnit:
       phonemes.length === 0
         ? 0

@@ -10,33 +10,37 @@ import { DrillPhonemeLesson } from "@/components/drill/drill-phoneme-lesson";
 import { DrillRecording } from "@/components/drill/drill-recording";
 import { DrillSummaryCard } from "@/components/drill/drill-summary";
 import { DrillTeaching } from "@/components/drill/drill-teaching";
+import { useLanguageConfig } from "@/hooks/use-api-keys";
 import { useDrillSession } from "@/hooks/use-drill-session";
 import { useMwPronunciation } from "@/hooks/use-mw-pronunciation";
 import { useTtsAligned } from "@/hooks/use-tts-aligned";
 import { buildSentenceDrillItems } from "@/lib/drill-utils";
-import { getPhonemeBySlug } from "@/lib/phoneme-data";
-import { SENTENCE_BANK } from "@/lib/sentence-bank";
+import { getLanguagePhonemeBySlug } from "@/lib/language-phonemes";
+import { getLanguageSentenceBank } from "@/lib/language-content-packs";
+import type { LanguageId } from "@/types/language";
 
 export default function SentenceDrillPage() {
   const drill = useDrillSession();
   const mw = useMwPronunciation();
   const tts = useTtsAligned();
+  const { languageId } = useLanguageConfig();
+  const sentenceBank = getLanguageSentenceBank(languageId);
 
   const handleStart = useCallback(
     (phonemeSlug: string, itemCount: number, passThreshold: number) => {
-      const phoneme = getPhonemeBySlug(phonemeSlug);
+      const phoneme = getLanguagePhonemeBySlug(languageId, phonemeSlug);
       const items = buildSentenceDrillItems(
-        SENTENCE_BANK,
+        sentenceBank,
         phonemeSlug,
         itemCount,
         phoneme?.description,
       );
       drill.start(
-        { kind: "sentence", phonemeSlug, itemCount, passThreshold },
+        { kind: "sentence", languageId, phonemeSlug, itemCount, passThreshold },
         items,
       );
     },
-    [drill],
+    [drill, languageId, sentenceBank],
   );
 
   const handlePlayReference = useCallback(() => {
@@ -47,11 +51,11 @@ export default function SentenceDrillPage() {
         if (item.text.split(/\s+/).length > 1) {
           tts.speak(item.text, 0.85);
         } else {
-          mw.playWord(item.text);
+          mw.playWord(item.text, "blue", languageId);
         }
       }
     }
-  }, [drill.phase, mw, tts]);
+  }, [drill.phase, mw, tts, languageId]);
 
   const handleRestart = useCallback(() => {
     if (!drill.config) return;
@@ -77,7 +81,7 @@ export default function SentenceDrillPage() {
           drill.phase.type !== "configuring" &&
           drill.phase.type !== "completed" && (
             <span className="text-sm text-muted-foreground">
-              {getPhonemeBySlug(drill.config.phonemeSlug)?.ipa}
+              {getLanguagePhonemeBySlug(languageId, drill.config.phonemeSlug)?.ipa}
             </span>
           )}
       </div>
@@ -90,6 +94,7 @@ export default function SentenceDrillPage() {
         {drill.phase.type === "phonemeLesson" && drill.config && (
           <SentenceLessonView
             config={drill.config}
+            languageId={languageId}
             onReady={drill.finishPhonemeLesson}
             mw={mw}
           />
@@ -176,18 +181,20 @@ export default function SentenceDrillPage() {
 
 function SentenceLessonView({
   config,
+  languageId,
   onReady,
   mw,
 }: {
   config: { phonemeSlug: string; itemCount: number };
+  languageId: LanguageId;
   onReady: () => void;
   mw: {
-    playWord: (w: string, v?: "blue" | "pink") => void;
+    playWord: (w: string, v?: "blue" | "pink", l?: LanguageId) => void;
     isPlaying: boolean;
     isLoading: boolean;
   };
 }) {
-  const phoneme = getPhonemeBySlug(config.phonemeSlug);
+  const phoneme = getLanguagePhonemeBySlug(languageId, config.phonemeSlug);
   if (!phoneme) return null;
   return (
     <DrillPhonemeLesson
@@ -195,7 +202,7 @@ function SentenceLessonView({
       itemCount={config.itemCount}
       kind="sentence"
       onReady={onReady}
-      onPlayExample={(word) => mw.playWord(word)}
+      onPlayExample={(word) => mw.playWord(word, "blue", languageId)}
       isPlayingExample={mw.isPlaying}
       isLoadingExample={mw.isLoading}
     />

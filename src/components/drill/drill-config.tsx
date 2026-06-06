@@ -1,11 +1,12 @@
 "use client";
 
 import { motion } from "motion/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useCoachMode } from "@/hooks/use-api-keys";
+import { useCoachMode, useLanguageConfig } from "@/hooks/use-api-keys";
 import { getAvailableWordCount, getPassThreshold } from "@/lib/drill-utils";
-import { PHONEMES } from "@/lib/phoneme-data";
+import { getLanguagePhonemes } from "@/lib/language-phonemes";
+import { getLanguageProfile } from "@/lib/language-profiles";
 import type { DrillKind } from "@/types/drill";
 import type { PhonemeData } from "@/types/phoneme";
 
@@ -25,15 +26,26 @@ export function DrillConfig({ kind, onStart }: DrillConfigProps) {
   const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
   const [itemCount, setItemCount] = useState(kind === "word" ? 10 : 5);
 
-  const vowels = PHONEMES.filter((p) => p.category === "vowel");
-  const consonants = PHONEMES.filter((p) => p.category === "consonant");
+  const { languageId } = useLanguageConfig();
+  const profile = getLanguageProfile(languageId);
+  const phonemes = getLanguagePhonemes(languageId);
+  const vowels = phonemes.filter((p) => p.category === "vowel");
+  const consonants = phonemes.filter((p) => p.category === "consonant");
+  const otherUnits = phonemes.filter(
+    (p) => p.category !== "vowel" && p.category !== "consonant",
+  );
   const countOptions =
     kind === "word" ? WORD_COUNT_OPTIONS : SENTENCE_COUNT_OPTIONS;
   const coachMode = useCoachMode();
   const threshold = getPassThreshold(coachMode);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: changing language invalidates the selected phoneme slug
+  useEffect(() => {
+    setSelectedSlug(null);
+  }, [languageId]);
+
   const selectedPhoneme = selectedSlug
-    ? PHONEMES.find((p) => p.slug === selectedSlug)
+    ? phonemes.find((p) => p.slug === selectedSlug)
     : null;
   const availableWords = selectedPhoneme
     ? getAvailableWordCount(selectedPhoneme)
@@ -78,6 +90,24 @@ export function DrillConfig({ kind, onStart }: DrillConfigProps) {
           ))}
         </div>
       </div>
+
+      {otherUnits.length > 0 && (
+        <div>
+          <h3 className="mb-3 text-sm font-semibold text-muted-foreground">
+            {profile.soundUnitLabel}补充（{otherUnits.length}）
+          </h3>
+          <div className="grid grid-cols-4 gap-2 sm:grid-cols-6 lg:grid-cols-8">
+            {otherUnits.map((p) => (
+              <PhonemeChip
+                key={p.slug}
+                phoneme={p}
+                selected={selectedSlug === p.slug}
+                onClick={() => setSelectedSlug(p.slug)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Count selection + start */}
       {selectedSlug && (

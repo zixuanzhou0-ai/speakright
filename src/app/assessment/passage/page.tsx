@@ -18,6 +18,7 @@ import { RecordingQualityPanel } from "@/components/audio/recording-quality-pane
 import { WaveformDisplay } from "@/components/audio/waveform-display";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useLanguageConfig } from "@/hooks/use-api-keys";
 import { useAzureAssessment } from "@/hooks/use-azure-assessment";
 import { useRecorder } from "@/hooks/use-recorder";
 import { useRecordingQuality } from "@/hooks/use-recording-quality";
@@ -36,6 +37,10 @@ import {
   selectCoverageAdaptiveProbes,
 } from "@/lib/coverage-passage";
 import { buildCoveragePassageDiagnosisReport } from "@/lib/diagnosis-engine";
+import {
+  DEFAULT_LANGUAGE_ID,
+  getLanguageProfile,
+} from "@/lib/language-profiles";
 import { getTrainingPack } from "@/lib/training-packs";
 import type {
   CoveragePassageRecording,
@@ -111,6 +116,37 @@ function getPromptForPhase(
 }
 
 export default function CoveragePassageAssessmentPage() {
+  const { languageId } = useLanguageConfig();
+  const profile = getLanguageProfile(languageId);
+
+  if (languageId !== DEFAULT_LANGUAGE_ID) {
+    return (
+      <div className="flex h-full items-center justify-center px-6 py-8">
+        <div className="w-full max-w-2xl rounded-xl border bg-card p-6 shadow-sm">
+          <h1 className="text-xl font-semibold">
+            {profile.displayName}全音覆盖朗读准备中
+          </h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            这条深度诊断目前只针对美式英语。{profile.displayName}
+            已开放快速诊断 beta，请先使用对应语言的筛查词和短文。
+          </p>
+          <div className="mt-5 flex gap-2">
+            <Link href="/assessment">
+              <Button>返回快速诊断</Button>
+            </Link>
+            <Link href="/settings">
+              <Button variant="outline">切换语言</Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return <EnglishCoveragePassageAssessmentPage />;
+}
+
+function EnglishCoveragePassageAssessmentPage() {
   const [savedReport, setSavedReport] = useState<DiagnosisReport | null>(() =>
     loadSavedCoverageReport(),
   );

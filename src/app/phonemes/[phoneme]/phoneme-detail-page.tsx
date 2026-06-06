@@ -116,8 +116,9 @@ export function PhonemeDetailPage() {
 
   // Hybrid word pool: static keywords + extended word bank + MW cached words
   const wordPool = useMemo(
-    () => (phoneme ? getWordPool(phoneme.slug, phoneme.keywords) : []),
-    [phoneme],
+    () =>
+      phoneme ? getWordPool(phoneme.slug, phoneme.keywords, languageId) : [],
+    [phoneme, languageId],
   );
   const [hasMwConfig, setHasMwConfig] = useState(false);
   const [practicedCount, setPracticedCount] = useState(0);
@@ -137,9 +138,9 @@ export function PhonemeDetailPage() {
   // Pick first random word on mount
   useEffect(() => {
     if (wordPool.length > 0 && !currentWord && phoneme) {
-      setCurrentWord(selectNextWord(phoneme.slug, wordPool));
+      setCurrentWord(selectNextWord(phoneme.slug, wordPool, undefined, languageId));
     }
-  }, [wordPool, currentWord, phoneme, setCurrentWord]);
+  }, [wordPool, currentWord, phoneme, languageId, setCurrentWord]);
 
   const currentWordStr = currentWord?.word ?? phoneme?.example ?? "";
 
@@ -156,7 +157,12 @@ export function PhonemeDetailPage() {
   // Right arrow → random next word
   const handleNext = useCallback(() => {
     if (!phoneme || wordPool.length === 0) return;
-    const next = selectNextWord(phoneme.slug, wordPool, currentWord?.word);
+    const next = selectNextWord(
+      phoneme.slug,
+      wordPool,
+      currentWord?.word,
+      languageId,
+    );
     if (currentWord) setWordHistory((prev) => [...prev, currentWord]);
     setCurrentWord(next);
     resetState();
@@ -164,6 +170,7 @@ export function PhonemeDetailPage() {
     phoneme,
     wordPool,
     currentWord,
+    languageId,
     resetState,
     setCurrentWord,
     setWordHistory,
