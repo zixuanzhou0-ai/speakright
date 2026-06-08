@@ -1,0 +1,990 @@
+{
+  "languageId": "es-ES",
+  "source": "University of Iowa Sounds of Speech Spanish",
+  "sourceBaseUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es",
+  "localBasePath": "/videos/language-assets/es-ES/examples",
+  "note": "Downloaded from official Sounds of Speech Spanish examples/*.mp4 endpoints after user-stated authorization for local educational/open-source bundling. Use exact filenames from examples[].video.",
+  "phonemes": [
+    {
+      "slug": "es-a",
+      "folderName": "a-sound",
+      "officialIpaKeys": [
+        "a"
+      ],
+      "soundVideo": {
+        "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/a-sound/examples/sound.mp4",
+        "localSrc": "/videos/language-assets/es-ES/examples/es-a/sound.mp4"
+      },
+      "examples": [
+        {
+          "word": "arma",
+          "video": "arma.mp4",
+          "formattedWord": "[ <span class=\"example-highlight\">a</span>ɾ.ma ]",
+          "officialIpaKey": "a",
+          "officialIpa": "a",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/a-sound/examples/arma.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-a/arma.mp4"
+        },
+        {
+          "word": "año",
+          "video": "ano.mp4",
+          "formattedWord": "[ <span class=\"example-highlight\">a.ɲo ]",
+          "officialIpaKey": "a",
+          "officialIpa": "a",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/a-sound/examples/ano.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-a/ano.mp4"
+        },
+        {
+          "word": "pato",
+          "video": "pato.mp4",
+          "formattedWord": "[ p<span class=\"example-highlight\">a</span>.t̪o ]",
+          "officialIpaKey": "a",
+          "officialIpa": "a",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/a-sound/examples/pato.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-a/pato.mp4"
+        },
+        {
+          "word": "boca",
+          "video": "boca.mp4",
+          "formattedWord": "[ bo.k<span class=\"example-highlight\">a</span> ]",
+          "officialIpaKey": "a",
+          "officialIpa": "a",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/a-sound/examples/boca.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-a/boca.mp4"
+        }
+      ]
+    },
+    {
+      "slug": "es-e",
+      "folderName": "e-sound",
+      "officialIpaKeys": [
+        "e"
+      ],
+      "soundVideo": {
+        "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/e-sound/examples/sound.mp4",
+        "localSrc": "/videos/language-assets/es-ES/examples/es-e/sound.mp4"
+      },
+      "examples": [
+        {
+          "word": "eje",
+          "video": "eje.mp4",
+          "formattedWord": "[ <span class=\"example-highlight\">e</span>.xe ]",
+          "officialIpaKey": "e",
+          "officialIpa": "e",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/e-sound/examples/eje.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-e/eje.mp4"
+        },
+        {
+          "word": "eco",
+          "video": "eco.mp4",
+          "formattedWord": "[ <span class=\"example-highlight\">e</span>.ko ]",
+          "officialIpaKey": "e",
+          "officialIpa": "e",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/e-sound/examples/eco.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-e/eco.mp4"
+        },
+        {
+          "word": "peso",
+          "video": "peso.mp4",
+          "formattedWord": "[ p<span class=\"example-highlight\">e</span>.so ]",
+          "officialIpaKey": "e",
+          "officialIpa": "e",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/e-sound/examples/peso.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-e/peso.mp4"
+        },
+        {
+          "word": "por qué",
+          "video": "porque.mp4",
+          "formattedWord": "[ por.k<span class=\"example-highlight\">e</span> ]",
+          "officialIpaKey": "e",
+          "officialIpa": "e",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/e-sound/examples/porque.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-e/porque.mp4"
+        }
+      ]
+    },
+    {
+      "slug": "es-i",
+      "folderName": "i-sound",
+      "officialIpaKeys": [
+        "i"
+      ],
+      "soundVideo": {
+        "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/i-sound/examples/sound.mp4",
+        "localSrc": "/videos/language-assets/es-ES/examples/es-i/sound.mp4"
+      },
+      "examples": [
+        {
+          "word": "hipo",
+          "video": "hipo.mp4",
+          "formattedWord": "[ <span class=\"example-highlight\">i</span>.po ]",
+          "officialIpaKey": "i",
+          "officialIpa": "i",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/i-sound/examples/hipo.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-i/hipo.mp4"
+        },
+        {
+          "word": "hija",
+          "video": "hija.mp4",
+          "formattedWord": "[ <span class=\"example-highlight\">i</span>.xa ]",
+          "officialIpaKey": "i",
+          "officialIpa": "i",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/i-sound/examples/hija.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-i/hija.mp4"
+        },
+        {
+          "word": "misa",
+          "video": "misa.mp4",
+          "formattedWord": "[ m<span class=\"example-highlight\">i</span>.sa ]",
+          "officialIpaKey": "i",
+          "officialIpa": "i",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/i-sound/examples/misa.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-i/misa.mp4"
+        },
+        {
+          "word": "aquí",
+          "video": "aqui.mp4",
+          "formattedWord": "[ a.k<span class=\"example-highlight\">i</span> ]",
+          "officialIpaKey": "i",
+          "officialIpa": "i",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/i-sound/examples/aqui.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-i/aqui.mp4"
+        }
+      ]
+    },
+    {
+      "slug": "es-o",
+      "folderName": "o-sound",
+      "officialIpaKeys": [
+        "o"
+      ],
+      "soundVideo": {
+        "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/o-sound/examples/sound.mp4",
+        "localSrc": "/videos/language-assets/es-ES/examples/es-o/sound.mp4"
+      },
+      "examples": [
+        {
+          "word": "ojo",
+          "video": "ojo.mp4",
+          "formattedWord": "[ <span class=\"example-highlight\">o</span>.xo ]",
+          "officialIpaKey": "o",
+          "officialIpa": "o",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/o-sound/examples/ojo.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-o/ojo.mp4"
+        },
+        {
+          "word": "ocho",
+          "video": "ocho.mp4",
+          "formattedWord": "[ <span class=\"example-highlight\">o</span>.tʃo ]",
+          "officialIpaKey": "o",
+          "officialIpa": "o",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/o-sound/examples/ocho.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-o/ocho.mp4"
+        },
+        {
+          "word": "cosa",
+          "video": "cosa.mp4",
+          "formattedWord": "[ k<span class=\"example-highlight\">o</span>.sa ]",
+          "officialIpaKey": "o",
+          "officialIpa": "o",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/o-sound/examples/cosa.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-o/cosa.mp4"
+        },
+        {
+          "word": "vaso",
+          "video": "vaso.mp4",
+          "formattedWord": "[ ba.s<span class=\"example-highlight\">o</span> ]",
+          "officialIpaKey": "o",
+          "officialIpa": "o",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/o-sound/examples/vaso.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-o/vaso.mp4"
+        }
+      ]
+    },
+    {
+      "slug": "es-u",
+      "folderName": "u-sound",
+      "officialIpaKeys": [
+        "u"
+      ],
+      "soundVideo": {
+        "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/u-sound/examples/sound.mp4",
+        "localSrc": "/videos/language-assets/es-ES/examples/es-u/sound.mp4"
+      },
+      "examples": [
+        {
+          "word": "uña",
+          "video": "una.mp4",
+          "formattedWord": "[ <span class=\"example-highlight\">u</span>.ɲa ]",
+          "officialIpaKey": "u",
+          "officialIpa": "u",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/u-sound/examples/una.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-u/una.mp4"
+        },
+        {
+          "word": "humo",
+          "video": "humo.mp4",
+          "formattedWord": "[ <span class=\"example-highlight\">u</span>.mo ]",
+          "officialIpaKey": "u",
+          "officialIpa": "u",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/u-sound/examples/humo.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-u/humo.mp4"
+        },
+        {
+          "word": "tuna",
+          "video": "tuna.mp4",
+          "formattedWord": "[ t̪<span class=\"example-highlight\">u</span>.na ]",
+          "officialIpaKey": "u",
+          "officialIpa": "u",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/u-sound/examples/tuna.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-u/tuna.mp4"
+        },
+        {
+          "word": "azul",
+          "video": "azul.mp4",
+          "formattedWord": "[ a.s<span class=\"example-highlight\">u</span>l ]",
+          "officialIpaKey": "u",
+          "officialIpa": "u",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/u-sound/examples/azul.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-u/azul.mp4"
+        }
+      ]
+    },
+    {
+      "slug": "es-bv",
+      "folderName": "beta-low-sound",
+      "officialIpaKeys": [
+        "β̞"
+      ],
+      "soundVideo": {
+        "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/beta-low-sound/examples/sound.mp4",
+        "localSrc": "/videos/language-assets/es-ES/examples/es-bv/sound.mp4"
+      },
+      "examples": [
+        {
+          "word": "lavar",
+          "video": "lavar.mp4",
+          "formattedWord": "[ la.<span class=\"example-highlight\">β̞</span>aɾ ]",
+          "officialIpaKey": "β̞",
+          "officialIpa": "β̞",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/beta-low-sound/examples/lavar.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-bv/lavar.mp4"
+        },
+        {
+          "word": "lobo",
+          "video": "lobo.mp4",
+          "formattedWord": "[ lo.<span class=\"example-highlight\">β̞</span>o ]",
+          "officialIpaKey": "β̞",
+          "officialIpa": "β̞",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/beta-low-sound/examples/lobo.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-bv/lobo.mp4"
+        },
+        {
+          "word": "curva",
+          "video": "curva.mp4",
+          "formattedWord": "[ kuɾ.<span class=\"example-highlight\">β̞</span>a ]",
+          "officialIpaKey": "β̞",
+          "officialIpa": "β̞",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/beta-low-sound/examples/curva.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-bv/curva.mp4"
+        },
+        {
+          "word": "selva",
+          "video": "selva.mp4",
+          "formattedWord": "[ sel.<span class=\"example-highlight\">β̞</span>a ]",
+          "officialIpaKey": "β̞",
+          "officialIpa": "β̞",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/beta-low-sound/examples/selva.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-bv/selva.mp4"
+        }
+      ]
+    },
+    {
+      "slug": "es-d",
+      "folderName": "eth-low-sound",
+      "officialIpaKeys": [
+        "ð̞",
+        "ð̟"
+      ],
+      "soundVideo": {
+        "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/eth-low-sound/examples/sound.mp4",
+        "localSrc": "/videos/language-assets/es-ES/examples/es-d/sound.mp4"
+      },
+      "examples": [
+        {
+          "word": "cada",
+          "video": "cada.mp4",
+          "formattedWord": "[ ka.<span class=\"example-highlight\">ð̞</span>a ]",
+          "officialIpaKey": "ð̞",
+          "officialIpa": "ð̞",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/eth-low-sound/examples/cada.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-d/cada.mp4"
+        },
+        {
+          "word": "cerdo",
+          "video": "cerdo.mp4",
+          "formattedWord": "[ seɾ.<span class=\"example-highlight\">ð̞</span>o ]",
+          "officialIpaKey": "ð̞",
+          "officialIpa": "ð̞",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/eth-low-sound/examples/cerdo.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-d/cerdo.mp4"
+        },
+        {
+          "word": "sus dedos",
+          "video": "sus dedos.mp4",
+          "formattedWord": "[ sus̬.<span class=\"example-highlight\">ð̞</span>e.<span class=\"example-highlight\">ð̞</span>os ]",
+          "officialIpaKey": "ð̞",
+          "officialIpa": "ð̞",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/eth-low-sound/examples/sus dedos.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-d/sus dedos.mp4"
+        },
+        {
+          "word": "verdad",
+          "video": "verdad.mp4",
+          "formattedWord": "[ beɾ.<span class=\"example-highlight\">ð̞</span>a<span class=\"example-highlight\">ð̞</span> ]",
+          "officialIpaKey": "ð̞",
+          "officialIpa": "ð̞",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/eth-low-sound/examples/verdad.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-d/verdad.mp4"
+        }
+      ]
+    },
+    {
+      "slug": "es-g",
+      "folderName": "gamma-sound",
+      "officialIpaKeys": [
+        "ɣ̞"
+      ],
+      "soundVideo": {
+        "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/gamma-sound/examples/sound.mp4",
+        "localSrc": "/videos/language-assets/es-ES/examples/es-g/sound.mp4"
+      },
+      "examples": [
+        {
+          "word": "lago",
+          "video": "lago.mp4",
+          "formattedWord": "[ la.<span class=\"example-highlight\">ɣ</span>o ]",
+          "officialIpaKey": "ɣ̞",
+          "officialIpa": "ɣ̞",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/gamma-sound/examples/lago.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-g/lago.mp4"
+        },
+        {
+          "word": "salga",
+          "video": "salga.mp4",
+          "formattedWord": "[ sal.<span class=\"example-highlight\">ɣ</span>a ]",
+          "officialIpaKey": "ɣ̞",
+          "officialIpa": "ɣ̞",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/gamma-sound/examples/salga.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-g/salga.mp4"
+        },
+        {
+          "word": "largo",
+          "video": "largo.mp4",
+          "formattedWord": "[ laɾ.<span class=\"example-highlight\">ɣ</span>o ]",
+          "officialIpaKey": "ɣ̞",
+          "officialIpa": "ɣ̞",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/gamma-sound/examples/largo.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-g/largo.mp4"
+        },
+        {
+          "word": "amigo",
+          "video": "amigo.mp4",
+          "formattedWord": "[ a.mi.<span class=\"example-highlight\">ɣ</span>o ]",
+          "officialIpaKey": "ɣ̞",
+          "officialIpa": "ɣ̞",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/gamma-sound/examples/amigo.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-g/amigo.mp4"
+        }
+      ]
+    },
+    {
+      "slug": "es-theta",
+      "folderName": "theta-sound",
+      "officialIpaKeys": [
+        "θ"
+      ],
+      "soundVideo": {
+        "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/theta-sound/examples/sound.mp4",
+        "localSrc": "/videos/language-assets/es-ES/examples/es-theta/sound.mp4"
+      },
+      "examples": [
+        {
+          "word": "cena",
+          "video": "cena.mp4",
+          "formattedWord": "[ <span class=\"example-highlight\">θ</span>e.na ]",
+          "officialIpaKey": "θ",
+          "officialIpa": "θ",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/theta-sound/examples/cena.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-theta/cena.mp4"
+        },
+        {
+          "word": "cima",
+          "video": "cima.mp4",
+          "formattedWord": "[ <span class=\"example-highlight\">θ</span>i.ma ]",
+          "officialIpaKey": "θ",
+          "officialIpa": "θ",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/theta-sound/examples/cima.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-theta/cima.mp4"
+        },
+        {
+          "word": "voz",
+          "video": "voz.mp4",
+          "formattedWord": "[ bo<span class=\"example-highlight\">θ</span> ]",
+          "officialIpaKey": "θ",
+          "officialIpa": "θ",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/theta-sound/examples/voz.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-theta/voz.mp4"
+        },
+        {
+          "word": "caza",
+          "video": "caza.mp4",
+          "formattedWord": "[ ka.<span class=\"example-highlight\">θ</span>a ]",
+          "officialIpaKey": "θ",
+          "officialIpa": "θ",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/theta-sound/examples/caza.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-theta/caza.mp4"
+        }
+      ]
+    },
+    {
+      "slug": "es-x",
+      "folderName": "chi-sound",
+      "officialIpaKeys": [
+        "x"
+      ],
+      "soundVideo": {
+        "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/chi-sound/examples/sound.mp4",
+        "localSrc": "/videos/language-assets/es-ES/examples/es-x/sound.mp4"
+      },
+      "examples": [
+        {
+          "word": "jota",
+          "video": "jota.mp4",
+          "formattedWord": "[ <span class=\"example-highlight\">x</span>o.t̪a ]",
+          "officialIpaKey": "x",
+          "officialIpa": "x",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/chi-sound/examples/jota.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-x/jota.mp4"
+        },
+        {
+          "word": "gente",
+          "video": "gente.mp4",
+          "formattedWord": "[ <span class=\"example-highlight\">x</span>en̪.t̪e ]",
+          "officialIpaKey": "x",
+          "officialIpa": "x",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/chi-sound/examples/gente.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-x/gente.mp4"
+        },
+        {
+          "word": "ajo",
+          "video": "ajo.mp4",
+          "formattedWord": "[ a.<span class=\"example-highlight\">x</span>o ]",
+          "officialIpaKey": "x",
+          "officialIpa": "x",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/chi-sound/examples/ajo.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-x/ajo.mp4"
+        },
+        {
+          "word": "caja",
+          "video": "caja.mp4",
+          "formattedWord": "[ ka.<span class=\"example-highlight\">x</span>a ]",
+          "officialIpaKey": "x",
+          "officialIpa": "x",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/chi-sound/examples/caja.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-x/caja.mp4"
+        }
+      ]
+    },
+    {
+      "slug": "es-ny",
+      "folderName": "n-left-sound",
+      "officialIpaKeys": [
+        "ɲ"
+      ],
+      "soundVideo": {
+        "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/n-left-sound/examples/sound.mp4",
+        "localSrc": "/videos/language-assets/es-ES/examples/es-ny/sound.mp4"
+      },
+      "examples": [
+        {
+          "word": "ñapa",
+          "video": "napa.mp4",
+          "formattedWord": "[ <span class=\"example-highlight\">ɲ</span>a.pa ]",
+          "officialIpaKey": "ɲ",
+          "officialIpa": "ɲ",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/n-left-sound/examples/napa.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-ny/napa.mp4"
+        },
+        {
+          "word": "año",
+          "video": "ano.mp4",
+          "formattedWord": "[ a.<span class=\"example-highlight\">ɲ</span>o ]",
+          "officialIpaKey": "ɲ",
+          "officialIpa": "ɲ",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/n-left-sound/examples/ano.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-ny/ano.mp4"
+        },
+        {
+          "word": "campaña",
+          "video": "campana.mp4",
+          "formattedWord": "[ kam.pa.<span class=\"example-highlight\">ɲ</span>a ]",
+          "officialIpaKey": "ɲ",
+          "officialIpa": "ɲ",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/n-left-sound/examples/campana.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-ny/campana.mp4"
+        },
+        {
+          "word": "empeño",
+          "video": "empeno.mp4",
+          "formattedWord": "[ em.pe<span class=\"example-highlight\">.ɲ</span>o ]",
+          "officialIpaKey": "ɲ",
+          "officialIpa": "ɲ",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/n-left-sound/examples/empeno.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-ny/empeno.mp4"
+        }
+      ]
+    },
+    {
+      "slug": "es-tap-r",
+      "folderName": "r-short-sound",
+      "officialIpaKeys": [
+        "ɾ"
+      ],
+      "soundVideo": {
+        "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/r-short-sound/examples/sound.mp4",
+        "localSrc": "/videos/language-assets/es-ES/examples/es-tap-r/sound.mp4"
+      },
+      "examples": [
+        {
+          "word": "cero",
+          "video": "cero.mp4",
+          "formattedWord": "[ se.<span class=\"example-highlight\">ɾ</span>o ]",
+          "officialIpaKey": "ɾ",
+          "officialIpa": "ɾ",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/r-short-sound/examples/cero.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-tap-r/cero.mp4"
+        },
+        {
+          "word": "amar",
+          "video": "amar.mp4",
+          "formattedWord": "[ a.ma<span class=\"example-highlight\">ɾ</span> ]",
+          "officialIpaKey": "ɾ",
+          "officialIpa": "ɾ",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/r-short-sound/examples/amar.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-tap-r/amar.mp4"
+        },
+        {
+          "word": "triste",
+          "video": "triste.mp4",
+          "formattedWord": "[ t̪<span class=\"example-highlight\">ɾ</span>is.t̪e ]",
+          "officialIpaKey": "ɾ",
+          "officialIpa": "ɾ",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/r-short-sound/examples/triste.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-tap-r/triste.mp4"
+        },
+        {
+          "word": "caro",
+          "video": "caro.mp4",
+          "formattedWord": "[ ka.<span class=\"example-highlight\">ɾ</span>o ]",
+          "officialIpaKey": "ɾ",
+          "officialIpa": "ɾ",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/r-short-sound/examples/caro.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-tap-r/caro.mp4"
+        }
+      ]
+    },
+    {
+      "slug": "es-trill-r",
+      "folderName": "r-rolled-sound",
+      "officialIpaKeys": [
+        "r"
+      ],
+      "soundVideo": {
+        "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/r-rolled-sound/examples/sound.mp4",
+        "localSrc": "/videos/language-assets/es-ES/examples/es-trill-r/sound.mp4"
+      },
+      "examples": [
+        {
+          "word": "tierra",
+          "video": "tierra.mp4",
+          "formattedWord": "[ t̪je.<span class=\"example-highlight\">r</span>a ]",
+          "officialIpaKey": "r",
+          "officialIpa": "r",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/r-rolled-sound/examples/tierra.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-trill-r/tierra.mp4"
+        },
+        {
+          "word": "carro",
+          "video": "carro.mp4",
+          "formattedWord": "[ ka.<span class=\"example-highlight\">r</span>o ]",
+          "officialIpaKey": "r",
+          "officialIpa": "r",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/r-rolled-sound/examples/carro.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-trill-r/carro.mp4"
+        },
+        {
+          "word": "alrededor",
+          "video": "alrededor.mp4",
+          "formattedWord": "[ al.<span class=\"example-highlight\">r</span>e.ð̞e.ð̞or ]",
+          "officialIpaKey": "r",
+          "officialIpa": "r",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/r-rolled-sound/examples/alrededor.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-trill-r/alrededor.mp4"
+        },
+        {
+          "word": "zorro",
+          "video": "zorro.mp4",
+          "formattedWord": "[ so.<span class=\"example-highlight\">r</span>o ]",
+          "officialIpaKey": "r",
+          "officialIpa": "r",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/r-rolled-sound/examples/zorro.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-trill-r/zorro.mp4"
+        }
+      ]
+    },
+    {
+      "slug": "es-s",
+      "folderName": "s-sound",
+      "officialIpaKeys": [
+        "s"
+      ],
+      "soundVideo": {
+        "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/s-sound/examples/sound.mp4",
+        "localSrc": "/videos/language-assets/es-ES/examples/es-s/sound.mp4"
+      },
+      "examples": [
+        {
+          "word": "suma",
+          "video": "suma.mp4",
+          "formattedWord": "[ <span class=\"example-highlight\">s</span>u.ma ]",
+          "officialIpaKey": "s",
+          "officialIpa": "s",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/s-sound/examples/suma.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-s/suma.mp4"
+        },
+        {
+          "word": "seco",
+          "video": "seco.mp4",
+          "formattedWord": "[ <span class=\"example-highlight\">s</span>e.ko ]",
+          "officialIpaKey": "s",
+          "officialIpa": "s",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/s-sound/examples/seco.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-s/seco.mp4"
+        },
+        {
+          "word": "mesa",
+          "video": "mesa.mp4",
+          "formattedWord": "[ me.<span class=\"example-highlight\">s</span>a ]",
+          "officialIpaKey": "s",
+          "officialIpa": "s",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/s-sound/examples/mesa.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-s/mesa.mp4"
+        },
+        {
+          "word": "cosa",
+          "video": "cosa.mp4",
+          "formattedWord": "[ ko.<span class=\"example-highlight\">s</span>a ]",
+          "officialIpaKey": "s",
+          "officialIpa": "s",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/s-sound/examples/cosa.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-s/cosa.mp4"
+        }
+      ]
+    },
+    {
+      "slug": "es-ch",
+      "folderName": "ch-sound",
+      "officialIpaKeys": [
+        "ʧ"
+      ],
+      "soundVideo": {
+        "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/ch-sound/examples/sound.mp4",
+        "localSrc": "/videos/language-assets/es-ES/examples/es-ch/sound.mp4"
+      },
+      "examples": [
+        {
+          "word": "chico",
+          "video": "chico.mp4",
+          "formattedWord": "[ <span class=\"example-highlight\">tʃ</span>i.ko ]",
+          "officialIpaKey": "ʧ",
+          "officialIpa": "ʧ",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/ch-sound/examples/chico.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-ch/chico.mp4"
+        },
+        {
+          "word": "choza",
+          "video": "choza.mp4",
+          "formattedWord": "[ <span class=\"example-highlight\">tʃ</span>o.sa ]",
+          "officialIpaKey": "ʧ",
+          "officialIpa": "ʧ",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/ch-sound/examples/choza.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-ch/choza.mp4"
+        },
+        {
+          "word": "ocho",
+          "video": "ocho.mp4",
+          "formattedWord": "[ o.<span class=\"example-highlight\">tʃ</span>o ]",
+          "officialIpaKey": "ʧ",
+          "officialIpa": "ʧ",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/ch-sound/examples/ocho.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-ch/ocho.mp4"
+        },
+        {
+          "word": "leche",
+          "video": "leche.mp4",
+          "formattedWord": "[ le.<span class=\"example-highlight\">tʃ</span>e ]",
+          "officialIpaKey": "ʧ",
+          "officialIpa": "ʧ",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/ch-sound/examples/leche.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-ch/leche.mp4"
+        }
+      ]
+    },
+    {
+      "slug": "es-y-ll",
+      "folderName": "yot-sound",
+      "officialIpaKeys": [
+        "ʝ"
+      ],
+      "soundVideo": {
+        "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/yot-sound/examples/sound.mp4",
+        "localSrc": "/videos/language-assets/es-ES/examples/es-y-ll/sound.mp4"
+      },
+      "examples": [
+        {
+          "word": "maya",
+          "video": "maya.mp4",
+          "formattedWord": "[ ma.<span class=\"example-highlight\">ʝ</span>a ]",
+          "officialIpaKey": "ʝ",
+          "officialIpa": "ʝ",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/yot-sound/examples/maya.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-y-ll/maya.mp4"
+        },
+        {
+          "word": "bella",
+          "video": "bella.mp4",
+          "formattedWord": "[ be.<span class=\"example-highlight\">ʝ</span>a ]",
+          "officialIpaKey": "ʝ",
+          "officialIpa": "ʝ",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/yot-sound/examples/bella.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-y-ll/bella.mp4"
+        },
+        {
+          "word": "amarillo",
+          "video": "amarillo.mp4",
+          "formattedWord": "[ a.ma.ri.<span class=\"example-highlight\">ʝ</span>o ]",
+          "officialIpaKey": "ʝ",
+          "officialIpa": "ʝ",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/yot-sound/examples/amarillo.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-y-ll/amarillo.mp4"
+        },
+        {
+          "word": "arroyo",
+          "video": "arroyo.mp4",
+          "formattedWord": "[ a.ro.<span class=\"example-highlight\">ʝ</span>o ]",
+          "officialIpaKey": "ʝ",
+          "officialIpa": "ʝ",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/yot-sound/examples/arroyo.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-y-ll/arroyo.mp4"
+        }
+      ]
+    },
+    {
+      "slug": "es-l",
+      "folderName": "l-sound",
+      "officialIpaKeys": [
+        "l"
+      ],
+      "soundVideo": {
+        "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/l-sound/examples/sound.mp4",
+        "localSrc": "/videos/language-assets/es-ES/examples/es-l/sound.mp4"
+      },
+      "examples": [
+        {
+          "word": "Lola",
+          "video": "lola.mp4",
+          "formattedWord": "[ <span class=\"example-highlight\">l</span>o.la ]",
+          "officialIpaKey": "l",
+          "officialIpa": "l",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/l-sound/examples/lola.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-l/lola.mp4"
+        },
+        {
+          "word": "balsa",
+          "video": "balsa.mp4",
+          "formattedWord": "[ ba<span class=\"example-highlight\">l</span>.sa ]",
+          "officialIpaKey": "l",
+          "officialIpa": "l",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/l-sound/examples/balsa.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-l/balsa.mp4"
+        },
+        {
+          "word": "el santo",
+          "video": "el santo.mp4",
+          "formattedWord": "[ e<span class=\"example-highlight\">l</span>.san̪.t̪o ]",
+          "officialIpaKey": "l",
+          "officialIpa": "l",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/l-sound/examples/el santo.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-l/el santo.mp4"
+        },
+        {
+          "word": "el lote",
+          "video": "el lote.mp4",
+          "formattedWord": "[ e<span class=\"example-highlight\">l</span>.lo.t̪e ]",
+          "officialIpaKey": "l",
+          "officialIpa": "l",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/l-sound/examples/el lote.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-l/el lote.mp4"
+        }
+      ]
+    },
+    {
+      "slug": "es-nasal-place",
+      "folderName": "n-right1-sound",
+      "officialIpaKeys": [
+        "ŋ"
+      ],
+      "soundVideo": {
+        "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/n-right1-sound/examples/sound.mp4",
+        "localSrc": "/videos/language-assets/es-ES/examples/es-nasal-place/sound.mp4"
+      },
+      "examples": [
+        {
+          "word": "mango",
+          "video": "mango.mp4",
+          "formattedWord": "[ ma<span class=\"example-highlight\">ŋ</span>.ɡo ]",
+          "officialIpaKey": "ŋ",
+          "officialIpa": "ŋ",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/n-right1-sound/examples/mango.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-nasal-place/mango.mp4"
+        },
+        {
+          "word": "tenga",
+          "video": "tenga.mp4",
+          "formattedWord": "[ t̪e<span class=\"example-highlight\">ŋ</span>.ɡa ]",
+          "officialIpaKey": "ŋ",
+          "officialIpa": "ŋ",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/n-right1-sound/examples/tenga.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-nasal-place/tenga.mp4"
+        },
+        {
+          "word": "un gesto",
+          "video": "un gesto.mp4",
+          "formattedWord": "[ u<span class=\"example-highlight\">ŋ</span>.xeh.t̪o ]",
+          "officialIpaKey": "ŋ",
+          "officialIpa": "ŋ",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/n-right1-sound/examples/un gesto.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-nasal-place/un gesto.mp4"
+        },
+        {
+          "word": "en cama",
+          "video": "en cama.mp4",
+          "formattedWord": "[ e<span class=\"example-highlight\">ŋ</span>.ka.ma ]",
+          "officialIpaKey": "ŋ",
+          "officialIpa": "ŋ",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/n-right1-sound/examples/en cama.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-nasal-place/en cama.mp4"
+        }
+      ]
+    },
+    {
+      "slug": "es-diphthongs-j",
+      "folderName": "j-sound",
+      "officialIpaKeys": [
+        "j"
+      ],
+      "soundVideo": {
+        "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/j-sound/examples/sound.mp4",
+        "localSrc": "/videos/language-assets/es-ES/examples/es-diphthongs-j/sound.mp4"
+      },
+      "examples": [
+        {
+          "word": "piano",
+          "video": "piano.mp4",
+          "formattedWord": "[ p<span class=\"example-highlight\">j</span>a.no ]",
+          "officialIpaKey": "j",
+          "officialIpa": "j",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/j-sound/examples/piano.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-diphthongs-j/piano.mp4"
+        },
+        {
+          "word": "cielo",
+          "video": "cielo.mp4",
+          "formattedWord": "[ s<span class=\"example-highlight\">j</span>e.lo ]",
+          "officialIpaKey": "j",
+          "officialIpa": "j",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/j-sound/examples/cielo.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-diphthongs-j/cielo.mp4"
+        },
+        {
+          "word": "salario",
+          "video": "salario.mp4",
+          "formattedWord": "[ sa.la.ɾ<span class=\"example-highlight\">j</span>o ]",
+          "officialIpaKey": "j",
+          "officialIpa": "j",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/j-sound/examples/salario.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-diphthongs-j/salario.mp4"
+        },
+        {
+          "word": "sabio",
+          "video": "sabio.mp4",
+          "formattedWord": "[ sa.β̞̞<span class=\"example-highlight\">j</span>o ]",
+          "officialIpaKey": "j",
+          "officialIpa": "j",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/j-sound/examples/sabio.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-diphthongs-j/sabio.mp4"
+        }
+      ]
+    },
+    {
+      "slug": "es-diphthongs-w",
+      "folderName": "w-sound",
+      "officialIpaKeys": [
+        "w"
+      ],
+      "soundVideo": {
+        "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/w-sound/examples/sound.mp4",
+        "localSrc": "/videos/language-assets/es-ES/examples/es-diphthongs-w/sound.mp4"
+      },
+      "examples": [
+        {
+          "word": "cuenta",
+          "video": "cuenta.mp4",
+          "formattedWord": "[ k<span class=\"example-highlight\">w</span>en̪.t̪a ]",
+          "officialIpaKey": "w",
+          "officialIpa": "w",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/w-sound/examples/cuenta.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-diphthongs-w/cuenta.mp4"
+        },
+        {
+          "word": "bueno",
+          "video": "bueno.mp4",
+          "formattedWord": "[ b<span class=\"example-highlight\">w</span>e.no ]",
+          "officialIpaKey": "w",
+          "officialIpa": "w",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/w-sound/examples/bueno.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-diphthongs-w/bueno.mp4"
+        },
+        {
+          "word": "Uruguay",
+          "video": "uruguay.mp4",
+          "formattedWord": "[ u.ru.ɣ<span class=\"example-highlight\">w</span>ai̯ ]",
+          "officialIpaKey": "w",
+          "officialIpa": "w",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/w-sound/examples/uruguay.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-diphthongs-w/uruguay.mp4"
+        },
+        {
+          "word": "guapo",
+          "video": "guapo.mp4",
+          "formattedWord": "[ ɡ<span class=\"example-highlight\">w</span>a.po ]",
+          "officialIpaKey": "w",
+          "officialIpa": "w",
+          "sourceUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es/w-sound/examples/guapo.mp4",
+          "localSrc": "/videos/language-assets/es-ES/examples/es-diphthongs-w/guapo.mp4"
+        }
+      ]
+    }
+  ]
+}

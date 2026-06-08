@@ -5,6 +5,7 @@ import { CoachModeCard } from "@/components/settings/coach-mode-card";
 import { DataControlCard } from "@/components/settings/data-control-card";
 import { ElevenLabsConfigCard } from "@/components/settings/elevenlabs-config-card";
 import { ElevenLabsVoicePackCard } from "@/components/settings/elevenlabs-voice-pack-card";
+import { LanguageAvailabilityCard } from "@/components/settings/language-availability-card";
 import { LanguageConfigCard } from "@/components/settings/language-config-card";
 import { LlmConfigCard } from "@/components/settings/llm-config-card";
 import { PronunciationConfigCard } from "@/components/settings/pronunciation-config-card";
@@ -23,6 +24,10 @@ export default function SettingsPage() {
 
         <div className="mb-6">
           <ReleaseCard />
+        </div>
+
+        <div className="mb-6">
+          <LanguageAvailabilityCard />
         </div>
 
         <div className="mb-10">

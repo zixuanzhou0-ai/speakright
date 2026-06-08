@@ -130,8 +130,10 @@ export function LlmConfigCard() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>LLM Provider</CardTitle>
-        <CardDescription>用于生成中文发音反馈</CardDescription>
+        <CardTitle>AI 教练 LLM</CardTitle>
+        <CardDescription>
+          用于生成中文教练反馈；评分分数仍来自 Azure Speech。
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Provider chips */}

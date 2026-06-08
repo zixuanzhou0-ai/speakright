@@ -1,6 +1,6 @@
 # SpeakRight 开发者入门指南
 
-> 面向中国市场的美式英语发音矫正 Web App。用户听标准示范、跟读、获得 AI 评分与中文反馈。
+> 面向中文学习者的多语言发音训练桌面端。英语是稳定基线，西语/法语/俄语是实验板块。
 
 ---
 
@@ -103,7 +103,7 @@ Turbopack 开发服务器默认在 `http://localhost:3000` 启动。
 npm run desktop:dev
 ```
 
-该命令会通过 Tauri 启动桌面窗口，并自动在 `http://localhost:1420` 拉起 Next.js 开发服务器。
+该命令会通过 Tauri 启动桌面窗口，并自动在 `http://localhost:3002` 拉起 Next.js 开发服务器。当前 Windows 环境不要使用 1420。
 首次运行前需先安装 Tauri 桌面开发依赖：Rust，以及 Windows 下的 Microsoft C++ Build Tools 和 WebView2。
 
 > 注意：本项目不需要 `.env` 文件。所有 API Key 由用户在设置页（`/settings`）通过浏览器 localStorage 配置，通过 HTTP headers 传递给 API Routes。
@@ -334,7 +334,7 @@ interface PronunciationConfig {
 
 ### 5.1 API 代理模式
 
-**核心原则：客户端永远不直接调用外部 API。** 所有外部服务请求通过 Next.js API Routes (`/api/*`) 代理，API Key 通过自定义 HTTP headers 传递，绝不放在 JSON body 中。
+**桌面端原则：评分、TTS、LLM、词典各自有清晰边界。** Tauri 桌面端优先使用本地 API client 与 secure store/系统凭据；历史 Next.js API Routes (`/api/*`) 仍保留给兼容和非桌面调试路径。API Key 不写入 Git，也不进入学习数据导出。
 
 ```
 客户端 → /api/azure/assess (headers: x-azure-key, x-azure-region)

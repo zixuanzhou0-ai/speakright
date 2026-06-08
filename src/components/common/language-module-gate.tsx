@@ -36,12 +36,12 @@ export function LanguageModuleGate({
           </div>
           <div>
             <h1 className="text-xl font-semibold">
-              {profile.displayName}{moduleName}准备中
+              {profile.displayName}{moduleName}暂未开放完整训练
             </h1>
             <p className="mt-2 text-sm text-muted-foreground">
               当前语言已有 {audit.soundUnits} 个{profile.soundUnitLabel}和{" "}
-              {audit.keywordTotal} 个示例词，但还缺{" "}
-              {audit.missingCapabilities.slice(0, 3).join("、")}。
+              {audit.keywordTotal} 个示例词；部分模块可预览/可练习，但{" "}
+              {audit.missingCapabilities.slice(0, 3).join("、")}还在补齐。
             </p>
           </div>
         </div>
@@ -57,7 +57,7 @@ export function LanguageModuleGate({
         <div className="mt-5 flex flex-wrap gap-2">
           <Link href="/phonemes">
             <Button className="gap-2">
-              先查看发音单位
+              先查看可练习的发音单位
               <ArrowRight className="h-4 w-4" />
             </Button>
           </Link>

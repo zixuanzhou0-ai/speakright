@@ -2,6 +2,8 @@
 
 import { ExternalLink, Film, Headphones, Languages } from "lucide-react";
 import { DesktopExternalLink } from "@/components/common/desktop-external-link";
+import { SpanishSoundsOfSpeechVideoPanel } from "@/components/phoneme/spanish-sounds-of-speech-video-panel";
+import type { SpanishSoundVideoSet } from "@/lib/spanish-sounds-of-speech-videos";
 import type { PhonemeTeachingResource } from "@/types/phoneme";
 
 interface VideoPlayerProps {
@@ -9,6 +11,8 @@ interface VideoPlayerProps {
   available?: boolean;
   label?: string;
   localSrc?: string;
+  // Kept for data compatibility; source metadata is shown in credits/about
+  // surfaces, not inline under playable local practice videos.
   source?: string;
   sourceUrl?: string;
   license?: string;
@@ -16,6 +20,7 @@ interface VideoPlayerProps {
   notes?: string[];
   className?: string;
   resources?: PhonemeTeachingResource[];
+  spanishVideoSet?: SpanishSoundVideoSet;
 }
 
 const RESOURCE_ICON = {
@@ -26,29 +31,16 @@ const RESOURCE_ICON = {
   audio: Headphones,
 } as const;
 
-function isProxyOrRuleNote(note: string): boolean {
-  return /proxy|rule\/prosody|cluster unit|final devoicing|voicing assimilation|soft consonants|soft sign|iotated vowels/i.test(
-    note,
-  );
-}
-
 export function VideoPlayer({
   slug,
   available = true,
   label,
   localSrc,
-  source,
-  sourceUrl,
-  license,
-  attribution,
-  notes = [],
   className,
   resources = [],
+  spanishVideoSet,
 }: VideoPlayerProps) {
   const videoSrc = localSrc ?? `/videos/phonemes/${slug}.mp4`;
-  const proxyNotes = notes.filter(isProxyOrRuleNote);
-  const visibleNotes = (proxyNotes.length > 0 ? proxyNotes : notes).slice(0, 2);
-  const hasProxyOrRuleNote = proxyNotes.length > 0;
 
   if (!available) {
     const visibleResources = resources.slice(0, 3);
@@ -106,48 +98,24 @@ export function VideoPlayer({
     );
   }
 
+  if (spanishVideoSet) {
+    return (
+      <SpanishSoundsOfSpeechVideoPanel
+        videoSet={spanishVideoSet}
+        className={className}
+      />
+    );
+  }
+
   return (
-    <div className={className}>
-      <video
-        key={slug}
-        src={videoSrc}
-        controls
-        preload="metadata"
-        className="w-full rounded-lg border"
-      >
-        <track kind="captions" />
-      </video>
-      {(visibleNotes.length > 0 || source || license || attribution) && (
-        <div className="-mt-1 rounded-b-lg border border-t-0 bg-muted/25 px-3 py-2 text-[11px] leading-relaxed text-muted-foreground">
-          <div className="flex flex-wrap items-center gap-1.5">
-            {hasProxyOrRuleNote && (
-              <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 font-medium text-amber-700 dark:text-amber-300">
-                规则/代理素材
-              </span>
-            )}
-            {sourceUrl ? (
-              <DesktopExternalLink
-                href={sourceUrl}
-                className="inline-flex items-center gap-1 font-medium text-foreground hover:text-primary"
-              >
-                {source ?? "本地授权素材"}
-                <ExternalLink className="h-3 w-3" />
-              </DesktopExternalLink>
-            ) : (
-              source && <span className="font-medium text-foreground">{source}</span>
-            )}
-            {license && <span>{license}</span>}
-          </div>
-          {visibleNotes.length > 0 && (
-            <ul className="mt-1 space-y-0.5">
-              {visibleNotes.map((note) => (
-                <li key={note}>{note}</li>
-              ))}
-            </ul>
-          )}
-          {attribution && <p className="mt-1">{attribution}</p>}
-        </div>
-      )}
-    </div>
+    <video
+      key={slug}
+      src={videoSrc}
+      controls
+      preload="metadata"
+      className={`w-full rounded-lg border ${className ?? ""}`}
+    >
+      <track kind="captions" />
+    </video>
   );
 }

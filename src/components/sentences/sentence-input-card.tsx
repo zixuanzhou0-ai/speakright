@@ -229,7 +229,7 @@ export function SentenceInputCard({
                 animate={
                   mwIsPlaying
                     ? { scale: 1.02, backgroundColor: "var(--primary-bg)" }
-                    : { scale: 1, backgroundColor: "transparent" }
+                    : { scale: 1, backgroundColor: "rgba(0, 0, 0, 0)" }
                 }
                 transition={{ duration: 0.3 }}
                 className="relative flex flex-col items-center gap-1 rounded-lg border bg-muted/30 px-6 py-5"

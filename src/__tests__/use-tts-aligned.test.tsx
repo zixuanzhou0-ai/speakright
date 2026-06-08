@@ -5,6 +5,8 @@ import { useTtsAligned } from "@/hooks/use-tts-aligned";
 const mocks = vi.hoisted(() => ({
   elevenLabsTtsAligned: vi.fn(),
   getElevenLabsConfig: vi.fn(),
+  getLanguageAudioPackEntry: vi.fn(),
+  getStaticLanguageAudioPackEntry: vi.fn(),
   getTtsFromCache: vi.fn(),
   setTtsToCache: vi.fn(),
 }));
@@ -17,13 +19,27 @@ vi.mock("@/lib/api-keys", () => ({
   getElevenLabsConfig: mocks.getElevenLabsConfig,
 }));
 
+vi.mock("@/lib/language-audio-pack-cache", () => ({
+  getLanguageAudioPackEntry: mocks.getLanguageAudioPackEntry,
+}));
+
+vi.mock("@/lib/static-language-audio-pack", () => ({
+  getStaticLanguageAudioPackEntry: mocks.getStaticLanguageAudioPackEntry,
+}));
+
 vi.mock("@/lib/tts-cache", () => ({
   getTtsFromCache: mocks.getTtsFromCache,
   setTtsToCache: mocks.setTtsToCache,
 }));
 
 vi.mock("howler", () => ({
-  Howl: vi.fn().mockImplementation((options) => {
+  Howl: vi.fn().mockImplementation(function (
+    this: unknown,
+    options: {
+      onplay?: () => void;
+      onstop?: () => void;
+    },
+  ) {
     let isPlaying = false;
     return {
       play: () => {
@@ -63,6 +79,8 @@ describe("useTtsAligned", () => {
       modelId: "eleven_flash_v2_5",
     });
     mocks.getTtsFromCache.mockResolvedValue(null);
+    mocks.getLanguageAudioPackEntry.mockResolvedValue(null);
+    mocks.getStaticLanguageAudioPackEntry.mockResolvedValue(null);
     mocks.setTtsToCache.mockResolvedValue(undefined);
     mocks.elevenLabsTtsAligned.mockResolvedValue({
       audio_base64: "AA==",
@@ -154,6 +172,40 @@ describe("useTtsAligned", () => {
       expect.any(Object),
       "fr-FR",
     );
+  });
+
+  it("explains TTS setup clearly when no provider or local pack is available", async () => {
+    mocks.getElevenLabsConfig.mockReturnValue(null);
+    const { result } = renderHook(() => useTtsAligned());
+
+    await act(async () => {
+      await result.current.speak("Привет, как дела?", {
+        languageId: "ru-RU",
+      });
+    });
+
+    expect(result.current.error).toContain("无法播放标准示范");
+    expect(result.current.error).toContain("TTS provider");
+    expect(result.current.error).toContain("本地发音包");
+    expect(result.current.error).toContain("单词词典发音只负责单词复读");
+  });
+
+  it("uses an installed local language pack when TTS provider is missing", async () => {
+    mocks.getElevenLabsConfig.mockReturnValue(null);
+    mocks.getLanguageAudioPackEntry.mockResolvedValueOnce({
+      audioBlob: new Blob([new Uint8Array([1, 2, 3])], {
+        type: "audio/mpeg",
+      }),
+    });
+    const { result } = renderHook(() => useTtsAligned());
+
+    await act(async () => {
+      await result.current.speak("hola", { languageId: "es-ES" });
+    });
+
+    expect(result.current.error).toBeNull();
+    expect(URL.createObjectURL).toHaveBeenCalled();
+    expect(mocks.elevenLabsTtsAligned).not.toHaveBeenCalled();
   });
 
   it("ignores a stale pending TTS response after reset", async () => {

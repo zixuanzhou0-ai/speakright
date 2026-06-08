@@ -7,6 +7,7 @@ import {
   KeyRound,
   Loader2,
   Mic2,
+  PlayCircle,
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
@@ -40,6 +41,7 @@ const STEP_ICONS = {
   azure: KeyRound,
   microphone: Mic2,
   diagnosis: ClipboardList,
+  training: PlayCircle,
 } satisfies Record<DesktopReadinessStep["id"], typeof KeyRound>;
 
 function supportsMicrophoneCheck(): boolean {
@@ -203,9 +205,12 @@ export function DesktopReadinessCard({
             <Badge variant="secondary">
               {summary.readyCount}/{summary.totalCount}
             </Badge>
-            <h2 className="text-base font-bold">桌面端准备状态</h2>
+            <h2 className="text-base font-bold">开始前设置清单</h2>
           </div>
-          <div className="grid gap-2 md:grid-cols-3">
+          <p className="mb-3 text-sm text-muted-foreground">
+            没有诊断前，今日训练会使用默认高频处方；完成诊断后才会变成你的个性化训练计划。
+          </p>
+          <div className="grid gap-2 md:grid-cols-4">
             {summary.steps.map((step) => {
               const Icon = STEP_ICONS[step.id];
               const isMic = step.id === "microphone";
@@ -239,7 +244,7 @@ export function DesktopReadinessCard({
             <Link href="/settings">
               <Button variant="outline" className="gap-2">
                 <KeyRound className="h-4 w-4" />
-                配置密钥
+                配置 Azure Speech 评分密钥
               </Button>
             </Link>
           )}
@@ -274,7 +279,7 @@ export function DesktopReadinessCard({
             <Link href="/assessment">
               <Button className="gap-2">
                 <ClipboardList className="h-4 w-4" />
-                建立诊断
+                开始 3 分钟诊断
               </Button>
             </Link>
           )}

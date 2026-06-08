@@ -359,6 +359,9 @@ describe("training course v2.6 quality gates", () => {
     expect(createCourseStartPosition(course, "missing-level").levelIndex).toBe(
       0,
     );
+    expect(createCourseStartPosition(course, "#shadowing-transfer").levelIndex).toBe(
+      position.levelIndex,
+    );
   });
 
   it("keeps remediation steps scoreable with natural English text", () => {

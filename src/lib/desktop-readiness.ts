@@ -27,7 +27,11 @@ export interface DesktopMicSignalEvaluation {
   reason?: "low-signal" | "too-short";
 }
 
-export type DesktopReadinessStepId = "azure" | "microphone" | "diagnosis";
+export type DesktopReadinessStepId =
+  | "azure"
+  | "microphone"
+  | "diagnosis"
+  | "training";
 
 export interface DesktopReadinessStep {
   id: DesktopReadinessStepId;
@@ -163,20 +167,26 @@ export function buildDesktopReadinessSummary({
   const steps: DesktopReadinessStep[] = [
     {
       id: "azure",
-      label: "评分密钥",
+      label: "Azure Speech 评分密钥",
       ready: azureReady,
       actionHref: azureReady ? undefined : "/settings",
     },
     {
       id: "microphone",
-      label: "麦克风",
+      label: "麦克风检测",
       ready: microphoneReady,
     },
     {
       id: "diagnosis",
-      label: "诊断档案",
+      label: "3 分钟诊断",
       ready: hasDiagnosis,
       actionHref: hasDiagnosis ? undefined : "/assessment",
+    },
+    {
+      id: "training",
+      label: "开始今日训练",
+      ready: azureReady && microphoneReady && hasDiagnosis,
+      actionHref: azureReady ? "/drill" : "/settings",
     },
   ];
   const readyCount = steps.filter((step) => step.ready).length;

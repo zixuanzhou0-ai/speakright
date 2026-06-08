@@ -86,8 +86,10 @@ export function AzureConfigCard() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Azure Speech</CardTitle>
-        <CardDescription>用于发音评估打分</CardDescription>
+        <CardTitle>录音评分 Azure</CardTitle>
+        <CardDescription>
+          用于发音评估、音素/词级打分和诊断证据，不负责标准示范朗读。
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">

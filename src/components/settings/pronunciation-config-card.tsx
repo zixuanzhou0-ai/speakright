@@ -149,9 +149,10 @@ export function PronunciationConfigCard() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>发音音源</CardTitle>
+        <CardTitle>单词词典发音</CardTitle>
         <CardDescription>
-          当前测试 {languageProfile.displayName} 单词“
+          只负责单词卡片和逐词复读，不负责句子/短语的标准示范 TTS。当前测试{" "}
+          {languageProfile.displayName} 单词“
           {languageProfile.pronunciationTestWord}”。韦氏词典仅用于美式英语。
         </CardDescription>
       </CardHeader>

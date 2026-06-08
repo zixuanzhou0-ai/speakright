@@ -1,6 +1,6 @@
 # API Reference
 
-All external API integrations. Each is called through server-side `/api/*` routes (keys never exposed to client).
+External API integrations. Tauri desktop uses local API clients plus secure store/system credentials where available; server-side `/api/*` routes remain compatibility/debug paths. Keys are never committed and are excluded from learning-data exports.
 
 ## Azure Speech — Pronunciation Assessment
 

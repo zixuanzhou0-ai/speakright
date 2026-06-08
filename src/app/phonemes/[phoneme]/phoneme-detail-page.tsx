@@ -37,6 +37,7 @@ import {
   markWordPracticedForLanguage,
 } from "@/lib/practice-tracker";
 import { addScore, scoreHistoryKey } from "@/lib/score-history";
+import { getAdjacentSpanishWord } from "@/lib/spanish-sound-examples";
 import { getWordPool } from "@/lib/word-pool";
 import { selectNextWord } from "@/lib/word-selector";
 import type { AzureAssessmentResult } from "@/types/azure";
@@ -137,9 +138,13 @@ export function PhonemeDetailPage() {
   // Pick first random word on mount
   useEffect(() => {
     if (wordPool.length > 0 && !currentWord && phoneme) {
-      setCurrentWord(selectNextWord(phoneme.slug, wordPool));
+      const firstWord =
+        languageId === "es-ES"
+          ? wordPool[0]
+          : selectNextWord(phoneme.slug, wordPool);
+      setCurrentWord(firstWord);
     }
-  }, [wordPool, currentWord, phoneme, setCurrentWord]);
+  }, [wordPool, currentWord, phoneme, languageId, setCurrentWord]);
 
   const currentWordStr = currentWord?.word ?? phoneme?.example ?? "";
 
@@ -156,13 +161,18 @@ export function PhonemeDetailPage() {
   // Right arrow → random next word
   const handleNext = useCallback(() => {
     if (!phoneme || wordPool.length === 0) return;
-    const next = selectNextWord(phoneme.slug, wordPool, currentWord?.word);
+    const next =
+      languageId === "es-ES"
+        ? (getAdjacentSpanishWord(wordPool, currentWord, 1) ??
+          selectNextWord(phoneme.slug, wordPool, currentWord?.word))
+        : selectNextWord(phoneme.slug, wordPool, currentWord?.word);
     if (currentWord) setWordHistory((prev) => [...prev, currentWord]);
     setCurrentWord(next);
     resetState();
   }, [
     phoneme,
     wordPool,
+    languageId,
     currentWord,
     resetState,
     setCurrentWord,
@@ -171,12 +181,29 @@ export function PhonemeDetailPage() {
 
   // Left arrow → go back in history
   const handlePrevious = useCallback(() => {
+    if (languageId === "es-ES" && phoneme && wordPool.length > 0) {
+      const prev = getAdjacentSpanishWord(wordPool, currentWord, -1);
+      if (!prev) return;
+      setCurrentWord(prev);
+      resetState();
+      return;
+    }
+
     if (wordHistory.length === 0) return;
     const prev = wordHistory[wordHistory.length - 1];
     setWordHistory((h) => h.slice(0, -1));
     setCurrentWord(prev);
     resetState();
-  }, [wordHistory, resetState, setCurrentWord, setWordHistory]);
+  }, [
+    languageId,
+    phoneme,
+    wordPool,
+    currentWord,
+    wordHistory,
+    resetState,
+    setCurrentWord,
+    setWordHistory,
+  ]);
 
   // Keyboard navigation for cards
   useEffect(() => {
@@ -347,17 +374,21 @@ export function PhonemeDetailPage() {
             onStopMw={() => mw.stop()}
             onStopChartAudio={() => chartAudio.stop()}
             wordHistoryLength={wordHistory.length}
+            canGoPrevious={
+              languageId === "es-ES" ? wordPool.length > 1 : wordHistory.length > 0
+            }
           />
 
           {isExperimentalLanguage && (
             <div className="rounded-xl border border-yellow-500/30 bg-yellow-500/5 px-4 py-3 text-sm text-muted-foreground">
               {languageProfile.displayName}当前是
               {languageProfile.status === "experimental" ? "实验" : "草案"}
-              板块：发音单位和示例词已接入，
+              板块：发音单位和示例词可练习，
               {hasCurrentUnitLocalVideo
-                ? "当前发音单位的本地口型/舌位素材已接入，"
-                : "本地授权教学视频仍在补齐，"}
-              诊断、系统训练和 mastery 证据链仍在补齐。
+                ? "当前发音单位的本地口型/舌位素材已接入；"
+                : "本地授权教学视频仍在补齐；"}
+              可评分和可复读的部分会继续开放，但 mastery
+              晋级不会被当作完整闭环。下一步建议先用单词/短语练习收集稳定样本。
             </div>
           )}
 

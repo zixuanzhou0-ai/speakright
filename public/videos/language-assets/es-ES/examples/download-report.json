@@ -1,0 +1,10 @@
+{
+  "counters": {
+    "soundDownloaded": 11,
+    "exampleDownloaded": 45,
+    "skipped": 44,
+    "failed": 0,
+    "bytes": 5999930
+  },
+  "failures": []
+}

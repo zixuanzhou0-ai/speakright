@@ -8,6 +8,8 @@ import {
   getElevenLabsLanguagePack,
   isElevenLabsPackLanguageId,
 } from "@/lib/elevenlabs-language-packs";
+import { getLanguageAudioPackEntry } from "@/lib/language-audio-pack-cache";
+import { getStaticLanguageAudioPackEntry } from "@/lib/static-language-audio-pack";
 import { getTtsFromCache, setTtsToCache } from "@/lib/tts-cache";
 import type { LanguageId } from "@/types/language";
 
@@ -42,6 +44,9 @@ interface AlignmentData {
   character_start_times_seconds: number[];
   character_end_times_seconds: number[];
 }
+
+const STANDARD_TTS_UNAVAILABLE_MESSAGE =
+  "无法播放标准示范：请配置 TTS provider（如 ElevenLabs）或安装当前语言的本地发音包。单词词典发音只负责单词复读；后续可接入更多 TTS provider。";
 
 function aggregateToWordTimings(
   _text: string,
@@ -105,6 +110,26 @@ function resolveSpeakOptions(
       : (speedOrOptions?.speed ?? languagePack?.speed ?? 0.85);
 
   return { languageId, languagePack, speed };
+}
+
+async function loadLocalLanguagePackBlob(
+  languageId: LanguageId,
+  text: string,
+): Promise<Blob | null> {
+  if (!isElevenLabsPackLanguageId(languageId)) return null;
+
+  try {
+    const staticEntry = await getStaticLanguageAudioPackEntry(languageId, text);
+    if (staticEntry) {
+      const response = await fetch(staticEntry.audioSrc);
+      if (response.ok) return response.blob();
+    }
+
+    const installedEntry = await getLanguageAudioPackEntry(languageId, text);
+    return installedEntry?.audioBlob ?? null;
+  } catch {
+    return null;
+  }
 }
 
 export function useTtsAligned(): UseTtsAlignedReturn {
@@ -212,7 +237,20 @@ export function useTtsAligned(): UseTtsAlignedReturn {
         resolveSpeakOptions(speedOrOptions);
       const config = getElevenLabsConfig();
       if (!config) {
-        setError("请先在设置页面配置 ElevenLabs API 密钥");
+        cleanup();
+        setError(null);
+        setIsLoading(true);
+        const localBlob = await loadLocalLanguagePackBlob(languageId, text);
+        if (requestIdRef.current !== requestId) return;
+        if (localBlob) {
+          lastAudioBlobRef.current = localBlob;
+          lastWordTimingsRef.current = [];
+          setIsLoading(false);
+          playBlob(localBlob, []);
+          return;
+        }
+        setIsLoading(false);
+        setError(STANDARD_TTS_UNAVAILABLE_MESSAGE);
         return;
       }
 
@@ -299,7 +337,17 @@ export function useTtsAligned(): UseTtsAlignedReturn {
       } catch (e) {
         if (requestIdRef.current !== requestId) return;
         console.error("[ElevenLabs TTS Aligned]", e);
-        setError(e instanceof Error ? e.message : "语音合成失败");
+        const localBlob = await loadLocalLanguagePackBlob(languageId, text);
+        if (requestIdRef.current !== requestId) return;
+        if (localBlob) {
+          lastAudioBlobRef.current = localBlob;
+          lastWordTimingsRef.current = [];
+          setIsLoading(false);
+          playBlob(localBlob, []);
+          return;
+        }
+        const details = e instanceof Error ? `（${e.message}）` : "";
+        setError(`${STANDARD_TTS_UNAVAILABLE_MESSAGE}${details}`);
         setIsLoading(false);
       }
     },

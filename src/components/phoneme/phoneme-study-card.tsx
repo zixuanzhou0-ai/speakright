@@ -6,6 +6,7 @@ import Image from "next/image";
 import { PhonemePlayButton } from "@/components/phoneme/phoneme-play-button";
 import { VideoPlayer } from "@/components/phoneme/video-player";
 import { Button } from "@/components/ui/button";
+import { getSpanishSoundVideoSet } from "@/lib/spanish-sounds-of-speech-videos";
 import type { LanguageProfile } from "@/types/language";
 import type { KeywordEntry, PhonemeData } from "@/types/phoneme";
 
@@ -30,6 +31,7 @@ interface PhonemeStudyCardProps {
   onStopMw: () => void;
   onStopChartAudio: () => void;
   wordHistoryLength: number;
+  canGoPrevious?: boolean;
 }
 
 export function PhonemeStudyCard({
@@ -53,9 +55,15 @@ export function PhonemeStudyCard({
   onStopMw,
   onStopChartAudio,
   wordHistoryLength,
+  canGoPrevious,
 }: PhonemeStudyCardProps) {
   const hasLocalPhonemeAssets = phoneme.languageId === "en-US";
   const displayWord = currentWord?.stressText ?? currentWord?.word;
+  const previousEnabled = canGoPrevious ?? wordHistoryLength > 0;
+  const spanishVideoSet =
+    phoneme.languageId === "es-ES"
+      ? getSpanishSoundVideoSet(phoneme.slug)
+      : undefined;
 
   return (
     <div className="shrink-0 rounded-xl border bg-card shadow-sm overflow-hidden">
@@ -64,12 +72,8 @@ export function PhonemeStudyCard({
         available={phoneme.video?.status === "ready"}
         label={phoneme.video?.label}
         localSrc={phoneme.video?.localSrc}
-        source={phoneme.video?.source}
-        sourceUrl={phoneme.video?.sourceUrl}
-        license={phoneme.video?.license}
-        attribution={phoneme.video?.attribution}
-        notes={phoneme.video?.notes}
         resources={phoneme.teachingResources}
+        spanishVideoSet={spanishVideoSet}
       />
       <div className="px-4 py-3">
         {/* IPA + play + emoji */}
@@ -131,7 +135,7 @@ export function PhonemeStudyCard({
                   onSetWordDirection(-1);
                   onPrevious();
                 }}
-                disabled={wordHistoryLength === 0}
+                disabled={!previousEnabled}
                 className="h-7 w-7 shrink-0 rounded-full cursor-pointer disabled:opacity-30"
               >
                 <ChevronLeft className="h-4 w-4" />

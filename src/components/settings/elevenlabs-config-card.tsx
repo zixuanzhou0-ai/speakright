@@ -100,8 +100,10 @@ export function ElevenLabsConfigCard() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>ElevenLabs</CardTitle>
-        <CardDescription>用于标准美式发音示范</CardDescription>
+        <CardTitle>标准示范 TTS</CardTitle>
+        <CardDescription>
+          ElevenLabs 用于句子/短语示范朗读和跟读高亮；单词词典发音在下方单独配置。
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">

@@ -226,7 +226,7 @@ export default function DrillPage() {
       : azureReady
         ? "/drill/word"
         : "/settings";
-  const primaryLabel = azureReady ? "开始今天训练" : "配置评分密钥";
+  const primaryLabel = azureReady ? "开始今天训练" : "配置 Azure Speech 评分密钥";
 
   return (
     <LanguageModuleGate moduleName="刻意练习" readinessKey="wordPractice">
@@ -248,7 +248,7 @@ export default function DrillPage() {
           <Link href="/assessment">
             <Button variant="outline" className="gap-2 cursor-pointer">
               <ClipboardList className="h-4 w-4" />
-              {report ? "重新诊断" : "先做诊断"}
+              {report ? "重新 3 分钟诊断" : "开始 3 分钟诊断"}
             </Button>
           </Link>
         </div>
@@ -277,7 +277,7 @@ export default function DrillPage() {
                   primaryItem?.reason ??
                   primaryPack?.focus ??
                   "先完成一组目标音训练，再进入复习或自由专项。")
-                : "Azure Speech 配置完成后，桌面端才能进行录音评分和训练证据记录。"}
+                : "Azure Speech 评分密钥配置完成后，桌面端才能进行录音评分和训练证据记录。"}
             </p>
           </div>
           <div className="flex shrink-0 flex-wrap gap-2">
@@ -299,7 +299,7 @@ export default function DrillPage() {
                   className="gap-2 cursor-pointer"
                 >
                   <ClipboardList className="h-5 w-5" />
-                  先做诊断
+                  开始 3 分钟诊断
                 </Button>
               </Link>
             )}
@@ -326,7 +326,7 @@ export default function DrillPage() {
             <p className="font-medium">还没有诊断报告</p>
             <p className="mt-1 text-muted-foreground">
               可以先做 3 分钟快速诊断；如果你想直接开始，系统会从 final
-              consonants、核心元音和重音节奏这些高影响问题开始。
+              consonants、核心元音和重音节奏这些高影响问题开始，但这还不是个性化处方。
             </p>
           </div>
         )}

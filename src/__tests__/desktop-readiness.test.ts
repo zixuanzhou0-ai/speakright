@@ -159,20 +159,26 @@ describe("desktop readiness", () => {
     expect(summary.steps).toEqual([
       {
         id: "azure",
-        label: "评分密钥",
+        label: "Azure Speech 评分密钥",
         ready: true,
         actionHref: undefined,
       },
       {
         id: "microphone",
-        label: "麦克风",
+        label: "麦克风检测",
         ready: false,
       },
       {
         id: "diagnosis",
-        label: "诊断档案",
+        label: "3 分钟诊断",
         ready: false,
         actionHref: "/assessment",
+      },
+      {
+        id: "training",
+        label: "开始今日训练",
+        ready: false,
+        actionHref: "/drill",
       },
     ]);
   });

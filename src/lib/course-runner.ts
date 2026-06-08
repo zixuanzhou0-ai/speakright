@@ -32,9 +32,19 @@ export function getLevelIndexById(
   course: TrainingPackCourse,
   levelId?: string | null,
 ): number {
-  if (!levelId) return 0;
-  const index = course.levels.findIndex((level) => level.id === levelId);
+  const normalizedLevelId = normalizeCourseLevelId(levelId);
+  if (!normalizedLevelId) return 0;
+  const index = course.levels.findIndex(
+    (level) => level.id === normalizedLevelId,
+  );
   return index >= 0 ? index : 0;
+}
+
+export function normalizeCourseLevelId(levelId?: string | null): string | null {
+  if (!levelId) return null;
+  const trimmed = levelId.trim();
+  if (!trimmed) return null;
+  return trimmed.replace(/^#+/, "");
 }
 
 export function createCourseStartPosition(

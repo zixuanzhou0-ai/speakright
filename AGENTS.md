@@ -1,6 +1,8 @@
-# SpeakRight — 英语发音学习 App
+# SpeakRight Desktop — 多语言发音学习 App
 
-面向中国市场的美式英语发音矫正 Web App。用户听标准示范、跟读、获得 AI 评分与中文反馈。
+面向中文学习者的多语言发音训练桌面端。英语 `en-US` 是稳定基线；
+西班牙语 `es-ES`、法语 `fr-FR`、俄语 `ru-RU` 是实验板块；日语本轮不做。
+用户听标准示范、跟读、获得 Azure 评分与中文 AI 教练反馈。
 
 ## Tech stack
 
@@ -12,15 +14,15 @@
 - **Markdown**: react-markdown + remark-gfm (LLM feedback rendering) + @tailwindcss/typography (prose styles, headings with primary left border)
 - **Audio**: MediaRecorder API (recording), wavesurfer.js v7 (waveform), howler.js (playback)
 - **Theme**: Custom ThemeProvider (替换 next-themes，避免 React 19 script 警告) + anti-FOUC `<head>` script
-- **Backend**: Next.js API Routes as proxy (Azure 用 Node.js runtime，其余可 Edge)
-- **Storage**: Phase 1 全部使用 localStorage（API Keys + 用量数据），Phase 2 计划接入 Supabase
+- **Backend**: 桌面端优先走 Tauri/本地安全存储 + 直接 API client；历史 `/api/*` proxy 仅保留给兼容和非桌面调试路径
+- **Storage**: 桌面端 API keys 使用 secure store/系统凭据，学习数据和偏好按 languageId 隔离保存
 - **Lint/Format**: Biome (replaces ESLint + Prettier)
-- **Language**: TypeScript strict mode, Chinese UI, English content only
+- **Language**: TypeScript strict mode, Chinese UI, en-US stable + es-ES/fr-FR/ru-RU experimental
 
 ## Commands
 
 ```bash
-npm run dev          # Start dev server (Turbopack)
+npm run dev          # Start Tauri desktop dev app; frontend dev server uses port 3002
 npm run build        # Production build
 npm run lint         # Biome check
 npx biome check --fix .  # Auto-fix lint + format
@@ -32,12 +34,12 @@ node scripts/download-word-emoji.mjs  # Download Fluent Emoji 3D PNGs for keywor
 
 ## Architecture
 
-Four external APIs, all proxied through `/api/*` routes (keys never exposed to client):
+External services are separated by purpose:
 
 1. **Azure Speech** → Pronunciation assessment (scoring + phoneme + syllable + prosody analysis，韵律仅句子模式启用)
-2. **ElevenLabs** → American English TTS demos (自由练习页实时调用 + with-timestamps 逐词高亮 + IndexedDB 缓存 + 速度调节 0.7x-1.2x)
+2. **ElevenLabs / 本地发音包** → 标准示范 TTS、句子/短语朗读、逐词高亮、本地多语言语音包
 3. **LLM (multi-provider)** → Chinese text feedback from Azure scores
-4. **单词发音** → 统一 `/api/pronunciation` 代理路由，支持有道词典（默认，国内快）和韦氏词典（需 API Key，海外快），设置页切换音源，fallback 到本地预生成音频
+4. **单词词典发音** → 有道词典/韦氏词典仅负责单词复读，不负责标准示范 TTS
 5. **韦氏词典** → `/api/merriam-webster/` 下 `pronunciation/`、`stress/`、`test/` 三个子路由
 
 所有 API 路由使用 `src/lib/rate-limit.ts` 内存速率限制（60 次/分钟/IP）。
@@ -108,7 +110,7 @@ docs/                 — PRD.md, api-reference.md
 
 ## Key conventions
 
-- All API calls go through server-side `/api/*` routes, never direct from client
+- Desktop code should use the local API client and secure store where available; legacy `/api/*` routes are compatibility/debug paths, not the primary desktop boundary
 - Motion v12 components must use `"use client"` directive
 - AudioPlayerButton uses motion.div wrapper with spring animation (whileHover + whileTap), supports sizes: sm(h-5)/default(h-4)/icon(h-4)/lg(h-6), 所有按钮加 cursor-pointer
 - `PhonemeGrid` 共享单个 `useAudioPlayer` 实例传给所有 PhonemeCard（避免 N 个 Howl 实例）
