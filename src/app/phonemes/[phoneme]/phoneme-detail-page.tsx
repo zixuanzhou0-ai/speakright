@@ -116,9 +116,8 @@ export function PhonemeDetailPage() {
 
   // Hybrid word pool: static keywords + extended word bank + MW cached words
   const wordPool = useMemo(
-    () =>
-      phoneme ? getWordPool(phoneme.slug, phoneme.keywords, languageId) : [],
-    [phoneme, languageId],
+    () => (phoneme ? getWordPool(phoneme.slug, phoneme.keywords) : []),
+    [phoneme],
   );
   const [hasMwConfig, setHasMwConfig] = useState(false);
   const [practicedCount, setPracticedCount] = useState(0);
@@ -138,9 +137,9 @@ export function PhonemeDetailPage() {
   // Pick first random word on mount
   useEffect(() => {
     if (wordPool.length > 0 && !currentWord && phoneme) {
-      setCurrentWord(selectNextWord(phoneme.slug, wordPool, undefined, languageId));
+      setCurrentWord(selectNextWord(phoneme.slug, wordPool));
     }
-  }, [wordPool, currentWord, phoneme, languageId, setCurrentWord]);
+  }, [wordPool, currentWord, phoneme, setCurrentWord]);
 
   const currentWordStr = currentWord?.word ?? phoneme?.example ?? "";
 
@@ -157,12 +156,7 @@ export function PhonemeDetailPage() {
   // Right arrow → random next word
   const handleNext = useCallback(() => {
     if (!phoneme || wordPool.length === 0) return;
-    const next = selectNextWord(
-      phoneme.slug,
-      wordPool,
-      currentWord?.word,
-      languageId,
-    );
+    const next = selectNextWord(phoneme.slug, wordPool, currentWord?.word);
     if (currentWord) setWordHistory((prev) => [...prev, currentWord]);
     setCurrentWord(next);
     resetState();
@@ -170,7 +164,6 @@ export function PhonemeDetailPage() {
     phoneme,
     wordPool,
     currentWord,
-    languageId,
     resetState,
     setCurrentWord,
     setWordHistory,
@@ -324,6 +317,7 @@ export function PhonemeDetailPage() {
 
   const isWordActive = mw.isPlaying || mw.isLoading;
   const isExperimentalLanguage = languageProfile.status !== "stable";
+  const hasCurrentUnitLocalVideo = Boolean(phoneme.video?.localSrc);
 
   return (
     <div className="h-full flex flex-col px-6 py-4 overflow-hidden">
@@ -359,15 +353,11 @@ export function PhonemeDetailPage() {
             <div className="rounded-xl border border-yellow-500/30 bg-yellow-500/5 px-4 py-3 text-sm text-muted-foreground">
               {languageProfile.displayName}当前是
               {languageProfile.status === "experimental" ? "实验" : "草案"}
-              板块：发音单位和示例词已接入，诊断、系统训练、mastery
-              证据链和本地教学视频仍在补齐。
-            </div>
-          )}
-
-          {phoneme.scoringPolicy?.singlePhonemeScore === "no" && (
-            <div className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-muted-foreground">
-              这个发音单位更适合做听辨、跟读或规则训练，不适合用单次音素分判断掌握。
-              {phoneme.scoringPolicy.notes ? ` ${phoneme.scoringPolicy.notes}` : ""}
+              板块：发音单位和示例词已接入，
+              {hasCurrentUnitLocalVideo
+                ? "当前发音单位的本地口型/舌位素材已接入，"
+                : "本地授权教学视频仍在补齐，"}
+              诊断、系统训练和 mastery 证据链仍在补齐。
             </div>
           )}
 

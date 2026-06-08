@@ -38,7 +38,7 @@ export function LanguageConfigCard() {
           <CardTitle className="text-base">学习语言</CardTitle>
         </div>
         <p className="text-sm text-muted-foreground">
-          当前：{activeProfile.displayName}。非英语板块仍按覆盖率逐步开放。
+          当前：{activeProfile.displayName}。西语、法语、俄语已开放 beta；单词/短语音频请在下方安装 ElevenLabs 多语言发音包。
         </p>
       </CardHeader>
       <CardContent className="grid gap-3 md:grid-cols-2">

@@ -18,7 +18,6 @@ function pack() {
 function profile(overrides: Partial<MasteryProfile> = {}): MasteryProfile {
   return {
     version: 2,
-    languageId: "en-US",
     updatedAt: NOW,
     packs: {
       "s-th": {
@@ -70,7 +69,6 @@ function session(
 ): TrainingSessionSummary {
   return {
     id: "s1",
-    languageId: "en-US",
     packId: "s-th",
     startedAt: NOW - 10_000,
     completedAt: NOW,

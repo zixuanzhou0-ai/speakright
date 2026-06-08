@@ -15,21 +15,29 @@ import { useDrillSession } from "@/hooks/use-drill-session";
 import { useMwPronunciation } from "@/hooks/use-mw-pronunciation";
 import { buildWordDrillItems } from "@/lib/drill-utils";
 import { getLanguagePhonemeBySlug } from "@/lib/language-phonemes";
+import { getLanguageProfile } from "@/lib/language-profiles";
+import { getPhonemeBySlug } from "@/lib/phoneme-data";
 import type { LanguageId } from "@/types/language";
 
 export default function WordDrillPage() {
-  const drill = useDrillSession();
-  const mw = useMwPronunciation();
   const { languageId } = useLanguageConfig();
+  const languageProfile = getLanguageProfile(languageId);
+  const drill = useDrillSession({
+    azureLocale: languageProfile.azureLocale,
+    scoreHistoryPrefix: languageId,
+  });
+  const mw = useMwPronunciation();
 
   const handleStart = useCallback(
     (phonemeSlug: string, itemCount: number, passThreshold: number) => {
-      const phoneme = getLanguagePhonemeBySlug(languageId, phonemeSlug);
+      const phoneme =
+        getLanguagePhonemeBySlug(languageId, phonemeSlug) ??
+        getPhonemeBySlug(phonemeSlug);
       if (!phoneme) return;
 
-      const items = buildWordDrillItems(phoneme, itemCount, languageId);
+      const items = buildWordDrillItems(phoneme, itemCount);
       drill.start(
-        { kind: "word", languageId, phonemeSlug, itemCount, passThreshold },
+        { kind: "word", phonemeSlug, itemCount, passThreshold },
         items,
       );
     },
@@ -68,7 +76,7 @@ export default function WordDrillPage() {
           drill.phase.type !== "configuring" &&
           drill.phase.type !== "completed" && (
             <span className="text-sm text-muted-foreground">
-              {getLanguagePhonemeBySlug(languageId, drill.config.phonemeSlug)?.ipa}
+              {getPhonemeBySlug(drill.config.phonemeSlug)?.ipa}
             </span>
           )}
       </div>
@@ -82,9 +90,9 @@ export default function WordDrillPage() {
         {drill.phase.type === "phonemeLesson" && drill.config && (
           <PhonemeLessonView
             config={drill.config}
-            languageId={languageId}
             onReady={drill.finishPhonemeLesson}
             mw={mw}
+            languageId={languageId}
           />
         )}
 
@@ -169,20 +177,22 @@ export default function WordDrillPage() {
 
 function PhonemeLessonView({
   config,
-  languageId,
   onReady,
   mw,
+  languageId,
 }: {
   config: { phonemeSlug: string; itemCount: number };
-  languageId: LanguageId;
   onReady: () => void;
   mw: {
     playWord: (w: string, v?: "blue" | "pink", l?: LanguageId) => void;
     isPlaying: boolean;
     isLoading: boolean;
   };
+  languageId: LanguageId;
 }) {
-  const phoneme = getLanguagePhonemeBySlug(languageId, config.phonemeSlug);
+  const phoneme =
+    getLanguagePhonemeBySlug(languageId, config.phonemeSlug) ??
+    getPhonemeBySlug(config.phonemeSlug);
   if (!phoneme) return null;
   return (
     <DrillPhonemeLesson

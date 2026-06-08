@@ -8,11 +8,7 @@ import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import type { UseAudioPlayerReturn } from "@/hooks/use-audio-player";
-import { cn } from "@/lib/utils";
-import {
-  getPhonemeCategoryLabel,
-  getSoundUnitTypeLabel,
-} from "@/lib/phoneme-display";
+import { openDesktopExternalUrl } from "@/lib/desktop-external-url";
 import type { Difficulty, PhonemeData } from "@/types/phoneme";
 
 interface PhonemeCardProps {
@@ -44,47 +40,48 @@ const DIFFICULTY_VARIANT: Record<
 export function PhonemeCard({ phoneme, player }: PhonemeCardProps) {
   const [lastWordPlay, setLastWordPlay] = useState<"normal" | "slow">("slow");
 
-  const localChartWord = phoneme.chartWord;
-  const word = phoneme.chartWord ?? phoneme.example;
+  const word = phoneme.chartWord;
   const image = phoneme.chartImage;
-  const keywordIpa = phoneme.chartIpa ?? phoneme.keywords[0]?.ipa;
-  const isLongPhoneme = phoneme.ipa.length >= 8;
-  const isVeryLongPhoneme = phoneme.ipa.length >= 14;
 
   const handlePlayPhoneme = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!localChartWord) return;
-    player.play(`/audio/ipa/phoneme/${localChartWord}.mp3`);
+
+    if (word) {
+      player.play(`/audio/ipa/phoneme/${word}.mp3`);
+      return;
+    }
+
+    if (phoneme.phonemeAudio?.localSrc) {
+      player.play(phoneme.phonemeAudio.localSrc);
+      return;
+    }
+
+    if (phoneme.phonemeAudio?.url) {
+      void openDesktopExternalUrl(phoneme.phonemeAudio.url);
+    }
   };
 
   const handlePlayWord = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!localChartWord) return;
+    if (!word) return;
     const next = lastWordPlay === "slow" ? "normal" : "slow";
     setLastWordPlay(next);
-    player.play(`/audio/ipa/${next}/${localChartWord}.mp3`);
+    player.play(`/audio/ipa/${next}/${word}.mp3`);
   };
 
   return (
     <Link href={`/phonemes/${phoneme.slug}`} className="block">
       <Card className="relative h-full cursor-pointer p-5 transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
         {/* Top row: IPA + difficulty badge */}
-        <div className="mb-4 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
+        <div className="mb-4 flex items-start justify-between">
           <motion.span
             whileHover={{ scale: 1.08 }}
             whileTap={{ scale: 0.95 }}
             transition={springTransition}
             onClick={handlePlayPhoneme}
-            className={cn(
-              "min-w-0 cursor-pointer select-none whitespace-normal break-words font-mono font-bold leading-tight [overflow-wrap:anywhere]",
-              isVeryLongPhoneme
-                ? "text-xl"
-                : isLongPhoneme
-                  ? "text-2xl"
-                  : "text-4xl",
-            )}
+            className="cursor-pointer select-none font-mono text-4xl font-bold"
           >
             {phoneme.ipa}
           </motion.span>
@@ -99,7 +96,7 @@ export function PhonemeCard({ phoneme, player }: PhonemeCardProps) {
         {/* Category + description */}
         <div className="mb-5">
           <p className="text-sm font-semibold">
-            {getPhonemeCategoryLabel(phoneme)} · {getSoundUnitTypeLabel(phoneme)}
+            {phoneme.category === "vowel" ? "元音" : "辅音"}
           </p>
           {phoneme.description && (
             <p className="mt-1 text-sm leading-snug text-muted-foreground line-clamp-2">
@@ -110,7 +107,7 @@ export function PhonemeCard({ phoneme, player }: PhonemeCardProps) {
 
         {/* Bottom: image + word + play */}
         <div className="flex items-center justify-between">
-          <div className="flex min-w-0 items-center gap-3">
+          <div className="flex items-center gap-3">
             {image && (
               <motion.div
                 whileHover={{ scale: 1.05 }}
@@ -128,30 +125,24 @@ export function PhonemeCard({ phoneme, player }: PhonemeCardProps) {
                 />
               </motion.div>
             )}
-            <div className="min-w-0">
-              {word && (
-                <p className="min-w-0 truncate font-semibold capitalize">
-                  {word}
-                </p>
-              )}
-              {keywordIpa && (
-                <p className="min-w-0 truncate text-sm text-muted-foreground font-mono">
-                  {keywordIpa}
+            <div>
+              {word && <p className="font-semibold capitalize">{word}</p>}
+              {phoneme.chartIpa && (
+                <p className="text-sm text-muted-foreground font-mono">
+                  {phoneme.chartIpa}
                 </p>
               )}
             </div>
           </div>
-          {localChartWord && (
-            <motion.div
-              whileHover={{ scale: 1.15 }}
-              whileTap={{ scale: 0.95 }}
-              transition={springTransition}
-              onClick={handlePlayPhoneme}
-              className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-muted transition-colors hover:bg-primary hover:text-primary-foreground"
-            >
-              <Play className="h-5 w-5" />
-            </motion.div>
-          )}
+          <motion.div
+            whileHover={{ scale: 1.15 }}
+            whileTap={{ scale: 0.95 }}
+            transition={springTransition}
+            onClick={handlePlayPhoneme}
+            className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-muted transition-colors hover:bg-primary hover:text-primary-foreground"
+          >
+            <Play className="h-5 w-5" />
+          </motion.div>
         </div>
       </Card>
     </Link>

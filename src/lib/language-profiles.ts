@@ -1,5 +1,12 @@
-import { LANGUAGE_PHONEMES, getLanguagePhonemes } from "@/lib/language-phonemes";
-import type { LanguageConfig, LanguageId, LanguageProfile } from "@/types/language";
+import {
+  LANGUAGE_PHONEMES,
+  getLanguagePhonemes,
+} from "@/lib/language-phonemes";
+import type {
+  LanguageConfig,
+  LanguageId,
+  LanguageProfile,
+} from "@/types/language";
 
 export const DEFAULT_LANGUAGE_ID: LanguageId = "en-US";
 export const DEFAULT_LANGUAGE_CONFIG: LanguageConfig = {
@@ -26,6 +33,7 @@ export const LANGUAGE_PROFILES: Record<LanguageId, LanguageProfile> = {
       diagnosis: true,
       evidenceMastery: true,
       localVideos: true,
+      externalArticulationResources: true,
     },
     learnerFocus: [
       "/iː/-/ɪ/",
@@ -52,13 +60,22 @@ export const LANGUAGE_PROFILES: Record<LanguageId, LanguageProfile> = {
     phonemeInventory: LANGUAGE_PHONEMES["es-ES"],
     readiness: {
       phonemeInventory: true,
-      wordAudio: false,
+      wordAudio: true,
       wordPractice: true,
       sentencePractice: true,
       diagnosis: true,
       evidenceMastery: false,
-      localVideos: false,
+      localVideos: true,
+      externalArticulationResources: true,
     },
+    resourceSiteIds: [
+      "easypronunciation-es-ipa",
+      "ipatics-es-ipa",
+      "spanishdict-pronunciation",
+      "wiktionary-es",
+      "forvo-es",
+      "sounds-of-speech-es",
+    ],
     learnerFocus: [
       "five pure vowels",
       "/b β/ and /d ð/ allophones",
@@ -67,9 +84,10 @@ export const LANGUAGE_PROFILES: Record<LanguageId, LanguageProfile> = {
       "/x/",
     ],
     knownGaps: [
-      "西语发音单位目录已扩展到第一版完整地图；单词、句子、最小对立和诊断仍是 beta，还没有 native speaker Azure fixture 校准。",
+      "西语单词音频通过 ElevenLabs 多语言发音包安装到本地缓存；未安装时仍退回实验性在线音源。",
+      "证据驱动 mastery 还没有完整覆盖多语言 languageId + soundUnitSlug 晋级闭环。",
+      "核心音素已接入 Sounds of Speech Spanish 本地口型/舌位素材；重音、音节节奏等韵律单元仍需要本地教学素材。",
       "当前 profile 是 es-ES；拉美西语 seseo、yeísmo 等变体需要单独 profile 或方言开关。",
-      "单词发音暂走在线发音/TTS fallback，尚未建立西语专用本地缓存和 evidence mastery gate。",
     ],
   },
   "fr-FR": {
@@ -78,20 +96,30 @@ export const LANGUAGE_PROFILES: Record<LanguageId, LanguageProfile> = {
     nativeName: "Français",
     shortLabel: "法语",
     azureLocale: "fr-FR",
-    status: "draft",
+    status: "experimental",
     defaultPhonemeSlug: "fr-i",
     soundUnitLabel: "发音单位",
     pronunciationTestWord: "bonjour",
     phonemeInventory: LANGUAGE_PHONEMES["fr-FR"],
     readiness: {
       phonemeInventory: true,
-      wordAudio: false,
-      wordPractice: false,
-      sentencePractice: false,
-      diagnosis: false,
+      wordAudio: true,
+      wordPractice: true,
+      sentencePractice: true,
+      diagnosis: true,
       evidenceMastery: false,
-      localVideos: false,
+      localVideos: true,
+      externalArticulationResources: true,
     },
+    resourceSiteIds: [
+      "easypronunciation-fr-ipa",
+      "openipa-fr",
+      "ipatics-fr-ipa",
+      "wiktionary-fr",
+      "forvo-fr",
+      "lawless-french-ipa",
+      "phonetique-ca",
+    ],
     learnerFocus: [
       "/y/",
       "/ø/-/œ/",
@@ -100,9 +128,9 @@ export const LANGUAGE_PROFILES: Record<LanguageId, LanguageProfile> = {
       "liaison and enchaînement",
     ],
     knownGaps: [
-      "法语发音单位目录已扩展，但单词训练、句子训练、诊断、缓存音频和本地视频仍未形成完整课程。",
-      "鼻化元音需要专门的听辨和录音质量门槛，不能用英语式音素评分直接升级 mastery。",
-      "连诵和静音词尾是句子层规则，需要单独内容引擎。",
+      "法语单词音频通过 ElevenLabs 多语言发音包安装到本地缓存；未安装时仍退回实验性在线音源。",
+      "鼻化元音、连诵、enchaînement、elision 已作为 beta 训练单位开放，但 mastery 晋级仍需语言专属证据规则。",
+      "核心元音、辅音和 glide 已接入 Phonétique.ca / Sheffield 本地口型视频；liaison、enchaînement、elision、词尾静音仍需要短语级教学素材。",
     ],
   },
   "ru-RU": {
@@ -111,20 +139,30 @@ export const LANGUAGE_PROFILES: Record<LanguageId, LanguageProfile> = {
     nativeName: "Русский",
     shortLabel: "俄语",
     azureLocale: "ru-RU",
-    status: "draft",
+    status: "experimental",
     defaultPhonemeSlug: "ru-a",
     soundUnitLabel: "发音单位",
     pronunciationTestWord: "привет",
     phonemeInventory: LANGUAGE_PHONEMES["ru-RU"],
     readiness: {
       phonemeInventory: true,
-      wordAudio: false,
-      wordPractice: false,
-      sentencePractice: false,
-      diagnosis: false,
+      wordAudio: true,
+      wordPractice: true,
+      sentencePractice: true,
+      diagnosis: true,
       evidenceMastery: false,
-      localVideos: false,
+      localVideos: true,
+      externalArticulationResources: true,
     },
+    resourceSiteIds: [
+      "easypronunciation-ru-ipa",
+      "ipatics-ru-ipa",
+      "easypronunciation-ru-trainer",
+      "forvo-ru",
+      "wiktionary-ru-pronunciation-appendix",
+      "wiktionary-ru",
+      "seeing-speech-ru",
+    ],
     learnerFocus: [
       "/ɨ/",
       "hard vs soft consonants",
@@ -134,9 +172,9 @@ export const LANGUAGE_PROFILES: Record<LanguageId, LanguageProfile> = {
       "consonant clusters",
     ],
     knownGaps: [
-      "俄语发音单位目录已扩展，但硬软辅音、重音、弱化和辅音丛仍需要专门训练内容，不应叫单纯音标表。",
-      "需要把硬/软辅音拆成更细的成对训练，否则学习路径仍然太粗。",
-      "俄语重音会改变元音质量，诊断必须先有重音标注和词级 evidence。",
+      "俄语单词音频通过 ElevenLabs 多语言发音包安装到本地缓存；未安装时仍退回实验性在线音源。",
+      "俄语重音、弱化、硬软辅音和清浊同化已作为 beta 训练单位开放，但 mastery 晋级仍需语言专属证据规则。",
+      "当前 27 个俄语 sound units 已接入 Seeing Speech / Wikimedia Commons 本地视频与音频；硬软辅音、重音弱化、词尾清化、清浊同化和辅音丛仍需要 SpeakRight 自制规则讲解视频。",
     ],
   },
 };

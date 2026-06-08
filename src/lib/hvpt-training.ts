@@ -1,5 +1,4 @@
 import type { MasteryProfile, TrainingSessionSummary } from "@/types/training";
-import { DEFAULT_LANGUAGE_ID } from "./language-profiles";
 import { buildReviewQueue, buildSessionReviewItems } from "./review-queue";
 import { getTrainingPack } from "./training-packs";
 
@@ -488,7 +487,6 @@ export function buildHvptTrainingSession(
   }));
   const session: TrainingSessionSummary = {
     id: `hvpt-${contrast.id}-${now}`,
-    languageId: DEFAULT_LANGUAGE_ID,
     packId: contrast.packId,
     modality: "perception",
     startedAt: now,

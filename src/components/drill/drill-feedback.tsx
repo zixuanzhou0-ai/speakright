@@ -3,7 +3,6 @@
 import { Check, RotateCcw, SkipForward, Volume2 } from "lucide-react";
 import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import type { DrillAttempt, DrillItem } from "@/types/drill";
 import { DrillProgress } from "./drill-progress";
 
@@ -38,7 +37,6 @@ export function DrillFeedback({
 }: DrillFeedbackProps) {
   const canRetry = !passed && attemptCount < maxAttempts;
   const mustDecide = !passed && attemptCount >= maxAttempts;
-  const isLongText = item.text.length >= 18;
 
   return (
     <div className="space-y-6">
@@ -49,14 +47,7 @@ export function DrillFeedback({
         animate={{ opacity: 1, scale: 1 }}
         className="flex flex-col items-center gap-5 rounded-xl border bg-card p-8 shadow-sm"
       >
-        <span
-          className={cn(
-            "max-w-full whitespace-normal break-words text-center font-bold leading-tight [overflow-wrap:anywhere]",
-            isLongText ? "text-2xl" : "text-3xl",
-          )}
-        >
-          {item.text}
-        </span>
+        <span className="text-3xl font-bold">{item.text}</span>
 
         {/* Score display */}
         <motion.div

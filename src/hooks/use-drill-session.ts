@@ -2,10 +2,6 @@
 
 import { useCallback, useEffect, useReducer, useRef } from "react";
 import { computeDrillSummary } from "@/lib/drill-utils";
-import {
-  DEFAULT_LANGUAGE_ID,
-  getLanguageProfile,
-} from "@/lib/language-profiles";
 import { addScore } from "@/lib/score-history";
 import { getPassScore } from "@/lib/training-score";
 import type {
@@ -265,7 +261,14 @@ export interface UseDrillSessionResult {
   reset: () => void;
 }
 
-export function useDrillSession(): UseDrillSessionResult {
+export interface UseDrillSessionOptions {
+  azureLocale?: string;
+  scoreHistoryPrefix?: string;
+}
+
+export function useDrillSession(
+  options: UseDrillSessionOptions = {},
+): UseDrillSessionResult {
   const [state, dispatch] = useReducer(drillReducer, initialState);
   const recorder = useRecorder();
   const azure = useAzureAssessment();
@@ -306,18 +309,20 @@ export function useDrillSession(): UseDrillSessionResult {
     if (!item) return;
 
     assessingRef.current = true;
-    const languageId = state.config?.languageId ?? DEFAULT_LANGUAGE_ID;
     const result = await azure.assess(
       recorder.audioBlob,
       item.text,
-      getLanguageProfile(languageId).azureLocale,
+      options.azureLocale ?? "en-US",
     );
     assessingRef.current = false;
 
     if (result) {
       const target = getPassScore(result, [item.phoneme]);
       // Save score to history
-      addScore(`${languageId}:${item.phoneme}:${item.text}`, target.targetScore);
+      addScore(
+        `${options.scoreHistoryPrefix ?? "en-US"}:${item.phoneme}:${item.text}`,
+        target.targetScore,
+      );
       dispatch({
         type: "ASSESS_SUCCESS",
         score: {
@@ -338,8 +343,9 @@ export function useDrillSession(): UseDrillSessionResult {
     recorder.audioBlob,
     state.items,
     state.currentIndex,
-    state.config?.languageId,
     azure,
+    options.azureLocale,
+    options.scoreHistoryPrefix,
   ]);
 
   // Auto-submit when recording stops and blob is ready

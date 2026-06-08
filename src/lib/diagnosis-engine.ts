@@ -3,8 +3,6 @@ import {
   analyzeAssessmentEvidence,
   summarizeAssessmentAnalyses,
 } from "@/lib/assessment-evidence-engine";
-import { getLanguagePhonemes } from "@/lib/language-phonemes";
-import { DEFAULT_LANGUAGE_ID } from "@/lib/language-profiles";
 import { PHONEMES } from "@/lib/phoneme-data";
 import { getErrorPatternIdsForIssue } from "@/lib/training-error-patterns";
 import { buildTrainingPrescription } from "@/lib/training-prescription";
@@ -19,10 +17,8 @@ import type {
   DiagnosisReport,
   RecordingQualitySnapshot,
 } from "@/types/diagnosis";
-import type { LanguageId } from "@/types/language";
-import type { TrainingPrescription } from "@/types/training";
 
-const ENGLISH_VOWELS = new Set(
+const VOWELS = new Set(
   PHONEMES.filter((phoneme) => phoneme.category === "vowel").map(
     (phoneme) => phoneme.slug,
   ),
@@ -156,52 +152,6 @@ function avg(values: number[]): number {
   return Math.round(
     values.reduce((sum, value) => sum + value, 0) / values.length,
   );
-}
-
-function vowelSetForLanguage(languageId: LanguageId): Set<string> {
-  if (languageId === DEFAULT_LANGUAGE_ID) return ENGLISH_VOWELS;
-  return new Set(
-    getLanguagePhonemes(languageId)
-      .filter((phoneme) => phoneme.category === "vowel")
-      .map((phoneme) => phoneme.slug),
-  );
-}
-
-function buildLanguageBetaPrescription(
-  languageId: LanguageId,
-): TrainingPrescription {
-  const languageLabel =
-    languageId === "es-ES"
-      ? "西语"
-      : languageId === "fr-FR"
-        ? "法语"
-        : "俄语";
-  return {
-    generatedAt: Date.now(),
-    source: "diagnosis",
-    days: [
-      {
-        day: 1,
-        title: `${languageLabel}实验诊断：先复测，不生成英语训练处方`,
-        items: [],
-      },
-      {
-        day: 2,
-        title: "等待语言专属规则和 Azure fixture 校准",
-        items: [],
-      },
-      {
-        day: 3,
-        title: "只做 feedback，不提升 mastery",
-        items: [],
-      },
-      {
-        day: 7,
-        title: "完成语言专属 evidence gate 后再安排复习",
-        items: [],
-      },
-    ],
-  };
 }
 
 function severityFromScore(score: number): DiagnosisIssueSeverity {
@@ -400,81 +350,6 @@ function buildRhythmIssue(
   };
 }
 
-function buildLanguageBetaIssues(
-  languageId: LanguageId,
-  rawEvidence: DiagnosisEvidence[],
-  phonemeScores: DiagnosisReport["phonemeScores"],
-): DiagnosisIssue[] {
-  const label =
-    languageId === "es-ES"
-      ? "西语"
-      : languageId === "fr-FR"
-        ? "法语"
-        : "俄语";
-  const scoredIssues = Object.entries(phonemeScores)
-    .filter(([, value]) => value.sampleCount > 0 && value.score < 82)
-    .sort(([, left], [, right]) => left.score - right.score)
-    .slice(0, 4)
-    .map(([phoneme, value]): DiagnosisIssue => {
-      const evidence = rawEvidence
-        .filter((entry) => entry.phoneme === phoneme)
-        .sort((a, b) => a.score - b.score)
-        .slice(0, 3)
-        .map((entry) => ({
-          text: entry.text,
-          score: entry.score,
-          detail: `${entry.detail}。${label}音素映射尚未完成 fixture 校准，本条只作为复测线索。`,
-        }));
-
-      return {
-        id: `${languageId}-${phoneme}-beta`,
-        severity: severityFromScore(value.score),
-        type: "phoneme",
-        title: `${label} ${phoneme} 需要复测确认`,
-        targetPhonemes: [phoneme],
-        evidence:
-          evidence.length > 0
-            ? evidence
-            : [
-                {
-                  text: phoneme,
-                  score: value.score,
-                  detail: `${label} ${phoneme} 平均 ${value.score} 分，但当前只做实验反馈。`,
-                },
-              ],
-        impact: `${label}诊断仍处于 beta；本次结果不能直接生成 mastery 或英语训练处方。`,
-        fixCue: "重新录 2-3 个包含该发音单位的词，确认录音质量稳定后再判断。",
-        recommendedPackIds: [],
-        confidence: value.sampleCount >= 2 ? "medium" : "low",
-        evidenceStrength: value.sampleCount >= 2 ? "fair" : "thin",
-      };
-    });
-
-  if (scoredIssues.length > 0) return scoredIssues;
-
-  return [
-    {
-      id: `${languageId}-beta-calibration`,
-      severity: "minor",
-      type: "phoneme",
-      title: `${label}诊断仅提供实验反馈`,
-      targetPhonemes: [],
-      evidence: [
-        {
-          text: "诊断校准",
-          score: 0,
-          detail: `${label} Azure 音素映射和诊断规则还没有完成 fixture 校准，本次不输出确定弱点。`,
-        },
-      ],
-      impact: "避免把非英语朗读误套进美式英语诊断规则。",
-      fixCue: "继续使用单词/句子练习做 feedback；等待语言专属规则上线后再生成处方。",
-      recommendedPackIds: [],
-      confidence: "low",
-      evidenceStrength: "thin",
-    },
-  ];
-}
-
 function buildCoverageRhythmIssue(
   recordings: CoveragePassageBuildInput["recordings"],
 ): DiagnosisIssue | null {
@@ -607,7 +482,6 @@ function enrichIssue(
 }
 
 export function buildDiagnosisReport({
-  languageId = DEFAULT_LANGUAGE_ID,
   wordRecordings,
   paragraphResult,
   paragraphText,
@@ -650,12 +524,11 @@ export function buildDiagnosisReport({
     phonemeScores[slug] = { score: avg(scores), sampleCount: scores.length };
   }
 
-  const vowels = vowelSetForLanguage(languageId);
   const vowelScores = Object.entries(phonemeScores)
-    .filter(([slug]) => vowels.has(slug))
+    .filter(([slug]) => VOWELS.has(slug))
     .map(([, value]) => value.score);
   const consonantScores = Object.entries(phonemeScores)
-    .filter(([slug]) => !vowels.has(slug))
+    .filter(([slug]) => !VOWELS.has(slug))
     .map(([, value]) => value.score);
   const syllableScores = [
     ...usableWordRecordings.flatMap((recording) =>
@@ -700,50 +573,38 @@ export function buildDiagnosisReport({
     ),
   );
 
-  const issues =
-    languageId === DEFAULT_LANGUAGE_ID
-      ? [
-          ...ISSUE_RULES.map((rule) =>
-            issueFromRule(rule, phonemeScores, rawEvidence),
-          ).filter((issue): issue is DiagnosisIssue => issue !== null),
-          buildFinalConsonantIssue(rawEvidence),
-          usableParagraphResult ? buildRhythmIssue(usableParagraphResult) : null,
-        ]
-          .filter((issue): issue is DiagnosisIssue => issue !== null)
-          .map((issue) => enrichIssue(issue, phonemeScores))
-          .sort((a, b) => {
-            const severityOrder = { critical: 0, major: 1, minor: 2 };
-            return severityOrder[a.severity] - severityOrder[b.severity];
-          })
-          .slice(0, 6)
-      : buildLanguageBetaIssues(languageId, rawEvidence, phonemeScores);
-  const prescription =
-    languageId === DEFAULT_LANGUAGE_ID
-      ? buildTrainingPrescription(issues, "diagnosis")
-      : buildLanguageBetaPrescription(languageId);
+  const issues = [
+    ...ISSUE_RULES.map((rule) =>
+      issueFromRule(rule, phonemeScores, rawEvidence),
+    ).filter((issue): issue is DiagnosisIssue => issue !== null),
+    buildFinalConsonantIssue(rawEvidence),
+    usableParagraphResult ? buildRhythmIssue(usableParagraphResult) : null,
+  ]
+    .filter((issue): issue is DiagnosisIssue => issue !== null)
+    .map((issue) => enrichIssue(issue, phonemeScores))
+    .sort((a, b) => {
+      const severityOrder = { critical: 0, major: 1, minor: 2 };
+      return severityOrder[a.severity] - severityOrder[b.severity];
+    })
+    .slice(0, 6);
 
   return {
     version: 2,
-    languageId,
     source: "quick-word-check",
     timestamp: Date.now(),
     overallScore,
     dimensions,
     phonemeScores,
     issues,
-    prescription,
+    prescription: buildTrainingPrescription(issues, "diagnosis"),
     rawEvidence: rawEvidence.sort((a, b) => a.score - b.score).slice(0, 18),
     evidenceSummary: summarizeAssessmentAnalyses(analyses),
   };
 }
 
 export function buildCoveragePassageDiagnosisReport({
-  languageId,
   recordings,
 }: CoveragePassageBuildInput): DiagnosisReport {
-  if (languageId !== DEFAULT_LANGUAGE_ID) {
-    throw new Error("Coverage passage diagnosis is currently en-US only.");
-  }
   const phonemeBuckets: Record<string, number[]> = {};
   const rawEvidence: DiagnosisEvidence[] = [];
   const analyses: AssessmentEvidenceAnalysis[] = [];
@@ -770,10 +631,10 @@ export function buildCoveragePassageDiagnosisReport({
 
   const results = usableRecordings.map((recording) => recording.result);
   const vowelScores = Object.entries(phonemeScores)
-    .filter(([slug]) => ENGLISH_VOWELS.has(slug))
+    .filter(([slug]) => VOWELS.has(slug))
     .map(([, value]) => value.score);
   const consonantScores = Object.entries(phonemeScores)
-    .filter(([slug]) => !ENGLISH_VOWELS.has(slug))
+    .filter(([slug]) => !VOWELS.has(slug))
     .map(([, value]) => value.score);
   const syllableScores = results.flatMap((result) =>
     result.words.flatMap((word) =>

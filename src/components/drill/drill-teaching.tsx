@@ -3,7 +3,6 @@
 import { Loader2, Volume2 } from "lucide-react";
 import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import type { DrillItem } from "@/types/drill";
 import { DrillProgress } from "./drill-progress";
 
@@ -26,8 +25,6 @@ export function DrillTeaching({
   onPlay,
   onReady,
 }: DrillTeachingProps) {
-  const isLongText = item.text.length >= 18;
-
   return (
     <div className="space-y-6">
       <DrillProgress current={index} total={total} />
@@ -42,16 +39,13 @@ export function DrillTeaching({
           key={item.text}
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className={cn(
-            "max-w-full whitespace-normal break-words text-center font-bold leading-tight [overflow-wrap:anywhere]",
-            isLongText ? "text-3xl" : "text-4xl",
-          )}
+          className="text-4xl font-bold"
         >
           {item.text}
         </motion.span>
 
         {item.ipa && (
-          <span className="max-w-full whitespace-normal break-words text-center font-mono text-sm leading-snug text-muted-foreground [overflow-wrap:anywhere]">
+          <span className="font-mono text-lg text-muted-foreground">
             {item.ipa}
           </span>
         )}

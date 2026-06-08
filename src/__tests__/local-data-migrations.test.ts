@@ -66,9 +66,7 @@ describe("local data migrations", () => {
     expect(profile.packs["th-s"].status).toBe("new");
     expect(profile.packs["th-s"].levelProgress).toEqual({});
     expect(profile.errorPatterns).toEqual({});
-    expect(sessions).toEqual([
-      { id: "s1", languageId: "en-US", packId: "th-s" },
-    ]);
+    expect(sessions).toEqual([{ id: "s1", packId: "th-s" }]);
   });
 
   it("backfills training session snapshots from existing mastery v2", async () => {
@@ -103,37 +101,21 @@ describe("local data migrations", () => {
       runLocalDataMigrations,
     } = await import("@/lib/local-data-migrations");
     localStorage.setItem("speakright_usage", "{not json");
-    localStorage.setItem("speakright_assessment_result_v2:es-ES", "{bad report");
-    localStorage.setItem("speakright_mastery_profile_v2:es-ES", "{bad profile");
-    localStorage.setItem("speakright_training_sessions_v2:es-ES", "{bad sessions");
     localStorage.setItem("speakright_mw_words_th", "{also bad");
 
     const result = runLocalDataMigrations();
 
     expect(result.quarantinedKeys).toEqual([
       "speakright_usage",
-      "speakright_assessment_result_v2:es-ES",
-      "speakright_mastery_profile_v2:es-ES",
-      "speakright_training_sessions_v2:es-ES",
       "speakright_mw_words_th",
     ]);
     expect(localStorage.getItem("speakright_usage")).toBeNull();
-    expect(
-      localStorage.getItem("speakright_assessment_result_v2:es-ES"),
-    ).toBeNull();
-    expect(localStorage.getItem("speakright_mastery_profile_v2:es-ES")).toBeNull();
-    expect(
-      localStorage.getItem("speakright_training_sessions_v2:es-ES"),
-    ).toBeNull();
     expect(localStorage.getItem("speakright_mw_words_th")).toBeNull();
     expect(localStorage.getItem(CORRUPT_LOCAL_DATA_KEY)).not.toBeNull();
     expect(readCorruptLocalData().map((item) => item.key)).toEqual([
       "speakright_mw_words_th",
-      "speakright_training_sessions_v2:es-ES",
-      "speakright_mastery_profile_v2:es-ES",
-      "speakright_assessment_result_v2:es-ES",
       "speakright_usage",
     ]);
-    expect(getLocalDataSchemaStatus().corruptItems).toBe(5);
+    expect(getLocalDataSchemaStatus().corruptItems).toBe(2);
   });
 });

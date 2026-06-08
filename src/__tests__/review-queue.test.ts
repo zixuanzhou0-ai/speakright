@@ -10,7 +10,6 @@ function session(
 ): TrainingSessionSummary {
   return {
     id: "s1",
-    languageId: "en-US",
     packId: "s-th",
     startedAt: 1,
     completedAt: 2,
@@ -73,7 +72,6 @@ describe("review queue", () => {
   it("prioritizes due review and active error patterns in the profile queue", () => {
     const profile: MasteryProfile = {
       version: 2,
-      languageId: "en-US",
       updatedAt: 1,
       packs: {
         "v-w": {
@@ -106,29 +104,5 @@ describe("review queue", () => {
     expect(tasks.some((task) => task.source === "due-review")).toBe(true);
     expect(tasks.some((task) => task.errorPatternId === "tongue-between-teeth")).toBe(true);
   });
-
-  it("does not build review tasks for non-English beta profiles", () => {
-    const profile: MasteryProfile = {
-      version: 2,
-      languageId: "es-ES",
-      updatedAt: 1,
-      packs: {
-        "s-th": {
-          packId: "s-th",
-          status: "mastered",
-          levelProgress: {},
-          bestTargetScore: 90,
-          perceptionBestRate: 1,
-          completedSessions: 2,
-          failureStreak: 0,
-          nextReviewAt: 5,
-        },
-      },
-      phonemes: {},
-      errorPatterns: {},
-      sessions: [session({ languageId: "es-ES" })],
-    };
-
-    expect(buildReviewQueue(profile, 10)).toEqual([]);
-  });
 });
+

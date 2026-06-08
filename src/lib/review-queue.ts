@@ -3,7 +3,6 @@ import type {
   ReviewQueueItem,
   TrainingSessionSummary,
 } from "@/types/training";
-import { DEFAULT_LANGUAGE_ID } from "./language-profiles";
 import { TRAINING_ERROR_PATTERNS } from "./training-error-patterns";
 import { getTrainingPack } from "./training-packs";
 
@@ -132,7 +131,6 @@ export function buildReviewQueue(
   now = Date.now(),
 ): ReviewQueueItem[] {
   if (!profile) return [];
-  if (profile.languageId !== DEFAULT_LANGUAGE_ID) return [];
   const tasks: ReviewQueueItem[] = [];
   const seen = new Set<string>();
 

@@ -1,7 +1,7 @@
 "use client";
 
 import type { AnchorHTMLAttributes, MouseEvent, ReactNode } from "react";
-import { toast } from "sonner";
+import { openDesktopExternalUrl } from "@/lib/desktop-external-url";
 import { isTauriEnvironment } from "@/lib/tauri-runtime";
 
 interface DesktopExternalLinkProps
@@ -9,18 +9,6 @@ interface DesktopExternalLinkProps
   href: string;
   children: ReactNode;
   copyMessage?: string;
-}
-
-async function copyHrefToClipboard(href: string, copyMessage?: string) {
-  try {
-    if (!navigator.clipboard?.writeText) {
-      throw new Error("Clipboard API is unavailable");
-    }
-    await navigator.clipboard.writeText(href);
-    toast.success(copyMessage ?? "已复制链接，请在浏览器中打开");
-  } catch {
-    toast.error(`请手动打开：${href}`);
-  }
 }
 
 export function DesktopExternalLink({
@@ -36,7 +24,7 @@ export function DesktopExternalLink({
     if (event.defaultPrevented || !isTauriEnvironment()) return;
 
     event.preventDefault();
-    void copyHrefToClipboard(href, copyMessage);
+    void openDesktopExternalUrl(href, copyMessage);
   };
 
   return (

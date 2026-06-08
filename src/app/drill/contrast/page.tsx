@@ -14,14 +14,14 @@ import { useMwPronunciation } from "@/hooks/use-mw-pronunciation";
 import { useRecorder } from "@/hooks/use-recorder";
 import { getPhonemeAccuracy } from "@/lib/azure-phoneme-map";
 import { computeDrillSummary, getPassThreshold } from "@/lib/drill-utils";
-import { getLanguageMinimalPairSets } from "@/lib/language-content-packs";
 import { getLanguageProfile } from "@/lib/language-profiles";
+import type { MinimalPairSet } from "@/lib/minimal-pairs";
+import { MINIMAL_PAIR_SETS } from "@/lib/minimal-pairs";
 import type {
   DrillProgressItem,
   DrillSessionConfig,
   DrillSummary,
 } from "@/types/drill";
-import type { LanguageMinimalPairSet } from "@/types/language";
 
 type ContrastPhase =
   | { type: "select" }
@@ -39,10 +39,8 @@ type ContrastPhase =
 
 export default function ContrastDrillPage() {
   const { languageId } = useLanguageConfig();
-  const profile = getLanguageProfile(languageId);
-  const minimalPairSets = getLanguageMinimalPairSets(languageId);
-  const [selectedSet, setSelectedSet] =
-    useState<LanguageMinimalPairSet | null>(null);
+  const languageProfile = getLanguageProfile(languageId);
+  const [selectedSet, setSelectedSet] = useState<MinimalPairSet | null>(null);
   const [phase, setPhase] = useState<ContrastPhase>({ type: "select" });
   const [progress, setProgress] = useState<DrillProgressItem[]>([]);
   const [startedAt] = useState(Date.now());
@@ -59,17 +57,7 @@ export default function ContrastDrillPage() {
   // so the effect doesn't re-assess the same audio if re-rendered.
   const processedBlobRef = useRef<Blob | null>(null);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: reset contrast state exactly when the active language changes
-  useEffect(() => {
-    processedBlobRef.current = null;
-    setSelectedSet(null);
-    setProgress([]);
-    setPhase({ type: "select" });
-    recorder.reset();
-    azure.reset();
-  }, [languageId]);
-
-  const handleSelectSet = (set: LanguageMinimalPairSet) => {
+  const handleSelectSet = (set: MinimalPairSet) => {
     setSelectedSet(set);
     setProgress([]);
     setPhase({ type: "listen", pairIndex: 0 });
@@ -129,7 +117,11 @@ export default function ContrastDrillPage() {
     const targetPhoneme = selectedSet.phonemeA;
 
     (async () => {
-      const result = await azure.assess(blob, targetWord, profile.azureLocale);
+      const result = await azure.assess(
+        blob,
+        targetWord,
+        languageProfile.azureLocale,
+      );
       if (!result) return;
       const phonemeScore = getPhonemeAccuracy(result, targetPhoneme);
       const scoreA = phonemeScore ?? result.pronunciationScore;
@@ -150,7 +142,7 @@ export default function ContrastDrillPage() {
     azure.isLoading,
     currentPair,
     selectedSet,
-    profile.azureLocale,
+    languageProfile.azureLocale,
   ]);
 
   // Auto-assess word B — same structure as above.
@@ -171,7 +163,11 @@ export default function ContrastDrillPage() {
     const priorScoreA = pendingScoreA;
 
     (async () => {
-      const result = await azure.assess(blob, targetWord, profile.azureLocale);
+      const result = await azure.assess(
+        blob,
+        targetWord,
+        languageProfile.azureLocale,
+      );
       if (!result) return;
       const phonemeScore = getPhonemeAccuracy(result, targetPhoneme);
       const scoreB = phonemeScore ?? result.pronunciationScore;
@@ -199,7 +195,7 @@ export default function ContrastDrillPage() {
     selectedSet,
     pendingScoreA,
     threshold,
-    profile.azureLocale,
+    languageProfile.azureLocale,
   ]);
 
   const handleNext = () => {
@@ -232,7 +228,6 @@ export default function ContrastDrillPage() {
       const config: DrillSessionConfig = {
         kind: "word",
         phonemeSlug: selectedSet.phonemeA,
-        languageId,
         itemCount: selectedSet.pairs.length,
         passThreshold: threshold,
       };
@@ -280,7 +275,7 @@ export default function ContrastDrillPage() {
               选择一组易混淆音标进行对比训练：
             </p>
             <div className="grid grid-cols-2 gap-3">
-              {minimalPairSets.map((set) => (
+              {MINIMAL_PAIR_SETS.map((set) => (
                 <motion.button
                   key={set.id}
                   type="button"
@@ -298,11 +293,6 @@ export default function ContrastDrillPage() {
                 </motion.button>
               ))}
             </div>
-            {minimalPairSets.length === 0 && (
-              <div className="rounded-xl border border-dashed bg-muted/30 p-6 text-center text-sm text-muted-foreground">
-                {profile.displayName}最小对立训练准备中。请先使用音标页、单词训练或句子训练。
-              </div>
-            )}
           </div>
         )}
 

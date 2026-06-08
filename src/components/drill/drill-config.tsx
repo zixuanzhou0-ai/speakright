@@ -1,13 +1,12 @@
 "use client";
 
 import { motion } from "motion/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useCoachMode, useLanguageConfig } from "@/hooks/use-api-keys";
 import { getAvailableWordCount, getPassThreshold } from "@/lib/drill-utils";
 import { getLanguagePhonemes } from "@/lib/language-phonemes";
-import { getPhonemeDisplayGroups } from "@/lib/phoneme-display";
-import { cn } from "@/lib/utils";
+import { getLanguageProfile } from "@/lib/language-profiles";
 import type { DrillKind } from "@/types/drill";
 import type { PhonemeData } from "@/types/phoneme";
 
@@ -24,21 +23,21 @@ const WORD_COUNT_OPTIONS = [5, 10, 15, 20];
 const SENTENCE_COUNT_OPTIONS = [3, 5, 8, 10];
 
 export function DrillConfig({ kind, onStart }: DrillConfigProps) {
+  const { languageId } = useLanguageConfig();
   const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
   const [itemCount, setItemCount] = useState(kind === "word" ? 10 : 5);
 
-  const { languageId } = useLanguageConfig();
+  const profile = getLanguageProfile(languageId);
   const phonemes = getLanguagePhonemes(languageId);
-  const groups = getPhonemeDisplayGroups(phonemes);
+  const vowels = phonemes.filter((p) => p.category === "vowel");
+  const consonants = phonemes.filter((p) => p.category === "consonant");
+  const ruleUnits = phonemes.filter(
+    (p) => p.category !== "vowel" && p.category !== "consonant",
+  );
   const countOptions =
     kind === "word" ? WORD_COUNT_OPTIONS : SENTENCE_COUNT_OPTIONS;
   const coachMode = useCoachMode();
   const threshold = getPassThreshold(coachMode);
-
-  // biome-ignore lint/correctness/useExhaustiveDependencies: changing language invalidates the selected phoneme slug
-  useEffect(() => {
-    setSelectedSlug(null);
-  }, [languageId]);
 
   const selectedPhoneme = selectedSlug
     ? phonemes.find((p) => p.slug === selectedSlug)
@@ -55,13 +54,45 @@ export function DrillConfig({ kind, onStart }: DrillConfigProps) {
   return (
     <div className="space-y-6">
       {/* Phoneme selection */}
-      {groups.map((group) => (
-        <div key={group.id}>
+      <div>
+        <h3 className="mb-3 text-sm font-semibold text-muted-foreground">
+          元音（{vowels.length}）
+        </h3>
+        <div className="grid grid-cols-4 gap-2 sm:grid-cols-6 lg:grid-cols-8">
+          {vowels.map((p) => (
+            <PhonemeChip
+              key={p.slug}
+              phoneme={p}
+              selected={selectedSlug === p.slug}
+              onClick={() => setSelectedSlug(p.slug)}
+            />
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <h3 className="mb-3 text-sm font-semibold text-muted-foreground">
+          辅音（{consonants.length}）
+        </h3>
+        <div className="grid grid-cols-4 gap-2 sm:grid-cols-6 lg:grid-cols-8">
+          {consonants.map((p) => (
+            <PhonemeChip
+              key={p.slug}
+              phoneme={p}
+              selected={selectedSlug === p.slug}
+              onClick={() => setSelectedSlug(p.slug)}
+            />
+          ))}
+        </div>
+      </div>
+
+      {ruleUnits.length > 0 && (
+        <div>
           <h3 className="mb-3 text-sm font-semibold text-muted-foreground">
-            {group.label}（{group.phonemes.length}）
+            规则 / 语流（{ruleUnits.length}）
           </h3>
           <div className="grid grid-cols-4 gap-2 sm:grid-cols-6 lg:grid-cols-8">
-            {group.phonemes.map((p) => (
+            {ruleUnits.map((p) => (
               <PhonemeChip
                 key={p.slug}
                 phoneme={p}
@@ -71,7 +102,7 @@ export function DrillConfig({ kind, onStart }: DrillConfigProps) {
             ))}
           </div>
         </div>
-      ))}
+      )}
 
       {/* Count selection + start */}
       {selectedSlug && (
@@ -85,7 +116,7 @@ export function DrillConfig({ kind, onStart }: DrillConfigProps) {
               {selectedPhoneme?.ipa}
             </span>
             <span className="text-sm text-muted-foreground">
-              {selectedPhoneme?.name}
+              {selectedPhoneme?.name} · {profile.shortLabel}
             </span>
           </div>
 
@@ -159,35 +190,20 @@ function PhonemeChip({
   selected: boolean;
   onClick: () => void;
 }) {
-  const isLongPhoneme = phoneme.ipa.length >= 8;
-  const isVeryLongPhoneme = phoneme.ipa.length >= 14;
-
   return (
     <motion.button
       type="button"
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
       onClick={onClick}
-      className={cn(
-        "flex min-h-20 flex-col items-center justify-center gap-1 rounded-lg border p-2 text-center transition-colors cursor-pointer",
+      className={`flex flex-col items-center gap-0.5 rounded-lg border p-2 text-center transition-colors cursor-pointer ${
         selected
           ? "border-primary bg-primary/10 text-primary"
-          : "border-border hover:border-primary/50",
-      )}
+          : "border-border hover:border-primary/50"
+      }`}
     >
-      <span
-        className={cn(
-          "w-full min-w-0 whitespace-normal break-words font-mono font-bold leading-tight [overflow-wrap:anywhere]",
-          isVeryLongPhoneme
-            ? "text-[11px]"
-            : isLongPhoneme
-              ? "text-sm"
-              : "text-lg",
-        )}
-      >
-        {phoneme.ipa}
-      </span>
-      <span className="w-full min-w-0 truncate text-[10px] text-muted-foreground">
+      <span className="font-mono text-lg font-bold">{phoneme.ipa}</span>
+      <span className="text-[10px] text-muted-foreground truncate w-full">
         {phoneme.example}
       </span>
     </motion.button>

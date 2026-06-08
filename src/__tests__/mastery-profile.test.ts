@@ -1,18 +1,14 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import {
   createEmptyMasteryProfile,
   evaluateSessionMastery,
-  loadMasteryProfile,
-  masteryStorageKey,
   recordTrainingSession,
-  saveMasteryProfile,
 } from "@/lib/mastery-profile";
 import type { TrainingSessionSummary } from "@/types/training";
 
 function session(overrides: Partial<TrainingSessionSummary> = {}) {
   const base: TrainingSessionSummary = {
     id: "s1",
-    languageId: "en-US",
     packId: "s-th",
     startedAt: 1,
     completedAt: 2,
@@ -63,10 +59,6 @@ function session(overrides: Partial<TrainingSessionSummary> = {}) {
 }
 
 describe("mastery profile", () => {
-  beforeEach(() => {
-    localStorage.clear();
-  });
-
   it("requires perception, recent word scores, and sentence scores", () => {
     expect(evaluateSessionMastery(session())).toBe(true);
     expect(evaluateSessionMastery(session({ perceptionCorrect: 3 }))).toBe(
@@ -247,31 +239,5 @@ describe("mastery profile", () => {
     expect(transferred.version).toBe(2);
     expect(transferred.packs["s-th"].masteryState).toBe("transferred");
     expect(transferred.packs["s-th"].transferEvidenceCount).toBe(1);
-  });
-
-  it("isolates saved mastery profiles by language", () => {
-    const english = recordTrainingSession(createEmptyMasteryProfile(), session());
-    const spanish = createEmptyMasteryProfile("es-ES");
-
-    saveMasteryProfile(english, "en-US");
-    saveMasteryProfile(spanish, "es-ES");
-
-    expect(localStorage.getItem(masteryStorageKey("en-US"))).not.toBeNull();
-    expect(localStorage.getItem(masteryStorageKey("es-ES"))).not.toBeNull();
-    expect(loadMasteryProfile("en-US").sessions).toHaveLength(1);
-    expect(loadMasteryProfile("es-ES").sessions).toHaveLength(0);
-  });
-
-  it("does not record non-English sessions into mastery", () => {
-    const spanish = createEmptyMasteryProfile("es-ES");
-    const next = recordTrainingSession(
-      spanish,
-      session({ languageId: "es-ES" }),
-    );
-
-    expect(next).toBe(spanish);
-    expect(evaluateSessionMastery(session({ languageId: "es-ES" }))).toBe(
-      false,
-    );
   });
 });

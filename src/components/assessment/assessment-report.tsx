@@ -17,7 +17,6 @@ import {
   buildDiagnosisReviewPackage,
   type DiagnosisReviewItem,
 } from "@/lib/diagnosis-review-package";
-import { DEFAULT_LANGUAGE_ID } from "@/lib/language-profiles";
 import { loadMasteryProfile } from "@/lib/mastery-profile";
 import { getScoreBg } from "@/lib/score-utils";
 import { getTrainingPack } from "@/lib/training-packs";
@@ -60,18 +59,16 @@ const LAYER_LABELS: Record<MasteryTaskLayer, string> = {
 
 export function AssessmentReport({ result, onRetake }: AssessmentReportProps) {
   const [profile, setProfile] = useState<MasteryProfile | null>(null);
-  const isNonEnglishReport =
-    result.languageId != null && result.languageId !== DEFAULT_LANGUAGE_ID;
   useEffect(() => {
-    setProfile(loadMasteryProfile(result.languageId ?? DEFAULT_LANGUAGE_ID));
-  }, [result.languageId]);
+    setProfile(loadMasteryProfile());
+  }, []);
 
   const displayPrescription = useMemo(
     () =>
-      !isNonEnglishReport && profile
+      profile
         ? buildTrainingPrescription(result.issues, "diagnosis", profile)
         : result.prescription,
-    [isNonEnglishReport, profile, result],
+    [profile, result],
   );
   const prescriptionItems = displayPrescription.days.flatMap(
     (day) => day.items,
@@ -153,11 +150,6 @@ export function AssessmentReport({ result, onRetake }: AssessmentReportProps) {
                   )}
                 </div>
               )}
-              {isNonEnglishReport && (
-                <p className="mt-2 rounded-lg border border-blue-300 bg-blue-50 px-3 py-2 text-sm text-blue-950 dark:border-blue-500/40 dark:bg-blue-500/10 dark:text-blue-100">
-                  当前语言诊断仍是 beta：结果用于反馈和补测，不会自动进入英语训练包或升级 mastery。
-                </p>
-              )}
             </div>
             <div className="flex flex-wrap gap-2">
               {result.issues.slice(0, 3).map((issue) => (
@@ -182,7 +174,7 @@ export function AssessmentReport({ result, onRetake }: AssessmentReportProps) {
         </div>
       </motion.div>
 
-      {!isNonEnglishReport && result.issues.length > 0 && (
+      {result.issues.length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -269,10 +261,7 @@ export function AssessmentReport({ result, onRetake }: AssessmentReportProps) {
         <h2 className="mb-4 text-sm font-semibold text-muted-foreground">
           音标健康图（含样本数）
         </h2>
-        <PhonemeHealthMap
-          scores={result.phonemeScores}
-          languageId={result.languageId}
-        />
+        <PhonemeHealthMap scores={result.phonemeScores} />
       </motion.div>
 
       {result.rawEvidence.length > 0 && (
@@ -311,7 +300,6 @@ export function AssessmentReport({ result, onRetake }: AssessmentReportProps) {
         </motion.div>
       )}
 
-      {!isNonEnglishReport && (
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -362,7 +350,6 @@ export function AssessmentReport({ result, onRetake }: AssessmentReportProps) {
           ))}
         </div>
       </motion.div>
-      )}
 
       <div className="flex justify-center gap-3 pb-6">
         <Button

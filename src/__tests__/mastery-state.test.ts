@@ -21,7 +21,6 @@ function level(kind: TrainingLevelKind, passed = true): TrainingLevelSummary {
 function session(overrides: Partial<TrainingSessionSummary> = {}) {
   const base: TrainingSessionSummary = {
     id: "s1",
-    languageId: "en-US",
     packId: "ee-ih",
     startedAt: 1,
     completedAt: 2,

@@ -25,8 +25,8 @@ import { WaveformDisplay } from "@/components/audio/waveform-display";
 import { FeedbackDisplay } from "@/components/feedback/feedback-display";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useAzureAssessment } from "@/hooks/use-azure-assessment";
 import { useLanguageConfig } from "@/hooks/use-api-keys";
+import { useAzureAssessment } from "@/hooks/use-azure-assessment";
 import { useLlmFeedback } from "@/hooks/use-llm-feedback";
 import { useMwPronunciation } from "@/hooks/use-mw-pronunciation";
 import { useRecorder } from "@/hooks/use-recorder";
@@ -55,10 +55,7 @@ import {
   buildSessionDebrief,
   type LessonBrief,
 } from "@/lib/lesson-brief";
-import {
-  DEFAULT_LANGUAGE_ID,
-  getLanguageProfile,
-} from "@/lib/language-profiles";
+import { getLanguageProfile } from "@/lib/language-profiles";
 import {
   evaluateSessionMastery,
   loadMasteryProfile,
@@ -86,6 +83,7 @@ import {
 import { getTrainingPack } from "@/lib/training-packs";
 import { cn } from "@/lib/utils";
 import type { AzureAssessmentResult } from "@/types/azure";
+import type { LanguageId } from "@/types/language";
 import type {
   AttemptAnalysis,
   ErrorPattern,
@@ -185,36 +183,7 @@ function itemFromRemediationStep(
 
 export default function TrainingPackPage() {
   const { languageId } = useLanguageConfig();
-  const profile = getLanguageProfile(languageId);
-
-  if (languageId !== DEFAULT_LANGUAGE_ID) {
-    return (
-      <div className="flex h-full items-center justify-center px-6 py-8">
-        <div className="w-full max-w-2xl rounded-xl border bg-card p-6 shadow-sm">
-          <h1 className="text-xl font-semibold">
-            {profile.displayName}训练包准备中
-          </h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            这条训练包是美式英语 evidence mastery 课程。当前语言只开放对应语言的
-            beta 单词/句子练习，不会进入英语训练包和 mastery。
-          </p>
-          <div className="mt-5 flex gap-2">
-            <Link href="/drill">
-              <Button>返回当前语言训练</Button>
-            </Link>
-            <Link href="/settings">
-              <Button variant="outline">切换语言</Button>
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  return <EnglishTrainingPackPage />;
-}
-
-function EnglishTrainingPackPage() {
+  const languageProfile = getLanguageProfile(languageId);
   const params = useParams<{ packId: string }>();
   const searchParams = useSearchParams();
   const packId = Array.isArray(params.packId)
@@ -302,7 +271,7 @@ function EnglishTrainingPackPage() {
   }, [currentLevel, levelStats]);
   const savedProfile = useMemo(() => {
     if (!pack || !course) return null;
-    return loadMasteryProfile(DEFAULT_LANGUAGE_ID);
+    return loadMasteryProfile();
   }, [pack, course]);
   const savedReviewQueue = useMemo(
     () => buildReviewQueue(savedProfile),
@@ -521,7 +490,6 @@ function EnglishTrainingPackPage() {
     const uniqueQualityIssues = Array.from(new Set(qualityIssues));
     const summary: TrainingSessionSummary = {
       id: `${pack.id}-${Date.now()}`,
-      languageId: DEFAULT_LANGUAGE_ID,
       packId: pack.id,
       startedAt: startedAtRef.current,
       completedAt: Date.now(),
@@ -572,10 +540,10 @@ function EnglishTrainingPackPage() {
     const mastered = evaluateSessionMastery(summary);
     const completedSummary = { ...summary, mastered };
     const profile = recordTrainingSession(
-      loadMasteryProfile(DEFAULT_LANGUAGE_ID),
+      loadMasteryProfile(),
       completedSummary,
     );
-    saveMasteryProfile(profile, DEFAULT_LANGUAGE_ID);
+    saveMasteryProfile(profile);
     setPhase({ type: "completed", summary: completedSummary });
   };
 
@@ -583,17 +551,17 @@ function EnglishTrainingPackPage() {
     if (!currentItem) return;
     const reference = getCourseItemPlaybackText(currentItem);
     if (reference.split(/\s+/).length > 1) {
-      tts.speak(reference, 0.85);
+      tts.speak(reference, { speed: 0.85, languageId });
     } else {
-      mw.playWord(reference.toLowerCase());
+      mw.playWord(reference.toLowerCase(), "blue", languageId);
     }
   };
 
   const playRemediationText = (text: string) => {
     if (text.split(/\s+/).length > 1) {
-      tts.speak(text, 0.75);
+      tts.speak(text, { speed: 0.75, languageId });
     } else {
-      mw.playWord(text.toLowerCase());
+      mw.playWord(text.toLowerCase(), "blue", languageId);
     }
   };
 
@@ -607,6 +575,7 @@ function EnglishTrainingPackPage() {
     mw.playWord(
       word.toLowerCase(),
       slot === "B" || (slot === "X" && !xIsA) ? "pink" : "blue",
+      languageId,
     );
   };
 
@@ -690,7 +659,11 @@ function EnglishTrainingPackPage() {
       qualityReportsRef.current = [...qualityReportsRef.current, qualityReport];
     }
     const reference = getCourseItemReference(currentItem);
-    const result = await azure.assess(recorder.audioBlob, reference);
+    const result = await azure.assess(
+      recorder.audioBlob,
+      reference,
+      languageProfile.azureLocale,
+    );
     if (!result) return;
     recorder.reset();
     recordingQuality.reset();
@@ -793,7 +766,11 @@ function EnglishTrainingPackPage() {
       remediationStepIndex,
     );
     const reference = getCourseItemReference(stepItem);
-    const result = await azure.assess(recorder.audioBlob, reference);
+    const result = await azure.assess(
+      recorder.audioBlob,
+      reference,
+      languageProfile.azureLocale,
+    );
     if (!result) return;
     recorder.reset();
     recordingQuality.reset();
@@ -1011,6 +988,7 @@ function EnglishTrainingPackPage() {
             summary={phase.summary}
             worstAttempt={worstAttempt}
             llm={llm}
+            languageId={languageId}
             onRestart={() => setPhase({ type: "intro" })}
             onStartLevel={(levelId) => resetSession(levelId)}
           />
@@ -2006,6 +1984,7 @@ function CompletedStep({
   summary,
   worstAttempt,
   llm,
+  languageId,
   onRestart,
   onStartLevel,
 }: {
@@ -2013,6 +1992,7 @@ function CompletedStep({
   summary: TrainingSessionSummary;
   worstAttempt: AttemptResult | null;
   llm: ReturnType<typeof useLlmFeedback>;
+  languageId: LanguageId;
   onRestart: () => void;
   onStartLevel: (levelId: string) => void;
 }) {
@@ -2021,8 +2001,7 @@ function CompletedStep({
         (level) => level.id === summary.recommendedNextLevelId,
       )
     : null;
-  const nextReview = loadMasteryProfile(DEFAULT_LANGUAGE_ID).packs[pack.id]
-    ?.nextReviewAt;
+  const nextReview = loadMasteryProfile().packs[pack.id]?.nextReviewAt;
   const evidencePrompt = buildCoachSummaryPrompt(pack, summary, worstAttempt);
   const debrief = buildSessionDebrief(pack, summary);
   return (
@@ -2163,6 +2142,7 @@ function CompletedStep({
                   evidencePrompt,
                   worstAttempt.azureResult,
                   "phoneme",
+                  languageId,
                 )
               }
               disabled={llm.isStreaming}

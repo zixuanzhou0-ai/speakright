@@ -1,6 +1,5 @@
 import type { DiagnosisIssueType, EvidenceStrength } from "@/types/diagnosis";
 import type { DrillItem } from "@/types/drill";
-import type { LanguageId } from "@/types/language";
 
 export type TrainingPackStatus =
   | "new"
@@ -319,7 +318,6 @@ export interface ReviewQueueItem {
 
 export interface TrainingSessionSummary {
   id: string;
-  languageId: LanguageId;
   packId: string;
   modality?: TrainingSessionModality;
   startedAt: number;
@@ -347,7 +345,6 @@ export interface TrainingSessionSummary {
 
 export interface MasteryProfile {
   version: 2;
-  languageId: LanguageId;
   updatedAt: number;
   packs: Record<string, PackMastery>;
   phonemes: Record<string, PhonemeMastery>;

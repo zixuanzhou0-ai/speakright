@@ -15,7 +15,6 @@ import { RecordButton } from "@/components/audio/record-button";
 import { RecordingActions } from "@/components/audio/recording-actions";
 import { RecordingQualityPanel } from "@/components/audio/recording-quality-panel";
 import { WaveformDisplay } from "@/components/audio/waveform-display";
-import { LanguageModuleGate } from "@/components/common/language-module-gate";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useLanguageConfig } from "@/hooks/use-api-keys";
@@ -29,16 +28,17 @@ import {
   recordTrainingSession,
   saveMasteryProfile,
 } from "@/lib/mastery-profile";
-import { DEFAULT_LANGUAGE_ID } from "@/lib/language-profiles";
 import {
   analyzeProsodyAttempt,
   buildProsodyTrainingSession,
   PROSODY_EXERCISES,
   type ProsodyAnalysis,
 } from "@/lib/prosody-training";
+import { getLanguageProfile } from "@/lib/language-profiles";
 
 export default function ProsodyPage() {
   const { languageId } = useLanguageConfig();
+  const languageProfile = getLanguageProfile(languageId);
   const [selectedId, setSelectedId] = useState(PROSODY_EXERCISES[0].id);
   const [analysis, setAnalysis] = useState<ProsodyAnalysis | null>(null);
   const recorder = useRecorder({ maxDurationMs: 35_000 });
@@ -71,20 +71,22 @@ export default function ProsodyPage() {
   };
 
   const submit = async () => {
-    if (languageId !== DEFAULT_LANGUAGE_ID) return;
     if (!recorder.audioBlob || !quality.report?.canSubmit) return;
-    const result = await assessment.assess(recorder.audioBlob, exercise.text);
+    const result = await assessment.assess(
+      recorder.audioBlob,
+      exercise.text,
+      languageProfile.azureLocale,
+    );
     if (!result) return;
     const nextAnalysis = analyzeProsodyAttempt(exercise, result);
     setAnalysis(nextAnalysis);
     const profile = recordTrainingSession(
-      loadMasteryProfile(DEFAULT_LANGUAGE_ID),
+      loadMasteryProfile(),
       buildProsodyTrainingSession(exercise, nextAnalysis),
     );
-    saveMasteryProfile(profile, DEFAULT_LANGUAGE_ID);
+    saveMasteryProfile(profile);
     try {
       await saveBenchmarkRecording(recorder.audioBlob, {
-        languageId: DEFAULT_LANGUAGE_ID,
         source: "prosody",
         title: exercise.title,
         text: exercise.text,
@@ -100,8 +102,7 @@ export default function ProsodyPage() {
     !!recorder.audioBlob && (quality.isAnalyzing || !quality.report?.canSubmit);
 
   return (
-    <LanguageModuleGate moduleName="韵律与重音训练" readinessKey="evidenceMastery">
-      <div className="h-full overflow-y-auto px-6 py-4 scrollbar-thin">
+    <div className="h-full overflow-y-auto px-6 py-4 scrollbar-thin">
       <div className="mb-5 flex items-center gap-3">
         <Link
           href="/drill"
@@ -158,7 +159,9 @@ export default function ProsodyPage() {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => tts.speak(exercise.text, 0.82)}
+                onClick={() =>
+                  tts.speak(exercise.text, { speed: 0.82, languageId })
+                }
                 disabled={tts.isLoading}
                 className="gap-2 cursor-pointer"
               >
@@ -307,8 +310,7 @@ export default function ProsodyPage() {
           )}
         </main>
       </div>
-      </div>
-    </LanguageModuleGate>
+    </div>
   );
 }
 

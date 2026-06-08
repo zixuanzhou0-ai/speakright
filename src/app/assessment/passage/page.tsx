@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { AssessmentReport } from "@/components/assessment/assessment-report";
 import { RecordButton } from "@/components/audio/record-button";
 import { RecordingQualityPanel } from "@/components/audio/recording-quality-panel";
@@ -37,10 +37,7 @@ import {
   selectCoverageAdaptiveProbes,
 } from "@/lib/coverage-passage";
 import { buildCoveragePassageDiagnosisReport } from "@/lib/diagnosis-engine";
-import {
-  DEFAULT_LANGUAGE_ID,
-  getLanguageProfile,
-} from "@/lib/language-profiles";
+import { getLanguageProfile } from "@/lib/language-profiles";
 import { getTrainingPack } from "@/lib/training-packs";
 import type {
   CoveragePassageRecording,
@@ -48,6 +45,10 @@ import type {
 } from "@/types/diagnosis";
 
 const STORAGE_KEY_V2 = "speakright_assessment_result_v2";
+
+function storageKeyFor(languageId: string): string {
+  return `${STORAGE_KEY_V2}:coverage:${languageId}`;
+}
 
 const FEATURE_LABELS: Record<CoverageFeature, string> = {
   "ee-ih": "/iː/ vs /ɪ/",
@@ -75,14 +76,14 @@ type PassagePhase =
   | { type: "report"; result: DiagnosisReport }
   | { type: "error"; message: string; recoverTo?: ReadablePassagePhase };
 
-function saveReport(report: DiagnosisReport) {
-  localStorage.setItem(STORAGE_KEY_V2, JSON.stringify(report));
+function saveReport(report: DiagnosisReport, languageId: string) {
+  localStorage.setItem(storageKeyFor(languageId), JSON.stringify(report));
 }
 
-function loadSavedCoverageReport(): DiagnosisReport | null {
+function loadSavedCoverageReport(languageId: string): DiagnosisReport | null {
   if (typeof window === "undefined") return null;
   try {
-    const raw = localStorage.getItem(STORAGE_KEY_V2);
+    const raw = localStorage.getItem(storageKeyFor(languageId));
     if (!raw) return null;
     const report = JSON.parse(raw) as DiagnosisReport;
     return report.source === "coverage-passage" ? report : null;
@@ -117,38 +118,9 @@ function getPromptForPhase(
 
 export default function CoveragePassageAssessmentPage() {
   const { languageId } = useLanguageConfig();
-  const profile = getLanguageProfile(languageId);
-
-  if (languageId !== DEFAULT_LANGUAGE_ID) {
-    return (
-      <div className="flex h-full items-center justify-center px-6 py-8">
-        <div className="w-full max-w-2xl rounded-xl border bg-card p-6 shadow-sm">
-          <h1 className="text-xl font-semibold">
-            {profile.displayName}全音覆盖朗读准备中
-          </h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            这条深度诊断目前只针对美式英语。{profile.displayName}
-            已开放快速诊断 beta，请先使用对应语言的筛查词和短文。
-          </p>
-          <div className="mt-5 flex gap-2">
-            <Link href="/assessment">
-              <Button>返回快速诊断</Button>
-            </Link>
-            <Link href="/settings">
-              <Button variant="outline">切换语言</Button>
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  return <EnglishCoveragePassageAssessmentPage />;
-}
-
-function EnglishCoveragePassageAssessmentPage() {
+  const languageProfile = getLanguageProfile(languageId);
   const [savedReport, setSavedReport] = useState<DiagnosisReport | null>(() =>
-    loadSavedCoverageReport(),
+    loadSavedCoverageReport(languageId),
   );
   const [phase, setPhase] = useState<PassagePhase>({ type: "intro" });
   const [benchmarkComparison, setBenchmarkComparison] =
@@ -163,16 +135,20 @@ function EnglishCoveragePassageAssessmentPage() {
   const recordingsRef = useRef<CoveragePassageRecording[]>([]);
   const usedProbeIdsRef = useRef<string[]>([]);
 
+  useEffect(() => {
+    setSavedReport(loadSavedCoverageReport(languageId));
+    setPhase({ type: "intro" });
+  }, [languageId]);
+
   const finalizeReport = useCallback(() => {
     const report = buildCoveragePassageDiagnosisReport({
-      languageId: "en-US",
       recordings: recordingsRef.current,
     });
-    saveReport(report);
+    saveReport(report, languageId);
     setBenchmarkComparison(saveCoverageBenchmark(report));
     setSavedReport(report);
     setPhase({ type: "report", result: report });
-  }, []);
+  }, [languageId]);
 
   const handleStart = () => {
     recordingsRef.current = [];
@@ -197,7 +173,11 @@ function EnglishCoveragePassageAssessmentPage() {
     const currentPhase =
       phase.type === "segment" || phase.type === "probe" ? phase : undefined;
 
-    const result = await azure.assess(recorder.audioBlob, prompt.text);
+    const result = await azure.assess(
+      recorder.audioBlob,
+      prompt.text,
+      languageProfile.azureLocale,
+    );
     if (!result) {
       setPhase({
         type: "error",
@@ -230,7 +210,6 @@ function EnglishCoveragePassageAssessmentPage() {
         message: "正在判断是否需要补测某些薄弱音...",
       });
       const preliminaryReport = buildCoveragePassageDiagnosisReport({
-        languageId: "en-US",
         recordings: recordingsRef.current,
       });
       const probes = selectCoverageAdaptiveProbes(
@@ -255,10 +234,17 @@ function EnglishCoveragePassageAssessmentPage() {
         finalizeReport();
       }
     }
-  }, [recorder, recordingQuality, phase, azure, finalizeReport]);
+  }, [
+    recorder,
+    recordingQuality,
+    phase,
+    azure,
+    finalizeReport,
+    languageProfile.azureLocale,
+  ]);
 
   const handleRetake = () => {
-    localStorage.removeItem(STORAGE_KEY_V2);
+    localStorage.removeItem(storageKeyFor(languageId));
     setSavedReport(null);
     recordingsRef.current = [];
     usedProbeIdsRef.current = [];

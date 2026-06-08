@@ -2,7 +2,7 @@
 
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { LanguageModuleGate } from "@/components/common/language-module-gate";
 import { DrillConfig } from "@/components/drill/drill-config";
 import { DrillFeedback } from "@/components/drill/drill-feedback";
@@ -15,38 +15,65 @@ import { useDrillSession } from "@/hooks/use-drill-session";
 import { useMwPronunciation } from "@/hooks/use-mw-pronunciation";
 import { useTtsAligned } from "@/hooks/use-tts-aligned";
 import { buildSentenceDrillItems } from "@/lib/drill-utils";
+import {
+  LANGUAGE_LEARNING_DECKS,
+  type DeckLanguageId,
+} from "@/lib/language-learning-decks";
 import { getLanguagePhonemeBySlug } from "@/lib/language-phonemes";
-import { getLanguageSentenceBank } from "@/lib/language-content-packs";
+import { getLanguageProfile } from "@/lib/language-profiles";
+import { getPhonemeBySlug } from "@/lib/phoneme-data";
+import { SENTENCE_BANK } from "@/lib/sentence-bank";
 import type { LanguageId } from "@/types/language";
 
 export default function SentenceDrillPage() {
-  const drill = useDrillSession();
+  const { languageId } = useLanguageConfig();
+  const languageProfile = getLanguageProfile(languageId);
+  const drill = useDrillSession({
+    azureLocale: languageProfile.azureLocale,
+    scoreHistoryPrefix: languageId,
+  });
   const mw = useMwPronunciation();
   const tts = useTtsAligned();
-  const { languageId } = useLanguageConfig();
-  const sentenceBank = getLanguageSentenceBank(languageId);
-  const [startError, setStartError] = useState<string | null>(null);
 
   const handleStart = useCallback(
     (phonemeSlug: string, itemCount: number, passThreshold: number) => {
-      const phoneme = getLanguagePhonemeBySlug(languageId, phonemeSlug);
-      const items = buildSentenceDrillItems(
-        sentenceBank,
-        phonemeSlug,
-        itemCount,
-        phoneme?.description,
-      );
-      if (items.length === 0) {
-        setStartError("这个发音单位还没有句子训练内容，先换一个有句子的发音单位。");
-        return;
-      }
-      setStartError(null);
+      const phoneme =
+        getLanguagePhonemeBySlug(languageId, phonemeSlug) ??
+        getPhonemeBySlug(phonemeSlug);
+      const items = (() => {
+        if (languageId === "en-US") {
+          return buildSentenceDrillItems(
+            SENTENCE_BANK,
+            phonemeSlug,
+            itemCount,
+            phoneme?.description,
+          );
+        }
+
+        const languageSentences =
+          LANGUAGE_LEARNING_DECKS[languageId as DeckLanguageId].sentenceDeck;
+        const matchingSentences = languageSentences.filter((item) =>
+          item.targetUnitSlugs.includes(phonemeSlug),
+        );
+        const candidates =
+          matchingSentences.length > 0 ? matchingSentences : languageSentences;
+
+        return [...candidates]
+          .sort(() => Math.random() - 0.5)
+          .slice(0, itemCount)
+          .map((item) => ({
+            text: item.text,
+            ipa: item.ipaHint,
+            phoneme: phonemeSlug,
+            description: item.focus,
+          }));
+      })();
       drill.start(
-        { kind: "sentence", languageId, phonemeSlug, itemCount, passThreshold },
+        { kind: "sentence", phonemeSlug, itemCount, passThreshold },
         items,
       );
     },
-    [drill, languageId, sentenceBank],
+    [drill, languageId],
   );
 
   const handlePlayReference = useCallback(() => {
@@ -55,7 +82,7 @@ export default function SentenceDrillPage() {
       if (item) {
         // For sentences use TTS, for single words use MW
         if (item.text.split(/\s+/).length > 1) {
-          tts.speak(item.text, 0.85);
+          tts.speak(item.text, { speed: 0.85, languageId });
         } else {
           mw.playWord(item.text, "blue", languageId);
         }
@@ -87,29 +114,22 @@ export default function SentenceDrillPage() {
           drill.phase.type !== "configuring" &&
           drill.phase.type !== "completed" && (
             <span className="text-sm text-muted-foreground">
-              {getLanguagePhonemeBySlug(languageId, drill.config.phonemeSlug)?.ipa}
+              {getPhonemeBySlug(drill.config.phonemeSlug)?.ipa}
             </span>
           )}
       </div>
 
       <div className="flex-1 max-w-2xl mx-auto w-full">
         {drill.phase.type === "configuring" && (
-          <div className="space-y-3">
-            {startError && (
-              <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-200">
-                {startError}
-              </div>
-            )}
-            <DrillConfig kind="sentence" onStart={handleStart} />
-          </div>
+          <DrillConfig kind="sentence" onStart={handleStart} />
         )}
 
         {drill.phase.type === "phonemeLesson" && drill.config && (
           <SentenceLessonView
             config={drill.config}
-            languageId={languageId}
             onReady={drill.finishPhonemeLesson}
             mw={mw}
+            languageId={languageId}
           />
         )}
 
@@ -194,20 +214,22 @@ export default function SentenceDrillPage() {
 
 function SentenceLessonView({
   config,
-  languageId,
   onReady,
   mw,
+  languageId,
 }: {
   config: { phonemeSlug: string; itemCount: number };
-  languageId: LanguageId;
   onReady: () => void;
   mw: {
     playWord: (w: string, v?: "blue" | "pink", l?: LanguageId) => void;
     isPlaying: boolean;
     isLoading: boolean;
   };
+  languageId: LanguageId;
 }) {
-  const phoneme = getLanguagePhonemeBySlug(languageId, config.phonemeSlug);
+  const phoneme =
+    getLanguagePhonemeBySlug(languageId, config.phonemeSlug) ??
+    getPhonemeBySlug(config.phonemeSlug);
   if (!phoneme) return null;
   return (
     <DrillPhonemeLesson

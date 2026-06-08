@@ -62,7 +62,7 @@ export function LanguageModuleGate({
             </Button>
           </Link>
           <Link href="/settings">
-            <Button variant="outline">切换语言</Button>
+            <Button variant="outline">配置语言/音频包</Button>
           </Link>
         </div>
       </div>

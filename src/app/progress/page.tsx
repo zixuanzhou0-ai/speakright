@@ -24,13 +24,11 @@ import {
   summarizeBenchmarkGroups,
   summarizeBenchmarkTrend,
 } from "@/lib/benchmark-archive";
-import { useLanguageConfig } from "@/hooks/use-api-keys";
 import { loadMasteryProfile } from "@/lib/mastery-profile";
 import { TRAINING_PACKS } from "@/lib/training-packs";
 import type { MasteryProfile } from "@/types/training";
 
 export default function ProgressPage() {
-  const { languageId } = useLanguageConfig();
   const [recordings, setRecordings] = useState<BenchmarkRecordingMeta[]>([]);
   const [profile, setProfile] = useState<MasteryProfile | null>(null);
   const benchmarkGroups = useMemo(
@@ -43,12 +41,12 @@ export default function ProgressPage() {
   );
 
   useEffect(() => {
-    setRecordings(listBenchmarkRecordings(languageId));
-    setProfile(loadMasteryProfile(languageId));
-  }, [languageId]);
+    setRecordings(listBenchmarkRecordings());
+    setProfile(loadMasteryProfile());
+  }, []);
 
   const refreshRecordings = () => {
-    setRecordings(listBenchmarkRecordings(languageId));
+    setRecordings(listBenchmarkRecordings());
   };
 
   const mastered = profile
@@ -78,10 +76,10 @@ export default function ProgressPage() {
   };
 
   const handleClearRecordings = async () => {
-    if (!window.confirm("清空当前语言的本机 benchmark 录音？此操作不能撤销。")) {
+    if (!window.confirm("清空全部本机 benchmark 录音？此操作不能撤销。")) {
       return;
     }
-    await clearBenchmarkRecordings(languageId);
+    await clearBenchmarkRecordings();
     refreshRecordings();
   };
 

@@ -6,7 +6,6 @@ import type {
   PhonemeMastery,
   TrainingSessionSummary,
 } from "@/types/training";
-import { DEFAULT_LANGUAGE_ID } from "@/lib/language-profiles";
 
 export const LOCAL_DATA_SCHEMA_VERSION = 2;
 export const LOCAL_DATA_SCHEMA_VERSION_KEY =
@@ -36,12 +35,7 @@ const KNOWN_JSON_STORAGE_KEYS = [
   "speakright_stress_cache",
 ] as const;
 
-const KNOWN_JSON_STORAGE_PREFIXES = [
-  "speakright_assessment_result_v2:",
-  "speakright_mastery_profile_v2:",
-  "speakright_training_sessions_v2:",
-  "speakright_mw_words_",
-] as const;
+const KNOWN_JSON_STORAGE_PREFIXES = ["speakright_mw_words_"] as const;
 
 export interface CorruptLocalDataItem {
   key: string;
@@ -197,17 +191,11 @@ function migrateLegacyMasteryProfile(): string[] {
 
   const next: MasteryProfile = {
     version: 2,
-    languageId: DEFAULT_LANGUAGE_ID,
     updatedAt: legacy.updatedAt ?? Date.now(),
     packs,
     phonemes: legacy.phonemes,
     errorPatterns: {},
-    sessions: Array.isArray(legacy.sessions)
-      ? legacy.sessions.map((session) => ({
-          ...session,
-          languageId: session.languageId ?? DEFAULT_LANGUAGE_ID,
-        }))
-      : [],
+    sessions: Array.isArray(legacy.sessions) ? legacy.sessions : [],
   };
 
   localStorage.setItem(MASTERY_V2_KEY, JSON.stringify(next));

@@ -5,7 +5,6 @@ import type {
   TrainingLevelSummary,
   TrainingSessionSummary,
 } from "@/types/training";
-import { DEFAULT_LANGUAGE_ID } from "./language-profiles";
 import { buildSessionReviewItems } from "./review-queue";
 
 export type ProsodyExerciseKind =
@@ -346,7 +345,6 @@ export function buildProsodyTrainingSession(
   };
   const session: TrainingSessionSummary = {
     id: `prosody-${exercise.id}-${now}`,
-    languageId: DEFAULT_LANGUAGE_ID,
     packId: "stress-rhythm",
     modality: "prosody",
     startedAt: now,

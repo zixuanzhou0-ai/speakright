@@ -3,7 +3,6 @@
 import { motion } from "motion/react";
 import { RecordButton } from "@/components/audio/record-button";
 import { WaveformDisplay } from "@/components/audio/waveform-display";
-import { cn } from "@/lib/utils";
 import type { DrillItem } from "@/types/drill";
 import { DrillProgress } from "./drill-progress";
 
@@ -30,8 +29,6 @@ export function DrillRecording({
   onStartRecording,
   onStopRecording,
 }: DrillRecordingProps) {
-  const isLongText = item.text.length >= 18;
-
   return (
     <div className="space-y-6">
       <DrillProgress current={index} total={total} />
@@ -41,16 +38,9 @@ export function DrillRecording({
         animate={{ opacity: 1, y: 0 }}
         className="flex flex-col items-center gap-4 rounded-xl border bg-card p-8 shadow-sm"
       >
-        <span
-          className={cn(
-            "max-w-full whitespace-normal break-words text-center font-bold leading-tight [overflow-wrap:anywhere]",
-            isLongText ? "text-2xl" : "text-3xl",
-          )}
-        >
-          {item.text}
-        </span>
+        <span className="text-3xl font-bold">{item.text}</span>
         {item.ipa && (
-          <span className="max-w-full whitespace-normal break-words text-center font-mono text-sm leading-snug text-muted-foreground [overflow-wrap:anywhere]">
+          <span className="font-mono text-base text-muted-foreground">
             {item.ipa}
           </span>
         )}

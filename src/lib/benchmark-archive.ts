@@ -1,11 +1,7 @@
 "use client";
 
-import { DEFAULT_LANGUAGE_ID } from "@/lib/language-profiles";
-import type { LanguageId } from "@/types/language";
-
 export interface BenchmarkRecordingMeta {
   id: string;
-  languageId: LanguageId;
   createdAt: number;
   source: "prosody" | "coverage" | "scenario" | "free-practice" | "spontaneous";
   title: string;
@@ -33,42 +29,11 @@ const DB_NAME = "speakright-benchmark-audio";
 const STORE_NAME = "recordings";
 const DB_VERSION = 1;
 
-function normalizeMetaItem(
-  item: Partial<BenchmarkRecordingMeta>,
-): BenchmarkRecordingMeta | null {
-  if (
-    typeof item.id !== "string" ||
-    typeof item.createdAt !== "number" ||
-    typeof item.source !== "string" ||
-    typeof item.title !== "string" ||
-    typeof item.text !== "string" ||
-    typeof item.score !== "number" ||
-    typeof item.targetLabel !== "string"
-  ) {
-    return null;
-  }
-
-  return {
-    id: item.id,
-    languageId: item.languageId ?? DEFAULT_LANGUAGE_ID,
-    createdAt: item.createdAt,
-    source: item.source as BenchmarkRecordingMeta["source"],
-    title: item.title,
-    text: item.text,
-    score: item.score,
-    targetLabel: item.targetLabel,
-  };
-}
-
 function readMeta(): BenchmarkRecordingMeta[] {
   if (typeof window === "undefined") return [];
   try {
     const raw = localStorage.getItem(META_KEY);
-    const parsed = raw ? JSON.parse(raw) : [];
-    if (!Array.isArray(parsed)) return [];
-    return parsed
-      .map((item) => normalizeMetaItem(item))
-      .filter((item): item is BenchmarkRecordingMeta => item !== null);
+    return raw ? (JSON.parse(raw) as BenchmarkRecordingMeta[]) : [];
   } catch {
     return [];
   }
@@ -166,12 +131,8 @@ export async function saveBenchmarkRecording(
   return item;
 }
 
-export function listBenchmarkRecordings(
-  languageId?: LanguageId,
-): BenchmarkRecordingMeta[] {
-  return readMeta()
-    .filter((item) => !languageId || item.languageId === languageId)
-    .sort((a, b) => b.createdAt - a.createdAt);
+export function listBenchmarkRecordings(): BenchmarkRecordingMeta[] {
+  return readMeta().sort((a, b) => b.createdAt - a.createdAt);
 }
 
 function bytesToBase64(bytes: Uint8Array): string {
@@ -242,16 +203,7 @@ export async function deleteBenchmarkRecording(id: string): Promise<void> {
   writeMeta(readMeta().filter((item) => item.id !== id));
 }
 
-export async function clearBenchmarkRecordings(
-  languageId?: LanguageId,
-): Promise<void> {
-  if (languageId) {
-    const retained = readMeta().filter((item) => item.languageId !== languageId);
-    const removed = readMeta().filter((item) => item.languageId === languageId);
-    await Promise.all(removed.map((item) => deleteBlob(item.id)));
-    writeMeta(retained);
-    return;
-  }
+export async function clearBenchmarkRecordings(): Promise<void> {
   await clearBlobs();
   writeMeta([]);
 }
@@ -275,7 +227,6 @@ function normalizeTargetLabel(label: string): string {
 
 export function benchmarkGroupKey(item: BenchmarkRecordingMeta): string {
   return [
-    item.languageId,
     item.source,
     normalizeTargetLabel(item.targetLabel),
     normalizeBenchmarkText(item.text),

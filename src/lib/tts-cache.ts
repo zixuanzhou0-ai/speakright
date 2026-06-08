@@ -1,19 +1,8 @@
 const DB_NAME = "speakright_tts_cache";
 const STORE_NAME = "tts_audio";
 const MAX_ENTRIES = 50;
-const DB_VERSION = 2;
-
-export interface TtsCacheKeyParts {
-  languageId: string;
-  provider: string;
-  modelId: string;
-  voiceId: string;
-  purpose: "word" | "pair" | "sentence" | "diagnosis" | "free-practice";
-  speed: number;
-  text: string;
-  dictionaryVersion?: string;
-  textNormalizerVersion?: string;
-}
+const DB_VERSION = 1;
+const DEFAULT_LANGUAGE_ID = "en-US";
 
 interface TtsCacheEntry {
   cacheKey: string;
@@ -23,19 +12,13 @@ interface TtsCacheEntry {
   textLength: number;
 }
 
-export function buildTtsCacheKey(parts: TtsCacheKeyParts): string {
-  return [
-    "v2",
-    parts.languageId,
-    parts.provider,
-    parts.modelId,
-    parts.voiceId,
-    parts.purpose,
-    parts.speed.toFixed(1),
-    parts.dictionaryVersion ?? "default-dict",
-    parts.textNormalizerVersion ?? "default-normalizer",
-    parts.text.trim().toLowerCase(),
-  ].join(":");
+export function buildCacheKey(
+  text: string,
+  voiceId: string,
+  speed: number,
+  languageId = DEFAULT_LANGUAGE_ID,
+): string {
+  return `${languageId}:${text.trim().toLowerCase()}:${voiceId}:${speed.toFixed(1)}`;
 }
 
 function openDb(): Promise<IDBDatabase> {
@@ -65,12 +48,15 @@ function waitForTransaction(tx: IDBTransaction): Promise<void> {
 }
 
 export async function getTtsFromCache(
-  keyParts: TtsCacheKeyParts,
+  text: string,
+  voiceId: string,
+  speed: number,
+  languageId = DEFAULT_LANGUAGE_ID,
 ): Promise<TtsCacheEntry | null> {
   let db: IDBDatabase | null = null;
   try {
     db = await openDb();
-    const key = buildTtsCacheKey(keyParts);
+    const key = buildCacheKey(text, voiceId, speed, languageId);
     const tx = db.transaction(STORE_NAME, "readonly");
     const store = tx.objectStore(STORE_NAME);
     const req = store.get(key);
@@ -88,21 +74,24 @@ export async function getTtsFromCache(
 }
 
 export async function setTtsToCache(
-  keyParts: TtsCacheKeyParts,
+  text: string,
+  voiceId: string,
+  speed: number,
   audioBlob: Blob,
   alignment: unknown,
+  languageId = DEFAULT_LANGUAGE_ID,
 ): Promise<void> {
   let db: IDBDatabase | null = null;
   try {
     db = await openDb();
-    const key = buildTtsCacheKey(keyParts);
+    const key = buildCacheKey(text, voiceId, speed, languageId);
 
     const entry: TtsCacheEntry = {
       cacheKey: key,
       audioBlob,
       alignment,
       createdAt: Date.now(),
-      textLength: keyParts.text.length,
+      textLength: text.length,
     };
 
     // Evict if over limit

@@ -12,12 +12,10 @@ import {
 import { motion } from "motion/react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { LanguageModuleGate } from "@/components/common/language-module-gate";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useLanguageConfig } from "@/hooks/use-api-keys";
 import { useMwPronunciation } from "@/hooks/use-mw-pronunciation";
-import { DEFAULT_LANGUAGE_ID } from "@/lib/language-profiles";
 import {
   buildHvptSession,
   buildHvptTrainingSession,
@@ -58,7 +56,6 @@ function answerIsCorrect(trial: HvptTrial, answer: HvptAnswer): boolean {
 }
 
 export default function PerceptionDrillPage() {
-  const { languageId } = useLanguageConfig();
   const [selectedContrast, setSelectedContrast] = useState<HvptContrast | null>(
     null,
   );
@@ -66,16 +63,15 @@ export default function PerceptionDrillPage() {
   const [responses, setResponses] = useState<HvptResponse[]>([]);
   const [trials, setTrials] = useState<HvptTrial[]>([]);
   const [activeSlot, setActiveSlot] = useState<PlayingSlot>(null);
+  const { languageId } = useLanguageConfig();
   const pronunciation = useMwPronunciation();
 
   const recommendedIds = useMemo(
     () =>
       typeof window === "undefined"
         ? ["ee-ih", "eh-ae", "s-th", "v-w", "l-r"]
-        : languageId === DEFAULT_LANGUAGE_ID
-          ? recommendedHvptContrastIds(loadMasteryProfile(DEFAULT_LANGUAGE_ID))
-          : ["ee-ih", "eh-ae", "s-th", "v-w", "l-r"],
-    [languageId],
+        : recommendedHvptContrastIds(loadMasteryProfile()),
+    [],
   );
 
   const startSession = (contrast: HvptContrast, reviewTrials?: HvptTrial[]) => {
@@ -111,7 +107,7 @@ export default function PerceptionDrillPage() {
         : slot === "B"
           ? currentTrial.speakerB
           : currentTrial.speakerX;
-    pronunciation.playWord(word, speaker);
+    pronunciation.playWord(word, speaker, languageId);
   };
 
   const answer = (answerValue: HvptAnswer) => {
@@ -144,16 +140,9 @@ export default function PerceptionDrillPage() {
       setPhase({ type: "completed", summary });
       return;
     }
-    if (languageId !== DEFAULT_LANGUAGE_ID) {
-      setPhase({ type: "completed", summary });
-      return;
-    }
     const session = buildHvptTrainingSession(selectedContrast, summary);
-    const nextProfile = recordTrainingSession(
-      loadMasteryProfile(DEFAULT_LANGUAGE_ID),
-      session,
-    );
-    saveMasteryProfile(nextProfile, DEFAULT_LANGUAGE_ID);
+    const nextProfile = recordTrainingSession(loadMasteryProfile(), session);
+    saveMasteryProfile(nextProfile);
     setPhase({ type: "completed", summary });
   };
 
@@ -189,8 +178,7 @@ export default function PerceptionDrillPage() {
   }).length;
 
   return (
-    <LanguageModuleGate moduleName="高变异听辨" readinessKey="evidenceMastery">
-      <div className="h-full flex flex-col px-6 py-4 overflow-y-auto scrollbar-thin">
+    <div className="h-full flex flex-col px-6 py-4 overflow-y-auto scrollbar-thin">
       <div className="mb-4 flex items-center gap-3 shrink-0">
         <Link
           href="/drill"
@@ -417,7 +405,11 @@ export default function PerceptionDrillPage() {
                       size="sm"
                       variant="outline"
                       onClick={() =>
-                        pronunciation.playWord(trial.wordA, trial.speakerA)
+                        pronunciation.playWord(
+                          trial.wordA,
+                          trial.speakerA,
+                          languageId,
+                        )
                       }
                       className="cursor-pointer"
                     >
@@ -428,7 +420,11 @@ export default function PerceptionDrillPage() {
                       size="sm"
                       variant="outline"
                       onClick={() =>
-                        pronunciation.playWord(trial.wordB, trial.speakerB)
+                        pronunciation.playWord(
+                          trial.wordB,
+                          trial.speakerB,
+                          languageId,
+                        )
                       }
                       className="cursor-pointer"
                     >
@@ -548,7 +544,6 @@ export default function PerceptionDrillPage() {
           </motion.div>
         )}
       </div>
-      </div>
-    </LanguageModuleGate>
+    </div>
   );
 }

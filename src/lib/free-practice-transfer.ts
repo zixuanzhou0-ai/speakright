@@ -11,7 +11,6 @@ import type {
   TransferEvidence,
 } from "@/types/training";
 import { getPhonemeAccuracy } from "./azure-phoneme-map";
-import { DEFAULT_LANGUAGE_ID } from "./language-profiles";
 import { recordTrainingSession } from "./mastery-profile";
 import { buildReviewQueue, buildSessionReviewItems } from "./review-queue";
 import { detectErrorPatterns } from "./training-error-patterns";
@@ -525,7 +524,6 @@ function buildTransferSession(
   };
   const session: TrainingSessionSummary = {
     id: `free-${evidence.packId}-${summary.generatedAt}`,
-    languageId: DEFAULT_LANGUAGE_ID,
     packId: evidence.packId,
     startedAt: summary.generatedAt,
     completedAt: summary.generatedAt,

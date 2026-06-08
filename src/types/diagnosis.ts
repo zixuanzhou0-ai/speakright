@@ -1,6 +1,5 @@
 import type { AssessmentWord } from "@/types/assessment";
 import type { AzureAssessmentResult } from "@/types/azure";
-import type { LanguageId } from "@/types/language";
 import type { TrainingPrescription } from "@/types/training";
 
 export type DiagnosisIssueSeverity = "critical" | "major" | "minor";
@@ -82,7 +81,6 @@ export interface DiagnosisIssue {
 
 export interface DiagnosisReport {
   version: 2;
-  languageId?: LanguageId;
   source?: "quick-word-check" | "coverage-passage";
   timestamp: number;
   overallScore: number;
@@ -109,7 +107,6 @@ export interface AssessmentRecording {
 }
 
 export interface DiagnosisBuildInput {
-  languageId?: LanguageId;
   wordRecordings: AssessmentRecording[];
   paragraphResult: AzureAssessmentResult;
   paragraphText: string;
@@ -125,6 +122,5 @@ export interface CoveragePassageRecording {
 }
 
 export interface CoveragePassageBuildInput {
-  languageId: Extract<LanguageId, "en-US">;
   recordings: CoveragePassageRecording[];
 }

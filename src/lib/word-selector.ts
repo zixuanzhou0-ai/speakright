@@ -1,10 +1,5 @@
 import type { KeywordEntry } from "@/types/phoneme";
-import type { LanguageId } from "@/types/language";
-import { DEFAULT_LANGUAGE_ID } from "@/lib/language-profiles";
-import {
-  getPracticedWords,
-  getPracticedWordsForLanguage,
-} from "./practice-tracker";
+import { getPracticedWords } from "./practice-tracker";
 
 /**
  * Weighted random selection for next word.
@@ -14,16 +9,11 @@ export function selectNextWord(
   slug: string,
   pool: KeywordEntry[],
   currentWord?: string,
-  languageId: LanguageId = DEFAULT_LANGUAGE_ID,
 ): KeywordEntry {
   if (pool.length === 0) throw new Error("Word pool is empty");
   if (pool.length === 1) return pool[0];
 
-  const practiced = new Set(
-    languageId === DEFAULT_LANGUAGE_ID
-      ? getPracticedWords(slug)
-      : getPracticedWordsForLanguage(languageId, slug),
-  );
+  const practiced = new Set(getPracticedWords(slug));
   const candidates = currentWord
     ? pool.filter((w) => w.word.toLowerCase() !== currentWord.toLowerCase())
     : pool;

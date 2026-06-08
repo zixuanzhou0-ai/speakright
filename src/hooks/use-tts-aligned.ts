@@ -2,10 +2,14 @@
 
 import { Howl } from "howler";
 import { useCallback, useRef, useState } from "react";
-import { useLanguageConfig } from "@/hooks/use-api-keys";
 import { elevenLabsTtsAligned } from "@/lib/api-client";
 import { getElevenLabsConfig } from "@/lib/api-keys";
+import {
+  getElevenLabsLanguagePack,
+  isElevenLabsPackLanguageId,
+} from "@/lib/elevenlabs-language-packs";
 import { getTtsFromCache, setTtsToCache } from "@/lib/tts-cache";
+import type { LanguageId } from "@/types/language";
 
 export interface WordTiming {
   word: string;
@@ -14,7 +18,10 @@ export interface WordTiming {
 }
 
 interface UseTtsAlignedReturn {
-  speak: (text: string, speed?: number) => Promise<void>;
+  speak: (
+    text: string,
+    speedOrOptions?: number | TtsAlignedSpeakOptions,
+  ) => Promise<void>;
   replay: () => void;
   stop: () => void;
   reset: () => void;
@@ -23,6 +30,11 @@ interface UseTtsAlignedReturn {
   error: string | null;
   wordTimings: WordTiming[];
   currentTime: number;
+}
+
+interface TtsAlignedSpeakOptions {
+  speed?: number;
+  languageId?: LanguageId;
 }
 
 interface AlignmentData {
@@ -77,8 +89,25 @@ function aggregateToWordTimings(
   return timings;
 }
 
+function resolveSpeakOptions(
+  speedOrOptions?: number | TtsAlignedSpeakOptions,
+) {
+  const languageId =
+    typeof speedOrOptions === "object"
+      ? (speedOrOptions.languageId ?? "en-US")
+      : "en-US";
+  const languagePack = isElevenLabsPackLanguageId(languageId)
+    ? getElevenLabsLanguagePack(languageId)
+    : null;
+  const speed =
+    typeof speedOrOptions === "number"
+      ? speedOrOptions
+      : (speedOrOptions?.speed ?? languagePack?.speed ?? 0.85);
+
+  return { languageId, languagePack, speed };
+}
+
 export function useTtsAligned(): UseTtsAlignedReturn {
-  const { languageId } = useLanguageConfig();
   const [isLoading, setIsLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -176,9 +205,11 @@ export function useTtsAligned(): UseTtsAlignedReturn {
   }, [cleanup]);
 
   const speak = useCallback(
-    async (text: string, speed = 0.85) => {
+    async (text: string, speedOrOptions?: number | TtsAlignedSpeakOptions) => {
       const requestId = requestIdRef.current + 1;
       requestIdRef.current = requestId;
+      const { languageId, languagePack, speed } =
+        resolveSpeakOptions(speedOrOptions);
       const config = getElevenLabsConfig();
       if (!config) {
         setError("请先在设置页面配置 ElevenLabs API 密钥");
@@ -192,20 +223,13 @@ export function useTtsAligned(): UseTtsAlignedReturn {
       setCurrentTime(0);
 
       try {
-        const modelId = config.modelId || "eleven_flash_v2_5";
-        const cacheKeyParts = {
-          languageId,
-          provider: "elevenlabs",
-          modelId,
-          voiceId: config.voiceId,
-          purpose: "sentence" as const,
-          speed,
-          text,
-          textNormalizerVersion: "aligned-v1",
-        };
-
         // Check cache first
-        const cached = await getTtsFromCache(cacheKeyParts);
+        const cached = await getTtsFromCache(
+          text,
+          config.voiceId,
+          speed,
+          languageId,
+        );
         if (requestIdRef.current !== requestId) return;
         if (cached) {
           const blob = cached.audioBlob;
@@ -224,8 +248,13 @@ export function useTtsAligned(): UseTtsAlignedReturn {
           config.apiKey,
           config.voiceId,
           text,
-          modelId,
-          speed,
+          languagePack?.modelId || config.modelId || "eleven_flash_v2_5",
+          languagePack
+            ? {
+                speed,
+                languageCode: languagePack.languageCode,
+              }
+            : speed,
         );
         if (requestIdRef.current !== requestId) return;
         const { audio_base64, alignment } = data;
@@ -246,7 +275,14 @@ export function useTtsAligned(): UseTtsAlignedReturn {
         const blob = new Blob([audioBytes], { type: "audio/mpeg" });
 
         // Cache the result
-        await setTtsToCache(cacheKeyParts, blob, alignment);
+        await setTtsToCache(
+          text,
+          config.voiceId,
+          speed,
+          blob,
+          alignment,
+          languageId,
+        );
         if (requestIdRef.current !== requestId) return;
 
         // Dispatch custom event to notify usage monitor (only on actual API calls)
@@ -267,7 +303,7 @@ export function useTtsAligned(): UseTtsAlignedReturn {
         setIsLoading(false);
       }
     },
-    [cleanup, languageId, playBlob],
+    [cleanup, playBlob],
   );
 
   const replay = useCallback(() => {

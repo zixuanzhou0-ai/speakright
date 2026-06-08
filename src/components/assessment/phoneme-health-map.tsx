@@ -7,15 +7,10 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { getLanguagePhonemes } from "@/lib/language-phonemes";
-import { DEFAULT_LANGUAGE_ID } from "@/lib/language-profiles";
-import { getPhonemeDisplayGroups } from "@/lib/phoneme-display";
-import { cn } from "@/lib/utils";
-import type { LanguageId } from "@/types/language";
+import { PHONEMES } from "@/lib/phoneme-data";
 
 interface PhonemeHealthMapProps {
   scores: Record<string, number | { score: number; sampleCount: number }>;
-  languageId?: LanguageId;
 }
 
 function normalizeScore(
@@ -41,42 +36,54 @@ function getLabel(score: number): string {
   return "未测";
 }
 
-export function PhonemeHealthMap({
-  scores,
-  languageId = DEFAULT_LANGUAGE_ID,
-}: PhonemeHealthMapProps) {
-  const groups = getPhonemeDisplayGroups(getLanguagePhonemes(languageId));
-  let renderedCount = 0;
+export function PhonemeHealthMap({ scores }: PhonemeHealthMapProps) {
+  const vowels = PHONEMES.filter((p) => p.category === "vowel");
+  const consonants = PHONEMES.filter((p) => p.category === "consonant");
 
   return (
     <div className="space-y-4">
-      {groups.map((group) => {
-        const startIndex = renderedCount;
-        renderedCount += group.phonemes.length;
-        return (
-          <div key={group.id}>
-            <h3 className="mb-2 text-sm font-semibold text-muted-foreground">
-              {group.label}（{group.phonemes.length}）
-            </h3>
-            <div className="grid grid-cols-4 gap-1.5 sm:grid-cols-6 lg:grid-cols-8">
-              {group.phonemes.map((p, i) => {
-                const normalized = normalizeScore(scores[p.slug]);
-                return (
-                  <PhonemeCell
-                    key={p.slug}
-                    ipa={p.ipa}
-                    slug={p.slug}
-                    name={p.name}
-                    score={normalized.score}
-                    sampleCount={normalized.sampleCount}
-                    delay={(startIndex + i) * 0.03}
-                  />
-                );
-              })}
-            </div>
-          </div>
-        );
-      })}
+      <div>
+        <h3 className="mb-2 text-sm font-semibold text-muted-foreground">
+          元音（{vowels.length}）
+        </h3>
+        <div className="grid grid-cols-8 gap-1.5">
+          {vowels.map((p, i) => {
+            const normalized = normalizeScore(scores[p.slug]);
+            return (
+              <PhonemeCell
+                key={p.slug}
+                ipa={p.ipa}
+                slug={p.slug}
+                name={p.name}
+                score={normalized.score}
+                sampleCount={normalized.sampleCount}
+                delay={i * 0.03}
+              />
+            );
+          })}
+        </div>
+      </div>
+      <div>
+        <h3 className="mb-2 text-sm font-semibold text-muted-foreground">
+          辅音（{consonants.length}）
+        </h3>
+        <div className="grid grid-cols-8 gap-1.5">
+          {consonants.map((p, i) => {
+            const normalized = normalizeScore(scores[p.slug]);
+            return (
+              <PhonemeCell
+                key={p.slug}
+                ipa={p.ipa}
+                slug={p.slug}
+                name={p.name}
+                score={normalized.score}
+                sampleCount={normalized.sampleCount}
+                delay={(vowels.length + i) * 0.03}
+              />
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }
@@ -96,9 +103,6 @@ function PhonemeCell({
   sampleCount: number;
   delay: number;
 }) {
-  const isLongPhoneme = ipa.length >= 8;
-  const isVeryLongPhoneme = ipa.length >= 14;
-
   return (
     <Tooltip>
       <TooltipTrigger
@@ -115,20 +119,9 @@ function PhonemeCell({
           whileHover={{ scale: 1.08 }}
           whileTap={{ scale: 0.95 }}
           transition={{ delay, type: "spring", stiffness: 300, damping: 20 }}
-          className={`flex min-h-14 flex-col items-center justify-center rounded-lg p-1.5 text-center cursor-pointer transition-shadow hover:shadow-md ${getColor(score)}`}
+          className={`flex flex-col items-center justify-center rounded-lg p-1.5 text-center cursor-pointer transition-shadow hover:shadow-md ${getColor(score)}`}
         >
-          <span
-            className={cn(
-              "max-w-full whitespace-normal break-words font-mono font-bold leading-tight [overflow-wrap:anywhere]",
-              isVeryLongPhoneme
-                ? "text-[10px]"
-                : isLongPhoneme
-                  ? "text-xs"
-                  : "text-sm",
-            )}
-          >
-            {ipa}
-          </span>
+          <span className="font-mono text-sm font-bold">{ipa}</span>
           <span className="text-[10px] tabular-nums">
             {score > 0 ? score : "—"}
           </span>

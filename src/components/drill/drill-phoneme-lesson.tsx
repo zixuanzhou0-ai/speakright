@@ -5,11 +5,6 @@ import { motion } from "motion/react";
 import { PhonemePlayButton } from "@/components/phoneme/phoneme-play-button";
 import { VideoPlayer } from "@/components/phoneme/video-player";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import {
-  getPhonemeCategoryLabel,
-  getSoundUnitTypeLabel,
-} from "@/lib/phoneme-display";
 import type { PhonemeData } from "@/types/phoneme";
 
 interface DrillPhonemeLessonProps {
@@ -30,9 +25,6 @@ export function DrillPhonemeLesson({
   onPlayExample,
   isLoadingExample,
 }: DrillPhonemeLessonProps) {
-  const isLongPhoneme = phoneme.ipa.length >= 10;
-  const isVeryLongPhoneme = phoneme.ipa.length >= 18;
-
   return (
     <div className="space-y-4 max-w-2xl mx-auto">
       {/* Video */}
@@ -52,28 +44,13 @@ export function DrillPhonemeLesson({
         className="rounded-xl border bg-card p-6 shadow-sm space-y-4"
       >
         {/* IPA + play + name */}
-        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4">
-          <div className="min-w-0">
-            <div className="flex min-w-0 items-start gap-2">
-              <span
-                className={cn(
-                  "min-w-0 whitespace-normal break-words font-mono font-bold leading-tight [overflow-wrap:anywhere]",
-                  isVeryLongPhoneme
-                    ? "text-2xl"
-                    : isLongPhoneme
-                      ? "text-3xl"
-                      : "text-4xl",
-                )}
-              >
-                {phoneme.ipa}
-              </span>
-              <div className="shrink-0 pt-1">
-                <PhonemePlayButton chartWord={phoneme.chartWord} />
-              </div>
-            </div>
+        <div className="flex items-center gap-4">
+          <span className="font-mono text-4xl font-bold">{phoneme.ipa}</span>
+          <PhonemePlayButton chartWord={phoneme.chartWord} />
+          <div className="flex-1">
             <p className="text-sm font-medium">{phoneme.name}</p>
             <p className="text-xs text-muted-foreground">
-              {getPhonemeCategoryLabel(phoneme)} · {getSoundUnitTypeLabel(phoneme)} ·{" "}
+              {phoneme.category === "vowel" ? "元音" : "辅音"} ·{" "}
               {phoneme.difficulty === "easy"
                 ? "简单"
                 : phoneme.difficulty === "medium"
@@ -105,13 +82,11 @@ export function DrillPhonemeLesson({
                 whileTap={{ scale: 0.95 }}
                 onClick={() => onPlayExample(kw.word)}
                 disabled={isLoadingExample}
-                className="flex max-w-full items-center gap-1.5 rounded-lg border bg-muted/30 px-3 py-1.5 text-left text-sm transition-colors hover:bg-primary/10 hover:border-primary/30 cursor-pointer disabled:opacity-50"
+                className="flex items-center gap-1.5 rounded-lg border bg-muted/30 px-3 py-1.5 text-sm transition-colors hover:bg-primary/10 hover:border-primary/30 cursor-pointer disabled:opacity-50"
               >
                 <Volume2 className="h-3 w-3 text-muted-foreground" />
-                <span className="min-w-0 max-w-36 truncate font-medium">
-                  {kw.word}
-                </span>
-                <span className="min-w-0 max-w-40 truncate font-mono text-xs text-muted-foreground">
+                <span className="font-medium">{kw.word}</span>
+                <span className="font-mono text-xs text-muted-foreground">
                   {kw.ipa}
                 </span>
               </motion.button>

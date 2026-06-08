@@ -61,14 +61,6 @@ describe("data registry", () => {
       JSON.stringify({ version: 2 }),
     );
     localStorage.setItem(
-      "speakright_mastery_profile_v2:es-ES",
-      JSON.stringify({ version: 2, languageId: "es-ES" }),
-    );
-    localStorage.setItem(
-      "speakright_assessment_result_v2:es-ES",
-      JSON.stringify({ languageId: "es-ES", overallScore: 78 }),
-    );
-    localStorage.setItem(
       "speakright_azure_config",
       JSON.stringify({ subscriptionKey: "secret" }),
     );
@@ -79,18 +71,6 @@ describe("data registry", () => {
     expect(snapshot.dataSchema.currentVersion).toBeGreaterThanOrEqual(2);
     expect(snapshot.localStorage.speakright_mastery_profile_v2).toEqual({
       version: 2,
-    });
-    expect(snapshot.localStorage["speakright_mastery_profile_v2:es-ES"]).toEqual(
-      {
-        version: 2,
-        languageId: "es-ES",
-      },
-    );
-    expect(
-      snapshot.localStorage["speakright_assessment_result_v2:es-ES"],
-    ).toEqual({
-      languageId: "es-ES",
-      overallScore: 78,
     });
     expect(snapshot.localStorage.speakright_azure_config).toBeUndefined();
     expect(snapshot.indexedDb.benchmarkRecordings).toEqual({
@@ -210,9 +190,6 @@ describe("data registry", () => {
   it("deletes learning data and caches while preserving app settings and keys", async () => {
     const { deleteLearningData } = await import("@/lib/data-registry");
     localStorage.setItem("speakright_mastery_profile_v2", "{}");
-    localStorage.setItem("speakright_assessment_result_v2:es-ES", "{}");
-    localStorage.setItem("speakright_mastery_profile_v2:es-ES", "{}");
-    localStorage.setItem("speakright_training_sessions_v2:es-ES", "[]");
     localStorage.setItem("speakright_ipa_cache", "{}");
     localStorage.setItem("speakright_mw_words_th", "{}");
     localStorage.setItem("speakright_corrupt_data_v1", "[]");
@@ -222,13 +199,6 @@ describe("data registry", () => {
     await deleteLearningData();
 
     expect(localStorage.getItem("speakright_mastery_profile_v2")).toBeNull();
-    expect(
-      localStorage.getItem("speakright_assessment_result_v2:es-ES"),
-    ).toBeNull();
-    expect(localStorage.getItem("speakright_mastery_profile_v2:es-ES")).toBeNull();
-    expect(
-      localStorage.getItem("speakright_training_sessions_v2:es-ES"),
-    ).toBeNull();
     expect(localStorage.getItem("speakright_ipa_cache")).toBeNull();
     expect(localStorage.getItem("speakright_mw_words_th")).toBeNull();
     expect(localStorage.getItem("speakright_corrupt_data_v1")).toBeNull();

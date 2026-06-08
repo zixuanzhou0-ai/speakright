@@ -60,7 +60,7 @@ export async function assessPronunciation(
   language = "en-US",
 ): Promise<AzureAssessmentResult> {
   const normalizedRegion = assertAzureRegion(region);
-  const enableProsody = language === "en-US" && isSentence(referenceText);
+  const enableProsody = isSentence(referenceText);
 
   // Build pronunciation assessment config as JSON, then base64-encode it
   const pronConfig = {
@@ -160,22 +160,45 @@ export async function transcribeSpeech(
 
 // ─── ElevenLabs ─────────────────────────────────────────
 
-const ALLOWED_VOICE_IDS = new Set([
-  "RaFzMbMIfqBcIurH6XF9",
-  "cR39HTrtXbjvEP4CNYFx",
-  "XfNU2rGpBa01ckF309OY",
-  "wvk9Caj0nEx4l3I9LaR6",
-  "G0yjIg3xY8gEJZkHpjVm",
-  "ashjVK50jp28G73AUTnb",
-  "Gfpl8Yo74Is0W6cPUWWT",
-]);
+export interface ElevenLabsVoiceSettings {
+  stability: number;
+  similarity_boost: number;
+  style: number;
+  use_speaker_boost: boolean;
+}
 
-function buildElevenLabsBody(text: string, modelId: string, speed?: number) {
+export interface ElevenLabsTtsOptions {
+  speed?: number;
+  languageCode?: string;
+  voiceSettings?: ElevenLabsVoiceSettings;
+}
+
+export interface ElevenLabsVoiceSummary {
+  voice_id: string;
+  name: string;
+  category?: string;
+  description?: string;
+  labels?: Record<string, string>;
+  preview_url?: string;
+}
+
+function assertElevenLabsVoiceId(voiceId: string): void {
+  if (!/^[A-Za-z0-9_-]{10,80}$/.test(voiceId)) {
+    throw new Error("Invalid ElevenLabs voice ID");
+  }
+}
+
+function buildElevenLabsBody(
+  text: string,
+  modelId: string,
+  options: ElevenLabsTtsOptions = {},
+) {
   return {
     text,
     model_id: modelId || "eleven_flash_v2_5",
-    speed: Math.min(1.2, Math.max(0.7, speed ?? 0.85)),
-    voice_settings: {
+    ...(options.languageCode ? { language_code: options.languageCode } : {}),
+    speed: Math.min(1.2, Math.max(0.7, options.speed ?? 0.85)),
+    voice_settings: options.voiceSettings ?? {
       stability: 0.65,
       similarity_boost: 0.85,
       style: 0.35,
@@ -243,16 +266,61 @@ export async function fetchElevenLabsVoices(
   return { voices };
 }
 
+/** Search available ElevenLabs voices with labels and descriptions. */
+export async function searchElevenLabsVoices(
+  apiKey: string,
+  search: string,
+): Promise<{ voices: ElevenLabsVoiceSummary[] }> {
+  const url = new URL("https://api.elevenlabs.io/v2/voices");
+  url.searchParams.set("page_size", "100");
+  url.searchParams.set("include_total_count", "false");
+  if (search.trim()) {
+    url.searchParams.set("search", search.trim());
+  }
+
+  const res = await apiFetch(url.toString(), {
+    headers: { "xi-api-key": apiKey },
+  });
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(`ElevenLabs voice search error (${res.status}): ${errText}`);
+  }
+
+  const data = await res.json();
+  const voices = (data.voices ?? []).map(
+    (v: {
+      voice_id: string;
+      name: string;
+      category?: string;
+      description?: string;
+      labels?: Record<string, string>;
+      preview_url?: string;
+    }) => ({
+      voice_id: v.voice_id,
+      name: v.name,
+      category: v.category,
+      description: v.description,
+      labels: v.labels,
+      preview_url: v.preview_url,
+    }),
+  );
+  return { voices };
+}
+
 /** TTS — returns audio blob */
 export async function elevenLabsTts(
   apiKey: string,
   voiceId: string,
   text: string,
   modelId: string,
-  speed?: number,
+  speedOrOptions?: number | ElevenLabsTtsOptions,
 ): Promise<Blob> {
-  if (!ALLOWED_VOICE_IDS.has(voiceId)) throw new Error("Invalid voice ID");
+  assertElevenLabsVoiceId(voiceId);
   if (text.length > 500) throw new Error("Text too long (max 500 chars)");
+  const options =
+    typeof speedOrOptions === "number"
+      ? { speed: speedOrOptions }
+      : (speedOrOptions ?? {});
 
   const res = await apiFetch(
     `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
@@ -262,7 +330,7 @@ export async function elevenLabsTts(
         "xi-api-key": apiKey,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(buildElevenLabsBody(text, modelId, speed)),
+      body: JSON.stringify(buildElevenLabsBody(text, modelId, options)),
     },
   );
 
@@ -279,10 +347,14 @@ export async function elevenLabsTtsAligned(
   voiceId: string,
   text: string,
   modelId: string,
-  speed?: number,
+  speedOrOptions?: number | ElevenLabsTtsOptions,
 ): Promise<{ audio_base64: string; alignment: unknown }> {
-  if (!ALLOWED_VOICE_IDS.has(voiceId)) throw new Error("Invalid voice ID");
+  assertElevenLabsVoiceId(voiceId);
   if (text.length > 500) throw new Error("Text too long (max 500 chars)");
+  const options =
+    typeof speedOrOptions === "number"
+      ? { speed: speedOrOptions }
+      : (speedOrOptions ?? {});
 
   const res = await apiFetch(
     `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}/with-timestamps`,
@@ -292,7 +364,7 @@ export async function elevenLabsTtsAligned(
         "xi-api-key": apiKey,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(buildElevenLabsBody(text, modelId, speed)),
+      body: JSON.stringify(buildElevenLabsBody(text, modelId, options)),
     },
   );
 
@@ -470,13 +542,8 @@ export function streamLlmFeedback(
   );
   const l1Context = buildL1ErrorContext(matchL1Errors(allPhonemes));
   const prompt =
-    buildFeedbackPrompt(
-      target,
-      azureResult,
-      mode,
-      getCoachMode(),
-      languageId,
-    ) + (languageId === "en-US" ? l1Context : "");
+    buildFeedbackPrompt(target, azureResult, mode, getCoachMode(), languageId) +
+    l1Context;
   return new ReadableStream({
     async start(controller) {
       try {

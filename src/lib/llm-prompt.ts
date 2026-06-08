@@ -1,9 +1,8 @@
 import type { CoachMode } from "@/lib/api-keys";
-import { getLanguageContentPack } from "@/lib/language-content-packs";
-import { DEFAULT_LANGUAGE_ID, getLanguageProfile } from "@/lib/language-profiles";
+import { buildLanguageFeedbackPromptContext } from "@/lib/language-feedback-rules";
 import { isSentence } from "@/lib/utils";
-import type { AzureAssessmentResult } from "@/types/azure";
 import type { LanguageId } from "@/types/language";
+import type { AzureAssessmentResult } from "@/types/azure";
 
 const COACH_PERSONAS: Record<CoachMode, string> = {
   easy: `你是一位友善包容的美式英语发音教练，像一个热情的外国朋友。
@@ -36,14 +35,11 @@ export function buildFeedbackPrompt(
   azureResult: AzureAssessmentResult,
   mode: "phoneme" | "sentence" = "phoneme",
   coachMode: CoachMode = "normal",
-  languageId: LanguageId = DEFAULT_LANGUAGE_ID,
+  languageId: LanguageId = "en-US",
 ): string {
-  if (languageId !== DEFAULT_LANGUAGE_ID) {
-    return buildNonEnglishFeedbackPrompt(target, azureResult, mode, languageId);
-  }
-
   const azureJson = JSON.stringify(azureResult, null, 2);
   const sentenceMode = isSentence(target);
+  const languageRulesContext = buildLanguageFeedbackPromptContext(languageId);
 
   const prosodyScoreLine = sentenceMode
     ? "\n- prosodyScore: 韵律（语调升降、重音位置、节奏模式）"
@@ -106,6 +102,7 @@ export function buildFeedbackPrompt(
 练习模式：${mode}（phoneme = 单词练习，sentence = 句子练习）
 ${mode === "phoneme" ? "注意：用户正在练习单个单词，请针对这个单词的每个音素给出详细的发音指导，包括舌位、口型、气流和常见中国学生错误。" : ""}
 Azure 发音评估结果：${azureJson}
+${languageRulesContext}
 
 ## 评估结果字段说明（你必须完整利用以下所有字段）
 
@@ -244,71 +241,4 @@ ${highScoreExtras}
 - practice_now 永远要写，除非 summary 是"完美。没有问题。"
 - priority_fixes 是用户最先看到的详细内容，必须最实用、最具可操作性
 - 所有分数都满分时，summary 写"完美。没有问题。"，其余标签内容留空`;
-}
-
-function buildNonEnglishFeedbackPrompt(
-  target: string,
-  azureResult: AzureAssessmentResult,
-  mode: "phoneme" | "sentence",
-  languageId: LanguageId,
-): string {
-  const profile = getLanguageProfile(languageId);
-  const pack = getLanguageContentPack(languageId);
-  const azureJson = JSON.stringify(azureResult, null, 2);
-  const focus = profile.learnerFocus.join("、");
-  const warnings = pack.llmPromptProfile.outputWarnings
-    .map((warning) => `- ${warning}`)
-    .join("\n");
-  const unitList = pack.phonemeUnits
-    .map((unit) => `${unit.ipa} ${unit.example}: ${unit.description}`)
-    .join("\n");
-
-  return `你是一位专业的${pack.llmPromptProfile.coachLanguageNameZh}发音教练，学生是中文母语者。
-
-重要边界：
-- 这是 ${profile.displayName} 实验版反馈，只能作为练习建议，不能宣称已经掌握。
-- 不要套用美式英语专属音位、弱读、连读、重音节奏或最小对立示例。
-- Azure 非英语音素名称和 prosody 信号尚未完成 fixture 校准；如果证据不足，必须说“本次只能做整体反馈，建议复测”。
-- 不要把整体 pronunciationScore 当作某个目标音的确定证据。
-${warnings}
-
-当前语言重点：${focus}
-
-本语言发音单位参考：
-${unitList}
-
-学生练习内容：${target}
-练习模式：${mode}
-Azure 发音评估结果：${azureJson}
-
-请用中文输出，并严格使用以下 XML 标签。反馈要短，每次只给 1 个最优先动作。
-
-<summary>
-一句话总结。必须提到这是 ${profile.shortLabel} 实验反馈。
-</summary>
-
-<top_issues>
-- 最关键的问题 1
-- 如有必要，第二个问题
-</top_issues>
-
-<practice_now>
-给 3 个马上可做的小练习。每条只改一个动作，围绕 ${profile.shortLabel} 发音，不要写英语专项训练。
-</practice_now>
-
-<priority_fixes>
-## 优先改
-列 1-2 个最影响清晰度的问题。必须包含：具体词、当前风险、立刻怎么改。证据不足时写“需要复测确认”。
-</priority_fixes>
-
-<dimensions>
-**发音单位**：整体判断。
-**单词完整度**：是否漏读/多读。
-**流利度**：只基于 fluencyScore 和可见词级数据，不分析英语 prosody。
-**证据可靠性**：说明本次能否只做 feedback。
-</dimensions>
-
-<details>
-给必要的技术解释，但不要超过 220 中文字。引用发音单位时用 /IPA/。
-</details>`;
 }

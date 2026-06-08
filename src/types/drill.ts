@@ -1,12 +1,10 @@
 // ── Session config ──
-import type { LanguageId } from "@/types/language";
 
 export type DrillKind = "word" | "sentence";
 
 export interface DrillSessionConfig {
   kind: DrillKind;
   phonemeSlug: string;
-  languageId?: LanguageId;
   itemCount: number;
   passThreshold: number;
 }

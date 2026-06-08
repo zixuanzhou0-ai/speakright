@@ -6,8 +6,8 @@ import { LanguageModuleGate } from "@/components/common/language-module-gate";
 import { SentenceInputCard } from "@/components/sentences/sentence-input-card";
 import { SentenceRecordingCard } from "@/components/sentences/sentence-recording-card";
 import { SentenceResultsColumn } from "@/components/sentences/sentence-results-column";
-import { useLanguageConfig } from "@/hooks/use-api-keys";
 import { useAudioPlayer } from "@/hooks/use-audio-player";
+import { useLanguageConfig } from "@/hooks/use-api-keys";
 import { useAzureAssessment } from "@/hooks/use-azure-assessment";
 import type { FeedbackData } from "@/hooks/use-llm-feedback";
 import { useLlmFeedback } from "@/hooks/use-llm-feedback";
@@ -29,31 +29,26 @@ import {
   type FreePracticeTransferSummary,
   recordFreePracticeTransfer,
 } from "@/lib/free-practice-transfer";
+import { getLanguageProfile } from "@/lib/language-profiles";
 import { loadMasteryProfile, saveMasteryProfile } from "@/lib/mastery-profile";
-import {
-  DEFAULT_LANGUAGE_ID,
-  getLanguageProfile,
-} from "@/lib/language-profiles";
 import { reliabilityFromRecordingQuality } from "@/lib/recording-quality";
 import { addScore } from "@/lib/score-history";
 import { isSentence } from "@/lib/utils";
 import type { AzureAssessmentResult, AzureWord } from "@/types/azure";
 import type { MasteryProfile } from "@/types/training";
 
-const SESSION_PREFIX = "sentences";
+const SESSION_PREFIX_BASE = "sentences";
 
 export default function SentencesPage() {
   const { languageId } = useLanguageConfig();
   const languageProfile = getLanguageProfile(languageId);
-  const sessionPrefix = `${SESSION_PREFIX}:${languageId}`;
+  const sessionPrefix = `${SESSION_PREFIX_BASE}:${languageId}`;
   const [sentence, setSentence] = useSessionState(`${sessionPrefix}:text`, "");
   const [speed, setSpeed] = useSessionState(`${sessionPrefix}:speed`, 0.85);
   const [selectedWord, setSelectedWord] = useState<AzureWord | null>(null);
   const [transferSummary, setTransferSummary] =
     useState<FreePracticeTransferSummary | null>(null);
-  const [masteryProfile, setMasteryProfile] = useState<MasteryProfile | null>(
-    null,
-  );
+  const [profile, setProfile] = useState<MasteryProfile | null>(null);
 
   const isWordMode = !isSentence(sentence);
   const trimmedText = sentence.trim();
@@ -79,28 +74,25 @@ export default function SentencesPage() {
   const llm = useLlmFeedback();
   const playback = useAudioPlayer();
   const autoAssessTriggered = useRef(false);
-  const restoredRef = useRef(false);
+  const restoredSessionPrefixRef = useRef<string | null>(null);
   const previousTrimmedTextRef = useRef(trimmedText);
-  const canRecordTransfer =
-    languageId === DEFAULT_LANGUAGE_ID &&
-    languageProfile.readiness.evidenceMastery;
   const targetPreview = useMemo(
     () =>
-      trimmedText && canRecordTransfer
+      trimmedText
         ? buildFreePracticeTargetPreview({
-            profile: masteryProfile,
+            profile,
             text: trimmedText,
             mode: isWordMode ? "word" : "sentence",
           })
         : null,
-    [masteryProfile, trimmedText, isWordMode, canRecordTransfer],
+    [profile, trimmedText, isWordMode],
   );
 
   // ── Session restore/save ──
 
   useEffect(() => {
-    if (restoredRef.current) return;
-    restoredRef.current = true;
+    if (restoredSessionPrefixRef.current === sessionPrefix) return;
+    restoredSessionPrefixRef.current = sessionPrefix;
 
     const savedResult = loadSession<AzureAssessmentResult>(
       `${sessionPrefix}:azureResult`,
@@ -119,32 +111,29 @@ export default function SentencesPage() {
       }
     }
     if (savedFeedback) llm.restore(savedFeedback);
-  }, [azure.restore, llm.restore, sessionPrefix]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [azure, llm, sessionPrefix]);
 
   useEffect(() => {
-    const refreshProfile = () =>
-      setMasteryProfile(
-        canRecordTransfer ? loadMasteryProfile(DEFAULT_LANGUAGE_ID) : null,
-      );
+    const refreshProfile = () => setProfile(loadMasteryProfile());
     refreshProfile();
     window.addEventListener("storage", refreshProfile);
     return () => window.removeEventListener("storage", refreshProfile);
-  }, [canRecordTransfer]);
+  }, []);
 
   useEffect(() => {
-    if (!restoredRef.current) return;
+    if (restoredSessionPrefixRef.current !== sessionPrefix) return;
     saveSession(`${sessionPrefix}:azureResult`, azure.result);
   }, [azure.result, sessionPrefix]);
 
   useEffect(() => {
-    if (!restoredRef.current) return;
+    if (restoredSessionPrefixRef.current !== sessionPrefix) return;
     if (llm.hasFeedback && !llm.isStreaming) {
       saveSession(`${sessionPrefix}:llmFeedback`, llm.feedback);
     }
   }, [llm.feedback, llm.hasFeedback, llm.isStreaming, sessionPrefix]);
 
   useEffect(() => {
-    if (!restoredRef.current) return;
+    if (restoredSessionPrefixRef.current !== sessionPrefix) return;
     const idx =
       selectedWord && azure.result
         ? azure.result.words.indexOf(selectedWord)
@@ -176,9 +165,9 @@ export default function SentencesPage() {
     mw,
     playback,
     recordingQuality,
-    sessionPrefix,
     setSentence,
     setSpeed,
+    sessionPrefix,
   ]);
 
   useEffect(() => {
@@ -206,7 +195,7 @@ export default function SentencesPage() {
       mw.playWord(trimmedText, "blue", languageId);
     } else {
       mw.stop();
-      tts.speak(trimmedText, speed);
+      tts.speak(trimmedText, { speed, languageId });
     }
   }, [trimmedText, isWordMode, playback, tts, mw, speed, languageId]);
 
@@ -240,39 +229,35 @@ export default function SentencesPage() {
       const text = sentence.trim();
       const histKey = `${languageId}:${text.slice(0, 50)}:${text.length}`;
       addScore(histKey, result.pronunciationScore);
-      if (canRecordTransfer) {
-        const currentProfile = loadMasteryProfile(DEFAULT_LANGUAGE_ID);
-        const transfer = analyzeFreePracticeTransfer({
-          profile: currentProfile,
-          result,
-          text,
-          mode: isSentence(text) ? "sentence" : "word",
-        });
-        if (transfer.evidences.length > 0) {
-          const reliability = reliabilityFromRecordingQuality(
-            recordingQuality.report,
-            {
-              evidenceStrength:
-                transfer.evidences.length >= 2 ? "strong" : "fair",
-              note:
-                recordingQuality.report?.issues.length === 0
-                  ? "自由练习命中当前目标且录音质量稳定，可计入迁移证据。"
-                  : "自由练习录音存在质量提示，本次只作为观察，不提升掌握度。",
-            },
-          );
-          const recorded = recordFreePracticeTransfer(
-            currentProfile,
-            transfer,
-            reliability,
-          );
-          saveMasteryProfile(recorded.profile, DEFAULT_LANGUAGE_ID);
-          setMasteryProfile(recorded.profile);
-          setTransferSummary(recorded.summary);
-        } else {
-          setTransferSummary(transfer);
-        }
+      const profile = loadMasteryProfile();
+      const transfer = analyzeFreePracticeTransfer({
+        profile,
+        result,
+        text,
+        mode: isSentence(text) ? "sentence" : "word",
+      });
+      if (transfer.evidences.length > 0) {
+        const reliability = reliabilityFromRecordingQuality(
+          recordingQuality.report,
+          {
+            evidenceStrength:
+              transfer.evidences.length >= 2 ? "strong" : "fair",
+            note:
+              recordingQuality.report?.issues.length === 0
+                ? "自由练习命中当前目标且录音质量稳定，可计入迁移证据。"
+                : "自由练习录音存在质量提示，本次只作为观察，不提升掌握度。",
+          },
+        );
+        const recorded = recordFreePracticeTransfer(
+          profile,
+          transfer,
+          reliability,
+        );
+        saveMasteryProfile(recorded.profile);
+        setProfile(recorded.profile);
+        setTransferSummary(recorded.summary);
       } else {
-        setTransferSummary(null);
+        setTransferSummary(transfer);
       }
       llm.requestFeedback(
         text,
@@ -287,9 +272,8 @@ export default function SentencesPage() {
     azure,
     llm,
     recordingQuality,
-    languageProfile.azureLocale,
-    canRecordTransfer,
     languageId,
+    languageProfile.azureLocale,
   ]);
 
   useEffect(() => {

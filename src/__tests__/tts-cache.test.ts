@@ -1,46 +1,26 @@
 import { describe, expect, it } from "vitest";
-import { buildTtsCacheKey } from "@/lib/tts-cache";
-
-const baseKey = {
-  languageId: "en-US",
-  provider: "elevenlabs",
-  modelId: "eleven_flash_v2_5",
-  voiceId: "voice1",
-  purpose: "sentence" as const,
-  speed: 1,
-  text: "Hello",
-  textNormalizerVersion: "aligned-v1",
-};
+import { buildCacheKey } from "@/lib/tts-cache";
 
 describe("TTS cache key format", () => {
-  it("normalizes text and speed while preserving provider dimensions", () => {
-    expect(buildTtsCacheKey({ ...baseKey, text: "  Hello  " })).toBe(
-      "v2:en-US:elevenlabs:eleven_flash_v2_5:voice1:sentence:1.0:default-dict:aligned-v1:hello",
+  it("normalizes text and speed", () => {
+    expect(buildCacheKey("  Hello  ", "voice1", 0.85)).toBe(
+      "en-US:hello:voice1:0.8",
     );
   });
 
-  it("separates identical text across languages", () => {
-    const english = buildTtsCacheKey(baseKey);
-    const spanish = buildTtsCacheKey({ ...baseKey, languageId: "es-ES" });
+  it("includes voiceId in key", () => {
+    const key1 = buildCacheKey("hello", "voice1", 1.0);
+    const key2 = buildCacheKey("hello", "voice2", 1.0);
 
-    expect(english).not.toBe(spanish);
+    expect(key1).not.toBe(key2);
   });
 
-  it("separates provider, model, voice, purpose and speed", () => {
-    const original = buildTtsCacheKey(baseKey);
+  it("separates identical text by language", () => {
+    const english = buildCacheKey("Bonjour", "voice1", 0.84, "en-US");
+    const french = buildCacheKey("Bonjour", "voice1", 0.84, "fr-FR");
 
-    expect(
-      buildTtsCacheKey({ ...baseKey, provider: "azure-tts" }),
-    ).not.toBe(original);
-    expect(
-      buildTtsCacheKey({ ...baseKey, modelId: "eleven_multilingual_v2" }),
-    ).not.toBe(original);
-    expect(
-      buildTtsCacheKey({ ...baseKey, voiceId: "voice2" }),
-    ).not.toBe(original);
-    expect(
-      buildTtsCacheKey({ ...baseKey, purpose: "diagnosis" }),
-    ).not.toBe(original);
-    expect(buildTtsCacheKey({ ...baseKey, speed: 0.85 })).not.toBe(original);
+    expect(english).toBe("en-US:bonjour:voice1:0.8");
+    expect(french).toBe("fr-FR:bonjour:voice1:0.8");
+    expect(english).not.toBe(french);
   });
 });

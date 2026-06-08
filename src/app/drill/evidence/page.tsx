@@ -15,8 +15,6 @@ import {
 import { motion } from "motion/react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { LanguageModuleGate } from "@/components/common/language-module-gate";
-import { useLanguageConfig } from "@/hooks/use-api-keys";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { loadMasteryProfile } from "@/lib/mastery-profile";
@@ -56,12 +54,11 @@ function formatDate(timestamp?: number): string {
 }
 
 export default function TrainingEvidencePage() {
-  const { languageId } = useLanguageConfig();
   const [profile, setProfile] = useState<MasteryProfile | null>(null);
 
   useEffect(() => {
-    setProfile(loadMasteryProfile(languageId));
-  }, [languageId]);
+    setProfile(loadMasteryProfile());
+  }, []);
 
   const evidenceBook = useMemo(
     () => buildTrainingEvidenceBook(profile),
@@ -72,8 +69,7 @@ export default function TrainingEvidencePage() {
   const remediations = evidenceBook.remediations.slice(0, 6);
 
   return (
-    <LanguageModuleGate moduleName="训练证据库" readinessKey="evidenceMastery">
-      <div className="h-full overflow-y-auto scrollbar-thin">
+    <div className="h-full overflow-y-auto scrollbar-thin">
       <div className="mx-auto max-w-6xl px-6 py-4">
         <div className="mb-5 flex items-start justify-between gap-4">
           <div className="flex items-start gap-3">
@@ -174,8 +170,7 @@ export default function TrainingEvidencePage() {
           </div>
         )}
       </div>
-      </div>
-    </LanguageModuleGate>
+    </div>
   );
 }
 

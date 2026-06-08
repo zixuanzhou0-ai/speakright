@@ -441,22 +441,6 @@ async function waitForBodyText(cdp, expectedText) {
   );
 }
 
-async function waitForAnyBodyText(cdp, expectedTexts) {
-  const deadline = Date.now() + 8_000;
-  let bodyText = "";
-  while (Date.now() < deadline) {
-    bodyText =
-      (await evaluate(cdp, "document.body ? document.body.innerText : ''")) ??
-      "";
-    const matchedText = expectedTexts.find((text) => bodyText.includes(text));
-    if (matchedText) return { bodyText, matchedText };
-    await delay(250);
-  }
-  throw new Error(
-    `Desktop route did not render any expected text "${expectedTexts.join('", "')}". Last body text: ${bodyText.slice(0, 400)}`,
-  );
-}
-
 async function clickVisibleButtonByText(
   cdp,
   text,
@@ -567,21 +551,10 @@ async function captureInteractiveEvidence(debuggingPort) {
   try {
     await cdp.send("Runtime.enable");
     await cdp.send("Page.enable");
-    const landing = await waitForAnyBodyText(cdp, [
-      "今日学习计划",
-      "刻意练习 beta",
-      "准备中",
-    ]);
-    if (landing.bodyText.includes("今日学习计划")) {
-      await waitForBodyText(cdp, "桌面端准备状态");
-      await waitForBodyText(cdp, "检测麦克风");
-      await waitForBodyText(cdp, "建立诊断");
-    } else {
-      await waitForAnyBodyText(cdp, [
-        "当前 beta 不显示英语专项训练包",
-        "准备中",
-      ]);
-    }
+    await waitForBodyText(cdp, "今日学习计划");
+    await waitForBodyText(cdp, "桌面端准备状态");
+    await waitForBodyText(cdp, "检测麦克风");
+    await waitForBodyText(cdp, "建立诊断");
     const runtimePolicy = await evaluate(
       cdp,
       `
@@ -642,150 +615,100 @@ async function captureInteractiveEvidence(debuggingPort) {
       cdp,
       `
 (async () => {
-  const languageLabels = ["美式英语", "西班牙语", "法语", "俄语"];
-  const previousLanguageLabel =
-    languageLabels.find((label) =>
-      document.body.innerText.includes(\`当前：\${label}\`)
-    ) ?? null;
-  async function clickLanguage(label) {
-    const button = [...document.querySelectorAll("button")]
-      .find((item) => (item.textContent || "").includes(label));
-    if (!button) {
-      return false;
+  const merriamRadio = [...document.querySelectorAll('input[name="pronunciation-source"]')]
+    .find((item) => item.value === "merriam-webster");
+  if (!merriamRadio) {
+    return {
+      ok: false,
+      reason: "Merriam-Webster pronunciation source radio missing",
+      bodyText: document.body.innerText.slice(0, 1200)
+    };
+  }
+  merriamRadio.dispatchEvent(new MouseEvent("click", {
+    bubbles: true,
+    cancelable: true,
+    view: window
+  }));
+
+  const deadline = Date.now() + 5000;
+  let dictionaryLink = null;
+  while (!dictionaryLink && Date.now() < deadline) {
+    dictionaryLink = [...document.querySelectorAll('a[href="https://dictionaryapi.com/register/index"]')]
+      .find((item) => (item.textContent || "").includes("dictionaryapi.com"));
+    if (!dictionaryLink) {
+      await new Promise((resolve) => setTimeout(resolve, 100));
     }
-    button.dispatchEvent(new MouseEvent("click", {
+  }
+  if (!dictionaryLink) {
+    return {
+      ok: false,
+      reason: "dictionary registration link missing",
+      bodyText: document.body.innerText.slice(0, 1200)
+    };
+  }
+
+  const releaseDownloadLinks = [...document.querySelectorAll('a[href*="/releases/download/"]')];
+  if (releaseDownloadLinks.length > 0 || document.body.innerText.includes("Windows 安装程序")) {
+    return {
+      ok: false,
+      reason: "installed app should not show installer download links",
+      bodyText: document.body.innerText.slice(0, 1200)
+    };
+  }
+
+  const originalClipboard = navigator.clipboard;
+  const results = [];
+
+  async function clickAndCapture(name, link) {
+    const beforeHref = window.location.href;
+    let copiedHref = null;
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: {
+        writeText: async (value) => {
+          copiedHref = value;
+        }
+      }
+    });
+    const clickEvent = new MouseEvent("click", {
       bubbles: true,
       cancelable: true,
       view: window
-    }));
-    const deadline = Date.now() + 5000;
-    while (Date.now() < deadline) {
-      if (document.body.innerText.includes(\`当前：\${label}\`)) {
-        return true;
-      }
-      await new Promise((resolve) => setTimeout(resolve, 100));
-    }
-    return false;
+    });
+    link.dispatchEvent(clickEvent);
+    await new Promise((resolve) => setTimeout(resolve, 250));
+    return {
+      name,
+      href: link.getAttribute("href") || link.href,
+      defaultPrevented: clickEvent.defaultPrevented,
+      copiedHref,
+      beforeHref,
+      afterHref: window.location.href,
+      target: link.target,
+      rel: link.rel
+    };
   }
 
   try {
-    if (!(await clickLanguage("美式英语"))) {
-      return {
-        ok: false,
-        reason: "could not switch settings language to English",
-        bodyText: document.body.innerText.slice(0, 1200)
-      };
-    }
-
-    const radioDeadline = Date.now() + 5000;
-    let merriamRadio = null;
-    while (!merriamRadio && Date.now() < radioDeadline) {
-      merriamRadio = [...document.querySelectorAll('input[name="pronunciation-source"]')]
-        .find((item) => item.value === "merriam-webster" && item.disabled !== true);
-      if (!merriamRadio) {
-        await new Promise((resolve) => setTimeout(resolve, 100));
-      }
-    }
-    if (!merriamRadio) {
-      return {
-        ok: false,
-        reason: "Merriam-Webster pronunciation source radio missing or disabled",
-        bodyText: document.body.innerText.slice(0, 1200)
-      };
-    }
-    merriamRadio.dispatchEvent(new MouseEvent("click", {
+    results.push(await clickAndCapture("dictionary", dictionaryLink));
+  } finally {
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: originalClipboard
+    });
+    const youdaoRadio = [...document.querySelectorAll('input[name="pronunciation-source"]')]
+      .find((item) => item.value === "youdao");
+    youdaoRadio?.dispatchEvent(new MouseEvent("click", {
       bubbles: true,
       cancelable: true,
       view: window
     }));
-
-    const deadline = Date.now() + 5000;
-    let dictionaryLink = null;
-    while (!dictionaryLink && Date.now() < deadline) {
-      dictionaryLink = [...document.querySelectorAll('a[href="https://dictionaryapi.com/register/index"]')]
-        .find((item) => (item.textContent || "").includes("dictionaryapi.com"));
-      if (!dictionaryLink) {
-        await new Promise((resolve) => setTimeout(resolve, 100));
-      }
-    }
-    if (!dictionaryLink) {
-      return {
-        ok: false,
-        reason: "dictionary registration link missing",
-        bodyText: document.body.innerText.slice(0, 1200)
-      };
-    }
-
-    const releaseDownloadLinks = [...document.querySelectorAll('a[href*="/releases/download/"]')];
-    if (releaseDownloadLinks.length > 0 || document.body.innerText.includes("Windows 安装程序")) {
-      return {
-        ok: false,
-        reason: "installed app should not show installer download links",
-        bodyText: document.body.innerText.slice(0, 1200)
-      };
-    }
-
-    const originalClipboard = navigator.clipboard;
-    const results = [];
-
-    async function clickAndCapture(name, link) {
-      const beforeHref = window.location.href;
-      let copiedHref = null;
-      Object.defineProperty(navigator, "clipboard", {
-        configurable: true,
-        value: {
-          writeText: async (value) => {
-            copiedHref = value;
-          }
-        }
-      });
-      const clickEvent = new MouseEvent("click", {
-        bubbles: true,
-        cancelable: true,
-        view: window
-      });
-      link.dispatchEvent(clickEvent);
-      await new Promise((resolve) => setTimeout(resolve, 250));
-      return {
-        name,
-        href: link.getAttribute("href") || link.href,
-        defaultPrevented: clickEvent.defaultPrevented,
-        copiedHref,
-        beforeHref,
-        afterHref: window.location.href,
-        target: link.target,
-        rel: link.rel
-      };
-    }
-
-    try {
-      results.push(await clickAndCapture("dictionary", dictionaryLink));
-    } finally {
-      Object.defineProperty(navigator, "clipboard", {
-        configurable: true,
-        value: originalClipboard
-      });
-      const youdaoRadio = [...document.querySelectorAll('input[name="pronunciation-source"]')]
-        .find((item) => item.value === "youdao");
-      youdaoRadio?.dispatchEvent(new MouseEvent("click", {
-        bubbles: true,
-        cancelable: true,
-        view: window
-      }));
-    }
-
-    return {
-      ok: true,
-      results
-    };
-  } finally {
-    if (
-      previousLanguageLabel !== null &&
-      previousLanguageLabel !== "美式英语"
-    ) {
-      await clickLanguage(previousLanguageLabel);
-    }
   }
+
+  return {
+    ok: true,
+    results
+  };
 })()
 `,
     );

@@ -1,0 +1,1656 @@
+{
+  "languageId": "ru-RU",
+  "generatedAt": "2026-06-08T06:12:56Z",
+  "purpose": "Local Russian IPA/articulation video and audio assets for SpeakRight, for user-stated noncommercial educational/open-source use.",
+  "downloadStatus": "complete-for-required-local-use",
+  "notes": [
+    "All Seeing Speech MP4 articulation videos listed here are downloaded locally and have extracted .m4a audio sidecars.",
+    "Wikimedia Commons IPA audio files that download successfully are included as extra reference audio.",
+    "Some optional Commons downloads may hit HTTP 429; equivalent required local audio exists via extracted Seeing Speech .m4a sidecars, so these are not blocking.",
+    "For public GitHub redistribution, keep attribution/license metadata and do not remove source URLs.",
+    "Russian-specific rule units still need SpeakRight-authored explanatory videos for stress, reduction, hard/soft consonants, final devoicing, voicing assimilation, and clusters."
+  ],
+  "assets": [
+    {
+      "kind": "video",
+      "source": "Seeing Speech, University of Glasgow",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=4&datatype=1&speaker=1#location=97",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_cardinal_4_vowel.mp4",
+      "localPublicPath": "/videos/language-assets/ru-RU/seeing-speech/ru-a.mp4",
+      "localFile": "videos/language-assets/ru-RU/seeing-speech/ru-a.mp4",
+      "speakRightUnits": [
+        "ru-a"
+      ],
+      "ipa": "/a/",
+      "role": "canonical",
+      "description": "MRI articulation for open/front [a] used by Russian stressed а.",
+      "bytes": 104493,
+      "sha256": "73b5c54562bd826bc4bfa8689f95062122822dc2c4e8be250e5152b4809b4830",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\videos\\language-assets\\ru-RU\\seeing-speech\\ru-a.mp4"
+    },
+    {
+      "kind": "video",
+      "source": "Seeing Speech, University of Glasgow",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=4&datatype=1&speaker=1#location=101",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_cardinal_2_vowel.mp4",
+      "localPublicPath": "/videos/language-assets/ru-RU/seeing-speech/ru-e.mp4",
+      "localFile": "videos/language-assets/ru-RU/seeing-speech/ru-e.mp4",
+      "speakRightUnits": [
+        "ru-e"
+      ],
+      "ipa": "/e/",
+      "role": "canonical",
+      "description": "MRI articulation for close-mid front [e], useful for stressed э/е.",
+      "bytes": 101851,
+      "sha256": "d6327893a7d191ee1473b8a663929ff4aa4cca46f2807e552a619815fd132096",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\videos\\language-assets\\ru-RU\\seeing-speech\\ru-e.mp4"
+    },
+    {
+      "kind": "video",
+      "source": "Seeing Speech, University of Glasgow",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=4&datatype=1&speaker=1#location=105",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_cardinal_1_vowel.mp4",
+      "localPublicPath": "/videos/language-assets/ru-RU/seeing-speech/ru-i.mp4",
+      "localFile": "videos/language-assets/ru-RU/seeing-speech/ru-i.mp4",
+      "speakRightUnits": [
+        "ru-i"
+      ],
+      "ipa": "/i/",
+      "role": "canonical",
+      "description": "MRI articulation for close front [i].",
+      "bytes": 103453,
+      "sha256": "6f6e047774cc745ab399ddc7c3b3468eb0a9ae2a798a0104afa045e55473a173",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\videos\\language-assets\\ru-RU\\seeing-speech\\ru-i.mp4"
+    },
+    {
+      "kind": "video",
+      "source": "Seeing Speech, University of Glasgow",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=4&datatype=1&speaker=1#location=111",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_cardinal_7_vowel.mp4",
+      "localPublicPath": "/videos/language-assets/ru-RU/seeing-speech/ru-o.mp4",
+      "localFile": "videos/language-assets/ru-RU/seeing-speech/ru-o.mp4",
+      "speakRightUnits": [
+        "ru-o"
+      ],
+      "ipa": "/o/",
+      "role": "canonical",
+      "description": "MRI articulation for close-mid back rounded [o], useful for stressed о.",
+      "bytes": 100304,
+      "sha256": "c4429a129c349ae9ceea63b40b13062710aa04c843c5bc6d77eb8998b94db3bc",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\videos\\language-assets\\ru-RU\\seeing-speech\\ru-o.mp4"
+    },
+    {
+      "kind": "video",
+      "source": "Seeing Speech, University of Glasgow",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=4&datatype=1&speaker=1#location=117",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_cardinal_8_vowel.mp4",
+      "localPublicPath": "/videos/language-assets/ru-RU/seeing-speech/ru-u.mp4",
+      "localFile": "videos/language-assets/ru-RU/seeing-speech/ru-u.mp4",
+      "speakRightUnits": [
+        "ru-u"
+      ],
+      "ipa": "/u/",
+      "role": "canonical",
+      "description": "MRI articulation for close back rounded [u].",
+      "bytes": 102576,
+      "sha256": "ac543f335bff97d51974af205531ce31c58755356aeef0ff9b2fb88e2b51518c",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\videos\\language-assets\\ru-RU\\seeing-speech\\ru-u.mp4"
+    },
+    {
+      "kind": "video",
+      "source": "Seeing Speech, University of Glasgow",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=4&datatype=1&speaker=1#location=616",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_cardinal_17_vowel.mp4",
+      "localPublicPath": "/videos/language-assets/ru-RU/seeing-speech/ru-y.mp4",
+      "localFile": "videos/language-assets/ru-RU/seeing-speech/ru-y.mp4",
+      "speakRightUnits": [
+        "ru-y"
+      ],
+      "ipa": "/ɨ/",
+      "role": "canonical",
+      "description": "MRI articulation for close central unrounded [ɨ], the Russian ы target.",
+      "bytes": 149140,
+      "sha256": "5287e9fe41015cc47f56c83e7d17ca3092ad223194a6e0dde966dac8daeea5d1",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\videos\\language-assets\\ru-RU\\seeing-speech\\ru-y.mp4"
+    },
+    {
+      "kind": "video",
+      "source": "Seeing Speech, University of Glasgow",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=4&datatype=1&speaker=1#location=601",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_central_schwa_float_vowel.mp4",
+      "localPublicPath": "/videos/language-assets/ru-RU/seeing-speech/ru-reduction-schwa.mp4",
+      "localFile": "videos/language-assets/ru-RU/seeing-speech/ru-reduction-schwa.mp4",
+      "speakRightUnits": [
+        "ru-stress-reduction",
+        "ru-unstressed-o-a",
+        "ru-unstressed-e-ya"
+      ],
+      "ipa": "[ə]",
+      "role": "related",
+      "description": "MRI proxy for reduced central schwa-like vowel quality.",
+      "bytes": 95425,
+      "sha256": "941f87ad3b81ad363745f6b68edbeaa454923f97e1384bb1f7f608112d828285",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\videos\\language-assets\\ru-RU\\seeing-speech\\ru-reduction-schwa.mp4"
+    },
+    {
+      "kind": "video",
+      "source": "Seeing Speech, University of Glasgow",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=4&datatype=1&speaker=1#location=593",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_cardinal_5_vowel.mp4",
+      "localPublicPath": "/videos/language-assets/ru-RU/seeing-speech/ru-reduction-open-back.mp4",
+      "localFile": "videos/language-assets/ru-RU/seeing-speech/ru-reduction-open-back.mp4",
+      "speakRightUnits": [
+        "ru-stress-reduction",
+        "ru-unstressed-o-a"
+      ],
+      "ipa": "[ɑ]/[ɐ] proxy",
+      "role": "related",
+      "description": "MRI proxy for open/back/centralized reduced a-like quality.",
+      "bytes": 102224,
+      "sha256": "38ff3ca12235586bab8606a0d228ba0648aadf0aefebcc476df8a4abce59c264",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\videos\\language-assets\\ru-RU\\seeing-speech\\ru-reduction-open-back.mp4"
+    },
+    {
+      "kind": "video",
+      "source": "Seeing Speech, University of Glasgow",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=1&datatype=1&speaker=1#location=112",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_vl_bilabial_plosive.mp4",
+      "localPublicPath": "/videos/language-assets/ru-RU/seeing-speech/ru-p.mp4",
+      "localFile": "videos/language-assets/ru-RU/seeing-speech/ru-p.mp4",
+      "speakRightUnits": [
+        "ru-soft-labials"
+      ],
+      "ipa": "/p/",
+      "role": "related",
+      "description": "MRI base gesture for hard /p/ before explaining Russian p/pʲ contrast.",
+      "bytes": 112101,
+      "sha256": "dcd90f3e286ffaf9e0186a3a1060d3721ef8d76f2fc61f0d4584418fa487627f",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\videos\\language-assets\\ru-RU\\seeing-speech\\ru-p.mp4"
+    },
+    {
+      "kind": "video",
+      "source": "Seeing Speech, University of Glasgow",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=1&datatype=1&speaker=1#location=98",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_vd_bilabial_plosive.mp4",
+      "localPublicPath": "/videos/language-assets/ru-RU/seeing-speech/ru-b.mp4",
+      "localFile": "videos/language-assets/ru-RU/seeing-speech/ru-b.mp4",
+      "speakRightUnits": [
+        "ru-soft-labials"
+      ],
+      "ipa": "/b/",
+      "role": "related",
+      "description": "MRI base gesture for hard /b/ before explaining Russian b/bʲ contrast.",
+      "bytes": 117197,
+      "sha256": "eb8b14e6ae249c44f3f35707b71cfbfa4175e1b6cdac253e31c409fe8cd7ea25",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\videos\\language-assets\\ru-RU\\seeing-speech\\ru-b.mp4"
+    },
+    {
+      "kind": "video",
+      "source": "Seeing Speech, University of Glasgow",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=1&datatype=1&speaker=1#location=109",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_vd_bilabial_nasal.mp4",
+      "localPublicPath": "/videos/language-assets/ru-RU/seeing-speech/ru-m.mp4",
+      "localFile": "videos/language-assets/ru-RU/seeing-speech/ru-m.mp4",
+      "speakRightUnits": [
+        "ru-soft-labials"
+      ],
+      "ipa": "/m/",
+      "role": "related",
+      "description": "MRI base gesture for hard /m/ before explaining Russian m/mʲ contrast.",
+      "bytes": 128188,
+      "sha256": "0f0280bed011e899df6cedd24e5dad69445cc10760d693ee02822af3d20a0d7f",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\videos\\language-assets\\ru-RU\\seeing-speech\\ru-m.mp4"
+    },
+    {
+      "kind": "video",
+      "source": "Seeing Speech, University of Glasgow",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=1&datatype=1&speaker=1#location=102",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_vl_labiodental_fricative.mp4",
+      "localPublicPath": "/videos/language-assets/ru-RU/seeing-speech/ru-f.mp4",
+      "localFile": "videos/language-assets/ru-RU/seeing-speech/ru-f.mp4",
+      "speakRightUnits": [
+        "ru-soft-labials",
+        "ru-final-devoicing",
+        "ru-voicing-assimilation"
+      ],
+      "ipa": "/f/",
+      "role": "related",
+      "description": "MRI base gesture for /f/ and final devoicing outcomes.",
+      "bytes": 122458,
+      "sha256": "f551c6a063b4870dfec26a157444815935436fb79bd920a794ad678d64cee403",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\videos\\language-assets\\ru-RU\\seeing-speech\\ru-f.mp4"
+    },
+    {
+      "kind": "video",
+      "source": "Seeing Speech, University of Glasgow",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=1&datatype=1&speaker=1#location=118",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_vd_labiodental_fricative.mp4",
+      "localPublicPath": "/videos/language-assets/ru-RU/seeing-speech/ru-v.mp4",
+      "localFile": "videos/language-assets/ru-RU/seeing-speech/ru-v.mp4",
+      "speakRightUnits": [
+        "ru-soft-labials",
+        "ru-voicing-assimilation"
+      ],
+      "ipa": "/v/",
+      "role": "related",
+      "description": "MRI base gesture for /v/ before Russian voicing assimilation explanations.",
+      "bytes": 121730,
+      "sha256": "50379e9f6209c6edd22690c3f2a7230a0a88da5237eeec162aa1310a4af0051a",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\videos\\language-assets\\ru-RU\\seeing-speech\\ru-v.mp4"
+    },
+    {
+      "kind": "video",
+      "source": "Seeing Speech, University of Glasgow",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=1&datatype=1&speaker=1#location=116",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_vl_alveolar_plosive.mp4",
+      "localPublicPath": "/videos/language-assets/ru-RU/seeing-speech/ru-t.mp4",
+      "localFile": "videos/language-assets/ru-RU/seeing-speech/ru-t.mp4",
+      "speakRightUnits": [
+        "ru-soft-t-d",
+        "ru-hard-soft",
+        "ru-final-devoicing"
+      ],
+      "ipa": "/t/",
+      "role": "canonical",
+      "description": "MRI base gesture for hard /t/ and final devoicing outcomes.",
+      "bytes": 82937,
+      "sha256": "19b1ebfeef67d9c743c263cf26b24b2878187b499f0942a24e1c5fdeb007b773",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\videos\\language-assets\\ru-RU\\seeing-speech\\ru-t.mp4"
+    },
+    {
+      "kind": "video",
+      "source": "Seeing Speech, University of Glasgow",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=1&datatype=1&speaker=1#location=100",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_vd_alveolar_plosive.mp4",
+      "localPublicPath": "/videos/language-assets/ru-RU/seeing-speech/ru-d.mp4",
+      "localFile": "videos/language-assets/ru-RU/seeing-speech/ru-d.mp4",
+      "speakRightUnits": [
+        "ru-soft-t-d",
+        "ru-hard-soft",
+        "ru-voicing-assimilation"
+      ],
+      "ipa": "/d/",
+      "role": "canonical",
+      "description": "MRI base gesture for hard /d/ before explaining d/dʲ.",
+      "bytes": 91009,
+      "sha256": "6076c04417ecceb7253d4105dc30bdbe23f910f7d57073898e5f359ad5226f7c",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\videos\\language-assets\\ru-RU\\seeing-speech\\ru-d.mp4"
+    },
+    {
+      "kind": "video",
+      "source": "Seeing Speech, University of Glasgow",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=1&datatype=1&speaker=1#location=110",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_vd_alveolar_nasal.mp4",
+      "localPublicPath": "/videos/language-assets/ru-RU/seeing-speech/ru-n.mp4",
+      "localFile": "videos/language-assets/ru-RU/seeing-speech/ru-n.mp4",
+      "speakRightUnits": [
+        "ru-soft-n-l-r",
+        "ru-hard-soft"
+      ],
+      "ipa": "/n/",
+      "role": "canonical",
+      "description": "MRI base gesture for hard /n/ before explaining n/nʲ.",
+      "bytes": 117810,
+      "sha256": "cf6305d4f262b5ba20739d7740248dfb6538ba52a44ca360aac353c079633440",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\videos\\language-assets\\ru-RU\\seeing-speech\\ru-n.mp4"
+    },
+    {
+      "kind": "video",
+      "source": "Seeing Speech, University of Glasgow",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=1&datatype=1&speaker=1#location=108",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_vd_alveolar-lateral_approximant.mp4",
+      "localPublicPath": "/videos/language-assets/ru-RU/seeing-speech/ru-l.mp4",
+      "localFile": "videos/language-assets/ru-RU/seeing-speech/ru-l.mp4",
+      "speakRightUnits": [
+        "ru-soft-n-l-r",
+        "ru-hard-soft"
+      ],
+      "ipa": "/l/",
+      "role": "canonical",
+      "description": "MRI base gesture for hard /l/ before explaining l/lʲ.",
+      "bytes": 101878,
+      "sha256": "9283872238b5fcd82fec536db99e5cca8c43b4ca4a8dded2fef505a3e7a52d0a",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\videos\\language-assets\\ru-RU\\seeing-speech\\ru-l.mp4"
+    },
+    {
+      "kind": "video",
+      "source": "Seeing Speech, University of Glasgow",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=1&datatype=1&speaker=1#location=115",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_vl_alveolar_fricative.mp4",
+      "localPublicPath": "/videos/language-assets/ru-RU/seeing-speech/ru-s.mp4",
+      "localFile": "videos/language-assets/ru-RU/seeing-speech/ru-s.mp4",
+      "speakRightUnits": [
+        "ru-soft-s-z",
+        "ru-hard-soft",
+        "ru-final-devoicing",
+        "ru-voicing-assimilation"
+      ],
+      "ipa": "/s/",
+      "role": "canonical",
+      "description": "MRI base gesture for /s/ and devoicing outcomes.",
+      "bytes": 109600,
+      "sha256": "1552ab37f65da21ce90759390da96d76eaa110223031df58d6f1dc6fea1cd0a8",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\videos\\language-assets\\ru-RU\\seeing-speech\\ru-s.mp4"
+    },
+    {
+      "kind": "video",
+      "source": "Seeing Speech, University of Glasgow",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=1&datatype=1&speaker=1#location=122",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_vd_alveolar_fricative.mp4",
+      "localPublicPath": "/videos/language-assets/ru-RU/seeing-speech/ru-z.mp4",
+      "localFile": "videos/language-assets/ru-RU/seeing-speech/ru-z.mp4",
+      "speakRightUnits": [
+        "ru-soft-s-z",
+        "ru-hard-soft",
+        "ru-voicing-assimilation"
+      ],
+      "ipa": "/z/",
+      "role": "canonical",
+      "description": "MRI base gesture for /z/ before explaining z/zʲ.",
+      "bytes": 97017,
+      "sha256": "1d3dd87700db16e46de6323a34eb6e5983aff2ca6cef197fc4134749a3fd741f",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\videos\\language-assets\\ru-RU\\seeing-speech\\ru-z.mp4"
+    },
+    {
+      "kind": "video",
+      "source": "Seeing Speech, University of Glasgow",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=1&datatype=1&speaker=1#location=106",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_vd_palatal_approximant.mp4",
+      "localPublicPath": "/videos/language-assets/ru-RU/seeing-speech/ru-j.mp4",
+      "localFile": "videos/language-assets/ru-RU/seeing-speech/ru-j.mp4",
+      "speakRightUnits": [
+        "ru-j",
+        "ru-iotated-vowels",
+        "ru-soft-sign",
+        "ru-hard-soft"
+      ],
+      "ipa": "/j/",
+      "role": "canonical",
+      "description": "MRI gesture for /j/; use as contrast only, because Russian [ʲ] is palatalization, not a full /j/.",
+      "bytes": 94787,
+      "sha256": "eb8603e4e6b917677f42635ef4eca02b16c50028cd3fe1cdb3dca2951d839272",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\videos\\language-assets\\ru-RU\\seeing-speech\\ru-j.mp4"
+    },
+    {
+      "kind": "video",
+      "source": "Seeing Speech, University of Glasgow",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=1&datatype=1&speaker=1#location=114",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_vd_alveolar_trill.mp4",
+      "localPublicPath": "/videos/language-assets/ru-RU/seeing-speech/ru-r.mp4",
+      "localFile": "videos/language-assets/ru-RU/seeing-speech/ru-r.mp4",
+      "speakRightUnits": [
+        "ru-r",
+        "ru-soft-n-l-r"
+      ],
+      "ipa": "/r/",
+      "role": "canonical",
+      "description": "MRI articulation for voiced alveolar trill, Russian р.",
+      "bytes": 111585,
+      "sha256": "8aae80011c30e51457a41c19ed8c493491dd1954c7880a3662fd8af815124267",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\videos\\language-assets\\ru-RU\\seeing-speech\\ru-r.mp4"
+    },
+    {
+      "kind": "video",
+      "source": "Seeing Speech, University of Glasgow",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=1&datatype=1&speaker=1#location=107",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_vl_velar_plosive.mp4",
+      "localPublicPath": "/videos/language-assets/ru-RU/seeing-speech/ru-k.mp4",
+      "localFile": "videos/language-assets/ru-RU/seeing-speech/ru-k.mp4",
+      "speakRightUnits": [
+        "ru-final-devoicing",
+        "ru-clusters"
+      ],
+      "ipa": "/k/",
+      "role": "related",
+      "description": "MRI base gesture for /k/, useful for final devoicing and clusters.",
+      "bytes": 59401,
+      "sha256": "170b58396d367f85ae0fc679bd494aa93f5aed71449181b727ad0065f789fa44",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\videos\\language-assets\\ru-RU\\seeing-speech\\ru-k.mp4"
+    },
+    {
+      "kind": "video",
+      "source": "Seeing Speech, University of Glasgow",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=1&datatype=1&speaker=1#location=609",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_vd_velar_plosive.mp4",
+      "localPublicPath": "/videos/language-assets/ru-RU/seeing-speech/ru-g.mp4",
+      "localFile": "videos/language-assets/ru-RU/seeing-speech/ru-g.mp4",
+      "speakRightUnits": [
+        "ru-final-devoicing",
+        "ru-voicing-assimilation",
+        "ru-clusters"
+      ],
+      "ipa": "/g/",
+      "role": "related",
+      "description": "MRI base gesture for /g/ before explaining final devoicing /g/ → [k].",
+      "bytes": 50688,
+      "sha256": "bc3de5e1ad493fbcc135536e765f99133e916832017c8916b5cc61b0a40c67b4",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\videos\\language-assets\\ru-RU\\seeing-speech\\ru-g.mp4"
+    },
+    {
+      "kind": "video",
+      "source": "Seeing Speech, University of Glasgow",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=1&datatype=1&speaker=1#location=120",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_vl_velar_fricative.mp4",
+      "localPublicPath": "/videos/language-assets/ru-RU/seeing-speech/ru-x.mp4",
+      "localFile": "videos/language-assets/ru-RU/seeing-speech/ru-x.mp4",
+      "speakRightUnits": [
+        "ru-x",
+        "ru-clusters"
+      ],
+      "ipa": "/x/",
+      "role": "canonical",
+      "description": "MRI articulation for Russian х /x/.",
+      "bytes": 79423,
+      "sha256": "27224e9a821efe167feec2499bee68eb5c3c8da83a1c974ed03bfe4232e06045",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\videos\\language-assets\\ru-RU\\seeing-speech\\ru-x.mp4"
+    },
+    {
+      "kind": "video",
+      "source": "Seeing Speech, University of Glasgow",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=1&datatype=1&speaker=1#location=642",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_vl_retroflex_fricative.mp4",
+      "localPublicPath": "/videos/language-assets/ru-RU/seeing-speech/ru-sh.mp4",
+      "localFile": "videos/language-assets/ru-RU/seeing-speech/ru-sh.mp4",
+      "speakRightUnits": [
+        "ru-sh-zh",
+        "ru-final-devoicing"
+      ],
+      "ipa": "/ʂ/",
+      "role": "canonical",
+      "description": "MRI articulation for ш-like voiceless retroflex fricative.",
+      "bytes": 112552,
+      "sha256": "81e4b51e1338dadafb4b0acb11bf4eb02b877627b24d8fb06de5dbb66fa89ae0",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\videos\\language-assets\\ru-RU\\seeing-speech\\ru-sh.mp4"
+    },
+    {
+      "kind": "video",
+      "source": "Seeing Speech, University of Glasgow",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=1&datatype=1&speaker=1#location=656",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_vd_retroflex_fricative.mp4",
+      "localPublicPath": "/videos/language-assets/ru-RU/seeing-speech/ru-zh.mp4",
+      "localFile": "videos/language-assets/ru-RU/seeing-speech/ru-zh.mp4",
+      "speakRightUnits": [
+        "ru-sh-zh",
+        "ru-voicing-assimilation"
+      ],
+      "ipa": "/ʐ/",
+      "role": "canonical",
+      "description": "MRI articulation for ж-like voiced retroflex fricative.",
+      "bytes": 91221,
+      "sha256": "ff25a565c5445bb3e47d1c2de706a6c40f40f5eceaafd5042c4bad7812838ff6",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\videos\\language-assets\\ru-RU\\seeing-speech\\ru-zh.mp4"
+    },
+    {
+      "kind": "video",
+      "source": "Seeing Speech, University of Glasgow",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=3&datatype=1&speaker=1#location=597",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_vl_alveolo-palatal_fricative.mp4",
+      "localPublicPath": "/videos/language-assets/ru-RU/seeing-speech/ru-shch-proxy.mp4",
+      "localFile": "videos/language-assets/ru-RU/seeing-speech/ru-shch-proxy.mp4",
+      "speakRightUnits": [
+        "ru-shch",
+        "ru-ts-ch-shch",
+        "ru-ch"
+      ],
+      "ipa": "/ɕ/ proxy",
+      "role": "canonical",
+      "description": "MRI proxy for щ /ɕː/ and ч /tɕ/ softness; needs Russian-specific explanation.",
+      "bytes": 112075,
+      "sha256": "4c7e64094bf075372821a91fbf2a7e5675edb08a8f1b1b1f113e399c95697d42",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\videos\\language-assets\\ru-RU\\seeing-speech\\ru-shch-proxy.mp4"
+    },
+    {
+      "kind": "video",
+      "source": "Seeing Speech, University of Glasgow",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=3&datatype=1&speaker=1#location=116703",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_vl_alveolar_affricate.mp4",
+      "localPublicPath": "/videos/language-assets/ru-RU/seeing-speech/ru-ts.mp4",
+      "localFile": "videos/language-assets/ru-RU/seeing-speech/ru-ts.mp4",
+      "speakRightUnits": [
+        "ru-ts",
+        "ru-ts-ch-shch"
+      ],
+      "ipa": "/ts/",
+      "role": "canonical",
+      "description": "MRI articulation for ц /ts/.",
+      "bytes": 100344,
+      "sha256": "d9df1cd67516e65d61352e280e8c8af14e80293838c31802532df7c8efce5f1c",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\videos\\language-assets\\ru-RU\\seeing-speech\\ru-ts.mp4"
+    },
+    {
+      "kind": "audio",
+      "source": "Wikimedia Commons IPA audio",
+      "license": "CC BY-SA 3.0",
+      "attribution": "See Wikimedia Commons file page: File:Open front unrounded vowel.ogg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Open_front_unrounded_vowel.ogg",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/6/65/Open_front_unrounded_vowel.ogg",
+      "localPublicPath": "/audio/language-assets/ru-RU/commons/ru-a.ogg",
+      "localFile": "audio/language-assets/ru-RU/commons/ru-a.ogg",
+      "speakRightUnits": [
+        "ru-a"
+      ],
+      "ipa": "/a/",
+      "role": "audio-reference",
+      "description": "IPA reference audio for [a].",
+      "bytes": 13748,
+      "sha256": "bfb25c2357cbd18b1a906712b676fb3a878682218514e0c3c68975c81a40b06f",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-assets\\ru-RU\\commons\\ru-a.ogg"
+    },
+    {
+      "kind": "audio",
+      "source": "Wikimedia Commons IPA audio",
+      "license": "CC BY-SA 3.0",
+      "attribution": "See Wikimedia Commons file page: File:Close-mid front unrounded vowel.ogg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Close-mid_front_unrounded_vowel.ogg",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/6/6c/Close-mid_front_unrounded_vowel.ogg",
+      "localPublicPath": "/audio/language-assets/ru-RU/commons/ru-e.ogg",
+      "localFile": "audio/language-assets/ru-RU/commons/ru-e.ogg",
+      "speakRightUnits": [
+        "ru-e"
+      ],
+      "ipa": "/e/",
+      "role": "audio-reference",
+      "description": "IPA reference audio for [e].",
+      "bytes": 18193,
+      "sha256": "521ff5063c0893d8da87c2ad7b07a0e28995741a5856f821d4cbf8628820eff6",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-assets\\ru-RU\\commons\\ru-e.ogg"
+    },
+    {
+      "kind": "audio",
+      "source": "Wikimedia Commons IPA audio",
+      "license": "CC BY-SA 3.0",
+      "attribution": "See Wikimedia Commons file page: File:Close front unrounded vowel.ogg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Close_front_unrounded_vowel.ogg",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/9/91/Close_front_unrounded_vowel.ogg",
+      "localPublicPath": "/audio/language-assets/ru-RU/commons/ru-i.ogg",
+      "localFile": "audio/language-assets/ru-RU/commons/ru-i.ogg",
+      "speakRightUnits": [
+        "ru-i"
+      ],
+      "ipa": "/i/",
+      "role": "audio-reference",
+      "description": "IPA reference audio for [i].",
+      "bytes": 12846,
+      "sha256": "b56dd3aaa59b5a7b1dc61892d1386652d5937fb0eccca8fe8e7faaea6b90b69d",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-assets\\ru-RU\\commons\\ru-i.ogg"
+    },
+    {
+      "kind": "audio",
+      "source": "Wikimedia Commons IPA audio",
+      "license": "CC BY-SA 3.0",
+      "attribution": "See Wikimedia Commons file page: File:Close-mid back rounded vowel.ogg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Close-mid_back_rounded_vowel.ogg",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/8/84/Close-mid_back_rounded_vowel.ogg",
+      "localPublicPath": "/audio/language-assets/ru-RU/commons/ru-o.ogg",
+      "localFile": "audio/language-assets/ru-RU/commons/ru-o.ogg",
+      "speakRightUnits": [
+        "ru-o"
+      ],
+      "ipa": "/o/",
+      "role": "audio-reference",
+      "description": "IPA reference audio for [o].",
+      "bytes": 11972,
+      "sha256": "cef0c5c4b905afac7d4405b6838ca310d4035a05e6731cb113e349b29ed23c26",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-assets\\ru-RU\\commons\\ru-o.ogg"
+    },
+    {
+      "kind": "audio",
+      "source": "Wikimedia Commons IPA audio",
+      "license": "CC BY-SA 3.0",
+      "attribution": "See Wikimedia Commons file page: File:Close back rounded vowel.ogg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Close_back_rounded_vowel.ogg",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/5/5d/Close_back_rounded_vowel.ogg",
+      "localPublicPath": "/audio/language-assets/ru-RU/commons/ru-u.ogg",
+      "localFile": "audio/language-assets/ru-RU/commons/ru-u.ogg",
+      "speakRightUnits": [
+        "ru-u"
+      ],
+      "ipa": "/u/",
+      "role": "audio-reference",
+      "description": "IPA reference audio for [u].",
+      "bytes": 13042,
+      "sha256": "3597a60cbf5197882365d58a4251db925f9f6855ba8c612e870817cb9eab8bac",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-assets\\ru-RU\\commons\\ru-u.ogg"
+    },
+    {
+      "kind": "audio",
+      "source": "Wikimedia Commons IPA audio",
+      "license": "CC BY-SA 3.0",
+      "attribution": "See Wikimedia Commons file page: File:Close central unrounded vowel.ogg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Close_central_unrounded_vowel.ogg",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/5/53/Close_central_unrounded_vowel.ogg",
+      "localPublicPath": "/audio/language-assets/ru-RU/commons/ru-y.ogg",
+      "localFile": "audio/language-assets/ru-RU/commons/ru-y.ogg",
+      "speakRightUnits": [
+        "ru-y"
+      ],
+      "ipa": "/ɨ/",
+      "role": "audio-reference",
+      "description": "IPA reference audio for [ɨ].",
+      "bytes": 12961,
+      "sha256": "fd757ca09838be489e95666292ada4655a6c421287ea9b9af434550618330f90",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-assets\\ru-RU\\commons\\ru-y.ogg"
+    },
+    {
+      "kind": "audio",
+      "source": "Wikimedia Commons IPA audio",
+      "license": "Commons license; verify exact attribution from file page",
+      "attribution": "See Wikimedia Commons file page: File:Mid-central vowel.ogg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Mid-central_vowel.ogg",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/d/d9/Mid-central_vowel.ogg",
+      "localPublicPath": "/audio/language-assets/ru-RU/commons/ru-schwa.ogg",
+      "localFile": "audio/language-assets/ru-RU/commons/ru-schwa.ogg",
+      "speakRightUnits": [
+        "ru-stress-reduction",
+        "ru-unstressed-o-a",
+        "ru-unstressed-e-ya"
+      ],
+      "ipa": "[ə]",
+      "role": "audio-reference",
+      "description": "IPA reference audio for schwa-like central vowel.",
+      "bytes": 10959,
+      "sha256": "5b0e21c9e7cefdc46f3822881cc24419d959994b6c7bad278d21ac4487c804f5",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-assets\\ru-RU\\commons\\ru-schwa.ogg"
+    },
+    {
+      "kind": "audio",
+      "source": "Wikimedia Commons IPA audio",
+      "license": "Commons license; verify exact attribution from file page",
+      "attribution": "See Wikimedia Commons file page: File:Near-open central unrounded vowel.ogg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Near-open_central_unrounded_vowel.ogg",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/2/22/Near-open_central_unrounded_vowel.ogg",
+      "localPublicPath": "/audio/language-assets/ru-RU/commons/ru-near-open-central.ogg",
+      "localFile": "audio/language-assets/ru-RU/commons/ru-near-open-central.ogg",
+      "speakRightUnits": [
+        "ru-stress-reduction",
+        "ru-unstressed-o-a"
+      ],
+      "ipa": "[ɐ]",
+      "role": "audio-reference",
+      "description": "IPA reference audio for near-open central reduced a-like vowel.",
+      "bytes": 12400,
+      "sha256": "c59504c2c3fea47f58aeb7676477e9fdb35bb5bfd5d24bcabc937cff69b1863f",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-assets\\ru-RU\\commons\\ru-near-open-central.ogg"
+    },
+    {
+      "kind": "audio",
+      "source": "Wikimedia Commons IPA audio",
+      "license": "Commons license; verify exact attribution from file page",
+      "attribution": "See Wikimedia Commons file page: File:Voiceless bilabial plosive.ogg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Voiceless_bilabial_plosive.ogg",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/5/51/Voiceless_bilabial_plosive.ogg",
+      "localPublicPath": "/audio/language-assets/ru-RU/commons/ru-p.ogg",
+      "localFile": "audio/language-assets/ru-RU/commons/ru-p.ogg",
+      "speakRightUnits": [
+        "ru-soft-labials"
+      ],
+      "ipa": "/p/",
+      "role": "audio-reference",
+      "description": "IPA reference audio for [p].",
+      "bytes": 20166,
+      "sha256": "576ae283995962f746a390fbc4461c01f6ce1e296c831d7beb9e1907acffa936",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-assets\\ru-RU\\commons\\ru-p.ogg"
+    },
+    {
+      "kind": "audio",
+      "source": "Wikimedia Commons IPA audio",
+      "license": "Commons license; verify exact attribution from file page",
+      "attribution": "See Wikimedia Commons file page: File:Voiced bilabial plosive.ogg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Voiced_bilabial_plosive.ogg",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/2/2c/Voiced_bilabial_plosive.ogg",
+      "localPublicPath": "/audio/language-assets/ru-RU/commons/ru-b.ogg",
+      "localFile": "audio/language-assets/ru-RU/commons/ru-b.ogg",
+      "speakRightUnits": [
+        "ru-soft-labials"
+      ],
+      "ipa": "/b/",
+      "role": "audio-reference",
+      "description": "IPA reference audio for [b].",
+      "bytes": 25203,
+      "sha256": "a91f7aee6c44ad70cbbf9d298d7b572cbf77afcb6923b3e3b9f4f6c91f9e7f53",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-assets\\ru-RU\\commons\\ru-b.ogg"
+    },
+    {
+      "kind": "audio",
+      "source": "Wikimedia Commons IPA audio",
+      "license": "Commons license; verify exact attribution from file page",
+      "attribution": "See Wikimedia Commons file page: File:Bilabial nasal.ogg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Bilabial_nasal.ogg",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/a/a9/Bilabial_nasal.ogg",
+      "localPublicPath": "/audio/language-assets/ru-RU/commons/ru-m.ogg",
+      "localFile": "audio/language-assets/ru-RU/commons/ru-m.ogg",
+      "speakRightUnits": [
+        "ru-soft-labials"
+      ],
+      "ipa": "/m/",
+      "role": "audio-reference",
+      "description": "IPA reference audio for [m].",
+      "bytes": 24826,
+      "sha256": "91092606944ea851ffc5c67d485fb26bae8ec5f4adaf86e58a1a7b4bfeb4d9be",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-assets\\ru-RU\\commons\\ru-m.ogg"
+    },
+    {
+      "kind": "audio",
+      "source": "Wikimedia Commons IPA audio",
+      "license": "Commons license; verify exact attribution from file page",
+      "attribution": "See Wikimedia Commons file page: File:Voiceless labiodental fricative.ogg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Voiceless_labiodental_fricative.ogg",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/3/33/Voiceless_labiodental_fricative.ogg",
+      "localPublicPath": "/audio/language-assets/ru-RU/commons/ru-f.ogg",
+      "localFile": "audio/language-assets/ru-RU/commons/ru-f.ogg",
+      "speakRightUnits": [
+        "ru-soft-labials",
+        "ru-final-devoicing",
+        "ru-voicing-assimilation"
+      ],
+      "ipa": "/f/",
+      "role": "audio-reference",
+      "description": "IPA reference audio for [f].",
+      "bytes": 11466,
+      "sha256": "72176c9094f87ee551ad6c2b280a378a5526b2829b4baf6654c1a093511886a0",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-assets\\ru-RU\\commons\\ru-f.ogg"
+    },
+    {
+      "kind": "audio",
+      "source": "Wikimedia Commons IPA audio",
+      "license": "CC BY-SA 3.0",
+      "attribution": "See Wikimedia Commons file page: File:Alveolar trill.ogg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Alveolar_trill.ogg",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/c/ce/Alveolar_trill.ogg",
+      "localPublicPath": "/audio/language-assets/ru-RU/commons/ru-r.ogg",
+      "localFile": "audio/language-assets/ru-RU/commons/ru-r.ogg",
+      "speakRightUnits": [
+        "ru-r",
+        "ru-soft-n-l-r"
+      ],
+      "ipa": "/r/",
+      "role": "audio-reference",
+      "description": "IPA reference audio for alveolar trill.",
+      "bytes": 25254,
+      "sha256": "e0030489fd63812e6b3b4f493577b94c936ae00d5181d3d93a6c6657f654e30f",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-assets\\ru-RU\\commons\\ru-r.ogg"
+    },
+    {
+      "kind": "audio",
+      "source": "Wikimedia Commons IPA audio",
+      "license": "CC BY 4.0",
+      "attribution": "See Wikimedia Commons file page: File:Voiced palatalized alveolar trill.ogg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Voiced_palatalized_alveolar_trill.ogg",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/6/60/Voiced_palatalized_alveolar_trill.ogg",
+      "localPublicPath": "/audio/language-assets/ru-RU/commons/ru-r-palatalized.ogg",
+      "localFile": "audio/language-assets/ru-RU/commons/ru-r-palatalized.ogg",
+      "speakRightUnits": [
+        "ru-r",
+        "ru-soft-n-l-r"
+      ],
+      "ipa": "/rʲ/",
+      "role": "audio-reference",
+      "description": "IPA reference audio for palatalized alveolar trill.",
+      "bytes": 16693,
+      "sha256": "cd4fe8c21efb1ee35dc77a58967c8c29f7b19b7051d8d9b73b973c669bb80bac",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-assets\\ru-RU\\commons\\ru-r-palatalized.ogg"
+    },
+    {
+      "kind": "audio",
+      "source": "Wikimedia Commons IPA audio",
+      "license": "CC BY-SA 3.0",
+      "attribution": "See Wikimedia Commons file page: File:Voiceless retroflex sibilant.ogg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Voiceless_retroflex_sibilant.ogg",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/b/b1/Voiceless_retroflex_sibilant.ogg",
+      "localPublicPath": "/audio/language-assets/ru-RU/commons/ru-sh.ogg",
+      "localFile": "audio/language-assets/ru-RU/commons/ru-sh.ogg",
+      "speakRightUnits": [
+        "ru-sh-zh",
+        "ru-final-devoicing"
+      ],
+      "ipa": "/ʂ/",
+      "role": "audio-reference",
+      "description": "IPA reference audio for [ʂ], Russian ш target.",
+      "bytes": 123097,
+      "sha256": "5a9ab67888b10ead50adaf42731b66f661a86feb271b04482a69e22e0e96e603",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-assets\\ru-RU\\commons\\ru-sh.ogg"
+    },
+    {
+      "kind": "audio",
+      "source": "Wikimedia Commons IPA audio",
+      "license": "CC BY-SA 3.0",
+      "attribution": "See Wikimedia Commons file page: File:Voiced retroflex sibilant.ogg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Voiced_retroflex_sibilant.ogg",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/7/7f/Voiced_retroflex_sibilant.ogg",
+      "localPublicPath": "/audio/language-assets/ru-RU/commons/ru-zh.ogg",
+      "localFile": "audio/language-assets/ru-RU/commons/ru-zh.ogg",
+      "speakRightUnits": [
+        "ru-sh-zh",
+        "ru-voicing-assimilation"
+      ],
+      "ipa": "/ʐ/",
+      "role": "audio-reference",
+      "description": "IPA reference audio for [ʐ], Russian ж target.",
+      "bytes": 128395,
+      "sha256": "8902e25c30e8ed9764833f93585ba90ae6305f5bfcefdc984c9ae5e682b53e04",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-assets\\ru-RU\\commons\\ru-zh.ogg"
+    },
+    {
+      "kind": "audio",
+      "source": "Wikimedia Commons IPA audio",
+      "license": "CC BY-SA 3.0",
+      "attribution": "See Wikimedia Commons file page: File:Voiceless alveolo-palatal sibilant.ogg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Voiceless_alveolo-palatal_sibilant.ogg",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/0/0b/Voiceless_alveolo-palatal_sibilant.ogg",
+      "localPublicPath": "/audio/language-assets/ru-RU/commons/ru-shch-proxy.ogg",
+      "localFile": "audio/language-assets/ru-RU/commons/ru-shch-proxy.ogg",
+      "speakRightUnits": [
+        "ru-shch",
+        "ru-ts-ch-shch",
+        "ru-ch"
+      ],
+      "ipa": "/ɕ/ proxy",
+      "role": "audio-reference",
+      "description": "IPA reference audio for [ɕ], proxy for Russian щ /ɕː/ softness.",
+      "bytes": 26146,
+      "sha256": "4e872351dd44088cf42fa8cf7c51dd719d9c98da2bbc9e165ea37c4a40ac076f",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-assets\\ru-RU\\commons\\ru-shch-proxy.ogg"
+    },
+    {
+      "kind": "audio",
+      "source": "Wikimedia Commons IPA audio",
+      "license": "CC BY-SA 3.0",
+      "attribution": "See Wikimedia Commons file page: File:Voiceless alveolo-palatal affricate.ogg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Voiceless_alveolo-palatal_affricate.ogg",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/c/c4/Voiceless_alveolo-palatal_affricate.ogg",
+      "localPublicPath": "/audio/language-assets/ru-RU/commons/ru-ch.ogg",
+      "localFile": "audio/language-assets/ru-RU/commons/ru-ch.ogg",
+      "speakRightUnits": [
+        "ru-ch",
+        "ru-ts-ch-shch"
+      ],
+      "ipa": "/tɕ/",
+      "role": "audio-reference",
+      "description": "IPA reference audio for [tɕ], Russian ч target.",
+      "bytes": 29254,
+      "sha256": "60ae435ff3d77c9801ec9b0a93c119e2f7b89b0685aa9d52140644263824c33d",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-assets\\ru-RU\\commons\\ru-ch.ogg"
+    },
+    {
+      "kind": "audio",
+      "source": "Wikimedia Commons IPA audio",
+      "license": "CC BY-SA 3.0",
+      "attribution": "See Wikimedia Commons file page: File:Voiceless alveolar sibilant affricate.oga",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Voiceless_alveolar_sibilant_affricate.oga",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/9/9d/Voiceless_alveolar_sibilant_affricate.oga",
+      "localPublicPath": "/audio/language-assets/ru-RU/commons/ru-ts.oga",
+      "localFile": "audio/language-assets/ru-RU/commons/ru-ts.oga",
+      "speakRightUnits": [
+        "ru-ts",
+        "ru-ts-ch-shch"
+      ],
+      "ipa": "/ts/",
+      "role": "audio-reference",
+      "description": "IPA reference audio for [ts], Russian ц target.",
+      "bytes": 11646,
+      "sha256": "96a95c0fa7aecdb5cbe1dd350b76ae51d7d43ee4740fbafc60a3377b2b5fe588",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-assets\\ru-RU\\commons\\ru-ts.oga"
+    },
+    {
+      "kind": "audio",
+      "source": "Seeing Speech, University of Glasgow (AAC track extracted locally from MP4)",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=4&datatype=1&speaker=1#location=97",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_cardinal_4_vowel.mp4",
+      "localPublicPath": "/audio/language-assets/ru-RU/seeing-speech/ru-a.m4a",
+      "localFile": "audio/language-assets/ru-RU/seeing-speech/ru-a.m4a",
+      "speakRightUnits": [
+        "ru-a"
+      ],
+      "ipa": "/a/",
+      "role": "extracted-audio-sidecar",
+      "description": "Extracted AAC audio sidecar for SpeakRight audio playback: MRI articulation for open/front [a] used by Russian stressed а.",
+      "bytes": 48743,
+      "sha256": "63ea0bc5c2837cbf2998e80e86b854f87c7ca0b36f8fdac1ec1083690e4ad55e",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-assets\\ru-RU\\seeing-speech\\ru-a.m4a"
+    },
+    {
+      "kind": "audio",
+      "source": "Seeing Speech, University of Glasgow (AAC track extracted locally from MP4)",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=4&datatype=1&speaker=1#location=101",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_cardinal_2_vowel.mp4",
+      "localPublicPath": "/audio/language-assets/ru-RU/seeing-speech/ru-e.m4a",
+      "localFile": "audio/language-assets/ru-RU/seeing-speech/ru-e.m4a",
+      "speakRightUnits": [
+        "ru-e"
+      ],
+      "ipa": "/e/",
+      "role": "extracted-audio-sidecar",
+      "description": "Extracted AAC audio sidecar for SpeakRight audio playback: MRI articulation for close-mid front [e], useful for stressed э/е.",
+      "bytes": 48862,
+      "sha256": "fd52a2c7b61d2e18df596318176b7492efe6564ee1947e4305cff0fb198c6ab8",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-assets\\ru-RU\\seeing-speech\\ru-e.m4a"
+    },
+    {
+      "kind": "audio",
+      "source": "Seeing Speech, University of Glasgow (AAC track extracted locally from MP4)",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=4&datatype=1&speaker=1#location=105",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_cardinal_1_vowel.mp4",
+      "localPublicPath": "/audio/language-assets/ru-RU/seeing-speech/ru-i.m4a",
+      "localFile": "audio/language-assets/ru-RU/seeing-speech/ru-i.m4a",
+      "speakRightUnits": [
+        "ru-i"
+      ],
+      "ipa": "/i/",
+      "role": "extracted-audio-sidecar",
+      "description": "Extracted AAC audio sidecar for SpeakRight audio playback: MRI articulation for close front [i].",
+      "bytes": 48332,
+      "sha256": "ae66e26cf45e51009b97d191c13b3660b4be30034d441a251ca1be6acef38b54",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-assets\\ru-RU\\seeing-speech\\ru-i.m4a"
+    },
+    {
+      "kind": "audio",
+      "source": "Seeing Speech, University of Glasgow (AAC track extracted locally from MP4)",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=4&datatype=1&speaker=1#location=111",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_cardinal_7_vowel.mp4",
+      "localPublicPath": "/audio/language-assets/ru-RU/seeing-speech/ru-o.m4a",
+      "localFile": "audio/language-assets/ru-RU/seeing-speech/ru-o.m4a",
+      "speakRightUnits": [
+        "ru-o"
+      ],
+      "ipa": "/o/",
+      "role": "extracted-audio-sidecar",
+      "description": "Extracted AAC audio sidecar for SpeakRight audio playback: MRI articulation for close-mid back rounded [o], useful for stressed о.",
+      "bytes": 48768,
+      "sha256": "b499e544060ac8e5a94e4c88be368dd5566ee2b32661fb2a6953d04b16f981ad",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-assets\\ru-RU\\seeing-speech\\ru-o.m4a"
+    },
+    {
+      "kind": "audio",
+      "source": "Seeing Speech, University of Glasgow (AAC track extracted locally from MP4)",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=4&datatype=1&speaker=1#location=117",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_cardinal_8_vowel.mp4",
+      "localPublicPath": "/audio/language-assets/ru-RU/seeing-speech/ru-u.m4a",
+      "localFile": "audio/language-assets/ru-RU/seeing-speech/ru-u.m4a",
+      "speakRightUnits": [
+        "ru-u"
+      ],
+      "ipa": "/u/",
+      "role": "extracted-audio-sidecar",
+      "description": "Extracted AAC audio sidecar for SpeakRight audio playback: MRI articulation for close back rounded [u].",
+      "bytes": 49249,
+      "sha256": "14993f0ec6f79e78a9582e8c444d821c01f73f06a49a999dccdf638e2b913a85",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-assets\\ru-RU\\seeing-speech\\ru-u.m4a"
+    },
+    {
+      "kind": "audio",
+      "source": "Seeing Speech, University of Glasgow (AAC track extracted locally from MP4)",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=4&datatype=1&speaker=1#location=616",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_cardinal_17_vowel.mp4",
+      "localPublicPath": "/audio/language-assets/ru-RU/seeing-speech/ru-y.m4a",
+      "localFile": "audio/language-assets/ru-RU/seeing-speech/ru-y.m4a",
+      "speakRightUnits": [
+        "ru-y"
+      ],
+      "ipa": "/ɨ/",
+      "role": "extracted-audio-sidecar",
+      "description": "Extracted AAC audio sidecar for SpeakRight audio playback: MRI articulation for close central unrounded [ɨ], the Russian ы target.",
+      "bytes": 108179,
+      "sha256": "dafd70ddfb681fa4b738443c2a3c696c4183a005c7d23a299c92d649c4d68e77",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-assets\\ru-RU\\seeing-speech\\ru-y.m4a"
+    },
+    {
+      "kind": "audio",
+      "source": "Seeing Speech, University of Glasgow (AAC track extracted locally from MP4)",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=4&datatype=1&speaker=1#location=601",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_central_schwa_float_vowel.mp4",
+      "localPublicPath": "/audio/language-assets/ru-RU/seeing-speech/ru-reduction-schwa.m4a",
+      "localFile": "audio/language-assets/ru-RU/seeing-speech/ru-reduction-schwa.m4a",
+      "speakRightUnits": [
+        "ru-stress-reduction",
+        "ru-unstressed-o-a",
+        "ru-unstressed-e-ya"
+      ],
+      "ipa": "[ə]",
+      "role": "extracted-audio-sidecar",
+      "description": "Extracted AAC audio sidecar for SpeakRight audio playback: MRI proxy for reduced central schwa-like vowel quality.",
+      "bytes": 41349,
+      "sha256": "12c43711453ac8aa7794e16b50d9b796188bc5a605271cd44ad29d9ac7f2f1fa",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-assets\\ru-RU\\seeing-speech\\ru-reduction-schwa.m4a"
+    },
+    {
+      "kind": "audio",
+      "source": "Seeing Speech, University of Glasgow (AAC track extracted locally from MP4)",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=4&datatype=1&speaker=1#location=593",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_cardinal_5_vowel.mp4",
+      "localPublicPath": "/audio/language-assets/ru-RU/seeing-speech/ru-reduction-open-back.m4a",
+      "localFile": "audio/language-assets/ru-RU/seeing-speech/ru-reduction-open-back.m4a",
+      "speakRightUnits": [
+        "ru-stress-reduction",
+        "ru-unstressed-o-a"
+      ],
+      "ipa": "[ɑ]/[ɐ] proxy",
+      "role": "extracted-audio-sidecar",
+      "description": "Extracted AAC audio sidecar for SpeakRight audio playback: MRI proxy for open/back/centralized reduced a-like quality.",
+      "bytes": 48774,
+      "sha256": "490c1ec87787aaf542f9b192e3eff49f7b98714c770f03ecb9ffd597b14b5764",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-assets\\ru-RU\\seeing-speech\\ru-reduction-open-back.m4a"
+    },
+    {
+      "kind": "audio",
+      "source": "Seeing Speech, University of Glasgow (AAC track extracted locally from MP4)",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=1&datatype=1&speaker=1#location=112",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_vl_bilabial_plosive.mp4",
+      "localPublicPath": "/audio/language-assets/ru-RU/seeing-speech/ru-p.m4a",
+      "localFile": "audio/language-assets/ru-RU/seeing-speech/ru-p.m4a",
+      "speakRightUnits": [
+        "ru-soft-labials"
+      ],
+      "ipa": "/p/",
+      "role": "extracted-audio-sidecar",
+      "description": "Extracted AAC audio sidecar for SpeakRight audio playback: MRI base gesture for hard /p/ before explaining Russian p/pʲ contrast.",
+      "bytes": 49496,
+      "sha256": "eb16b5c8f24452667e5f6fabc7a4b2254ecf464809de6416849edfea920c7f84",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-assets\\ru-RU\\seeing-speech\\ru-p.m4a"
+    },
+    {
+      "kind": "audio",
+      "source": "Seeing Speech, University of Glasgow (AAC track extracted locally from MP4)",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=1&datatype=1&speaker=1#location=98",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_vd_bilabial_plosive.mp4",
+      "localPublicPath": "/audio/language-assets/ru-RU/seeing-speech/ru-b.m4a",
+      "localFile": "audio/language-assets/ru-RU/seeing-speech/ru-b.m4a",
+      "speakRightUnits": [
+        "ru-soft-labials"
+      ],
+      "ipa": "/b/",
+      "role": "extracted-audio-sidecar",
+      "description": "Extracted AAC audio sidecar for SpeakRight audio playback: MRI base gesture for hard /b/ before explaining Russian b/bʲ contrast.",
+      "bytes": 54041,
+      "sha256": "8e06cd2dd6ec674482f80aaee2aa5cd892faccdc48dc62115c2379065996d116",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-assets\\ru-RU\\seeing-speech\\ru-b.m4a"
+    },
+    {
+      "kind": "audio",
+      "source": "Seeing Speech, University of Glasgow (AAC track extracted locally from MP4)",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=1&datatype=1&speaker=1#location=109",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_vd_bilabial_nasal.mp4",
+      "localPublicPath": "/audio/language-assets/ru-RU/seeing-speech/ru-m.m4a",
+      "localFile": "audio/language-assets/ru-RU/seeing-speech/ru-m.m4a",
+      "speakRightUnits": [
+        "ru-soft-labials"
+      ],
+      "ipa": "/m/",
+      "role": "extracted-audio-sidecar",
+      "description": "Extracted AAC audio sidecar for SpeakRight audio playback: MRI base gesture for hard /m/ before explaining Russian m/mʲ contrast.",
+      "bytes": 60445,
+      "sha256": "7b25b7ea2b22134437401de377c65f3f71697eccef162550c937863c15477b0b",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-assets\\ru-RU\\seeing-speech\\ru-m.m4a"
+    },
+    {
+      "kind": "audio",
+      "source": "Seeing Speech, University of Glasgow (AAC track extracted locally from MP4)",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=1&datatype=1&speaker=1#location=102",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_vl_labiodental_fricative.mp4",
+      "localPublicPath": "/audio/language-assets/ru-RU/seeing-speech/ru-f.m4a",
+      "localFile": "audio/language-assets/ru-RU/seeing-speech/ru-f.m4a",
+      "speakRightUnits": [
+        "ru-soft-labials",
+        "ru-final-devoicing",
+        "ru-voicing-assimilation"
+      ],
+      "ipa": "/f/",
+      "role": "extracted-audio-sidecar",
+      "description": "Extracted AAC audio sidecar for SpeakRight audio playback: MRI base gesture for /f/ and final devoicing outcomes.",
+      "bytes": 54023,
+      "sha256": "8c1173af46d0fbfaf2cee9673f3f646d62f77731b28a859aa841df6259481aa5",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-assets\\ru-RU\\seeing-speech\\ru-f.m4a"
+    },
+    {
+      "kind": "audio",
+      "source": "Seeing Speech, University of Glasgow (AAC track extracted locally from MP4)",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=1&datatype=1&speaker=1#location=118",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_vd_labiodental_fricative.mp4",
+      "localPublicPath": "/audio/language-assets/ru-RU/seeing-speech/ru-v.m4a",
+      "localFile": "audio/language-assets/ru-RU/seeing-speech/ru-v.m4a",
+      "speakRightUnits": [
+        "ru-soft-labials",
+        "ru-voicing-assimilation"
+      ],
+      "ipa": "/v/",
+      "role": "extracted-audio-sidecar",
+      "description": "Extracted AAC audio sidecar for SpeakRight audio playback: MRI base gesture for /v/ before Russian voicing assimilation explanations.",
+      "bytes": 54332,
+      "sha256": "ba6bdc07ff9ef02ba4e9ceaefa2272c4ff805f7743b3b7b287a0bbee351899e1",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-assets\\ru-RU\\seeing-speech\\ru-v.m4a"
+    },
+    {
+      "kind": "audio",
+      "source": "Seeing Speech, University of Glasgow (AAC track extracted locally from MP4)",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=1&datatype=1&speaker=1#location=116",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_vl_alveolar_plosive.mp4",
+      "localPublicPath": "/audio/language-assets/ru-RU/seeing-speech/ru-t.m4a",
+      "localFile": "audio/language-assets/ru-RU/seeing-speech/ru-t.m4a",
+      "speakRightUnits": [
+        "ru-soft-t-d",
+        "ru-hard-soft",
+        "ru-final-devoicing"
+      ],
+      "ipa": "/t/",
+      "role": "extracted-audio-sidecar",
+      "description": "Extracted AAC audio sidecar for SpeakRight audio playback: MRI base gesture for hard /t/ and final devoicing outcomes.",
+      "bytes": 39427,
+      "sha256": "7a8530d73993de3612d7749a3e3300089ddf9bfd6672b60db1be2c3b4793643a",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-assets\\ru-RU\\seeing-speech\\ru-t.m4a"
+    },
+    {
+      "kind": "audio",
+      "source": "Seeing Speech, University of Glasgow (AAC track extracted locally from MP4)",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=1&datatype=1&speaker=1#location=100",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_vd_alveolar_plosive.mp4",
+      "localPublicPath": "/audio/language-assets/ru-RU/seeing-speech/ru-d.m4a",
+      "localFile": "audio/language-assets/ru-RU/seeing-speech/ru-d.m4a",
+      "speakRightUnits": [
+        "ru-soft-t-d",
+        "ru-hard-soft",
+        "ru-voicing-assimilation"
+      ],
+      "ipa": "/d/",
+      "role": "extracted-audio-sidecar",
+      "description": "Extracted AAC audio sidecar for SpeakRight audio playback: MRI base gesture for hard /d/ before explaining d/dʲ.",
+      "bytes": 41186,
+      "sha256": "5d4d7cfb2a58d6c9fdf3eb2b5ec91a4cc07cb9974940f9c91c172f6304147e69",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-assets\\ru-RU\\seeing-speech\\ru-d.m4a"
+    },
+    {
+      "kind": "audio",
+      "source": "Seeing Speech, University of Glasgow (AAC track extracted locally from MP4)",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=1&datatype=1&speaker=1#location=110",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_vd_alveolar_nasal.mp4",
+      "localPublicPath": "/audio/language-assets/ru-RU/seeing-speech/ru-n.m4a",
+      "localFile": "audio/language-assets/ru-RU/seeing-speech/ru-n.m4a",
+      "speakRightUnits": [
+        "ru-soft-n-l-r",
+        "ru-hard-soft"
+      ],
+      "ipa": "/n/",
+      "role": "extracted-audio-sidecar",
+      "description": "Extracted AAC audio sidecar for SpeakRight audio playback: MRI base gesture for hard /n/ before explaining n/nʲ.",
+      "bytes": 54497,
+      "sha256": "ab594b3504fc2843afff569f94122a4ab71b367b09cd17b126527ae02cdb4575",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-assets\\ru-RU\\seeing-speech\\ru-n.m4a"
+    },
+    {
+      "kind": "audio",
+      "source": "Seeing Speech, University of Glasgow (AAC track extracted locally from MP4)",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=1&datatype=1&speaker=1#location=108",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_vd_alveolar-lateral_approximant.mp4",
+      "localPublicPath": "/audio/language-assets/ru-RU/seeing-speech/ru-l.m4a",
+      "localFile": "audio/language-assets/ru-RU/seeing-speech/ru-l.m4a",
+      "speakRightUnits": [
+        "ru-soft-n-l-r",
+        "ru-hard-soft"
+      ],
+      "ipa": "/l/",
+      "role": "extracted-audio-sidecar",
+      "description": "Extracted AAC audio sidecar for SpeakRight audio playback: MRI base gesture for hard /l/ before explaining l/lʲ.",
+      "bytes": 39959,
+      "sha256": "65bea526a7255bc1d04fa797df8b67f11866a7700477239175a3a476f36380e7",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-assets\\ru-RU\\seeing-speech\\ru-l.m4a"
+    },
+    {
+      "kind": "audio",
+      "source": "Seeing Speech, University of Glasgow (AAC track extracted locally from MP4)",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=1&datatype=1&speaker=1#location=115",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_vl_alveolar_fricative.mp4",
+      "localPublicPath": "/audio/language-assets/ru-RU/seeing-speech/ru-s.m4a",
+      "localFile": "audio/language-assets/ru-RU/seeing-speech/ru-s.m4a",
+      "speakRightUnits": [
+        "ru-soft-s-z",
+        "ru-hard-soft",
+        "ru-final-devoicing",
+        "ru-voicing-assimilation"
+      ],
+      "ipa": "/s/",
+      "role": "extracted-audio-sidecar",
+      "description": "Extracted AAC audio sidecar for SpeakRight audio playback: MRI base gesture for /s/ and devoicing outcomes.",
+      "bytes": 48618,
+      "sha256": "3c526ffbe937830d87208927b1624f4860422bbf277aee0a805e350329a847d6",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-assets\\ru-RU\\seeing-speech\\ru-s.m4a"
+    },
+    {
+      "kind": "audio",
+      "source": "Seeing Speech, University of Glasgow (AAC track extracted locally from MP4)",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=1&datatype=1&speaker=1#location=122",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_vd_alveolar_fricative.mp4",
+      "localPublicPath": "/audio/language-assets/ru-RU/seeing-speech/ru-z.m4a",
+      "localFile": "audio/language-assets/ru-RU/seeing-speech/ru-z.m4a",
+      "speakRightUnits": [
+        "ru-soft-s-z",
+        "ru-hard-soft",
+        "ru-voicing-assimilation"
+      ],
+      "ipa": "/z/",
+      "role": "extracted-audio-sidecar",
+      "description": "Extracted AAC audio sidecar for SpeakRight audio playback: MRI base gesture for /z/ before explaining z/zʲ.",
+      "bytes": 37531,
+      "sha256": "8210d0212d35bcff85ee43d6213506014c4b26ae64f28914f201906a888450f9",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-assets\\ru-RU\\seeing-speech\\ru-z.m4a"
+    },
+    {
+      "kind": "audio",
+      "source": "Seeing Speech, University of Glasgow (AAC track extracted locally from MP4)",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=1&datatype=1&speaker=1#location=106",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_vd_palatal_approximant.mp4",
+      "localPublicPath": "/audio/language-assets/ru-RU/seeing-speech/ru-j.m4a",
+      "localFile": "audio/language-assets/ru-RU/seeing-speech/ru-j.m4a",
+      "speakRightUnits": [
+        "ru-j",
+        "ru-iotated-vowels",
+        "ru-soft-sign",
+        "ru-hard-soft"
+      ],
+      "ipa": "/j/",
+      "role": "extracted-audio-sidecar",
+      "description": "Extracted AAC audio sidecar for SpeakRight audio playback: MRI gesture for /j/; use as contrast only, because Russian [ʲ] is palatalization, not a full /j/.",
+      "bytes": 40556,
+      "sha256": "29a23e84063d3b6207428328014dfe577b220bb598807f20bc13db941555e2b3",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-assets\\ru-RU\\seeing-speech\\ru-j.m4a"
+    },
+    {
+      "kind": "audio",
+      "source": "Seeing Speech, University of Glasgow (AAC track extracted locally from MP4)",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=1&datatype=1&speaker=1#location=114",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_vd_alveolar_trill.mp4",
+      "localPublicPath": "/audio/language-assets/ru-RU/seeing-speech/ru-r.m4a",
+      "localFile": "audio/language-assets/ru-RU/seeing-speech/ru-r.m4a",
+      "speakRightUnits": [
+        "ru-r",
+        "ru-soft-n-l-r"
+      ],
+      "ipa": "/r/",
+      "role": "extracted-audio-sidecar",
+      "description": "Extracted AAC audio sidecar for SpeakRight audio playback: MRI articulation for voiced alveolar trill, Russian р.",
+      "bytes": 49440,
+      "sha256": "a88d29bce0e87d23c7dc9da7e8c48e1d4c131043a13077c898bea02af81ab5f1",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-assets\\ru-RU\\seeing-speech\\ru-r.m4a"
+    },
+    {
+      "kind": "audio",
+      "source": "Seeing Speech, University of Glasgow (AAC track extracted locally from MP4)",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=1&datatype=1&speaker=1#location=107",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_vl_velar_plosive.mp4",
+      "localPublicPath": "/audio/language-assets/ru-RU/seeing-speech/ru-k.m4a",
+      "localFile": "audio/language-assets/ru-RU/seeing-speech/ru-k.m4a",
+      "speakRightUnits": [
+        "ru-final-devoicing",
+        "ru-clusters"
+      ],
+      "ipa": "/k/",
+      "role": "extracted-audio-sidecar",
+      "description": "Extracted AAC audio sidecar for SpeakRight audio playback: MRI base gesture for /k/, useful for final devoicing and clusters.",
+      "bytes": 23694,
+      "sha256": "230f6bf26d46f3ab9aba02daa63b4807781e6cae3519f50a41dd8c774db0f282",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-assets\\ru-RU\\seeing-speech\\ru-k.m4a"
+    },
+    {
+      "kind": "audio",
+      "source": "Seeing Speech, University of Glasgow (AAC track extracted locally from MP4)",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=1&datatype=1&speaker=1#location=609",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_vd_velar_plosive.mp4",
+      "localPublicPath": "/audio/language-assets/ru-RU/seeing-speech/ru-g.m4a",
+      "localFile": "audio/language-assets/ru-RU/seeing-speech/ru-g.m4a",
+      "speakRightUnits": [
+        "ru-final-devoicing",
+        "ru-voicing-assimilation",
+        "ru-clusters"
+      ],
+      "ipa": "/g/",
+      "role": "extracted-audio-sidecar",
+      "description": "Extracted AAC audio sidecar for SpeakRight audio playback: MRI base gesture for /g/ before explaining final devoicing /g/ → [k].",
+      "bytes": 23437,
+      "sha256": "879fc1e59149ab0b2e83ed93b914a760eaa56c5a76e0c58916da98adc9cb50f7",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-assets\\ru-RU\\seeing-speech\\ru-g.m4a"
+    },
+    {
+      "kind": "audio",
+      "source": "Seeing Speech, University of Glasgow (AAC track extracted locally from MP4)",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=1&datatype=1&speaker=1#location=120",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_vl_velar_fricative.mp4",
+      "localPublicPath": "/audio/language-assets/ru-RU/seeing-speech/ru-x.m4a",
+      "localFile": "audio/language-assets/ru-RU/seeing-speech/ru-x.m4a",
+      "speakRightUnits": [
+        "ru-x",
+        "ru-clusters"
+      ],
+      "ipa": "/x/",
+      "role": "extracted-audio-sidecar",
+      "description": "Extracted AAC audio sidecar for SpeakRight audio playback: MRI articulation for Russian х /x/.",
+      "bytes": 38390,
+      "sha256": "9797028ac67e4b6370413990db739579ec4d088bc6ffe6d6b5d86a66ad094f53",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-assets\\ru-RU\\seeing-speech\\ru-x.m4a"
+    },
+    {
+      "kind": "audio",
+      "source": "Seeing Speech, University of Glasgow (AAC track extracted locally from MP4)",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=1&datatype=1&speaker=1#location=642",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_vl_retroflex_fricative.mp4",
+      "localPublicPath": "/audio/language-assets/ru-RU/seeing-speech/ru-sh.m4a",
+      "localFile": "audio/language-assets/ru-RU/seeing-speech/ru-sh.m4a",
+      "speakRightUnits": [
+        "ru-sh-zh",
+        "ru-final-devoicing"
+      ],
+      "ipa": "/ʂ/",
+      "role": "extracted-audio-sidecar",
+      "description": "Extracted AAC audio sidecar for SpeakRight audio playback: MRI articulation for ш-like voiceless retroflex fricative.",
+      "bytes": 48994,
+      "sha256": "40e5e7c3a3a15895d79dcb50f6db745f60c2dfca9a3cf1a28bacd96391f9a755",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-assets\\ru-RU\\seeing-speech\\ru-sh.m4a"
+    },
+    {
+      "kind": "audio",
+      "source": "Seeing Speech, University of Glasgow (AAC track extracted locally from MP4)",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=1&datatype=1&speaker=1#location=656",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_vd_retroflex_fricative.mp4",
+      "localPublicPath": "/audio/language-assets/ru-RU/seeing-speech/ru-zh.m4a",
+      "localFile": "audio/language-assets/ru-RU/seeing-speech/ru-zh.m4a",
+      "speakRightUnits": [
+        "ru-sh-zh",
+        "ru-voicing-assimilation"
+      ],
+      "ipa": "/ʐ/",
+      "role": "extracted-audio-sidecar",
+      "description": "Extracted AAC audio sidecar for SpeakRight audio playback: MRI articulation for ж-like voiced retroflex fricative.",
+      "bytes": 40064,
+      "sha256": "44facd664fc586b7bfbb3dfb457e6ea3ceaff6b389a6fb435f502ebdfd244a69",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-assets\\ru-RU\\seeing-speech\\ru-zh.m4a"
+    },
+    {
+      "kind": "audio",
+      "source": "Seeing Speech, University of Glasgow (AAC track extracted locally from MP4)",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=3&datatype=1&speaker=1#location=597",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_vl_alveolo-palatal_fricative.mp4",
+      "localPublicPath": "/audio/language-assets/ru-RU/seeing-speech/ru-shch-proxy.m4a",
+      "localFile": "audio/language-assets/ru-RU/seeing-speech/ru-shch-proxy.m4a",
+      "speakRightUnits": [
+        "ru-shch",
+        "ru-ts-ch-shch",
+        "ru-ch"
+      ],
+      "ipa": "/ɕ/ proxy",
+      "role": "extracted-audio-sidecar",
+      "description": "Extracted AAC audio sidecar for SpeakRight audio playback: MRI proxy for щ /ɕː/ and ч /tɕ/ softness; needs Russian-specific explanation.",
+      "bytes": 48035,
+      "sha256": "29724d1318af2dd1aaf8bf50066c748647cfdbb42777bc3a4cb57be8580941b5",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-assets\\ru-RU\\seeing-speech\\ru-shch-proxy.m4a"
+    },
+    {
+      "kind": "audio",
+      "source": "Seeing Speech, University of Glasgow (AAC track extracted locally from MP4)",
+      "license": "CC BY-NC-ND 4.0; user-stated noncommercial educational local use; preserve unmodified file and attribution",
+      "attribution": "Lawson, E., Stuart-Smith, J., Scobbie, J. M., Nakai, S. (2018). Seeing Speech: an articulatory web resource for the study of Phonetics. University of Glasgow.",
+      "sourcePageUrl": "https://www.seeingspeech.ac.uk/ipa-charts/?chart=3&datatype=1&speaker=1#location=116703",
+      "sourceUrl": "https://www.seeingspeech.ac.uk/recording/MRI_vl_alveolar_affricate.mp4",
+      "localPublicPath": "/audio/language-assets/ru-RU/seeing-speech/ru-ts.m4a",
+      "localFile": "audio/language-assets/ru-RU/seeing-speech/ru-ts.m4a",
+      "speakRightUnits": [
+        "ru-ts",
+        "ru-ts-ch-shch"
+      ],
+      "ipa": "/ts/",
+      "role": "extracted-audio-sidecar",
+      "description": "Extracted AAC audio sidecar for SpeakRight audio playback: MRI articulation for ц /ts/.",
+      "bytes": 43309,
+      "sha256": "01048ab1d3e7f2fd7e1b8770b23a86facdcfcfbc5ef225fb9ae36c45538365a4",
+      "downloaded": true,
+      "absolutePath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-assets\\ru-RU\\seeing-speech\\ru-ts.m4a"
+    }
+  ],
+  "optionalCommonsAudioNotDownloadedDueRateLimit": [
+    {
+      "localFile": "audio/language-assets/ru-RU/commons/ru-v.ogg",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/8/85/Voiced_labiodental_fricative.ogg",
+      "error": "failed to download https://upload.wikimedia.org/wikipedia/commons/8/85/Voiced_labiodental_fricative.ogg: HTTP Error 429: Too many requests - please contact noc@wikimedia.org to discuss a less disruptive approach or instead use thumbnail images in sizes listed on https://w.wiki/GHai. (0c640b1)"
+    },
+    {
+      "localFile": "audio/language-assets/ru-RU/commons/ru-t.ogg",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/0/02/Voiceless_alveolar_plosive.ogg",
+      "error": "failed to download https://upload.wikimedia.org/wikipedia/commons/0/02/Voiceless_alveolar_plosive.ogg: HTTP Error 429: Too many requests - please contact noc@wikimedia.org to discuss a less disruptive approach or instead use thumbnail images in sizes listed on https://w.wiki/GHai. (0c640b1)"
+    },
+    {
+      "localFile": "audio/language-assets/ru-RU/commons/ru-d.ogg",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/0/01/Voiced_alveolar_plosive.ogg",
+      "error": "failed to download https://upload.wikimedia.org/wikipedia/commons/0/01/Voiced_alveolar_plosive.ogg: HTTP Error 429: Too many requests - please contact noc@wikimedia.org to discuss a less disruptive approach or instead use thumbnail images in sizes listed on https://w.wiki/GHai. (0c640b1)"
+    },
+    {
+      "localFile": "audio/language-assets/ru-RU/commons/ru-n.ogg",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/2/29/Alveolar_nasal.ogg",
+      "error": "failed to download https://upload.wikimedia.org/wikipedia/commons/2/29/Alveolar_nasal.ogg: HTTP Error 429: Too many requests - please contact noc@wikimedia.org to discuss a less disruptive approach or instead use thumbnail images in sizes listed on https://w.wiki/GHai. (0c640b1)"
+    },
+    {
+      "localFile": "audio/language-assets/ru-RU/commons/ru-l.ogg",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/b/bc/Alveolar_lateral_approximant.ogg",
+      "error": "failed to download https://upload.wikimedia.org/wikipedia/commons/b/bc/Alveolar_lateral_approximant.ogg: HTTP Error 429: Too many requests - please contact noc@wikimedia.org to discuss a less disruptive approach or instead use thumbnail images in sizes listed on https://w.wiki/GHai. (0c640b1)"
+    },
+    {
+      "localFile": "audio/language-assets/ru-RU/commons/ru-s.ogg",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/a/ac/Voiceless_alveolar_sibilant.ogg",
+      "error": "failed to download https://upload.wikimedia.org/wikipedia/commons/a/ac/Voiceless_alveolar_sibilant.ogg: HTTP Error 429: Too many requests - please contact noc@wikimedia.org to discuss a less disruptive approach or instead use thumbnail images in sizes listed on https://w.wiki/GHai. (0c640b1)"
+    },
+    {
+      "localFile": "audio/language-assets/ru-RU/commons/ru-z.ogg",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/c/c0/Voiced_alveolar_sibilant.ogg",
+      "error": "failed to download https://upload.wikimedia.org/wikipedia/commons/c/c0/Voiced_alveolar_sibilant.ogg: HTTP Error 429: Too many requests - please contact noc@wikimedia.org to discuss a less disruptive approach or instead use thumbnail images in sizes listed on https://w.wiki/GHai. (0c640b1)"
+    },
+    {
+      "localFile": "audio/language-assets/ru-RU/commons/ru-j.ogg",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/e/e8/Palatal_approximant.ogg",
+      "error": "failed to download https://upload.wikimedia.org/wikipedia/commons/e/e8/Palatal_approximant.ogg: HTTP Error 429: Too many requests - please contact noc@wikimedia.org to discuss a less disruptive approach or instead use thumbnail images in sizes listed on https://w.wiki/GHai. (0c640b1)"
+    },
+    {
+      "localFile": "audio/language-assets/ru-RU/commons/ru-k.ogg",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/e/e3/Voiceless_velar_plosive.ogg",
+      "error": "failed to download https://upload.wikimedia.org/wikipedia/commons/e/e3/Voiceless_velar_plosive.ogg: HTTP Error 429: Too many requests - please contact noc@wikimedia.org to discuss a less disruptive approach or instead use thumbnail images in sizes listed on https://w.wiki/GHai. (0c640b1)"
+    },
+    {
+      "localFile": "audio/language-assets/ru-RU/commons/ru-g.ogg",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/b/b4/Voiced_velar_plosive.ogg",
+      "error": "failed to download https://upload.wikimedia.org/wikipedia/commons/b/b4/Voiced_velar_plosive.ogg: HTTP Error 429: Too many requests - please contact noc@wikimedia.org to discuss a less disruptive approach or instead use thumbnail images in sizes listed on https://w.wiki/GHai. (0c640b1)"
+    },
+    {
+      "localFile": "audio/language-assets/ru-RU/commons/ru-x.ogg",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/0/0f/Voiceless_velar_fricative.ogg",
+      "error": "failed to download https://upload.wikimedia.org/wikipedia/commons/0/0f/Voiceless_velar_fricative.ogg: HTTP Error 429: Too many requests - please contact noc@wikimedia.org to discuss a less disruptive approach or instead use thumbnail images in sizes listed on https://w.wiki/GHai. (0c640b1)"
+    }
+  ],
+  "blockingFailures": [],
+  "counts": {
+    "assets": 75,
+    "videos": 28,
+    "audio": 47,
+    "seeingSpeechVideos": 28,
+    "seeingSpeechExtractedAudio": 28,
+    "commonsAudio": 19,
+    "blockingFailures": 0,
+    "optionalCommonsRateLimited": 11
+  }
+}

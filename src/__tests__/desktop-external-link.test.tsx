@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => ({
   toastError: vi.fn(),
   toastSuccess: vi.fn(),
   writeText: vi.fn(async () => {}),
+  openUrl: vi.fn(async () => {}),
 }));
 
 vi.mock("@/lib/tauri-runtime", () => ({
@@ -17,6 +18,10 @@ vi.mock("sonner", () => ({
     error: mocks.toastError,
     success: mocks.toastSuccess,
   },
+}));
+
+vi.mock("@tauri-apps/plugin-opener", () => ({
+  openUrl: mocks.openUrl,
 }));
 
 describe("DesktopExternalLink", () => {
@@ -35,7 +40,7 @@ describe("DesktopExternalLink", () => {
     cleanup();
   });
 
-  it("copies external links instead of navigating inside the Tauri WebView", async () => {
+  it("opens external links in the system browser instead of navigating inside the Tauri WebView", async () => {
     const { DesktopExternalLink } = await import(
       "@/components/common/desktop-external-link"
     );
@@ -61,13 +66,12 @@ describe("DesktopExternalLink", () => {
     expect(link).toHaveAttribute("rel", "noopener noreferrer");
     expect(event.defaultPrevented).toBe(true);
     await waitFor(() => {
-      expect(mocks.writeText).toHaveBeenCalledWith(
+      expect(mocks.openUrl).toHaveBeenCalledWith(
         "https://dictionaryapi.com/register/index",
       );
     });
-    expect(mocks.toastSuccess).toHaveBeenCalledWith(
-      "已复制链接，请在浏览器中打开",
-    );
+    expect(mocks.writeText).not.toHaveBeenCalled();
+    expect(mocks.toastSuccess).not.toHaveBeenCalled();
   });
 
   it("leaves normal browser links untouched outside Tauri", async () => {
@@ -94,7 +98,8 @@ describe("DesktopExternalLink", () => {
     expect(mocks.toastSuccess).not.toHaveBeenCalled();
   });
 
-  it("keeps the desktop window on the app when clipboard copy fails", async () => {
+  it("falls back to copying the link when the opener plugin fails", async () => {
+    mocks.openUrl.mockRejectedValueOnce(new Error("opener denied"));
     mocks.writeText.mockRejectedValueOnce(new Error("clipboard denied"));
     const { DesktopExternalLink } = await import(
       "@/components/common/desktop-external-link"
@@ -115,6 +120,9 @@ describe("DesktopExternalLink", () => {
 
     expect(event.defaultPrevented).toBe(true);
     await waitFor(() => {
+      expect(mocks.openUrl).toHaveBeenCalledWith(
+        "https://dictionaryapi.com/register/index",
+      );
       expect(mocks.toastError).toHaveBeenCalledWith(
         "请手动打开：https://dictionaryapi.com/register/index",
       );
@@ -141,7 +149,7 @@ describe("DesktopExternalLink", () => {
 
     expect(sourceEvent.defaultPrevented).toBe(true);
     await waitFor(() => {
-      expect(mocks.writeText).toHaveBeenCalledWith(
+      expect(mocks.openUrl).toHaveBeenCalledWith(
         DESKTOP_RELEASE_INFO.repositoryUrl,
       );
     });

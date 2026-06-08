@@ -8,6 +8,10 @@ import {
   getPronunciationConfig,
 } from "@/lib/api-keys";
 import type { LanguageId } from "@/types/language";
+import {
+  getLanguageAudioPackEntry,
+} from "@/lib/language-audio-pack-cache";
+import { isElevenLabsPackLanguageId } from "@/lib/elevenlabs-language-packs";
 
 export interface UseMwPronunciationReturn {
   playWord: (
@@ -78,6 +82,31 @@ export function useMwPronunciation(): UseMwPronunciationReturn {
 
       cleanup();
       setIsLoading(true);
+
+      if (isElevenLabsPackLanguageId(languageId)) {
+        const cached = await getLanguageAudioPackEntry(languageId, word);
+        if (cached) {
+          const url = URL.createObjectURL(cached.audioBlob);
+          blobUrlRef.current = url;
+          const howl = new Howl({
+            src: [url],
+            format: ["mp3"],
+            onplay: () => {
+              setIsLoading(false);
+              setIsPlaying(true);
+            },
+            onend: () => setIsPlaying(false),
+            onstop: () => setIsPlaying(false),
+            onloaderror: () => {
+              setIsLoading(false);
+              setIsPlaying(false);
+            },
+          });
+          howlRef.current = howl;
+          howl.play();
+          return;
+        }
+      }
 
       // Primary: API-based pronunciation (youdao default, or merriam-webster)
       try {

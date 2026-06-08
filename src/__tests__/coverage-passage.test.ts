@@ -32,15 +32,6 @@ function resultForWords(
 }
 
 describe("coverage passage", () => {
-  it("rejects non-English coverage diagnosis at the engine boundary", () => {
-    expect(() =>
-      buildCoveragePassageDiagnosisReport({
-        languageId: "es-ES" as never,
-        recordings: [],
-      }),
-    ).toThrow("en-US only");
-  });
-
   it("covers the ten core training packs with natural recordable text", () => {
     expect(COVERAGE_PASSAGE.segments.length).toBeGreaterThanOrEqual(7);
 
@@ -63,7 +54,6 @@ describe("coverage passage", () => {
 
   it("builds a v2 coverage report and maps weak th evidence to s-th", () => {
     const report = buildCoveragePassageDiagnosisReport({
-      languageId: "en-US",
       recordings: [
         {
           text: "thin sheep",
@@ -158,7 +148,6 @@ describe("coverage passage", () => {
 
   it("creates rhythm evidence from the weakest passage segment", () => {
     const report = buildCoveragePassageDiagnosisReport({
-      languageId: "en-US",
       recordings: [
         {
           text: "again",
@@ -193,7 +182,6 @@ describe("coverage passage", () => {
 
   it("includes coverage recording quality notes in evidence summary", () => {
     const report = buildCoveragePassageDiagnosisReport({
-      languageId: "en-US",
       recordings: [
         {
           text: "thin sheep",
@@ -232,7 +220,6 @@ describe("coverage passage", () => {
 
   it("routes repeated weak final consonants to the final consonant probe", () => {
     const report = buildCoveragePassageDiagnosisReport({
-      languageId: "en-US",
       recordings: [
         {
           text: "asked lift",

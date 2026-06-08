@@ -34,7 +34,6 @@ function resultForWord(
 function profile(overrides: Partial<MasteryProfile> = {}): MasteryProfile {
   return {
     version: 2,
-    languageId: "en-US",
     updatedAt: NOW,
     packs: {
       "s-th": {

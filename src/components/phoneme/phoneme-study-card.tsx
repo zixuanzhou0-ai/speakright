@@ -6,7 +6,6 @@ import Image from "next/image";
 import { PhonemePlayButton } from "@/components/phoneme/phoneme-play-button";
 import { VideoPlayer } from "@/components/phoneme/video-player";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import type { LanguageProfile } from "@/types/language";
 import type { KeywordEntry, PhonemeData } from "@/types/phoneme";
 
@@ -56,9 +55,7 @@ export function PhonemeStudyCard({
   wordHistoryLength,
 }: PhonemeStudyCardProps) {
   const hasLocalPhonemeAssets = phoneme.languageId === "en-US";
-  const isLongPhoneme = phoneme.ipa.length >= 10;
-  const isVeryLongPhoneme = phoneme.ipa.length >= 18;
-  const isLongWord = (currentWord?.word.length ?? 0) >= 14;
+  const displayWord = currentWord?.stressText ?? currentWord?.word;
 
   return (
     <div className="shrink-0 rounded-xl border bg-card shadow-sm overflow-hidden">
@@ -66,34 +63,28 @@ export function PhonemeStudyCard({
         slug={phoneme.slug}
         available={phoneme.video?.status === "ready"}
         label={phoneme.video?.label}
+        localSrc={phoneme.video?.localSrc}
+        resources={phoneme.teachingResources}
       />
       <div className="px-4 py-3">
         {/* IPA + play + emoji */}
-        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
-          <div className="min-w-0 space-y-2">
-            <div className="flex min-w-0 items-start gap-2">
-              <h1
-                className={cn(
-                  "min-w-0 whitespace-normal break-words font-mono font-bold leading-tight [overflow-wrap:anywhere]",
-                  isVeryLongPhoneme
-                    ? "text-xl"
-                    : isLongPhoneme
-                      ? "text-2xl"
-                      : "text-3xl",
-                )}
-              >
-                {phoneme.ipa}
-              </h1>
-              <div className="shrink-0 pt-0.5">
-                <PhonemePlayButton
-                  chartWord={hasLocalPhonemeAssets ? phoneme.chartWord : undefined}
-                />
-              </div>
-            </div>
-            <p className="min-w-0 text-sm leading-snug text-muted-foreground line-clamp-2">
-              {languageProfile.shortLabel} · {phoneme.name}
-            </p>
-          </div>
+        <div className="flex items-center gap-3">
+          <h1 className="font-mono text-3xl font-bold">{phoneme.ipa}</h1>
+          <PhonemePlayButton
+            chartWord={hasLocalPhonemeAssets ? phoneme.chartWord : undefined}
+            phonemeAudio={
+              hasLocalPhonemeAssets ? undefined : phoneme.phonemeAudio
+            }
+            onBeforePlay={() => {
+              onStopPlayback();
+              onStopMw();
+              onStopChartAudio();
+            }}
+          />
+          <span className="text-muted-foreground/30">|</span>
+          <p className="text-sm text-muted-foreground flex-1 truncate">
+            {languageProfile.shortLabel} · {phoneme.name}
+          </p>
           {hasLocalPhonemeAssets && phoneme.chartImage && (
             <motion.button
               type="button"
@@ -126,7 +117,7 @@ export function PhonemeStudyCard({
 
         {/* Word navigation */}
         {currentWord ? (
-          <div className="mt-3 grid grid-cols-[2rem_minmax(0,1fr)_2rem] items-center gap-2 rounded-xl border bg-muted/25 px-1.5 py-2">
+          <div className="mt-3 flex items-center gap-2">
             <motion.div whileTap={{ scale: 0.9 }}>
               <Button
                 variant="ghost"
@@ -142,7 +133,7 @@ export function PhonemeStudyCard({
               </Button>
             </motion.div>
 
-            <div className="relative min-w-0 overflow-hidden">
+            <div className="relative flex-1 overflow-hidden">
               <AnimatePresence mode="wait" initial={false}>
                 <motion.div
                   key={currentWord.word}
@@ -150,49 +141,41 @@ export function PhonemeStudyCard({
                   animate={{ x: 0, opacity: 1 }}
                   exit={{ x: wordDirection > 0 ? -120 : 120, opacity: 0 }}
                   transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                  className="min-w-0 text-center"
+                  className="flex items-center justify-center gap-2"
                 >
-                  <div className="flex min-w-0 items-center justify-center gap-2">
-                    <motion.span
-                      animate={{ scale: isWordActive ? 1.03 : 1 }}
-                      className={cn(
-                        "min-w-0 whitespace-normal break-words text-center font-bold leading-tight transition-colors [overflow-wrap:anywhere]",
-                        isLongWord ? "text-xl" : "text-2xl",
-                        isWordActive && "text-primary",
-                      )}
-                    >
-                      {currentWord.word}
-                    </motion.span>
-                    <motion.button
-                      type="button"
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                      onClick={() => {
-                        onStopPlayback();
-                        onStopChartAudio();
-                        onPlayWord(currentWord.word, "blue");
-                      }}
-                      disabled={mwIsLoading}
-                      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full cursor-pointer text-muted-foreground hover:bg-primary/10 hover:text-primary disabled:opacity-50"
-                    >
-                      {mwIsLoading ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Volume2 className="h-4 w-4" />
-                      )}
-                    </motion.button>
-                  </div>
+                  <motion.span
+                    animate={{ scale: isWordActive ? 1.05 : 1 }}
+                    className={`text-2xl font-bold transition-colors ${isWordActive ? "text-primary" : ""}`}
+                  >
+                    {displayWord}
+                  </motion.span>
                   <span
-                    className={cn(
-                      "mt-1 block min-w-0 whitespace-normal break-words font-mono text-xs leading-snug [overflow-wrap:anywhere]",
-                      isWordActive ? "text-primary/70" : "text-muted-foreground",
-                    )}
+                    className={`font-mono text-sm ${isWordActive ? "text-primary/70" : "text-muted-foreground"}`}
                   >
                     {currentWord.ipa}
                   </span>
                 </motion.div>
               </AnimatePresence>
             </div>
+
+            <motion.button
+              type="button"
+              whileHover={{ scale: 1.15 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={() => {
+                onStopPlayback();
+                onStopChartAudio();
+                onPlayWord(currentWord.word, "blue");
+              }}
+              disabled={mwIsLoading}
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full cursor-pointer hover:bg-primary/10 hover:text-primary text-muted-foreground disabled:opacity-50"
+            >
+              {mwIsLoading ? (
+                <Loader2 className="h-5 w-5 animate-spin" />
+              ) : (
+                <Volume2 className="h-5 w-5" />
+              )}
+            </motion.button>
 
             <motion.div whileTap={{ scale: 0.9 }}>
               <Button

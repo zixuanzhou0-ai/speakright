@@ -15,7 +15,6 @@ import { RecordButton } from "@/components/audio/record-button";
 import { RecordingActions } from "@/components/audio/recording-actions";
 import { RecordingQualityPanel } from "@/components/audio/recording-quality-panel";
 import { WaveformDisplay } from "@/components/audio/waveform-display";
-import { LanguageModuleGate } from "@/components/common/language-module-gate";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useLanguageConfig } from "@/hooks/use-api-keys";
@@ -29,7 +28,7 @@ import {
   type FreePracticeTransferSummary,
   recordFreePracticeTransfer,
 } from "@/lib/free-practice-transfer";
-import { DEFAULT_LANGUAGE_ID } from "@/lib/language-profiles";
+import { getLanguageProfile } from "@/lib/language-profiles";
 import { loadMasteryProfile, saveMasteryProfile } from "@/lib/mastery-profile";
 import { reliabilityFromRecordingQuality } from "@/lib/recording-quality";
 import {
@@ -40,6 +39,7 @@ import type { MasteryProfile } from "@/types/training";
 
 export default function ScenariosPage() {
   const { languageId } = useLanguageConfig();
+  const languageProfile = getLanguageProfile(languageId);
   const [profile, setProfile] = useState<MasteryProfile | null>(null);
   const [scenarioId, setScenarioId] = useState(TRANSFER_SCENARIOS[0].id);
   const [userText, setUserText] = useState("");
@@ -55,12 +55,8 @@ export default function ScenariosPage() {
   });
 
   useEffect(() => {
-    setProfile(
-      languageId === DEFAULT_LANGUAGE_ID
-        ? loadMasteryProfile(DEFAULT_LANGUAGE_ID)
-        : null,
-    );
-  }, [languageId]);
+    setProfile(loadMasteryProfile());
+  }, []);
 
   const plan = useMemo(
     () => buildTransferPromptPlan(scenarioId, profile),
@@ -84,9 +80,12 @@ export default function ScenariosPage() {
   };
 
   const submit = async () => {
-    if (languageId !== DEFAULT_LANGUAGE_ID) return;
     if (!recorder.audioBlob || !quality.report?.canSubmit) return;
-    const result = await assessment.assess(recorder.audioBlob, textToRead);
+    const result = await assessment.assess(
+      recorder.audioBlob,
+      textToRead,
+      languageProfile.azureLocale,
+    );
     if (!result) return;
     const transferSummary = analyzeFreePracticeTransfer({
       profile,
@@ -109,13 +108,12 @@ export default function ScenariosPage() {
         transferSummary,
         reliability,
       );
-      saveMasteryProfile(recorded.profile, DEFAULT_LANGUAGE_ID);
+      saveMasteryProfile(recorded.profile);
       setProfile(recorded.profile);
       setSummary(recorded.summary);
     }
     try {
       await saveBenchmarkRecording(recorder.audioBlob, {
-        languageId: DEFAULT_LANGUAGE_ID,
         source: "scenario",
         title: plan.scenario.title,
         text: textToRead,
@@ -131,8 +129,7 @@ export default function ScenariosPage() {
     !!recorder.audioBlob && (quality.isAnalyzing || !quality.report?.canSubmit);
 
   return (
-    <LanguageModuleGate moduleName="场景迁移训练" readinessKey="evidenceMastery">
-      <div className="h-full overflow-y-auto px-6 py-4 scrollbar-thin">
+    <div className="h-full overflow-y-auto px-6 py-4 scrollbar-thin">
       <div className="mb-5 flex items-center gap-3">
         <Link
           href="/drill"
@@ -224,7 +221,9 @@ export default function ScenariosPage() {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => tts.speak(textToRead, 0.86)}
+                onClick={() =>
+                  tts.speak(textToRead, { speed: 0.86, languageId })
+                }
                 disabled={tts.isLoading}
                 className="gap-2 cursor-pointer"
               >
@@ -324,7 +323,6 @@ export default function ScenariosPage() {
           )}
         </main>
       </div>
-      </div>
-    </LanguageModuleGate>
+    </div>
   );
 }

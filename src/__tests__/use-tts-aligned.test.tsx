@@ -17,10 +17,6 @@ vi.mock("@/lib/api-keys", () => ({
   getElevenLabsConfig: mocks.getElevenLabsConfig,
 }));
 
-vi.mock("@/hooks/use-api-keys", () => ({
-  useLanguageConfig: () => ({ languageId: "en-US" }),
-}));
-
 vi.mock("@/lib/tts-cache", () => ({
   getTtsFromCache: mocks.getTtsFromCache,
   setTtsToCache: mocks.setTtsToCache,
@@ -122,6 +118,42 @@ describe("useTtsAligned", () => {
     });
 
     expect(result.current.wordTimings).toEqual([]);
+  });
+
+  it("uses language pack defaults and language-separated cache for non-English TTS", async () => {
+    const { result } = renderHook(() => useTtsAligned());
+
+    await act(async () => {
+      await result.current.speak("Bonjour", { languageId: "fr-FR" });
+    });
+
+    await waitFor(() => {
+      expect(mocks.getTtsFromCache).toHaveBeenCalledWith(
+        "Bonjour",
+        "test-voice",
+        0.84,
+        "fr-FR",
+      );
+    });
+
+    expect(mocks.elevenLabsTtsAligned).toHaveBeenCalledWith(
+      "test-key",
+      "test-voice",
+      "Bonjour",
+      "eleven_multilingual_v2",
+      {
+        speed: 0.84,
+        languageCode: "fr",
+      },
+    );
+    expect(mocks.setTtsToCache).toHaveBeenCalledWith(
+      "Bonjour",
+      "test-voice",
+      0.84,
+      expect.any(Blob),
+      expect.any(Object),
+      "fr-FR",
+    );
   });
 
   it("ignores a stale pending TTS response after reset", async () => {
