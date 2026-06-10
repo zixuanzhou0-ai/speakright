@@ -12,6 +12,7 @@ import {
 import {
   getAssessmentPhonemeLabel,
   getPhonemeAudioUrl,
+  normalizeAssessmentPhoneme,
   syllableToIpa,
 } from "@/lib/azure-phoneme-map";
 import { getBarColor } from "@/lib/score-utils";
@@ -196,7 +197,10 @@ export function PhonemeHighlight({
   syllables,
   languageId = "en-US",
 }: PhonemeHighlightProps) {
-  const hasAnyAudio = phonemes.some((ph) =>
+  const visiblePhonemes = phonemes.filter((ph) =>
+    normalizeAssessmentPhoneme(ph.phoneme),
+  );
+  const hasAnyAudio = visiblePhonemes.some((ph) =>
     getPhonemeAudioUrl(ph.phoneme, languageId),
   );
   const breakdownLabel = languageId === "en-US" ? "音标拆解" : "发音拆解";
@@ -220,16 +224,22 @@ export function PhonemeHighlight({
             </span>
           )}
         </div>
-        <div className="flex flex-wrap gap-2">
-          {phonemes.map((ph, i) => (
-            <PhonemeBlock
-              key={`${ph.phoneme}-${ph.accuracyScore}`}
-              ph={ph}
-              index={i}
-              languageId={languageId}
-            />
-          ))}
-        </div>
+        {visiblePhonemes.length > 0 ? (
+          <div className="flex flex-wrap gap-2">
+            {visiblePhonemes.map((ph, i) => (
+              <PhonemeBlock
+                key={`${ph.phoneme}-${ph.accuracyScore}`}
+                ph={ph}
+                index={i}
+                languageId={languageId}
+              />
+            ))}
+          </div>
+        ) : (
+          <p className="rounded-lg border border-dashed bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
+            Azure 返回了评分，但没有返回可用的分段音素标签；请重新录制或换一个示例词复测。
+          </p>
+        )}
       </div>
 
       {/* Syllable view (hidden for single-syllable words) */}

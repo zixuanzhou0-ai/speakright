@@ -30,6 +30,7 @@ import {
   getLanguageProfile,
 } from "@/lib/language-profiles";
 import { isRuleLikeSoundUnit } from "@/lib/language-sound-unit-groups";
+import { normalizeAssessmentPhoneme } from "@/lib/azure-phoneme-map";
 import {
   getPracticedWordsForLanguage,
   markWordPracticedForLanguage,
@@ -38,8 +39,82 @@ import { addScore, scoreHistoryKey } from "@/lib/score-history";
 import { getAdjacentSpanishWord } from "@/lib/spanish-sound-examples";
 import { getWordPool } from "@/lib/word-pool";
 import { selectNextWord } from "@/lib/word-selector";
-import type { AzureAssessmentResult } from "@/types/azure";
+import type { AzureAssessmentResult, AzurePhoneme } from "@/types/azure";
 import type { KeywordEntry } from "@/types/phoneme";
+
+const IPA_COMBINING_MARKS = new Set([
+  "ː",
+  "ʲ",
+  "ʷ",
+  "̃",
+  "̯",
+  "̞",
+  "̩",
+  "̥",
+  "̬",
+  "̪",
+  "̟",
+  "̠",
+  "̝",
+  "̜",
+  "̹",
+  "̺",
+  "̻",
+]);
+
+function segmentIpaForAssessment(ipa?: string): string[] {
+  const cleaned = (ipa ?? "")
+    .normalize("NFC")
+    .replace(/[/[\]ˈˌ.\s]/g, "")
+    .replace(/[͜͡]/g, "");
+
+  const chars = Array.from(cleaned);
+  const tokens: string[] = [];
+
+  for (let index = 0; index < chars.length; index++) {
+    let token = chars[index];
+    const next = chars[index + 1];
+
+    if (token === "t" && ["ʃ", "ɕ", "s"].includes(next)) {
+      token += next;
+      index++;
+    } else if (token === "d" && ["ʒ", "z"].includes(next)) {
+      token += next;
+      index++;
+    }
+
+    while (IPA_COMBINING_MARKS.has(chars[index + 1])) {
+      token += chars[index + 1];
+      index++;
+    }
+
+    if (normalizeAssessmentPhoneme(token)) tokens.push(token);
+  }
+
+  return tokens;
+}
+
+function hydrateAssessmentPhonemes(
+  phonemes: AzurePhoneme[],
+  fallbackIpa?: string,
+): AzurePhoneme[] {
+  const fallbackTokens = segmentIpaForAssessment(fallbackIpa);
+
+  return phonemes
+    .map((phoneme, index) => {
+      const rawPhoneme =
+        typeof phoneme.phoneme === "string" ? phoneme.phoneme : "";
+      if (normalizeAssessmentPhoneme(rawPhoneme)) {
+        return { ...phoneme, phoneme: rawPhoneme };
+      }
+
+      return {
+        ...phoneme,
+        phoneme: fallbackTokens[index] ?? rawPhoneme,
+      };
+    })
+    .filter((phoneme) => normalizeAssessmentPhoneme(phoneme.phoneme));
+}
 
 export function PhonemeDetailPage() {
   const params = useParams<{ phoneme: string }>();
@@ -235,7 +310,9 @@ export function PhonemeDetailPage() {
 
     if (result) {
       if (result.words[0]?.phonemes) {
-        setSelectedWordPhonemes(result.words[0].phonemes);
+        setSelectedWordPhonemes(
+          hydrateAssessmentPhonemes(result.words[0].phonemes, currentWord?.ipa),
+        );
       }
       if (result.words[0]?.syllables) {
         setSelectedWordSyllables(result.words[0].syllables);
@@ -260,6 +337,7 @@ export function PhonemeDetailPage() {
   }, [
     recorder.audioBlob,
     currentWordStr,
+    currentWord?.ipa,
     phoneme,
     languageId,
     languageProfile.azureLocale,
@@ -289,10 +367,11 @@ export function PhonemeDetailPage() {
   }, [recorder.isRecording]);
 
   const handlePlayRecording = () => {
-    if (recorder.audioBlob) {
+    const replayBlob = recorder.rawBlob ?? recorder.audioBlob;
+    if (replayBlob) {
       wordAudio.stop();
       chartAudio.stop();
-      playback.playBlob(recorder.audioBlob);
+      playback.playBlob(replayBlob);
     }
   };
 
@@ -402,7 +481,10 @@ export function PhonemeDetailPage() {
               />
 
               <RecordingActions
-                hasRecording={!!recorder.audioBlob && !recorder.isRecording}
+                hasRecording={
+                  !!(recorder.rawBlob ?? recorder.audioBlob) &&
+                  !recorder.isRecording
+                }
                 isPlaying={playback.isPlaying}
                 isAssessing={azure.isLoading}
                 onReplay={handlePlayRecording}

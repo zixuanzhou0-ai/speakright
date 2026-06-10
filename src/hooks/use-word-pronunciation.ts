@@ -16,7 +16,9 @@ export interface UseWordPronunciationReturn {
   ) => void;
   isLoading: boolean;
   isPlaying: boolean;
+  error: string | null;
   stop: () => void;
+  clearError: () => void;
 }
 
 export function getEnglishWordAudioSrc(
@@ -38,6 +40,7 @@ function resumeHowlerAudioContext(): void {
 export function useWordPronunciation(): UseWordPronunciationReturn {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const howlRef = useRef<Howl | null>(null);
   const blobUrlRef = useRef<string | null>(null);
 
@@ -80,6 +83,7 @@ export function useWordPronunciation(): UseWordPronunciationReturn {
           }
           setIsLoading(false);
           setIsPlaying(false);
+          setError("音频加载失败，请稍后重试。");
           console.warn(`[Pronunciation] Audio failed to load: ${src}`);
         },
       });
@@ -101,6 +105,7 @@ export function useWordPronunciation(): UseWordPronunciationReturn {
       } catch (error) {
         setIsLoading(false);
         setIsPlaying(false);
+        setError("在线发音兜底失败。");
         console.warn(`[Pronunciation] Youdao fallback failed for "${word}":`, error);
       }
     },
@@ -119,6 +124,7 @@ export function useWordPronunciation(): UseWordPronunciationReturn {
       resumeHowlerAudioContext();
       cleanup();
       setIsLoading(true);
+      setError(null);
 
       if (languageId === "en-US") {
         playHowl(getEnglishWordAudioSrc(normalizedWord, fallbackVoice), {
@@ -146,6 +152,14 @@ export function useWordPronunciation(): UseWordPronunciationReturn {
           playHowl(url);
           return;
         }
+
+        setIsLoading(false);
+        setIsPlaying(false);
+        setError(`暂无「${normalizedWord}」的本地标准发音。`);
+        console.warn(
+          `[Pronunciation] Missing local ${languageId} pronunciation for "${normalizedWord}"`,
+        );
+        return;
       }
 
       await playYoudaoFallback(normalizedWord);
@@ -159,5 +173,7 @@ export function useWordPronunciation(): UseWordPronunciationReturn {
     setIsLoading(false);
   }, [cleanup]);
 
-  return { playWord, isLoading, isPlaying, stop };
+  const clearError = useCallback(() => setError(null), []);
+
+  return { playWord, isLoading, isPlaying, error, stop, clearError };
 }

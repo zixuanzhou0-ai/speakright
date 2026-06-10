@@ -21,6 +21,8 @@
     "tauri:test": "cargo test --manifest-path src-tauri/Cargo.toml",
     "desktop:artifact-smoke": "node scripts/desktop-artifact-smoke.mjs",
     "desktop:smoke": "node scripts/desktop-smoke.mjs",
+    "desktop:live-validation": "node scripts/desktop-live-validation.mjs --azure-mode=high",
+    "desktop:live-validation:full": "node scripts/desktop-live-validation.mjs --azure-mode=full",
     "desktop:release-report": "node scripts/desktop-release-report.mjs",
     "desktop:installer-smoke": "node scripts/desktop-installer-smoke.mjs",
     "desktop:release-gate": "node scripts/desktop-release-gate.mjs",

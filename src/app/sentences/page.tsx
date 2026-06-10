@@ -311,12 +311,13 @@ export default function SentencesPage() {
   );
 
   const handlePlayRecording = useCallback(() => {
-    if (recorder.audioBlob) {
+    const replayBlob = recorder.rawBlob ?? recorder.audioBlob;
+    if (replayBlob) {
       wordAudio.stop();
       tts.reset();
-      playback.playBlob(recorder.audioBlob);
+      playback.playBlob(replayBlob);
     }
-  }, [recorder.audioBlob, wordAudio, tts, playback]);
+  }, [recorder.rawBlob, recorder.audioBlob, wordAudio, tts, playback]);
 
   const handleClear = useCallback(() => {
     playback.stop();

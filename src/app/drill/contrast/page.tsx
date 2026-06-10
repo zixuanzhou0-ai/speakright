@@ -3,7 +3,7 @@
 import { ArrowLeft, Check, Loader2, SkipForward, Volume2 } from "lucide-react";
 import { motion } from "motion/react";
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { RecordButton } from "@/components/audio/record-button";
 import { WaveformDisplay } from "@/components/audio/waveform-display";
 import { DrillSummaryCard } from "@/components/drill/drill-summary";
@@ -14,6 +14,11 @@ import { useWordPronunciation } from "@/hooks/use-word-pronunciation";
 import { useRecorder } from "@/hooks/use-recorder";
 import { getPhonemeAccuracy } from "@/lib/azure-phoneme-map";
 import { computeDrillSummary, getPassThreshold } from "@/lib/drill-utils";
+import {
+  LANGUAGE_LEARNING_DECKS,
+  type DeckLanguageId,
+} from "@/lib/language-learning-decks";
+import { getLanguagePhonemeBySlug } from "@/lib/language-phonemes";
 import { getLanguageProfile } from "@/lib/language-profiles";
 import type { MinimalPairSet } from "@/lib/minimal-pairs";
 import { MINIMAL_PAIR_SETS } from "@/lib/minimal-pairs";
@@ -37,6 +42,36 @@ type ContrastPhase =
     }
   | { type: "completed"; summary: DrillSummary };
 
+function contrastSetsForLanguage(languageId: string): MinimalPairSet[] {
+  if (languageId === "en-US") return MINIMAL_PAIR_SETS;
+  const deck = LANGUAGE_LEARNING_DECKS[languageId as DeckLanguageId];
+  const grouped = new Map<string, typeof deck.contrastDeck>();
+  for (const item of deck.contrastDeck) {
+    const items = grouped.get(item.targetUnitSlug) ?? [];
+    items.push(item);
+    grouped.set(item.targetUnitSlug, items);
+  }
+
+  return Array.from(grouped.entries()).map(([slug, items]) => {
+    const unit = getLanguagePhonemeBySlug(languageId as DeckLanguageId, slug);
+    return {
+      id: `${languageId}:${slug}`,
+      phonemeA: slug,
+      phonemeB: slug,
+      label: unit ? `${unit.ipa} ${unit.name}` : slug,
+      pairs: items.map((item) => {
+        const [ipaA, ipaB] = item.ipa.split("~").map((part) => part.trim());
+        return {
+          wordA: item.left,
+          ipaA: ipaA || item.ipa,
+          wordB: item.right,
+          ipaB: ipaB || item.ipa,
+        };
+      }),
+    };
+  });
+}
+
 export default function ContrastDrillPage() {
   const { languageId } = useLanguageConfig();
   const languageProfile = getLanguageProfile(languageId);
@@ -50,6 +85,10 @@ export default function ContrastDrillPage() {
   const azure = useAzureAssessment();
   const wordAudio = useWordPronunciation();
   const coachMode = useCoachMode();
+  const availableSets = useMemo(
+    () => contrastSetsForLanguage(languageId),
+    [languageId],
+  );
 
   const threshold = getPassThreshold(coachMode);
 
@@ -124,7 +163,8 @@ export default function ContrastDrillPage() {
       );
       if (!result) return;
       const phonemeScore = getPhonemeAccuracy(result, targetPhoneme);
-      const scoreA = phonemeScore ?? result.pronunciationScore;
+      const scoreA =
+        phonemeScore ?? (languageId === "en-US" ? result.pronunciationScore : 0);
       setPendingScoreA(scoreA);
       processedBlobRef.current = null;
       recorder.reset();
@@ -143,6 +183,7 @@ export default function ContrastDrillPage() {
     currentPair,
     selectedSet,
     languageProfile.azureLocale,
+    languageId,
   ]);
 
   // Auto-assess word B — same structure as above.
@@ -170,7 +211,8 @@ export default function ContrastDrillPage() {
       );
       if (!result) return;
       const phonemeScore = getPhonemeAccuracy(result, targetPhoneme);
-      const scoreB = phonemeScore ?? result.pronunciationScore;
+      const scoreB =
+        phonemeScore ?? (languageId === "en-US" ? result.pronunciationScore : 0);
       const passed =
         priorScoreA >= currentThreshold && scoreB >= currentThreshold;
       processedBlobRef.current = null;
@@ -196,6 +238,7 @@ export default function ContrastDrillPage() {
     pendingScoreA,
     threshold,
     languageProfile.azureLocale,
+    languageId,
   ]);
 
   const handleNext = () => {
@@ -275,7 +318,7 @@ export default function ContrastDrillPage() {
               选择一组易混淆音标进行对比训练：
             </p>
             <div className="grid grid-cols-2 gap-3">
-              {MINIMAL_PAIR_SETS.map((set) => (
+              {availableSets.map((set) => (
                 <motion.button
                   key={set.id}
                   type="button"
@@ -354,6 +397,11 @@ export default function ContrastDrillPage() {
                 </div>
               </div>
               <div className="mt-6 text-center">
+                {wordAudio.error && (
+                  <p className="mb-3 text-xs text-destructive">
+                    {wordAudio.error}
+                  </p>
+                )}
                 <Button onClick={handleStartRecordA} className="cursor-pointer">
                   开始录音（先读 {currentPair.wordA}）
                 </Button>

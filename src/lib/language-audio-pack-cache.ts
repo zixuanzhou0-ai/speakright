@@ -22,7 +22,15 @@ export interface LanguageAudioPackEntry {
 }
 
 export function normalizeAudioPackText(text: string): string {
-  return text.trim().toLocaleLowerCase();
+  return text
+    .normalize("NFC")
+    .replace(/[\u0301\u0341]/g, "")
+    .replace(/[\u2018\u2019\u201B\u02BC\u2032]/g, "'")
+    .replace(/[\u201C\u201D\u2033]/g, '"')
+    .replace(/\s*'\s*/g, "'")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLocaleLowerCase();
 }
 
 function audioCacheKey(languageId: ElevenLabsPackLanguageId, text: string): string {

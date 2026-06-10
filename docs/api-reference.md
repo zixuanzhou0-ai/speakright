@@ -24,6 +24,9 @@ shown in release artifacts.
   `public/audio/language-packs/`; users do not install them in Settings.
 - Missing bundled audio may fall back to ElevenLabs only when the user has
   configured a key.
+- Release validation must not batch-generate ElevenLabs audio. The normal
+  `desktop:live-validation` command queries usage and skips TTS smoke; optional
+  smoke requires an explicit flag and is capped to a short low-cost sample.
 
 ## Dictionary Pronunciation
 

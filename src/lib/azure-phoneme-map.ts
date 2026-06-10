@@ -116,12 +116,7 @@ export function getPhonemeAudioUrl(
   languageId: LanguageId = "en-US",
 ): string | null {
   if (languageId !== "en-US") {
-    const normalizedCode = normalizeAssessmentPhoneme(azureCode);
-    const matchingUnit = getLanguagePhonemes(languageId).find((unit) =>
-      getAssessmentAliasesForSlug(unit.slug).includes(normalizedCode),
-    );
-
-    return matchingUnit?.phonemeAudio?.localSrc ?? null;
+    return resolveAssessmentPhonemeUnit(azureCode, languageId)?.audioUrl ?? null;
   }
 
   const chartWord = azureToChartWord[azureCode.toLowerCase()];
@@ -135,7 +130,13 @@ export function getAssessmentPhonemeLabel(
   if (languageId === "en-US") return toIpa(azureCode);
 
   const normalized = normalizeAssessmentPhoneme(azureCode);
-  return normalized ? `/${normalized}/` : `/${azureCode}/`;
+  if (!normalized) return "—";
+
+  const match = resolveAssessmentPhonemeUnit(azureCode, languageId);
+  if (match?.displayIpa) return match.displayIpa;
+
+  const englishMappedIpa = azureToIpa[normalized];
+  return `/${englishMappedIpa ?? normalized}/`;
 }
 
 /**
@@ -399,6 +400,99 @@ export function getAssessmentExemptionForSlug(
   slug: string,
 ): AssessmentExemption | undefined {
   return phonemeAssessmentExemptions[slug];
+}
+
+type LanguagePhonemeUnit = ReturnType<typeof getLanguagePhonemes>[number];
+
+interface ResolvedAssessmentPhonemeUnit {
+  slug: string;
+  displayIpa: string;
+  audioUrl: string | null;
+}
+
+function uniqueStrings(values: Array<string | null | undefined>): string[] {
+  return [...new Set(values.filter((value): value is string => Boolean(value)))];
+}
+
+function assessmentCodeCandidates(code: string): string[] {
+  const normalized = normalizeAssessmentPhoneme(code);
+  if (!normalized) return [];
+
+  const englishIpa = azureToIpa[normalized];
+  return uniqueStrings([
+    normalized,
+    englishIpa ? normalizeAssessmentPhoneme(englishIpa) : undefined,
+  ]);
+}
+
+function unitIpaCandidates(unit: LanguagePhonemeUnit): string[] {
+  const rawIpa = unit.ipa
+    .replace(/[/[\]]/g, " ")
+    .replace(/[ˈˌ.]/g, "")
+    .split(/[\s,|~]+/)
+    .map(normalizeAssessmentPhoneme);
+
+  return uniqueStrings([normalizeAssessmentPhoneme(unit.ipa), ...rawIpa]);
+}
+
+function assessmentCandidatesForUnit(unit: LanguagePhonemeUnit): string[] {
+  return uniqueStrings([
+    ...getAssessmentAliasesForSlug(unit.slug),
+    ...unitIpaCandidates(unit),
+  ]);
+}
+
+function displayIpaForUnit(
+  unit: LanguagePhonemeUnit,
+  normalizedCode: string,
+): string {
+  const unitIpaCandidateSet = new Set(unitIpaCandidates(unit));
+  const shouldUseUnitIpa =
+    unit.soundUnitType === "phoneme" ||
+    unitIpaCandidateSet.has(normalizedCode) ||
+    normalizeAssessmentPhoneme(unit.ipa).includes(normalizedCode);
+
+  if (shouldUseUnitIpa) return unit.ipa;
+
+  const englishMappedIpa = azureToIpa[normalizedCode];
+  return `/${englishMappedIpa ?? normalizedCode}/`;
+}
+
+export function resolveAssessmentPhonemeUnit(
+  azureCode: string,
+  languageId: LanguageId,
+): ResolvedAssessmentPhonemeUnit | null {
+  if (languageId === "en-US") return null;
+
+  const candidates = assessmentCodeCandidates(azureCode);
+  if (candidates.length === 0) return null;
+
+  const units = getLanguagePhonemes(languageId);
+  const exactIpaMatch = units
+    .filter((unit) =>
+      unitIpaCandidates(unit).some((candidate) =>
+        candidates.includes(candidate),
+      ),
+    )
+    .sort(
+      (left, right) =>
+        unitIpaCandidates(left).length - unitIpaCandidates(right).length,
+    )[0];
+  const matchingUnit =
+    exactIpaMatch ??
+    units.find((unit) =>
+      assessmentCandidatesForUnit(unit).some((candidate) =>
+        candidates.includes(candidate),
+      ),
+    );
+
+  if (!matchingUnit) return null;
+
+  return {
+    slug: matchingUnit.slug,
+    displayIpa: displayIpaForUnit(matchingUnit, candidates[0]),
+    audioUrl: matchingUnit.phonemeAudio?.localSrc ?? null,
+  };
 }
 
 /**

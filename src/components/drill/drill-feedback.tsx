@@ -19,6 +19,7 @@ interface DrillFeedbackProps {
   onRetry: () => void;
   onSkip: () => void;
   onPlayReference: () => void;
+  audioError?: string | null;
 }
 
 export function DrillFeedback({
@@ -34,6 +35,7 @@ export function DrillFeedback({
   onRetry,
   onSkip,
   onPlayReference,
+  audioError,
 }: DrillFeedbackProps) {
   const canRetry = !passed && attemptCount < maxAttempts;
   const mustDecide = !passed && attemptCount >= maxAttempts;
@@ -111,6 +113,11 @@ export function DrillFeedback({
               💡 {item.description}
             </p>
           </div>
+        )}
+        {audioError && (
+          <p className="max-w-sm text-center text-xs text-destructive">
+            {audioError}
+          </p>
         )}
 
         {/* Action buttons */}

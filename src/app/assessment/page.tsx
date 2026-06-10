@@ -21,6 +21,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useLanguageConfig } from "@/hooks/use-api-keys";
 import { useAzureAssessment } from "@/hooks/use-azure-assessment";
+import { useTtsAligned } from "@/hooks/use-tts-aligned";
 import { useWordPronunciation } from "@/hooks/use-word-pronunciation";
 import { useRecorder } from "@/hooks/use-recorder";
 import { useRecordingQuality } from "@/hooks/use-recording-quality";
@@ -89,6 +90,7 @@ function migrateLegacyResult(legacy: LegacyAssessmentResult): DiagnosisReport {
 
   return {
     version: 2,
+    languageId: "en-US",
     timestamp: legacy.timestamp,
     overallScore: legacy.overallScore,
     dimensions: {
@@ -183,6 +185,7 @@ export default function AssessmentPage() {
   const recorder = useRecorder({ maxDurationMs: 60_000 });
   const azure = useAzureAssessment();
   const wordAudio = useWordPronunciation();
+  const paragraphAudio = useTtsAligned();
   const recordingQuality = useRecordingQuality(recorder.audioBlob, {
     expectedMode: phase.type === "paragraph" ? "paragraph" : "word",
     minDurationMs: phase.type === "paragraph" ? 1200 : 500,
@@ -208,6 +211,7 @@ export default function AssessmentPage() {
   const finalizeReport = useCallback(
     (paragraphResult: AzureAssessmentResult) => {
       const report = buildDiagnosisReport({
+        languageId,
         wordRecordings: wordRecordingsRef.current,
         paragraphResult,
         paragraphText: assessmentParagraph,
@@ -340,6 +344,7 @@ export default function AssessmentPage() {
     setPhase({ type: "analyzing" });
 
     const preliminaryReport = buildDiagnosisReport({
+      languageId,
       wordRecordings: wordRecordingsRef.current,
       paragraphResult: result,
       paragraphText: assessmentParagraph,
@@ -375,6 +380,7 @@ export default function AssessmentPage() {
     languageProfile.azureLocale,
     assessmentParagraph,
     adaptiveAssessmentWords,
+    languageId,
   ]);
 
   const handleRecordStop = useCallback(() => {
@@ -536,6 +542,11 @@ export default function AssessmentPage() {
                       <Volume2 className="h-5 w-5" />
                     )}
                   </motion.button>
+                  {wordAudio.error && (
+                    <p className="text-xs text-destructive">
+                      {wordAudio.error}
+                    </p>
+                  )}
 
                   <RecordButton
                     isRecording={recorder.isRecording}
@@ -606,6 +617,32 @@ export default function AssessmentPage() {
                 <p className="text-base leading-relaxed">
                   {assessmentParagraph}
                 </p>
+                <div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() =>
+                      paragraphAudio.speak(assessmentParagraph, {
+                        speed: 0.85,
+                        languageId,
+                      })
+                    }
+                    disabled={paragraphAudio.isLoading}
+                    className="gap-2 cursor-pointer"
+                  >
+                    {paragraphAudio.isLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Volume2 className="h-4 w-4" />
+                    )}
+                    {paragraphAudio.isPlaying ? "正在播放" : "听标准示范"}
+                  </Button>
+                  {paragraphAudio.error && (
+                    <p className="mt-2 text-xs text-destructive">
+                      {paragraphAudio.error}
+                    </p>
+                  )}
+                </div>
 
                 <div className="flex flex-col items-center gap-3">
                   <RecordButton

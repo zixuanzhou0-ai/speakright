@@ -114,7 +114,8 @@ export default function SentenceDrillPage() {
           drill.phase.type !== "configuring" &&
           drill.phase.type !== "completed" && (
             <span className="text-sm text-muted-foreground">
-              {getPhonemeBySlug(drill.config.phonemeSlug)?.ipa}
+              {getLanguagePhonemeBySlug(languageId, drill.config.phonemeSlug)
+                ?.ipa ?? getPhonemeBySlug(drill.config.phonemeSlug)?.ipa}
             </span>
           )}
       </div>
@@ -140,6 +141,7 @@ export default function SentenceDrillPage() {
             total={drill.items.length}
             isPlaying={wordAudio.isPlaying || tts.isPlaying}
             isLoading={wordAudio.isLoading || tts.isLoading}
+            audioError={wordAudio.error ?? tts.error}
             onPlay={handlePlayReference}
             onReady={drill.finishTeaching}
           />
@@ -181,6 +183,7 @@ export default function SentenceDrillPage() {
             onRetry={drill.retryItem}
             onSkip={drill.skipItem}
             onPlayReference={handlePlayReference}
+            audioError={wordAudio.error ?? tts.error}
           />
         )}
 

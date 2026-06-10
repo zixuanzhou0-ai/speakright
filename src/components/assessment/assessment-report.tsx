@@ -81,6 +81,7 @@ export function AssessmentReport({ result, onRetake }: AssessmentReportProps) {
     reviewPackage.reviewItems.map((item) => [item.issueId, item]),
   );
   const dims = result.dimensions;
+  const hasScore = result.scoreStatus !== "insufficient-evidence";
   const primaryPackId = displayPrescription.days[0]?.items[0]?.packId;
   const primaryLevelId = displayPrescription.days[0]?.items[0]?.levelId;
   const primaryPack = primaryPackId ? getTrainingPack(primaryPackId) : null;
@@ -105,13 +106,18 @@ export function AssessmentReport({ result, onRetake }: AssessmentReportProps) {
             <div
               className={cn(
                 "flex h-24 w-24 items-center justify-center rounded-2xl text-white",
-                getScoreBg(result.overallScore),
+                hasScore ? getScoreBg(result.overallScore) : "bg-muted text-muted-foreground",
               )}
             >
               <span className="text-4xl font-bold tabular-nums">
-                {result.overallScore}
+                {hasScore ? result.overallScore : "—"}
               </span>
             </div>
+            {!hasScore && (
+              <p className="max-w-32 text-center text-xs text-muted-foreground">
+                本次不生成总分
+              </p>
+            )}
           </div>
           <div className="space-y-4">
             <div>
@@ -167,7 +173,9 @@ export function AssessmentReport({ result, onRetake }: AssessmentReportProps) {
                 </Badge>
               ))}
               {result.issues.length === 0 && (
-                <Badge variant="outline">没有明显重灾区</Badge>
+                <Badge variant="outline">
+                  {hasScore ? "没有明显重灾区" : "证据不足，需复测"}
+                </Badge>
               )}
             </div>
           </div>
@@ -228,7 +236,7 @@ export function AssessmentReport({ result, onRetake }: AssessmentReportProps) {
               <div className="relative h-20 w-6 rounded-full bg-muted overflow-hidden">
                 <motion.div
                   initial={{ height: 0 }}
-                  animate={{ height: `${d.value}%` }}
+                  animate={{ height: hasScore || d.value > 0 ? `${d.value}%` : "0%" }}
                   transition={{
                     delay: 0.3,
                     type: "spring",
@@ -237,12 +245,14 @@ export function AssessmentReport({ result, onRetake }: AssessmentReportProps) {
                   }}
                   className={cn(
                     "absolute bottom-0 w-full rounded-full",
-                    getScoreBg(d.value),
+                    hasScore || d.value > 0
+                      ? getScoreBg(d.value)
+                      : "bg-muted-foreground/30",
                   )}
                 />
               </div>
               <span className="text-xs font-medium tabular-nums">
-                {d.value}
+                {hasScore || d.value > 0 ? d.value : "—"}
               </span>
               <span className="text-[10px] text-muted-foreground">
                 {d.label}
@@ -261,7 +271,10 @@ export function AssessmentReport({ result, onRetake }: AssessmentReportProps) {
         <h2 className="mb-4 text-sm font-semibold text-muted-foreground">
           音标健康图（含样本数）
         </h2>
-        <PhonemeHealthMap scores={result.phonemeScores} />
+        <PhonemeHealthMap
+          scores={result.phonemeScores}
+          languageId={result.languageId}
+        />
       </motion.div>
 
       {result.rawEvidence.length > 0 && (

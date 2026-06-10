@@ -114,6 +114,20 @@ describe("useWordPronunciation", () => {
     expect(mocks.howlSources).toEqual(["blob:pronunciation"]);
   });
 
+  it("does not silently fall back to Youdao for missing non-English local audio", async () => {
+    const { result } = renderHook(() => useWordPronunciation());
+
+    await act(async () => {
+      result.current.playWord("j’aime", "blue", "fr-FR");
+    });
+
+    await waitFor(() => {
+      expect(result.current.error).toContain("暂无");
+    });
+    expect(mocks.fetchPronunciation).not.toHaveBeenCalled();
+    expect(mocks.howlSources).toEqual([]);
+  });
+
   it("plays bundled English word audio before calling Youdao", async () => {
     const { result } = renderHook(() => useWordPronunciation());
 

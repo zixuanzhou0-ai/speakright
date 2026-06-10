@@ -317,7 +317,9 @@ export function useDrillSession(
     assessingRef.current = false;
 
     if (result) {
-      const target = getPassScore(result, [item.phoneme]);
+      const target = getPassScore(result, [item.phoneme], {
+        allowFallback: (options.scoreHistoryPrefix ?? "en-US") === "en-US",
+      });
       // Save score to history
       addScore(
         `${options.scoreHistoryPrefix ?? "en-US"}:${item.phoneme}:${item.text}`,

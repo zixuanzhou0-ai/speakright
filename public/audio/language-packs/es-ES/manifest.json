@@ -13,7 +13,7 @@
     "style": 0.05,
     "use_speaker_boost": true
   },
-  "itemCount": 387,
+  "itemCount": 398,
   "generated": 387,
   "skipped": 0,
   "failed": 0,
@@ -21,25 +21,35 @@
   "failures": [],
   "items": [
     {
-      "key": "casa",
-      "text": "casa",
-      "ipa": "/ˈkasa/",
+      "key": "abril",
+      "text": "abril",
+      "ipa": "/aˈβɾil/",
       "soundUnitSlugs": [
-        "es-a",
-        "es-s"
+        "es-tap-r",
+        "es-l"
       ],
-      "fileName": "casa-81bce1f3bf.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/casa-81bce1f3bf.mp3"
+      "fileName": "abril-2fae671016.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/abril-2fae671016.mp3"
     },
     {
-      "key": "mano",
-      "text": "mano",
-      "ipa": "/ˈmano/",
+      "key": "adiós",
+      "text": "adiós",
+      "ipa": "/aˈðjos/",
       "soundUnitSlugs": [
-        "es-a"
+        "es-d"
       ],
-      "fileName": "mano-abf1aa4a5e.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/mano-abf1aa4a5e.mp3"
+      "fileName": "adios-01674e46d2.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/adios-01674e46d2.mp3"
+    },
+    {
+      "key": "agosto",
+      "text": "agosto",
+      "ipa": "/aˈɣosto/",
+      "soundUnitSlugs": [
+        "es-g"
+      ],
+      "fileName": "agosto-5a3c84cbf0.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/agosto-5a3c84cbf0.mp3"
     },
     {
       "key": "agua",
@@ -54,198 +64,44 @@
       "audioSrc": "/audio/language-packs/es-ES/agua-c1962c232b.mp3"
     },
     {
-      "key": "mapa",
-      "text": "mapa",
-      "ipa": "/ˈmapa/",
+      "key": "agua fría",
+      "text": "agua fría",
+      "ipa": "/ˈaɣwa ˈfɾia/",
       "soundUnitSlugs": [
-        "es-a"
+        "es-diphthongs-w"
       ],
-      "fileName": "mapa-4a472d01a3.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/mapa-4a472d01a3.mp3"
+      "fileName": "agua-fria-46e6d67918.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/agua-fria-46e6d67918.mp3"
     },
     {
-      "key": "nada",
-      "text": "nada",
-      "ipa": "/ˈnaða/",
+      "key": "ahora",
+      "text": "ahora",
+      "ipa": "/aˈoɾa/",
       "soundUnitSlugs": [
-        "es-a",
-        "es-d"
-      ],
-      "fileName": "nada-a3fcfe3a3b.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/nada-a3fcfe3a3b.mp3"
-    },
-    {
-      "key": "sal",
-      "text": "sal",
-      "ipa": "/sal/",
-      "soundUnitSlugs": [
-        "es-a"
-      ],
-      "fileName": "sal-caf8dae170.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/sal-caf8dae170.mp3"
-    },
-    {
-      "key": "cama",
-      "text": "cama",
-      "ipa": "/ˈkama/",
-      "soundUnitSlugs": [
-        "es-a"
-      ],
-      "fileName": "cama-1bef95abfc.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/cama-1bef95abfc.mp3"
-    },
-    {
-      "key": "padre",
-      "text": "padre",
-      "ipa": "/ˈpaðɾe/",
-      "soundUnitSlugs": [
-        "es-a"
-      ],
-      "fileName": "padre-05d4ac9a16.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/padre-05d4ac9a16.mp3"
-    },
-    {
-      "key": "tarde",
-      "text": "tarde",
-      "ipa": "/ˈtaɾðe/",
-      "soundUnitSlugs": [
-        "es-a",
-        "es-d",
         "es-tap-r"
       ],
-      "fileName": "tarde-8693c78aea.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/tarde-8693c78aea.mp3"
+      "fileName": "ahora-317914bb85.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/ahora-317914bb85.mp3"
     },
     {
-      "key": "playa",
-      "text": "playa",
-      "ipa": "/ˈplaʝa/",
+      "key": "aire",
+      "text": "aire",
+      "ipa": "/ˈajɾe/",
       "soundUnitSlugs": [
-        "es-a",
-        "es-y-ll"
-      ],
-      "fileName": "playa-abd5cf4ffb.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/playa-abd5cf4ffb.mp3"
-    },
-    {
-      "key": "pan",
-      "text": "pan",
-      "ipa": "/pan/",
-      "soundUnitSlugs": [
-        "es-a"
-      ],
-      "fileName": "pan-bd2bd8216b.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/pan-bd2bd8216b.mp3"
-    },
-    {
-      "key": "gato",
-      "text": "gato",
-      "ipa": "/ˈgato/",
-      "soundUnitSlugs": [
-        "es-a",
-        "es-g"
-      ],
-      "fileName": "gato-8f39c63d50.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/gato-8f39c63d50.mp3"
-    },
-    {
-      "key": "barato",
-      "text": "barato",
-      "ipa": "/baˈɾato/",
-      "soundUnitSlugs": [
-        "es-a",
-        "es-tap-r"
-      ],
-      "fileName": "barato-33e8c86f39.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/barato-33e8c86f39.mp3"
-    },
-    {
-      "key": "palabra",
-      "text": "palabra",
-      "ipa": "/paˈlaβɾa/",
-      "soundUnitSlugs": [
-        "es-a"
-      ],
-      "fileName": "palabra-00787666ba.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/palabra-00787666ba.mp3"
-    },
-    {
-      "key": "mañana",
-      "text": "mañana",
-      "ipa": "/maˈɲana/",
-      "soundUnitSlugs": [
-        "es-a",
-        "es-ny"
-      ],
-      "fileName": "manana-8727ae6503.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/manana-8727ae6503.mp3"
-    },
-    {
-      "key": "españa",
-      "text": "España",
-      "ipa": "/esˈpaɲa/",
-      "soundUnitSlugs": [
-        "es-a",
-        "es-ny",
-        "es-s"
-      ],
-      "fileName": "espana-9633dc28e8.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/espana-9633dc28e8.mp3"
-    },
-    {
-      "key": "familia",
-      "text": "familia",
-      "ipa": "/faˈmilja/",
-      "soundUnitSlugs": [
-        "es-a",
-        "es-l",
         "es-diphthongs-j"
       ],
-      "fileName": "familia-3b660a83d5.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/familia-3b660a83d5.mp3"
+      "fileName": "aire-437ec6c121.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/aire-437ec6c121.mp3"
     },
     {
-      "key": "trabajo",
-      "text": "trabajo",
-      "ipa": "/tɾaˈβaxo/",
+      "key": "ajo",
+      "text": "ajo",
+      "ipa": "/ˈaxo/",
       "soundUnitSlugs": [
-        "es-a",
-        "es-tap-r"
+        "es-x"
       ],
-      "fileName": "trabajo-09d2e3a150.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/trabajo-09d2e3a150.mp3"
-    },
-    {
-      "key": "hablar",
-      "text": "hablar",
-      "ipa": "/aˈβlaɾ/",
-      "soundUnitSlugs": [
-        "es-a",
-        "es-bv"
-      ],
-      "fileName": "hablar-18c35a29fc.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/hablar-18c35a29fc.mp3"
-    },
-    {
-      "key": "plaza",
-      "text": "plaza",
-      "ipa": "/ˈplaθa/",
-      "soundUnitSlugs": [
-        "es-a",
-        "es-l"
-      ],
-      "fileName": "plaza-2366c31fc3.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/plaza-2366c31fc3.mp3"
-    },
-    {
-      "key": "carta",
-      "text": "carta",
-      "ipa": "/ˈkaɾta/",
-      "soundUnitSlugs": [
-        "es-a"
-      ],
-      "fileName": "carta-b0f8e771d8.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/carta-b0f8e771d8.mp3"
+      "fileName": "ajo-63b963ade1.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/ajo-63b963ade1.mp3"
     },
     {
       "key": "alma",
@@ -259,6 +115,66 @@
       "audioSrc": "/audio/language-packs/es-ES/alma-5f5ea3800d.mp3"
     },
     {
+      "key": "amigo",
+      "text": "amigo",
+      "ipa": "/aˈmiɣo/",
+      "soundUnitSlugs": [
+        "es-g"
+      ],
+      "fileName": "amigo-01f07beb85.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/amigo-01f07beb85.mp3"
+    },
+    {
+      "key": "ancho",
+      "text": "ancho",
+      "ipa": "/ˈantʃo/",
+      "soundUnitSlugs": [
+        "es-ch"
+      ],
+      "fileName": "ancho-0b950c55c4.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/ancho-0b950c55c4.mp3"
+    },
+    {
+      "key": "andar",
+      "text": "andar",
+      "ipa": "/anˈdaɾ/",
+      "soundUnitSlugs": [
+        "es-d"
+      ],
+      "fileName": "andar-4aa025f539.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/andar-4aa025f539.mp3"
+    },
+    {
+      "key": "año",
+      "text": "año",
+      "ipa": "/ˈaɲo/",
+      "soundUnitSlugs": [
+        "es-ny"
+      ],
+      "fileName": "ano-8470d9e5f7.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/ano-8470d9e5f7.mp3"
+    },
+    {
+      "key": "antes",
+      "text": "antes",
+      "ipa": "/ˈantes/",
+      "soundUnitSlugs": [
+        "es-nasal-place"
+      ],
+      "fileName": "antes-cef4b5e9a6.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/antes-cef4b5e9a6.mp3"
+    },
+    {
+      "key": "aquí",
+      "text": "aquí",
+      "ipa": "/aˈki/",
+      "soundUnitSlugs": [
+        "es-i"
+      ],
+      "fileName": "aqui-fe01be3cb3.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/aqui-fe01be3cb3.mp3"
+    },
+    {
       "key": "arena",
       "text": "arena",
       "ipa": "/aˈɾena/",
@@ -269,123 +185,157 @@
       "audioSrc": "/audio/language-packs/es-ES/arena-bbcfcdbce6.mp3"
     },
     {
-      "key": "mercado",
-      "text": "mercado",
-      "ipa": "/meɾˈkaðo/",
+      "key": "arriba",
+      "text": "arriba",
+      "ipa": "/aˈriba/",
       "soundUnitSlugs": [
-        "es-a"
-      ],
-      "fileName": "mercado-a822bd0a82.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/mercado-a822bd0a82.mp3"
-    },
-    {
-      "key": "mesa",
-      "text": "mesa",
-      "ipa": "/ˈmesa/",
-      "soundUnitSlugs": [
-        "es-e",
-        "es-s"
-      ],
-      "fileName": "mesa-f04cc316d7.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/mesa-f04cc316d7.mp3"
-    },
-    {
-      "key": "leche",
-      "text": "leche",
-      "ipa": "/ˈletʃe/",
-      "soundUnitSlugs": [
-        "es-e",
-        "es-ch",
-        "es-l"
-      ],
-      "fileName": "leche-3c60405a25.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/leche-3c60405a25.mp3"
-    },
-    {
-      "key": "perro",
-      "text": "perro",
-      "ipa": "/ˈpero/",
-      "soundUnitSlugs": [
-        "es-e",
         "es-trill-r"
       ],
-      "fileName": "perro-6139bdc23a.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/perro-6139bdc23a.mp3"
+      "fileName": "arriba-522b9e8a7a.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/arriba-522b9e8a7a.mp3"
     },
     {
-      "key": "verde",
-      "text": "verde",
-      "ipa": "/ˈbeɾðe/",
+      "key": "avión",
+      "text": "avión",
+      "ipa": "/aˈβjon/",
       "soundUnitSlugs": [
-        "es-e",
+        "es-bv"
+      ],
+      "fileName": "avion-1901d3a3ed.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/avion-1901d3a3ed.mp3"
+    },
+    {
+      "key": "ayer",
+      "text": "ayer",
+      "ipa": "/aˈʝeɾ/",
+      "soundUnitSlugs": [
+        "es-e"
+      ],
+      "fileName": "ayer-d2617dbaad.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/ayer-d2617dbaad.mp3"
+    },
+    {
+      "key": "ayuda",
+      "text": "ayuda",
+      "ipa": "/aˈʝuða/",
+      "soundUnitSlugs": [
         "es-d",
+        "es-y-ll"
+      ],
+      "fileName": "ayuda-39b97647a7.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/ayuda-39b97647a7.mp3"
+    },
+    {
+      "key": "azúcar",
+      "text": "azúcar",
+      "ipa": "/aˈθukaɾ/",
+      "soundUnitSlugs": [
+        "es-theta"
+      ],
+      "fileName": "azucar-59c21812e9.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/azucar-59c21812e9.mp3"
+    },
+    {
+      "key": "azul",
+      "text": "azul",
+      "ipa": "/aˈθul/",
+      "soundUnitSlugs": [
+        "es-u",
+        "es-theta"
+      ],
+      "fileName": "azul-1768d39c5b.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/azul-1768d39c5b.mp3"
+    },
+    {
+      "key": "baca",
+      "text": "baca",
+      "ipa": "/ˈbaka/ ~ /ˈbaka/",
+      "soundUnitSlugs": [
+        "es-bv"
+      ],
+      "audioSrc": "/audio/language-packs/es-ES/baca-6786136584.mp3"
+    },
+    {
+      "key": "bajo",
+      "text": "bajo",
+      "ipa": "/ˈbaxo/",
+      "soundUnitSlugs": [
+        "es-x"
+      ],
+      "fileName": "bajo-98973d5c9a.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/bajo-98973d5c9a.mp3"
+    },
+    {
+      "key": "banco",
+      "text": "banco",
+      "ipa": "/ˈbaŋko/",
+      "soundUnitSlugs": [
+        "es-bv",
+        "es-nasal-place"
+      ],
+      "fileName": "banco-8339f984a0.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/banco-8339f984a0.mp3"
+    },
+    {
+      "key": "baño",
+      "text": "baño",
+      "ipa": "/ˈbaɲo/",
+      "soundUnitSlugs": [
+        "es-ny"
+      ],
+      "fileName": "bano-1d7f53dfb1.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/bano-1d7f53dfb1.mp3"
+    },
+    {
+      "key": "barato",
+      "text": "barato",
+      "ipa": "/baˈɾato/",
+      "soundUnitSlugs": [
+        "es-a",
         "es-tap-r"
       ],
-      "fileName": "verde-2030abee0f.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/verde-2030abee0f.mp3"
+      "fileName": "barato-33e8c86f39.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/barato-33e8c86f39.mp3"
     },
     {
-      "key": "tres",
-      "text": "tres",
-      "ipa": "/tɾes/",
+      "key": "barcelona",
+      "text": "Barcelona",
+      "ipa": "/baɾθeˈlona/",
       "soundUnitSlugs": [
-        "es-e"
+        "es-syllable-rhythm"
       ],
-      "fileName": "tres-0c95987338.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/tres-0c95987338.mp3"
+      "fileName": "barcelona-eacb0d1b53.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/barcelona-eacb0d1b53.mp3"
     },
     {
-      "key": "dedo",
-      "text": "dedo",
-      "ipa": "/ˈdeðo/",
+      "key": "barco",
+      "text": "barco",
+      "ipa": "/ˈbaɾko/",
       "soundUnitSlugs": [
-        "es-e",
-        "es-d"
+        "es-bv"
       ],
-      "fileName": "dedo-8b9b43e964.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/dedo-8b9b43e964.mp3"
+      "fileName": "barco-5ff84c75c4.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/barco-5ff84c75c4.mp3"
     },
     {
-      "key": "escuela",
-      "text": "escuela",
-      "ipa": "/esˈkwela/",
+      "key": "barrio",
+      "text": "barrio",
+      "ipa": "/ˈbarjo/",
       "soundUnitSlugs": [
-        "es-e",
-        "es-diphthongs-w"
+        "es-trill-r"
       ],
-      "fileName": "escuela-6cb8387f0f.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/escuela-6cb8387f0f.mp3"
+      "fileName": "barrio-2ce33323f0.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/barrio-2ce33323f0.mp3"
     },
     {
-      "key": "este",
-      "text": "este",
-      "ipa": "/ˈeste/",
+      "key": "bebé",
+      "text": "bebé",
+      "ipa": "/beˈβe/",
       "soundUnitSlugs": [
-        "es-e"
+        "es-bv"
       ],
-      "fileName": "este-3957e302fd.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/este-3957e302fd.mp3"
-    },
-    {
-      "key": "teléfono",
-      "text": "teléfono",
-      "ipa": "/teˈlefono/",
-      "soundUnitSlugs": [
-        "es-e",
-        "es-lexical-stress"
-      ],
-      "fileName": "telefono-9303fb5d29.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/telefono-9303fb5d29.mp3"
-    },
-    {
-      "key": "comer",
-      "text": "comer",
-      "ipa": "/koˈmeɾ/",
-      "soundUnitSlugs": [
-        "es-e"
-      ],
-      "fileName": "comer-5fb14f826f.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/comer-5fb14f826f.mp3"
+      "fileName": "bebe-5bb308acf2.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/bebe-5bb308acf2.mp3"
     },
     {
       "key": "beber",
@@ -398,66 +348,344 @@
       "audioSrc": "/audio/language-packs/es-ES/beber-5c7c319bec.mp3"
     },
     {
-      "key": "cerca",
-      "text": "cerca",
-      "ipa": "/ˈθeɾka/",
+      "key": "beso",
+      "text": "beso",
+      "ipa": "/ˈbeso/",
       "soundUnitSlugs": [
-        "es-e"
+        "es-s"
       ],
-      "fileName": "cerca-34bbe760fd.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/cerca-34bbe760fd.mp3"
+      "fileName": "beso-6edd8a12b3.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/beso-6edd8a12b3.mp3"
     },
     {
-      "key": "mujer",
-      "text": "mujer",
-      "ipa": "/muˈxeɾ/",
+      "key": "bien",
+      "text": "bien",
+      "ipa": "/bjen/",
       "soundUnitSlugs": [
-        "es-e",
+        "es-diphthongs-j"
+      ],
+      "fileName": "bien-d4e2f60841.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/bien-d4e2f60841.mp3"
+    },
+    {
+      "key": "bien dicho",
+      "text": "bien dicho",
+      "ipa": "/bjen ˈditʃo/",
+      "soundUnitSlugs": [
+        "es-diphthongs-j"
+      ],
+      "fileName": "bien-dicho-25cbebf7a1.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/bien-dicho-25cbebf7a1.mp3"
+    },
+    {
+      "key": "boca",
+      "text": "boca",
+      "ipa": "/ˈboka/",
+      "soundUnitSlugs": [
+        "es-o",
+        "es-bv"
+      ],
+      "fileName": "boca-42a50539b0.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/boca-42a50539b0.mp3"
+    },
+    {
+      "key": "bono",
+      "text": "bono",
+      "ipa": "/ˈbweno/ ~ /ˈbono/",
+      "soundUnitSlugs": [
+        "es-diphthongs-w"
+      ],
+      "audioSrc": "/audio/language-packs/es-ES/bono-cb4a215ceb.mp3"
+    },
+    {
+      "key": "bravo",
+      "text": "bravo",
+      "ipa": "/ˈbɾaβo/",
+      "soundUnitSlugs": [
+        "es-bv"
+      ],
+      "fileName": "bravo-962665711e.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/bravo-962665711e.mp3"
+    },
+    {
+      "key": "brazo",
+      "text": "brazo",
+      "ipa": "/ˈbɾaθo/",
+      "soundUnitSlugs": [
+        "es-tap-r"
+      ],
+      "fileName": "brazo-d2f68f12f4.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/brazo-d2f68f12f4.mp3"
+    },
+    {
+      "key": "buen viaje",
+      "text": "buen viaje",
+      "ipa": "/bwem ˈbjaxe/",
+      "soundUnitSlugs": [
+        "es-nasal-place"
+      ],
+      "fileName": "buen-viaje-ea8d4f1cd0.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/buen-viaje-ea8d4f1cd0.mp3"
+    },
+    {
+      "key": "buena suerte",
+      "text": "buena suerte",
+      "ipa": "/ˈbwena ˈsweɾte/",
+      "soundUnitSlugs": [
+        "es-diphthongs-w"
+      ],
+      "fileName": "buena-suerte-f3eb0670ef.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/buena-suerte-f3eb0670ef.mp3"
+    },
+    {
+      "key": "bueno",
+      "text": "bueno",
+      "ipa": "/ˈbweno/",
+      "soundUnitSlugs": [
+        "es-bv",
+        "es-diphthongs-w"
+      ],
+      "fileName": "bueno-28e5793a19.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/bueno-28e5793a19.mp3"
+    },
+    {
+      "key": "buenos días",
+      "text": "Buenos días",
+      "ipa": "/ˈbwenos ˈdias/",
+      "soundUnitSlugs": [
+        "es-lexical-stress",
+        "es-syllable-rhythm"
+      ],
+      "fileName": "buenos-dias-a25b998dff.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/buenos-dias-a25b998dff.mp3"
+    },
+    {
+      "key": "buenos días a todos",
+      "text": "Buenos días a todos",
+      "ipa": "/ˈbwenos ˈdias a ˈtoðos/",
+      "soundUnitSlugs": [
+        "es-syllable-rhythm"
+      ],
+      "fileName": "buenos-dias-a-todos-f3fd9144ea.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/buenos-dias-a-todos-f3fd9144ea.mp3"
+    },
+    {
+      "key": "buscar",
+      "text": "buscar",
+      "ipa": "/busˈkaɾ/",
+      "soundUnitSlugs": [
+        "es-bv"
+      ],
+      "fileName": "buscar-ac55cf0cc2.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/buscar-ac55cf0cc2.mp3"
+    },
+    {
+      "key": "cabeza",
+      "text": "cabeza",
+      "ipa": "/kaˈβeθa/",
+      "soundUnitSlugs": [
+        "es-bv"
+      ],
+      "fileName": "cabeza-ba03ef3ed3.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/cabeza-ba03ef3ed3.mp3"
+    },
+    {
+      "key": "cada sílaba cuenta",
+      "text": "Cada sílaba cuenta",
+      "ipa": "/ˈkaða ˈsilaβa ˈkwenta/",
+      "soundUnitSlugs": [
+        "es-syllable-rhythm"
+      ],
+      "fileName": "cada-silaba-cuenta-30e29474de.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/cada-silaba-cuenta-30e29474de.mp3"
+    },
+    {
+      "key": "café",
+      "text": "café",
+      "ipa": "/kaˈfe/",
+      "soundUnitSlugs": [
+        "es-lexical-stress"
+      ],
+      "fileName": "cafe-f424452a96.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/cafe-f424452a96.mp3"
+    },
+    {
+      "key": "caja",
+      "text": "caja",
+      "ipa": "/ˈkaxa/",
+      "soundUnitSlugs": [
         "es-x"
       ],
-      "fileName": "mujer-c4034b7d65.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/mujer-c4034b7d65.mp3"
+      "fileName": "caja-862448c9b2.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/caja-862448c9b2.mp3"
     },
     {
-      "key": "enero",
-      "text": "enero",
-      "ipa": "/eˈneɾo/",
+      "key": "caja roja",
+      "text": "caja roja",
+      "ipa": "/ˈkaxa ˈroxa/",
       "soundUnitSlugs": [
-        "es-e"
+        "es-x"
       ],
-      "fileName": "enero-6d5e647d87.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/enero-6d5e647d87.mp3"
+      "fileName": "caja-roja-97ea32b65b.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/caja-roja-97ea32b65b.mp3"
     },
     {
-      "key": "señor",
-      "text": "señor",
-      "ipa": "/seˈɲoɾ/",
+      "key": "calle",
+      "text": "calle",
+      "ipa": "/ˈkaʝe/",
       "soundUnitSlugs": [
-        "es-e",
+        "es-y-ll"
+      ],
+      "fileName": "calle-8f9f97eb45.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/calle-8f9f97eb45.mp3"
+    },
+    {
+      "key": "calle mayor",
+      "text": "calle mayor",
+      "ipa": "/ˈkaʝe maˈʝoɾ/",
+      "soundUnitSlugs": [
+        "es-y-ll"
+      ],
+      "fileName": "calle-mayor-0f81d310c9.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/calle-mayor-0f81d310c9.mp3"
+    },
+    {
+      "key": "cama",
+      "text": "cama",
+      "ipa": "/ˈkama/",
+      "soundUnitSlugs": [
+        "es-a"
+      ],
+      "fileName": "cama-1bef95abfc.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/cama-1bef95abfc.mp3"
+    },
+    {
+      "key": "camión",
+      "text": "camión",
+      "ipa": "/kaˈmjon/",
+      "soundUnitSlugs": [
+        "es-lexical-stress"
+      ],
+      "fileName": "camion-303ef7817e.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/camion-303ef7817e.mp3"
+    },
+    {
+      "key": "campaña",
+      "text": "campaña",
+      "ipa": "/kamˈpaɲa/",
+      "soundUnitSlugs": [
         "es-ny"
       ],
-      "fileName": "senor-93f6a8523a.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/senor-93f6a8523a.mp3"
+      "fileName": "campana-9e0c58dd09.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/campana-9e0c58dd09.mp3"
     },
     {
-      "key": "queso",
-      "text": "queso",
-      "ipa": "/ˈkeso/",
+      "key": "campo",
+      "text": "campo",
+      "ipa": "/ˈkampo/",
       "soundUnitSlugs": [
-        "es-e"
+        "es-nasal-place"
       ],
-      "fileName": "queso-8e5fc65edb.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/queso-8e5fc65edb.mp3"
+      "fileName": "campo-bdc4e01461.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/campo-bdc4e01461.mp3"
     },
     {
-      "key": "ayer",
-      "text": "ayer",
-      "ipa": "/aˈʝeɾ/",
+      "key": "cana",
+      "text": "cana",
+      "ipa": "/ˈkana/ ~ /ˈkaɲa/",
       "soundUnitSlugs": [
-        "es-e"
+        "es-ny"
       ],
-      "fileName": "ayer-d2617dbaad.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/ayer-d2617dbaad.mp3"
+      "audioSrc": "/audio/language-packs/es-ES/cana-06c34d216a.mp3"
+    },
+    {
+      "key": "caña",
+      "text": "caña",
+      "ipa": "/ˈkana/ ~ /ˈkaɲa/",
+      "soundUnitSlugs": [
+        "es-ny"
+      ],
+      "audioSrc": "/audio/language-packs/es-ES/cana-4677342824.mp3"
+    },
+    {
+      "key": "canción",
+      "text": "canción",
+      "ipa": "/kanˈθjon/",
+      "soundUnitSlugs": [
+        "es-lexical-stress"
+      ],
+      "fileName": "cancion-b7b043b04b.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/cancion-b7b043b04b.mp3"
+    },
+    {
+      "key": "cariño",
+      "text": "cariño",
+      "ipa": "/kaˈɾiɲo/",
+      "soundUnitSlugs": [
+        "es-ny"
+      ],
+      "fileName": "carino-31d01593ef.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/carino-31d01593ef.mp3"
+    },
+    {
+      "key": "caro",
+      "text": "caro",
+      "ipa": "/ˈkaɾo/",
+      "soundUnitSlugs": [
+        "es-tap-r"
+      ],
+      "fileName": "caro-732849d5bc.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/caro-732849d5bc.mp3"
+    },
+    {
+      "key": "carretera",
+      "text": "carretera",
+      "ipa": "/kareˈteɾa/",
+      "soundUnitSlugs": [
+        "es-trill-r"
+      ],
+      "fileName": "carretera-157a7200f4.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/carretera-157a7200f4.mp3"
+    },
+    {
+      "key": "carro",
+      "text": "carro",
+      "ipa": "/ˈkaro/",
+      "soundUnitSlugs": [
+        "es-trill-r"
+      ],
+      "fileName": "carro-3959fc6166.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/carro-3959fc6166.mp3"
+    },
+    {
+      "key": "carta",
+      "text": "carta",
+      "ipa": "/ˈkaɾta/",
+      "soundUnitSlugs": [
+        "es-a"
+      ],
+      "fileName": "carta-b0f8e771d8.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/carta-b0f8e771d8.mp3"
+    },
+    {
+      "key": "casa",
+      "text": "casa",
+      "ipa": "/ˈkasa/",
+      "soundUnitSlugs": [
+        "es-a",
+        "es-s"
+      ],
+      "fileName": "casa-81bce1f3bf.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/casa-81bce1f3bf.mp3"
+    },
+    {
+      "key": "caza",
+      "text": "caza",
+      "ipa": "/ˈkasa/ ~ /ˈkaθa/",
+      "soundUnitSlugs": [
+        "es-theta"
+      ],
+      "audioSrc": "/audio/language-packs/es-ES/caza-820dde8264.mp3"
     },
     {
       "key": "cena",
@@ -471,110 +699,115 @@
       "audioSrc": "/audio/language-packs/es-ES/cena-62e5582aac.mp3"
     },
     {
-      "key": "lección",
-      "text": "lección",
-      "ipa": "/lekˈθjon/",
+      "key": "cerca",
+      "text": "cerca",
+      "ipa": "/ˈθeɾka/",
       "soundUnitSlugs": [
         "es-e"
       ],
-      "fileName": "leccion-c98ed63579.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/leccion-c98ed63579.mp3"
+      "fileName": "cerca-34bbe760fd.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/cerca-34bbe760fd.mp3"
     },
     {
-      "key": "veinte",
-      "text": "veinte",
-      "ipa": "/ˈbeinte/",
+      "key": "cero",
+      "text": "cero",
+      "ipa": "/ˈθeɾo/",
       "soundUnitSlugs": [
-        "es-e"
+        "es-theta"
       ],
-      "fileName": "veinte-3b1b17811d.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/veinte-3b1b17811d.mp3"
+      "fileName": "cero-74cbf12e07.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/cero-74cbf12e07.mp3"
     },
     {
-      "key": "leer",
-      "text": "leer",
-      "ipa": "/leˈeɾ/",
+      "key": "cerveza",
+      "text": "cerveza",
+      "ipa": "/θeɾˈβeθa/",
       "soundUnitSlugs": [
-        "es-e"
+        "es-theta"
       ],
-      "fileName": "leer-40a26dbccc.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/leer-40a26dbccc.mp3"
+      "fileName": "cerveza-e996f592b0.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/cerveza-e996f592b0.mp3"
     },
     {
-      "key": "tren",
-      "text": "tren",
-      "ipa": "/tɾen/",
+      "key": "chaqueta",
+      "text": "chaqueta",
+      "ipa": "/tʃaˈketa/",
       "soundUnitSlugs": [
-        "es-e"
+        "es-ch"
       ],
-      "fileName": "tren-15047c92a2.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/tren-15047c92a2.mp3"
+      "fileName": "chaqueta-c0cc5ed98a.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/chaqueta-c0cc5ed98a.mp3"
     },
     {
-      "key": "mesa grande",
-      "text": "mesa grande",
-      "ipa": "/ˈmesa ˈgɾande/",
-      "soundUnitSlugs": [
-        "es-e"
-      ],
-      "fileName": "mesa-grande-d09b2a21e8.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/mesa-grande-d09b2a21e8.mp3"
-    },
-    {
-      "key": "tres veces",
-      "text": "tres veces",
-      "ipa": "/tɾes ˈbeθes/",
-      "soundUnitSlugs": [
-        "es-e"
-      ],
-      "fileName": "tres-veces-5044a3bc61.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/tres-veces-5044a3bc61.mp3"
-    },
-    {
-      "key": "sí",
-      "text": "sí",
-      "ipa": "/si/",
+      "key": "chico",
+      "text": "chico",
+      "ipa": "/ˈtʃiko/",
       "soundUnitSlugs": [
         "es-i",
-        "es-s"
+        "es-ch"
       ],
-      "fileName": "si-5e06bd15f9.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/si-5e06bd15f9.mp3"
+      "fileName": "chico-763c189e10.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/chico-763c189e10.mp3"
     },
     {
-      "key": "vida",
-      "text": "vida",
-      "ipa": "/ˈbiða/",
+      "key": "chico escucha",
+      "text": "chico escucha",
+      "ipa": "/ˈtʃiko esˈkutʃa/",
       "soundUnitSlugs": [
-        "es-i",
-        "es-bv"
+        "es-ch"
       ],
-      "fileName": "vida-c303fda042.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/vida-c303fda042.mp3"
+      "fileName": "chico-escucha-c3f66deba7.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/chico-escucha-c3f66deba7.mp3"
     },
     {
-      "key": "niño",
-      "text": "niño",
-      "ipa": "/ˈniɲo/",
+      "key": "chocolate",
+      "text": "chocolate",
+      "ipa": "/tʃokoˈlate/",
       "soundUnitSlugs": [
-        "es-i",
-        "es-ny",
-        "es-nasal-place"
+        "es-ch"
       ],
-      "fileName": "nino-36a2baf40d.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/nino-36a2baf40d.mp3"
+      "fileName": "chocolate-891c5feef1.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/chocolate-891c5feef1.mp3"
     },
     {
-      "key": "libro",
-      "text": "libro",
-      "ipa": "/ˈlibɾo/",
+      "key": "churro",
+      "text": "churro",
+      "ipa": "/ˈtʃuro/",
       "soundUnitSlugs": [
-        "es-i",
-        "es-tap-r",
-        "es-l"
+        "es-ch"
       ],
-      "fileName": "libro-7d664b804e.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/libro-7d664b804e.mp3"
+      "fileName": "churro-861d6f0879.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/churro-861d6f0879.mp3"
+    },
+    {
+      "key": "ciclo",
+      "text": "ciclo",
+      "ipa": "/ˈtʃiko/ ~ /ˈθiklo/",
+      "soundUnitSlugs": [
+        "es-ch"
+      ],
+      "audioSrc": "/audio/language-packs/es-ES/ciclo-940bf7cba5.mp3"
+    },
+    {
+      "key": "cielo",
+      "text": "cielo",
+      "ipa": "/ˈθjelo/",
+      "soundUnitSlugs": [
+        "es-theta",
+        "es-diphthongs-j"
+      ],
+      "fileName": "cielo-b54cfda898.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/cielo-b54cfda898.mp3"
+    },
+    {
+      "key": "cien euros",
+      "text": "cien euros",
+      "ipa": "/θjen ˈewɾos/",
+      "soundUnitSlugs": [
+        "es-theta"
+      ],
+      "fileName": "cien-euros-2d6dddb5f7.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/cien-euros-2d6dddb5f7.mp3"
     },
     {
       "key": "cinco",
@@ -589,181 +822,14 @@
       "audioSrc": "/audio/language-packs/es-ES/cinco-a097b33b77.mp3"
     },
     {
-      "key": "mira",
-      "text": "mira",
-      "ipa": "/ˈmiɾa/",
+      "key": "cinco zapatos azules",
+      "text": "Cinco zapatos azules",
+      "ipa": "/ˈθiŋko θaˈpatos aˈθules/",
       "soundUnitSlugs": [
-        "es-i"
+        "es-syllable-rhythm"
       ],
-      "fileName": "mira-ca84273789.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/mira-ca84273789.mp3"
-    },
-    {
-      "key": "listo",
-      "text": "listo",
-      "ipa": "/ˈlisto/",
-      "soundUnitSlugs": [
-        "es-i"
-      ],
-      "fileName": "listo-035fa923bf.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/listo-035fa923bf.mp3"
-    },
-    {
-      "key": "difícil",
-      "text": "difícil",
-      "ipa": "/diˈfiθil/",
-      "soundUnitSlugs": [
-        "es-i",
-        "es-lexical-stress"
-      ],
-      "fileName": "dificil-87bf808093.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/dificil-87bf808093.mp3"
-    },
-    {
-      "key": "vivir",
-      "text": "vivir",
-      "ipa": "/biˈβiɾ/",
-      "soundUnitSlugs": [
-        "es-i",
-        "es-bv"
-      ],
-      "fileName": "vivir-a8c28ff883.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/vivir-a8c28ff883.mp3"
-    },
-    {
-      "key": "pedir",
-      "text": "pedir",
-      "ipa": "/peˈðiɾ/",
-      "soundUnitSlugs": [
-        "es-i"
-      ],
-      "fileName": "pedir-499b7081af.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/pedir-499b7081af.mp3"
-    },
-    {
-      "key": "chico",
-      "text": "chico",
-      "ipa": "/ˈtʃiko/",
-      "soundUnitSlugs": [
-        "es-i",
-        "es-ch"
-      ],
-      "fileName": "chico-763c189e10.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/chico-763c189e10.mp3"
-    },
-    {
-      "key": "aquí",
-      "text": "aquí",
-      "ipa": "/aˈki/",
-      "soundUnitSlugs": [
-        "es-i"
-      ],
-      "fileName": "aqui-fe01be3cb3.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/aqui-fe01be3cb3.mp3"
-    },
-    {
-      "key": "limpio",
-      "text": "limpio",
-      "ipa": "/ˈlimpjo/",
-      "soundUnitSlugs": [
-        "es-i",
-        "es-diphthongs-j"
-      ],
-      "fileName": "limpio-b1825946d3.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/limpio-b1825946d3.mp3"
-    },
-    {
-      "key": "iglesia",
-      "text": "iglesia",
-      "ipa": "/iˈɣlesja/",
-      "soundUnitSlugs": [
-        "es-i",
-        "es-diphthongs-j"
-      ],
-      "fileName": "iglesia-f163153f77.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/iglesia-f163153f77.mp3"
-    },
-    {
-      "key": "escribir",
-      "text": "escribir",
-      "ipa": "/eskɾiˈβiɾ/",
-      "soundUnitSlugs": [
-        "es-i"
-      ],
-      "fileName": "escribir-6aaf02f17d.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/escribir-6aaf02f17d.mp3"
-    },
-    {
-      "key": "príncipe",
-      "text": "príncipe",
-      "ipa": "/ˈpɾinθipe/",
-      "soundUnitSlugs": [
-        "es-i"
-      ],
-      "fileName": "principe-b92eafe2ba.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/principe-b92eafe2ba.mp3"
-    },
-    {
-      "key": "feliz",
-      "text": "feliz",
-      "ipa": "/feˈliθ/",
-      "soundUnitSlugs": [
-        "es-i"
-      ],
-      "fileName": "feliz-b9081c99fc.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/feliz-b9081c99fc.mp3"
-    },
-    {
-      "key": "mil",
-      "text": "mil",
-      "ipa": "/mil/",
-      "soundUnitSlugs": [
-        "es-i"
-      ],
-      "fileName": "mil-d34e454154.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/mil-d34e454154.mp3"
-    },
-    {
-      "key": "isla",
-      "text": "isla",
-      "ipa": "/ˈisla/",
-      "soundUnitSlugs": [
-        "es-i",
-        "es-s"
-      ],
-      "fileName": "isla-ef64ecf779.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/isla-ef64ecf779.mp3"
-    },
-    {
-      "key": "tiempo",
-      "text": "tiempo",
-      "ipa": "/ˈtjempo/",
-      "soundUnitSlugs": [
-        "es-i",
-        "es-diphthongs-j"
-      ],
-      "fileName": "tiempo-a5da6d9c96.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/tiempo-a5da6d9c96.mp3"
-    },
-    {
-      "key": "línea",
-      "text": "línea",
-      "ipa": "/ˈlinea/",
-      "soundUnitSlugs": [
-        "es-i"
-      ],
-      "fileName": "linea-f638806621.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/linea-f638806621.mp3"
-    },
-    {
-      "key": "minuto",
-      "text": "minuto",
-      "ipa": "/miˈnuto/",
-      "soundUnitSlugs": [
-        "es-i"
-      ],
-      "fileName": "minuto-e53435e667.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/minuto-e53435e667.mp3"
+      "fileName": "cinco-zapatos-azules-675774359d.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/cinco-zapatos-azules-675774359d.mp3"
     },
     {
       "key": "cita",
@@ -774,777 +840,6 @@
       ],
       "fileName": "cita-7862f114bd.mp3",
       "audioSrc": "/audio/language-packs/es-ES/cita-7862f114bd.mp3"
-    },
-    {
-      "key": "mi amigo",
-      "text": "mi amigo",
-      "ipa": "/mi aˈmiɣo/",
-      "soundUnitSlugs": [
-        "es-i"
-      ],
-      "fileName": "mi-amigo-f2abb30ae2.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/mi-amigo-f2abb30ae2.mp3"
-    },
-    {
-      "key": "sol",
-      "text": "sol",
-      "ipa": "/sol/",
-      "soundUnitSlugs": [
-        "es-o",
-        "es-s",
-        "es-l"
-      ],
-      "fileName": "sol-fbb93bb966.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/sol-fbb93bb966.mp3"
-    },
-    {
-      "key": "hola",
-      "text": "hola",
-      "ipa": "/ˈola/",
-      "soundUnitSlugs": [
-        "es-o",
-        "es-l"
-      ],
-      "fileName": "hola-99800b85d3.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/hola-99800b85d3.mp3"
-    },
-    {
-      "key": "coche",
-      "text": "coche",
-      "ipa": "/ˈkotʃe/",
-      "soundUnitSlugs": [
-        "es-o",
-        "es-ch"
-      ],
-      "fileName": "coche-33feb9d01a.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/coche-33feb9d01a.mp3"
-    },
-    {
-      "key": "rojo",
-      "text": "rojo",
-      "ipa": "/ˈroxo/",
-      "soundUnitSlugs": [
-        "es-o",
-        "es-x",
-        "es-trill-r"
-      ],
-      "fileName": "rojo-af6c1a0ca2.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/rojo-af6c1a0ca2.mp3"
-    },
-    {
-      "key": "todo",
-      "text": "todo",
-      "ipa": "/ˈtoðo/",
-      "soundUnitSlugs": [
-        "es-o"
-      ],
-      "fileName": "todo-05f20a7178.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/todo-05f20a7178.mp3"
-    },
-    {
-      "key": "boca",
-      "text": "boca",
-      "ipa": "/ˈboka/",
-      "soundUnitSlugs": [
-        "es-o",
-        "es-bv"
-      ],
-      "fileName": "boca-42a50539b0.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/boca-42a50539b0.mp3"
-    },
-    {
-      "key": "noche",
-      "text": "noche",
-      "ipa": "/ˈnotʃe/",
-      "soundUnitSlugs": [
-        "es-o",
-        "es-ch"
-      ],
-      "fileName": "noche-fdadc53ed4.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/noche-fdadc53ed4.mp3"
-    },
-    {
-      "key": "poco",
-      "text": "poco",
-      "ipa": "/ˈpoko/",
-      "soundUnitSlugs": [
-        "es-o"
-      ],
-      "fileName": "poco-5aa462b02c.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/poco-5aa462b02c.mp3"
-    },
-    {
-      "key": "solo",
-      "text": "solo",
-      "ipa": "/ˈsolo/",
-      "soundUnitSlugs": [
-        "es-o"
-      ],
-      "fileName": "solo-49f25741ff.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/solo-49f25741ff.mp3"
-    },
-    {
-      "key": "flor",
-      "text": "flor",
-      "ipa": "/floɾ/",
-      "soundUnitSlugs": [
-        "es-o",
-        "es-l"
-      ],
-      "fileName": "flor-4cb270f3d7.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/flor-4cb270f3d7.mp3"
-    },
-    {
-      "key": "color",
-      "text": "color",
-      "ipa": "/koˈloɾ/",
-      "soundUnitSlugs": [
-        "es-o",
-        "es-l"
-      ],
-      "fileName": "color-6dd0fe8001.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/color-6dd0fe8001.mp3"
-    },
-    {
-      "key": "otoño",
-      "text": "otoño",
-      "ipa": "/oˈtoɲo/",
-      "soundUnitSlugs": [
-        "es-o"
-      ],
-      "fileName": "otono-6a60258795.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/otono-6a60258795.mp3"
-    },
-    {
-      "key": "entonces",
-      "text": "entonces",
-      "ipa": "/enˈtonθes/",
-      "soundUnitSlugs": [
-        "es-o"
-      ],
-      "fileName": "entonces-256580b217.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/entonces-256580b217.mp3"
-    },
-    {
-      "key": "comprar",
-      "text": "comprar",
-      "ipa": "/komˈpɾaɾ/",
-      "soundUnitSlugs": [
-        "es-o"
-      ],
-      "fileName": "comprar-a2039cb46d.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/comprar-a2039cb46d.mp3"
-    },
-    {
-      "key": "otro",
-      "text": "otro",
-      "ipa": "/ˈotɾo/",
-      "soundUnitSlugs": [
-        "es-o"
-      ],
-      "fileName": "otro-a1da106dfc.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/otro-a1da106dfc.mp3"
-    },
-    {
-      "key": "oro",
-      "text": "oro",
-      "ipa": "/ˈoɾo/",
-      "soundUnitSlugs": [
-        "es-o"
-      ],
-      "fileName": "oro-b198acf272.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/oro-b198acf272.mp3"
-    },
-    {
-      "key": "corto",
-      "text": "corto",
-      "ipa": "/ˈkoɾto/",
-      "soundUnitSlugs": [
-        "es-o"
-      ],
-      "fileName": "corto-a523e5667a.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/corto-a523e5667a.mp3"
-    },
-    {
-      "key": "foto",
-      "text": "foto",
-      "ipa": "/ˈfoto/",
-      "soundUnitSlugs": [
-        "es-o"
-      ],
-      "fileName": "foto-0eb57679c4.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/foto-0eb57679c4.mp3"
-    },
-    {
-      "key": "domingo",
-      "text": "domingo",
-      "ipa": "/doˈmiŋgo/",
-      "soundUnitSlugs": [
-        "es-o",
-        "es-d"
-      ],
-      "fileName": "domingo-da41631035.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/domingo-da41631035.mp3"
-    },
-    {
-      "key": "octubre",
-      "text": "octubre",
-      "ipa": "/okˈtuβɾe/",
-      "soundUnitSlugs": [
-        "es-o"
-      ],
-      "fileName": "octubre-ed4c928435.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/octubre-ed4c928435.mp3"
-    },
-    {
-      "key": "profesor",
-      "text": "profesor",
-      "ipa": "/pɾofeˈsoɾ/",
-      "soundUnitSlugs": [
-        "es-o"
-      ],
-      "fileName": "profesor-aabb211b66.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/profesor-aabb211b66.mp3"
-    },
-    {
-      "key": "corazón",
-      "text": "corazón",
-      "ipa": "/koɾaˈθon/",
-      "soundUnitSlugs": [
-        "es-o",
-        "es-theta",
-        "es-lexical-stress"
-      ],
-      "fileName": "corazon-dcbe4dd31e.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/corazon-dcbe4dd31e.mp3"
-    },
-    {
-      "key": "dos ojos",
-      "text": "dos ojos",
-      "ipa": "/dos ˈoxos/",
-      "soundUnitSlugs": [
-        "es-o"
-      ],
-      "fileName": "dos-ojos-4022deccf6.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/dos-ojos-4022deccf6.mp3"
-    },
-    {
-      "key": "como todo",
-      "text": "como todo",
-      "ipa": "/ˈkomo ˈtoðo/",
-      "soundUnitSlugs": [
-        "es-o"
-      ],
-      "fileName": "como-todo-d8ba8b2f9e.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/como-todo-d8ba8b2f9e.mp3"
-    },
-    {
-      "key": "luna",
-      "text": "luna",
-      "ipa": "/ˈluna/",
-      "soundUnitSlugs": [
-        "es-u",
-        "es-l"
-      ],
-      "fileName": "luna-4b7fad4f3f.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/luna-4b7fad4f3f.mp3"
-    },
-    {
-      "key": "uno",
-      "text": "uno",
-      "ipa": "/ˈuno/",
-      "soundUnitSlugs": [
-        "es-u"
-      ],
-      "fileName": "uno-81b6f50734.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/uno-81b6f50734.mp3"
-    },
-    {
-      "key": "tú",
-      "text": "tú",
-      "ipa": "/tu/",
-      "soundUnitSlugs": [
-        "es-u"
-      ],
-      "fileName": "tu-044e993fbe.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/tu-044e993fbe.mp3"
-    },
-    {
-      "key": "azul",
-      "text": "azul",
-      "ipa": "/aˈθul/",
-      "soundUnitSlugs": [
-        "es-u",
-        "es-theta"
-      ],
-      "fileName": "azul-1768d39c5b.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/azul-1768d39c5b.mp3"
-    },
-    {
-      "key": "mundo",
-      "text": "mundo",
-      "ipa": "/ˈmundo/",
-      "soundUnitSlugs": [
-        "es-u",
-        "es-nasal-place"
-      ],
-      "fileName": "mundo-5956a2b28d.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/mundo-5956a2b28d.mp3"
-    },
-    {
-      "key": "curso",
-      "text": "curso",
-      "ipa": "/ˈkuɾso/",
-      "soundUnitSlugs": [
-        "es-u"
-      ],
-      "fileName": "curso-5bc4c37a30.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/curso-5bc4c37a30.mp3"
-    },
-    {
-      "key": "música",
-      "text": "música",
-      "ipa": "/ˈmusika/",
-      "soundUnitSlugs": [
-        "es-u"
-      ],
-      "fileName": "musica-56a08b6dae.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/musica-56a08b6dae.mp3"
-    },
-    {
-      "key": "usted",
-      "text": "usted",
-      "ipa": "/usˈteð/",
-      "soundUnitSlugs": [
-        "es-u"
-      ],
-      "fileName": "usted-5155ddcd5c.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/usted-5155ddcd5c.mp3"
-    },
-    {
-      "key": "mucho",
-      "text": "mucho",
-      "ipa": "/ˈmutʃo/",
-      "soundUnitSlugs": [
-        "es-u",
-        "es-ch"
-      ],
-      "fileName": "mucho-5629cc17d5.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/mucho-5629cc17d5.mp3"
-    },
-    {
-      "key": "jueves",
-      "text": "jueves",
-      "ipa": "/ˈxweβes/",
-      "soundUnitSlugs": [
-        "es-u",
-        "es-x",
-        "es-diphthongs-w"
-      ],
-      "fileName": "jueves-5abc964903.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/jueves-5abc964903.mp3"
-    },
-    {
-      "key": "puerta",
-      "text": "puerta",
-      "ipa": "/ˈpweɾta/",
-      "soundUnitSlugs": [
-        "es-u",
-        "es-tap-r",
-        "es-diphthongs-w"
-      ],
-      "fileName": "puerta-16924b922b.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/puerta-16924b922b.mp3"
-    },
-    {
-      "key": "fuerte",
-      "text": "fuerte",
-      "ipa": "/ˈfweɾte/",
-      "soundUnitSlugs": [
-        "es-u"
-      ],
-      "fileName": "fuerte-7af0f1c607.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/fuerte-7af0f1c607.mp3"
-    },
-    {
-      "key": "dulce",
-      "text": "dulce",
-      "ipa": "/ˈdulθe/",
-      "soundUnitSlugs": [
-        "es-u"
-      ],
-      "fileName": "dulce-29e35acc60.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/dulce-29e35acc60.mp3"
-    },
-    {
-      "key": "grupo",
-      "text": "grupo",
-      "ipa": "/ˈgɾupo/",
-      "soundUnitSlugs": [
-        "es-u"
-      ],
-      "fileName": "grupo-612a369860.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/grupo-612a369860.mp3"
-    },
-    {
-      "key": "lluvia",
-      "text": "lluvia",
-      "ipa": "/ˈʝuβja/",
-      "soundUnitSlugs": [
-        "es-u",
-        "es-y-ll"
-      ],
-      "fileName": "lluvia-b16f5946e4.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/lluvia-b16f5946e4.mp3"
-    },
-    {
-      "key": "cultura",
-      "text": "cultura",
-      "ipa": "/kulˈtuɾa/",
-      "soundUnitSlugs": [
-        "es-u"
-      ],
-      "fileName": "cultura-a3e2211294.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/cultura-a3e2211294.mp3"
-    },
-    {
-      "key": "julio",
-      "text": "julio",
-      "ipa": "/ˈxuljo/",
-      "soundUnitSlugs": [
-        "es-u"
-      ],
-      "fileName": "julio-52336104be.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/julio-52336104be.mp3"
-    },
-    {
-      "key": "seguro",
-      "text": "seguro",
-      "ipa": "/seˈɣuɾo/",
-      "soundUnitSlugs": [
-        "es-u"
-      ],
-      "fileName": "seguro-f26ad5965a.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/seguro-f26ad5965a.mp3"
-    },
-    {
-      "key": "puente",
-      "text": "puente",
-      "ipa": "/ˈpwente/",
-      "soundUnitSlugs": [
-        "es-u",
-        "es-diphthongs-w"
-      ],
-      "fileName": "puente-190e6debd8.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/puente-190e6debd8.mp3"
-    },
-    {
-      "key": "ruido",
-      "text": "ruido",
-      "ipa": "/ˈrwiðo/",
-      "soundUnitSlugs": [
-        "es-u",
-        "es-diphthongs-w"
-      ],
-      "fileName": "ruido-ce49d44fd9.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/ruido-ce49d44fd9.mp3"
-    },
-    {
-      "key": "suerte",
-      "text": "suerte",
-      "ipa": "/ˈsweɾte/",
-      "soundUnitSlugs": [
-        "es-u",
-        "es-s",
-        "es-diphthongs-w"
-      ],
-      "fileName": "suerte-38ea296915.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/suerte-38ea296915.mp3"
-    },
-    {
-      "key": "último",
-      "text": "último",
-      "ipa": "/ˈultimo/",
-      "soundUnitSlugs": [
-        "es-u"
-      ],
-      "fileName": "ultimo-4c753a4824.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/ultimo-4c753a4824.mp3"
-    },
-    {
-      "key": "tu curso",
-      "text": "tu curso",
-      "ipa": "/tu ˈkuɾso/",
-      "soundUnitSlugs": [
-        "es-u"
-      ],
-      "fileName": "tu-curso-baebc4e0f9.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/tu-curso-baebc4e0f9.mp3"
-    },
-    {
-      "key": "una luna",
-      "text": "una luna",
-      "ipa": "/ˈuna ˈluna/",
-      "soundUnitSlugs": [
-        "es-u"
-      ],
-      "fileName": "una-luna-682ba6eb7e.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/una-luna-682ba6eb7e.mp3"
-    },
-    {
-      "key": "vino",
-      "text": "vino",
-      "ipa": "/ˈbino/",
-      "soundUnitSlugs": [
-        "es-bv"
-      ],
-      "fileName": "vino-f0e4876639.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/vino-f0e4876639.mp3"
-    },
-    {
-      "key": "bebé",
-      "text": "bebé",
-      "ipa": "/beˈβe/",
-      "soundUnitSlugs": [
-        "es-bv"
-      ],
-      "fileName": "bebe-5bb308acf2.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/bebe-5bb308acf2.mp3"
-    },
-    {
-      "key": "saber",
-      "text": "saber",
-      "ipa": "/saˈβeɾ/",
-      "soundUnitSlugs": [
-        "es-bv",
-        "es-s"
-      ],
-      "fileName": "saber-1b60697026.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/saber-1b60697026.mp3"
-    },
-    {
-      "key": "uva",
-      "text": "uva",
-      "ipa": "/ˈuβa/",
-      "soundUnitSlugs": [
-        "es-bv"
-      ],
-      "fileName": "uva-2d2c2a1400.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/uva-2d2c2a1400.mp3"
-    },
-    {
-      "key": "bueno",
-      "text": "bueno",
-      "ipa": "/ˈbweno/",
-      "soundUnitSlugs": [
-        "es-bv",
-        "es-diphthongs-w"
-      ],
-      "fileName": "bueno-28e5793a19.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/bueno-28e5793a19.mp3"
-    },
-    {
-      "key": "valor",
-      "text": "valor",
-      "ipa": "/baˈloɾ/",
-      "soundUnitSlugs": [
-        "es-bv"
-      ],
-      "fileName": "valor-0a3c0dbb93.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/valor-0a3c0dbb93.mp3"
-    },
-    {
-      "key": "vaca",
-      "text": "vaca",
-      "ipa": "/ˈbaka/",
-      "soundUnitSlugs": [
-        "es-bv"
-      ],
-      "fileName": "vaca-c0b3f2cd99.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/vaca-c0b3f2cd99.mp3"
-    },
-    {
-      "key": "banco",
-      "text": "banco",
-      "ipa": "/ˈbaŋko/",
-      "soundUnitSlugs": [
-        "es-bv",
-        "es-nasal-place"
-      ],
-      "fileName": "banco-8339f984a0.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/banco-8339f984a0.mp3"
-    },
-    {
-      "key": "bravo",
-      "text": "bravo",
-      "ipa": "/ˈbɾaβo/",
-      "soundUnitSlugs": [
-        "es-bv"
-      ],
-      "fileName": "bravo-962665711e.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/bravo-962665711e.mp3"
-    },
-    {
-      "key": "volver",
-      "text": "volver",
-      "ipa": "/bolˈβeɾ/",
-      "soundUnitSlugs": [
-        "es-bv"
-      ],
-      "fileName": "volver-60ab455fc4.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/volver-60ab455fc4.mp3"
-    },
-    {
-      "key": "avión",
-      "text": "avión",
-      "ipa": "/aˈβjon/",
-      "soundUnitSlugs": [
-        "es-bv"
-      ],
-      "fileName": "avion-1901d3a3ed.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/avion-1901d3a3ed.mp3"
-    },
-    {
-      "key": "barco",
-      "text": "barco",
-      "ipa": "/ˈbaɾko/",
-      "soundUnitSlugs": [
-        "es-bv"
-      ],
-      "fileName": "barco-5ff84c75c4.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/barco-5ff84c75c4.mp3"
-    },
-    {
-      "key": "verano",
-      "text": "verano",
-      "ipa": "/beˈɾano/",
-      "soundUnitSlugs": [
-        "es-bv"
-      ],
-      "fileName": "verano-952fa74954.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/verano-952fa74954.mp3"
-    },
-    {
-      "key": "novia",
-      "text": "novia",
-      "ipa": "/ˈnoβja/",
-      "soundUnitSlugs": [
-        "es-bv"
-      ],
-      "fileName": "novia-3eb1762b32.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/novia-3eb1762b32.mp3"
-    },
-    {
-      "key": "cabeza",
-      "text": "cabeza",
-      "ipa": "/kaˈβeθa/",
-      "soundUnitSlugs": [
-        "es-bv"
-      ],
-      "fileName": "cabeza-ba03ef3ed3.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/cabeza-ba03ef3ed3.mp3"
-    },
-    {
-      "key": "favor",
-      "text": "favor",
-      "ipa": "/faˈβoɾ/",
-      "soundUnitSlugs": [
-        "es-bv"
-      ],
-      "fileName": "favor-a399328adb.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/favor-a399328adb.mp3"
-    },
-    {
-      "key": "buscar",
-      "text": "buscar",
-      "ipa": "/busˈkaɾ/",
-      "soundUnitSlugs": [
-        "es-bv"
-      ],
-      "fileName": "buscar-ac55cf0cc2.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/buscar-ac55cf0cc2.mp3"
-    },
-    {
-      "key": "sábado",
-      "text": "sábado",
-      "ipa": "/ˈsaβaðo/",
-      "soundUnitSlugs": [
-        "es-bv",
-        "es-s"
-      ],
-      "fileName": "sabado-1e73aa8ef0.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/sabado-1e73aa8ef0.mp3"
-    },
-    {
-      "key": "mi vida",
-      "text": "mi vida",
-      "ipa": "/mi ˈbiða/",
-      "soundUnitSlugs": [
-        "es-bv"
-      ],
-      "fileName": "mi-vida-8f152983ae.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/mi-vida-8f152983ae.mp3"
-    },
-    {
-      "key": "la boca",
-      "text": "la boca",
-      "ipa": "/la ˈboka/",
-      "soundUnitSlugs": [
-        "es-bv"
-      ],
-      "fileName": "la-boca-932d098e0e.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/la-boca-932d098e0e.mp3"
-    },
-    {
-      "key": "día",
-      "text": "día",
-      "ipa": "/ˈdia/",
-      "soundUnitSlugs": [
-        "es-d"
-      ],
-      "fileName": "dia-743a04a95c.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/dia-743a04a95c.mp3"
-    },
-    {
-      "key": "lado",
-      "text": "lado",
-      "ipa": "/ˈlaðo/",
-      "soundUnitSlugs": [
-        "es-d",
-        "es-l"
-      ],
-      "fileName": "lado-0b8bc0c4b4.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/lado-0b8bc0c4b4.mp3"
-    },
-    {
-      "key": "dos",
-      "text": "dos",
-      "ipa": "/dos/",
-      "soundUnitSlugs": [
-        "es-d"
-      ],
-      "fileName": "dos-e67f16d28a.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/dos-e67f16d28a.mp3"
-    },
-    {
-      "key": "dama",
-      "text": "dama",
-      "ipa": "/ˈdama/",
-      "soundUnitSlugs": [
-        "es-d"
-      ],
-      "fileName": "dama-9c64dc6c5c.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/dama-9c64dc6c5c.mp3"
-    },
-    {
-      "key": "andar",
-      "text": "andar",
-      "ipa": "/anˈdaɾ/",
-      "soundUnitSlugs": [
-        "es-d"
-      ],
-      "fileName": "andar-4aa025f539.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/andar-4aa025f539.mp3"
     },
     {
       "key": "ciudad",
@@ -1560,35 +855,66 @@
       "audioSrc": "/audio/language-packs/es-ES/ciudad-7227e71007.mp3"
     },
     {
-      "key": "madrid",
-      "text": "Madrid",
-      "ipa": "/maˈðɾið/",
+      "key": "claro",
+      "text": "claro",
+      "ipa": "/ˈklaɾo/",
       "soundUnitSlugs": [
-        "es-d"
+        "es-tap-r"
       ],
-      "fileName": "madrid-6c1e06292d.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/madrid-6c1e06292d.mp3"
+      "fileName": "claro-98a793c74a.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/claro-98a793c74a.mp3"
     },
     {
-      "key": "medio",
-      "text": "medio",
-      "ipa": "/ˈmeðjo/",
+      "key": "clase",
+      "text": "clase",
+      "ipa": "/ˈklase/",
       "soundUnitSlugs": [
-        "es-d"
+        "es-l"
       ],
-      "fileName": "medio-cabbbaf029.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/medio-cabbbaf029.mp3"
+      "fileName": "clase-686bf5da3a.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/clase-686bf5da3a.mp3"
     },
     {
-      "key": "ayuda",
-      "text": "ayuda",
-      "ipa": "/aˈʝuða/",
+      "key": "coche",
+      "text": "coche",
+      "ipa": "/ˈkotʃe/",
       "soundUnitSlugs": [
-        "es-d",
-        "es-y-ll"
+        "es-o",
+        "es-ch"
       ],
-      "fileName": "ayuda-39b97647a7.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/ayuda-39b97647a7.mp3"
+      "fileName": "coche-33feb9d01a.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/coche-33feb9d01a.mp3"
+    },
+    {
+      "key": "colegio",
+      "text": "colegio",
+      "ipa": "/koˈlexjo/",
+      "soundUnitSlugs": [
+        "es-g"
+      ],
+      "fileName": "colegio-a1f9819caf.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/colegio-a1f9819caf.mp3"
+    },
+    {
+      "key": "color",
+      "text": "color",
+      "ipa": "/koˈloɾ/",
+      "soundUnitSlugs": [
+        "es-o",
+        "es-l"
+      ],
+      "fileName": "color-6dd0fe8001.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/color-6dd0fe8001.mp3"
+    },
+    {
+      "key": "comer",
+      "text": "comer",
+      "ipa": "/koˈmeɾ/",
+      "soundUnitSlugs": [
+        "es-e"
+      ],
+      "fileName": "comer-5fb14f826f.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/comer-5fb14f826f.mp3"
     },
     {
       "key": "comida",
@@ -1601,34 +927,136 @@
       "audioSrc": "/audio/language-packs/es-ES/comida-9024543383.mp3"
     },
     {
-      "key": "adiós",
-      "text": "adiós",
-      "ipa": "/aˈðjos/",
+      "key": "como todo",
+      "text": "como todo",
+      "ipa": "/ˈkomo ˈtoðo/",
       "soundUnitSlugs": [
-        "es-d"
+        "es-o"
       ],
-      "fileName": "adios-01674e46d2.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/adios-01674e46d2.mp3"
+      "fileName": "como-todo-d8ba8b2f9e.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/como-todo-d8ba8b2f9e.mp3"
     },
     {
-      "key": "dormir",
-      "text": "dormir",
-      "ipa": "/doɾˈmiɾ/",
+      "key": "comprar",
+      "text": "comprar",
+      "ipa": "/komˈpɾaɾ/",
       "soundUnitSlugs": [
-        "es-d"
+        "es-o"
       ],
-      "fileName": "dormir-fc5ed9f5c6.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/dormir-fc5ed9f5c6.mp3"
+      "fileName": "comprar-a2039cb46d.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/comprar-a2039cb46d.mp3"
     },
     {
-      "key": "desde",
-      "text": "desde",
-      "ipa": "/ˈdezðe/",
+      "key": "con él",
+      "text": "con él",
+      "ipa": "/kon el/",
       "soundUnitSlugs": [
-        "es-d"
+        "es-nasal-place"
       ],
-      "fileName": "desde-110176e52c.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/desde-110176e52c.mp3"
+      "fileName": "con-el-b302a727e2.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/con-el-b302a727e2.mp3"
+    },
+    {
+      "key": "con gusto",
+      "text": "con gusto",
+      "ipa": "/koŋ ˈgusto/",
+      "soundUnitSlugs": [
+        "es-nasal-place"
+      ],
+      "fileName": "con-gusto-c4572b7379.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/con-gusto-c4572b7379.mp3"
+    },
+    {
+      "key": "conmigo",
+      "text": "conmigo",
+      "ipa": "/komˈmiɣo/",
+      "soundUnitSlugs": [
+        "es-nasal-place"
+      ],
+      "fileName": "conmigo-a93cf18ed9.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/conmigo-a93cf18ed9.mp3"
+    },
+    {
+      "key": "corazón",
+      "text": "corazón",
+      "ipa": "/koɾaˈθon/",
+      "soundUnitSlugs": [
+        "es-o",
+        "es-theta",
+        "es-lexical-stress"
+      ],
+      "fileName": "corazon-dcbe4dd31e.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/corazon-dcbe4dd31e.mp3"
+    },
+    {
+      "key": "correo",
+      "text": "correo",
+      "ipa": "/koˈreo/",
+      "soundUnitSlugs": [
+        "es-trill-r"
+      ],
+      "fileName": "correo-4fc1c3d194.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/correo-4fc1c3d194.mp3"
+    },
+    {
+      "key": "corto",
+      "text": "corto",
+      "ipa": "/ˈkoɾto/",
+      "soundUnitSlugs": [
+        "es-o"
+      ],
+      "fileName": "corto-a523e5667a.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/corto-a523e5667a.mp3"
+    },
+    {
+      "key": "cuándo",
+      "text": "cuándo",
+      "ipa": "/ˈkwando/",
+      "soundUnitSlugs": [
+        "es-diphthongs-w"
+      ],
+      "fileName": "cuando-4344af9a12.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/cuando-4344af9a12.mp3"
+    },
+    {
+      "key": "cuatro",
+      "text": "cuatro",
+      "ipa": "/ˈkwatɾo/",
+      "soundUnitSlugs": [
+        "es-diphthongs-w"
+      ],
+      "fileName": "cuatro-a37e3bea6f.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/cuatro-a37e3bea6f.mp3"
+    },
+    {
+      "key": "cuatro puertas",
+      "text": "cuatro puertas",
+      "ipa": "/ˈkwatɾo ˈpweɾtas/",
+      "soundUnitSlugs": [
+        "es-diphthongs-w"
+      ],
+      "fileName": "cuatro-puertas-342795a9b1.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/cuatro-puertas-342795a9b1.mp3"
+    },
+    {
+      "key": "cuchara",
+      "text": "cuchara",
+      "ipa": "/kuˈtʃaɾa/",
+      "soundUnitSlugs": [
+        "es-ch"
+      ],
+      "fileName": "cuchara-7b30da9d00.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/cuchara-7b30da9d00.mp3"
+    },
+    {
+      "key": "cuenta",
+      "text": "cuenta",
+      "ipa": "/ˈkwenta/",
+      "soundUnitSlugs": [
+        "es-diphthongs-w"
+      ],
+      "fileName": "cuenta-de7f6b3e6f.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/cuenta-de7f6b3e6f.mp3"
     },
     {
       "key": "cuidado",
@@ -1641,6 +1069,57 @@
       "audioSrc": "/audio/language-packs/es-ES/cuidado-ff6aa34304.mp3"
     },
     {
+      "key": "cultura",
+      "text": "cultura",
+      "ipa": "/kulˈtuɾa/",
+      "soundUnitSlugs": [
+        "es-u"
+      ],
+      "fileName": "cultura-a3e2211294.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/cultura-a3e2211294.mp3"
+    },
+    {
+      "key": "curso",
+      "text": "curso",
+      "ipa": "/ˈkuɾso/",
+      "soundUnitSlugs": [
+        "es-u"
+      ],
+      "fileName": "curso-5bc4c37a30.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/curso-5bc4c37a30.mp3"
+    },
+    {
+      "key": "dama",
+      "text": "dama",
+      "ipa": "/ˈdama/",
+      "soundUnitSlugs": [
+        "es-d"
+      ],
+      "fileName": "dama-9c64dc6c5c.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/dama-9c64dc6c5c.mp3"
+    },
+    {
+      "key": "daño",
+      "text": "daño",
+      "ipa": "/ˈdaɲo/",
+      "soundUnitSlugs": [
+        "es-ny"
+      ],
+      "fileName": "dano-4f22c2cc1e.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/dano-4f22c2cc1e.mp3"
+    },
+    {
+      "key": "dedo",
+      "text": "dedo",
+      "ipa": "/ˈdeðo/",
+      "soundUnitSlugs": [
+        "es-e",
+        "es-d"
+      ],
+      "fileName": "dedo-8b9b43e964.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/dedo-8b9b43e964.mp3"
+    },
+    {
       "key": "delgado",
       "text": "delgado",
       "ipa": "/delˈɣaðo/",
@@ -1651,14 +1130,85 @@
       "audioSrc": "/audio/language-packs/es-ES/delgado-31a9fdfdc6.mp3"
     },
     {
-      "key": "verdad",
-      "text": "verdad",
-      "ipa": "/beɾˈðað/",
+      "key": "derecho",
+      "text": "derecho",
+      "ipa": "/deˈɾetʃo/",
+      "soundUnitSlugs": [
+        "es-ch"
+      ],
+      "fileName": "derecho-47207a6890.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/derecho-47207a6890.mp3"
+    },
+    {
+      "key": "desayuno",
+      "text": "desayuno",
+      "ipa": "/desaˈʝuno/",
+      "soundUnitSlugs": [
+        "es-y-ll"
+      ],
+      "fileName": "desayuno-6987adf004.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/desayuno-6987adf004.mp3"
+    },
+    {
+      "key": "desde",
+      "text": "desde",
+      "ipa": "/ˈdezðe/",
       "soundUnitSlugs": [
         "es-d"
       ],
-      "fileName": "verdad-762ba43a5d.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/verdad-762ba43a5d.mp3"
+      "fileName": "desde-110176e52c.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/desde-110176e52c.mp3"
+    },
+    {
+      "key": "día",
+      "text": "día",
+      "ipa": "/ˈdia/",
+      "soundUnitSlugs": [
+        "es-d"
+      ],
+      "fileName": "dia-743a04a95c.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/dia-743a04a95c.mp3"
+    },
+    {
+      "key": "dicho",
+      "text": "dicho",
+      "ipa": "/ˈditʃo/",
+      "soundUnitSlugs": [
+        "es-ch"
+      ],
+      "fileName": "dicho-d007cc0080.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/dicho-d007cc0080.mp3"
+    },
+    {
+      "key": "diez",
+      "text": "diez",
+      "ipa": "/djeθ/",
+      "soundUnitSlugs": [
+        "es-theta"
+      ],
+      "fileName": "diez-8c95def646.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/diez-8c95def646.mp3"
+    },
+    {
+      "key": "difícil",
+      "text": "difícil",
+      "ipa": "/diˈfiθil/",
+      "soundUnitSlugs": [
+        "es-i",
+        "es-lexical-stress"
+      ],
+      "fileName": "dificil-87bf808093.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/dificil-87bf808093.mp3"
+    },
+    {
+      "key": "doce",
+      "text": "doce",
+      "ipa": "/ˈdoθe/",
+      "soundUnitSlugs": [
+        "es-theta"
+      ],
+      "fileName": "doce-c24b8eb0d0.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/doce-c24b8eb0d0.mp3"
     },
     {
       "key": "doctor",
@@ -1671,35 +1221,433 @@
       "audioSrc": "/audio/language-packs/es-ES/doctor-1f0160076c.mp3"
     },
     {
-      "key": "un día",
-      "text": "un día",
-      "ipa": "/un ˈdia/",
+      "key": "domingo",
+      "text": "domingo",
+      "ipa": "/doˈmiŋgo/",
       "soundUnitSlugs": [
-        "es-d",
-        "es-nasal-place"
+        "es-o",
+        "es-d"
       ],
-      "fileName": "un-dia-2a0f0869ec.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/un-dia-2a0f0869ec.mp3"
+      "fileName": "domingo-da41631035.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/domingo-da41631035.mp3"
     },
     {
-      "key": "la duda",
-      "text": "la duda",
-      "ipa": "/la ˈduða/",
+      "key": "dormir",
+      "text": "dormir",
+      "ipa": "/doɾˈmiɾ/",
       "soundUnitSlugs": [
         "es-d"
       ],
-      "fileName": "la-duda-5219898424.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/la-duda-5219898424.mp3"
+      "fileName": "dormir-fc5ed9f5c6.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/dormir-fc5ed9f5c6.mp3"
     },
     {
-      "key": "amigo",
-      "text": "amigo",
-      "ipa": "/aˈmiɣo/",
+      "key": "dos",
+      "text": "dos",
+      "ipa": "/dos/",
+      "soundUnitSlugs": [
+        "es-d"
+      ],
+      "fileName": "dos-e67f16d28a.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/dos-e67f16d28a.mp3"
+    },
+    {
+      "key": "dos ojos",
+      "text": "dos ojos",
+      "ipa": "/dos ˈoxos/",
+      "soundUnitSlugs": [
+        "es-o"
+      ],
+      "fileName": "dos-ojos-4022deccf6.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/dos-ojos-4022deccf6.mp3"
+    },
+    {
+      "key": "drama",
+      "text": "drama",
+      "ipa": "/ˈdɾama/",
+      "soundUnitSlugs": [
+        "es-tap-r"
+      ],
+      "fileName": "drama-63b1298947.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/drama-63b1298947.mp3"
+    },
+    {
+      "key": "dulce",
+      "text": "dulce",
+      "ipa": "/ˈdulθe/",
+      "soundUnitSlugs": [
+        "es-u"
+      ],
+      "fileName": "dulce-29e35acc60.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/dulce-29e35acc60.mp3"
+    },
+    {
+      "key": "eje",
+      "text": "eje",
+      "ipa": "/ˈexe/",
+      "soundUnitSlugs": [
+        "es-x"
+      ],
+      "fileName": "eje-160e413b2f.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/eje-160e413b2f.mp3"
+    },
+    {
+      "key": "ejemplo",
+      "text": "ejemplo",
+      "ipa": "/eˈxemplo/",
+      "soundUnitSlugs": [
+        "es-x"
+      ],
+      "fileName": "ejemplo-a6c05bd5d5.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/ejemplo-a6c05bd5d5.mp3"
+    },
+    {
+      "key": "el",
+      "text": "el",
+      "ipa": "/el/",
+      "soundUnitSlugs": [
+        "es-l"
+      ],
+      "fileName": "el-4f1ea4f09d.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/el-4f1ea4f09d.mp3"
+    },
+    {
+      "key": "el libro",
+      "text": "el libro",
+      "ipa": "/el ˈlibɾo/",
+      "soundUnitSlugs": [
+        "es-l"
+      ],
+      "fileName": "el-libro-3601a248e5.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/el-libro-3601a248e5.mp3"
+    },
+    {
+      "key": "el perro corre rápido",
+      "text": "El perro corre rápido",
+      "ipa": "/el ˈpero ˈkore ˈrapiðo/",
+      "soundUnitSlugs": [
+        "es-syllable-rhythm"
+      ],
+      "fileName": "el-perro-corre-rapido-4895f3b094.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/el-perro-corre-rapido-4895f3b094.mp3"
+    },
+    {
+      "key": "ella",
+      "text": "ella",
+      "ipa": "/ˈeʝa/",
+      "soundUnitSlugs": [
+        "es-y-ll"
+      ],
+      "fileName": "ella-5edf31da3f.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/ella-5edf31da3f.mp3"
+    },
+    {
+      "key": "en casa",
+      "text": "en casa",
+      "ipa": "/eŋ ˈkasa/",
+      "soundUnitSlugs": [
+        "es-nasal-place"
+      ],
+      "fileName": "en-casa-faf4b3251c.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/en-casa-faf4b3251c.mp3"
+    },
+    {
+      "key": "enero",
+      "text": "enero",
+      "ipa": "/eˈneɾo/",
+      "soundUnitSlugs": [
+        "es-e"
+      ],
+      "fileName": "enero-6d5e647d87.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/enero-6d5e647d87.mp3"
+    },
+    {
+      "key": "enredo",
+      "text": "enredo",
+      "ipa": "/enˈredo/",
+      "soundUnitSlugs": [
+        "es-trill-r"
+      ],
+      "fileName": "enredo-c9c1488fa2.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/enredo-c9c1488fa2.mp3"
+    },
+    {
+      "key": "ensayo",
+      "text": "ensayo",
+      "ipa": "/enˈsaʝo/",
+      "soundUnitSlugs": [
+        "es-y-ll"
+      ],
+      "fileName": "ensayo-856ecd76c9.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/ensayo-856ecd76c9.mp3"
+    },
+    {
+      "key": "entonces",
+      "text": "entonces",
+      "ipa": "/enˈtonθes/",
+      "soundUnitSlugs": [
+        "es-o"
+      ],
+      "fileName": "entonces-256580b217.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/entonces-256580b217.mp3"
+    },
+    {
+      "key": "escribir",
+      "text": "escribir",
+      "ipa": "/eskɾiˈβiɾ/",
+      "soundUnitSlugs": [
+        "es-i"
+      ],
+      "fileName": "escribir-6aaf02f17d.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/escribir-6aaf02f17d.mp3"
+    },
+    {
+      "key": "escucha y repite",
+      "text": "Escucha y repite",
+      "ipa": "/esˈkutʃa i reˈpite/",
+      "soundUnitSlugs": [
+        "es-syllable-rhythm"
+      ],
+      "fileName": "escucha-y-repite-9d328d979a.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/escucha-y-repite-9d328d979a.mp3"
+    },
+    {
+      "key": "escuchar",
+      "text": "escuchar",
+      "ipa": "/eskuˈtʃaɾ/",
+      "soundUnitSlugs": [
+        "es-ch"
+      ],
+      "fileName": "escuchar-08571a9e04.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/escuchar-08571a9e04.mp3"
+    },
+    {
+      "key": "escuela",
+      "text": "escuela",
+      "ipa": "/esˈkwela/",
+      "soundUnitSlugs": [
+        "es-e",
+        "es-diphthongs-w"
+      ],
+      "fileName": "escuela-6cb8387f0f.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/escuela-6cb8387f0f.mp3"
+    },
+    {
+      "key": "españa",
+      "text": "España",
+      "ipa": "/esˈpaɲa/",
+      "soundUnitSlugs": [
+        "es-a",
+        "es-ny",
+        "es-s"
+      ],
+      "fileName": "espana-9633dc28e8.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/espana-9633dc28e8.mp3"
+    },
+    {
+      "key": "español",
+      "text": "español",
+      "ipa": "/espaˈɲol/",
+      "soundUnitSlugs": [
+        "es-ny"
+      ],
+      "fileName": "espanol-d2a8463fba.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/espanol-d2a8463fba.mp3"
+    },
+    {
+      "key": "este",
+      "text": "este",
+      "ipa": "/ˈeste/",
+      "soundUnitSlugs": [
+        "es-e"
+      ],
+      "fileName": "este-3957e302fd.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/este-3957e302fd.mp3"
+    },
+    {
+      "key": "fácil",
+      "text": "fácil",
+      "ipa": "/ˈfaθil/",
+      "soundUnitSlugs": [
+        "es-theta"
+      ],
+      "fileName": "facil-2c60cfa345.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/facil-2c60cfa345.mp3"
+    },
+    {
+      "key": "familia",
+      "text": "familia",
+      "ipa": "/faˈmilja/",
+      "soundUnitSlugs": [
+        "es-a",
+        "es-l",
+        "es-diphthongs-j"
+      ],
+      "fileName": "familia-3b660a83d5.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/familia-3b660a83d5.mp3"
+    },
+    {
+      "key": "familia grande",
+      "text": "familia grande",
+      "ipa": "/faˈmilja ˈgɾande/",
+      "soundUnitSlugs": [
+        "es-diphthongs-j"
+      ],
+      "fileName": "familia-grande-2ce07b9071.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/familia-grande-2ce07b9071.mp3"
+    },
+    {
+      "key": "favor",
+      "text": "favor",
+      "ipa": "/faˈβoɾ/",
+      "soundUnitSlugs": [
+        "es-bv"
+      ],
+      "fileName": "favor-a399328adb.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/favor-a399328adb.mp3"
+    },
+    {
+      "key": "fecha",
+      "text": "fecha",
+      "ipa": "/ˈfetʃa/",
+      "soundUnitSlugs": [
+        "es-ch"
+      ],
+      "fileName": "fecha-c01a46e22e.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/fecha-c01a46e22e.mp3"
+    },
+    {
+      "key": "feliz",
+      "text": "feliz",
+      "ipa": "/feˈliθ/",
+      "soundUnitSlugs": [
+        "es-i"
+      ],
+      "fileName": "feliz-b9081c99fc.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/feliz-b9081c99fc.mp3"
+    },
+    {
+      "key": "ferrocarril",
+      "text": "ferrocarril",
+      "ipa": "/ferokaˈril/",
+      "soundUnitSlugs": [
+        "es-trill-r"
+      ],
+      "fileName": "ferrocarril-346c754d16.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/ferrocarril-346c754d16.mp3"
+    },
+    {
+      "key": "flor",
+      "text": "flor",
+      "ipa": "/floɾ/",
+      "soundUnitSlugs": [
+        "es-o",
+        "es-l"
+      ],
+      "fileName": "flor-4cb270f3d7.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/flor-4cb270f3d7.mp3"
+    },
+    {
+      "key": "foto",
+      "text": "foto",
+      "ipa": "/ˈfoto/",
+      "soundUnitSlugs": [
+        "es-o"
+      ],
+      "fileName": "foto-0eb57679c4.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/foto-0eb57679c4.mp3"
+    },
+    {
+      "key": "fruta",
+      "text": "fruta",
+      "ipa": "/ˈfɾuta/",
+      "soundUnitSlugs": [
+        "es-tap-r"
+      ],
+      "fileName": "fruta-1ea8c03fd2.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/fruta-1ea8c03fd2.mp3"
+    },
+    {
+      "key": "fuego",
+      "text": "fuego",
+      "ipa": "/ˈfweɣo/",
+      "soundUnitSlugs": [
+        "es-diphthongs-w"
+      ],
+      "fileName": "fuego-29a2923a32.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/fuego-29a2923a32.mp3"
+    },
+    {
+      "key": "fuerte",
+      "text": "fuerte",
+      "ipa": "/ˈfweɾte/",
+      "soundUnitSlugs": [
+        "es-u"
+      ],
+      "fileName": "fuerte-7af0f1c607.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/fuerte-7af0f1c607.mp3"
+    },
+    {
+      "key": "gato",
+      "text": "gato",
+      "ipa": "/ˈgato/",
+      "soundUnitSlugs": [
+        "es-a",
+        "es-g"
+      ],
+      "fileName": "gato-8f39c63d50.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/gato-8f39c63d50.mp3"
+    },
+    {
+      "key": "gente",
+      "text": "gente",
+      "ipa": "/ˈxente/",
+      "soundUnitSlugs": [
+        "es-x"
+      ],
+      "fileName": "gente-b52e0a7a80.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/gente-b52e0a7a80.mp3"
+    },
+    {
+      "key": "gobierno",
+      "text": "gobierno",
+      "ipa": "/goˈβjeɾno/",
       "soundUnitSlugs": [
         "es-g"
       ],
-      "fileName": "amigo-01f07beb85.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/amigo-01f07beb85.mp3"
+      "fileName": "gobierno-33d169f4a9.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/gobierno-33d169f4a9.mp3"
+    },
+    {
+      "key": "gol",
+      "text": "gol",
+      "ipa": "/gol/",
+      "soundUnitSlugs": [
+        "es-g"
+      ],
+      "fileName": "gol-c33dc8d208.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/gol-c33dc8d208.mp3"
+    },
+    {
+      "key": "gota",
+      "text": "gota",
+      "ipa": "/ˈgota/",
+      "soundUnitSlugs": [
+        "es-g"
+      ],
+      "fileName": "gota-244eebcd96.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/gota-244eebcd96.mp3"
+    },
+    {
+      "key": "gracias",
+      "text": "gracias",
+      "ipa": "/ˈgɾaθjas/",
+      "soundUnitSlugs": [
+        "es-theta",
+        "es-diphthongs-j"
+      ],
+      "fileName": "gracias-a30b3970f3.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/gracias-a30b3970f3.mp3"
     },
     {
       "key": "grande",
@@ -1712,26 +1660,45 @@
       "audioSrc": "/audio/language-packs/es-ES/grande-35272bf81d.mp3"
     },
     {
-      "key": "juego",
-      "text": "juego",
-      "ipa": "/ˈxweɣo/",
+      "key": "gris",
+      "text": "gris",
+      "ipa": "/gɾis/",
       "soundUnitSlugs": [
-        "es-g",
-        "es-x"
+        "es-g"
       ],
-      "fileName": "juego-2a5246ff7f.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/juego-2a5246ff7f.mp3"
+      "fileName": "gris-28c94237bc.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/gris-28c94237bc.mp3"
     },
     {
-      "key": "lago",
-      "text": "lago",
-      "ipa": "/ˈlaɣo/",
+      "key": "grupo",
+      "text": "grupo",
+      "ipa": "/ˈgɾupo/",
+      "soundUnitSlugs": [
+        "es-u"
+      ],
+      "fileName": "grupo-612a369860.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/grupo-612a369860.mp3"
+    },
+    {
+      "key": "guapo",
+      "text": "guapo",
+      "ipa": "/ˈgwapo/",
+      "soundUnitSlugs": [
+        "es-diphthongs-w"
+      ],
+      "fileName": "guapo-5013193dfb.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/guapo-5013193dfb.mp3"
+    },
+    {
+      "key": "guardar",
+      "text": "guardar",
+      "ipa": "/gwaɾˈðaɾ/",
       "soundUnitSlugs": [
         "es-g",
-        "es-l"
+        "es-diphthongs-w"
       ],
-      "fileName": "lago-4e68e95b58.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/lago-4e68e95b58.mp3"
+      "fileName": "guardar-3c67c9b854.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/guardar-3c67c9b854.mp3"
     },
     {
       "key": "guerra",
@@ -1755,109 +1722,6 @@
       "audioSrc": "/audio/language-packs/es-ES/guitarra-4436a76d1c.mp3"
     },
     {
-      "key": "gol",
-      "text": "gol",
-      "ipa": "/gol/",
-      "soundUnitSlugs": [
-        "es-g"
-      ],
-      "fileName": "gol-c33dc8d208.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/gol-c33dc8d208.mp3"
-    },
-    {
-      "key": "gobierno",
-      "text": "gobierno",
-      "ipa": "/goˈβjeɾno/",
-      "soundUnitSlugs": [
-        "es-g"
-      ],
-      "fileName": "gobierno-33d169f4a9.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/gobierno-33d169f4a9.mp3"
-    },
-    {
-      "key": "lengua",
-      "text": "lengua",
-      "ipa": "/ˈleŋgwa/",
-      "soundUnitSlugs": [
-        "es-g",
-        "es-nasal-place",
-        "es-diphthongs-w"
-      ],
-      "fileName": "lengua-d1eb2e1346.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/lengua-d1eb2e1346.mp3"
-    },
-    {
-      "key": "pagar",
-      "text": "pagar",
-      "ipa": "/paˈɣaɾ/",
-      "soundUnitSlugs": [
-        "es-g"
-      ],
-      "fileName": "pagar-7b125739d8.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/pagar-7b125739d8.mp3"
-    },
-    {
-      "key": "seguir",
-      "text": "seguir",
-      "ipa": "/seˈɣiɾ/",
-      "soundUnitSlugs": [
-        "es-g"
-      ],
-      "fileName": "seguir-33acf95ee2.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/seguir-33acf95ee2.mp3"
-    },
-    {
-      "key": "regalo",
-      "text": "regalo",
-      "ipa": "/reˈɣalo/",
-      "soundUnitSlugs": [
-        "es-g"
-      ],
-      "fileName": "regalo-721e8c821c.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/regalo-721e8c821c.mp3"
-    },
-    {
-      "key": "llegar",
-      "text": "llegar",
-      "ipa": "/ʝeˈɣaɾ/",
-      "soundUnitSlugs": [
-        "es-g",
-        "es-y-ll"
-      ],
-      "fileName": "llegar-ec24f23b3a.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/llegar-ec24f23b3a.mp3"
-    },
-    {
-      "key": "agosto",
-      "text": "agosto",
-      "ipa": "/aˈɣosto/",
-      "soundUnitSlugs": [
-        "es-g"
-      ],
-      "fileName": "agosto-5a3c84cbf0.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/agosto-5a3c84cbf0.mp3"
-    },
-    {
-      "key": "colegio",
-      "text": "colegio",
-      "ipa": "/koˈlexjo/",
-      "soundUnitSlugs": [
-        "es-g"
-      ],
-      "fileName": "colegio-a1f9819caf.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/colegio-a1f9819caf.mp3"
-    },
-    {
-      "key": "gota",
-      "text": "gota",
-      "ipa": "/ˈgota/",
-      "soundUnitSlugs": [
-        "es-g"
-      ],
-      "fileName": "gota-244eebcd96.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/gota-244eebcd96.mp3"
-    },
-    {
       "key": "gusto",
       "text": "gusto",
       "ipa": "/ˈgusto/",
@@ -1868,1795 +1732,25 @@
       "audioSrc": "/audio/language-packs/es-ES/gusto-969598327e.mp3"
     },
     {
-      "key": "guardar",
-      "text": "guardar",
-      "ipa": "/gwaɾˈðaɾ/",
+      "key": "habla claro y lento",
+      "text": "Habla claro y lento",
+      "ipa": "/ˈaβla ˈklaɾo i ˈlento/",
       "soundUnitSlugs": [
-        "es-g",
-        "es-diphthongs-w"
+        "es-syllable-rhythm"
       ],
-      "fileName": "guardar-3c67c9b854.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/guardar-3c67c9b854.mp3"
+      "fileName": "habla-claro-y-lento-a607b1cf6b.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/habla-claro-y-lento-a607b1cf6b.mp3"
     },
     {
-      "key": "gris",
-      "text": "gris",
-      "ipa": "/gɾis/",
+      "key": "hablar",
+      "text": "hablar",
+      "ipa": "/aˈβlaɾ/",
       "soundUnitSlugs": [
-        "es-g"
+        "es-a",
+        "es-bv"
       ],
-      "fileName": "gris-28c94237bc.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/gris-28c94237bc.mp3"
-    },
-    {
-      "key": "jugar",
-      "text": "jugar",
-      "ipa": "/xuˈɣaɾ/",
-      "soundUnitSlugs": [
-        "es-g"
-      ],
-      "fileName": "jugar-ff1d117945.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/jugar-ff1d117945.mp3"
-    },
-    {
-      "key": "luego",
-      "text": "luego",
-      "ipa": "/ˈlweɣo/",
-      "soundUnitSlugs": [
-        "es-g"
-      ],
-      "fileName": "luego-11e6ab9f3c.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/luego-11e6ab9f3c.mp3"
-    },
-    {
-      "key": "higo",
-      "text": "higo",
-      "ipa": "/ˈiɣo/",
-      "soundUnitSlugs": [
-        "es-g"
-      ],
-      "fileName": "higo-d073257f1b.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/higo-d073257f1b.mp3"
-    },
-    {
-      "key": "cielo",
-      "text": "cielo",
-      "ipa": "/ˈθjelo/",
-      "soundUnitSlugs": [
-        "es-theta",
-        "es-diphthongs-j"
-      ],
-      "fileName": "cielo-b54cfda898.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/cielo-b54cfda898.mp3"
-    },
-    {
-      "key": "zapato",
-      "text": "zapato",
-      "ipa": "/θaˈpato/",
-      "soundUnitSlugs": [
-        "es-theta"
-      ],
-      "fileName": "zapato-d508dffa96.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/zapato-d508dffa96.mp3"
-    },
-    {
-      "key": "gracias",
-      "text": "gracias",
-      "ipa": "/ˈgɾaθjas/",
-      "soundUnitSlugs": [
-        "es-theta",
-        "es-diphthongs-j"
-      ],
-      "fileName": "gracias-a30b3970f3.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/gracias-a30b3970f3.mp3"
-    },
-    {
-      "key": "luz",
-      "text": "luz",
-      "ipa": "/luθ/",
-      "soundUnitSlugs": [
-        "es-theta"
-      ],
-      "fileName": "luz-c307b63565.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/luz-c307b63565.mp3"
-    },
-    {
-      "key": "cerveza",
-      "text": "cerveza",
-      "ipa": "/θeɾˈβeθa/",
-      "soundUnitSlugs": [
-        "es-theta"
-      ],
-      "fileName": "cerveza-e996f592b0.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/cerveza-e996f592b0.mp3"
-    },
-    {
-      "key": "zona",
-      "text": "zona",
-      "ipa": "/ˈθona/",
-      "soundUnitSlugs": [
-        "es-theta"
-      ],
-      "fileName": "zona-90dd8f26ae.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/zona-90dd8f26ae.mp3"
-    },
-    {
-      "key": "azúcar",
-      "text": "azúcar",
-      "ipa": "/aˈθukaɾ/",
-      "soundUnitSlugs": [
-        "es-theta"
-      ],
-      "fileName": "azucar-59c21812e9.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/azucar-59c21812e9.mp3"
-    },
-    {
-      "key": "lápiz",
-      "text": "lápiz",
-      "ipa": "/ˈlapiθ/",
-      "soundUnitSlugs": [
-        "es-theta",
-        "es-l"
-      ],
-      "fileName": "lapiz-5187e8dbb9.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/lapiz-5187e8dbb9.mp3"
-    },
-    {
-      "key": "once",
-      "text": "once",
-      "ipa": "/ˈonθe/",
-      "soundUnitSlugs": [
-        "es-theta"
-      ],
-      "fileName": "once-1863835675.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/once-1863835675.mp3"
-    },
-    {
-      "key": "doce",
-      "text": "doce",
-      "ipa": "/ˈdoθe/",
-      "soundUnitSlugs": [
-        "es-theta"
-      ],
-      "fileName": "doce-c24b8eb0d0.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/doce-c24b8eb0d0.mp3"
-    },
-    {
-      "key": "trece",
-      "text": "trece",
-      "ipa": "/ˈtɾeθe/",
-      "soundUnitSlugs": [
-        "es-theta"
-      ],
-      "fileName": "trece-0f72d7d73e.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/trece-0f72d7d73e.mp3"
-    },
-    {
-      "key": "fácil",
-      "text": "fácil",
-      "ipa": "/ˈfaθil/",
-      "soundUnitSlugs": [
-        "es-theta"
-      ],
-      "fileName": "facil-2c60cfa345.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/facil-2c60cfa345.mp3"
-    },
-    {
-      "key": "voz",
-      "text": "voz",
-      "ipa": "/boθ/",
-      "soundUnitSlugs": [
-        "es-theta"
-      ],
-      "fileName": "voz-cb83905204.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/voz-cb83905204.mp3"
-    },
-    {
-      "key": "cero",
-      "text": "cero",
-      "ipa": "/ˈθeɾo/",
-      "soundUnitSlugs": [
-        "es-theta"
-      ],
-      "fileName": "cero-74cbf12e07.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/cero-74cbf12e07.mp3"
-    },
-    {
-      "key": "hacia",
-      "text": "hacia",
-      "ipa": "/ˈaθja/",
-      "soundUnitSlugs": [
-        "es-theta",
-        "es-diphthongs-j"
-      ],
-      "fileName": "hacia-fa9f438bf2.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/hacia-fa9f438bf2.mp3"
-    },
-    {
-      "key": "zapatería",
-      "text": "zapatería",
-      "ipa": "/θapateˈɾia/",
-      "soundUnitSlugs": [
-        "es-theta"
-      ],
-      "fileName": "zapateria-155b8eb0fc.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/zapateria-155b8eb0fc.mp3"
-    },
-    {
-      "key": "diez",
-      "text": "diez",
-      "ipa": "/djeθ/",
-      "soundUnitSlugs": [
-        "es-theta"
-      ],
-      "fileName": "diez-8c95def646.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/diez-8c95def646.mp3"
-    },
-    {
-      "key": "cien euros",
-      "text": "cien euros",
-      "ipa": "/θjen ˈewɾos/",
-      "soundUnitSlugs": [
-        "es-theta"
-      ],
-      "fileName": "cien-euros-2d6dddb5f7.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/cien-euros-2d6dddb5f7.mp3"
-    },
-    {
-      "key": "zona azul",
-      "text": "zona azul",
-      "ipa": "/ˈθona aˈθul/",
-      "soundUnitSlugs": [
-        "es-theta"
-      ],
-      "fileName": "zona-azul-b2453ca887.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/zona-azul-b2453ca887.mp3"
-    },
-    {
-      "key": "jamón",
-      "text": "jamón",
-      "ipa": "/xaˈmon/",
-      "soundUnitSlugs": [
-        "es-x"
-      ],
-      "fileName": "jamon-8d298a01d5.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/jamon-8d298a01d5.mp3"
-    },
-    {
-      "key": "gente",
-      "text": "gente",
-      "ipa": "/ˈxente/",
-      "soundUnitSlugs": [
-        "es-x"
-      ],
-      "fileName": "gente-b52e0a7a80.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/gente-b52e0a7a80.mp3"
-    },
-    {
-      "key": "josé",
-      "text": "José",
-      "ipa": "/xoˈse/",
-      "soundUnitSlugs": [
-        "es-x"
-      ],
-      "fileName": "jose-8e9c993beb.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/jose-8e9c993beb.mp3"
-    },
-    {
-      "key": "méxico",
-      "text": "México",
-      "ipa": "/ˈmexiko/",
-      "soundUnitSlugs": [
-        "es-x"
-      ],
-      "fileName": "mexico-ba74ec4c05.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/mexico-ba74ec4c05.mp3"
-    },
-    {
-      "key": "jardín",
-      "text": "jardín",
-      "ipa": "/xaɾˈðin/",
-      "soundUnitSlugs": [
-        "es-x"
-      ],
-      "fileName": "jardin-152b0c982f.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/jardin-152b0c982f.mp3"
-    },
-    {
-      "key": "jota",
-      "text": "jota",
-      "ipa": "/ˈxota/",
-      "soundUnitSlugs": [
-        "es-x"
-      ],
-      "fileName": "jota-9a02f63cf7.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/jota-9a02f63cf7.mp3"
-    },
-    {
-      "key": "jefe",
-      "text": "jefe",
-      "ipa": "/ˈxefe/",
-      "soundUnitSlugs": [
-        "es-x"
-      ],
-      "fileName": "jefe-a7434f460c.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/jefe-a7434f460c.mp3"
-    },
-    {
-      "key": "caja",
-      "text": "caja",
-      "ipa": "/ˈkaxa/",
-      "soundUnitSlugs": [
-        "es-x"
-      ],
-      "fileName": "caja-862448c9b2.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/caja-862448c9b2.mp3"
-    },
-    {
-      "key": "hoja",
-      "text": "hoja",
-      "ipa": "/ˈoxa/",
-      "soundUnitSlugs": [
-        "es-x"
-      ],
-      "fileName": "hoja-d4235bc03b.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/hoja-d4235bc03b.mp3"
-    },
-    {
-      "key": "ajo",
-      "text": "ajo",
-      "ipa": "/ˈaxo/",
-      "soundUnitSlugs": [
-        "es-x"
-      ],
-      "fileName": "ajo-63b963ade1.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/ajo-63b963ade1.mp3"
-    },
-    {
-      "key": "eje",
-      "text": "eje",
-      "ipa": "/ˈexe/",
-      "soundUnitSlugs": [
-        "es-x"
-      ],
-      "fileName": "eje-160e413b2f.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/eje-160e413b2f.mp3"
-    },
-    {
-      "key": "traje",
-      "text": "traje",
-      "ipa": "/ˈtɾaxe/",
-      "soundUnitSlugs": [
-        "es-x"
-      ],
-      "fileName": "traje-73b04d045a.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/traje-73b04d045a.mp3"
-    },
-    {
-      "key": "lejos",
-      "text": "lejos",
-      "ipa": "/ˈlexos/",
-      "soundUnitSlugs": [
-        "es-x"
-      ],
-      "fileName": "lejos-96b5d8f2ac.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/lejos-96b5d8f2ac.mp3"
-    },
-    {
-      "key": "bajo",
-      "text": "bajo",
-      "ipa": "/ˈbaxo/",
-      "soundUnitSlugs": [
-        "es-x"
-      ],
-      "fileName": "bajo-98973d5c9a.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/bajo-98973d5c9a.mp3"
-    },
-    {
-      "key": "viajar",
-      "text": "viajar",
-      "ipa": "/bjaˈxaɾ/",
-      "soundUnitSlugs": [
-        "es-x"
-      ],
-      "fileName": "viajar-3ce867c1d2.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/viajar-3ce867c1d2.mp3"
-    },
-    {
-      "key": "naranja",
-      "text": "naranja",
-      "ipa": "/naˈɾaŋxa/",
-      "soundUnitSlugs": [
-        "es-x"
-      ],
-      "fileName": "naranja-3cf3494082.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/naranja-3cf3494082.mp3"
-    },
-    {
-      "key": "ejemplo",
-      "text": "ejemplo",
-      "ipa": "/eˈxemplo/",
-      "soundUnitSlugs": [
-        "es-x"
-      ],
-      "fileName": "ejemplo-a6c05bd5d5.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/ejemplo-a6c05bd5d5.mp3"
-    },
-    {
-      "key": "reloj",
-      "text": "reloj",
-      "ipa": "/reˈlox/",
-      "soundUnitSlugs": [
-        "es-x"
-      ],
-      "fileName": "reloj-2e490be4ff.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/reloj-2e490be4ff.mp3"
-    },
-    {
-      "key": "josé juega",
-      "text": "José juega",
-      "ipa": "/xoˈse ˈxweɣa/",
-      "soundUnitSlugs": [
-        "es-x"
-      ],
-      "fileName": "jose-juega-3aec6f6fe2.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/jose-juega-3aec6f6fe2.mp3"
-    },
-    {
-      "key": "caja roja",
-      "text": "caja roja",
-      "ipa": "/ˈkaxa ˈroxa/",
-      "soundUnitSlugs": [
-        "es-x"
-      ],
-      "fileName": "caja-roja-97ea32b65b.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/caja-roja-97ea32b65b.mp3"
-    },
-    {
-      "key": "año",
-      "text": "año",
-      "ipa": "/ˈaɲo/",
-      "soundUnitSlugs": [
-        "es-ny"
-      ],
-      "fileName": "ano-8470d9e5f7.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/ano-8470d9e5f7.mp3"
-    },
-    {
-      "key": "sueño",
-      "text": "sueño",
-      "ipa": "/ˈsweɲo/",
-      "soundUnitSlugs": [
-        "es-ny",
-        "es-s"
-      ],
-      "fileName": "sueno-b05f8bb9b1.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/sueno-b05f8bb9b1.mp3"
-    },
-    {
-      "key": "español",
-      "text": "español",
-      "ipa": "/espaˈɲol/",
-      "soundUnitSlugs": [
-        "es-ny"
-      ],
-      "fileName": "espanol-d2a8463fba.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/espanol-d2a8463fba.mp3"
-    },
-    {
-      "key": "pequeño",
-      "text": "pequeño",
-      "ipa": "/peˈkeɲo/",
-      "soundUnitSlugs": [
-        "es-ny"
-      ],
-      "fileName": "pequeno-f5a425f86a.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/pequeno-f5a425f86a.mp3"
-    },
-    {
-      "key": "señora",
-      "text": "señora",
-      "ipa": "/seˈɲoɾa/",
-      "soundUnitSlugs": [
-        "es-ny"
-      ],
-      "fileName": "senora-e04d588b97.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/senora-e04d588b97.mp3"
-    },
-    {
-      "key": "baño",
-      "text": "baño",
-      "ipa": "/ˈbaɲo/",
-      "soundUnitSlugs": [
-        "es-ny"
-      ],
-      "fileName": "bano-1d7f53dfb1.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/bano-1d7f53dfb1.mp3"
-    },
-    {
-      "key": "cariño",
-      "text": "cariño",
-      "ipa": "/kaˈɾiɲo/",
-      "soundUnitSlugs": [
-        "es-ny"
-      ],
-      "fileName": "carino-31d01593ef.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/carino-31d01593ef.mp3"
-    },
-    {
-      "key": "montaña",
-      "text": "montaña",
-      "ipa": "/monˈtaɲa/",
-      "soundUnitSlugs": [
-        "es-ny"
-      ],
-      "fileName": "montana-9a5807ec4d.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/montana-9a5807ec4d.mp3"
-    },
-    {
-      "key": "campaña",
-      "text": "campaña",
-      "ipa": "/kamˈpaɲa/",
-      "soundUnitSlugs": [
-        "es-ny"
-      ],
-      "fileName": "campana-9e0c58dd09.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/campana-9e0c58dd09.mp3"
-    },
-    {
-      "key": "señal",
-      "text": "señal",
-      "ipa": "/seˈɲal/",
-      "soundUnitSlugs": [
-        "es-ny"
-      ],
-      "fileName": "senal-b75d71d7c4.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/senal-b75d71d7c4.mp3"
-    },
-    {
-      "key": "muñeca",
-      "text": "muñeca",
-      "ipa": "/muˈɲeka/",
-      "soundUnitSlugs": [
-        "es-ny"
-      ],
-      "fileName": "muneca-6e45d6b020.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/muneca-6e45d6b020.mp3"
-    },
-    {
-      "key": "piñata",
-      "text": "piñata",
-      "ipa": "/piˈɲata/",
-      "soundUnitSlugs": [
-        "es-ny"
-      ],
-      "fileName": "pinata-d33f9a7f50.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/pinata-d33f9a7f50.mp3"
-    },
-    {
-      "key": "leña",
-      "text": "leña",
-      "ipa": "/ˈleɲa/",
-      "soundUnitSlugs": [
-        "es-ny"
-      ],
-      "fileName": "lena-addf2c6fec.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/lena-addf2c6fec.mp3"
-    },
-    {
-      "key": "uña",
-      "text": "uña",
-      "ipa": "/ˈuɲa/",
-      "soundUnitSlugs": [
-        "es-ny"
-      ],
-      "fileName": "una-49520ffd61.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/una-49520ffd61.mp3"
-    },
-    {
-      "key": "daño",
-      "text": "daño",
-      "ipa": "/ˈdaɲo/",
-      "soundUnitSlugs": [
-        "es-ny"
-      ],
-      "fileName": "dano-4f22c2cc1e.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/dano-4f22c2cc1e.mp3"
-    },
-    {
-      "key": "niñez",
-      "text": "niñez",
-      "ipa": "/niˈɲeθ/",
-      "soundUnitSlugs": [
-        "es-ny"
-      ],
-      "fileName": "ninez-e13e6fdff7.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/ninez-e13e6fdff7.mp3"
-    },
-    {
-      "key": "mi niño",
-      "text": "mi niño",
-      "ipa": "/mi ˈniɲo/",
-      "soundUnitSlugs": [
-        "es-ny"
-      ],
-      "fileName": "mi-nino-cf03bb643e.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/mi-nino-cf03bb643e.mp3"
-    },
-    {
-      "key": "un año",
-      "text": "un año",
-      "ipa": "/un ˈaɲo/",
-      "soundUnitSlugs": [
-        "es-ny"
-      ],
-      "fileName": "un-ano-f948f58383.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/un-ano-f948f58383.mp3"
-    },
-    {
-      "key": "pero",
-      "text": "pero",
-      "ipa": "/ˈpeɾo/",
-      "soundUnitSlugs": [
-        "es-tap-r"
-      ],
-      "fileName": "pero-98fc7b3476.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/pero-98fc7b3476.mp3"
-    },
-    {
-      "key": "caro",
-      "text": "caro",
-      "ipa": "/ˈkaɾo/",
-      "soundUnitSlugs": [
-        "es-tap-r"
-      ],
-      "fileName": "caro-732849d5bc.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/caro-732849d5bc.mp3"
-    },
-    {
-      "key": "para",
-      "text": "para",
-      "ipa": "/ˈpaɾa/",
-      "soundUnitSlugs": [
-        "es-tap-r"
-      ],
-      "fileName": "para-d2f9be8fe2.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/para-d2f9be8fe2.mp3"
-    },
-    {
-      "key": "brazo",
-      "text": "brazo",
-      "ipa": "/ˈbɾaθo/",
-      "soundUnitSlugs": [
-        "es-tap-r"
-      ],
-      "fileName": "brazo-d2f68f12f4.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/brazo-d2f68f12f4.mp3"
-    },
-    {
-      "key": "pera",
-      "text": "pera",
-      "ipa": "/ˈpeɾa/",
-      "soundUnitSlugs": [
-        "es-tap-r"
-      ],
-      "fileName": "pera-c9c2708d92.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/pera-c9c2708d92.mp3"
-    },
-    {
-      "key": "primero",
-      "text": "primero",
-      "ipa": "/pɾiˈmeɾo/",
-      "soundUnitSlugs": [
-        "es-tap-r"
-      ],
-      "fileName": "primero-2e146f6319.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/primero-2e146f6319.mp3"
-    },
-    {
-      "key": "claro",
-      "text": "claro",
-      "ipa": "/ˈklaɾo/",
-      "soundUnitSlugs": [
-        "es-tap-r"
-      ],
-      "fileName": "claro-98a793c74a.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/claro-98a793c74a.mp3"
-    },
-    {
-      "key": "fruta",
-      "text": "fruta",
-      "ipa": "/ˈfɾuta/",
-      "soundUnitSlugs": [
-        "es-tap-r"
-      ],
-      "fileName": "fruta-1ea8c03fd2.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/fruta-1ea8c03fd2.mp3"
-    },
-    {
-      "key": "drama",
-      "text": "drama",
-      "ipa": "/ˈdɾama/",
-      "soundUnitSlugs": [
-        "es-tap-r"
-      ],
-      "fileName": "drama-63b1298947.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/drama-63b1298947.mp3"
-    },
-    {
-      "key": "abril",
-      "text": "abril",
-      "ipa": "/aˈβɾil/",
-      "soundUnitSlugs": [
-        "es-tap-r",
-        "es-l"
-      ],
-      "fileName": "abril-2fae671016.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/abril-2fae671016.mp3"
-    },
-    {
-      "key": "problema",
-      "text": "problema",
-      "ipa": "/pɾoˈβlema/",
-      "soundUnitSlugs": [
-        "es-tap-r"
-      ],
-      "fileName": "problema-c98484f0d2.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/problema-c98484f0d2.mp3"
-    },
-    {
-      "key": "hermano",
-      "text": "hermano",
-      "ipa": "/eɾˈmano/",
-      "soundUnitSlugs": [
-        "es-tap-r"
-      ],
-      "fileName": "hermano-9587a8303a.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/hermano-9587a8303a.mp3"
-    },
-    {
-      "key": "ahora",
-      "text": "ahora",
-      "ipa": "/aˈoɾa/",
-      "soundUnitSlugs": [
-        "es-tap-r"
-      ],
-      "fileName": "ahora-317914bb85.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/ahora-317914bb85.mp3"
-    },
-    {
-      "key": "morir",
-      "text": "morir",
-      "ipa": "/moˈɾiɾ/",
-      "soundUnitSlugs": [
-        "es-tap-r"
-      ],
-      "fileName": "morir-0bcfdca8d4.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/morir-0bcfdca8d4.mp3"
-    },
-    {
-      "key": "rápido",
-      "text": "rápido",
-      "ipa": "/ˈrapiðo/",
-      "soundUnitSlugs": [
-        "es-trill-r",
-        "es-lexical-stress"
-      ],
-      "fileName": "rapido-28216bb78b.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/rapido-28216bb78b.mp3"
-    },
-    {
-      "key": "carro",
-      "text": "carro",
-      "ipa": "/ˈkaro/",
-      "soundUnitSlugs": [
-        "es-trill-r"
-      ],
-      "fileName": "carro-3959fc6166.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/carro-3959fc6166.mp3"
-    },
-    {
-      "key": "tierra",
-      "text": "tierra",
-      "ipa": "/ˈtjera/",
-      "soundUnitSlugs": [
-        "es-trill-r",
-        "es-diphthongs-j"
-      ],
-      "fileName": "tierra-c7039f8547.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/tierra-c7039f8547.mp3"
-    },
-    {
-      "key": "río",
-      "text": "río",
-      "ipa": "/ˈrio/",
-      "soundUnitSlugs": [
-        "es-trill-r"
-      ],
-      "fileName": "rio-348f83686b.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/rio-348f83686b.mp3"
-    },
-    {
-      "key": "rosa",
-      "text": "rosa",
-      "ipa": "/ˈrosa/",
-      "soundUnitSlugs": [
-        "es-trill-r"
-      ],
-      "fileName": "rosa-5efc86ca88.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/rosa-5efc86ca88.mp3"
-    },
-    {
-      "key": "ropa",
-      "text": "ropa",
-      "ipa": "/ˈropa/",
-      "soundUnitSlugs": [
-        "es-trill-r"
-      ],
-      "fileName": "ropa-9a5226551b.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/ropa-9a5226551b.mp3"
-    },
-    {
-      "key": "rueda",
-      "text": "rueda",
-      "ipa": "/ˈrweða/",
-      "soundUnitSlugs": [
-        "es-trill-r"
-      ],
-      "fileName": "rueda-8b4e77564f.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/rueda-8b4e77564f.mp3"
-    },
-    {
-      "key": "barrio",
-      "text": "barrio",
-      "ipa": "/ˈbarjo/",
-      "soundUnitSlugs": [
-        "es-trill-r"
-      ],
-      "fileName": "barrio-2ce33323f0.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/barrio-2ce33323f0.mp3"
-    },
-    {
-      "key": "rata",
-      "text": "rata",
-      "ipa": "/ˈrata/",
-      "soundUnitSlugs": [
-        "es-trill-r"
-      ],
-      "fileName": "rata-5ede3db025.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/rata-5ede3db025.mp3"
-    },
-    {
-      "key": "rey",
-      "text": "rey",
-      "ipa": "/rei/",
-      "soundUnitSlugs": [
-        "es-trill-r",
-        "es-diphthongs-j"
-      ],
-      "fileName": "rey-9fc518ef19.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/rey-9fc518ef19.mp3"
-    },
-    {
-      "key": "radio",
-      "text": "radio",
-      "ipa": "/ˈraðjo/",
-      "soundUnitSlugs": [
-        "es-trill-r"
-      ],
-      "fileName": "radio-d432c3525b.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/radio-d432c3525b.mp3"
-    },
-    {
-      "key": "arriba",
-      "text": "arriba",
-      "ipa": "/aˈriba/",
-      "soundUnitSlugs": [
-        "es-trill-r"
-      ],
-      "fileName": "arriba-522b9e8a7a.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/arriba-522b9e8a7a.mp3"
-    },
-    {
-      "key": "correo",
-      "text": "correo",
-      "ipa": "/koˈreo/",
-      "soundUnitSlugs": [
-        "es-trill-r"
-      ],
-      "fileName": "correo-4fc1c3d194.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/correo-4fc1c3d194.mp3"
-    },
-    {
-      "key": "ferrocarril",
-      "text": "ferrocarril",
-      "ipa": "/ferokaˈril/",
-      "soundUnitSlugs": [
-        "es-trill-r"
-      ],
-      "fileName": "ferrocarril-346c754d16.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/ferrocarril-346c754d16.mp3"
-    },
-    {
-      "key": "enredo",
-      "text": "enredo",
-      "ipa": "/enˈredo/",
-      "soundUnitSlugs": [
-        "es-trill-r"
-      ],
-      "fileName": "enredo-c9c1488fa2.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/enredo-c9c1488fa2.mp3"
-    },
-    {
-      "key": "subrayar",
-      "text": "subrayar",
-      "ipa": "/suβraˈʝaɾ/",
-      "soundUnitSlugs": [
-        "es-trill-r"
-      ],
-      "fileName": "subrayar-31c50d62fc.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/subrayar-31c50d62fc.mp3"
-    },
-    {
-      "key": "israel",
-      "text": "Israel",
-      "ipa": "/israˈel/",
-      "soundUnitSlugs": [
-        "es-trill-r"
-      ],
-      "fileName": "israel-8f4f9f2dcb.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/israel-8f4f9f2dcb.mp3"
-    },
-    {
-      "key": "honrado",
-      "text": "honrado",
-      "ipa": "/onˈrado/",
-      "soundUnitSlugs": [
-        "es-trill-r"
-      ],
-      "fileName": "honrado-aafa7cfd2d.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/honrado-aafa7cfd2d.mp3"
-    },
-    {
-      "key": "romper",
-      "text": "romper",
-      "ipa": "/romˈpeɾ/",
-      "soundUnitSlugs": [
-        "es-trill-r"
-      ],
-      "fileName": "romper-9ebc60ae06.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/romper-9ebc60ae06.mp3"
-    },
-    {
-      "key": "carretera",
-      "text": "carretera",
-      "ipa": "/kareˈteɾa/",
-      "soundUnitSlugs": [
-        "es-trill-r"
-      ],
-      "fileName": "carretera-157a7200f4.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/carretera-157a7200f4.mp3"
-    },
-    {
-      "key": "rojo rápido",
-      "text": "rojo rápido",
-      "ipa": "/ˈroxo ˈrapiðo/",
-      "soundUnitSlugs": [
-        "es-trill-r"
-      ],
-      "fileName": "rojo-rapido-a8b29589e7.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/rojo-rapido-a8b29589e7.mp3"
-    },
-    {
-      "key": "sopa",
-      "text": "sopa",
-      "ipa": "/ˈsopa/",
-      "soundUnitSlugs": [
-        "es-s"
-      ],
-      "fileName": "sopa-4662abffdd.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/sopa-4662abffdd.mp3"
-    },
-    {
-      "key": "seis",
-      "text": "seis",
-      "ipa": "/sejs/",
-      "soundUnitSlugs": [
-        "es-s",
-        "es-diphthongs-j"
-      ],
-      "fileName": "seis-ba15793485.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/seis-ba15793485.mp3"
-    },
-    {
-      "key": "serie",
-      "text": "serie",
-      "ipa": "/ˈseɾje/",
-      "soundUnitSlugs": [
-        "es-s"
-      ],
-      "fileName": "serie-82cd0722a5.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/serie-82cd0722a5.mp3"
-    },
-    {
-      "key": "silla",
-      "text": "silla",
-      "ipa": "/ˈsiʝa/",
-      "soundUnitSlugs": [
-        "es-s"
-      ],
-      "fileName": "silla-86546b912b.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/silla-86546b912b.mp3"
-    },
-    {
-      "key": "salud",
-      "text": "salud",
-      "ipa": "/saˈluð/",
-      "soundUnitSlugs": [
-        "es-s"
-      ],
-      "fileName": "salud-250a4a1b82.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/salud-250a4a1b82.mp3"
-    },
-    {
-      "key": "mismo",
-      "text": "mismo",
-      "ipa": "/ˈmismo/",
-      "soundUnitSlugs": [
-        "es-s"
-      ],
-      "fileName": "mismo-c859579a7c.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/mismo-c859579a7c.mp3"
-    },
-    {
-      "key": "beso",
-      "text": "beso",
-      "ipa": "/ˈbeso/",
-      "soundUnitSlugs": [
-        "es-s"
-      ],
-      "fileName": "beso-6edd8a12b3.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/beso-6edd8a12b3.mp3"
-    },
-    {
-      "key": "los niños",
-      "text": "los niños",
-      "ipa": "/los ˈniɲos/",
-      "soundUnitSlugs": [
-        "es-s"
-      ],
-      "fileName": "los-ninos-5176121c70.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/los-ninos-5176121c70.mp3"
-    },
-    {
-      "key": "seis casas",
-      "text": "seis casas",
-      "ipa": "/sejs ˈkasas/",
-      "soundUnitSlugs": [
-        "es-s"
-      ],
-      "fileName": "seis-casas-e6a452b75b.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/seis-casas-e6a452b75b.mp3"
-    },
-    {
-      "key": "solo sé",
-      "text": "solo sé",
-      "ipa": "/ˈsolo se/",
-      "soundUnitSlugs": [
-        "es-s"
-      ],
-      "fileName": "solo-se-8f6cf83348.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/solo-se-8f6cf83348.mp3"
-    },
-    {
-      "key": "ocho",
-      "text": "ocho",
-      "ipa": "/ˈotʃo/",
-      "soundUnitSlugs": [
-        "es-ch"
-      ],
-      "fileName": "ocho-311047fbb0.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/ocho-311047fbb0.mp3"
-    },
-    {
-      "key": "chocolate",
-      "text": "chocolate",
-      "ipa": "/tʃokoˈlate/",
-      "soundUnitSlugs": [
-        "es-ch"
-      ],
-      "fileName": "chocolate-891c5feef1.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/chocolate-891c5feef1.mp3"
-    },
-    {
-      "key": "derecho",
-      "text": "derecho",
-      "ipa": "/deˈɾetʃo/",
-      "soundUnitSlugs": [
-        "es-ch"
-      ],
-      "fileName": "derecho-47207a6890.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/derecho-47207a6890.mp3"
-    },
-    {
-      "key": "escuchar",
-      "text": "escuchar",
-      "ipa": "/eskuˈtʃaɾ/",
-      "soundUnitSlugs": [
-        "es-ch"
-      ],
-      "fileName": "escuchar-08571a9e04.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/escuchar-08571a9e04.mp3"
-    },
-    {
-      "key": "cuchara",
-      "text": "cuchara",
-      "ipa": "/kuˈtʃaɾa/",
-      "soundUnitSlugs": [
-        "es-ch"
-      ],
-      "fileName": "cuchara-7b30da9d00.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/cuchara-7b30da9d00.mp3"
-    },
-    {
-      "key": "muchacho",
-      "text": "muchacho",
-      "ipa": "/muˈtʃatʃo/",
-      "soundUnitSlugs": [
-        "es-ch"
-      ],
-      "fileName": "muchacho-5849d57521.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/muchacho-5849d57521.mp3"
-    },
-    {
-      "key": "chaqueta",
-      "text": "chaqueta",
-      "ipa": "/tʃaˈketa/",
-      "soundUnitSlugs": [
-        "es-ch"
-      ],
-      "fileName": "chaqueta-c0cc5ed98a.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/chaqueta-c0cc5ed98a.mp3"
-    },
-    {
-      "key": "churro",
-      "text": "churro",
-      "ipa": "/ˈtʃuro/",
-      "soundUnitSlugs": [
-        "es-ch"
-      ],
-      "fileName": "churro-861d6f0879.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/churro-861d6f0879.mp3"
-    },
-    {
-      "key": "hecho",
-      "text": "hecho",
-      "ipa": "/ˈetʃo/",
-      "soundUnitSlugs": [
-        "es-ch"
-      ],
-      "fileName": "hecho-23af90bc8d.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/hecho-23af90bc8d.mp3"
-    },
-    {
-      "key": "dicho",
-      "text": "dicho",
-      "ipa": "/ˈditʃo/",
-      "soundUnitSlugs": [
-        "es-ch"
-      ],
-      "fileName": "dicho-d007cc0080.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/dicho-d007cc0080.mp3"
-    },
-    {
-      "key": "fecha",
-      "text": "fecha",
-      "ipa": "/ˈfetʃa/",
-      "soundUnitSlugs": [
-        "es-ch"
-      ],
-      "fileName": "fecha-c01a46e22e.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/fecha-c01a46e22e.mp3"
-    },
-    {
-      "key": "ancho",
-      "text": "ancho",
-      "ipa": "/ˈantʃo/",
-      "soundUnitSlugs": [
-        "es-ch"
-      ],
-      "fileName": "ancho-0b950c55c4.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/ancho-0b950c55c4.mp3"
-    },
-    {
-      "key": "chico escucha",
-      "text": "chico escucha",
-      "ipa": "/ˈtʃiko esˈkutʃa/",
-      "soundUnitSlugs": [
-        "es-ch"
-      ],
-      "fileName": "chico-escucha-c3f66deba7.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/chico-escucha-c3f66deba7.mp3"
-    },
-    {
-      "key": "mucha leche",
-      "text": "mucha leche",
-      "ipa": "/ˈmutʃa ˈletʃe/",
-      "soundUnitSlugs": [
-        "es-ch"
-      ],
-      "fileName": "mucha-leche-9ca89308c8.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/mucha-leche-9ca89308c8.mp3"
-    },
-    {
-      "key": "ocho coches",
-      "text": "ocho coches",
-      "ipa": "/ˈotʃo ˈkotʃes/",
-      "soundUnitSlugs": [
-        "es-ch"
-      ],
-      "fileName": "ocho-coches-7f5ea95ef2.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/ocho-coches-7f5ea95ef2.mp3"
-    },
-    {
-      "key": "yo",
-      "text": "yo",
-      "ipa": "/ʝo/",
-      "soundUnitSlugs": [
-        "es-y-ll"
-      ],
-      "fileName": "yo-c41975d1da.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/yo-c41975d1da.mp3"
-    },
-    {
-      "key": "ya",
-      "text": "ya",
-      "ipa": "/ʝa/",
-      "soundUnitSlugs": [
-        "es-y-ll"
-      ],
-      "fileName": "ya-e92fc4e26a.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/ya-e92fc4e26a.mp3"
-    },
-    {
-      "key": "llave",
-      "text": "llave",
-      "ipa": "/ˈʝaβe/",
-      "soundUnitSlugs": [
-        "es-y-ll"
-      ],
-      "fileName": "llave-b48663d247.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/llave-b48663d247.mp3"
-    },
-    {
-      "key": "calle",
-      "text": "calle",
-      "ipa": "/ˈkaʝe/",
-      "soundUnitSlugs": [
-        "es-y-ll"
-      ],
-      "fileName": "calle-8f9f97eb45.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/calle-8f9f97eb45.mp3"
-    },
-    {
-      "key": "ella",
-      "text": "ella",
-      "ipa": "/ˈeʝa/",
-      "soundUnitSlugs": [
-        "es-y-ll"
-      ],
-      "fileName": "ella-5edf31da3f.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/ella-5edf31da3f.mp3"
-    },
-    {
-      "key": "mayor",
-      "text": "mayor",
-      "ipa": "/maˈʝoɾ/",
-      "soundUnitSlugs": [
-        "es-y-ll"
-      ],
-      "fileName": "mayor-e6a04b67d2.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/mayor-e6a04b67d2.mp3"
-    },
-    {
-      "key": "yema",
-      "text": "yema",
-      "ipa": "/ˈʝema/",
-      "soundUnitSlugs": [
-        "es-y-ll"
-      ],
-      "fileName": "yema-b76baa4c82.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/yema-b76baa4c82.mp3"
-    },
-    {
-      "key": "yeso",
-      "text": "yeso",
-      "ipa": "/ˈʝeso/",
-      "soundUnitSlugs": [
-        "es-y-ll"
-      ],
-      "fileName": "yeso-4a5901e8c6.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/yeso-4a5901e8c6.mp3"
-    },
-    {
-      "key": "llamar",
-      "text": "llamar",
-      "ipa": "/ʝaˈmaɾ/",
-      "soundUnitSlugs": [
-        "es-y-ll"
-      ],
-      "fileName": "llamar-b9bd9d84b9.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/llamar-b9bd9d84b9.mp3"
-    },
-    {
-      "key": "desayuno",
-      "text": "desayuno",
-      "ipa": "/desaˈʝuno/",
-      "soundUnitSlugs": [
-        "es-y-ll"
-      ],
-      "fileName": "desayuno-6987adf004.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/desayuno-6987adf004.mp3"
-    },
-    {
-      "key": "ensayo",
-      "text": "ensayo",
-      "ipa": "/enˈsaʝo/",
-      "soundUnitSlugs": [
-        "es-y-ll"
-      ],
-      "fileName": "ensayo-856ecd76c9.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/ensayo-856ecd76c9.mp3"
-    },
-    {
-      "key": "mayo",
-      "text": "mayo",
-      "ipa": "/ˈmaʝo/",
-      "soundUnitSlugs": [
-        "es-y-ll"
-      ],
-      "fileName": "mayo-b2479b710d.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/mayo-b2479b710d.mp3"
-    },
-    {
-      "key": "oye",
-      "text": "oye",
-      "ipa": "/ˈoʝe/",
-      "soundUnitSlugs": [
-        "es-y-ll"
-      ],
-      "fileName": "oye-52b4cbd5b0.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/oye-52b4cbd5b0.mp3"
-    },
-    {
-      "key": "yo llamo",
-      "text": "yo llamo",
-      "ipa": "/ʝo ˈʝamo/",
-      "soundUnitSlugs": [
-        "es-y-ll"
-      ],
-      "fileName": "yo-llamo-e5b42c87f0.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/yo-llamo-e5b42c87f0.mp3"
-    },
-    {
-      "key": "la llave",
-      "text": "la llave",
-      "ipa": "/la ˈʝaβe/",
-      "soundUnitSlugs": [
-        "es-y-ll"
-      ],
-      "fileName": "la-llave-3912d423d5.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/la-llave-3912d423d5.mp3"
-    },
-    {
-      "key": "calle mayor",
-      "text": "calle mayor",
-      "ipa": "/ˈkaʝe maˈʝoɾ/",
-      "soundUnitSlugs": [
-        "es-y-ll"
-      ],
-      "fileName": "calle-mayor-0f81d310c9.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/calle-mayor-0f81d310c9.mp3"
-    },
-    {
-      "key": "el",
-      "text": "el",
-      "ipa": "/el/",
-      "soundUnitSlugs": [
-        "es-l"
-      ],
-      "fileName": "el-4f1ea4f09d.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/el-4f1ea4f09d.mp3"
-    },
-    {
-      "key": "clase",
-      "text": "clase",
-      "ipa": "/ˈklase/",
-      "soundUnitSlugs": [
-        "es-l"
-      ],
-      "fileName": "clase-686bf5da3a.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/clase-686bf5da3a.mp3"
-    },
-    {
-      "key": "pueblo",
-      "text": "pueblo",
-      "ipa": "/ˈpweβlo/",
-      "soundUnitSlugs": [
-        "es-l"
-      ],
-      "fileName": "pueblo-40e61a659e.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/pueblo-40e61a659e.mp3"
-    },
-    {
-      "key": "luna clara",
-      "text": "luna clara",
-      "ipa": "/ˈluna ˈklaɾa/",
-      "soundUnitSlugs": [
-        "es-l"
-      ],
-      "fileName": "luna-clara-abb7ccae22.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/luna-clara-abb7ccae22.mp3"
-    },
-    {
-      "key": "el libro",
-      "text": "el libro",
-      "ipa": "/el ˈlibɾo/",
-      "soundUnitSlugs": [
-        "es-l"
-      ],
-      "fileName": "el-libro-3601a248e5.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/el-libro-3601a248e5.mp3"
-    },
-    {
-      "key": "la plaza",
-      "text": "la plaza",
-      "ipa": "/la ˈplaθa/",
-      "soundUnitSlugs": [
-        "es-l"
-      ],
-      "fileName": "la-plaza-107bf33ec1.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/la-plaza-107bf33ec1.mp3"
-    },
-    {
-      "key": "un beso",
-      "text": "un beso",
-      "ipa": "/um ˈbeso/",
-      "soundUnitSlugs": [
-        "es-nasal-place"
-      ],
-      "fileName": "un-beso-404d363351.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/un-beso-404d363351.mp3"
-    },
-    {
-      "key": "un gato",
-      "text": "un gato",
-      "ipa": "/uŋ ˈgato/",
-      "soundUnitSlugs": [
-        "es-nasal-place"
-      ],
-      "fileName": "un-gato-cb0821b10a.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/un-gato-cb0821b10a.mp3"
-    },
-    {
-      "key": "tango",
-      "text": "tango",
-      "ipa": "/ˈtaŋgo/",
-      "soundUnitSlugs": [
-        "es-nasal-place"
-      ],
-      "fileName": "tango-de852dff30.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/tango-de852dff30.mp3"
-    },
-    {
-      "key": "conmigo",
-      "text": "conmigo",
-      "ipa": "/komˈmiɣo/",
-      "soundUnitSlugs": [
-        "es-nasal-place"
-      ],
-      "fileName": "conmigo-a93cf18ed9.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/conmigo-a93cf18ed9.mp3"
-    },
-    {
-      "key": "antes",
-      "text": "antes",
-      "ipa": "/ˈantes/",
-      "soundUnitSlugs": [
-        "es-nasal-place"
-      ],
-      "fileName": "antes-cef4b5e9a6.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/antes-cef4b5e9a6.mp3"
-    },
-    {
-      "key": "campo",
-      "text": "campo",
-      "ipa": "/ˈkampo/",
-      "soundUnitSlugs": [
-        "es-nasal-place"
-      ],
-      "fileName": "campo-bdc4e01461.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/campo-bdc4e01461.mp3"
-    },
-    {
-      "key": "también",
-      "text": "también",
-      "ipa": "/tamˈbjen/",
-      "soundUnitSlugs": [
-        "es-nasal-place"
-      ],
-      "fileName": "tambien-db38e4d37a.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/tambien-db38e4d37a.mp3"
-    },
-    {
-      "key": "un pan",
-      "text": "un pan",
-      "ipa": "/um pan/",
-      "soundUnitSlugs": [
-        "es-nasal-place"
-      ],
-      "fileName": "un-pan-76c52d8242.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/un-pan-76c52d8242.mp3"
-    },
-    {
-      "key": "en casa",
-      "text": "en casa",
-      "ipa": "/eŋ ˈkasa/",
-      "soundUnitSlugs": [
-        "es-nasal-place"
-      ],
-      "fileName": "en-casa-faf4b3251c.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/en-casa-faf4b3251c.mp3"
-    },
-    {
-      "key": "con él",
-      "text": "con él",
-      "ipa": "/kon el/",
-      "soundUnitSlugs": [
-        "es-nasal-place"
-      ],
-      "fileName": "con-el-b302a727e2.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/con-el-b302a727e2.mp3"
-    },
-    {
-      "key": "mi nombre",
-      "text": "mi nombre",
-      "ipa": "/mi ˈnombɾe/",
-      "soundUnitSlugs": [
-        "es-nasal-place"
-      ],
-      "fileName": "mi-nombre-3ed4ff026c.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/mi-nombre-3ed4ff026c.mp3"
-    },
-    {
-      "key": "un niño",
-      "text": "un niño",
-      "ipa": "/un ˈniɲo/",
-      "soundUnitSlugs": [
-        "es-nasal-place"
-      ],
-      "fileName": "un-nino-2126589c50.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/un-nino-2126589c50.mp3"
-    },
-    {
-      "key": "con gusto",
-      "text": "con gusto",
-      "ipa": "/koŋ ˈgusto/",
-      "soundUnitSlugs": [
-        "es-nasal-place"
-      ],
-      "fileName": "con-gusto-c4572b7379.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/con-gusto-c4572b7379.mp3"
-    },
-    {
-      "key": "buen viaje",
-      "text": "buen viaje",
-      "ipa": "/bwem ˈbjaxe/",
-      "soundUnitSlugs": [
-        "es-nasal-place"
-      ],
-      "fileName": "buen-viaje-ea8d4f1cd0.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/buen-viaje-ea8d4f1cd0.mp3"
-    },
-    {
-      "key": "bien",
-      "text": "bien",
-      "ipa": "/bjen/",
-      "soundUnitSlugs": [
-        "es-diphthongs-j"
-      ],
-      "fileName": "bien-d4e2f60841.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/bien-d4e2f60841.mp3"
-    },
-    {
-      "key": "aire",
-      "text": "aire",
-      "ipa": "/ˈajɾe/",
-      "soundUnitSlugs": [
-        "es-diphthongs-j"
-      ],
-      "fileName": "aire-437ec6c121.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/aire-437ec6c121.mp3"
-    },
-    {
-      "key": "viaje",
-      "text": "viaje",
-      "ipa": "/ˈbjaxe/",
-      "soundUnitSlugs": [
-        "es-diphthongs-j"
-      ],
-      "fileName": "viaje-4db7412397.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/viaje-4db7412397.mp3"
-    },
-    {
-      "key": "ley",
-      "text": "ley",
-      "ipa": "/lej/",
-      "soundUnitSlugs": [
-        "es-diphthongs-j"
-      ],
-      "fileName": "ley-afa139195b.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/ley-afa139195b.mp3"
-    },
-    {
-      "key": "hoy",
-      "text": "hoy",
-      "ipa": "/oj/",
-      "soundUnitSlugs": [
-        "es-diphthongs-j"
-      ],
-      "fileName": "hoy-ec80f56906.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/hoy-ec80f56906.mp3"
-    },
-    {
-      "key": "muy",
-      "text": "muy",
-      "ipa": "/muj/",
-      "soundUnitSlugs": [
-        "es-diphthongs-j"
-      ],
-      "fileName": "muy-060ab0c090.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/muy-060ab0c090.mp3"
-    },
-    {
-      "key": "bien dicho",
-      "text": "bien dicho",
-      "ipa": "/bjen ˈditʃo/",
-      "soundUnitSlugs": [
-        "es-diphthongs-j"
-      ],
-      "fileName": "bien-dicho-25cbebf7a1.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/bien-dicho-25cbebf7a1.mp3"
-    },
-    {
-      "key": "seis años",
-      "text": "seis años",
-      "ipa": "/sejs ˈaɲos/",
-      "soundUnitSlugs": [
-        "es-diphthongs-j"
-      ],
-      "fileName": "seis-anos-c6939d689b.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/seis-anos-c6939d689b.mp3"
-    },
-    {
-      "key": "familia grande",
-      "text": "familia grande",
-      "ipa": "/faˈmilja ˈgɾande/",
-      "soundUnitSlugs": [
-        "es-diphthongs-j"
-      ],
-      "fileName": "familia-grande-2ce07b9071.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/familia-grande-2ce07b9071.mp3"
-    },
-    {
-      "key": "cuatro",
-      "text": "cuatro",
-      "ipa": "/ˈkwatɾo/",
-      "soundUnitSlugs": [
-        "es-diphthongs-w"
-      ],
-      "fileName": "cuatro-a37e3bea6f.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/cuatro-a37e3bea6f.mp3"
-    },
-    {
-      "key": "fuego",
-      "text": "fuego",
-      "ipa": "/ˈfweɣo/",
-      "soundUnitSlugs": [
-        "es-diphthongs-w"
-      ],
-      "fileName": "fuego-29a2923a32.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/fuego-29a2923a32.mp3"
-    },
-    {
-      "key": "cuenta",
-      "text": "cuenta",
-      "ipa": "/ˈkwenta/",
-      "soundUnitSlugs": [
-        "es-diphthongs-w"
-      ],
-      "fileName": "cuenta-de7f6b3e6f.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/cuenta-de7f6b3e6f.mp3"
-    },
-    {
-      "key": "cuándo",
-      "text": "cuándo",
-      "ipa": "/ˈkwando/",
-      "soundUnitSlugs": [
-        "es-diphthongs-w"
-      ],
-      "fileName": "cuando-4344af9a12.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/cuando-4344af9a12.mp3"
-    },
-    {
-      "key": "guapo",
-      "text": "guapo",
-      "ipa": "/ˈgwapo/",
-      "soundUnitSlugs": [
-        "es-diphthongs-w"
-      ],
-      "fileName": "guapo-5013193dfb.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/guapo-5013193dfb.mp3"
-    },
-    {
-      "key": "huevo",
-      "text": "huevo",
-      "ipa": "/ˈweβo/",
-      "soundUnitSlugs": [
-        "es-diphthongs-w"
-      ],
-      "fileName": "huevo-12c2d512a3.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/huevo-12c2d512a3.mp3"
-    },
-    {
-      "key": "buena suerte",
-      "text": "buena suerte",
-      "ipa": "/ˈbwena ˈsweɾte/",
-      "soundUnitSlugs": [
-        "es-diphthongs-w"
-      ],
-      "fileName": "buena-suerte-f3eb0670ef.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/buena-suerte-f3eb0670ef.mp3"
-    },
-    {
-      "key": "agua fría",
-      "text": "agua fría",
-      "ipa": "/ˈaɣwa ˈfɾia/",
-      "soundUnitSlugs": [
-        "es-diphthongs-w"
-      ],
-      "fileName": "agua-fria-46e6d67918.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/agua-fria-46e6d67918.mp3"
-    },
-    {
-      "key": "cuatro puertas",
-      "text": "cuatro puertas",
-      "ipa": "/ˈkwatɾo ˈpweɾtas/",
-      "soundUnitSlugs": [
-        "es-diphthongs-w"
-      ],
-      "fileName": "cuatro-puertas-342795a9b1.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/cuatro-puertas-342795a9b1.mp3"
-    },
-    {
-      "key": "papá",
-      "text": "papá",
-      "ipa": "/paˈpa/",
-      "soundUnitSlugs": [
-        "es-lexical-stress"
-      ],
-      "fileName": "papa-bec5e7268a.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/papa-bec5e7268a.mp3"
-    },
-    {
-      "key": "papa",
-      "text": "papa",
-      "ipa": "/ˈpapa/",
-      "soundUnitSlugs": [
-        "es-lexical-stress"
-      ],
-      "fileName": "papa-f722f20fc5.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/papa-f722f20fc5.mp3"
+      "fileName": "hablar-18c35a29fc.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/hablar-18c35a29fc.mp3"
     },
     {
       "key": "habló",
@@ -3679,135 +1773,241 @@
       "audioSrc": "/audio/language-packs/es-ES/hablo-7dd286a81f.mp3"
     },
     {
-      "key": "práctico",
-      "text": "práctico",
-      "ipa": "/ˈpɾaktiko/",
+      "key": "hacia",
+      "text": "hacia",
+      "ipa": "/ˈaθja/",
       "soundUnitSlugs": [
-        "es-lexical-stress"
+        "es-theta",
+        "es-diphthongs-j"
       ],
-      "fileName": "practico-829a0d1b3f.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/practico-829a0d1b3f.mp3"
+      "fileName": "hacia-fa9f438bf2.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/hacia-fa9f438bf2.mp3"
     },
     {
-      "key": "practico",
-      "text": "practico",
-      "ipa": "/pɾakˈtiko/",
+      "key": "hecho",
+      "text": "hecho",
+      "ipa": "/ˈetʃo/",
       "soundUnitSlugs": [
-        "es-lexical-stress"
+        "es-ch"
       ],
-      "fileName": "practico-548110f34f.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/practico-548110f34f.mp3"
+      "fileName": "hecho-23af90bc8d.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/hecho-23af90bc8d.mp3"
     },
     {
-      "key": "practicó",
-      "text": "practicó",
-      "ipa": "/pɾaktiˈko/",
+      "key": "hermano",
+      "text": "hermano",
+      "ipa": "/eɾˈmano/",
       "soundUnitSlugs": [
-        "es-lexical-stress"
+        "es-tap-r"
       ],
-      "fileName": "practico-adfcf13510.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/practico-adfcf13510.mp3"
+      "fileName": "hermano-9587a8303a.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/hermano-9587a8303a.mp3"
     },
     {
-      "key": "médico",
-      "text": "médico",
-      "ipa": "/ˈmeðiko/",
+      "key": "higo",
+      "text": "higo",
+      "ipa": "/ˈiɣo/",
       "soundUnitSlugs": [
-        "es-lexical-stress"
+        "es-g"
       ],
-      "fileName": "medico-08bbc36500.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/medico-08bbc36500.mp3"
+      "fileName": "higo-d073257f1b.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/higo-d073257f1b.mp3"
     },
     {
-      "key": "medico",
-      "text": "medico",
-      "ipa": "/meˈðiko/",
+      "key": "hoja",
+      "text": "hoja",
+      "ipa": "/ˈoxa/",
       "soundUnitSlugs": [
-        "es-lexical-stress"
+        "es-x"
       ],
-      "fileName": "medico-c83be04260.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/medico-c83be04260.mp3"
+      "fileName": "hoja-d4235bc03b.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/hoja-d4235bc03b.mp3"
     },
     {
-      "key": "medicó",
-      "text": "medicó",
-      "ipa": "/meðiˈko/",
+      "key": "hola",
+      "text": "hola",
+      "ipa": "/ˈola/",
       "soundUnitSlugs": [
-        "es-lexical-stress"
+        "es-o",
+        "es-l"
       ],
-      "fileName": "medico-54ab67260b.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/medico-54ab67260b.mp3"
+      "fileName": "hola-99800b85d3.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/hola-99800b85d3.mp3"
     },
     {
-      "key": "canción",
-      "text": "canción",
-      "ipa": "/kanˈθjon/",
+      "key": "honrado",
+      "text": "honrado",
+      "ipa": "/onˈrado/",
       "soundUnitSlugs": [
-        "es-lexical-stress"
+        "es-trill-r"
       ],
-      "fileName": "cancion-b7b043b04b.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/cancion-b7b043b04b.mp3"
+      "fileName": "honrado-aafa7cfd2d.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/honrado-aafa7cfd2d.mp3"
     },
     {
-      "key": "camión",
-      "text": "camión",
-      "ipa": "/kaˈmjon/",
+      "key": "hoy",
+      "text": "hoy",
+      "ipa": "/oj/",
       "soundUnitSlugs": [
-        "es-lexical-stress"
+        "es-diphthongs-j"
       ],
-      "fileName": "camion-303ef7817e.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/camion-303ef7817e.mp3"
+      "fileName": "hoy-ec80f56906.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/hoy-ec80f56906.mp3"
     },
     {
-      "key": "café",
-      "text": "café",
-      "ipa": "/kaˈfe/",
+      "key": "huevo",
+      "text": "huevo",
+      "ipa": "/ˈweβo/",
       "soundUnitSlugs": [
-        "es-lexical-stress"
+        "es-diphthongs-w"
       ],
-      "fileName": "cafe-f424452a96.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/cafe-f424452a96.mp3"
+      "fileName": "huevo-12c2d512a3.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/huevo-12c2d512a3.mp3"
     },
     {
-      "key": "buenos días",
-      "text": "Buenos días",
-      "ipa": "/ˈbwenos ˈdias/",
+      "key": "iglesia",
+      "text": "iglesia",
+      "ipa": "/iˈɣlesja/",
       "soundUnitSlugs": [
-        "es-lexical-stress",
-        "es-syllable-rhythm"
+        "es-i",
+        "es-diphthongs-j"
       ],
-      "fileName": "buenos-dias-a25b998dff.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/buenos-dias-a25b998dff.mp3"
+      "fileName": "iglesia-f163153f77.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/iglesia-f163153f77.mp3"
     },
     {
-      "key": "papá habló",
-      "text": "papá habló",
-      "ipa": "/paˈpa aˈβlo/",
+      "key": "isla",
+      "text": "isla",
+      "ipa": "/ˈisla/",
       "soundUnitSlugs": [
-        "es-lexical-stress"
+        "es-i",
+        "es-s"
       ],
-      "fileName": "papa-hablo-bc778b2924.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/papa-hablo-bc778b2924.mp3"
+      "fileName": "isla-ef64ecf779.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/isla-ef64ecf779.mp3"
     },
     {
-      "key": "médico práctico",
-      "text": "médico práctico",
-      "ipa": "/ˈmeðiko ˈpɾaktiko/",
+      "key": "israel",
+      "text": "Israel",
+      "ipa": "/israˈel/",
       "soundUnitSlugs": [
-        "es-lexical-stress"
+        "es-trill-r"
       ],
-      "fileName": "medico-practico-f7199ef3e1.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/medico-practico-f7199ef3e1.mp3"
+      "fileName": "israel-8f4f9f2dcb.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/israel-8f4f9f2dcb.mp3"
     },
     {
-      "key": "muchas gracias",
-      "text": "Muchas gracias",
-      "ipa": "/ˈmutʃas ˈgɾaθjas/",
+      "key": "jamón",
+      "text": "jamón",
+      "ipa": "/xaˈmon/",
       "soundUnitSlugs": [
-        "es-syllable-rhythm"
+        "es-x"
       ],
-      "fileName": "muchas-gracias-f965d0ccc6.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/muchas-gracias-f965d0ccc6.mp3"
+      "fileName": "jamon-8d298a01d5.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/jamon-8d298a01d5.mp3"
+    },
+    {
+      "key": "jardín",
+      "text": "jardín",
+      "ipa": "/xaɾˈðin/",
+      "soundUnitSlugs": [
+        "es-x"
+      ],
+      "fileName": "jardin-152b0c982f.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/jardin-152b0c982f.mp3"
+    },
+    {
+      "key": "jefe",
+      "text": "jefe",
+      "ipa": "/ˈxefe/",
+      "soundUnitSlugs": [
+        "es-x"
+      ],
+      "fileName": "jefe-a7434f460c.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/jefe-a7434f460c.mp3"
+    },
+    {
+      "key": "josé",
+      "text": "José",
+      "ipa": "/xoˈse/",
+      "soundUnitSlugs": [
+        "es-x"
+      ],
+      "fileName": "jose-8e9c993beb.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/jose-8e9c993beb.mp3"
+    },
+    {
+      "key": "josé juega",
+      "text": "José juega",
+      "ipa": "/xoˈse ˈxweɣa/",
+      "soundUnitSlugs": [
+        "es-x"
+      ],
+      "fileName": "jose-juega-3aec6f6fe2.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/jose-juega-3aec6f6fe2.mp3"
+    },
+    {
+      "key": "jota",
+      "text": "jota",
+      "ipa": "/ˈxota/",
+      "soundUnitSlugs": [
+        "es-x"
+      ],
+      "fileName": "jota-9a02f63cf7.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/jota-9a02f63cf7.mp3"
+    },
+    {
+      "key": "juego",
+      "text": "juego",
+      "ipa": "/ˈxweɣo/",
+      "soundUnitSlugs": [
+        "es-g",
+        "es-x"
+      ],
+      "fileName": "juego-2a5246ff7f.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/juego-2a5246ff7f.mp3"
+    },
+    {
+      "key": "jueves",
+      "text": "jueves",
+      "ipa": "/ˈxweβes/",
+      "soundUnitSlugs": [
+        "es-u",
+        "es-x",
+        "es-diphthongs-w"
+      ],
+      "fileName": "jueves-5abc964903.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/jueves-5abc964903.mp3"
+    },
+    {
+      "key": "jugar",
+      "text": "jugar",
+      "ipa": "/xuˈɣaɾ/",
+      "soundUnitSlugs": [
+        "es-g"
+      ],
+      "fileName": "jugar-ff1d117945.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/jugar-ff1d117945.mp3"
+    },
+    {
+      "key": "julio",
+      "text": "julio",
+      "ipa": "/ˈxuljo/",
+      "soundUnitSlugs": [
+        "es-u"
+      ],
+      "fileName": "julio-52336104be.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/julio-52336104be.mp3"
+    },
+    {
+      "key": "la boca",
+      "text": "la boca",
+      "ipa": "/la ˈboka/",
+      "soundUnitSlugs": [
+        "es-bv"
+      ],
+      "fileName": "la-boca-932d098e0e.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/la-boca-932d098e0e.mp3"
     },
     {
       "key": "la casa está cerca",
@@ -3820,134 +2020,24 @@
       "audioSrc": "/audio/language-packs/es-ES/la-casa-esta-cerca-20e0d18dc4.mp3"
     },
     {
-      "key": "barcelona",
-      "text": "Barcelona",
-      "ipa": "/baɾθeˈlona/",
+      "key": "la duda",
+      "text": "la duda",
+      "ipa": "/la ˈduða/",
       "soundUnitSlugs": [
-        "es-syllable-rhythm"
+        "es-d"
       ],
-      "fileName": "barcelona-eacb0d1b53.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/barcelona-eacb0d1b53.mp3"
+      "fileName": "la-duda-5219898424.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/la-duda-5219898424.mp3"
     },
     {
-      "key": "pa-ta-ta",
-      "text": "pa-ta-ta",
-      "ipa": "/pa ta ta/",
+      "key": "la llave",
+      "text": "la llave",
+      "ipa": "/la ˈʝaβe/",
       "soundUnitSlugs": [
-        "es-syllable-rhythm"
+        "es-y-ll"
       ],
-      "fileName": "pa-ta-ta-5c0de2bbd8.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/pa-ta-ta-5c0de2bbd8.mp3"
-    },
-    {
-      "key": "mi amigo dice hola",
-      "text": "Mi amigo dice hola",
-      "ipa": "/mi aˈmiɣo ˈdiθe ˈola/",
-      "soundUnitSlugs": [
-        "es-syllable-rhythm"
-      ],
-      "fileName": "mi-amigo-dice-hola-dbbbcfbd31.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/mi-amigo-dice-hola-dbbbcfbd31.mp3"
-    },
-    {
-      "key": "la niña come pan",
-      "text": "La niña come pan",
-      "ipa": "/la ˈniɲa ˈkome pan/",
-      "soundUnitSlugs": [
-        "es-syllable-rhythm"
-      ],
-      "fileName": "la-nina-come-pan-f048dcb7a8.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/la-nina-come-pan-f048dcb7a8.mp3"
-    },
-    {
-      "key": "vivo en madrid",
-      "text": "Vivo en Madrid",
-      "ipa": "/ˈbiβo en maˈðɾið/",
-      "soundUnitSlugs": [
-        "es-syllable-rhythm"
-      ],
-      "fileName": "vivo-en-madrid-18af7f020f.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/vivo-en-madrid-18af7f020f.mp3"
-    },
-    {
-      "key": "el perro corre rápido",
-      "text": "El perro corre rápido",
-      "ipa": "/el ˈpero ˈkore ˈrapiðo/",
-      "soundUnitSlugs": [
-        "es-syllable-rhythm"
-      ],
-      "fileName": "el-perro-corre-rapido-4895f3b094.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/el-perro-corre-rapido-4895f3b094.mp3"
-    },
-    {
-      "key": "una familia grande",
-      "text": "Una familia grande",
-      "ipa": "/ˈuna faˈmilja ˈgɾande/",
-      "soundUnitSlugs": [
-        "es-syllable-rhythm"
-      ],
-      "fileName": "una-familia-grande-e90f1cd1a7.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/una-familia-grande-e90f1cd1a7.mp3"
-    },
-    {
-      "key": "cinco zapatos azules",
-      "text": "Cinco zapatos azules",
-      "ipa": "/ˈθiŋko θaˈpatos aˈθules/",
-      "soundUnitSlugs": [
-        "es-syllable-rhythm"
-      ],
-      "fileName": "cinco-zapatos-azules-675774359d.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/cinco-zapatos-azules-675774359d.mp3"
-    },
-    {
-      "key": "tengo una pregunta",
-      "text": "Tengo una pregunta",
-      "ipa": "/ˈteŋgo ˈuna pɾeˈɣunta/",
-      "soundUnitSlugs": [
-        "es-syllable-rhythm"
-      ],
-      "fileName": "tengo-una-pregunta-fd971a1a21.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/tengo-una-pregunta-fd971a1a21.mp3"
-    },
-    {
-      "key": "escucha y repite",
-      "text": "Escucha y repite",
-      "ipa": "/esˈkutʃa i reˈpite/",
-      "soundUnitSlugs": [
-        "es-syllable-rhythm"
-      ],
-      "fileName": "escucha-y-repite-9d328d979a.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/escucha-y-repite-9d328d979a.mp3"
-    },
-    {
-      "key": "cada sílaba cuenta",
-      "text": "Cada sílaba cuenta",
-      "ipa": "/ˈkaða ˈsilaβa ˈkwenta/",
-      "soundUnitSlugs": [
-        "es-syllable-rhythm"
-      ],
-      "fileName": "cada-silaba-cuenta-30e29474de.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/cada-silaba-cuenta-30e29474de.mp3"
-    },
-    {
-      "key": "no comas deprisa",
-      "text": "No comas deprisa",
-      "ipa": "/no ˈkomas deˈpɾisa/",
-      "soundUnitSlugs": [
-        "es-syllable-rhythm"
-      ],
-      "fileName": "no-comas-deprisa-1b8847b5bb.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/no-comas-deprisa-1b8847b5bb.mp3"
-    },
-    {
-      "key": "habla claro y lento",
-      "text": "Habla claro y lento",
-      "ipa": "/ˈaβla ˈklaɾo i ˈlento/",
-      "soundUnitSlugs": [
-        "es-syllable-rhythm"
-      ],
-      "fileName": "habla-claro-y-lento-a607b1cf6b.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/habla-claro-y-lento-a607b1cf6b.mp3"
+      "fileName": "la-llave-3912d423d5.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/la-llave-3912d423d5.mp3"
     },
     {
       "key": "la música suena bien",
@@ -3960,14 +2050,1180 @@
       "audioSrc": "/audio/language-packs/es-ES/la-musica-suena-bien-d728ea4e19.mp3"
     },
     {
-      "key": "tres palabras cortas",
-      "text": "Tres palabras cortas",
-      "ipa": "/tɾes paˈlaβɾas ˈkoɾtas/",
+      "key": "la niña come pan",
+      "text": "La niña come pan",
+      "ipa": "/la ˈniɲa ˈkome pan/",
       "soundUnitSlugs": [
         "es-syllable-rhythm"
       ],
-      "fileName": "tres-palabras-cortas-2dcae44d79.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/tres-palabras-cortas-2dcae44d79.mp3"
+      "fileName": "la-nina-come-pan-f048dcb7a8.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/la-nina-come-pan-f048dcb7a8.mp3"
+    },
+    {
+      "key": "la plaza",
+      "text": "la plaza",
+      "ipa": "/la ˈplaθa/",
+      "soundUnitSlugs": [
+        "es-l"
+      ],
+      "fileName": "la-plaza-107bf33ec1.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/la-plaza-107bf33ec1.mp3"
+    },
+    {
+      "key": "lado",
+      "text": "lado",
+      "ipa": "/ˈlaðo/",
+      "soundUnitSlugs": [
+        "es-d",
+        "es-l"
+      ],
+      "fileName": "lado-0b8bc0c4b4.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/lado-0b8bc0c4b4.mp3"
+    },
+    {
+      "key": "lago",
+      "text": "lago",
+      "ipa": "/ˈlaɣo/",
+      "soundUnitSlugs": [
+        "es-g",
+        "es-l"
+      ],
+      "fileName": "lago-4e68e95b58.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/lago-4e68e95b58.mp3"
+    },
+    {
+      "key": "lápiz",
+      "text": "lápiz",
+      "ipa": "/ˈlapiθ/",
+      "soundUnitSlugs": [
+        "es-theta",
+        "es-l"
+      ],
+      "fileName": "lapiz-5187e8dbb9.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/lapiz-5187e8dbb9.mp3"
+    },
+    {
+      "key": "lata",
+      "text": "lata",
+      "ipa": "/ˈlata/ ~ /ˈrata/",
+      "soundUnitSlugs": [
+        "es-l"
+      ],
+      "audioSrc": "/audio/language-packs/es-ES/lata-00366908b7.mp3"
+    },
+    {
+      "key": "lección",
+      "text": "lección",
+      "ipa": "/lekˈθjon/",
+      "soundUnitSlugs": [
+        "es-e"
+      ],
+      "fileName": "leccion-c98ed63579.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/leccion-c98ed63579.mp3"
+    },
+    {
+      "key": "leche",
+      "text": "leche",
+      "ipa": "/ˈletʃe/",
+      "soundUnitSlugs": [
+        "es-e",
+        "es-ch",
+        "es-l"
+      ],
+      "fileName": "leche-3c60405a25.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/leche-3c60405a25.mp3"
+    },
+    {
+      "key": "leer",
+      "text": "leer",
+      "ipa": "/leˈeɾ/",
+      "soundUnitSlugs": [
+        "es-e"
+      ],
+      "fileName": "leer-40a26dbccc.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/leer-40a26dbccc.mp3"
+    },
+    {
+      "key": "lejos",
+      "text": "lejos",
+      "ipa": "/ˈlexos/",
+      "soundUnitSlugs": [
+        "es-x"
+      ],
+      "fileName": "lejos-96b5d8f2ac.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/lejos-96b5d8f2ac.mp3"
+    },
+    {
+      "key": "leña",
+      "text": "leña",
+      "ipa": "/ˈleɲa/",
+      "soundUnitSlugs": [
+        "es-ny"
+      ],
+      "fileName": "lena-addf2c6fec.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/lena-addf2c6fec.mp3"
+    },
+    {
+      "key": "lengua",
+      "text": "lengua",
+      "ipa": "/ˈleŋgwa/",
+      "soundUnitSlugs": [
+        "es-g",
+        "es-nasal-place",
+        "es-diphthongs-w"
+      ],
+      "fileName": "lengua-d1eb2e1346.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/lengua-d1eb2e1346.mp3"
+    },
+    {
+      "key": "ley",
+      "text": "ley",
+      "ipa": "/lej/",
+      "soundUnitSlugs": [
+        "es-diphthongs-j"
+      ],
+      "fileName": "ley-afa139195b.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/ley-afa139195b.mp3"
+    },
+    {
+      "key": "libro",
+      "text": "libro",
+      "ipa": "/ˈlibɾo/",
+      "soundUnitSlugs": [
+        "es-i",
+        "es-tap-r",
+        "es-l"
+      ],
+      "fileName": "libro-7d664b804e.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/libro-7d664b804e.mp3"
+    },
+    {
+      "key": "limpio",
+      "text": "limpio",
+      "ipa": "/ˈlimpjo/",
+      "soundUnitSlugs": [
+        "es-i",
+        "es-diphthongs-j"
+      ],
+      "fileName": "limpio-b1825946d3.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/limpio-b1825946d3.mp3"
+    },
+    {
+      "key": "línea",
+      "text": "línea",
+      "ipa": "/ˈlinea/",
+      "soundUnitSlugs": [
+        "es-i"
+      ],
+      "fileName": "linea-f638806621.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/linea-f638806621.mp3"
+    },
+    {
+      "key": "listo",
+      "text": "listo",
+      "ipa": "/ˈlisto/",
+      "soundUnitSlugs": [
+        "es-i"
+      ],
+      "fileName": "listo-035fa923bf.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/listo-035fa923bf.mp3"
+    },
+    {
+      "key": "llama",
+      "text": "llama",
+      "ipa": "/ˈʝama/ ~ /ˈʝema/",
+      "soundUnitSlugs": [
+        "es-y-ll"
+      ],
+      "audioSrc": "/audio/language-packs/es-ES/llama-ad4ba4cc53.mp3"
+    },
+    {
+      "key": "llamar",
+      "text": "llamar",
+      "ipa": "/ʝaˈmaɾ/",
+      "soundUnitSlugs": [
+        "es-y-ll"
+      ],
+      "fileName": "llamar-b9bd9d84b9.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/llamar-b9bd9d84b9.mp3"
+    },
+    {
+      "key": "llave",
+      "text": "llave",
+      "ipa": "/ˈʝaβe/",
+      "soundUnitSlugs": [
+        "es-y-ll"
+      ],
+      "fileName": "llave-b48663d247.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/llave-b48663d247.mp3"
+    },
+    {
+      "key": "llegar",
+      "text": "llegar",
+      "ipa": "/ʝeˈɣaɾ/",
+      "soundUnitSlugs": [
+        "es-g",
+        "es-y-ll"
+      ],
+      "fileName": "llegar-ec24f23b3a.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/llegar-ec24f23b3a.mp3"
+    },
+    {
+      "key": "lluvia",
+      "text": "lluvia",
+      "ipa": "/ˈʝuβja/",
+      "soundUnitSlugs": [
+        "es-u",
+        "es-y-ll"
+      ],
+      "fileName": "lluvia-b16f5946e4.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/lluvia-b16f5946e4.mp3"
+    },
+    {
+      "key": "los niños",
+      "text": "los niños",
+      "ipa": "/los ˈniɲos/",
+      "soundUnitSlugs": [
+        "es-s"
+      ],
+      "fileName": "los-ninos-5176121c70.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/los-ninos-5176121c70.mp3"
+    },
+    {
+      "key": "luego",
+      "text": "luego",
+      "ipa": "/ˈlweɣo/",
+      "soundUnitSlugs": [
+        "es-g"
+      ],
+      "fileName": "luego-11e6ab9f3c.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/luego-11e6ab9f3c.mp3"
+    },
+    {
+      "key": "luna",
+      "text": "luna",
+      "ipa": "/ˈluna/",
+      "soundUnitSlugs": [
+        "es-u",
+        "es-l"
+      ],
+      "fileName": "luna-4b7fad4f3f.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/luna-4b7fad4f3f.mp3"
+    },
+    {
+      "key": "luna clara",
+      "text": "luna clara",
+      "ipa": "/ˈluna ˈklaɾa/",
+      "soundUnitSlugs": [
+        "es-l"
+      ],
+      "fileName": "luna-clara-abb7ccae22.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/luna-clara-abb7ccae22.mp3"
+    },
+    {
+      "key": "luz",
+      "text": "luz",
+      "ipa": "/luθ/",
+      "soundUnitSlugs": [
+        "es-theta"
+      ],
+      "fileName": "luz-c307b63565.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/luz-c307b63565.mp3"
+    },
+    {
+      "key": "madrid",
+      "text": "Madrid",
+      "ipa": "/maˈðɾið/",
+      "soundUnitSlugs": [
+        "es-d"
+      ],
+      "fileName": "madrid-6c1e06292d.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/madrid-6c1e06292d.mp3"
+    },
+    {
+      "key": "mañana",
+      "text": "mañana",
+      "ipa": "/maˈɲana/",
+      "soundUnitSlugs": [
+        "es-a",
+        "es-ny"
+      ],
+      "fileName": "manana-8727ae6503.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/manana-8727ae6503.mp3"
+    },
+    {
+      "key": "mano",
+      "text": "mano",
+      "ipa": "/ˈmano/",
+      "soundUnitSlugs": [
+        "es-a"
+      ],
+      "fileName": "mano-abf1aa4a5e.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/mano-abf1aa4a5e.mp3"
+    },
+    {
+      "key": "mapa",
+      "text": "mapa",
+      "ipa": "/ˈmapa/",
+      "soundUnitSlugs": [
+        "es-a"
+      ],
+      "fileName": "mapa-4a472d01a3.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/mapa-4a472d01a3.mp3"
+    },
+    {
+      "key": "mayo",
+      "text": "mayo",
+      "ipa": "/ˈmaʝo/",
+      "soundUnitSlugs": [
+        "es-y-ll"
+      ],
+      "fileName": "mayo-b2479b710d.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/mayo-b2479b710d.mp3"
+    },
+    {
+      "key": "mayor",
+      "text": "mayor",
+      "ipa": "/maˈʝoɾ/",
+      "soundUnitSlugs": [
+        "es-y-ll"
+      ],
+      "fileName": "mayor-e6a04b67d2.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/mayor-e6a04b67d2.mp3"
+    },
+    {
+      "key": "médico",
+      "text": "médico",
+      "ipa": "/ˈmeðiko/",
+      "soundUnitSlugs": [
+        "es-lexical-stress"
+      ],
+      "fileName": "medico-08bbc36500.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/medico-08bbc36500.mp3"
+    },
+    {
+      "key": "medicó",
+      "text": "medicó",
+      "ipa": "/meðiˈko/",
+      "soundUnitSlugs": [
+        "es-lexical-stress"
+      ],
+      "fileName": "medico-54ab67260b.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/medico-54ab67260b.mp3"
+    },
+    {
+      "key": "medico",
+      "text": "medico",
+      "ipa": "/meˈðiko/",
+      "soundUnitSlugs": [
+        "es-lexical-stress"
+      ],
+      "fileName": "medico-c83be04260.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/medico-c83be04260.mp3"
+    },
+    {
+      "key": "médico práctico",
+      "text": "médico práctico",
+      "ipa": "/ˈmeðiko ˈpɾaktiko/",
+      "soundUnitSlugs": [
+        "es-lexical-stress"
+      ],
+      "fileName": "medico-practico-f7199ef3e1.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/medico-practico-f7199ef3e1.mp3"
+    },
+    {
+      "key": "medio",
+      "text": "medio",
+      "ipa": "/ˈmeðjo/",
+      "soundUnitSlugs": [
+        "es-d"
+      ],
+      "fileName": "medio-cabbbaf029.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/medio-cabbbaf029.mp3"
+    },
+    {
+      "key": "mercado",
+      "text": "mercado",
+      "ipa": "/meɾˈkaðo/",
+      "soundUnitSlugs": [
+        "es-a"
+      ],
+      "fileName": "mercado-a822bd0a82.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/mercado-a822bd0a82.mp3"
+    },
+    {
+      "key": "mesa",
+      "text": "mesa",
+      "ipa": "/ˈmesa/",
+      "soundUnitSlugs": [
+        "es-e",
+        "es-s"
+      ],
+      "fileName": "mesa-f04cc316d7.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/mesa-f04cc316d7.mp3"
+    },
+    {
+      "key": "mesa grande",
+      "text": "mesa grande",
+      "ipa": "/ˈmesa ˈgɾande/",
+      "soundUnitSlugs": [
+        "es-e"
+      ],
+      "fileName": "mesa-grande-d09b2a21e8.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/mesa-grande-d09b2a21e8.mp3"
+    },
+    {
+      "key": "méxico",
+      "text": "México",
+      "ipa": "/ˈmexiko/",
+      "soundUnitSlugs": [
+        "es-x"
+      ],
+      "fileName": "mexico-ba74ec4c05.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/mexico-ba74ec4c05.mp3"
+    },
+    {
+      "key": "mi amigo",
+      "text": "mi amigo",
+      "ipa": "/mi aˈmiɣo/",
+      "soundUnitSlugs": [
+        "es-i"
+      ],
+      "fileName": "mi-amigo-f2abb30ae2.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/mi-amigo-f2abb30ae2.mp3"
+    },
+    {
+      "key": "mi amigo dice hola",
+      "text": "Mi amigo dice hola",
+      "ipa": "/mi aˈmiɣo ˈdiθe ˈola/",
+      "soundUnitSlugs": [
+        "es-syllable-rhythm"
+      ],
+      "fileName": "mi-amigo-dice-hola-dbbbcfbd31.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/mi-amigo-dice-hola-dbbbcfbd31.mp3"
+    },
+    {
+      "key": "mi niño",
+      "text": "mi niño",
+      "ipa": "/mi ˈniɲo/",
+      "soundUnitSlugs": [
+        "es-ny"
+      ],
+      "fileName": "mi-nino-cf03bb643e.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/mi-nino-cf03bb643e.mp3"
+    },
+    {
+      "key": "mi nombre",
+      "text": "mi nombre",
+      "ipa": "/mi ˈnombɾe/",
+      "soundUnitSlugs": [
+        "es-nasal-place"
+      ],
+      "fileName": "mi-nombre-3ed4ff026c.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/mi-nombre-3ed4ff026c.mp3"
+    },
+    {
+      "key": "mi vida",
+      "text": "mi vida",
+      "ipa": "/mi ˈbiða/",
+      "soundUnitSlugs": [
+        "es-bv"
+      ],
+      "fileName": "mi-vida-8f152983ae.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/mi-vida-8f152983ae.mp3"
+    },
+    {
+      "key": "mil",
+      "text": "mil",
+      "ipa": "/mil/",
+      "soundUnitSlugs": [
+        "es-i"
+      ],
+      "fileName": "mil-d34e454154.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/mil-d34e454154.mp3"
+    },
+    {
+      "key": "minuto",
+      "text": "minuto",
+      "ipa": "/miˈnuto/",
+      "soundUnitSlugs": [
+        "es-i"
+      ],
+      "fileName": "minuto-e53435e667.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/minuto-e53435e667.mp3"
+    },
+    {
+      "key": "mira",
+      "text": "mira",
+      "ipa": "/ˈmiɾa/",
+      "soundUnitSlugs": [
+        "es-i"
+      ],
+      "fileName": "mira-ca84273789.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/mira-ca84273789.mp3"
+    },
+    {
+      "key": "mismo",
+      "text": "mismo",
+      "ipa": "/ˈmismo/",
+      "soundUnitSlugs": [
+        "es-s"
+      ],
+      "fileName": "mismo-c859579a7c.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/mismo-c859579a7c.mp3"
+    },
+    {
+      "key": "montaña",
+      "text": "montaña",
+      "ipa": "/monˈtaɲa/",
+      "soundUnitSlugs": [
+        "es-ny"
+      ],
+      "fileName": "montana-9a5807ec4d.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/montana-9a5807ec4d.mp3"
+    },
+    {
+      "key": "morir",
+      "text": "morir",
+      "ipa": "/moˈɾiɾ/",
+      "soundUnitSlugs": [
+        "es-tap-r"
+      ],
+      "fileName": "morir-0bcfdca8d4.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/morir-0bcfdca8d4.mp3"
+    },
+    {
+      "key": "mucha leche",
+      "text": "mucha leche",
+      "ipa": "/ˈmutʃa ˈletʃe/",
+      "soundUnitSlugs": [
+        "es-ch"
+      ],
+      "fileName": "mucha-leche-9ca89308c8.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/mucha-leche-9ca89308c8.mp3"
+    },
+    {
+      "key": "muchacho",
+      "text": "muchacho",
+      "ipa": "/muˈtʃatʃo/",
+      "soundUnitSlugs": [
+        "es-ch"
+      ],
+      "fileName": "muchacho-5849d57521.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/muchacho-5849d57521.mp3"
+    },
+    {
+      "key": "muchas gracias",
+      "text": "Muchas gracias",
+      "ipa": "/ˈmutʃas ˈgɾaθjas/",
+      "soundUnitSlugs": [
+        "es-syllable-rhythm"
+      ],
+      "fileName": "muchas-gracias-f965d0ccc6.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/muchas-gracias-f965d0ccc6.mp3"
+    },
+    {
+      "key": "mucho",
+      "text": "mucho",
+      "ipa": "/ˈmutʃo/",
+      "soundUnitSlugs": [
+        "es-u",
+        "es-ch"
+      ],
+      "fileName": "mucho-5629cc17d5.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/mucho-5629cc17d5.mp3"
+    },
+    {
+      "key": "mujer",
+      "text": "mujer",
+      "ipa": "/muˈxeɾ/",
+      "soundUnitSlugs": [
+        "es-e",
+        "es-x"
+      ],
+      "fileName": "mujer-c4034b7d65.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/mujer-c4034b7d65.mp3"
+    },
+    {
+      "key": "mundo",
+      "text": "mundo",
+      "ipa": "/ˈmundo/",
+      "soundUnitSlugs": [
+        "es-u",
+        "es-nasal-place"
+      ],
+      "fileName": "mundo-5956a2b28d.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/mundo-5956a2b28d.mp3"
+    },
+    {
+      "key": "muñeca",
+      "text": "muñeca",
+      "ipa": "/muˈɲeka/",
+      "soundUnitSlugs": [
+        "es-ny"
+      ],
+      "fileName": "muneca-6e45d6b020.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/muneca-6e45d6b020.mp3"
+    },
+    {
+      "key": "música",
+      "text": "música",
+      "ipa": "/ˈmusika/",
+      "soundUnitSlugs": [
+        "es-u"
+      ],
+      "fileName": "musica-56a08b6dae.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/musica-56a08b6dae.mp3"
+    },
+    {
+      "key": "muy",
+      "text": "muy",
+      "ipa": "/muj/",
+      "soundUnitSlugs": [
+        "es-diphthongs-j"
+      ],
+      "fileName": "muy-060ab0c090.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/muy-060ab0c090.mp3"
+    },
+    {
+      "key": "nada",
+      "text": "nada",
+      "ipa": "/ˈnaða/",
+      "soundUnitSlugs": [
+        "es-a",
+        "es-d"
+      ],
+      "fileName": "nada-a3fcfe3a3b.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/nada-a3fcfe3a3b.mp3"
+    },
+    {
+      "key": "naranja",
+      "text": "naranja",
+      "ipa": "/naˈɾaŋxa/",
+      "soundUnitSlugs": [
+        "es-x"
+      ],
+      "fileName": "naranja-3cf3494082.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/naranja-3cf3494082.mp3"
+    },
+    {
+      "key": "niñez",
+      "text": "niñez",
+      "ipa": "/niˈɲeθ/",
+      "soundUnitSlugs": [
+        "es-ny"
+      ],
+      "fileName": "ninez-e13e6fdff7.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/ninez-e13e6fdff7.mp3"
+    },
+    {
+      "key": "niño",
+      "text": "niño",
+      "ipa": "/ˈniɲo/",
+      "soundUnitSlugs": [
+        "es-i",
+        "es-ny",
+        "es-nasal-place"
+      ],
+      "fileName": "nino-36a2baf40d.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/nino-36a2baf40d.mp3"
+    },
+    {
+      "key": "no comas deprisa",
+      "text": "No comas deprisa",
+      "ipa": "/no ˈkomas deˈpɾisa/",
+      "soundUnitSlugs": [
+        "es-syllable-rhythm"
+      ],
+      "fileName": "no-comas-deprisa-1b8847b5bb.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/no-comas-deprisa-1b8847b5bb.mp3"
+    },
+    {
+      "key": "noche",
+      "text": "noche",
+      "ipa": "/ˈnotʃe/",
+      "soundUnitSlugs": [
+        "es-o",
+        "es-ch"
+      ],
+      "fileName": "noche-fdadc53ed4.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/noche-fdadc53ed4.mp3"
+    },
+    {
+      "key": "novia",
+      "text": "novia",
+      "ipa": "/ˈnoβja/",
+      "soundUnitSlugs": [
+        "es-bv"
+      ],
+      "fileName": "novia-3eb1762b32.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/novia-3eb1762b32.mp3"
+    },
+    {
+      "key": "ocho",
+      "text": "ocho",
+      "ipa": "/ˈotʃo/",
+      "soundUnitSlugs": [
+        "es-ch"
+      ],
+      "fileName": "ocho-311047fbb0.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/ocho-311047fbb0.mp3"
+    },
+    {
+      "key": "ocho coches",
+      "text": "ocho coches",
+      "ipa": "/ˈotʃo ˈkotʃes/",
+      "soundUnitSlugs": [
+        "es-ch"
+      ],
+      "fileName": "ocho-coches-7f5ea95ef2.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/ocho-coches-7f5ea95ef2.mp3"
+    },
+    {
+      "key": "octubre",
+      "text": "octubre",
+      "ipa": "/okˈtuβɾe/",
+      "soundUnitSlugs": [
+        "es-o"
+      ],
+      "fileName": "octubre-ed4c928435.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/octubre-ed4c928435.mp3"
+    },
+    {
+      "key": "once",
+      "text": "once",
+      "ipa": "/ˈonθe/",
+      "soundUnitSlugs": [
+        "es-theta"
+      ],
+      "fileName": "once-1863835675.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/once-1863835675.mp3"
+    },
+    {
+      "key": "oro",
+      "text": "oro",
+      "ipa": "/ˈoɾo/",
+      "soundUnitSlugs": [
+        "es-o"
+      ],
+      "fileName": "oro-b198acf272.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/oro-b198acf272.mp3"
+    },
+    {
+      "key": "otoño",
+      "text": "otoño",
+      "ipa": "/oˈtoɲo/",
+      "soundUnitSlugs": [
+        "es-o"
+      ],
+      "fileName": "otono-6a60258795.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/otono-6a60258795.mp3"
+    },
+    {
+      "key": "otro",
+      "text": "otro",
+      "ipa": "/ˈotɾo/",
+      "soundUnitSlugs": [
+        "es-o"
+      ],
+      "fileName": "otro-a1da106dfc.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/otro-a1da106dfc.mp3"
+    },
+    {
+      "key": "oye",
+      "text": "oye",
+      "ipa": "/ˈoʝe/",
+      "soundUnitSlugs": [
+        "es-y-ll"
+      ],
+      "fileName": "oye-52b4cbd5b0.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/oye-52b4cbd5b0.mp3"
+    },
+    {
+      "key": "pa-ta-ta",
+      "text": "pa-ta-ta",
+      "ipa": "/pa ta ta/",
+      "soundUnitSlugs": [
+        "es-syllable-rhythm"
+      ],
+      "fileName": "pa-ta-ta-5c0de2bbd8.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/pa-ta-ta-5c0de2bbd8.mp3"
+    },
+    {
+      "key": "padre",
+      "text": "padre",
+      "ipa": "/ˈpaðɾe/",
+      "soundUnitSlugs": [
+        "es-a"
+      ],
+      "fileName": "padre-05d4ac9a16.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/padre-05d4ac9a16.mp3"
+    },
+    {
+      "key": "pagar",
+      "text": "pagar",
+      "ipa": "/paˈɣaɾ/",
+      "soundUnitSlugs": [
+        "es-g"
+      ],
+      "fileName": "pagar-7b125739d8.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/pagar-7b125739d8.mp3"
+    },
+    {
+      "key": "palabra",
+      "text": "palabra",
+      "ipa": "/paˈlaβɾa/",
+      "soundUnitSlugs": [
+        "es-a"
+      ],
+      "fileName": "palabra-00787666ba.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/palabra-00787666ba.mp3"
+    },
+    {
+      "key": "pan",
+      "text": "pan",
+      "ipa": "/pan/",
+      "soundUnitSlugs": [
+        "es-a"
+      ],
+      "fileName": "pan-bd2bd8216b.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/pan-bd2bd8216b.mp3"
+    },
+    {
+      "key": "papá",
+      "text": "papá",
+      "ipa": "/paˈpa/",
+      "soundUnitSlugs": [
+        "es-lexical-stress"
+      ],
+      "fileName": "papa-bec5e7268a.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/papa-bec5e7268a.mp3"
+    },
+    {
+      "key": "papa",
+      "text": "papa",
+      "ipa": "/ˈpapa/",
+      "soundUnitSlugs": [
+        "es-lexical-stress"
+      ],
+      "fileName": "papa-f722f20fc5.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/papa-f722f20fc5.mp3"
+    },
+    {
+      "key": "papá habló",
+      "text": "papá habló",
+      "ipa": "/paˈpa aˈβlo/",
+      "soundUnitSlugs": [
+        "es-lexical-stress"
+      ],
+      "fileName": "papa-hablo-bc778b2924.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/papa-hablo-bc778b2924.mp3"
+    },
+    {
+      "key": "para",
+      "text": "para",
+      "ipa": "/ˈpaɾa/",
+      "soundUnitSlugs": [
+        "es-tap-r"
+      ],
+      "fileName": "para-d2f9be8fe2.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/para-d2f9be8fe2.mp3"
+    },
+    {
+      "key": "pedir",
+      "text": "pedir",
+      "ipa": "/peˈðiɾ/",
+      "soundUnitSlugs": [
+        "es-i"
+      ],
+      "fileName": "pedir-499b7081af.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/pedir-499b7081af.mp3"
+    },
+    {
+      "key": "pequeño",
+      "text": "pequeño",
+      "ipa": "/peˈkeɲo/",
+      "soundUnitSlugs": [
+        "es-ny"
+      ],
+      "fileName": "pequeno-f5a425f86a.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/pequeno-f5a425f86a.mp3"
+    },
+    {
+      "key": "pera",
+      "text": "pera",
+      "ipa": "/ˈpeɾa/",
+      "soundUnitSlugs": [
+        "es-tap-r"
+      ],
+      "fileName": "pera-c9c2708d92.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/pera-c9c2708d92.mp3"
+    },
+    {
+      "key": "pero",
+      "text": "pero",
+      "ipa": "/ˈpeɾo/",
+      "soundUnitSlugs": [
+        "es-tap-r"
+      ],
+      "fileName": "pero-98fc7b3476.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/pero-98fc7b3476.mp3"
+    },
+    {
+      "key": "perro",
+      "text": "perro",
+      "ipa": "/ˈpero/",
+      "soundUnitSlugs": [
+        "es-e",
+        "es-trill-r"
+      ],
+      "fileName": "perro-6139bdc23a.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/perro-6139bdc23a.mp3"
+    },
+    {
+      "key": "peso",
+      "text": "peso",
+      "ipa": "/ˈpiso/ ~ /ˈpeso/",
+      "soundUnitSlugs": [
+        "es-i"
+      ],
+      "audioSrc": "/audio/language-packs/es-ES/peso-b0c7efa6f3.mp3"
+    },
+    {
+      "key": "piñata",
+      "text": "piñata",
+      "ipa": "/piˈɲata/",
+      "soundUnitSlugs": [
+        "es-ny"
+      ],
+      "fileName": "pinata-d33f9a7f50.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/pinata-d33f9a7f50.mp3"
+    },
+    {
+      "key": "piso",
+      "text": "piso",
+      "ipa": "/ˈpiso/ ~ /ˈpeso/",
+      "soundUnitSlugs": [
+        "es-i"
+      ],
+      "audioSrc": "/audio/language-packs/es-ES/piso-90d94ae30f.mp3"
+    },
+    {
+      "key": "playa",
+      "text": "playa",
+      "ipa": "/ˈplaʝa/",
+      "soundUnitSlugs": [
+        "es-a",
+        "es-y-ll"
+      ],
+      "fileName": "playa-abd5cf4ffb.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/playa-abd5cf4ffb.mp3"
+    },
+    {
+      "key": "plaza",
+      "text": "plaza",
+      "ipa": "/ˈplaθa/",
+      "soundUnitSlugs": [
+        "es-a",
+        "es-l"
+      ],
+      "fileName": "plaza-2366c31fc3.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/plaza-2366c31fc3.mp3"
+    },
+    {
+      "key": "poco",
+      "text": "poco",
+      "ipa": "/ˈpoko/",
+      "soundUnitSlugs": [
+        "es-o"
+      ],
+      "fileName": "poco-5aa462b02c.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/poco-5aa462b02c.mp3"
+    },
+    {
+      "key": "práctico",
+      "text": "práctico",
+      "ipa": "/ˈpɾaktiko/",
+      "soundUnitSlugs": [
+        "es-lexical-stress"
+      ],
+      "fileName": "practico-829a0d1b3f.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/practico-829a0d1b3f.mp3"
+    },
+    {
+      "key": "practicó",
+      "text": "practicó",
+      "ipa": "/pɾaktiˈko/",
+      "soundUnitSlugs": [
+        "es-lexical-stress"
+      ],
+      "fileName": "practico-adfcf13510.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/practico-adfcf13510.mp3"
+    },
+    {
+      "key": "practico",
+      "text": "practico",
+      "ipa": "/pɾakˈtiko/",
+      "soundUnitSlugs": [
+        "es-lexical-stress"
+      ],
+      "fileName": "practico-548110f34f.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/practico-548110f34f.mp3"
+    },
+    {
+      "key": "primero",
+      "text": "primero",
+      "ipa": "/pɾiˈmeɾo/",
+      "soundUnitSlugs": [
+        "es-tap-r"
+      ],
+      "fileName": "primero-2e146f6319.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/primero-2e146f6319.mp3"
+    },
+    {
+      "key": "príncipe",
+      "text": "príncipe",
+      "ipa": "/ˈpɾinθipe/",
+      "soundUnitSlugs": [
+        "es-i"
+      ],
+      "fileName": "principe-b92eafe2ba.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/principe-b92eafe2ba.mp3"
+    },
+    {
+      "key": "problema",
+      "text": "problema",
+      "ipa": "/pɾoˈβlema/",
+      "soundUnitSlugs": [
+        "es-tap-r"
+      ],
+      "fileName": "problema-c98484f0d2.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/problema-c98484f0d2.mp3"
+    },
+    {
+      "key": "profesor",
+      "text": "profesor",
+      "ipa": "/pɾofeˈsoɾ/",
+      "soundUnitSlugs": [
+        "es-o"
+      ],
+      "fileName": "profesor-aabb211b66.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/profesor-aabb211b66.mp3"
+    },
+    {
+      "key": "pueblo",
+      "text": "pueblo",
+      "ipa": "/ˈpweβlo/",
+      "soundUnitSlugs": [
+        "es-l"
+      ],
+      "fileName": "pueblo-40e61a659e.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/pueblo-40e61a659e.mp3"
+    },
+    {
+      "key": "puente",
+      "text": "puente",
+      "ipa": "/ˈpwente/",
+      "soundUnitSlugs": [
+        "es-u",
+        "es-diphthongs-w"
+      ],
+      "fileName": "puente-190e6debd8.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/puente-190e6debd8.mp3"
+    },
+    {
+      "key": "puerta",
+      "text": "puerta",
+      "ipa": "/ˈpweɾta/",
+      "soundUnitSlugs": [
+        "es-u",
+        "es-tap-r",
+        "es-diphthongs-w"
+      ],
+      "fileName": "puerta-16924b922b.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/puerta-16924b922b.mp3"
+    },
+    {
+      "key": "queso",
+      "text": "queso",
+      "ipa": "/ˈkeso/",
+      "soundUnitSlugs": [
+        "es-e"
+      ],
+      "fileName": "queso-8e5fc65edb.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/queso-8e5fc65edb.mp3"
+    },
+    {
+      "key": "radio",
+      "text": "radio",
+      "ipa": "/ˈraðjo/",
+      "soundUnitSlugs": [
+        "es-trill-r"
+      ],
+      "fileName": "radio-d432c3525b.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/radio-d432c3525b.mp3"
+    },
+    {
+      "key": "rápido",
+      "text": "rápido",
+      "ipa": "/ˈrapiðo/",
+      "soundUnitSlugs": [
+        "es-trill-r",
+        "es-lexical-stress"
+      ],
+      "fileName": "rapido-28216bb78b.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/rapido-28216bb78b.mp3"
+    },
+    {
+      "key": "rata",
+      "text": "rata",
+      "ipa": "/ˈrata/",
+      "soundUnitSlugs": [
+        "es-trill-r"
+      ],
+      "fileName": "rata-5ede3db025.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/rata-5ede3db025.mp3"
+    },
+    {
+      "key": "regalo",
+      "text": "regalo",
+      "ipa": "/reˈɣalo/",
+      "soundUnitSlugs": [
+        "es-g"
+      ],
+      "fileName": "regalo-721e8c821c.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/regalo-721e8c821c.mp3"
+    },
+    {
+      "key": "reloj",
+      "text": "reloj",
+      "ipa": "/reˈlox/",
+      "soundUnitSlugs": [
+        "es-x"
+      ],
+      "fileName": "reloj-2e490be4ff.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/reloj-2e490be4ff.mp3"
+    },
+    {
+      "key": "rey",
+      "text": "rey",
+      "ipa": "/rei/",
+      "soundUnitSlugs": [
+        "es-trill-r",
+        "es-diphthongs-j"
+      ],
+      "fileName": "rey-9fc518ef19.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/rey-9fc518ef19.mp3"
+    },
+    {
+      "key": "río",
+      "text": "río",
+      "ipa": "/ˈrio/",
+      "soundUnitSlugs": [
+        "es-trill-r"
+      ],
+      "fileName": "rio-348f83686b.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/rio-348f83686b.mp3"
     },
     {
       "key": "ritmo de sílabas",
@@ -3980,14 +3236,857 @@
       "audioSrc": "/audio/language-packs/es-ES/ritmo-de-silabas-d3443e5b18.mp3"
     },
     {
-      "key": "buenos días a todos",
-      "text": "Buenos días a todos",
-      "ipa": "/ˈbwenos ˈdias a ˈtoðos/",
+      "key": "rojo",
+      "text": "rojo",
+      "ipa": "/ˈroxo/",
+      "soundUnitSlugs": [
+        "es-o",
+        "es-x",
+        "es-trill-r"
+      ],
+      "fileName": "rojo-af6c1a0ca2.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/rojo-af6c1a0ca2.mp3"
+    },
+    {
+      "key": "rojo rápido",
+      "text": "rojo rápido",
+      "ipa": "/ˈroxo ˈrapiðo/",
+      "soundUnitSlugs": [
+        "es-trill-r"
+      ],
+      "fileName": "rojo-rapido-a8b29589e7.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/rojo-rapido-a8b29589e7.mp3"
+    },
+    {
+      "key": "romper",
+      "text": "romper",
+      "ipa": "/romˈpeɾ/",
+      "soundUnitSlugs": [
+        "es-trill-r"
+      ],
+      "fileName": "romper-9ebc60ae06.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/romper-9ebc60ae06.mp3"
+    },
+    {
+      "key": "ropa",
+      "text": "ropa",
+      "ipa": "/ˈropa/",
+      "soundUnitSlugs": [
+        "es-trill-r"
+      ],
+      "fileName": "ropa-9a5226551b.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/ropa-9a5226551b.mp3"
+    },
+    {
+      "key": "rosa",
+      "text": "rosa",
+      "ipa": "/ˈrosa/",
+      "soundUnitSlugs": [
+        "es-trill-r"
+      ],
+      "fileName": "rosa-5efc86ca88.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/rosa-5efc86ca88.mp3"
+    },
+    {
+      "key": "rueda",
+      "text": "rueda",
+      "ipa": "/ˈrweða/",
+      "soundUnitSlugs": [
+        "es-trill-r"
+      ],
+      "fileName": "rueda-8b4e77564f.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/rueda-8b4e77564f.mp3"
+    },
+    {
+      "key": "ruido",
+      "text": "ruido",
+      "ipa": "/ˈrwiðo/",
+      "soundUnitSlugs": [
+        "es-u",
+        "es-diphthongs-w"
+      ],
+      "fileName": "ruido-ce49d44fd9.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/ruido-ce49d44fd9.mp3"
+    },
+    {
+      "key": "sábado",
+      "text": "sábado",
+      "ipa": "/ˈsaβaðo/",
+      "soundUnitSlugs": [
+        "es-bv",
+        "es-s"
+      ],
+      "fileName": "sabado-1e73aa8ef0.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/sabado-1e73aa8ef0.mp3"
+    },
+    {
+      "key": "saber",
+      "text": "saber",
+      "ipa": "/saˈβeɾ/",
+      "soundUnitSlugs": [
+        "es-bv",
+        "es-s"
+      ],
+      "fileName": "saber-1b60697026.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/saber-1b60697026.mp3"
+    },
+    {
+      "key": "sal",
+      "text": "sal",
+      "ipa": "/sal/",
+      "soundUnitSlugs": [
+        "es-a"
+      ],
+      "fileName": "sal-caf8dae170.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/sal-caf8dae170.mp3"
+    },
+    {
+      "key": "salud",
+      "text": "salud",
+      "ipa": "/saˈluð/",
+      "soundUnitSlugs": [
+        "es-s"
+      ],
+      "fileName": "salud-250a4a1b82.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/salud-250a4a1b82.mp3"
+    },
+    {
+      "key": "seguir",
+      "text": "seguir",
+      "ipa": "/seˈɣiɾ/",
+      "soundUnitSlugs": [
+        "es-g"
+      ],
+      "fileName": "seguir-33acf95ee2.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/seguir-33acf95ee2.mp3"
+    },
+    {
+      "key": "seguro",
+      "text": "seguro",
+      "ipa": "/seˈɣuɾo/",
+      "soundUnitSlugs": [
+        "es-u"
+      ],
+      "fileName": "seguro-f26ad5965a.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/seguro-f26ad5965a.mp3"
+    },
+    {
+      "key": "seis",
+      "text": "seis",
+      "ipa": "/sejs/",
+      "soundUnitSlugs": [
+        "es-s",
+        "es-diphthongs-j"
+      ],
+      "fileName": "seis-ba15793485.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/seis-ba15793485.mp3"
+    },
+    {
+      "key": "seis años",
+      "text": "seis años",
+      "ipa": "/sejs ˈaɲos/",
+      "soundUnitSlugs": [
+        "es-diphthongs-j"
+      ],
+      "fileName": "seis-anos-c6939d689b.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/seis-anos-c6939d689b.mp3"
+    },
+    {
+      "key": "seis casas",
+      "text": "seis casas",
+      "ipa": "/sejs ˈkasas/",
+      "soundUnitSlugs": [
+        "es-s"
+      ],
+      "fileName": "seis-casas-e6a452b75b.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/seis-casas-e6a452b75b.mp3"
+    },
+    {
+      "key": "señal",
+      "text": "señal",
+      "ipa": "/seˈɲal/",
+      "soundUnitSlugs": [
+        "es-ny"
+      ],
+      "fileName": "senal-b75d71d7c4.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/senal-b75d71d7c4.mp3"
+    },
+    {
+      "key": "señor",
+      "text": "señor",
+      "ipa": "/seˈɲoɾ/",
+      "soundUnitSlugs": [
+        "es-e",
+        "es-ny"
+      ],
+      "fileName": "senor-93f6a8523a.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/senor-93f6a8523a.mp3"
+    },
+    {
+      "key": "señora",
+      "text": "señora",
+      "ipa": "/seˈɲoɾa/",
+      "soundUnitSlugs": [
+        "es-ny"
+      ],
+      "fileName": "senora-e04d588b97.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/senora-e04d588b97.mp3"
+    },
+    {
+      "key": "serie",
+      "text": "serie",
+      "ipa": "/ˈseɾje/",
+      "soundUnitSlugs": [
+        "es-s"
+      ],
+      "fileName": "serie-82cd0722a5.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/serie-82cd0722a5.mp3"
+    },
+    {
+      "key": "sí",
+      "text": "sí",
+      "ipa": "/si/",
+      "soundUnitSlugs": [
+        "es-i",
+        "es-s"
+      ],
+      "fileName": "si-5e06bd15f9.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/si-5e06bd15f9.mp3"
+    },
+    {
+      "key": "silla",
+      "text": "silla",
+      "ipa": "/ˈsiʝa/",
+      "soundUnitSlugs": [
+        "es-s"
+      ],
+      "fileName": "silla-86546b912b.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/silla-86546b912b.mp3"
+    },
+    {
+      "key": "sol",
+      "text": "sol",
+      "ipa": "/sol/",
+      "soundUnitSlugs": [
+        "es-o",
+        "es-s",
+        "es-l"
+      ],
+      "fileName": "sol-fbb93bb966.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/sol-fbb93bb966.mp3"
+    },
+    {
+      "key": "solo",
+      "text": "solo",
+      "ipa": "/ˈsolo/",
+      "soundUnitSlugs": [
+        "es-o"
+      ],
+      "fileName": "solo-49f25741ff.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/solo-49f25741ff.mp3"
+    },
+    {
+      "key": "solo sé",
+      "text": "solo sé",
+      "ipa": "/ˈsolo se/",
+      "soundUnitSlugs": [
+        "es-s"
+      ],
+      "fileName": "solo-se-8f6cf83348.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/solo-se-8f6cf83348.mp3"
+    },
+    {
+      "key": "sopa",
+      "text": "sopa",
+      "ipa": "/ˈsopa/",
+      "soundUnitSlugs": [
+        "es-s"
+      ],
+      "fileName": "sopa-4662abffdd.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/sopa-4662abffdd.mp3"
+    },
+    {
+      "key": "subrayar",
+      "text": "subrayar",
+      "ipa": "/suβraˈʝaɾ/",
+      "soundUnitSlugs": [
+        "es-trill-r"
+      ],
+      "fileName": "subrayar-31c50d62fc.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/subrayar-31c50d62fc.mp3"
+    },
+    {
+      "key": "sueño",
+      "text": "sueño",
+      "ipa": "/ˈsweɲo/",
+      "soundUnitSlugs": [
+        "es-ny",
+        "es-s"
+      ],
+      "fileName": "sueno-b05f8bb9b1.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/sueno-b05f8bb9b1.mp3"
+    },
+    {
+      "key": "suerte",
+      "text": "suerte",
+      "ipa": "/ˈsweɾte/",
+      "soundUnitSlugs": [
+        "es-u",
+        "es-s",
+        "es-diphthongs-w"
+      ],
+      "fileName": "suerte-38ea296915.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/suerte-38ea296915.mp3"
+    },
+    {
+      "key": "también",
+      "text": "también",
+      "ipa": "/tamˈbjen/",
+      "soundUnitSlugs": [
+        "es-nasal-place"
+      ],
+      "fileName": "tambien-db38e4d37a.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/tambien-db38e4d37a.mp3"
+    },
+    {
+      "key": "tango",
+      "text": "tango",
+      "ipa": "/ˈtaŋgo/",
+      "soundUnitSlugs": [
+        "es-nasal-place"
+      ],
+      "fileName": "tango-de852dff30.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/tango-de852dff30.mp3"
+    },
+    {
+      "key": "tarde",
+      "text": "tarde",
+      "ipa": "/ˈtaɾðe/",
+      "soundUnitSlugs": [
+        "es-a",
+        "es-d",
+        "es-tap-r"
+      ],
+      "fileName": "tarde-8693c78aea.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/tarde-8693c78aea.mp3"
+    },
+    {
+      "key": "teléfono",
+      "text": "teléfono",
+      "ipa": "/teˈlefono/",
+      "soundUnitSlugs": [
+        "es-e",
+        "es-lexical-stress"
+      ],
+      "fileName": "telefono-9303fb5d29.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/telefono-9303fb5d29.mp3"
+    },
+    {
+      "key": "tengo una pregunta",
+      "text": "Tengo una pregunta",
+      "ipa": "/ˈteŋgo ˈuna pɾeˈɣunta/",
       "soundUnitSlugs": [
         "es-syllable-rhythm"
       ],
-      "fileName": "buenos-dias-a-todos-f3fd9144ea.mp3",
-      "audioSrc": "/audio/language-packs/es-ES/buenos-dias-a-todos-f3fd9144ea.mp3"
+      "fileName": "tengo-una-pregunta-fd971a1a21.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/tengo-una-pregunta-fd971a1a21.mp3"
+    },
+    {
+      "key": "tiempo",
+      "text": "tiempo",
+      "ipa": "/ˈtjempo/",
+      "soundUnitSlugs": [
+        "es-i",
+        "es-diphthongs-j"
+      ],
+      "fileName": "tiempo-a5da6d9c96.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/tiempo-a5da6d9c96.mp3"
+    },
+    {
+      "key": "tierra",
+      "text": "tierra",
+      "ipa": "/ˈtjera/",
+      "soundUnitSlugs": [
+        "es-trill-r",
+        "es-diphthongs-j"
+      ],
+      "fileName": "tierra-c7039f8547.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/tierra-c7039f8547.mp3"
+    },
+    {
+      "key": "todo",
+      "text": "todo",
+      "ipa": "/ˈtoðo/",
+      "soundUnitSlugs": [
+        "es-o"
+      ],
+      "fileName": "todo-05f20a7178.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/todo-05f20a7178.mp3"
+    },
+    {
+      "key": "trabajo",
+      "text": "trabajo",
+      "ipa": "/tɾaˈβaxo/",
+      "soundUnitSlugs": [
+        "es-a",
+        "es-tap-r"
+      ],
+      "fileName": "trabajo-09d2e3a150.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/trabajo-09d2e3a150.mp3"
+    },
+    {
+      "key": "traje",
+      "text": "traje",
+      "ipa": "/ˈtɾaxe/",
+      "soundUnitSlugs": [
+        "es-x"
+      ],
+      "fileName": "traje-73b04d045a.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/traje-73b04d045a.mp3"
+    },
+    {
+      "key": "trece",
+      "text": "trece",
+      "ipa": "/ˈtɾeθe/",
+      "soundUnitSlugs": [
+        "es-theta"
+      ],
+      "fileName": "trece-0f72d7d73e.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/trece-0f72d7d73e.mp3"
+    },
+    {
+      "key": "tren",
+      "text": "tren",
+      "ipa": "/tɾen/",
+      "soundUnitSlugs": [
+        "es-e"
+      ],
+      "fileName": "tren-15047c92a2.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/tren-15047c92a2.mp3"
+    },
+    {
+      "key": "tres",
+      "text": "tres",
+      "ipa": "/tɾes/",
+      "soundUnitSlugs": [
+        "es-e"
+      ],
+      "fileName": "tres-0c95987338.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/tres-0c95987338.mp3"
+    },
+    {
+      "key": "tres palabras cortas",
+      "text": "Tres palabras cortas",
+      "ipa": "/tɾes paˈlaβɾas ˈkoɾtas/",
+      "soundUnitSlugs": [
+        "es-syllable-rhythm"
+      ],
+      "fileName": "tres-palabras-cortas-2dcae44d79.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/tres-palabras-cortas-2dcae44d79.mp3"
+    },
+    {
+      "key": "tres veces",
+      "text": "tres veces",
+      "ipa": "/tɾes ˈbeθes/",
+      "soundUnitSlugs": [
+        "es-e"
+      ],
+      "fileName": "tres-veces-5044a3bc61.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/tres-veces-5044a3bc61.mp3"
+    },
+    {
+      "key": "tú",
+      "text": "tú",
+      "ipa": "/tu/",
+      "soundUnitSlugs": [
+        "es-u"
+      ],
+      "fileName": "tu-044e993fbe.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/tu-044e993fbe.mp3"
+    },
+    {
+      "key": "tu curso",
+      "text": "tu curso",
+      "ipa": "/tu ˈkuɾso/",
+      "soundUnitSlugs": [
+        "es-u"
+      ],
+      "fileName": "tu-curso-baebc4e0f9.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/tu-curso-baebc4e0f9.mp3"
+    },
+    {
+      "key": "último",
+      "text": "último",
+      "ipa": "/ˈultimo/",
+      "soundUnitSlugs": [
+        "es-u"
+      ],
+      "fileName": "ultimo-4c753a4824.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/ultimo-4c753a4824.mp3"
+    },
+    {
+      "key": "un año",
+      "text": "un año",
+      "ipa": "/un ˈaɲo/",
+      "soundUnitSlugs": [
+        "es-ny"
+      ],
+      "fileName": "un-ano-f948f58383.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/un-ano-f948f58383.mp3"
+    },
+    {
+      "key": "un beso",
+      "text": "un beso",
+      "ipa": "/um ˈbeso/",
+      "soundUnitSlugs": [
+        "es-nasal-place"
+      ],
+      "fileName": "un-beso-404d363351.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/un-beso-404d363351.mp3"
+    },
+    {
+      "key": "un día",
+      "text": "un día",
+      "ipa": "/un ˈdia/",
+      "soundUnitSlugs": [
+        "es-d",
+        "es-nasal-place"
+      ],
+      "fileName": "un-dia-2a0f0869ec.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/un-dia-2a0f0869ec.mp3"
+    },
+    {
+      "key": "un gato",
+      "text": "un gato",
+      "ipa": "/uŋ ˈgato/",
+      "soundUnitSlugs": [
+        "es-nasal-place"
+      ],
+      "fileName": "un-gato-cb0821b10a.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/un-gato-cb0821b10a.mp3"
+    },
+    {
+      "key": "un niño",
+      "text": "un niño",
+      "ipa": "/un ˈniɲo/",
+      "soundUnitSlugs": [
+        "es-nasal-place"
+      ],
+      "fileName": "un-nino-2126589c50.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/un-nino-2126589c50.mp3"
+    },
+    {
+      "key": "un pan",
+      "text": "un pan",
+      "ipa": "/um pan/",
+      "soundUnitSlugs": [
+        "es-nasal-place"
+      ],
+      "fileName": "un-pan-76c52d8242.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/un-pan-76c52d8242.mp3"
+    },
+    {
+      "key": "uña",
+      "text": "uña",
+      "ipa": "/ˈuɲa/",
+      "soundUnitSlugs": [
+        "es-ny"
+      ],
+      "fileName": "una-49520ffd61.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/una-49520ffd61.mp3"
+    },
+    {
+      "key": "una familia grande",
+      "text": "Una familia grande",
+      "ipa": "/ˈuna faˈmilja ˈgɾande/",
+      "soundUnitSlugs": [
+        "es-syllable-rhythm"
+      ],
+      "fileName": "una-familia-grande-e90f1cd1a7.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/una-familia-grande-e90f1cd1a7.mp3"
+    },
+    {
+      "key": "una luna",
+      "text": "una luna",
+      "ipa": "/ˈuna ˈluna/",
+      "soundUnitSlugs": [
+        "es-u"
+      ],
+      "fileName": "una-luna-682ba6eb7e.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/una-luna-682ba6eb7e.mp3"
+    },
+    {
+      "key": "uno",
+      "text": "uno",
+      "ipa": "/ˈuno/",
+      "soundUnitSlugs": [
+        "es-u"
+      ],
+      "fileName": "uno-81b6f50734.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/uno-81b6f50734.mp3"
+    },
+    {
+      "key": "usted",
+      "text": "usted",
+      "ipa": "/usˈteð/",
+      "soundUnitSlugs": [
+        "es-u"
+      ],
+      "fileName": "usted-5155ddcd5c.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/usted-5155ddcd5c.mp3"
+    },
+    {
+      "key": "uva",
+      "text": "uva",
+      "ipa": "/ˈuβa/",
+      "soundUnitSlugs": [
+        "es-bv"
+      ],
+      "fileName": "uva-2d2c2a1400.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/uva-2d2c2a1400.mp3"
+    },
+    {
+      "key": "vaca",
+      "text": "vaca",
+      "ipa": "/ˈbaka/",
+      "soundUnitSlugs": [
+        "es-bv"
+      ],
+      "fileName": "vaca-c0b3f2cd99.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/vaca-c0b3f2cd99.mp3"
+    },
+    {
+      "key": "valor",
+      "text": "valor",
+      "ipa": "/baˈloɾ/",
+      "soundUnitSlugs": [
+        "es-bv"
+      ],
+      "fileName": "valor-0a3c0dbb93.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/valor-0a3c0dbb93.mp3"
+    },
+    {
+      "key": "veinte",
+      "text": "veinte",
+      "ipa": "/ˈbeinte/",
+      "soundUnitSlugs": [
+        "es-e"
+      ],
+      "fileName": "veinte-3b1b17811d.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/veinte-3b1b17811d.mp3"
+    },
+    {
+      "key": "ven",
+      "text": "ven",
+      "ipa": "/bjen/ ~ /ben/",
+      "soundUnitSlugs": [
+        "es-diphthongs-j"
+      ],
+      "audioSrc": "/audio/language-packs/es-ES/ven-20b11ca780.mp3"
+    },
+    {
+      "key": "verano",
+      "text": "verano",
+      "ipa": "/beˈɾano/",
+      "soundUnitSlugs": [
+        "es-bv"
+      ],
+      "fileName": "verano-952fa74954.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/verano-952fa74954.mp3"
+    },
+    {
+      "key": "verdad",
+      "text": "verdad",
+      "ipa": "/beɾˈðað/",
+      "soundUnitSlugs": [
+        "es-d"
+      ],
+      "fileName": "verdad-762ba43a5d.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/verdad-762ba43a5d.mp3"
+    },
+    {
+      "key": "verde",
+      "text": "verde",
+      "ipa": "/ˈbeɾðe/",
+      "soundUnitSlugs": [
+        "es-e",
+        "es-d",
+        "es-tap-r"
+      ],
+      "fileName": "verde-2030abee0f.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/verde-2030abee0f.mp3"
+    },
+    {
+      "key": "viajar",
+      "text": "viajar",
+      "ipa": "/bjaˈxaɾ/",
+      "soundUnitSlugs": [
+        "es-x"
+      ],
+      "fileName": "viajar-3ce867c1d2.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/viajar-3ce867c1d2.mp3"
+    },
+    {
+      "key": "viaje",
+      "text": "viaje",
+      "ipa": "/ˈbjaxe/",
+      "soundUnitSlugs": [
+        "es-diphthongs-j"
+      ],
+      "fileName": "viaje-4db7412397.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/viaje-4db7412397.mp3"
+    },
+    {
+      "key": "vida",
+      "text": "vida",
+      "ipa": "/ˈbiða/",
+      "soundUnitSlugs": [
+        "es-i",
+        "es-bv"
+      ],
+      "fileName": "vida-c303fda042.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/vida-c303fda042.mp3"
+    },
+    {
+      "key": "vino",
+      "text": "vino",
+      "ipa": "/ˈbino/",
+      "soundUnitSlugs": [
+        "es-bv"
+      ],
+      "fileName": "vino-f0e4876639.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/vino-f0e4876639.mp3"
+    },
+    {
+      "key": "vivir",
+      "text": "vivir",
+      "ipa": "/biˈβiɾ/",
+      "soundUnitSlugs": [
+        "es-i",
+        "es-bv"
+      ],
+      "fileName": "vivir-a8c28ff883.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/vivir-a8c28ff883.mp3"
+    },
+    {
+      "key": "vivo en madrid",
+      "text": "Vivo en Madrid",
+      "ipa": "/ˈbiβo en maˈðɾið/",
+      "soundUnitSlugs": [
+        "es-syllable-rhythm"
+      ],
+      "fileName": "vivo-en-madrid-18af7f020f.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/vivo-en-madrid-18af7f020f.mp3"
+    },
+    {
+      "key": "volver",
+      "text": "volver",
+      "ipa": "/bolˈβeɾ/",
+      "soundUnitSlugs": [
+        "es-bv"
+      ],
+      "fileName": "volver-60ab455fc4.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/volver-60ab455fc4.mp3"
+    },
+    {
+      "key": "voz",
+      "text": "voz",
+      "ipa": "/boθ/",
+      "soundUnitSlugs": [
+        "es-theta"
+      ],
+      "fileName": "voz-cb83905204.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/voz-cb83905204.mp3"
+    },
+    {
+      "key": "ya",
+      "text": "ya",
+      "ipa": "/ʝa/",
+      "soundUnitSlugs": [
+        "es-y-ll"
+      ],
+      "fileName": "ya-e92fc4e26a.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/ya-e92fc4e26a.mp3"
+    },
+    {
+      "key": "yema",
+      "text": "yema",
+      "ipa": "/ˈʝema/",
+      "soundUnitSlugs": [
+        "es-y-ll"
+      ],
+      "fileName": "yema-b76baa4c82.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/yema-b76baa4c82.mp3"
+    },
+    {
+      "key": "yeso",
+      "text": "yeso",
+      "ipa": "/ˈʝeso/",
+      "soundUnitSlugs": [
+        "es-y-ll"
+      ],
+      "fileName": "yeso-4a5901e8c6.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/yeso-4a5901e8c6.mp3"
+    },
+    {
+      "key": "yo",
+      "text": "yo",
+      "ipa": "/ʝo/",
+      "soundUnitSlugs": [
+        "es-y-ll"
+      ],
+      "fileName": "yo-c41975d1da.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/yo-c41975d1da.mp3"
+    },
+    {
+      "key": "yo llamo",
+      "text": "yo llamo",
+      "ipa": "/ʝo ˈʝamo/",
+      "soundUnitSlugs": [
+        "es-y-ll"
+      ],
+      "fileName": "yo-llamo-e5b42c87f0.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/yo-llamo-e5b42c87f0.mp3"
+    },
+    {
+      "key": "zapatería",
+      "text": "zapatería",
+      "ipa": "/θapateˈɾia/",
+      "soundUnitSlugs": [
+        "es-theta"
+      ],
+      "fileName": "zapateria-155b8eb0fc.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/zapateria-155b8eb0fc.mp3"
+    },
+    {
+      "key": "zapato",
+      "text": "zapato",
+      "ipa": "/θaˈpato/",
+      "soundUnitSlugs": [
+        "es-theta"
+      ],
+      "fileName": "zapato-d508dffa96.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/zapato-d508dffa96.mp3"
+    },
+    {
+      "key": "zona",
+      "text": "zona",
+      "ipa": "/ˈθona/",
+      "soundUnitSlugs": [
+        "es-theta"
+      ],
+      "fileName": "zona-90dd8f26ae.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/zona-90dd8f26ae.mp3"
+    },
+    {
+      "key": "zona azul",
+      "text": "zona azul",
+      "ipa": "/ˈθona aˈθul/",
+      "soundUnitSlugs": [
+        "es-theta"
+      ],
+      "fileName": "zona-azul-b2453ca887.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/zona-azul-b2453ca887.mp3"
     }
   ]
 }

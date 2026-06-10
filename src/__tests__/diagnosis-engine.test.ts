@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { buildDiagnosisReport } from "@/lib/diagnosis-engine";
+import {
+  buildDiagnosisReport,
+  getDiagnosisSummary,
+} from "@/lib/diagnosis-engine";
 import type { AssessmentRecording } from "@/types/diagnosis";
 
 function resultForWord(
@@ -124,5 +127,70 @@ describe("buildDiagnosisReport", () => {
     expect(report.issues.some((issue) => issue.id === "s-th")).toBe(false);
     expect(report.evidenceSummary?.invalidRecordings).toBe(1);
     expect(report.rawEvidence[0]?.recommendedAction).toBe("request-retry");
+  });
+
+  it("withholds non-English overall scores when evidence is too thin", () => {
+    const report = buildDiagnosisReport({
+      languageId: "fr-FR",
+      wordRecordings: [],
+      paragraphText:
+        "Un étudiant prend un bon café. Les amis parlent dans une petite rue.",
+      paragraphResult: resultForWord(
+        "bonjour",
+        [
+          { phoneme: "unknown-1", accuracyScore: 100 },
+          { phoneme: "unknown-2", accuracyScore: 100 },
+        ],
+        {
+          pronunciationScore: 100,
+          accuracyScore: 100,
+          fluencyScore: 100,
+          completenessScore: 100,
+          prosodyScore: 100,
+        },
+      ),
+    });
+
+    expect(report.scoreStatus).toBe("insufficient-evidence");
+    expect(report.overallScore).toBe(0);
+    expect(report.issues.map((issue) => issue.id)).not.toContain(
+      "stress-rhythm",
+    );
+    expect(getDiagnosisSummary(report)).toContain("证据不足");
+  });
+
+  it("keeps non-English reports out of English training-pack issue rules", () => {
+    const report = buildDiagnosisReport({
+      languageId: "es-ES",
+      wordRecordings: [
+        {
+          prompt: {
+            word: "casa",
+            ipa: "/ˈkasa/",
+            targetPhonemes: ["es-a"],
+          },
+          source: "word",
+          result: resultForWord("casa", [
+            { phoneme: "a", accuracyScore: 45 },
+            { phoneme: "s", accuracyScore: 92 },
+          ]),
+        },
+      ],
+      paragraphText: "Mi perro corre por la plaza.",
+      paragraphResult: resultForWord(
+        "plaza",
+        [
+          { phoneme: "a", accuracyScore: 48 },
+          { phoneme: "s", accuracyScore: 90 },
+        ],
+        { prosodyScore: 85, fluencyScore: 86 },
+      ),
+    });
+
+    expect(report.issues.map((issue) => issue.id)).not.toContain("ee-ih");
+    expect(report.issues.map((issue) => issue.id)).not.toContain("s-th");
+    expect(report.issues.every((issue) => issue.id.startsWith("es-ES:"))).toBe(
+      true,
+    );
   });
 });

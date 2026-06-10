@@ -120,6 +120,12 @@ describe("multilingual Azure phoneme map parity", () => {
     expect(getPhonemeAudioUrl("a", "es-ES")).toMatch(
       /^\/(?:audio|videos)\/language-assets\/es-ES\//,
     );
+    expect(getPhonemeAudioUrl("eh", "fr-FR")).toMatch(
+      /^\/(?:audio|videos)\/language-assets\/fr-FR\//,
+    );
+    expect(getPhonemeAudioUrl("ax", "fr-FR")).toMatch(
+      /^\/(?:audio|videos)\/language-assets\/fr-FR\//,
+    );
     expect(getPhonemeAudioUrl("ʁ", "fr-FR")).toMatch(
       /^\/(?:audio|videos)\/language-assets\/fr-FR\//,
     );
@@ -133,6 +139,9 @@ describe("multilingual Azure phoneme map parity", () => {
   });
 
   it("keeps non-English assessment phoneme labels visible instead of empty slashes", () => {
+    expect(getAssessmentPhonemeLabel("", "fr-FR")).toBe("—");
+    expect(getAssessmentPhonemeLabel("eh", "fr-FR")).toBe("/ɛ/");
+    expect(getAssessmentPhonemeLabel("ax", "fr-FR")).toBe("/ə/");
     expect(getAssessmentPhonemeLabel("ʁ", "fr-FR")).toBe("/ʁ/");
     expect(getAssessmentPhonemeLabel("ˈɛ̃", "fr-FR")).toBe("/ɛ̃/");
     expect(getAssessmentPhonemeLabel("[ɕː]", "ru-RU")).toBe("/ɕː/");

@@ -16,15 +16,18 @@ export function getTargetPhonemeScore(
 export function getPassScore(
   result: AzureAssessmentResult,
   targetPhonemes: string[],
+  options: { allowFallback?: boolean } = { allowFallback: true },
 ): {
   targetScore: number;
   overallScore: number;
   usedFallback: boolean;
 } {
   const targetScore = getTargetPhonemeScore(result, targetPhonemes);
+  const usedFallback = targetScore === null;
   return {
-    targetScore: targetScore ?? result.pronunciationScore,
+    targetScore:
+      targetScore ?? (options.allowFallback ? result.pronunciationScore : 0),
     overallScore: result.pronunciationScore,
-    usedFallback: targetScore === null,
+    usedFallback,
   };
 }

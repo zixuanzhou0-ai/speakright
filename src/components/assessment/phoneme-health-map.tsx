@@ -7,10 +7,13 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { getLanguagePhonemes } from "@/lib/language-phonemes";
 import { PHONEMES } from "@/lib/phoneme-data";
+import type { LanguageId } from "@/types/language";
 
 interface PhonemeHealthMapProps {
   scores: Record<string, number | { score: number; sampleCount: number }>;
+  languageId?: LanguageId;
 }
 
 function normalizeScore(
@@ -36,9 +39,17 @@ function getLabel(score: number): string {
   return "未测";
 }
 
-export function PhonemeHealthMap({ scores }: PhonemeHealthMapProps) {
-  const vowels = PHONEMES.filter((p) => p.category === "vowel");
-  const consonants = PHONEMES.filter((p) => p.category === "consonant");
+export function PhonemeHealthMap({
+  scores,
+  languageId = "en-US",
+}: PhonemeHealthMapProps) {
+  const inventory =
+    languageId === "en-US" ? PHONEMES : getLanguagePhonemes(languageId);
+  const vowels = inventory.filter((p) => p.category === "vowel");
+  const consonants = inventory.filter((p) => p.category === "consonant");
+  const otherUnits = inventory.filter(
+    (p) => p.category !== "vowel" && p.category !== "consonant",
+  );
 
   return (
     <div className="space-y-4">
@@ -84,6 +95,29 @@ export function PhonemeHealthMap({ scores }: PhonemeHealthMapProps) {
           })}
         </div>
       </div>
+      {otherUnits.length > 0 && (
+        <div>
+          <h3 className="mb-2 text-sm font-semibold text-muted-foreground">
+            规则/语流（{otherUnits.length}）
+          </h3>
+          <div className="grid grid-cols-8 gap-1.5">
+            {otherUnits.map((p, i) => {
+              const normalized = normalizeScore(scores[p.slug]);
+              return (
+                <PhonemeCell
+                  key={p.slug}
+                  ipa={p.ipa}
+                  slug={p.slug}
+                  name={p.name}
+                  score={normalized.score}
+                  sampleCount={normalized.sampleCount}
+                  delay={(vowels.length + consonants.length + i) * 0.03}
+                />
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

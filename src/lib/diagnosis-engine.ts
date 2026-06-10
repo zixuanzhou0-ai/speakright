@@ -3,7 +3,7 @@ import {
   analyzeAssessmentEvidence,
   summarizeAssessmentAnalyses,
 } from "@/lib/assessment-evidence-engine";
-import { PHONEMES } from "@/lib/phoneme-data";
+import { getLanguagePhonemes } from "@/lib/language-phonemes";
 import { getErrorPatternIdsForIssue } from "@/lib/training-error-patterns";
 import { buildTrainingPrescription } from "@/lib/training-prescription";
 import type { AssessmentWord } from "@/types/assessment";
@@ -17,12 +17,7 @@ import type {
   DiagnosisReport,
   RecordingQualitySnapshot,
 } from "@/types/diagnosis";
-
-const VOWELS = new Set(
-  PHONEMES.filter((phoneme) => phoneme.category === "vowel").map(
-    (phoneme) => phoneme.slug,
-  ),
-);
+import type { LanguageId } from "@/types/language";
 
 const FINAL_CONSONANTS = new Set([
   "p",
@@ -166,6 +161,7 @@ function collectPhonemes(
   source: DiagnosisEvidence["source"],
   phonemeBuckets: Record<string, number[]>,
   rawEvidence: DiagnosisEvidence[],
+  languageId: LanguageId,
   referenceText = label,
   recordingQuality?: RecordingQualitySnapshot,
 ): AssessmentEvidenceAnalysis {
@@ -174,6 +170,7 @@ function collectPhonemes(
     referenceText,
     label,
     source,
+    languageId,
     recordingQuality,
   });
 
@@ -243,6 +240,104 @@ function collectPhonemes(
   }
 
   return analysis;
+}
+
+function vowelSlugsFor(languageId: LanguageId): Set<string> {
+  return new Set(
+    getLanguagePhonemes(languageId)
+      .filter((phoneme) => phoneme.category === "vowel")
+      .map((phoneme) => phoneme.slug),
+  );
+}
+
+function scoreStatusForReport(
+  languageId: LanguageId,
+  summary: ReturnType<typeof summarizeAssessmentAnalyses>,
+  phonemeScores: DiagnosisReport["phonemeScores"],
+): Pick<DiagnosisReport, "scoreStatus" | "scoreStatusReason"> {
+  if (languageId === "en-US") {
+    return { scoreStatus: "scored" };
+  }
+
+  const mappedTokenCount = Object.values(phonemeScores).reduce(
+    (sum, item) => sum + item.sampleCount,
+    0,
+  );
+  if (summary.overallStrength === "invalid") {
+    return {
+      scoreStatus: "insufficient-evidence",
+      scoreStatusReason: "证据不足：录音无效或漏读比例过高，请重新测试。",
+    };
+  }
+  if (summary.invalidRecordings > 0) {
+    return {
+      scoreStatus: "insufficient-evidence",
+      scoreStatusReason:
+        "证据不足：存在漏读、多读或低质量录音，本次不生成综合分。",
+    };
+  }
+  if (summary.overallStrength === "thin" || mappedTokenCount < 8) {
+    return {
+      scoreStatus: "insufficient-evidence",
+      scoreStatusReason:
+        "证据不足：Azure 返回的可用发音单位太少，本次只保留反馈并建议复测。",
+    };
+  }
+  return { scoreStatus: "scored" };
+}
+
+function buildLanguageIssue(
+  languageId: LanguageId,
+  slug: string,
+  score: number,
+  sampleCount: number,
+  rawEvidence: DiagnosisEvidence[],
+): DiagnosisIssue | null {
+  const unit = getLanguagePhonemes(languageId).find((item) => item.slug === slug);
+  if (!unit || score >= 78) return null;
+  const evidence = rawEvidence
+    .filter((entry) => entry.phoneme === slug)
+    .sort((a, b) => a.score - b.score)
+    .slice(0, 3)
+    .map((entry) => ({
+      text: entry.text,
+      score: entry.score,
+      detail: entry.detail,
+    }));
+
+  return {
+    id: `${languageId}:${slug}`,
+    severity: severityFromScore(score),
+    type: unit.category === "prosody" ? "rhythm" : "phoneme",
+    title: `${unit.ipa} 需要复测`,
+    targetPhonemes: [slug],
+    evidence:
+      evidence.length > 0
+        ? evidence
+        : [
+            {
+              text: unit.example,
+              score,
+              detail: `${unit.name} 当前样本平均 ${score} 分，样本数 ${sampleCount}。`,
+            },
+          ],
+    impact: "当前证据显示这个发音单位可能影响清晰度，但仍需更多样本确认。",
+    fixCue: unit.description ?? "先听标准发音，再慢速录 2-3 个不同词复测。",
+    recommendedPackIds: [],
+  };
+}
+
+function buildLanguageIssues(
+  languageId: LanguageId,
+  phonemeScores: DiagnosisReport["phonemeScores"],
+  rawEvidence: DiagnosisEvidence[],
+): DiagnosisIssue[] {
+  if (languageId === "en-US") return [];
+  return Object.entries(phonemeScores)
+    .map(([slug, value]) =>
+      buildLanguageIssue(languageId, slug, value.score, value.sampleCount, rawEvidence),
+    )
+    .filter((issue): issue is DiagnosisIssue => issue !== null);
 }
 
 function issueFromRule(
@@ -482,6 +577,7 @@ function enrichIssue(
 }
 
 export function buildDiagnosisReport({
+  languageId = "en-US",
   wordRecordings,
   paragraphResult,
   paragraphText,
@@ -499,6 +595,7 @@ export function buildDiagnosisReport({
       recording.source,
       phonemeBuckets,
       rawEvidence,
+      languageId,
       recording.prompt.word,
       recording.recordingQuality,
     );
@@ -511,6 +608,7 @@ export function buildDiagnosisReport({
     "paragraph",
     phonemeBuckets,
     rawEvidence,
+    languageId,
     paragraphText,
     paragraphRecordingQuality,
   );
@@ -524,11 +622,12 @@ export function buildDiagnosisReport({
     phonemeScores[slug] = { score: avg(scores), sampleCount: scores.length };
   }
 
+  const languageVowels = vowelSlugsFor(languageId);
   const vowelScores = Object.entries(phonemeScores)
-    .filter(([slug]) => VOWELS.has(slug))
+    .filter(([slug]) => languageVowels.has(slug))
     .map(([, value]) => value.score);
   const consonantScores = Object.entries(phonemeScores)
-    .filter(([slug]) => !VOWELS.has(slug))
+    .filter(([slug]) => !languageVowels.has(slug))
     .map(([, value]) => value.score);
   const syllableScores = [
     ...usableWordRecordings.flatMap((recording) =>
@@ -567,19 +666,32 @@ export function buildDiagnosisReport({
   const allPhonemeScores = Object.values(phonemeScores).map(
     (item) => item.score,
   );
-  const overallScore = avg(
+  const evidenceSummary = summarizeAssessmentAnalyses(analyses);
+  const scoreStatus = scoreStatusForReport(
+    languageId,
+    evidenceSummary,
+    phonemeScores,
+  );
+  const calculatedOverallScore = avg(
     [avg(allPhonemeScores), dimensions.fluency, dimensions.rhythm].filter(
       (score) => score > 0,
     ),
   );
+  const overallScore =
+    scoreStatus.scoreStatus === "scored" ? calculatedOverallScore : 0;
 
-  const issues = [
-    ...ISSUE_RULES.map((rule) =>
-      issueFromRule(rule, phonemeScores, rawEvidence),
-    ).filter((issue): issue is DiagnosisIssue => issue !== null),
-    buildFinalConsonantIssue(rawEvidence),
-    usableParagraphResult ? buildRhythmIssue(usableParagraphResult) : null,
-  ]
+  const languageSpecificIssues =
+    languageId === "en-US"
+      ? [
+          ...ISSUE_RULES.map((rule) =>
+            issueFromRule(rule, phonemeScores, rawEvidence),
+          ).filter((issue): issue is DiagnosisIssue => issue !== null),
+          buildFinalConsonantIssue(rawEvidence),
+          usableParagraphResult ? buildRhythmIssue(usableParagraphResult) : null,
+        ]
+      : buildLanguageIssues(languageId, phonemeScores, rawEvidence);
+
+  const issues = languageSpecificIssues
     .filter((issue): issue is DiagnosisIssue => issue !== null)
     .map((issue) => enrichIssue(issue, phonemeScores))
     .sort((a, b) => {
@@ -590,21 +702,24 @@ export function buildDiagnosisReport({
 
   return {
     version: 2,
+    languageId,
     source: "quick-word-check",
     timestamp: Date.now(),
     overallScore,
+    ...scoreStatus,
     dimensions,
     phonemeScores,
     issues,
     prescription: buildTrainingPrescription(issues, "diagnosis"),
     rawEvidence: rawEvidence.sort((a, b) => a.score - b.score).slice(0, 18),
-    evidenceSummary: summarizeAssessmentAnalyses(analyses),
+    evidenceSummary,
   };
 }
 
 export function buildCoveragePassageDiagnosisReport({
   recordings,
 }: CoveragePassageBuildInput): DiagnosisReport {
+  const languageId: LanguageId = "en-US";
   const phonemeBuckets: Record<string, number[]> = {};
   const rawEvidence: DiagnosisEvidence[] = [];
   const analyses: AssessmentEvidenceAnalysis[] = [];
@@ -617,6 +732,7 @@ export function buildCoveragePassageDiagnosisReport({
       recording.source,
       phonemeBuckets,
       rawEvidence,
+      languageId,
       recording.text,
       recording.recordingQuality,
     );
@@ -630,11 +746,12 @@ export function buildCoveragePassageDiagnosisReport({
   }
 
   const results = usableRecordings.map((recording) => recording.result);
+  const languageVowels = vowelSlugsFor(languageId);
   const vowelScores = Object.entries(phonemeScores)
-    .filter(([slug]) => VOWELS.has(slug))
+    .filter(([slug]) => languageVowels.has(slug))
     .map(([, value]) => value.score);
   const consonantScores = Object.entries(phonemeScores)
-    .filter(([slug]) => !VOWELS.has(slug))
+    .filter(([slug]) => !languageVowels.has(slug))
     .map(([, value]) => value.score);
   const syllableScores = results.flatMap((result) =>
     result.words.flatMap((word) =>
@@ -659,11 +776,19 @@ export function buildCoveragePassageDiagnosisReport({
   const allPhonemeScores = Object.values(phonemeScores).map(
     (item) => item.score,
   );
-  const overallScore = avg(
+  const evidenceSummary = summarizeAssessmentAnalyses(analyses);
+  const scoreStatus = scoreStatusForReport(
+    languageId,
+    evidenceSummary,
+    phonemeScores,
+  );
+  const calculatedOverallScore = avg(
     [avg(allPhonemeScores), dimensions.fluency, dimensions.rhythm].filter(
       (score) => score > 0,
     ),
   );
+  const overallScore =
+    scoreStatus.scoreStatus === "scored" ? calculatedOverallScore : 0;
 
   const issues = [
     ...ISSUE_RULES.map((rule) =>
@@ -682,15 +807,17 @@ export function buildCoveragePassageDiagnosisReport({
 
   return {
     version: 2,
+    languageId,
     source: "coverage-passage",
     timestamp: Date.now(),
     overallScore,
+    ...scoreStatus,
     dimensions,
     phonemeScores,
     issues,
     prescription: buildTrainingPrescription(issues, "diagnosis"),
     rawEvidence: rawEvidence.sort((a, b) => a.score - b.score).slice(0, 24),
-    evidenceSummary: summarizeAssessmentAnalyses(analyses),
+    evidenceSummary,
   };
 }
 
@@ -716,6 +843,9 @@ export function selectAdaptiveAssessmentWords(
 }
 
 export function getDiagnosisSummary(report: DiagnosisReport): string {
+  if (report.scoreStatus === "insufficient-evidence") {
+    return report.scoreStatusReason ?? "证据不足，请补测后再生成诊断结论。";
+  }
   if (report.issues.length === 0) {
     return "没有明显重灾区，可以直接进入高频问题维护训练。";
   }

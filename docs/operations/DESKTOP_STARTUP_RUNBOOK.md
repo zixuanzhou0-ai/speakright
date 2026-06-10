@@ -1,6 +1,6 @@
 # Desktop Startup Runbook
 
-Last verified: 2026-06-10
+Last verified: 2026-06-11
 
 This repository is the current SpeakRight Desktop workspace:
 
@@ -31,6 +31,12 @@ launch it in one step:
 cd /d E:\SpeakRightDesktopRepo
 npm run desktop:run-release
 ```
+
+Before rebuilding release artifacts, close any currently running SpeakRight
+window. On Windows, a running `speakright.exe` locks the executable and Tauri
+cannot overwrite it during `npm run desktop:build` or `npm run validate:desktop`.
+If needed, close the window from the taskbar or stop the `speakright` process
+before starting the build.
 
 Expected process after startup:
 
@@ -94,6 +100,16 @@ installers:
 npm run validate:internal-release
 ```
 
+Run the live pronunciation/resource gate when checking multilingual readiness:
+
+```bat
+npm run desktop:live-validation
+```
+
+This command validates bundled audio/video paths and a high-coverage Azure
+sample. It queries ElevenLabs usage but does not generate audio in the normal
+release checklist.
+
 Use the public release gate only after Windows code signing is configured:
 
 ```bat
@@ -130,3 +146,24 @@ release notes and installation guide keep the unsigned warning visible.
   at the public release gate because EXE/MSI/NSIS artifacts are unsigned.
 - Current public-release blocker remains Windows code signing; controlled
   internal testing may continue with the unsigned warning visible.
+
+## 2026-06-11 Release-Validation Result
+
+- Current validation update: `chore: tighten desktop release validation`.
+- `npm.cmd run test`: 72 test files and 363 tests passed.
+- `npm.cmd run typecheck`: passed.
+- `npm.cmd run lint`: passed; Biome checked 308 files.
+- `npm.cmd run build:desktop-frontend`: passed; 144 static pages generated.
+- `npm.cmd run desktop:live-validation`: passed.
+- First `npm.cmd run validate:desktop` attempt found a real process-lock issue:
+  an already-running `speakright.exe` prevented Tauri from overwriting the
+  release executable. After closing the release process, the full validation
+  passed.
+- Bundled audio validated: English `1464/1464`, Spanish `398/398`, French
+  `509/509`, Russian `407/407`.
+- Bundled videos validated: `210/210`.
+- Azure live pronunciation-assessment sample: `220/220` passed.
+- ElevenLabs usage was checked before and after validation; no TTS smoke was run
+  and estimated generated characters used were `0`.
+- Keep using `npm run desktop:launch-release` for tomorrow's manual testing;
+  dev mode remains debug-only.

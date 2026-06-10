@@ -12,6 +12,7 @@ interface DrillTeachingProps {
   total: number;
   isPlaying: boolean;
   isLoading: boolean;
+  audioError?: string | null;
   onPlay: () => void;
   onReady: () => void;
 }
@@ -22,6 +23,7 @@ export function DrillTeaching({
   total,
   isPlaying,
   isLoading,
+  audioError,
   onPlay,
   onReady,
 }: DrillTeachingProps) {
@@ -69,6 +71,11 @@ export function DrillTeaching({
         <p className="text-xs text-muted-foreground">
           {isPlaying ? "正在播放..." : "点击听标准发音"}
         </p>
+        {audioError && (
+          <p className="max-w-sm text-center text-xs text-destructive">
+            {audioError}
+          </p>
+        )}
 
         {/* Pronunciation tips */}
         {item.description && (

@@ -63,7 +63,8 @@ export function useAudioPlayer(): UseAudioPlayerReturn {
       setIsLoading(true);
       const howl = new Howl({
         src: [url],
-        format: ["wav", "ogg", "mp4", "m4a"],
+        format: ["wav", "webm", "ogg", "mp4", "m4a", "mp3"],
+        html5: true,
         onplay: () => {
           setIsLoading(false);
           setIsPlaying(true);

@@ -67,7 +67,11 @@ export async function getStaticLanguageAudioPackEntry(
   if (!manifest) return null;
 
   const key = normalizeAudioPackText(text);
-  const item = manifest.items.find((entry) => entry.key === key);
+  const item = manifest.items.find(
+    (entry) =>
+      normalizeAudioPackText(entry.key) === key ||
+      normalizeAudioPackText(entry.text) === key,
+  );
   if (!item) return null;
 
   return {

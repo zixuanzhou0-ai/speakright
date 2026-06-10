@@ -25,11 +25,13 @@ import { LanguageModuleGate } from "@/components/common/language-module-gate";
 import { DesktopReadinessCard } from "@/components/drill/desktop-readiness-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useLanguageConfig } from "@/hooks/use-api-keys";
 import { getAzureConfig, subscribeToStorage } from "@/lib/api-keys";
 import { isAzureConfigReady } from "@/lib/azure-config";
 import { isReviewDue, loadMasteryProfile } from "@/lib/mastery-profile";
 import { buildReviewQueue } from "@/lib/review-queue";
 import { buildTrainingMemory } from "@/lib/training-memory";
+import { getLanguageProfile } from "@/lib/language-profiles";
 import { TRAINING_PACKS } from "@/lib/training-packs";
 import {
   buildDefaultPrescription,
@@ -120,6 +122,16 @@ function loadReport(): DiagnosisReport | null {
   }
 }
 
+function loadReportForLanguage(languageId: string): DiagnosisReport | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(`${REPORT_STORAGE_KEY}:${languageId}`);
+    return raw ? (JSON.parse(raw) as DiagnosisReport) : null;
+  } catch {
+    return null;
+  }
+}
+
 function levelTitle(pack: TrainingPack, levelId?: string): string {
   return (
     pack.course?.levels.find((level) => level.id === levelId)?.title ??
@@ -166,12 +178,16 @@ function priorityVariant(priority: ReviewQueueItem["priority"]) {
 }
 
 export default function DrillPage() {
+  const { languageId } = useLanguageConfig();
+  const languageProfile = getLanguageProfile(languageId);
   const [report, setReport] = useState<DiagnosisReport | null>(null);
   const [profile, setProfile] = useState<MasteryProfile | null>(null);
   const [azureReady, setAzureReady] = useState(false);
 
   useEffect(() => {
-    setReport(loadReport());
+    setReport(
+      languageId === "en-US" ? loadReportForLanguage(languageId) ?? loadReport() : loadReportForLanguage(languageId),
+    );
     setProfile(loadMasteryProfile());
     const refreshAzureState = () => {
       const config = getAzureConfig();
@@ -179,7 +195,7 @@ export default function DrillPage() {
     };
     refreshAzureState();
     return subscribeToStorage(refreshAzureState);
-  }, []);
+  }, [languageId]);
 
   const prescription =
     report && profile
@@ -227,6 +243,89 @@ export default function DrillPage() {
         ? "/drill/word"
         : "/settings";
   const primaryLabel = azureReady ? "开始今天训练" : "配置 Azure Speech 评分密钥";
+
+  if (languageId !== "en-US") {
+    const betaModes = [
+      {
+        href: "/drill/word",
+        icon: BookOpen,
+        title: "单词训练",
+        description: `${languageProfile.shortLabel}本地词音频优先，缺音频会明确提示`,
+      },
+      {
+        href: "/drill/sentence",
+        icon: MessageSquareText,
+        title: "句子训练",
+        description: "使用当前语言句子 deck，支持试听和录音评分",
+      },
+      {
+        href: "/drill/contrast",
+        icon: GitCompareArrows,
+        title: "对比训练",
+        description: "使用当前语言对比 deck，不再混入英语最小对立对",
+      },
+      {
+        href: "/assessment",
+        icon: ClipboardList,
+        title: "发音诊断",
+        description: "证据不足时不生成总分，只保留复测建议",
+      },
+    ];
+
+    return (
+      <LanguageModuleGate moduleName="刻意练习" readinessKey="wordPractice">
+        <div
+          className="h-full flex flex-col px-6 py-4 overflow-y-auto scrollbar-thin"
+          data-smoke="drill-page"
+        >
+          <div className="mb-5 flex items-start justify-between gap-4 shrink-0">
+            <div>
+              <h1 className="text-2xl font-bold">
+                {languageProfile.shortLabel}实验训练
+              </h1>
+              <p className="mt-1 text-muted-foreground">
+                当前语言为 experimental：可以练习和获取反馈，但不生成正式 mastery。
+              </p>
+            </div>
+            <Link href="/settings">
+              <Button variant="outline" className="gap-2 cursor-pointer">
+                <Settings className="h-4 w-4" />
+                设置
+              </Button>
+            </Link>
+          </div>
+
+          <div className="mb-5 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-100">
+            西语、法语、俄语仍处于内测阶段。系统会优先播放内置本地音频；
+            如果 Azure 没有返回可用发音单位证据，就不会用整词分冒充掌握证据。
+          </div>
+
+          <DesktopReadinessCard hasDiagnosis={!!report} />
+
+          <div className="grid gap-3 md:grid-cols-2">
+            {betaModes.map((mode) => (
+              <Link key={mode.href} href={mode.href}>
+                <motion.div
+                  whileHover={{ y: -2 }}
+                  className="h-full rounded-xl border bg-card p-5 shadow-sm transition-colors hover:border-primary/40"
+                >
+                  <div className="mb-3 flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+                      <mode.icon className="h-5 w-5" />
+                    </div>
+                    <h2 className="font-semibold">{mode.title}</h2>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    {mode.description}
+                  </p>
+                </motion.div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </LanguageModuleGate>
+    );
+  }
 
   return (
     <LanguageModuleGate moduleName="刻意练习" readinessKey="wordPractice">

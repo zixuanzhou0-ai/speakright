@@ -55,6 +55,12 @@ uses the online dictionary only as a fallback. Spanish, French, and Russian
 word/phrase audio is already bundled in the desktop app. Users do not install
 language audio packs separately.
 
+Release validation is intentionally conservative with ElevenLabs credits:
+normal validation checks the usage endpoint only and does not generate fresh
+audio. Free-form read-along TTS can still use ElevenLabs after the user enters a
+key, but bundled word and language-pack audio should work without spending
+additional ElevenLabs credits.
+
 ### LLM Provider
 
 Used for Chinese AI coach feedback.
@@ -83,6 +89,18 @@ credential store where supported; learning data stays local to the app.
 - training sessions and review queue
 
 No cloud backend is required for this release.
+
+## Current Internal-Test Status
+
+Last controlled-test verification: 2026-06-11.
+
+- Recommended launch path: `npm run desktop:launch-release`.
+- Build shape: Tauri static bundle, not `localhost`.
+- Bundled asset check: English `1464/1464`, Spanish `398/398`, French
+  `509/509`, Russian `407/407`, videos `210/210`.
+- Azure live validation: `220/220` sampled pronunciation assessments passed.
+- ElevenLabs validation usage: usage query only, `0` generated TTS characters.
+- Public-release blocker: Windows EXE/MSI/NSIS artifacts are still unsigned.
 
 ## Troubleshooting
 
