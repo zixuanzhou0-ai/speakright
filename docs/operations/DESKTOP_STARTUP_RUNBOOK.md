@@ -149,7 +149,8 @@ release notes and installation guide keep the unsigned warning visible.
 
 ## 2026-06-11 Release-Validation Result
 
-- Current validation update: `chore: tighten desktop release validation`.
+- Current validation update: commit `94be1d4` (`chore: tighten desktop release
+  validation`).
 - `npm.cmd run test`: 72 test files and 363 tests passed.
 - `npm.cmd run typecheck`: passed.
 - `npm.cmd run lint`: passed; Biome checked 308 files.

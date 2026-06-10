@@ -65,8 +65,8 @@ release checklist.
 
 - The current Windows artifacts are for controlled testing unless code signing
   is complete.
-- Last controlled-test verification: 2026-06-11, from the current
-  `chore: tighten desktop release validation` release-validation update.
+- Last controlled-test verification: 2026-06-11, from commit `94be1d4`
+  (`chore: tighten desktop release validation`).
 - Verified bundled assets: English word audio `1464/1464`, Spanish language-pack
   audio `398/398`, French language-pack audio `509/509`, Russian language-pack
   audio `407/407`, local videos `210/210`.

@@ -92,7 +92,7 @@ No cloud backend is required for this release.
 
 ## Current Internal-Test Status
 
-Last controlled-test verification: 2026-06-11.
+Last controlled-test verification: 2026-06-11, commit `94be1d4`.
 
 - Recommended launch path: `npm run desktop:launch-release`.
 - Build shape: Tauri static bundle, not `localhost`.
