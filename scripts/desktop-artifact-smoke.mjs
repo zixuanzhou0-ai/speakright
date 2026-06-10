@@ -191,7 +191,7 @@ async function assertStaticExport() {
     },
     {
       file: "assessment.html",
-      markers: ["DOCTYPE"],
+      markers: ['data-smoke="assessment-page"'],
     },
     {
       file: path.join("drill", "pack", "ee-ih.html"),
@@ -199,7 +199,7 @@ async function assertStaticExport() {
     },
     {
       file: path.join("phonemes", "ee.html"),
-      markers: ["DOCTYPE"],
+      markers: ['data-smoke="phoneme-detail-page"'],
     },
   ];
 

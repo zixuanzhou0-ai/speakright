@@ -5,6 +5,57 @@ import { describe, expect, it } from "vitest";
 const projectRoot = process.cwd();
 
 describe("desktop artifact smoke wiring", () => {
+  it("provides release-first launch scripts for manual desktop QA", () => {
+    const packageJson = JSON.parse(
+      readFileSync(join(projectRoot, "package.json"), "utf8"),
+    ) as { scripts: Record<string, string> };
+
+    expect(packageJson.scripts["desktop:launch-release"]).toContain(
+      "desktop-launch-release.mjs",
+    );
+    expect(packageJson.scripts["desktop:run-release"]).toContain(
+      "desktop:build",
+    );
+    expect(packageJson.scripts["desktop:run-release"]).toContain(
+      "desktop:launch-release",
+    );
+    expect(
+      packageJson.scripts["desktop:run-release"].indexOf("desktop:build"),
+    ).toBeLessThan(
+      packageJson.scripts["desktop:run-release"].indexOf(
+        "desktop:launch-release",
+      ),
+    );
+  });
+
+  it("launches the release executable without starting the dev server", () => {
+    const launchScript = readFileSync(
+      join(projectRoot, "scripts/desktop-launch-release.mjs"),
+      "utf8",
+    );
+
+    expect(launchScript).toContain("target");
+    expect(launchScript).toContain("release");
+    expect(launchScript).toContain("speakright.exe");
+    expect(launchScript).toContain("does not start localhost");
+    expect(launchScript).not.toContain("next dev");
+    expect(launchScript).not.toContain("3002");
+  });
+
+  it("documents release exe startup as the manual QA path", () => {
+    const runbook = readFileSync(
+      join(projectRoot, "docs/operations/DESKTOP_STARTUP_RUNBOOK.md"),
+      "utf8",
+    );
+
+    expect(runbook).toContain("npm run desktop:launch-release");
+    expect(runbook).toContain("npm run desktop:run-release");
+    expect(runbook).toContain("Dev Mode Is Debug-Only");
+    expect(runbook).toContain("compiling...");
+    expect(runbook).toContain("validate:internal-release");
+    expect(runbook).toContain("validate:public-release");
+  });
+
   it("runs artifact smoke after desktop build and before launching the release exe", () => {
     const packageJson = JSON.parse(
       readFileSync(join(projectRoot, "package.json"), "utf8"),
@@ -45,6 +96,8 @@ describe("desktop artifact smoke wiring", () => {
     expect(smokeScript).toContain("_next");
     expect(smokeScript).toContain("sheep.mp3");
     expect(smokeScript).toContain("sheep.png");
+    expect(smokeScript).toContain('data-smoke="assessment-page"');
+    expect(smokeScript).toContain('data-smoke="phoneme-detail-page"');
     expect(smokeScript).toContain("findNewestGeneratedCapabilities");
     expect(smokeScript).toContain("generated Tauri capabilities.json");
     expect(smokeScript).toContain("devtools");
@@ -95,6 +148,8 @@ describe("desktop artifact smoke wiring", () => {
     expect(smokeScript).toContain("releaseServedFromDevServer");
     expect(smokeScript).toContain("waitForSelector");
     expect(smokeScript).toContain('data-smoke="drill-page"');
+    expect(smokeScript).toContain('data-smoke="phoneme-detail-page"');
+    expect(smokeScript).toContain('data-smoke="assessment-page"');
     expect(smokeScript).toContain('data-smoke="desktop-readiness-checklist"');
     expect(smokeScript).toContain('data-smoke="check-microphone"');
     expect(smokeScript).toContain('data-smoke="start-three-minute-diagnosis"');

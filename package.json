@@ -8,6 +8,8 @@
     "dev:web:desktop": "next dev --turbopack --port 3002",
     "build": "tauri build",
     "desktop:build": "tauri build",
+    "desktop:launch-release": "node scripts/desktop-launch-release.mjs",
+    "desktop:run-release": "npm run desktop:build && npm run desktop:launch-release",
     "build:desktop-frontend": "next build",
     "lint": "biome lint .",
     "lint:fix": "biome lint --write .",

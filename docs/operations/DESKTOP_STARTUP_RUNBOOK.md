@@ -1,6 +1,6 @@
 # Desktop Startup Runbook
 
-Last verified: 2026-06-09
+Last verified: 2026-06-10
 
 This repository is the current SpeakRight Desktop workspace:
 
@@ -15,34 +15,56 @@ while the dev server is not running.
 
 ## Start Tomorrow
 
-Use this command from a fresh terminal:
+For user testing and release acceptance, start the static Release EXE. This is
+the same runtime shape as the packaged desktop app and does not depend on
+`localhost` or the Next dev server.
 
 ```bat
 cd /d E:\SpeakRightDesktopRepo
-npm run desktop:dev
+npm run desktop:launch-release
 ```
 
-Expected processes after startup:
+If the release executable is missing or you need fresh artifacts, build and
+launch it in one step:
 
-- `tauri dev`
-- `next dev --turbopack --port 3002`
+```bat
+cd /d E:\SpeakRightDesktopRepo
+npm run desktop:run-release
+```
+
+Expected process after startup:
+
 - `speakright.exe`
 
-The desktop window should open through Tauri. The browser tab at
+The desktop window should open through Tauri. A browser tab at
 `http://localhost:3002` is only a dev frontend view and should not be treated as
-the installed desktop app.
+the installed or release desktop app.
 
 ## If The Window Shows Localhost Refused
 
 1. Confirm the command was run from `E:\SpeakRightDesktopRepo`.
-2. Confirm the process list contains `next dev --port 3002` and `speakright.exe`.
-3. Close stale browser tabs that show `localhost refused`.
-4. Start the desktop dev command again:
+2. Close stale browser tabs that show `localhost refused`.
+3. Start the release app, not the browser tab:
+
+```bat
+cd /d E:\SpeakRightDesktopRepo
+npm run desktop:launch-release
+```
+
+If the release app itself is missing, use `npm run desktop:run-release`.
+
+## Dev Mode Is Debug-Only
+
+Use dev mode only when actively debugging code changes:
 
 ```bat
 cd /d E:\SpeakRightDesktopRepo
 npm run desktop:dev
 ```
+
+Dev mode runs `next dev --turbopack --port 3002` and can spend a long time on
+`compiling...` after large multilingual asset or route changes. Do not use it as
+the release-readiness or user-testing entrypoint.
 
 ## Current Resource Boundary
 
@@ -63,13 +85,23 @@ npm run lint
 npm run build:desktop-frontend
 ```
 
-Use this full desktop release gate before publishing installers:
+Use this full controlled-internal release gate before publishing internal-test
+installers:
 
 ```bat
-npm run validate:desktop
+npm run validate:internal-release
 ```
 
-## 2026-06-09 Handoff Notes
+Use the public release gate only after Windows code signing is configured:
+
+```bat
+npm run validate:public-release
+```
+
+Unsigned artifacts are acceptable for controlled internal testing only when the
+release notes and installation guide keep the unsigned warning visible.
+
+## 2026-06-10 Handoff Notes
 
 - English remains the stable baseline.
 - `es-ES`, `fr-FR`, and `ru-RU` remain experimental; `evidenceMastery` is still
@@ -80,4 +112,6 @@ npm run validate:desktop
   for non-English sound units to avoid overlapping long rule labels.
 - Spanish Sounds of Speech videos use original-ratio sizing with small side
   previous/next controls.
+- Manual testing should start from `npm run desktop:launch-release` or
+  `npm run desktop:run-release`, not `npm run desktop:dev`.
 - No real API key was found in the repository during the final secret scan.

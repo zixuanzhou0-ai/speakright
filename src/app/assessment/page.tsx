@@ -399,7 +399,11 @@ export default function AssessmentPage() {
 
   return (
     <LanguageModuleGate moduleName="发音诊断" readinessKey="diagnosis">
-      <div className="h-full flex flex-col px-6 py-4 overflow-y-auto scrollbar-thin">
+      <div
+        className="h-full flex flex-col px-6 py-4 overflow-y-auto scrollbar-thin"
+        data-smoke="assessment-page"
+        data-language-id={languageId}
+      >
       <h1 className="mb-2 text-2xl font-bold shrink-0">发音诊断</h1>
       <p className="mb-4 text-muted-foreground shrink-0">
         {phase.type === "report"

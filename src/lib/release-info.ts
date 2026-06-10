@@ -8,7 +8,7 @@ export const DESKTOP_RELEASE_INFO = {
   productName: "SpeakRight",
   currentVersion: DESKTOP_RELEASE_VERSION,
   channel: "internal",
-  releasedAt: "2026-05-13",
+  releasedAt: "2026-06-10",
   repositoryUrl,
   releaseUrl,
   build: {

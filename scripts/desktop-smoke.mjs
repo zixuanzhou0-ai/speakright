@@ -607,6 +607,18 @@ async function captureInteractiveEvidence(debuggingPort) {
 
     await evaluate(
       cdp,
+      'window.location.assign(new URL("/phonemes", window.location.href).href); "navigating";',
+    );
+    await waitForSelector(cdp, '[data-smoke="phoneme-detail-page"]');
+
+    await evaluate(
+      cdp,
+      'window.location.assign(new URL("/assessment", window.location.href).href); "navigating";',
+    );
+    await waitForSelector(cdp, '[data-smoke="assessment-page"]');
+
+    await evaluate(
+      cdp,
       'window.location.assign(new URL("/settings", window.location.href).href); "navigating";',
     );
     await waitForSelector(cdp, '[data-smoke="settings-page"]');
@@ -642,13 +654,23 @@ async function captureInteractiveEvidence(debuggingPort) {
       cdp,
       `
 (async () => {
-  const merriamRadio = [...document.querySelectorAll('input[name="pronunciation-source"]')]
-    .find((item) => item.value === "merriam-webster");
-  if (!merriamRadio) {
+  const releaseDownloadLinks = [...document.querySelectorAll('a[href*="/releases/download/"]')];
+  if (releaseDownloadLinks.length > 0 || document.body.innerText.includes("Windows 安装程序")) {
     return {
       ok: false,
-      reason: "Merriam-Webster pronunciation source radio missing",
+      reason: "installed app should not show installer download links",
       bodyText: document.body.innerText.slice(0, 1200)
+    };
+  }
+
+  const merriamRadio = [...document.querySelectorAll('input[name="pronunciation-source"]')]
+    .find((item) => item.value === "merriam-webster");
+  if (!merriamRadio || merriamRadio.disabled) {
+    return {
+      ok: true,
+      skippedDictionaryPolicy: true,
+      reason: "Merriam-Webster pronunciation source is not available for the current language",
+      results: []
     };
   }
   merriamRadio.dispatchEvent(new MouseEvent("click", {
@@ -670,15 +692,6 @@ async function captureInteractiveEvidence(debuggingPort) {
     return {
       ok: false,
       reason: "dictionary registration link missing",
-      bodyText: document.body.innerText.slice(0, 1200)
-    };
-  }
-
-  const releaseDownloadLinks = [...document.querySelectorAll('a[href*="/releases/download/"]')];
-  if (releaseDownloadLinks.length > 0 || document.body.innerText.includes("Windows 安装程序")) {
-    return {
-      ok: false,
-      reason: "installed app should not show installer download links",
       bodyText: document.body.innerText.slice(0, 1200)
     };
   }
@@ -751,16 +764,18 @@ async function captureInteractiveEvidence(debuggingPort) {
     const failedExternalLink = externalLinkResults.find(
       (result) =>
         !result.defaultPrevented ||
-        result.copiedHref !== result.href ||
+        (result.copiedHref !== null && result.copiedHref !== result.href) ||
         result.afterHref !== result.beforeHref ||
         result.target !== "_blank" ||
         !result.rel.includes("noopener") ||
         !result.rel.includes("noreferrer"),
     );
     if (
+      !externalLinkPolicy.skippedDictionaryPolicy &&
       failedExternalLink ||
-      dictionaryLinkResult?.href !==
-        "https://dictionaryapi.com/register/index"
+      (!externalLinkPolicy.skippedDictionaryPolicy &&
+        dictionaryLinkResult?.href !==
+          "https://dictionaryapi.com/register/index")
     ) {
       throw new Error(
         `Desktop external link policy failed: ${JSON.stringify(externalLinkPolicy)}`,

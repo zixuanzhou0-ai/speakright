@@ -350,7 +350,12 @@ export function PhonemeDetailPage() {
     languageId !== "en-US" && isRuleLikeSoundUnit(phoneme);
 
   return (
-    <div className="h-full flex flex-col px-6 py-4 overflow-hidden">
+    <div
+      className="h-full flex flex-col px-6 py-4 overflow-hidden"
+      data-smoke="phoneme-detail-page"
+      data-language-id={languageId}
+      data-sound-unit={phoneme.slug}
+    >
       {/* Two-column layout */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_2fr] flex-1 min-h-0">
         {/* ====== LEFT COLUMN ====== */}

@@ -86,7 +86,9 @@ No cloud backend is required for this release.
 
 For developer startup issues, especially `localhost refused`, first check
 `docs/operations/DESKTOP_STARTUP_RUNBOOK.md` and confirm you are using
-`E:\SpeakRightDesktopRepo`.
+`E:\SpeakRightDesktopRepo`. For release-style testing, use
+`npm run desktop:launch-release` or `npm run desktop:run-release`; do not treat a
+browser `localhost` tab as the desktop app.
 
 If recording does not work:
 

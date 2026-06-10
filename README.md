@@ -20,11 +20,24 @@ not included in this release track.
 
 ```bat
 cd /d E:\SpeakRightDesktopRepo
-npm run tauri:dev
+npm run desktop:dev
 ```
 
 The dev build uses the Tauri `devUrl` configured in `src-tauri/tauri.conf.json`.
 Release builds must use the static export in `out/`.
+
+For manual QA and user testing, launch the Release EXE instead of dev mode:
+
+```bat
+cd /d E:\SpeakRightDesktopRepo
+npm run desktop:launch-release
+```
+
+If the Release EXE is missing or stale:
+
+```bat
+npm run desktop:run-release
+```
 
 For the daily desktop startup checklist, see
 `docs/operations/DESKTOP_STARTUP_RUNBOOK.md`.
@@ -35,10 +48,11 @@ For the daily desktop startup checklist, see
 npm run test
 npm run typecheck
 npm run lint
-npm run validate:desktop
+npm run validate:internal-release
 ```
 
-Use `npm run desktop:build` when you need fresh Windows artifacts.
+Use `npm run desktop:build` when you need fresh Windows artifacts. Use
+`npm run validate:public-release` only after Windows code signing is configured.
 
 ## Release Notes
 

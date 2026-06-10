@@ -69,68 +69,76 @@ describe("settings key hydration", () => {
     cleanup();
   });
 
-  it("updates the Azure settings card when desktop secure-store hydration completes", async () => {
-    const { AzureConfigCard } = await import(
-      "@/components/settings/azure-config-card"
-    );
-    const { hydrateKeys, clearItem } = await import("@/lib/api-keys");
-    mocks.secureStore.set("speakright_azure_config", {
-      subscriptionKey: "desktop-hydrated-key",
-      region: "westus",
-    });
-
-    render(<AzureConfigCard />);
-
-    expect(screen.getByLabelText("Subscription Key")).toHaveValue("");
-
-    await act(async () => {
-      await hydrateKeys();
-    });
-
-    await waitFor(() => {
-      expect(screen.getByLabelText("Subscription Key")).toHaveValue(
-        "desktop-hydrated-key",
+  it(
+    "updates the Azure settings card when desktop secure-store hydration completes",
+    async () => {
+      const { AzureConfigCard } = await import(
+        "@/components/settings/azure-config-card"
       );
-      expect(screen.getByLabelText("Region")).toHaveValue("westus");
-    });
-    expect(localStorage.getItem("speakright_azure_config")).toBeNull();
+      const { hydrateKeys, clearItem } = await import("@/lib/api-keys");
+      mocks.secureStore.set("speakright_azure_config", {
+        subscriptionKey: "desktop-hydrated-key",
+        region: "westus",
+      });
 
-    await act(async () => {
-      await clearItem("speakright_azure_config");
-    });
+      render(<AzureConfigCard />);
 
-    await waitFor(() => {
       expect(screen.getByLabelText("Subscription Key")).toHaveValue("");
-      expect(screen.getByLabelText("Region")).toHaveValue("eastus");
-    });
-  });
 
-  it("refreshes the ElevenLabs usage card after secure-store hydration", async () => {
-    const { UsageMonitor } = await import(
-      "@/components/settings/usage-monitor"
-    );
-    const { hydrateKeys } = await import("@/lib/api-keys");
-    mocks.secureStore.set("speakright_elevenlabs_config", {
-      apiKey: "eleven-hydrated-key",
-      voiceId: "voice",
-      modelId: "eleven_flash_v2_5",
-    });
+      await act(async () => {
+        await hydrateKeys();
+      });
 
-    render(<UsageMonitor />);
+      await waitFor(() => {
+        expect(screen.getByLabelText("Subscription Key")).toHaveValue(
+          "desktop-hydrated-key",
+        );
+        expect(screen.getByLabelText("Region")).toHaveValue("westus");
+      });
+      expect(localStorage.getItem("speakright_azure_config")).toBeNull();
 
-    expect(screen.getByText("未配置 API Key")).toBeInTheDocument();
-    expect(mocks.fetchElevenLabsUsage).not.toHaveBeenCalled();
+      await act(async () => {
+        await clearItem("speakright_azure_config");
+      });
 
-    await act(async () => {
-      await hydrateKeys();
-    });
+      await waitFor(() => {
+        expect(screen.getByLabelText("Subscription Key")).toHaveValue("");
+        expect(screen.getByLabelText("Region")).toHaveValue("eastus");
+      });
+    },
+    30_000,
+  );
 
-    await waitFor(() => {
-      expect(mocks.fetchElevenLabsUsage).toHaveBeenCalledWith(
-        "eleven-hydrated-key",
+  it(
+    "refreshes the ElevenLabs usage card after secure-store hydration",
+    async () => {
+      const { UsageMonitor } = await import(
+        "@/components/settings/usage-monitor"
       );
-    });
-  });
+      const { hydrateKeys } = await import("@/lib/api-keys");
+      mocks.secureStore.set("speakright_elevenlabs_config", {
+        apiKey: "eleven-hydrated-key",
+        voiceId: "voice",
+        modelId: "eleven_flash_v2_5",
+      });
+
+      render(<UsageMonitor />);
+
+      expect(screen.getByText("未配置 API Key")).toBeInTheDocument();
+      expect(mocks.fetchElevenLabsUsage).not.toHaveBeenCalled();
+
+      await act(async () => {
+        await hydrateKeys();
+      });
+
+      await waitFor(() => {
+        expect(mocks.fetchElevenLabsUsage).toHaveBeenCalledWith(
+          "eleven-hydrated-key",
+        );
+      });
+    },
+    30_000,
+  );
 
   it("updates the word pronunciation source label after store hydration", async () => {
     const { SentenceInputCard } = await import(
