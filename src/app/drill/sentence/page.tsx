@@ -12,7 +12,7 @@ import { DrillSummaryCard } from "@/components/drill/drill-summary";
 import { DrillTeaching } from "@/components/drill/drill-teaching";
 import { useLanguageConfig } from "@/hooks/use-api-keys";
 import { useDrillSession } from "@/hooks/use-drill-session";
-import { useMwPronunciation } from "@/hooks/use-mw-pronunciation";
+import { useWordPronunciation } from "@/hooks/use-word-pronunciation";
 import { useTtsAligned } from "@/hooks/use-tts-aligned";
 import { buildSentenceDrillItems } from "@/lib/drill-utils";
 import {
@@ -32,7 +32,7 @@ export default function SentenceDrillPage() {
     azureLocale: languageProfile.azureLocale,
     scoreHistoryPrefix: languageId,
   });
-  const mw = useMwPronunciation();
+  const wordAudio = useWordPronunciation();
   const tts = useTtsAligned();
 
   const handleStart = useCallback(
@@ -80,15 +80,15 @@ export default function SentenceDrillPage() {
     if (drill.phase.type === "teaching" || drill.phase.type === "feedback") {
       const item = "item" in drill.phase ? drill.phase.item : null;
       if (item) {
-        // For sentences use TTS, for single words use MW
+        // For sentences use aligned TTS; for single words use the word-audio pipeline.
         if (item.text.split(/\s+/).length > 1) {
           tts.speak(item.text, { speed: 0.85, languageId });
         } else {
-          mw.playWord(item.text, "blue", languageId);
+          wordAudio.playWord(item.text, "blue", languageId);
         }
       }
     }
-  }, [drill.phase, mw, tts, languageId]);
+  }, [drill.phase, wordAudio, tts, languageId]);
 
   const handleRestart = useCallback(() => {
     if (!drill.config) return;
@@ -128,7 +128,7 @@ export default function SentenceDrillPage() {
           <SentenceLessonView
             config={drill.config}
             onReady={drill.finishPhonemeLesson}
-            mw={mw}
+            wordAudio={wordAudio}
             languageId={languageId}
           />
         )}
@@ -138,8 +138,8 @@ export default function SentenceDrillPage() {
             item={drill.phase.item}
             index={drill.phase.index}
             total={drill.items.length}
-            isPlaying={mw.isPlaying || tts.isPlaying}
-            isLoading={mw.isLoading || tts.isLoading}
+            isPlaying={wordAudio.isPlaying || tts.isPlaying}
+            isLoading={wordAudio.isLoading || tts.isLoading}
             onPlay={handlePlayReference}
             onReady={drill.finishTeaching}
           />
@@ -215,12 +215,12 @@ export default function SentenceDrillPage() {
 function SentenceLessonView({
   config,
   onReady,
-  mw,
+  wordAudio,
   languageId,
 }: {
   config: { phonemeSlug: string; itemCount: number };
   onReady: () => void;
-  mw: {
+  wordAudio: {
     playWord: (w: string, v?: "blue" | "pink", l?: LanguageId) => void;
     isPlaying: boolean;
     isLoading: boolean;
@@ -237,9 +237,9 @@ function SentenceLessonView({
       itemCount={config.itemCount}
       kind="sentence"
       onReady={onReady}
-      onPlayExample={(word) => mw.playWord(word, "blue", languageId)}
-      isPlayingExample={mw.isPlaying}
-      isLoadingExample={mw.isLoading}
+      onPlayExample={(word) => wordAudio.playWord(word, "blue", languageId)}
+      isPlayingExample={wordAudio.isPlaying}
+      isLoadingExample={wordAudio.isLoading}
     />
   );
 }

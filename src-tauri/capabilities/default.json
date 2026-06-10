@@ -51,12 +51,6 @@
           "url": "https://ark.cn-beijing.volces.com/**"
         },
         {
-          "url": "https://dictionaryapi.com/**"
-        },
-        {
-          "url": "https://media.merriam-webster.com/**"
-        },
-        {
           "url": "https://dict.youdao.com/**"
         }
       ]

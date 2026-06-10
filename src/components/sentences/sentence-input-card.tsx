@@ -6,7 +6,6 @@ import { ReadAlongText } from "@/components/audio/read-along-text";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
-import { usePronunciationConfig } from "@/hooks/use-api-keys";
 import type { FreePracticeTargetPreview } from "@/lib/free-practice-transfer";
 
 const MAX_CHARS = 150;
@@ -21,10 +20,10 @@ interface SentenceInputCardProps {
   trimmedText: string;
   wordIpa: string | null;
   hasPlayedWord: boolean;
-  // MW pronunciation
-  mwIsPlaying: boolean;
-  mwIsLoading: boolean;
-  onMwPlay: (word: string) => void;
+  // Word pronunciation
+  wordAudioIsPlaying: boolean;
+  wordAudioIsLoading: boolean;
+  onWordAudioPlay: (word: string) => void;
   // TTS
   ttsIsPlaying: boolean;
   ttsIsLoading: boolean;
@@ -46,9 +45,9 @@ export function SentenceInputCard({
   trimmedText,
   wordIpa,
   hasPlayedWord,
-  mwIsPlaying,
-  mwIsLoading,
-  onMwPlay,
+  wordAudioIsPlaying,
+  wordAudioIsLoading,
+  onWordAudioPlay,
   ttsIsPlaying,
   ttsIsLoading,
   ttsError,
@@ -58,7 +57,6 @@ export function SentenceInputCard({
   targetPreview,
   onListen,
 }: SentenceInputCardProps) {
-  const pronunciationConfig = usePronunciationConfig();
   const charCount = sentence.length;
 
   return (
@@ -93,7 +91,7 @@ export function SentenceInputCard({
         </div>
         {isWordMode ? (
           <div className="relative flex h-[100px] w-[100px] shrink-0 items-center justify-center">
-            {mwIsPlaying && (
+            {wordAudioIsPlaying && (
               <>
                 <motion.span
                   className="absolute rounded-full border-2 border-primary/40"
@@ -135,10 +133,10 @@ export function SentenceInputCard({
               whileTap={{ scale: 0.9 }}
               transition={{ type: "spring", stiffness: 400, damping: 15 }}
               onClick={onListen}
-              disabled={!trimmedText || mwIsLoading}
+              disabled={!trimmedText || wordAudioIsLoading}
               className="relative z-10 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {mwIsLoading ? (
+              {wordAudioIsLoading ? (
                 <Loader2 className="h-8 w-8 animate-spin" />
               ) : (
                 <Volume2 className="h-8 w-8" />
@@ -169,7 +167,7 @@ export function SentenceInputCard({
       {trimmedText && (
         <p className="text-xs text-muted-foreground/70">
           {isWordMode
-            ? `单词模式 · 发音来自${pronunciationConfig.source === "merriam-webster" ? "韦氏词典" : "有道词典"}`
+            ? "单词模式 · 本地音频优先，有道兜底"
             : "句子模式 · 发音来自 ElevenLabs"}
         </p>
       )}
@@ -227,7 +225,7 @@ export function SentenceInputCard({
             >
               <motion.div
                 animate={
-                  mwIsPlaying
+                  wordAudioIsPlaying
                     ? { scale: 1.02, backgroundColor: "var(--primary-bg)" }
                     : { scale: 1, backgroundColor: "rgba(0, 0, 0, 0)" }
                 }
@@ -242,7 +240,7 @@ export function SentenceInputCard({
                     {wordIpa}
                   </span>
                 )}
-                {hasPlayedWord && !mwIsPlaying && (
+                {hasPlayedWord && !wordAudioIsPlaying && (
                   <motion.button
                     type="button"
                     initial={{ opacity: 0 }}
@@ -250,7 +248,7 @@ export function SentenceInputCard({
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                     transition={{ type: "spring", stiffness: 400, damping: 15 }}
-                    onClick={() => onMwPlay(trimmedText)}
+                    onClick={() => onWordAudioPlay(trimmedText)}
                     className="absolute right-2 bottom-2 flex h-7 w-7 items-center justify-center rounded-full bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary cursor-pointer"
                   >
                     <RotateCcw className="h-3.5 w-3.5" />

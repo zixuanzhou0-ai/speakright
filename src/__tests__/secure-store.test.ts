@@ -68,14 +68,19 @@ describe("secure store", () => {
       "@/lib/secure-store"
     );
 
-    await secureStoreSet("speakright_mw_config", { apiKey: "dev-secret" });
+    await secureStoreSet("speakright_llm_config", {
+      provider: "openai",
+      apiKey: "dev-secret",
+      baseUrl: "https://api.openai.com/v1",
+      model: "gpt-4o-mini",
+    });
 
     expect(mocks.invoke).not.toHaveBeenCalled();
-    expect(localStorage.getItem("speakright_mw_config")).toContain(
+    expect(localStorage.getItem("speakright_llm_config")).toContain(
       "dev-secret",
     );
-    await expect(secureStoreGet("speakright_mw_config")).resolves.toEqual({
-      apiKey: "dev-secret",
-    });
+    await expect(secureStoreGet("speakright_llm_config")).resolves.toMatchObject(
+      { apiKey: "dev-secret" },
+    );
   });
 });

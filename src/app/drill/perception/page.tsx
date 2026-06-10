@@ -15,7 +15,7 @@ import { useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useLanguageConfig } from "@/hooks/use-api-keys";
-import { useMwPronunciation } from "@/hooks/use-mw-pronunciation";
+import { useWordPronunciation } from "@/hooks/use-word-pronunciation";
 import {
   buildHvptSession,
   buildHvptTrainingSession,
@@ -64,7 +64,7 @@ export default function PerceptionDrillPage() {
   const [trials, setTrials] = useState<HvptTrial[]>([]);
   const [activeSlot, setActiveSlot] = useState<PlayingSlot>(null);
   const { languageId } = useLanguageConfig();
-  const pronunciation = useMwPronunciation();
+  const pronunciation = useWordPronunciation();
 
   const recommendedIds = useMemo(
     () =>

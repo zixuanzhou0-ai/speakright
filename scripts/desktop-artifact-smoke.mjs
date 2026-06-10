@@ -233,7 +233,6 @@ async function assertStaticExportPolicy() {
     "/api/elevenlabs",
     "/api/llm",
     "/api/pronunciation",
-    "/api/merriam-webster",
   ];
 
   for (const filePath of textArtifactFiles(outDir)) {

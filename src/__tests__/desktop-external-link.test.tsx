@@ -46,12 +46,12 @@ describe("DesktopExternalLink", () => {
     );
 
     render(
-      <DesktopExternalLink href="https://dictionaryapi.com/register/index">
-        dictionaryapi.com
+      <DesktopExternalLink href="https://example.com/docs">
+        example.com
       </DesktopExternalLink>,
     );
 
-    const link = screen.getByRole("link", { name: "dictionaryapi.com" });
+    const link = screen.getByRole("link", { name: "example.com" });
     const event = new MouseEvent("click", {
       bubbles: true,
       cancelable: true,
@@ -60,14 +60,14 @@ describe("DesktopExternalLink", () => {
 
     expect(link).toHaveAttribute(
       "href",
-      "https://dictionaryapi.com/register/index",
+      "https://example.com/docs",
     );
     expect(link).toHaveAttribute("target", "_blank");
     expect(link).toHaveAttribute("rel", "noopener noreferrer");
     expect(event.defaultPrevented).toBe(true);
     await waitFor(() => {
       expect(mocks.openUrl).toHaveBeenCalledWith(
-        "https://dictionaryapi.com/register/index",
+        "https://example.com/docs",
       );
     });
     expect(mocks.writeText).not.toHaveBeenCalled();
@@ -81,12 +81,12 @@ describe("DesktopExternalLink", () => {
     );
 
     render(
-      <DesktopExternalLink href="https://dictionaryapi.com/register/index">
-        dictionaryapi.com
+      <DesktopExternalLink href="https://example.com/docs">
+        example.com
       </DesktopExternalLink>,
     );
 
-    const link = screen.getByRole("link", { name: "dictionaryapi.com" });
+    const link = screen.getByRole("link", { name: "example.com" });
     const event = new MouseEvent("click", {
       bubbles: true,
       cancelable: true,
@@ -106,12 +106,12 @@ describe("DesktopExternalLink", () => {
     );
 
     render(
-      <DesktopExternalLink href="https://dictionaryapi.com/register/index">
-        dictionaryapi.com
+      <DesktopExternalLink href="https://example.com/docs">
+        example.com
       </DesktopExternalLink>,
     );
 
-    const link = screen.getByRole("link", { name: "dictionaryapi.com" });
+    const link = screen.getByRole("link", { name: "example.com" });
     const event = new MouseEvent("click", {
       bubbles: true,
       cancelable: true,
@@ -121,10 +121,10 @@ describe("DesktopExternalLink", () => {
     expect(event.defaultPrevented).toBe(true);
     await waitFor(() => {
       expect(mocks.openUrl).toHaveBeenCalledWith(
-        "https://dictionaryapi.com/register/index",
+        "https://example.com/docs",
       );
       expect(mocks.toastError).toHaveBeenCalledWith(
-        "请手动打开：https://dictionaryapi.com/register/index",
+        "请手动打开：https://example.com/docs",
       );
     });
   });

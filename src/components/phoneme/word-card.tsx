@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { useMwPronunciation } from "@/hooks/use-mw-pronunciation";
+import { useWordPronunciation } from "@/hooks/use-word-pronunciation";
 import { cn } from "@/lib/utils";
 import type { LanguageId } from "@/types/language";
 import type { KeywordEntry } from "@/types/phoneme";
@@ -35,7 +35,7 @@ export function WordCard({
   totalCount,
   languageId = "en-US",
 }: WordCardProps) {
-  const mw = useMwPronunciation();
+  const wordAudio = useWordPronunciation();
   const [direction, setDirection] = useState<number>(1);
 
   const handlePrev = useCallback(() => {
@@ -51,10 +51,10 @@ export function WordCard({
   }, [onNext]);
 
   const handlePlay = () => {
-    mw.playWord(currentWord.word, "blue", languageId);
+    wordAudio.playWord(currentWord.word, "blue", languageId);
   };
 
-  const isActive = mw.isPlaying || mw.isLoading;
+  const isActive = wordAudio.isPlaying || wordAudio.isLoading;
   const displayWord = currentWord.stressText ?? currentWord.word;
 
   return (
@@ -110,7 +110,7 @@ export function WordCard({
                   {/* Play button with ripple animation */}
                   <div className="relative flex items-center justify-center pt-1">
                     {/* Ripple rings — visible only while playing */}
-                    {mw.isPlaying && (
+                    {wordAudio.isPlaying && (
                       <>
                         <motion.span
                           className="absolute rounded-full border-2 border-primary/40"
@@ -150,7 +150,7 @@ export function WordCard({
                     <motion.button
                       type="button"
                       onClick={handlePlay}
-                      disabled={mw.isLoading}
+                      disabled={wordAudio.isLoading}
                       whileHover={{ scale: 1.15 }}
                       whileTap={{ scale: 0.9 }}
                       transition={springTransition}
@@ -163,7 +163,7 @@ export function WordCard({
                           : "text-muted-foreground",
                       )}
                     >
-                      {mw.isLoading ? (
+                      {wordAudio.isLoading ? (
                         <Loader2 className="h-7 w-7 animate-spin" />
                       ) : (
                         <Volume2 className="h-7 w-7" />

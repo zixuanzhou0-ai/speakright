@@ -17,14 +17,8 @@ export interface LLMConfig {
   model: string;
 }
 
-export interface MerriamWebsterConfig {
-  apiKey: string;
-}
-
-export type PronunciationSource = "youdao" | "merriam-webster";
-
 export interface PronunciationConfig {
-  source: PronunciationSource;
+  source: "youdao";
 }
 
 export type { LanguageConfig } from "@/types/language";

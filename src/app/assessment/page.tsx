@@ -21,7 +21,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useLanguageConfig } from "@/hooks/use-api-keys";
 import { useAzureAssessment } from "@/hooks/use-azure-assessment";
-import { useMwPronunciation } from "@/hooks/use-mw-pronunciation";
+import { useWordPronunciation } from "@/hooks/use-word-pronunciation";
 import { useRecorder } from "@/hooks/use-recorder";
 import { useRecordingQuality } from "@/hooks/use-recording-quality";
 import {
@@ -182,7 +182,7 @@ export default function AssessmentPage() {
 
   const recorder = useRecorder({ maxDurationMs: 60_000 });
   const azure = useAzureAssessment();
-  const mw = useMwPronunciation();
+  const wordAudio = useWordPronunciation();
   const recordingQuality = useRecordingQuality(recorder.audioBlob, {
     expectedMode: phase.type === "paragraph" ? "paragraph" : "word",
     minDurationMs: phase.type === "paragraph" ? 1200 : 500,
@@ -524,11 +524,13 @@ export default function AssessmentPage() {
                     type="button"
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
-                    onClick={() => mw.playWord(currentWord.word, "blue", languageId)}
-                    disabled={mw.isLoading}
+                    onClick={() =>
+                      wordAudio.playWord(currentWord.word, "blue", languageId)
+                    }
+                    disabled={wordAudio.isLoading}
                     className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary cursor-pointer disabled:opacity-50"
                   >
-                    {mw.isLoading ? (
+                    {wordAudio.isLoading ? (
                       <Loader2 className="h-5 w-5 animate-spin" />
                     ) : (
                       <Volume2 className="h-5 w-5" />

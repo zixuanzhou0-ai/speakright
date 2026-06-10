@@ -3,7 +3,7 @@
  *
  * 重音数据来源（按优先级）：
  * 1. 静态词库 IPA（phoneme-data + word-bank，约 100+ 多音节词已标注 ˈ/ˌ）
- * 2. 韦氏词典 API（Collegiate API 返回 mw 字段含重音标记）
+ * 2. 旧版本地缓存（不再请求外部词典）
  * 3. 优雅降级（无数据时不显示重音）
  */
 
@@ -134,15 +134,15 @@ export function parseIpaStress(
 }
 
 /**
- * 从韦氏词典 mw 字符串解析重音
+ * 从旧版词典音节字符串解析重音
  *
- * MW Collegiate API 的 mw 字段用 `-` 分隔音节，ˈ/ˌ 标记紧贴在重读音节前。
+ * 旧版词典缓存用 `-` 分隔音节，ˈ/ˌ 标记紧贴在重读音节前。
  *
- * @example parseMwStress("ˌaf-tər-ˈnün") → ["secondary", "none", "primary"]
- * @example parseMwStress("ˈshü-gər") → ["primary", "none"]
+ * @example parseDictionaryStress("ˌaf-tər-ˈnün") → ["secondary", "none", "primary"]
+ * @example parseDictionaryStress("ˈshü-gər") → ["primary", "none"]
  */
-export function parseMwStress(mw: string): StressLevel[] {
-  const parts = mw.split("-");
+export function parseDictionaryStress(value: string): StressLevel[] {
+  const parts = value.split("-");
 
   return parts.map((part) => {
     const trimmed = part.trim();

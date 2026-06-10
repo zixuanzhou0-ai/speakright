@@ -28,7 +28,7 @@ shown in release artifacts.
 ## Dictionary Pronunciation
 
 - Purpose: single-word replay on word cards.
-- English may use Youdao or Merriam-Webster depending on Settings.
+- English practice words prefer bundled local audio, then fall back to Youdao online pronunciation.
 - Non-English word cards first use bundled local audio. Dictionary APIs are only
   fallback helpers and should not be described as the source of truth.
 

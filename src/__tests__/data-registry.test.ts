@@ -86,9 +86,6 @@ describe("data registry", () => {
   it("exports non-secret desktop app preferences from the Tauri store", async () => {
     const { buildLocalDataExport } = await import("@/lib/data-registry");
     mocks.storeGet.mockImplementation(async (key: string) => {
-      if (key === "speakright_pronunciation_config") {
-        return { source: "merriam-webster" };
-      }
       if (key === "speakright_coach_mode") {
         return "hard";
       }
@@ -98,7 +95,6 @@ describe("data registry", () => {
     const snapshot = await buildLocalDataExport();
 
     expect(snapshot.appSettings).toEqual({
-      speakright_pronunciation_config: { source: "merriam-webster" },
       speakright_coach_mode: "hard",
     });
     expect(
@@ -184,7 +180,7 @@ describe("data registry", () => {
     const summary = getLocalDataSummary();
 
     expect(summary.configuredApiKeys).toBe(2);
-    expect(summary.apiKeySlots).toBe(4);
+    expect(summary.apiKeySlots).toBe(3);
   });
 
   it("deletes learning data and caches while preserving app settings and keys", async () => {
@@ -274,12 +270,9 @@ describe("data registry", () => {
     expect(mocks.secureStoreDelete).not.toHaveBeenCalled();
   });
 
-  it("reports app setting delete failures and preserves the local fallback copy", async () => {
+  it("reports app setting delete failures and clears the local fallback copy", async () => {
     const { deleteAllLocalData } = await import("@/lib/data-registry");
-    localStorage.setItem(
-      "speakright_pronunciation_config",
-      '{"source":"merriam-webster"}',
-    );
+    localStorage.setItem("speakright_coach_mode", '"strict"');
     mocks.storeDelete.mockRejectedValueOnce(
       new Error("settings store delete failed"),
     );
@@ -288,9 +281,7 @@ describe("data registry", () => {
       "settings store delete failed",
     );
 
-    expect(localStorage.getItem("speakright_pronunciation_config")).toBe(
-      '{"source":"merriam-webster"}',
-    );
+    expect(localStorage.getItem("speakright_coach_mode")).toBeNull();
   });
 
   it("can include API keys in the full local reset", async () => {

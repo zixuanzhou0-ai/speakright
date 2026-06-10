@@ -33,8 +33,8 @@ vi.mock("@/hooks/use-llm-feedback", () => ({
   }),
 }));
 
-vi.mock("@/hooks/use-mw-pronunciation", () => ({
-  useMwPronunciation: () => ({
+vi.mock("@/hooks/use-word-pronunciation", () => ({
+  useWordPronunciation: () => ({
     playWord: vi.fn(),
     stop: vi.fn(),
     isLoading: false,

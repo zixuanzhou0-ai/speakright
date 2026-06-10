@@ -12,7 +12,6 @@ import { parseAzureResult } from "@/lib/azure-speech";
 import { buildL1ErrorContext, matchL1Errors } from "@/lib/l1-error-patterns";
 import { getDesktopLlmPolicyError } from "@/lib/llm-providers";
 import { buildFeedbackPrompt } from "@/lib/llm-prompt";
-import { parseMwStress } from "@/lib/syllable-stress";
 import { apiFetch } from "@/lib/tauri-http";
 import { isTauriEnvironment } from "@/lib/tauri-runtime";
 import { isSentence } from "@/lib/utils";
@@ -652,34 +651,14 @@ export function streamLlmFeedback(
   });
 }
 
-// ─── Pronunciation (Youdao / Merriam-Webster) ───────────
-
-function getAudioSubdir(filename: string): string {
-  if (filename.startsWith("bix")) return "bix";
-  if (filename.startsWith("gg")) return "gg";
-  if (/^[0-9]/.test(filename) || /^[^a-zA-Z]/.test(filename)) return "number";
-  return filename.charAt(0);
-}
-
-function buildMwDictionaryUrl(word: string, mwKey: string): string {
-  return `https://dictionaryapi.com/api/v3/references/collegiate/json/${encodeURIComponent(word)}?key=${encodeURIComponent(mwKey)}`;
-}
+// ─── Pronunciation (Youdao online fallback) ───────────
 
 /** Fetch pronunciation audio — returns blob */
-export async function fetchPronunciation(
-  word: string,
-  source: "youdao" | "merriam-webster",
-  mwKey?: string,
-): Promise<Blob> {
+export async function fetchPronunciation(word: string): Promise<Blob> {
   const w = word.trim().normalize("NFC").toLowerCase();
   if (!w) throw new Error("Missing word");
   if (w.length > 80) throw new Error("Text too long (max 80 chars)");
 
-  if (source === "merriam-webster") {
-    if (!mwKey) throw new Error("Missing MW API key");
-    if (/\s/.test(w)) throw new Error("Merriam-Webster only supports single words");
-    return fetchMwAudio(w, mwKey);
-  }
   return fetchYoudaoAudio(w);
 }
 
@@ -688,93 +667,4 @@ async function fetchYoudaoAudio(word: string): Promise<Blob> {
   const res = await apiFetch(url);
   if (!res.ok) throw new Error(`Youdao returned ${res.status}`);
   return audioBlobFromResponse(res);
-}
-
-async function fetchMwAudio(word: string, mwKey: string): Promise<Blob> {
-  const apiUrl = buildMwDictionaryUrl(word, mwKey);
-  const dictRes = await apiFetch(apiUrl);
-  if (!dictRes.ok) throw new Error(`MW API error: ${dictRes.status}`);
-
-  const data = await dictRes.json();
-  if (
-    !Array.isArray(data) ||
-    data.length === 0 ||
-    typeof data[0] === "string"
-  ) {
-    throw new Error("Word not found in dictionary");
-  }
-
-  const audioFilename = data[0]?.hwi?.prs?.[0]?.sound?.audio;
-  if (!audioFilename) throw new Error("No pronunciation audio available");
-
-  const subdir = getAudioSubdir(audioFilename);
-  const audioUrl = `https://media.merriam-webster.com/audio/prons/en/us/mp3/${subdir}/${audioFilename}.mp3`;
-  const audioRes = await apiFetch(audioUrl);
-  if (!audioRes.ok) throw new Error("Failed to fetch audio from MW");
-  return audioBlobFromResponse(audioRes);
-}
-
-// ─── Merriam-Webster Stress ─────────────────────────────
-
-/** Fetch stress pattern from MW dictionary */
-export async function fetchMwStress(
-  word: string,
-  mwKey: string,
-): Promise<{
-  stress: ReturnType<typeof parseMwStress> | null;
-  mw: string | null;
-}> {
-  const w = word.trim().toLowerCase();
-  if (!w || w.length > 50 || /\s/.test(w)) return { stress: null, mw: null };
-
-  const apiUrl = buildMwDictionaryUrl(w, mwKey);
-  const res = await apiFetch(apiUrl);
-  if (!res.ok) return { stress: null, mw: null };
-
-  const data = await res.json();
-  if (
-    !Array.isArray(data) ||
-    data.length === 0 ||
-    typeof data[0] === "string"
-  ) {
-    return { stress: null, mw: null };
-  }
-
-  const mw = data[0]?.hwi?.prs?.[0]?.mw as string | undefined;
-  if (!mw) return { stress: null, mw: null };
-
-  const hasStress = mw.includes("ˈ") || mw.includes("ˌ");
-  return { stress: hasStress ? parseMwStress(mw) : null, mw };
-}
-
-/** Test MW API key */
-export async function testMw(mwKey: string): Promise<{
-  success: boolean;
-  word?: string;
-  hasAudio?: boolean;
-  error?: string;
-}> {
-  const apiUrl = buildMwDictionaryUrl("hello", mwKey);
-  const res = await apiFetch(apiUrl);
-  if (!res.ok)
-    return { success: false, error: `MW API returned ${res.status}` };
-
-  const data = await res.json();
-  if (
-    !Array.isArray(data) ||
-    data.length === 0 ||
-    typeof data[0] === "string"
-  ) {
-    return { success: false, error: "Invalid API key or unexpected response" };
-  }
-
-  const entry = data[0];
-  if (entry?.meta?.id) {
-    return {
-      success: true,
-      word: entry.meta.id,
-      hasAudio: !!entry?.hwi?.prs?.[0]?.sound?.audio,
-    };
-  }
-  return { success: false, error: "Unexpected API response format" };
 }

@@ -10,7 +10,7 @@ import { DrillSummaryCard } from "@/components/drill/drill-summary";
 import { Button } from "@/components/ui/button";
 import { useAzureAssessment } from "@/hooks/use-azure-assessment";
 import { useCoachMode, useLanguageConfig } from "@/hooks/use-api-keys";
-import { useMwPronunciation } from "@/hooks/use-mw-pronunciation";
+import { useWordPronunciation } from "@/hooks/use-word-pronunciation";
 import { useRecorder } from "@/hooks/use-recorder";
 import { getPhonemeAccuracy } from "@/lib/azure-phoneme-map";
 import { computeDrillSummary, getPassThreshold } from "@/lib/drill-utils";
@@ -48,7 +48,7 @@ export default function ContrastDrillPage() {
 
   const recorder = useRecorder();
   const azure = useAzureAssessment();
-  const mw = useMwPronunciation();
+  const wordAudio = useWordPronunciation();
   const coachMode = useCoachMode();
 
   const threshold = getPassThreshold(coachMode);
@@ -69,11 +69,11 @@ export default function ContrastDrillPage() {
       : null;
 
   const handlePlayA = () => {
-    if (currentPair) mw.playWord(currentPair.wordA, "blue", languageId);
+    if (currentPair) wordAudio.playWord(currentPair.wordA, "blue", languageId);
   };
 
   const handlePlayB = () => {
-    if (currentPair) mw.playWord(currentPair.wordB, "blue", languageId);
+    if (currentPair) wordAudio.playWord(currentPair.wordB, "blue", languageId);
   };
 
   const handleStartRecordA = () => {
@@ -321,10 +321,10 @@ export default function ContrastDrillPage() {
                     type="button"
                     whileTap={{ scale: 0.9 }}
                     onClick={handlePlayA}
-                    disabled={mw.isLoading}
+                    disabled={wordAudio.isLoading}
                     className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary cursor-pointer"
                   >
-                    {mw.isLoading ? (
+                    {wordAudio.isLoading ? (
                       <Loader2 className="h-5 w-5 animate-spin" />
                     ) : (
                       <Volume2 className="h-5 w-5" />
@@ -342,10 +342,10 @@ export default function ContrastDrillPage() {
                     type="button"
                     whileTap={{ scale: 0.9 }}
                     onClick={handlePlayB}
-                    disabled={mw.isLoading}
+                    disabled={wordAudio.isLoading}
                     className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary cursor-pointer"
                   >
-                    {mw.isLoading ? (
+                    {wordAudio.isLoading ? (
                       <Loader2 className="h-5 w-5 animate-spin" />
                     ) : (
                       <Volume2 className="h-5 w-5" />

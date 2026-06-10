@@ -28,7 +28,7 @@ import { Button } from "@/components/ui/button";
 import { useLanguageConfig } from "@/hooks/use-api-keys";
 import { useAzureAssessment } from "@/hooks/use-azure-assessment";
 import { useLlmFeedback } from "@/hooks/use-llm-feedback";
-import { useMwPronunciation } from "@/hooks/use-mw-pronunciation";
+import { useWordPronunciation } from "@/hooks/use-word-pronunciation";
 import { useRecorder } from "@/hooks/use-recorder";
 import { useRecordingQuality } from "@/hooks/use-recording-quality";
 import { useTtsAligned } from "@/hooks/use-tts-aligned";
@@ -227,7 +227,7 @@ export default function TrainingPackPage() {
   const qualityReportsRef = useRef<RecordingQualityReport[]>([]);
   const recorder = useRecorder();
   const azure = useAzureAssessment();
-  const mw = useMwPronunciation();
+  const wordAudio = useWordPronunciation();
   const tts = useTtsAligned();
   const llm = useLlmFeedback();
 
@@ -553,7 +553,7 @@ export default function TrainingPackPage() {
     if (reference.split(/\s+/).length > 1) {
       tts.speak(reference, { speed: 0.85, languageId });
     } else {
-      mw.playWord(reference.toLowerCase(), "blue", languageId);
+      wordAudio.playWord(reference.toLowerCase(), "blue", languageId);
     }
   };
 
@@ -561,7 +561,7 @@ export default function TrainingPackPage() {
     if (text.split(/\s+/).length > 1) {
       tts.speak(text, { speed: 0.75, languageId });
     } else {
-      mw.playWord(text.toLowerCase(), "blue", languageId);
+      wordAudio.playWord(text.toLowerCase(), "blue", languageId);
     }
   };
 
@@ -572,7 +572,7 @@ export default function TrainingPackPage() {
     const word =
       slot === "A" ? wordA : slot === "B" ? wordB : xIsA ? wordA : wordB;
     setActiveSlot(slot);
-    mw.playWord(
+    wordAudio.playWord(
       word.toLowerCase(),
       slot === "B" || (slot === "X" && !xIsA) ? "pink" : "blue",
       languageId,
@@ -928,7 +928,7 @@ export default function TrainingPackPage() {
                 onPlaySlot={playSlot}
                 onAnswer={answerPerception}
                 onNext={nextPerception}
-                isPlaying={mw.isPlaying}
+                isPlaying={wordAudio.isPlaying}
               />
             )}
 
@@ -955,8 +955,8 @@ export default function TrainingPackPage() {
                 remediationAttempt={remediationAttempt}
                 isRecording={recorder.isRecording}
                 isAssessing={azure.isLoading}
-                isPlaying={mw.isPlaying || tts.isPlaying}
-                isLoadingReference={mw.isLoading || tts.isLoading}
+                isPlaying={wordAudio.isPlaying || tts.isPlaying}
+                isLoadingReference={wordAudio.isLoading || tts.isLoading}
                 audioBlob={recorder.audioBlob}
                 stream={recorder.stream}
                 qualityReport={recordingQuality.report}

@@ -13,13 +13,10 @@ import { ScoreSummary } from "@/components/scoring/score-summary";
 import { Button } from "@/components/ui/button";
 import { useAudioPlayer } from "@/hooks/use-audio-player";
 import { useAzureAssessment } from "@/hooks/use-azure-assessment";
-import {
-  useLanguageConfig,
-  useMerriamWebsterConfig,
-} from "@/hooks/use-api-keys";
+import { useLanguageConfig } from "@/hooks/use-api-keys";
 import type { FeedbackData } from "@/hooks/use-llm-feedback";
 import { useLlmFeedback } from "@/hooks/use-llm-feedback";
-import { useMwPronunciation } from "@/hooks/use-mw-pronunciation";
+import { useWordPronunciation } from "@/hooks/use-word-pronunciation";
 import { useRecorder } from "@/hooks/use-recorder";
 import {
   loadSession,
@@ -56,8 +53,7 @@ export function PhonemeDetailPage() {
   const llm = useLlmFeedback();
   const playback = useAudioPlayer();
   const chartAudio = useAudioPlayer();
-  const mw = useMwPronunciation();
-  const mwConfig = useMerriamWebsterConfig();
+  const wordAudio = useWordPronunciation();
   const [lastChartPlay, setLastChartPlay] = useState<"normal" | "slow">("slow");
   const [wordDirection, setWordDirection] = useState<number>(1);
   const autoAssessTriggered = useRef(false);
@@ -79,7 +75,7 @@ export function PhonemeDetailPage() {
     { syllable: string; grapheme?: string; accuracyScore: number }[]
   >(`${sessionPrefix}:syllables`, []);
 
-  // Annotate syllables with stress data (static IPA lookup → MW API fallback)
+  // Annotate syllables with stress data (static IPA lookup → legacy local cache).
   const stressedSyllables = useSyllableStress(
     languageId === "en-US" ? (currentWord?.word ?? null) : null,
     selectedWordSyllables,
@@ -116,19 +112,17 @@ export function PhonemeDetailPage() {
     }
   }, [llm.feedback, llm.hasFeedback, llm.isStreaming, sessionPrefix]);
 
-  // Hybrid word pool: static keywords + extended word bank + MW cached words
+  // Deterministic word pool: static keywords + extended word bank.
   const wordPool = useMemo(
     () => (phoneme ? getWordPool(phoneme.slug, phoneme.keywords) : []),
     [phoneme],
   );
-  const [hasMwConfig, setHasMwConfig] = useState(false);
   const [practicedCount, setPracticedCount] = useState(0);
   useEffect(() => {
-    setHasMwConfig(!!mwConfig?.apiKey);
     setPracticedCount(
       getPracticedWordsForLanguage(languageId, phoneme?.slug ?? "").length,
     );
-  }, [languageId, phoneme?.slug, mwConfig?.apiKey]);
+  }, [languageId, phoneme?.slug]);
 
   useEffect(() => {
     if (!phoneme) {
@@ -296,7 +290,7 @@ export function PhonemeDetailPage() {
 
   const handlePlayRecording = () => {
     if (recorder.audioBlob) {
-      mw.stop();
+      wordAudio.stop();
       chartAudio.stop();
       playback.playBlob(recorder.audioBlob);
     }
@@ -344,7 +338,7 @@ export function PhonemeDetailPage() {
     );
   }
 
-  const isWordActive = mw.isPlaying || mw.isLoading;
+  const isWordActive = wordAudio.isPlaying || wordAudio.isLoading;
   const breakdownLabel = languageId === "en-US" ? "音标拆解" : "发音拆解";
   const showRuleEvidenceNote =
     languageId !== "en-US" && isRuleLikeSoundUnit(phoneme);
@@ -368,18 +362,17 @@ export function PhonemeDetailPage() {
             wordDirection={wordDirection}
             wordPoolSize={wordPool.length}
             practicedCount={practicedCount}
-            hasMwConfig={languageId === "en-US" && hasMwConfig}
             isWordActive={isWordActive}
-            mwIsLoading={mw.isLoading}
+            wordIsLoading={wordAudio.isLoading}
             lastChartPlay={lastChartPlay}
             onPrevious={handlePrevious}
             onNext={handleNext}
             onSetWordDirection={setWordDirection}
             onSetLastChartPlay={setLastChartPlay}
-            onPlayWord={(word, voice) => mw.playWord(word, voice, languageId)}
+            onPlayWord={(word, voice) => wordAudio.playWord(word, voice, languageId)}
             onPlayChartAudio={(path) => chartAudio.play(path)}
             onStopPlayback={() => playback.stop()}
-            onStopMw={() => mw.stop()}
+            onStopWordAudio={() => wordAudio.stop()}
             onStopChartAudio={() => chartAudio.stop()}
             wordHistoryLength={wordHistory.length}
             canGoPrevious={

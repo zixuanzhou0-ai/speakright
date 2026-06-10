@@ -11,7 +11,7 @@ import { useLanguageConfig } from "@/hooks/use-api-keys";
 import { useAzureAssessment } from "@/hooks/use-azure-assessment";
 import type { FeedbackData } from "@/hooks/use-llm-feedback";
 import { useLlmFeedback } from "@/hooks/use-llm-feedback";
-import { useMwPronunciation } from "@/hooks/use-mw-pronunciation";
+import { useWordPronunciation } from "@/hooks/use-word-pronunciation";
 import { useRecorder } from "@/hooks/use-recorder";
 import { useRecordingQuality } from "@/hooks/use-recording-quality";
 import {
@@ -62,7 +62,7 @@ export default function SentencesPage() {
   );
 
   const tts = useTtsAligned();
-  const mw = useMwPronunciation();
+  const wordAudio = useWordPronunciation();
   // Free-practice page allows up to 150-char sentences; bump cap to 60s so
   // paragraph-length input isn't cut off mid-read.
   const recorder = useRecorder({ maxDurationMs: 60_000 });
@@ -152,7 +152,7 @@ export default function SentencesPage() {
     llm.reset();
     recorder.reset();
     tts.reset();
-    mw.stop();
+    wordAudio.stop();
     playback.stop();
     setTransferSummary(null);
     recordingQuality.reset();
@@ -162,7 +162,7 @@ export default function SentencesPage() {
     llm,
     recorder,
     tts,
-    mw,
+    wordAudio,
     playback,
     recordingQuality,
     setSentence,
@@ -174,14 +174,14 @@ export default function SentencesPage() {
     if (previousTrimmedTextRef.current === trimmedText) return;
     previousTrimmedTextRef.current = trimmedText;
     tts.reset();
-    mw.stop();
+    wordAudio.stop();
     playback.stop();
     setHasPlayedWord(false);
-  }, [trimmedText, tts, mw, playback]);
+  }, [trimmedText, tts, wordAudio, playback]);
 
   useEffect(() => {
-    if (mw.isPlaying) setHasPlayedWord(true);
-  }, [mw.isPlaying]);
+    if (wordAudio.isPlaying) setHasPlayedWord(true);
+  }, [wordAudio.isPlaying]);
 
   useEffect(() => {
     setHasPlayedWord(false);
@@ -192,12 +192,12 @@ export default function SentencesPage() {
     playback.stop();
     if (isWordMode) {
       tts.reset();
-      mw.playWord(trimmedText, "blue", languageId);
+      wordAudio.playWord(trimmedText, "blue", languageId);
     } else {
-      mw.stop();
+      wordAudio.stop();
       tts.speak(trimmedText, { speed, languageId });
     }
-  }, [trimmedText, isWordMode, playback, tts, mw, speed, languageId]);
+  }, [trimmedText, isWordMode, playback, tts, wordAudio, speed, languageId]);
 
   const handleRecordStart = useCallback(() => {
     llm.reset();
@@ -305,23 +305,23 @@ export default function SentencesPage() {
       setSelectedWord(word);
       playback.stop();
       tts.reset();
-      mw.playWord(word.word, "blue", languageId);
+      wordAudio.playWord(word.word, "blue", languageId);
     },
-    [playback, tts, mw, languageId],
+    [playback, tts, wordAudio, languageId],
   );
 
   const handlePlayRecording = useCallback(() => {
     if (recorder.audioBlob) {
-      mw.stop();
+      wordAudio.stop();
       tts.reset();
       playback.playBlob(recorder.audioBlob);
     }
-  }, [recorder.audioBlob, mw, tts, playback]);
+  }, [recorder.audioBlob, wordAudio, tts, playback]);
 
   const handleClear = useCallback(() => {
     playback.stop();
     tts.reset();
-    mw.stop();
+    wordAudio.stop();
     recorder.reset();
     azure.reset();
     llm.reset();
@@ -329,15 +329,15 @@ export default function SentencesPage() {
     setTransferSummary(null);
     recordingQuality.reset();
     autoAssessTriggered.current = false;
-  }, [playback, tts, mw, recorder, azure, llm, recordingQuality]);
+  }, [playback, tts, wordAudio, recorder, azure, llm, recordingQuality]);
 
-  const handleMwPlay = useCallback(
+  const handleWordAudioPlay = useCallback(
     (word: string) => {
       playback.stop();
       tts.reset();
-      mw.playWord(word, "blue", languageId);
+      wordAudio.playWord(word, "blue", languageId);
     },
-    [playback, tts, mw, languageId],
+    [playback, tts, wordAudio, languageId],
   );
 
   const handleRetryFeedback = useCallback(() => {
@@ -393,9 +393,9 @@ export default function SentencesPage() {
             trimmedText={trimmedText}
             wordIpa={wordIpa}
             hasPlayedWord={hasPlayedWord}
-            mwIsPlaying={mw.isPlaying}
-            mwIsLoading={mw.isLoading}
-            onMwPlay={handleMwPlay}
+            wordAudioIsPlaying={wordAudio.isPlaying}
+            wordAudioIsLoading={wordAudio.isLoading}
+            onWordAudioPlay={handleWordAudioPlay}
             ttsIsPlaying={tts.isPlaying}
             ttsIsLoading={tts.isLoading}
             ttsError={tts.error}

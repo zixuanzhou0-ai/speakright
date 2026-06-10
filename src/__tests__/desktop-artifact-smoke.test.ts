@@ -109,7 +109,6 @@ describe("desktop artifact smoke wiring", () => {
     expect(smokeScript).toContain("/api/elevenlabs");
     expect(smokeScript).toContain("/api/llm");
     expect(smokeScript).toContain("/api/pronunciation");
-    expect(smokeScript).toContain("/api/merriam-webster");
     expect(smokeScript).toContain("core:default");
     expect(smokeScript).toContain("store:default");
     expect(smokeScript).toContain("http://");

@@ -12,7 +12,7 @@ import { DrillSummaryCard } from "@/components/drill/drill-summary";
 import { DrillTeaching } from "@/components/drill/drill-teaching";
 import { useLanguageConfig } from "@/hooks/use-api-keys";
 import { useDrillSession } from "@/hooks/use-drill-session";
-import { useMwPronunciation } from "@/hooks/use-mw-pronunciation";
+import { useWordPronunciation } from "@/hooks/use-word-pronunciation";
 import { buildWordDrillItems } from "@/lib/drill-utils";
 import { getLanguagePhonemeBySlug } from "@/lib/language-phonemes";
 import { getLanguageProfile } from "@/lib/language-profiles";
@@ -26,7 +26,7 @@ export default function WordDrillPage() {
     azureLocale: languageProfile.azureLocale,
     scoreHistoryPrefix: languageId,
   });
-  const mw = useMwPronunciation();
+  const wordAudio = useWordPronunciation();
 
   const handleStart = useCallback(
     (phonemeSlug: string, itemCount: number, passThreshold: number) => {
@@ -47,9 +47,9 @@ export default function WordDrillPage() {
   const handlePlayReference = useCallback(() => {
     if (drill.phase.type === "teaching" || drill.phase.type === "feedback") {
       const item = "item" in drill.phase ? drill.phase.item : null;
-      if (item) mw.playWord(item.text, "blue", languageId);
+      if (item) wordAudio.playWord(item.text, "blue", languageId);
     }
-  }, [drill.phase, mw, languageId]);
+  }, [drill.phase, wordAudio, languageId]);
 
   const handleRestart = useCallback(() => {
     if (!drill.config) return;
@@ -91,7 +91,7 @@ export default function WordDrillPage() {
           <PhonemeLessonView
             config={drill.config}
             onReady={drill.finishPhonemeLesson}
-            mw={mw}
+            wordAudio={wordAudio}
             languageId={languageId}
           />
         )}
@@ -101,8 +101,8 @@ export default function WordDrillPage() {
             item={drill.phase.item}
             index={drill.phase.index}
             total={drill.items.length}
-            isPlaying={mw.isPlaying}
-            isLoading={mw.isLoading}
+            isPlaying={wordAudio.isPlaying}
+            isLoading={wordAudio.isLoading}
             onPlay={handlePlayReference}
             onReady={drill.finishTeaching}
           />
@@ -178,12 +178,12 @@ export default function WordDrillPage() {
 function PhonemeLessonView({
   config,
   onReady,
-  mw,
+  wordAudio,
   languageId,
 }: {
   config: { phonemeSlug: string; itemCount: number };
   onReady: () => void;
-  mw: {
+  wordAudio: {
     playWord: (w: string, v?: "blue" | "pink", l?: LanguageId) => void;
     isPlaying: boolean;
     isLoading: boolean;
@@ -200,9 +200,9 @@ function PhonemeLessonView({
       itemCount={config.itemCount}
       kind="word"
       onReady={onReady}
-      onPlayExample={(word) => mw.playWord(word, "blue", languageId)}
-      isPlayingExample={mw.isPlaying}
-      isLoadingExample={mw.isLoading}
+      onPlayExample={(word) => wordAudio.playWord(word, "blue", languageId)}
+      isPlayingExample={wordAudio.isPlaying}
+      isLoadingExample={wordAudio.isLoading}
     />
   );
 }

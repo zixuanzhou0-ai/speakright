@@ -10,7 +10,6 @@ import type {
   ElevenLabsConfig,
   LanguageConfig,
   LLMConfig,
-  MerriamWebsterConfig,
   PronunciationConfig,
 } from "@/types/api-keys";
 import { normalizeLanguageId } from "@/lib/language-profiles";
@@ -21,7 +20,6 @@ const STORAGE_KEYS = {
   azure: "speakright_azure_config",
   elevenlabs: "speakright_elevenlabs_config",
   llm: "speakright_llm_config",
-  merriamWebster: "speakright_mw_config",
   pronunciation: "speakright_pronunciation_config",
   language: "speakright_language_config",
   coachMode: "speakright_coach_mode",
@@ -32,10 +30,8 @@ export const API_KEY_STORAGE_KEYS = [
   STORAGE_KEYS.azure,
   STORAGE_KEYS.elevenlabs,
   STORAGE_KEYS.llm,
-  STORAGE_KEYS.merriamWebster,
 ] as const;
 export const APP_PREFERENCE_STORAGE_KEYS = [
-  STORAGE_KEYS.pronunciation,
   STORAGE_KEYS.language,
   STORAGE_KEYS.coachMode,
 ] as const;
@@ -280,21 +276,11 @@ export function setLlmConfig(config: LLMConfig): void {
   setItem(STORAGE_KEYS.llm, config);
 }
 
-// Merriam-Webster
-export function getMerriamWebsterConfig(): MerriamWebsterConfig | null {
-  return getItem<MerriamWebsterConfig>(STORAGE_KEYS.merriamWebster);
-}
-
-export function setMerriamWebsterConfig(config: MerriamWebsterConfig): void {
-  setItem(STORAGE_KEYS.merriamWebster, config);
-}
-
 export function getApiKeySummary(): ApiKeySummary {
   const configs = [
     hasTextSecret(getAzureConfig()?.subscriptionKey),
     hasTextSecret(getElevenLabsConfig()?.apiKey),
     hasTextSecret(getLlmConfig()?.apiKey),
-    hasTextSecret(getMerriamWebsterConfig()?.apiKey),
   ];
   return {
     configured: configs.filter(Boolean).length,
@@ -304,14 +290,11 @@ export function getApiKeySummary(): ApiKeySummary {
 
 // Pronunciation source
 export function getPronunciationConfig(): PronunciationConfig {
-  return (
-    getItem<PronunciationConfig>(STORAGE_KEYS.pronunciation) ??
-    DEFAULT_PRONUNCIATION_CONFIG
-  );
+  return DEFAULT_PRONUNCIATION_CONFIG;
 }
 
 export function setPronunciationConfig(config: PronunciationConfig): void {
-  setItem(STORAGE_KEYS.pronunciation, config);
+  setItem(STORAGE_KEYS.pronunciation, { source: config.source });
 }
 
 // Learning language
@@ -346,7 +329,6 @@ export function subscribeToStorage(callback: () => void): () => void {
       e.key === STORAGE_KEYS.azure ||
       e.key === STORAGE_KEYS.elevenlabs ||
       e.key === STORAGE_KEYS.llm ||
-      e.key === STORAGE_KEYS.merriamWebster ||
       e.key === STORAGE_KEYS.pronunciation ||
       e.key === STORAGE_KEYS.language ||
       e.key === STORAGE_KEYS.coachMode

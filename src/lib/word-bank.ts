@@ -22,6 +22,10 @@ export const WORD_BANK: Record<string, KeywordEntry[]> = {
     { word: "cream", ipa: "/kriːm/" },
     { word: "sweet", ipa: "/swiːt/" },
     { word: "freeze", ipa: "/friːz/" },
+    { word: "east", ipa: "/iːst/" },
+    { word: "dream", ipa: "/driːm/" },
+    { word: "leave", ipa: "/liːv/" },
+    { word: "breathe", ipa: "/briːð/" },
   ],
 
   // /ɪ/ — near-close near-front unrounded
@@ -38,6 +42,10 @@ export const WORD_BANK: Record<string, KeywordEntry[]> = {
     { word: "print", ipa: "/prɪnt/" },
     { word: "grin", ipa: "/ɡrɪn/" },
     { word: "brick", ipa: "/brɪk/" },
+    { word: "list", ipa: "/lɪst/" },
+    { word: "dinner", ipa: "/ˈdɪnər/" },
+    { word: "picture", ipa: "/ˈpɪktʃər/" },
+    { word: "busy", ipa: "/ˈbɪzi/" },
   ],
 
   // /eɪ/ — diphthong
@@ -54,6 +62,10 @@ export const WORD_BANK: Record<string, KeywordEntry[]> = {
     { word: "grade", ipa: "/ɡreɪd/" },
     { word: "flame", ipa: "/fleɪm/" },
     { word: "chase", ipa: "/tʃeɪs/" },
+    { word: "game", ipa: "/ɡeɪm/" },
+    { word: "awake", ipa: "/əˈweɪk/" },
+    { word: "paper", ipa: "/ˈpeɪpər/" },
+    { word: "escape", ipa: "/ɪˈskeɪp/" },
   ],
 
   // /e/ — open-mid front unrounded
@@ -70,6 +82,10 @@ export const WORD_BANK: Record<string, KeywordEntry[]> = {
     { word: "spell", ipa: "/spel/" },
     { word: "press", ipa: "/pres/" },
     { word: "blend", ipa: "/blend/" },
+    { word: "end", ipa: "/end/" },
+    { word: "friend", ipa: "/frend/" },
+    { word: "every", ipa: "/ˈevri/" },
+    { word: "heavy", ipa: "/ˈhevi/" },
   ],
 
   // /æ/ — near-open front unrounded
@@ -86,6 +102,10 @@ export const WORD_BANK: Record<string, KeywordEntry[]> = {
     { word: "clap", ipa: "/klæp/" },
     { word: "math", ipa: "/mæθ/" },
     { word: "ranch", ipa: "/ræntʃ/" },
+    { word: "apple", ipa: "/ˈæpəl/" },
+    { word: "angry", ipa: "/ˈæŋɡri/" },
+    { word: "family", ipa: "/ˈfæməli/" },
+    { word: "travel", ipa: "/ˈtrævəl/" },
   ],
 
   // /ɑː/ — open back unrounded
@@ -102,6 +122,10 @@ export const WORD_BANK: Record<string, KeywordEntry[]> = {
     { word: "cop", ipa: "/kɑːp/" },
     { word: "dot", ipa: "/dɑːt/" },
     { word: "stock", ipa: "/stɑːk/" },
+    { word: "lot", ipa: "/lɑːt/" },
+    { word: "possible", ipa: "/ˈpɑːsəbəl/" },
+    { word: "office", ipa: "/ˈɑːfɪs/" },
+    { word: "body", ipa: "/ˈbɑːdi/" },
   ],
 
   // /ɔː/ — open-mid back rounded
@@ -118,6 +142,10 @@ export const WORD_BANK: Record<string, KeywordEntry[]> = {
     { word: "storm", ipa: "/stɔːrm/" },
     { word: "warm", ipa: "/wɔːrm/" },
     { word: "horse", ipa: "/hɔːrs/" },
+    { word: "talk", ipa: "/tɔːk/" },
+    { word: "coffee", ipa: "/ˈkɔːfi/" },
+    { word: "bought", ipa: "/bɔːt/" },
+    { word: "daughter", ipa: "/ˈdɔːtər/" },
   ],
 
   // /oʊ/ — diphthong
@@ -134,6 +162,10 @@ export const WORD_BANK: Record<string, KeywordEntry[]> = {
     { word: "hope", ipa: "/hoʊp/" },
     { word: "throw", ipa: "/θroʊ/" },
     { word: "globe", ipa: "/ɡloʊb/" },
+    { word: "own", ipa: "/oʊn/" },
+    { word: "alone", ipa: "/əˈloʊn/" },
+    { word: "open", ipa: "/ˈoʊpən/" },
+    { word: "coat", ipa: "/koʊt/" },
   ],
 
   // /ʊ/ — near-close near-back rounded
@@ -150,6 +182,10 @@ export const WORD_BANK: Record<string, KeywordEntry[]> = {
     { word: "should", ipa: "/ʃʊd/" },
     { word: "sugar", ipa: "/ˈʃʊɡər/" },
     { word: "wool", ipa: "/wʊl/" },
+    { word: "took", ipa: "/tʊk/" },
+    { word: "cushion", ipa: "/ˈkʊʃən/" },
+    { word: "woman", ipa: "/ˈwʊmən/" },
+    { word: "pudding", ipa: "/ˈpʊdɪŋ/" },
   ],
 
   // /uː/ — close back rounded
@@ -166,6 +202,10 @@ export const WORD_BANK: Record<string, KeywordEntry[]> = {
     { word: "shoot", ipa: "/ʃuːt/" },
     { word: "boot", ipa: "/buːt/" },
     { word: "goose", ipa: "/ɡuːs/" },
+    { word: "move", ipa: "/muːv/" },
+    { word: "soon", ipa: "/suːn/" },
+    { word: "student", ipa: "/ˈstuːdənt/" },
+    { word: "tooth", ipa: "/tuːθ/" },
   ],
 
   // /ʌ/ — open-mid back unrounded
@@ -182,6 +222,10 @@ export const WORD_BANK: Record<string, KeywordEntry[]> = {
     { word: "trust", ipa: "/trʌst/" },
     { word: "blood", ipa: "/blʌd/" },
     { word: "month", ipa: "/mʌnθ/" },
+    { word: "under", ipa: "/ˈʌndər/" },
+    { word: "enough", ipa: "/ɪˈnʌf/" },
+    { word: "trouble", ipa: "/ˈtrʌbəl/" },
+    { word: "country", ipa: "/ˈkʌntri/" },
   ],
 
   // /ə/ — mid central (schwa)
@@ -198,6 +242,10 @@ export const WORD_BANK: Record<string, KeywordEntry[]> = {
     { word: "suggest", ipa: "/səˈdʒest/" },
     { word: "supply", ipa: "/səˈplaɪ/" },
     { word: "suppose", ipa: "/səˈpoʊz/" },
+    { word: "today", ipa: "/təˈdeɪ/" },
+    { word: "around", ipa: "/əˈraʊnd/" },
+    { word: "polite", ipa: "/pəˈlaɪt/" },
+    { word: "control", ipa: "/kənˈtroʊl/" },
   ],
 
   // /ɜːr/ — rhotacized mid central
@@ -214,6 +262,10 @@ export const WORD_BANK: Record<string, KeywordEntry[]> = {
     { word: "verb", ipa: "/vɜːrb/" },
     { word: "merge", ipa: "/mɜːrdʒ/" },
     { word: "worth", ipa: "/wɜːrθ/" },
+    { word: "purple", ipa: "/ˈpɜːrpəl/" },
+    { word: "perfect", ipa: "/ˈpɜːrfɪkt/" },
+    { word: "early", ipa: "/ˈɜːrli/" },
+    { word: "circle", ipa: "/ˈsɜːrkəl/" },
   ],
 
   // /aɪ/ — diphthong
@@ -230,6 +282,10 @@ export const WORD_BANK: Record<string, KeywordEntry[]> = {
     { word: "slide", ipa: "/slaɪd/" },
     { word: "stripe", ipa: "/straɪp/" },
     { word: "blind", ipa: "/blaɪnd/" },
+    { word: "ice", ipa: "/aɪs/" },
+    { word: "arrive", ipa: "/əˈraɪv/" },
+    { word: "behind", ipa: "/bɪˈhaɪnd/" },
+    { word: "quiet", ipa: "/ˈkwaɪət/" },
   ],
 
   // /aʊ/ — diphthong
@@ -246,6 +302,10 @@ export const WORD_BANK: Record<string, KeywordEntry[]> = {
     { word: "power", ipa: "/ˈpaʊər/" },
     { word: "flour", ipa: "/flaʊr/" },
     { word: "frown", ipa: "/fraʊn/" },
+    { word: "allow", ipa: "/əˈlaʊ/" },
+    { word: "about", ipa: "/əˈbaʊt/" },
+    { word: "outside", ipa: "/ˌaʊtˈsaɪd/" },
+    { word: "mountain", ipa: "/ˈmaʊntən/" },
   ],
 
   // /ɔɪ/ — diphthong
@@ -262,6 +322,10 @@ export const WORD_BANK: Record<string, KeywordEntry[]> = {
     { word: "destroy", ipa: "/dɪˈstrɔɪ/" },
     { word: "employ", ipa: "/ɪmˈplɔɪ/" },
     { word: "joyful", ipa: "/ˈdʒɔɪfl/" },
+    { word: "annoy", ipa: "/əˈnɔɪ/" },
+    { word: "oyster", ipa: "/ˈɔɪstər/" },
+    { word: "pointed", ipa: "/ˈpɔɪntɪd/" },
+    { word: "poison", ipa: "/ˈpɔɪzən/" },
   ],
 
   // ===== Consonants =====
@@ -280,6 +344,10 @@ export const WORD_BANK: Record<string, KeywordEntry[]> = {
     { word: "sharp", ipa: "/ʃɑːrp/" },
     { word: "stamp", ipa: "/stæmp/" },
     { word: "split", ipa: "/splɪt/" },
+    { word: "pack", ipa: "/pæk/" },
+    { word: "appear", ipa: "/əˈpɪr/" },
+    { word: "pocket", ipa: "/ˈpɑːkɪt/" },
+    { word: "copy", ipa: "/ˈkɑːpi/" },
   ],
 
   // /b/ — voiced bilabial plosive
@@ -296,6 +364,10 @@ export const WORD_BANK: Record<string, KeywordEntry[]> = {
     { word: "block", ipa: "/blɑːk/" },
     { word: "tribe", ipa: "/traɪb/" },
     { word: "bulb", ipa: "/bʌlb/" },
+    { word: "bag", ipa: "/bæɡ/" },
+    { word: "able", ipa: "/ˈeɪbəl/" },
+    { word: "rubber", ipa: "/ˈrʌbər/" },
+    { word: "describe", ipa: "/dɪˈskraɪb/" },
   ],
 
   // /t/ — voiceless alveolar plosive
@@ -312,6 +384,10 @@ export const WORD_BANK: Record<string, KeywordEntry[]> = {
     { word: "tight", ipa: "/taɪt/" },
     { word: "treat", ipa: "/triːt/" },
     { word: "script", ipa: "/skrɪpt/" },
+    { word: "time", ipa: "/taɪm/" },
+    { word: "city", ipa: "/ˈsɪti/" },
+    { word: "little", ipa: "/ˈlɪtəl/" },
+    { word: "twenty", ipa: "/ˈtwenti/" },
   ],
 
   // /d/ — voiced alveolar plosive
@@ -328,6 +404,10 @@ export const WORD_BANK: Record<string, KeywordEntry[]> = {
     { word: "draft", ipa: "/dræft/" },
     { word: "judge", ipa: "/dʒʌdʒ/" },
     { word: "shade", ipa: "/ʃeɪd/" },
+    { word: "done", ipa: "/dʌn/" },
+    { word: "ready", ipa: "/ˈredi/" },
+    { word: "today", ipa: "/təˈdeɪ/" },
+    { word: "ladder", ipa: "/ˈlædər/" },
   ],
 
   // /k/ — voiceless velar plosive
@@ -344,6 +424,10 @@ export const WORD_BANK: Record<string, KeywordEntry[]> = {
     { word: "knock", ipa: "/nɑːk/" },
     { word: "blank", ipa: "/blæŋk/" },
     { word: "strike", ipa: "/straɪk/" },
+    { word: "kind", ipa: "/kaɪnd/" },
+    { word: "camera", ipa: "/ˈkæmərə/" },
+    { word: "cookie", ipa: "/ˈkʊki/" },
+    { word: "because", ipa: "/bɪˈkɔːz/" },
   ],
 
   // /ɡ/ — voiced velar plosive
@@ -360,6 +444,10 @@ export const WORD_BANK: Record<string, KeywordEntry[]> = {
     { word: "ghost", ipa: "/ɡoʊst/" },
     { word: "grind", ipa: "/ɡraɪnd/" },
     { word: "guide", ipa: "/ɡaɪd/" },
+    { word: "game", ipa: "/ɡeɪm/" },
+    { word: "begin", ipa: "/bɪˈɡɪn/" },
+    { word: "bigger", ipa: "/ˈbɪɡər/" },
+    { word: "target", ipa: "/ˈtɑːrɡɪt/" },
   ],
 
   // /f/ — voiceless labiodental fricative
@@ -376,6 +464,10 @@ export const WORD_BANK: Record<string, KeywordEntry[]> = {
     { word: "frost", ipa: "/frɔːst/" },
     { word: "shelf", ipa: "/ʃelf/" },
     { word: "cliff", ipa: "/klɪf/" },
+    { word: "fire", ipa: "/ˈfaɪər/" },
+    { word: "offer", ipa: "/ˈɔːfər/" },
+    { word: "before", ipa: "/bɪˈfɔːr/" },
+    { word: "enough", ipa: "/ɪˈnʌf/" },
   ],
 
   // /v/ — voiced labiodental fricative
@@ -392,6 +484,10 @@ export const WORD_BANK: Record<string, KeywordEntry[]> = {
     { word: "stove", ipa: "/stoʊv/" },
     { word: "shave", ipa: "/ʃeɪv/" },
     { word: "glove", ipa: "/ɡlʌv/" },
+    { word: "visit", ipa: "/ˈvɪzɪt/" },
+    { word: "over", ipa: "/ˈoʊvər/" },
+    { word: "alive", ipa: "/əˈlaɪv/" },
+    { word: "cover", ipa: "/ˈkʌvər/" },
   ],
 
   // /θ/ — voiceless dental fricative
@@ -408,6 +504,10 @@ export const WORD_BANK: Record<string, KeywordEntry[]> = {
     { word: "growth", ipa: "/ɡroʊθ/" },
     { word: "strength", ipa: "/streŋθ/" },
     { word: "thumb", ipa: "/θʌm/" },
+    { word: "thirty", ipa: "/ˈθɜːrti/" },
+    { word: "method", ipa: "/ˈmeθəd/" },
+    { word: "athlete", ipa: "/ˈæθliːt/" },
+    { word: "something", ipa: "/ˈsʌmθɪŋ/" },
   ],
 
   // /ð/ — voiced dental fricative
@@ -424,6 +524,10 @@ export const WORD_BANK: Record<string, KeywordEntry[]> = {
     { word: "soothe", ipa: "/suːð/" },
     { word: "within", ipa: "/wɪˈðɪn/" },
     { word: "rhythm", ipa: "/ˈrɪðəm/" },
+    { word: "either", ipa: "/ˈiːðər/" },
+    { word: "another", ipa: "/əˈnʌðər/" },
+    { word: "without", ipa: "/wɪˈðaʊt/" },
+    { word: "clothing", ipa: "/ˈkloʊðɪŋ/" },
   ],
 
   // /s/ — voiceless alveolar fricative
@@ -440,6 +544,10 @@ export const WORD_BANK: Record<string, KeywordEntry[]> = {
     { word: "smooth", ipa: "/smuːð/" },
     { word: "switch", ipa: "/swɪtʃ/" },
     { word: "split", ipa: "/splɪt/" },
+    { word: "say", ipa: "/seɪ/" },
+    { word: "pencil", ipa: "/ˈpensəl/" },
+    { word: "answer", ipa: "/ˈænsər/" },
+    { word: "receive", ipa: "/rɪˈsiːv/" },
   ],
 
   // /z/ — voiced alveolar fricative
@@ -456,6 +564,10 @@ export const WORD_BANK: Record<string, KeywordEntry[]> = {
     { word: "close", ipa: "/kloʊz/" },
     { word: "cause", ipa: "/kɔːz/" },
     { word: "bronze", ipa: "/brɑːnz/" },
+    { word: "zero", ipa: "/ˈzɪroʊ/" },
+    { word: "visit", ipa: "/ˈvɪzɪt/" },
+    { word: "busy", ipa: "/ˈbɪzi/" },
+    { word: "amazing", ipa: "/əˈmeɪzɪŋ/" },
   ],
 
   // /ʃ/ — voiceless postalveolar fricative
@@ -472,6 +584,10 @@ export const WORD_BANK: Record<string, KeywordEntry[]> = {
     { word: "sharp", ipa: "/ʃɑːrp/" },
     { word: "shout", ipa: "/ʃaʊt/" },
     { word: "push", ipa: "/pʊʃ/" },
+    { word: "special", ipa: "/ˈspeʃəl/" },
+    { word: "machine", ipa: "/məˈʃiːn/" },
+    { word: "social", ipa: "/ˈsoʊʃəl/" },
+    { word: "pressure", ipa: "/ˈpreʃər/" },
   ],
 
   // /ʒ/ — voiced postalveolar fricative
@@ -488,6 +604,10 @@ export const WORD_BANK: Record<string, KeywordEntry[]> = {
     { word: "invasion", ipa: "/ɪnˈveɪʒn/" },
     { word: "confusion", ipa: "/kənˈfjuːʒn/" },
     { word: "collision", ipa: "/kəˈlɪʒn/" },
+    { word: "television", ipa: "/ˈteləvɪʒən/" },
+    { word: "usually", ipa: "/ˈjuːʒuəli/" },
+    { word: "Asia", ipa: "/ˈeɪʒə/" },
+    { word: "casual", ipa: "/ˈkæʒuəl/" },
   ],
 
   // /tʃ/ — voiceless postalveolar affricate
@@ -504,6 +624,10 @@ export const WORD_BANK: Record<string, KeywordEntry[]> = {
     { word: "sketch", ipa: "/sketʃ/" },
     { word: "charm", ipa: "/tʃɑːrm/" },
     { word: "pitch", ipa: "/pɪtʃ/" },
+    { word: "kitchen", ipa: "/ˈkɪtʃən/" },
+    { word: "question", ipa: "/ˈkwestʃən/" },
+    { word: "future", ipa: "/ˈfjuːtʃər/" },
+    { word: "picture", ipa: "/ˈpɪktʃər/" },
   ],
 
   // /dʒ/ — voiced postalveolar affricate
@@ -520,6 +644,10 @@ export const WORD_BANK: Record<string, KeywordEntry[]> = {
     { word: "lodge", ipa: "/lɑːdʒ/" },
     { word: "badge", ipa: "/bædʒ/" },
     { word: "wedge", ipa: "/wedʒ/" },
+    { word: "July", ipa: "/dʒuˈlaɪ/" },
+    { word: "major", ipa: "/ˈmeɪdʒər/" },
+    { word: "enjoy", ipa: "/ɪnˈdʒɔɪ/" },
+    { word: "project", ipa: "/ˈprɑːdʒekt/" },
   ],
 
   // /m/ — bilabial nasal
@@ -536,6 +664,10 @@ export const WORD_BANK: Record<string, KeywordEntry[]> = {
     { word: "month", ipa: "/mʌnθ/" },
     { word: "stamp", ipa: "/stæmp/" },
     { word: "climb", ipa: "/klaɪm/" },
+    { word: "money", ipa: "/ˈmʌni/" },
+    { word: "moment", ipa: "/ˈmoʊmənt/" },
+    { word: "remember", ipa: "/rɪˈmembər/" },
+    { word: "family", ipa: "/ˈfæməli/" },
   ],
 
   // /n/ — alveolar nasal
@@ -552,6 +684,10 @@ export const WORD_BANK: Record<string, KeywordEntry[]> = {
     { word: "green", ipa: "/ɡriːn/" },
     { word: "blend", ipa: "/blend/" },
     { word: "print", ipa: "/prɪnt/" },
+    { word: "number", ipa: "/ˈnʌmbər/" },
+    { word: "never", ipa: "/ˈnevər/" },
+    { word: "enough", ipa: "/ɪˈnʌf/" },
+    { word: "answer", ipa: "/ˈænsər/" },
   ],
 
   // /ŋ/ — velar nasal
@@ -568,6 +704,10 @@ export const WORD_BANK: Record<string, KeywordEntry[]> = {
     { word: "along", ipa: "/əˈlɔːŋ/" },
     { word: "belong", ipa: "/bɪˈlɔːŋ/" },
     { word: "string", ipa: "/strɪŋ/" },
+    { word: "morning", ipa: "/ˈmɔːrnɪŋ/" },
+    { word: "singer", ipa: "/ˈsɪŋər/" },
+    { word: "English", ipa: "/ˈɪŋɡlɪʃ/" },
+    { word: "walking", ipa: "/ˈwɔːkɪŋ/" },
   ],
 
   // /l/ — alveolar lateral approximant
@@ -584,6 +724,10 @@ export const WORD_BANK: Record<string, KeywordEntry[]> = {
     { word: "float", ipa: "/floʊt/" },
     { word: "skill", ipa: "/skɪl/" },
     { word: "blame", ipa: "/bleɪm/" },
+    { word: "light", ipa: "/laɪt/" },
+    { word: "really", ipa: "/ˈriːəli/" },
+    { word: "people", ipa: "/ˈpiːpəl/" },
+    { word: "family", ipa: "/ˈfæməli/" },
   ],
 
   // /r/ — alveolar approximant
@@ -600,6 +744,10 @@ export const WORD_BANK: Record<string, KeywordEntry[]> = {
     { word: "throw", ipa: "/θroʊ/" },
     { word: "shrink", ipa: "/ʃrɪŋk/" },
     { word: "stripe", ipa: "/straɪp/" },
+    { word: "real", ipa: "/riːl/" },
+    { word: "around", ipa: "/əˈraʊnd/" },
+    { word: "correct", ipa: "/kəˈrekt/" },
+    { word: "story", ipa: "/ˈstɔːri/" },
   ],
 
   // /w/ — labial-velar approximant
@@ -616,6 +764,10 @@ export const WORD_BANK: Record<string, KeywordEntry[]> = {
     { word: "swing", ipa: "/swɪŋ/" },
     { word: "witch", ipa: "/wɪtʃ/" },
     { word: "wrap", ipa: "/ræp/" },
+    { word: "word", ipa: "/wɜːrd/" },
+    { word: "welcome", ipa: "/ˈwelkəm/" },
+    { word: "always", ipa: "/ˈɔːlweɪz/" },
+    { word: "between", ipa: "/bɪˈtwiːn/" },
   ],
 
   // /j/ — palatal approximant
@@ -632,6 +784,10 @@ export const WORD_BANK: Record<string, KeywordEntry[]> = {
     { word: "rescue", ipa: "/ˈreskjuː/" },
     { word: "beauty", ipa: "/ˈbjuːti/" },
     { word: "abuse", ipa: "/əˈbjuːz/" },
+    { word: "yesterday", ipa: "/ˈjestərdeɪ/" },
+    { word: "million", ipa: "/ˈmɪljən/" },
+    { word: "familiar", ipa: "/fəˈmɪljər/" },
+    { word: "onion", ipa: "/ˈʌnjən/" },
   ],
 
   // /h/ — voiceless glottal fricative
@@ -648,6 +804,10 @@ export const WORD_BANK: Record<string, KeywordEntry[]> = {
     { word: "hunt", ipa: "/hʌnt/" },
     { word: "harm", ipa: "/hɑːrm/" },
     { word: "hook", ipa: "/hʊk/" },
+    { word: "hotel", ipa: "/hoʊˈtel/" },
+    { word: "perhaps", ipa: "/pərˈhæps/" },
+    { word: "history", ipa: "/ˈhɪstəri/" },
+    { word: "healthy", ipa: "/ˈhelθi/" },
   ],
 };
 

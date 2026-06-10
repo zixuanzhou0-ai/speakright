@@ -12,11 +12,10 @@ const LOG_MAX_FILE_SIZE_BYTES: u128 = 1_000_000;
 const LOG_ARCHIVE_COUNT: usize = 5;
 const LOG_TAIL_LINE_COUNT: usize = 200;
 const LOG_TAIL_MAX_LINE_CHARS: usize = 500;
-const ALLOWED_SECURE_STORE_KEYS: [&str; 4] = [
+const ALLOWED_SECURE_STORE_KEYS: [&str; 3] = [
     "speakright_azure_config",
     "speakright_elevenlabs_config",
     "speakright_llm_config",
-    "speakright_mw_config",
 ];
 
 #[derive(Serialize)]
@@ -435,7 +434,7 @@ mod tests {
         let path = std::env::temp_dir().join(unique_test_key("secret-url-diagnostics-log"));
         fs::write(
             &path,
-            "Authorization: Bearer anth-secret-token url=https://dictionaryapi.com/api/v3/references/collegiate/json/hello?key=mw-secret&format=json",
+            "Authorization: Bearer anth-secret-token url=https://api.openai.com/v1/chat/completions?key=llm-secret&format=json",
         )
         .expect("test log should be written");
 

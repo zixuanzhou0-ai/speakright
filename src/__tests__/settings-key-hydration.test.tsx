@@ -140,13 +140,13 @@ describe("settings key hydration", () => {
     30_000,
   );
 
-  it("updates the word pronunciation source label after store hydration", async () => {
+  it("keeps the word pronunciation label fixed after legacy source hydration", async () => {
     const { SentenceInputCard } = await import(
       "@/components/sentences/sentence-input-card"
     );
     const { hydrateKeys } = await import("@/lib/api-keys");
     mocks.store.set("speakright_pronunciation_config", {
-      source: "merriam-webster",
+      source: "legacy-source",
     });
 
     render(
@@ -159,9 +159,9 @@ describe("settings key hydration", () => {
         trimmedText="hello"
         wordIpa={null}
         hasPlayedWord={false}
-        mwIsPlaying={false}
-        mwIsLoading={false}
-        onMwPlay={vi.fn()}
+        wordAudioIsPlaying={false}
+        wordAudioIsLoading={false}
+        onWordAudioPlay={vi.fn()}
         ttsIsPlaying={false}
         ttsIsLoading={false}
         ttsError={null}
@@ -172,7 +172,7 @@ describe("settings key hydration", () => {
       />,
     );
 
-    expect(screen.getByText("单词模式 · 发音来自有道词典")).toBeInTheDocument();
+    expect(screen.getByText("单词模式 · 本地音频优先，有道兜底")).toBeInTheDocument();
 
     await act(async () => {
       await hydrateKeys();
@@ -180,7 +180,7 @@ describe("settings key hydration", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText("单词模式 · 发音来自韦氏词典"),
+        screen.getByText("单词模式 · 本地音频优先，有道兜底"),
       ).toBeInTheDocument();
     });
   });
@@ -253,14 +253,14 @@ describe("settings key hydration", () => {
     render(<DataControlCard />);
 
     expect(screen.getByText("已配置密钥")).toBeInTheDocument();
-    expect(screen.getByText("0/4")).toBeInTheDocument();
+    expect(screen.getByText("0/3")).toBeInTheDocument();
 
     await act(async () => {
       await hydrateKeys();
     });
 
     await waitFor(() => {
-      expect(screen.getByText("2/4")).toBeInTheDocument();
+      expect(screen.getByText("2/3")).toBeInTheDocument();
     });
   });
 });

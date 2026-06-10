@@ -17,9 +17,8 @@ interface PhonemeStudyCardProps {
   wordDirection: number;
   wordPoolSize: number;
   practicedCount: number;
-  hasMwConfig: boolean;
   isWordActive: boolean;
-  mwIsLoading: boolean;
+  wordIsLoading: boolean;
   lastChartPlay: "normal" | "slow";
   onPrevious: () => void;
   onNext: () => void;
@@ -28,7 +27,7 @@ interface PhonemeStudyCardProps {
   onPlayWord: (word: string, voice?: "blue" | "pink") => void;
   onPlayChartAudio: (path: string) => void;
   onStopPlayback: () => void;
-  onStopMw: () => void;
+  onStopWordAudio: () => void;
   onStopChartAudio: () => void;
   wordHistoryLength: number;
   canGoPrevious?: boolean;
@@ -41,9 +40,8 @@ export function PhonemeStudyCard({
   wordDirection,
   wordPoolSize,
   practicedCount,
-  hasMwConfig,
   isWordActive,
-  mwIsLoading,
+  wordIsLoading,
   lastChartPlay,
   onPrevious,
   onNext,
@@ -52,7 +50,7 @@ export function PhonemeStudyCard({
   onPlayWord,
   onPlayChartAudio,
   onStopPlayback,
-  onStopMw,
+  onStopWordAudio,
   onStopChartAudio,
   wordHistoryLength,
   canGoPrevious,
@@ -86,7 +84,7 @@ export function PhonemeStudyCard({
             }
             onBeforePlay={() => {
               onStopPlayback();
-              onStopMw();
+              onStopWordAudio();
               onStopChartAudio();
             }}
           />
@@ -103,7 +101,7 @@ export function PhonemeStudyCard({
               onClick={() => {
                 if (!phoneme.chartWord) return;
                 onStopPlayback();
-                onStopMw();
+                onStopWordAudio();
                 const next = lastChartPlay === "slow" ? "normal" : "slow";
                 onSetLastChartPlay(next);
                 onPlayChartAudio(`/audio/ipa/${next}/${phoneme.chartWord}.mp3`);
@@ -176,10 +174,10 @@ export function PhonemeStudyCard({
                 onStopChartAudio();
                 onPlayWord(currentWord.word, "blue");
               }}
-              disabled={mwIsLoading}
+              disabled={wordIsLoading}
               className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full cursor-pointer hover:bg-primary/10 hover:text-primary text-muted-foreground disabled:opacity-50"
             >
-              {mwIsLoading ? (
+              {wordIsLoading ? (
                 <Loader2 className="h-5 w-5 animate-spin" />
               ) : (
                 <Volume2 className="h-5 w-5" />
@@ -204,26 +202,11 @@ export function PhonemeStudyCard({
           <div className="mt-3 h-8" />
         )}
 
-        {/* Progress + MW attribution */}
+        {/* Progress */}
         <div className="mt-1.5 flex items-center justify-center gap-2">
           <span className="text-xs text-muted-foreground">
             已练 {practicedCount}/{wordPoolSize}
           </span>
-          {hasMwConfig && (
-            <>
-              <span className="text-muted-foreground/20">|</span>
-              <div className="flex items-center gap-1 text-xs text-muted-foreground/50">
-                <Image
-                  src="/images/mw-logo.svg"
-                  alt="MW"
-                  width={12}
-                  height={12}
-                  className="opacity-50"
-                />
-                <span>Merriam-Webster</span>
-              </div>
-            </>
-          )}
         </div>
       </div>
     </div>

@@ -650,7 +650,7 @@ async function captureInteractiveEvidence(debuggingPort) {
       );
     }
 
-    const externalLinkPolicy = await evaluate(
+    const pronunciationSourcePolicy = await evaluate(
       cdp,
       `
 (async () => {
@@ -663,122 +663,31 @@ async function captureInteractiveEvidence(debuggingPort) {
     };
   }
 
-  const merriamRadio = [...document.querySelectorAll('input[name="pronunciation-source"]')]
-    .find((item) => item.value === "merriam-webster");
-  if (!merriamRadio || merriamRadio.disabled) {
-    return {
-      ok: true,
-      skippedDictionaryPolicy: true,
-      reason: "Merriam-Webster pronunciation source is not available for the current language",
-      results: []
-    };
-  }
-  merriamRadio.dispatchEvent(new MouseEvent("click", {
-    bubbles: true,
-    cancelable: true,
-    view: window
-  }));
-
-  const deadline = Date.now() + 5000;
-  let dictionaryLink = null;
-  while (!dictionaryLink && Date.now() < deadline) {
-    dictionaryLink = [...document.querySelectorAll('a[href="https://dictionaryapi.com/register/index"]')]
-      .find((item) => (item.textContent || "").includes("dictionaryapi.com"));
-    if (!dictionaryLink) {
-      await new Promise((resolve) => setTimeout(resolve, 100));
-    }
-  }
-  if (!dictionaryLink) {
+  const bodyText = document.body.innerText;
+  const forbiddenText =
+    bodyText.includes("Merriam-Webster") ||
+    bodyText.includes("dictionaryapi.com") ||
+    bodyText.includes("韦氏");
+  const forbiddenInputs = [...document.querySelectorAll('input[name="pronunciation-source"]')]
+    .some((item) => item.value === "merriam-webster");
+  const forbiddenLinks = [...document.querySelectorAll('a[href*="dictionaryapi.com"]')].length > 0;
+  if (forbiddenText || forbiddenInputs || forbiddenLinks) {
     return {
       ok: false,
-      reason: "dictionary registration link missing",
-      bodyText: document.body.innerText.slice(0, 1200)
+      reason: "retired Merriam-Webster pronunciation source is still visible",
+      bodyText: bodyText.slice(0, 1200)
     };
-  }
-
-  const originalClipboard = navigator.clipboard;
-  const results = [];
-
-  async function clickAndCapture(name, link) {
-    const beforeHref = window.location.href;
-    let copiedHref = null;
-    Object.defineProperty(navigator, "clipboard", {
-      configurable: true,
-      value: {
-        writeText: async (value) => {
-          copiedHref = value;
-        }
-      }
-    });
-    const clickEvent = new MouseEvent("click", {
-      bubbles: true,
-      cancelable: true,
-      view: window
-    });
-    link.dispatchEvent(clickEvent);
-    await new Promise((resolve) => setTimeout(resolve, 250));
-    return {
-      name,
-      href: link.getAttribute("href") || link.href,
-      defaultPrevented: clickEvent.defaultPrevented,
-      copiedHref,
-      beforeHref,
-      afterHref: window.location.href,
-      target: link.target,
-      rel: link.rel
-    };
-  }
-
-  try {
-    results.push(await clickAndCapture("dictionary", dictionaryLink));
-  } finally {
-    Object.defineProperty(navigator, "clipboard", {
-      configurable: true,
-      value: originalClipboard
-    });
-    const youdaoRadio = [...document.querySelectorAll('input[name="pronunciation-source"]')]
-      .find((item) => item.value === "youdao");
-    youdaoRadio?.dispatchEvent(new MouseEvent("click", {
-      bubbles: true,
-      cancelable: true,
-      view: window
-    }));
   }
 
   return {
-    ok: true,
-    results
+    ok: true
   };
 })()
 `,
     );
-    if (!externalLinkPolicy?.ok) {
+    if (!pronunciationSourcePolicy?.ok) {
       throw new Error(
-        `Desktop external link policy could not be verified: ${externalLinkPolicy?.reason ?? "unknown"} ${externalLinkPolicy?.bodyText ?? ""}`,
-      );
-    }
-    const externalLinkResults = externalLinkPolicy.results ?? [];
-    const dictionaryLinkResult = externalLinkResults.find(
-      (result) => result.name === "dictionary",
-    );
-    const failedExternalLink = externalLinkResults.find(
-      (result) =>
-        !result.defaultPrevented ||
-        (result.copiedHref !== null && result.copiedHref !== result.href) ||
-        result.afterHref !== result.beforeHref ||
-        result.target !== "_blank" ||
-        !result.rel.includes("noopener") ||
-        !result.rel.includes("noreferrer"),
-    );
-    if (
-      !externalLinkPolicy.skippedDictionaryPolicy &&
-      failedExternalLink ||
-      (!externalLinkPolicy.skippedDictionaryPolicy &&
-        dictionaryLinkResult?.href !==
-          "https://dictionaryapi.com/register/index")
-    ) {
-      throw new Error(
-        `Desktop external link policy failed: ${JSON.stringify(externalLinkPolicy)}`,
+        `Desktop pronunciation source policy failed: ${pronunciationSourcePolicy?.reason ?? "unknown"} ${pronunciationSourcePolicy?.bodyText ?? ""}`,
       );
     }
 
@@ -1195,9 +1104,6 @@ async function captureInteractiveEvidence(debuggingPort) {
           apiKey: "desktop-smoke-llm-key",
           model: "gpt-4o-mini",
         }),
-        speakright_mw_config: JSON.stringify({
-          apiKey: "desktop-smoke-mw-key",
-        }),
       },
       async () => {
         let result = null;
@@ -1223,8 +1129,7 @@ async function captureInteractiveEvidence(debuggingPort) {
   const keys = [
     "speakright_azure_config",
     "speakright_elevenlabs_config",
-    "speakright_llm_config",
-    "speakright_mw_config"
+    "speakright_llm_config"
   ];
   const deleteDeadline = Date.now() + 10000;
   while (
@@ -1255,8 +1160,7 @@ async function captureInteractiveEvidence(debuggingPort) {
   for (const key of [
     "speakright_azure_config",
     "speakright_elevenlabs_config",
-    "speakright_llm_config",
-    "speakright_mw_config"
+    "speakright_llm_config"
   ]) {
     localStorage.removeItem(key);
   }
@@ -1299,7 +1203,7 @@ async function captureInteractiveEvidence(debuggingPort) {
   localStorage.setItem("speakright_local_data_migrated_at", String(Date.now()));
   localStorage.setItem(
     "speakright_pronunciation_config",
-    JSON.stringify({ source: "merriam-webster" })
+    JSON.stringify({ source: "youdao" })
   );
   localStorage.setItem("speakright_coach_mode", JSON.stringify("strict"));
   localStorage.setItem("theme", "dark");
@@ -1554,7 +1458,7 @@ async function captureInteractiveEvidence(debuggingPort) {
       locationHostname: runtimePolicy.locationHostname,
       locationPort: runtimePolicy.locationPort,
       releaseServedFromDevServer: runtimePolicy.releaseServedFromDevServer,
-      externalLinksCopied: externalLinkResults.map((result) => result.name),
+      retiredPronunciationSourceHidden: pronunciationSourcePolicy.ok,
       learningDeletePreservedKey: learningDelete.preservedApiKey,
       apiKeysDeleted: apiKeysDelete.deletedApiKeys,
       localResetPreservedKey: localReset.preservedApiKey,
@@ -1657,7 +1561,7 @@ async function smoke() {
               ? `runtimeLog="${runtimeLog.path}" bytes=${runtimeLog.bytes}`
               : "",
             interactiveEvidence
-              ? `diagnostics="${interactiveEvidence.diagnosticsDownload}" learningData="${interactiveEvidence.learningDataDownload}" learningDeletePreservedKey=${interactiveEvidence.learningDeletePreservedKey} apiKeysDeleted=${interactiveEvidence.apiKeysDeleted} localResetPreservedKey=${interactiveEvidence.localResetPreservedKey} benchmarkAudioCleared=${interactiveEvidence.benchmarkAudioCleared} externalLinksCopied=${interactiveEvidence.externalLinksCopied.join(",")} route=${interactiveEvidence.route} appIdentifier=${interactiveEvidence.appIdentifier} llmCustomDisabled=${interactiveEvidence.llmCustomDisabled} tauriGlobalExposed=${interactiveEvidence.tauriGlobalExposed} tauriInvokeAvailable=${interactiveEvidence.tauriInvokeAvailable} location=${interactiveEvidence.locationProtocol}//${interactiveEvidence.locationHostname}${interactiveEvidence.locationPort ? `:${interactiveEvidence.locationPort}` : ""} releaseServedFromDevServer=${interactiveEvidence.releaseServedFromDevServer}`
+              ? `diagnostics="${interactiveEvidence.diagnosticsDownload}" learningData="${interactiveEvidence.learningDataDownload}" learningDeletePreservedKey=${interactiveEvidence.learningDeletePreservedKey} apiKeysDeleted=${interactiveEvidence.apiKeysDeleted} localResetPreservedKey=${interactiveEvidence.localResetPreservedKey} benchmarkAudioCleared=${interactiveEvidence.benchmarkAudioCleared} retiredPronunciationSourceHidden=${interactiveEvidence.retiredPronunciationSourceHidden} route=${interactiveEvidence.route} appIdentifier=${interactiveEvidence.appIdentifier} llmCustomDisabled=${interactiveEvidence.llmCustomDisabled} tauriGlobalExposed=${interactiveEvidence.tauriGlobalExposed} tauriInvokeAvailable=${interactiveEvidence.tauriInvokeAvailable} location=${interactiveEvidence.locationProtocol}//${interactiveEvidence.locationHostname}${interactiveEvidence.locationPort ? `:${interactiveEvidence.locationPort}` : ""} releaseServedFromDevServer=${interactiveEvidence.releaseServedFromDevServer}`
               : "",
           ]
             .filter(Boolean)

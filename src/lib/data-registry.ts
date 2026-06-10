@@ -48,10 +48,14 @@ const CACHE_STORAGE_KEYS = [
 const DEVICE_STORAGE_KEYS = [DESKTOP_MIC_CHECK_KEY] as const;
 
 const CACHE_STORAGE_PREFIXES = ["speakright_mw_words_"] as const;
+const LEGACY_APP_PREFERENCE_STORAGE_KEYS = [
+  "speakright_pronunciation_config",
+] as const;
 const RESET_ONLY_STORAGE_KEYS = [
   ...DEVICE_STORAGE_KEYS,
   LOCAL_DATA_SCHEMA_VERSION_KEY,
   LOCAL_DATA_MIGRATED_AT_KEY,
+  ...LEGACY_APP_PREFERENCE_STORAGE_KEYS,
   "theme",
 ] as const;
 
@@ -235,7 +239,10 @@ export async function deleteAllLocalData({
 }: DeleteAllLocalDataOptions): Promise<void> {
   await deleteLearningData();
   removeLocalStorageKeys(RESET_ONLY_STORAGE_KEYS);
-  await removePersistentKeys(APP_PREFERENCE_STORAGE_KEYS);
+  await removePersistentKeys([
+    ...APP_PREFERENCE_STORAGE_KEYS,
+    ...LEGACY_APP_PREFERENCE_STORAGE_KEYS,
+  ]);
   if (includeApiKeys) {
     await deleteApiKeys();
   }

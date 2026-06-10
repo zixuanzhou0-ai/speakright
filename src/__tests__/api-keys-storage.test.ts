@@ -201,7 +201,7 @@ describe("api key storage in Tauri", () => {
       setPronunciationConfig,
     } = await import("@/lib/api-keys");
     setCoachMode("strict");
-    setPronunciationConfig({ source: "merriam-webster" });
+    setPronunciationConfig({ source: "youdao" });
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     await clearItem("speakright_coach_mode");

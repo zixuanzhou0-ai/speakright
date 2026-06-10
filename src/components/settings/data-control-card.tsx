@@ -53,7 +53,7 @@ const COPY: Record<
   "api-keys": {
     title: "删除所有 API keys？",
     description:
-      "会删除 Azure、ElevenLabs、LLM 和 Merriam-Webster 的本机密钥。删除后需要重新配置才能继续调用服务。",
+      "会删除 Azure、ElevenLabs 和 LLM 的本机密钥。删除后需要重新配置才能继续调用服务。",
     button: "删除 API keys",
   },
   "benchmark-audio": {
