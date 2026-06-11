@@ -58,6 +58,7 @@ npm run build:desktop-frontend
 npm run desktop:preflight
 npm run desktop:ui-smoke
 npm run desktop:live-validation
+npm run audio:parity:dry-run
 npm run validate:internal-release
 ```
 
@@ -68,6 +69,11 @@ The live validation command checks bundled audio/video assets and a high-coverag
 Azure pronunciation-assessment sample. It queries ElevenLabs usage only; it does
 not generate new audio unless an explicit smoke flag is set outside the normal
 release checklist.
+
+`audio:parity:dry-run` checks the Spanish, French, and Russian learning-density
+contract without calling ElevenLabs. It writes
+`src-tauri/target/audio-parity/gap-report.json` and verifies that every required
+single-voice language-pack audio item is present.
 
 `desktop:preflight` checks the active workspace, release executable, and running
 `speakright.exe` process before release-style testing. It never closes the app
@@ -91,9 +97,12 @@ README/docs-only changes run the lightweight Docs Check workflow.
 - Latest release-hardening pass added non-English low-evidence diagnosis gates,
   `desktop:preflight`, `desktop:ui-smoke`, and docs-only CI path filtering; the
   final local `validate:desktop` pass completed successfully.
-- Verified bundled assets: English word audio `1464/1464`, Spanish language-pack
-  audio `398/398`, French language-pack audio `509/509`, Russian language-pack
-  audio `407/407`, local videos `210/210`.
+- Verified bundled assets before the audio-density expansion: English word audio
+  `1464/1464`, Spanish language-pack audio `398/398`, French language-pack
+  audio `509/509`, Russian language-pack audio `407/407`, local videos `210/210`.
+- Multilingual audio-density expansion target: 24 practice items per Spanish,
+  French, and Russian sound unit. The latest dry-run after generation reports
+  Spanish `440/440`, French `545/545`, Russian `460/460`, total missing `0`.
 - Verified Azure live sample: `220/220` pronunciation-assessment calls passed.
 - ElevenLabs was usage-checked only during validation; estimated TTS characters
   used were `0`.

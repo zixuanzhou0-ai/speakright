@@ -13,11 +13,11 @@
     "style": 0.04,
     "use_speaker_boost": true
   },
-  "itemCount": 509,
-  "generated": 501,
+  "itemCount": 545,
+  "generated": 537,
   "skipped": 0,
   "failed": 0,
-  "estimatedCredits": 3243,
+  "estimatedCredits": 3948,
   "failures": [],
   "items": [
     {
@@ -566,6 +566,23 @@
       "audioSrc": "/audio/language-packs/fr-FR/c-est-f47b8cdc59.mp3"
     },
     {
+      "key": "c'est ici",
+      "text": "c'est ici",
+      "ipa": "/sɛtisi/",
+      "soundUnitSlugs": [
+        "fr-elision"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "c-est-ici-a83ec708e8.mp3",
+      "audioSrc": "/audio/language-packs/fr-FR/c-est-ici-a83ec708e8.mp3",
+      "bytes": 20942
+    },
+    {
       "key": "c'est ouvert",
       "text": "c'est ouvert",
       "ipa": "/sɛ uvɛʁ/",
@@ -634,6 +651,23 @@
       ],
       "fileName": "ce-matin-2cbcf88949.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/ce-matin-2cbcf88949.mp3"
+    },
+    {
+      "key": "ce que je veux",
+      "text": "ce que je veux",
+      "ipa": "/sə kə ʒə vø/",
+      "soundUnitSlugs": [
+        "fr-schwa"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "ce-que-je-veux-4dbd0a2cd8.mp3",
+      "audioSrc": "/audio/language-packs/fr-FR/ce-que-je-veux-4dbd0a2cd8.mp3",
+      "bytes": 20524
     },
     {
       "key": "ceux",
@@ -1412,6 +1446,23 @@
       "audioSrc": "/audio/language-packs/fr-FR/eau-chaude-ebe329ce56.mp3"
     },
     {
+      "key": "eau claire",
+      "text": "eau claire",
+      "ipa": "/o klɛʁ/",
+      "soundUnitSlugs": [
+        "fr-o-close"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "eau-claire-09efd85bf2.mp3",
+      "audioSrc": "/audio/language-packs/fr-FR/eau-claire-09efd85bf2.mp3",
+      "bytes": 18016
+    },
+    {
       "key": "école",
       "text": "école",
       "ipa": "/ekɔl/",
@@ -1990,6 +2041,23 @@
       "audioSrc": "/audio/language-packs/fr-FR/grand-homme-b0a3890f3e.mp3"
     },
     {
+      "key": "grand tapis",
+      "text": "grand tapis",
+      "ipa": "/gʁɑ̃ tapi/",
+      "soundUnitSlugs": [
+        "fr-final-consonant-silence"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "grand-tapis-d9b6a3ffc5.mp3",
+      "audioSrc": "/audio/language-packs/fr-FR/grand-tapis-d9b6a3ffc5.mp3",
+      "bytes": 26375
+    },
+    {
       "key": "grande amie",
       "text": "grande amie",
       "ipa": "/gʁɑ̃dami/",
@@ -2202,6 +2270,44 @@
       "audioSrc": "/audio/language-packs/fr-FR/il-habite-3a2cc51908.mp3"
     },
     {
+      "key": "il habite avec elle.",
+      "text": "Il habite avec elle.",
+      "ipa": "enchaînement",
+      "soundUnitSlugs": [
+        "fr-enchainement"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "il-habite-avec-elle-1983d86cfc.mp3",
+      "audioSrc": "/audio/language-packs/fr-FR/il-habite-avec-elle-1983d86cfc.mp3",
+      "bytes": 26375
+    },
+    {
+      "key": "il y a un agneau près du jardin.",
+      "text": "Il y a un agneau près du jardin.",
+      "ipa": "/ɲ j/",
+      "soundUnitSlugs": [
+        "fr-glide-j",
+        "fr-ny",
+        "fr-un"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "il-y-a-un-agneau-pres-du-jardin-099d8eeb47.mp3",
+      "audioSrc": "/audio/language-packs/fr-FR/il-y-a-un-agneau-pres-du-jardin-099d8eeb47.mp3",
+      "bytes": 34316
+    },
+    {
       "key": "ils ont",
       "text": "ils ont",
       "ipa": "/ilzɔ̃/",
@@ -2249,6 +2355,44 @@
       ],
       "fileName": "j-aime-441cf49654.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/j-aime-441cf49654.mp3"
+    },
+    {
+      "key": "j'aime encore",
+      "text": "j'aime encore",
+      "ipa": "/ʒɛm ɑ̃kɔʁ/",
+      "soundUnitSlugs": [
+        "fr-elision"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "j-aime-encore-8de92beb41.mp3",
+      "audioSrc": "/audio/language-packs/fr-FR/j-aime-encore-8de92beb41.mp3",
+      "bytes": 21777
+    },
+    {
+      "key": "j'aime le bon vin blanc.",
+      "text": "J’aime le bon vin blanc.",
+      "ipa": "elision + nasal vowels",
+      "soundUnitSlugs": [
+        "fr-an",
+        "fr-elision",
+        "fr-in",
+        "fr-on"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "j-aime-le-bon-vin-blanc-792b499352.mp3",
+      "audioSrc": "/audio/language-packs/fr-FR/j-aime-le-bon-vin-blanc-792b499352.mp3",
+      "bytes": 25539
     },
     {
       "key": "j'aime paris",
@@ -2353,6 +2497,42 @@
       ],
       "fileName": "je-joue-92af83199d.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/je-joue-92af83199d.mp3"
+    },
+    {
+      "key": "je le prends",
+      "text": "je le prends",
+      "ipa": "/ʒə lə pʁɑ̃/",
+      "soundUnitSlugs": [
+        "fr-schwa"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "je-le-prends-ba75b768cd.mp3",
+      "audioSrc": "/audio/language-packs/fr-FR/je-le-prends-ba75b768cd.mp3",
+      "bytes": 19688
+    },
+    {
+      "key": "je prends un petit déjeuner.",
+      "text": "Je prends un petit déjeuner.",
+      "ipa": "/ə ɑ̃/",
+      "soundUnitSlugs": [
+        "fr-an",
+        "fr-schwa"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "je-prends-un-petit-dejeuner-1f29147a56.mp3",
+      "audioSrc": "/audio/language-packs/fr-FR/je-prends-un-petit-dejeuner-1f29147a56.mp3",
+      "bytes": 30137
     },
     {
       "key": "je veux",
@@ -2548,6 +2728,26 @@
       "audioSrc": "/audio/language-packs/fr-FR/l-ami-arrive-6b21f87e94.mp3"
     },
     {
+      "key": "l'ami arrive à huit heures.",
+      "text": "L’ami arrive à huit heures.",
+      "ipa": "elision + /ɥ/",
+      "soundUnitSlugs": [
+        "fr-elision",
+        "fr-enchainement",
+        "fr-glide-hui"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "l-ami-arrive-a-huit-heures-95badf2eb0.mp3",
+      "audioSrc": "/audio/language-packs/fr-FR/l-ami-arrive-a-huit-heures-95badf2eb0.mp3",
+      "bytes": 28465
+    },
+    {
       "key": "l'eau",
       "text": "l'eau",
       "ipa": "/lo/",
@@ -2568,6 +2768,23 @@
       "audioSrc": "/audio/language-packs/fr-FR/l-ecole-3fe632e86b.mp3"
     },
     {
+      "key": "l'école ouvre",
+      "text": "l'école ouvre",
+      "ipa": "/lekɔl uvʁ/",
+      "soundUnitSlugs": [
+        "fr-elision"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "l-ecole-ouvre-b63a6c9e04.mp3",
+      "audioSrc": "/audio/language-packs/fr-FR/l-ecole-ouvre-b63a6c9e04.mp3",
+      "bytes": 24703
+    },
+    {
       "key": "l'homme",
       "text": "l'homme",
       "ipa": "/lɔm/",
@@ -2576,6 +2793,23 @@
       ],
       "fileName": "l-homme-f9eac6e6aa.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/l-homme-f9eac6e6aa.mp3"
+    },
+    {
+      "key": "l'homme écoute",
+      "text": "l'homme écoute",
+      "ipa": "/lɔm ekut/",
+      "soundUnitSlugs": [
+        "fr-elision"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "l-homme-ecoute-4175c43788.mp3",
+      "audioSrc": "/audio/language-packs/fr-FR/l-homme-ecoute-4175c43788.mp3",
+      "bytes": 21777
     },
     {
       "key": "la",
@@ -2596,6 +2830,25 @@
       ],
       "fileName": "la-porte-ouverte-b0fe5a479b.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/la-porte-ouverte-b0fe5a479b.mp3"
+    },
+    {
+      "key": "la sœur de luc parle peu.",
+      "text": "La sœur de Luc parle peu.",
+      "ipa": "/œ ø/",
+      "soundUnitSlugs": [
+        "fr-eu-close",
+        "fr-eu-open"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "la-s-ur-de-luc-parle-peu-228f0b124e.mp3",
+      "audioSrc": "/audio/language-packs/fr-FR/la-s-ur-de-luc-parle-peu-228f0b124e.mp3",
+      "bytes": 30973
     },
     {
       "key": "la table",
@@ -2628,6 +2881,46 @@
       "audioSrc": "/audio/language-packs/fr-FR/le-593b743b20.mp3"
     },
     {
+      "key": "le chat jaune dort.",
+      "text": "Le chat jaune dort.",
+      "ipa": "/ʃ ʒ/",
+      "soundUnitSlugs": [
+        "fr-final-consonant-silence",
+        "fr-sh",
+        "fr-zh"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "le-chat-jaune-dort-23dad1587d.mp3",
+      "audioSrc": "/audio/language-packs/fr-FR/le-chat-jaune-dort-23dad1587d.mp3",
+      "bytes": 27629
+    },
+    {
+      "key": "le grand homme parle encore.",
+      "text": "Le grand homme parle encore.",
+      "ipa": "liaison",
+      "soundUnitSlugs": [
+        "fr-an",
+        "fr-liaison",
+        "fr-r"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "le-grand-homme-parle-encore-c9afe09e21.mp3",
+      "audioSrc": "/audio/language-packs/fr-FR/le-grand-homme-parle-encore-c9afe09e21.mp3",
+      "bytes": 30137
+    },
+    {
       "key": "le livre est",
       "text": "le livre est",
       "ipa": "/lə livʁɛ/",
@@ -2646,6 +2939,23 @@
       ],
       "fileName": "le-petit-f7e971c23b.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/le-petit-f7e971c23b.mp3"
+    },
+    {
+      "key": "le prix bas",
+      "text": "le prix bas",
+      "ipa": "/lə pʁi ba/",
+      "soundUnitSlugs": [
+        "fr-final-consonant-silence"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "le-prix-bas-a2189ed4d1.mp3",
+      "audioSrc": "/audio/language-packs/fr-FR/le-prix-bas-a2189ed4d1.mp3",
+      "bytes": 19688
     },
     {
       "key": "lendemain",
@@ -2676,6 +2986,25 @@
       ],
       "fileName": "les-amis-651f2ea383.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/les-amis-651f2ea383.mp3"
+    },
+    {
+      "key": "les amis arrivent à paris.",
+      "text": "Les amis arrivent à Paris.",
+      "ipa": "/z‿a ʁ/",
+      "soundUnitSlugs": [
+        "fr-liaison",
+        "fr-r"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "les-amis-arrivent-a-paris-995a2cfe3d.mp3",
+      "audioSrc": "/audio/language-packs/fr-FR/les-amis-arrivent-a-paris-995a2cfe3d.mp3",
+      "bytes": 30973
     },
     {
       "key": "les livres",
@@ -2788,6 +3117,23 @@
       ],
       "fileName": "louis-d82ece8d51.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/louis-d82ece8d51.mp3"
+    },
+    {
+      "key": "louis voit",
+      "text": "Louis voit",
+      "ipa": "/lwi vwa/",
+      "soundUnitSlugs": [
+        "fr-glide-w"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "louis-voit-f96efe521d.mp3",
+      "audioSrc": "/audio/language-packs/fr-FR/louis-voit-f96efe521d.mp3",
+      "bytes": 21777
     },
     {
       "key": "lourd",
@@ -3536,6 +3882,23 @@
       "audioSrc": "/audio/language-packs/fr-FR/oui-5898fc8603.mp3"
     },
     {
+      "key": "oui encore",
+      "text": "oui encore",
+      "ipa": "/wi ɑ̃kɔʁ/",
+      "soundUnitSlugs": [
+        "fr-glide-w"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "oui-encore-2eafcbb72c.mp3",
+      "audioSrc": "/audio/language-packs/fr-FR/oui-encore-2eafcbb72c.mp3",
+      "bytes": 20942
+    },
+    {
       "key": "oui trois",
       "text": "oui trois",
       "ipa": "/wi tʁwa/",
@@ -3544,6 +3907,26 @@
       ],
       "fileName": "oui-trois-e2255ed48a.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/oui-trois-e2255ed48a.mp3"
+    },
+    {
+      "key": "oui, nous allons au bureau.",
+      "text": "Oui, nous allons au bureau.",
+      "ipa": "/w o/",
+      "soundUnitSlugs": [
+        "fr-glide-w",
+        "fr-o-close",
+        "fr-u"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "oui-nous-allons-au-bureau-458a1d5933.mp3",
+      "audioSrc": "/audio/language-packs/fr-FR/oui-nous-allons-au-bureau-458a1d5933.mp3",
+      "bytes": 32226
     },
     {
       "key": "outil",
@@ -3771,6 +4154,25 @@
       "audioSrc": "/audio/language-packs/fr-FR/petit-0f6878f15a.mp3"
     },
     {
+      "key": "petit à petit, elle écoute.",
+      "text": "Petit à petit, elle écoute.",
+      "ipa": "/ə/",
+      "soundUnitSlugs": [
+        "fr-enchainement",
+        "fr-schwa"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "petit-a-petit-elle-ecoute-acb6101654.mp3",
+      "audioSrc": "/audio/language-packs/fr-FR/petit-a-petit-elle-ecoute-acb6101654.mp3",
+      "bytes": 32226
+    },
+    {
       "key": "petit ami",
       "text": "petit ami",
       "ipa": "/pətitami/",
@@ -3779,6 +4181,23 @@
       ],
       "fileName": "petit-ami-cf30560af3.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/petit-ami-cf30560af3.mp3"
+    },
+    {
+      "key": "petit chat",
+      "text": "petit chat",
+      "ipa": "/pəti ʃa/",
+      "soundUnitSlugs": [
+        "fr-final-consonant-silence"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "petit-chat-de4154a16c.mp3",
+      "audioSrc": "/audio/language-packs/fr-FR/petit-chat-de4154a16c.mp3",
+      "bytes": 19688
     },
     {
       "key": "petit enfant",
@@ -3809,6 +4228,23 @@
       ],
       "fileName": "petite-ecole-f64027e2a5.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/petite-ecole-f64027e2a5.mp3"
+    },
+    {
+      "key": "petite fenêtre",
+      "text": "petite fenêtre",
+      "ipa": "/pətit fənɛtʁ/",
+      "soundUnitSlugs": [
+        "fr-schwa"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "petite-fenetre-0266f12562.mp3",
+      "audioSrc": "/audio/language-packs/fr-FR/petite-fenetre-0266f12562.mp3",
+      "bytes": 24285
     },
     {
       "key": "peu",
@@ -4059,6 +4495,23 @@
       ],
       "fileName": "qu-il-4800dc1548.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/qu-il-4800dc1548.mp3"
+    },
+    {
+      "key": "qu'il arrive",
+      "text": "qu'il arrive",
+      "ipa": "/kilaʁiv/",
+      "soundUnitSlugs": [
+        "fr-elision"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "qu-il-arrive-3575292c8d.mp3",
+      "audioSrc": "/audio/language-packs/fr-FR/qu-il-arrive-3575292c8d.mp3",
+      "bytes": 20942
     },
     {
       "key": "quand il",
@@ -4324,6 +4777,23 @@
       ],
       "fileName": "samedi-785ee49b7e.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/samedi-785ee49b7e.mp3"
+    },
+    {
+      "key": "samedi matin",
+      "text": "samedi matin",
+      "ipa": "/samdi matɛ̃/",
+      "soundUnitSlugs": [
+        "fr-schwa"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "samedi-matin-8e822ef412.mp3",
+      "audioSrc": "/audio/language-packs/fr-FR/samedi-matin-8e822ef412.mp3",
+      "bytes": 20942
     },
     {
       "key": "sans",
@@ -4646,6 +5116,23 @@
       "audioSrc": "/audio/language-packs/fr-FR/ton-5e4b6ad299.mp3"
     },
     {
+      "key": "tôt",
+      "text": "tôt",
+      "ipa": "/to/",
+      "soundUnitSlugs": [
+        "fr-o-close"
+      ],
+      "kinds": [
+        "word"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "tot-809aee3e6d.mp3",
+      "audioSrc": "/audio/language-packs/fr-FR/tot-809aee3e6d.mp3",
+      "bytes": 15090
+    },
+    {
       "key": "tout",
       "text": "tout",
       "ipa": "/tu/",
@@ -4727,6 +5214,23 @@
       "audioSrc": "/audio/language-packs/fr-FR/trois-dff3ee8d74.mp3"
     },
     {
+      "key": "trois amis",
+      "text": "trois amis",
+      "ipa": "/tʁwɑzami/",
+      "soundUnitSlugs": [
+        "fr-final-consonant-silence"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "trois-amis-a9d0ab1d72.mp3",
+      "audioSrc": "/audio/language-packs/fr-FR/trois-amis-a9d0ab1d72.mp3",
+      "bytes": 21777
+    },
+    {
       "key": "trois enfants",
       "text": "trois enfants",
       "ipa": "/tʁwɑzɑ̃fɑ̃/",
@@ -4746,6 +5250,26 @@
       ],
       "fileName": "trop-687ccffb59.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/trop-687ccffb59.mp3"
+    },
+    {
+      "key": "trop grand, trop lent, trop fort.",
+      "text": "Trop grand, trop lent, trop fort.",
+      "ipa": "final silence",
+      "soundUnitSlugs": [
+        "fr-an",
+        "fr-final-consonant-silence",
+        "fr-r"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "trop-grand-trop-lent-trop-fort-1ae4d34ddd.mp3",
+      "audioSrc": "/audio/language-packs/fr-FR/trop-grand-trop-lent-trop-fort-1ae4d34ddd.mp3",
+      "bytes": 52288
     },
     {
       "key": "trou",
@@ -4776,6 +5300,25 @@
       ],
       "fileName": "tu-peux-aabc0b1341.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/tu-peux-aabc0b1341.mp3"
+    },
+    {
+      "key": "tu veux du café ?",
+      "text": "Tu veux du café ?",
+      "ipa": "/y ø/",
+      "soundUnitSlugs": [
+        "fr-eu-close",
+        "fr-y"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "tu-veux-du-cafe-bcd01aa2fb.mp3",
+      "audioSrc": "/audio/language-packs/fr-FR/tu-veux-du-cafe-bcd01aa2fb.mp3",
+      "bytes": 22613
     },
     {
       "key": "type",
@@ -4809,6 +5352,26 @@
       "audioSrc": "/audio/language-packs/fr-FR/un-ami-c50b3e1da8.mp3"
     },
     {
+      "key": "un bon vin blanc.",
+      "text": "Un bon vin blanc.",
+      "ipa": "/œ̃ ɔ̃ ɛ̃ ɑ̃/",
+      "soundUnitSlugs": [
+        "fr-an",
+        "fr-in",
+        "fr-on"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "un-bon-vin-blanc-5dbc687f2b.mp3",
+      "audioSrc": "/audio/language-packs/fr-FR/un-bon-vin-blanc-5dbc687f2b.mp3",
+      "bytes": 23449
+    },
+    {
       "key": "un cadeau",
       "text": "un cadeau",
       "ipa": "/œ̃ kado/",
@@ -4839,6 +5402,45 @@
       "audioSrc": "/audio/language-packs/fr-FR/un-enfant-20a7bd1148.mp3"
     },
     {
+      "key": "un étudiant prend un bon café. les amis parlent dans une petite rue.",
+      "text": "Un étudiant prend un bon café. Les amis parlent dans une petite rue.",
+      "ipa": "Un étudiant prend un bon café. Les amis parlent dans une petite rue.",
+      "soundUnitSlugs": [
+        "fr-an",
+        "fr-in",
+        "fr-liaison",
+        "fr-on",
+        "fr-y"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "diagnostic-passage",
+        "phoneme-keyword"
+      ],
+      "fileName": "un-etudiant-prend-un-bon-cafe-les-amis-par-6d1e6e0267.mp3",
+      "audioSrc": "/audio/language-packs/fr-FR/un-etudiant-prend-un-bon-cafe-les-amis-par-6d1e6e0267.mp3",
+      "bytes": 83635
+    },
+    {
+      "key": "un grand choix",
+      "text": "un grand choix",
+      "ipa": "/œ̃ gʁɑ̃ ʃwa/",
+      "soundUnitSlugs": [
+        "fr-final-consonant-silence"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "un-grand-choix-0099ef6b1d.mp3",
+      "audioSrc": "/audio/language-packs/fr-FR/un-grand-choix-0099ef6b1d.mp3",
+      "bytes": 23449
+    },
+    {
       "key": "un homme",
       "text": "un homme",
       "ipa": "/œ̃nɔm/",
@@ -4860,6 +5462,43 @@
       "audioSrc": "/audio/language-packs/fr-FR/un-lundi-8547bbd2fb.mp3"
     },
     {
+      "key": "un mot court",
+      "text": "un mot court",
+      "ipa": "/œ̃ mo kuʁ/",
+      "soundUnitSlugs": [
+        "fr-final-consonant-silence"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "un-mot-court-40e8b93b4a.mp3",
+      "audioSrc": "/audio/language-packs/fr-FR/un-mot-court-40e8b93b4a.mp3",
+      "bytes": 21777
+    },
+    {
+      "key": "un parfum brun peut varier selon l'accent.",
+      "text": "Un parfum brun peut varier selon l’accent.",
+      "ipa": "/œ̃ ɛ̃/",
+      "soundUnitSlugs": [
+        "fr-elision",
+        "fr-in",
+        "fr-un"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "un-parfum-brun-peut-varier-selon-l-accent-2628429278.mp3",
+      "audioSrc": "/audio/language-packs/fr-FR/un-parfum-brun-peut-varier-selon-l-accent-2628429278.mp3",
+      "bytes": 46437
+    },
+    {
       "key": "un petit chat",
       "text": "un petit chat",
       "ipa": "/œ̃ pəti ʃa/",
@@ -4878,6 +5517,26 @@
       ],
       "fileName": "une-e3bae98dee.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/une-e3bae98dee.mp3"
+    },
+    {
+      "key": "une fille lit près de la porte.",
+      "text": "Une fille lit près de la porte.",
+      "ipa": "/j a ɔ/",
+      "soundUnitSlugs": [
+        "fr-a",
+        "fr-glide-j",
+        "fr-o-open"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "une-fille-lit-pres-de-la-porte-6eef607f42.mp3",
+      "audioSrc": "/audio/language-packs/fr-FR/une-fille-lit-pres-de-la-porte-6eef607f42.mp3",
+      "bytes": 41004
     },
     {
       "key": "une robe orange",
@@ -5169,5 +5828,6 @@
       "fileName": "zero-efc58ff149.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/zero-efc58ff149.mp3"
     }
-  ]
+  ],
+  "updatedAt": "2026-06-11T08:27:45.557Z"
 }

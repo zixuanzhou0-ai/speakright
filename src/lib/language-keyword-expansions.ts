@@ -1,8 +1,15 @@
 import type { LanguageId } from "@/types/language";
 import type { KeywordEntry, PhonemeData } from "@/types/phoneme";
+import { LANGUAGE_LEARNING_DECKS } from "@/lib/language-learning-decks";
+import type { DeckLanguageId } from "@/lib/language-learning-decks";
 
-const MIN_KEYWORD_OPTIONS_PER_UNIT = 20;
+const MIN_KEYWORD_OPTIONS_PER_UNIT = 24;
 const MAX_KEYWORD_OPTIONS_PER_UNIT = 36;
+
+const RUSSIAN_DECK_STRESS_TEXT: Record<string, string> = {
+  "дома": "до́ма",
+  "дуба": "ду́ба",
+};
 
 const EXTRA_KEYWORD_OPTIONS: Partial<Record<LanguageId, Record<string, KeywordEntry[]>>> = {
   "es-ES": {
@@ -266,6 +273,47 @@ const EXTRA_KEYWORD_OPTIONS: Partial<Record<LanguageId, Record<string, KeywordEn
       { word: "carretera", ipa: "/kareˈteɾa/" },
       { word: "rojo rápido", ipa: "/ˈroxo ˈrapiðo/" },
     ],
+    "es-s": [
+      { word: "seis", ipa: "/seis/" },
+      { word: "sopa", ipa: "/ˈsopa/" },
+      { word: "sala", ipa: "/ˈsala/" },
+      { word: "siempre", ipa: "/ˈsjempɾe/" },
+    ],
+    "es-diphthongs-j": [
+      { word: "tiene tiempo", ipa: "/ˈtjene ˈtjempo/" },
+      { word: "cielo claro", ipa: "/ˈθjelo ˈklaɾo/" },
+      { word: "piedra pequeña", ipa: "/ˈpjeðɾa peˈkeɲa/" },
+      { word: "viaje diario", ipa: "/ˈbjaxe ˈdjaɾjo/" },
+      { word: "familia limpia", ipa: "/faˈmilja ˈlimpja/" },
+      { word: "radio antiguo", ipa: "/ˈraðjo anˈtiɣwo/" },
+    ],
+    "es-diphthongs-w": [
+      { word: "puerta nueva", ipa: "/ˈpweɾta ˈnweβa/" },
+      { word: "fuego suave", ipa: "/ˈfweɣo ˈswaβe/" },
+      { word: "buena suerte", ipa: "/ˈbwena ˈsweɾte/" },
+      { word: "cuatro huevos", ipa: "/ˈkwatɾo ˈweβos/" },
+      { word: "agua buena", ipa: "/ˈaɣwa ˈbwena/" },
+      { word: "suelo fuerte", ipa: "/ˈswelo ˈfweɾte/" },
+      { word: "cuando vuelva", ipa: "/ˈkwando ˈbwelβa/" },
+      { word: "nueve puertas", ipa: "/ˈnweβe ˈpweɾtas/" },
+    ],
+    "es-lexical-stress": [
+      { word: "papa y papá", ipa: "/ˈpapa i paˈpa/" },
+      { word: "hablo habló", ipa: "/ˈaβlo aˈβlo/" },
+      { word: "termino terminó", ipa: "/teɾˈmino teɾmiˈno/" },
+      { word: "camino caminó", ipa: "/kaˈmino kamiˈno/" },
+      { word: "practico practicó", ipa: "/pɾakˈtiko pɾaktiˈko/" },
+      { word: "medico médico", ipa: "/meˈðiko ˈmeðiko/" },
+      { word: "numero número", ipa: "/nuˈmeɾo ˈnumeɾo/" },
+    ],
+    "es-syllable-rhythm": [
+      { word: "sábado", ipa: "/ˈsaβaðo/" },
+      { word: "camino", ipa: "/kaˈmino/" },
+      { word: "rápido", ipa: "/ˈrapiðo/" },
+      { word: "tomate", ipa: "/toˈmate/" },
+      { word: "banana", ipa: "/baˈnana/" },
+      { word: "minuto", ipa: "/miˈnuto/" },
+    ],
   },
   "fr-FR": {
     "fr-i": [
@@ -469,6 +517,14 @@ const EXTRA_KEYWORD_OPTIONS: Partial<Record<LanguageId, Record<string, KeywordEn
       { word: "bon garçon", ipa: "/bɔ̃ gaʁsɔ̃/" },
       { word: "maison ronde", ipa: "/mɛzɔ̃ ʁɔ̃d/" },
     ],
+    "fr-o-close": [
+      { word: "tôt", ipa: "/to/" },
+      { word: "eau claire", ipa: "/o klɛʁ/" },
+    ],
+    "fr-glide-w": [
+      { word: "oui encore", ipa: "/wi ɑ̃kɔʁ/" },
+      { word: "Louis voit", ipa: "/lwi vwa/" },
+    ],
     "fr-r": [
       { word: "rose", ipa: "/ʁoz/" },
       { word: "rire", ipa: "/ʁiʁ/" },
@@ -489,6 +545,21 @@ const EXTRA_KEYWORD_OPTIONS: Partial<Record<LanguageId, Record<string, KeywordEn
       { word: "frère très rare", ipa: "/fʁɛʁ tʁɛ ʁaʁ/" },
       { word: "Paris retour", ipa: "/paʁi ʁətuʁ/" },
     ],
+    "fr-schwa": [
+      { word: "je le prends", ipa: "/ʒə lə pʁɑ̃/" },
+      { word: "petite fenêtre", ipa: "/pətit fənɛtʁ/" },
+      { word: "ce que je veux", ipa: "/sə kə ʒə vø/" },
+      { word: "samedi matin", ipa: "/samdi matɛ̃/" },
+    ],
+    "fr-final-consonant-silence": [
+      { word: "petit chat", ipa: "/pəti ʃa/" },
+      { word: "grand tapis", ipa: "/gʁɑ̃ tapi/" },
+      { word: "beaucoup trop", ipa: "/boku tʁo/" },
+      { word: "le prix bas", ipa: "/lə pʁi ba/" },
+      { word: "un mot court", ipa: "/œ̃ mo kuʁ/" },
+      { word: "trois amis", ipa: "/tʁwɑzami/" },
+      { word: "un grand choix", ipa: "/œ̃ gʁɑ̃ ʃwa/" },
+    ],
     "fr-liaison": [
       { word: "deux amis", ipa: "/døzami/" },
       { word: "trois enfants", ipa: "/tʁwɑzɑ̃fɑ̃/" },
@@ -508,6 +579,14 @@ const EXTRA_KEYWORD_OPTIONS: Partial<Record<LanguageId, Record<string, KeywordEn
       { word: "les yeux", ipa: "/lezjø/" },
       { word: "quand il", ipa: "/kɑ̃til/" },
       { word: "premier avril", ipa: "/pʁəmjeʁavʁil/" },
+    ],
+    "fr-elision": [
+      { word: "j'aime encore", ipa: "/ʒɛm ɑ̃kɔʁ/" },
+      { word: "l'école ouvre", ipa: "/lekɔl uvʁ/" },
+      { word: "c'est ici", ipa: "/sɛtisi/" },
+      { word: "qu'il arrive", ipa: "/kilaʁiv/" },
+      { word: "d'accord avec elle", ipa: "/dakɔʁ avɛk ɛl/" },
+      { word: "l'homme écoute", ipa: "/lɔm ekut/" },
     ],
   },
   "ru-RU": {
@@ -711,6 +790,36 @@ const EXTRA_KEYWORD_OPTIONS: Partial<Record<LanguageId, Record<string, KeywordEn
       { word: "цена и чай", ipa: "/tsɨˈna i tɕaj/" },
       { word: "борщ и щи", ipa: "/borɕː i ɕːi/" },
     ],
+    "ru-iotated-vowels": [
+      { word: "я дома", ipa: "/ja ˈdomə/" },
+      { word: "её имя", ipa: "/jɪˈjo ˈimʲə/" },
+      { word: "юный юрист", ipa: "/ˈjunɨj jʊˈrʲist/" },
+      { word: "ёлка яркая", ipa: "/ˈjolkə ˈjarkəjə/" },
+      { word: "моя семья", ipa: "/mɐˈja sʲɪmʲˈja/" },
+      { word: "новая юбка", ipa: "/ˈnovəjə ˈjupkə/" },
+    ],
+    "ru-unstressed-o-a": [
+      { word: "она дома", ipa: "/ɐˈna ˈdomə/" },
+      { word: "молоко холодное", ipa: "/məlɐˈko ˈxolədnəjə/" },
+      { word: "Москва большая", ipa: "/mɐˈskva bɐlʲˈʂajə/" },
+      { word: "дорога назад", ipa: "/dɐˈrogə nɐˈzat/" },
+      { word: "окно открыто", ipa: "/ɐkˈno ɐtˈkrɨtə/" },
+      { word: "собака голодная", ipa: "/sɐˈbakə ˈgolədnəjə/" },
+    ],
+    "ru-unstressed-e-ya": [
+      { word: "сегодня вечером", ipa: "/sʲɪˈvodnʲə ˈvʲetɕɪrəm/" },
+      { word: "семья приехала", ipa: "/sʲɪmʲˈja prʲɪˈjexələ/" },
+      { word: "ребята рядом", ipa: "/rʲɪˈbʲatə ˈrʲadəm/" },
+      { word: "тетрадь лежит", ipa: "/tʲɪˈtratʲ lʲɪˈʐɨt/" },
+    ],
+    "ru-final-devoicing": [
+      { word: "друг пришёл", ipa: "/druk prʲɪˈʂol/" },
+      { word: "город спит", ipa: "/ˈgorət spʲit/" },
+      { word: "хлеб свежий", ipa: "/xlʲep ˈsvʲeʐɨj/" },
+      { word: "снег идёт", ipa: "/snʲek ɪˈdʲot/" },
+      { word: "сад пустой", ipa: "/sat pʊˈstoj/" },
+      { word: "нож тупой", ipa: "/noʂ tʊˈpoj/" },
+    ],
     "ru-stress-reduction": [
       { word: "телефон", ipa: "/tʲɪlʲɪˈfon/" },
       { word: "машина", ipa: "/mɐˈʂinə/" },
@@ -730,6 +839,14 @@ const EXTRA_KEYWORD_OPTIONS: Partial<Record<LanguageId, Record<string, KeywordEn
       { word: "работа", ipa: "/rɐˈbotə/" },
       { word: "молоко дома", ipa: "/məlɐˈko ˈdomə/" },
       { word: "Москва сегодня", ipa: "/mɐˈskva sʲɪˈvodnʲə/" },
+      { word: "телефон на столе", ipa: "/tʲɪlʲɪˈfon nɐ stɐˈlʲe/" },
+      { word: "машина у дома", ipa: "/mɐˈʂinə u ˈdomə/" },
+      { word: "дорога далеко", ipa: "/dɐˈrogə dəlʲɪˈko/" },
+      { word: "погода хорошая", ipa: "/pɐˈgodə xɐˈroʂəjə/" },
+      { word: "работа сегодня", ipa: "/rɐˈbotə sʲɪˈvodnʲə/" },
+      { word: "вокзал открыт", ipa: "/vɐgˈzal ɐtˈkrɨt/" },
+      { word: "семья дома", ipa: "/sʲɪmʲˈja ˈdomə/" },
+      { word: "магазин закрыт", ipa: "/məgɐˈzʲin zɐˈkrɨt/" },
     ],
     "ru-clusters": [
       { word: "вторник", ipa: "/ˈftornʲɪk/" },
@@ -750,6 +867,10 @@ const EXTRA_KEYWORD_OPTIONS: Partial<Record<LanguageId, Record<string, KeywordEn
       { word: "строить", ipa: "/ˈstroɪtʲ/" },
       { word: "встреча завтра", ipa: "/ˈfstrʲetɕə ˈzaftrə/" },
       { word: "текст простой", ipa: "/tʲekst prɐˈstoj/" },
+      { word: "врач строгий", ipa: "/vratɕ ˈstrogʲɪj/" },
+      { word: "класс большой", ipa: "/klas bɐlʲˈʂoj/" },
+      { word: "страна красивая", ipa: "/strɐˈna krɐˈsʲivəjə/" },
+      { word: "группа студентов", ipa: "/ˈgrupə stʊˈdʲentəf/" },
     ],
   },
 };
@@ -779,6 +900,78 @@ function mergeKeywordEntries(
   return merged.slice(0, MAX_KEYWORD_OPTIONS_PER_UNIT);
 }
 
+function splitContrastIpa(ipa: string): [string, string] {
+  const parts = ipa.split("~").map((part) => part.trim());
+  if (parts.length >= 2) return [parts[0], parts[1]];
+  return [ipa, ipa];
+}
+
+function deckLanguageId(languageId: LanguageId): DeckLanguageId | null {
+  return languageId === "es-ES" || languageId === "fr-FR" || languageId === "ru-RU"
+    ? languageId
+    : null;
+}
+
+function withDeckStressText(
+  languageId: DeckLanguageId,
+  keyword: KeywordEntry,
+): KeywordEntry {
+  if (languageId !== "ru-RU" || keyword.stressText) return keyword;
+  const stressText = RUSSIAN_DECK_STRESS_TEXT[keyword.word];
+  return stressText ? { ...keyword, stressText } : keyword;
+}
+
+function deckKeywordsForUnit(
+  languageId: LanguageId,
+  slug: string,
+): KeywordEntry[] {
+  const deckId = deckLanguageId(languageId);
+  if (!deckId) return [];
+
+  const deck = LANGUAGE_LEARNING_DECKS[deckId];
+  const keywords: KeywordEntry[] = [];
+
+  for (const word of deck.diagnosticWords) {
+    if (word.targetUnitSlug === slug) {
+      keywords.push({
+        word: word.text,
+        ipa: word.ipa,
+        stressText: word.stressText,
+      });
+    }
+  }
+
+  if (deck.diagnosticPassage.targetUnitSlugs.includes(slug)) {
+    keywords.push({
+      word: deck.diagnosticPassage.text,
+      ipa: deck.diagnosticPassage.stressText ?? deck.diagnosticPassage.text,
+    });
+  }
+
+  for (const contrast of deck.contrastDeck) {
+    if (contrast.targetUnitSlug !== slug) continue;
+    const [leftIpa, rightIpa] = splitContrastIpa(contrast.ipa);
+    keywords.push(
+      withDeckStressText(deckId, { word: contrast.left, ipa: leftIpa }),
+    );
+    keywords.push(
+      withDeckStressText(deckId, { word: contrast.right, ipa: rightIpa }),
+    );
+  }
+
+  for (const sentence of deck.sentenceDeck) {
+    if (sentence.targetUnitSlugs.includes(slug)) {
+      keywords.push({
+        word: sentence.text,
+        ipa: sentence.ipaHint,
+        stressText: sentence.stressText,
+      });
+    }
+  }
+
+  return keywords;
+}
+
 export function expandLanguageKeywordOptions(
   languageId: LanguageId,
   units: PhonemeData[],
@@ -788,7 +981,10 @@ export function expandLanguageKeywordOptions(
   return units.map((soundUnit) => {
     const keywords = mergeKeywordEntries(
       soundUnit.keywords,
-      languageExtras[soundUnit.slug] ?? [],
+      [
+        ...(languageExtras[soundUnit.slug] ?? []),
+        ...deckKeywordsForUnit(languageId, soundUnit.slug),
+      ],
     );
 
     return {

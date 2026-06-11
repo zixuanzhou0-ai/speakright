@@ -113,6 +113,9 @@ the release-readiness or user-testing entrypoint.
   `pink` voice variants; Youdao is only the online fallback.
 - Spanish, French, and Russian word/phrase audio is bundled in
   `public/audio/language-packs/`.
+- Spanish, French, and Russian audio density is now tracked by
+  `npm run audio:parity:dry-run`; the target is 24 practice items per sound
+  unit, and the latest report has no missing language-pack audio.
 - Multilingual audio packs are not installed from Settings anymore.
 - Local articulation/video assets live under `public/videos/language-assets/`.
 - API keys are not stored in Git and are excluded from learning-data export.
@@ -147,12 +150,22 @@ This command validates bundled audio/video paths and a high-coverage Azure
 sample. It queries ElevenLabs usage but does not generate audio in the normal
 release checklist.
 
+Run the non-English audio-density dry-run before deciding whether to generate
+new language-pack audio:
+
+```bat
+npm run audio:parity:dry-run
+```
+
+The dry-run writes `src-tauri\target\audio-parity\gap-report.json`, checks
+Spanish/French/Russian audio coverage, and makes zero ElevenLabs API calls.
+
 Use `desktop:ui-smoke` for release-window page coverage. It opens Settings,
 English, Spanish, French, Russian, drill, free practice, and diagnosis routes,
 checks that the runtime is not `localhost`, and avoids recording, Azure live
 scoring, and ElevenLabs TTS generation.
 
-Do not run ElevenLabs TTS smoke or any audio generation scripts during routine
+Do not run ElevenLabs TTS smoke or audio generation scripts during routine
 startup or manual QA. If bundled audio is missing, record the missing item first
 and ask for confirmation before generating replacement audio.
 
@@ -256,3 +269,22 @@ release notes and installation guide keep the unsigned warning visible.
   and whether it is audio, video, scoring, recording replay, layout, or wording.
 - Only rebuild with `npm run desktop:run-release` after code changes or if the
   release executable is missing.
+
+## 2026-06-11 Multilingual Audio Parity Dry-Run
+
+- Added `npm run audio:parity:dry-run`.
+- The density contract now checks Spanish, French, and Russian at 24 practice
+  items per sound unit; rule/prosody units must be phrase-heavy rather than
+  word-only.
+- Initial dry-run before generation:
+  - Spanish: `398` existing local audio items, `42` pending.
+  - French: `509` existing local audio items, `36` pending.
+  - Russian: `407` existing local audio items, `53` pending.
+  - Total pending single-voice audio items: `131`.
+  - Estimated ElevenLabs characters/credits before generation: about `2418`.
+- After user confirmation, generated the missing single-voice language-pack
+  audio and updated manifests:
+  - Spanish: `440/440`, missing `0`.
+  - French: `545/545`, missing `0`.
+  - Russian: `460/460`, missing `0`.
+- Routine dry-run checks still make zero ElevenLabs API calls.

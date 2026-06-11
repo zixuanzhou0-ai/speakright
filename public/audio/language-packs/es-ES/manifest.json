@@ -13,11 +13,11 @@
     "style": 0.05,
     "use_speaker_boost": true
   },
-  "itemCount": 398,
-  "generated": 387,
+  "itemCount": 440,
+  "generated": 429,
   "skipped": 0,
   "failed": 0,
-  "estimatedCredits": 2415,
+  "estimatedCredits": 3244,
   "failures": [],
   "items": [
     {
@@ -62,6 +62,23 @@
       ],
       "fileName": "agua-c1962c232b.mp3",
       "audioSrc": "/audio/language-packs/es-ES/agua-c1962c232b.mp3"
+    },
+    {
+      "key": "agua buena",
+      "text": "agua buena",
+      "ipa": "/ˈaɣwa ˈbwena/",
+      "soundUnitSlugs": [
+        "es-diphthongs-w"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "agua-buena-635bf7472c.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/agua-buena-635bf7472c.mp3",
+      "bytes": 25539
     },
     {
       "key": "agua fría",
@@ -266,6 +283,23 @@
       "audioSrc": "/audio/language-packs/es-ES/bajo-98973d5c9a.mp3"
     },
     {
+      "key": "banana",
+      "text": "banana",
+      "ipa": "/baˈnana/",
+      "soundUnitSlugs": [
+        "es-syllable-rhythm"
+      ],
+      "kinds": [
+        "word"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "banana-b6265d28f8.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/banana-b6265d28f8.mp3",
+      "bytes": 20942
+    },
+    {
       "key": "banco",
       "text": "banco",
       "ipa": "/ˈbaŋko/",
@@ -449,6 +483,25 @@
       "audioSrc": "/audio/language-packs/es-ES/bueno-28e5793a19.mp3"
     },
     {
+      "key": "bueno, cuatro amigos juegan afuera.",
+      "text": "Bueno, cuatro amigos juegan afuera.",
+      "ipa": "/w ɣ/",
+      "soundUnitSlugs": [
+        "es-diphthongs-w",
+        "es-g"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "bueno-cuatro-amigos-juegan-afuera-b374e0b8dc.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/bueno-cuatro-amigos-juegan-afuera-b374e0b8dc.mp3",
+      "bytes": 56050
+    },
+    {
       "key": "buenos días",
       "text": "Buenos días",
       "ipa": "/ˈbwenos ˈdias/",
@@ -468,6 +521,25 @@
       ],
       "fileName": "buenos-dias-a-todos-f3fd9144ea.mp3",
       "audioSrc": "/audio/language-packs/es-ES/buenos-dias-a-todos-f3fd9144ea.mp3"
+    },
+    {
+      "key": "buenos días, muchas gracias.",
+      "text": "Buenos días, muchas gracias.",
+      "ipa": "syllable rhythm",
+      "soundUnitSlugs": [
+        "es-diphthongs-w",
+        "es-syllable-rhythm"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "buenos-dias-muchas-gracias-a78b5527e8.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/buenos-dias-muchas-gracias-a78b5527e8.mp3",
+      "bytes": 51453
     },
     {
       "key": "buscar",
@@ -558,6 +630,40 @@
       ],
       "fileName": "cama-1bef95abfc.mp3",
       "audioSrc": "/audio/language-packs/es-ES/cama-1bef95abfc.mp3"
+    },
+    {
+      "key": "camino",
+      "text": "camino",
+      "ipa": "/kaˈmino/",
+      "soundUnitSlugs": [
+        "es-syllable-rhythm"
+      ],
+      "kinds": [
+        "word"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "camino-4d9cc2a94d.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/camino-4d9cc2a94d.mp3",
+      "bytes": 19688
+    },
+    {
+      "key": "camino caminó",
+      "text": "camino caminó",
+      "ipa": "/kaˈmino kamiˈno/",
+      "soundUnitSlugs": [
+        "es-lexical-stress"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "camino-camino-17dd4e81ef.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/camino-camino-17dd4e81ef.mp3",
+      "bytes": 30137
     },
     {
       "key": "camión",
@@ -760,6 +866,25 @@
       "audioSrc": "/audio/language-packs/es-ES/chico-escucha-c3f66deba7.mp3"
     },
     {
+      "key": "chico, escucha la leche.",
+      "text": "Chico, escucha la leche.",
+      "ipa": "/tʃ/",
+      "soundUnitSlugs": [
+        "es-ch",
+        "es-e"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "chico-escucha-la-leche-02f1351b35.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/chico-escucha-la-leche-02f1351b35.mp3",
+      "bytes": 42675
+    },
+    {
       "key": "chocolate",
       "text": "chocolate",
       "ipa": "/tʃokoˈlate/",
@@ -800,6 +925,23 @@
       "audioSrc": "/audio/language-packs/es-ES/cielo-b54cfda898.mp3"
     },
     {
+      "key": "cielo claro",
+      "text": "cielo claro",
+      "ipa": "/ˈθjelo ˈklaɾo/",
+      "soundUnitSlugs": [
+        "es-diphthongs-j"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "cielo-claro-88740fb915.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/cielo-claro-88740fb915.mp3",
+      "bytes": 29301
+    },
+    {
       "key": "cien euros",
       "text": "cien euros",
       "ipa": "/θjen ˈewɾos/",
@@ -830,6 +972,24 @@
       ],
       "fileName": "cinco-zapatos-azules-675774359d.mp3",
       "audioSrc": "/audio/language-packs/es-ES/cinco-zapatos-azules-675774359d.mp3"
+    },
+    {
+      "key": "cinco zapatos son azules.",
+      "text": "Cinco zapatos son azules.",
+      "ipa": "/θ s/",
+      "soundUnitSlugs": [
+        "es-theta"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "cinco-zapatos-son-azules-5fad5366a8.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/cinco-zapatos-son-azules-5fad5366a8.mp3",
+      "bytes": 42675
     },
     {
       "key": "cita",
@@ -1019,6 +1179,23 @@
       "audioSrc": "/audio/language-packs/es-ES/cuando-4344af9a12.mp3"
     },
     {
+      "key": "cuando vuelva",
+      "text": "cuando vuelva",
+      "ipa": "/ˈkwando ˈbwelβa/",
+      "soundUnitSlugs": [
+        "es-diphthongs-w"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "cuando-vuelva-188324de5b.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/cuando-vuelva-188324de5b.mp3",
+      "bytes": 30973
+    },
+    {
       "key": "cuatro",
       "text": "cuatro",
       "ipa": "/ˈkwatɾo/",
@@ -1027,6 +1204,23 @@
       ],
       "fileName": "cuatro-a37e3bea6f.mp3",
       "audioSrc": "/audio/language-packs/es-ES/cuatro-a37e3bea6f.mp3"
+    },
+    {
+      "key": "cuatro huevos",
+      "text": "cuatro huevos",
+      "ipa": "/ˈkwatɾo ˈweβos/",
+      "soundUnitSlugs": [
+        "es-diphthongs-w"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "cuatro-huevos-feb00ebc7c.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/cuatro-huevos-feb00ebc7c.mp3",
+      "bytes": 30137
     },
     {
       "key": "cuatro puertas",
@@ -1312,6 +1506,26 @@
       "audioSrc": "/audio/language-packs/es-ES/el-4f1ea4f09d.mp3"
     },
     {
+      "key": "el carro rojo va por la carretera.",
+      "text": "El carro rojo va por la carretera.",
+      "ipa": "/r x ɾ/",
+      "soundUnitSlugs": [
+        "es-tap-r",
+        "es-trill-r",
+        "es-x"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "el-carro-rojo-va-por-la-carretera-e09d75b68f.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/el-carro-rojo-va-por-la-carretera-e09d75b68f.mp3",
+      "bytes": 53960
+    },
+    {
       "key": "el libro",
       "text": "el libro",
       "ipa": "/el ˈlibɾo/",
@@ -1320,6 +1534,25 @@
       ],
       "fileName": "el-libro-3601a248e5.mp3",
       "audioSrc": "/audio/language-packs/es-ES/el-libro-3601a248e5.mp3"
+    },
+    {
+      "key": "el niño bebe agua fría.",
+      "text": "El niño bebe agua fría.",
+      "ipa": "/ɲ β/",
+      "soundUnitSlugs": [
+        "es-bv",
+        "es-ny"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "el-nino-bebe-agua-fria-c01ee76082.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/el-nino-bebe-agua-fria-c01ee76082.mp3",
+      "bytes": 41839
     },
     {
       "key": "el perro corre rápido",
@@ -1497,6 +1730,23 @@
       "audioSrc": "/audio/language-packs/es-ES/familia-grande-2ce07b9071.mp3"
     },
     {
+      "key": "familia limpia",
+      "text": "familia limpia",
+      "ipa": "/faˈmilja ˈlimpja/",
+      "soundUnitSlugs": [
+        "es-diphthongs-j"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "familia-limpia-60202b0e42.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/familia-limpia-60202b0e42.mp3",
+      "bytes": 33062
+    },
+    {
       "key": "favor",
       "text": "favor",
       "ipa": "/faˈβoɾ/",
@@ -1576,6 +1826,23 @@
       ],
       "fileName": "fuego-29a2923a32.mp3",
       "audioSrc": "/audio/language-packs/es-ES/fuego-29a2923a32.mp3"
+    },
+    {
+      "key": "fuego suave",
+      "text": "fuego suave",
+      "ipa": "/ˈfweɣo ˈswaβe/",
+      "soundUnitSlugs": [
+        "es-diphthongs-w"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "fuego-suave-665b997c29.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/fuego-suave-665b997c29.mp3",
+      "bytes": 27211
     },
     {
       "key": "fuerte",
@@ -1773,6 +2040,23 @@
       "audioSrc": "/audio/language-packs/es-ES/hablo-7dd286a81f.mp3"
     },
     {
+      "key": "hablo habló",
+      "text": "hablo habló",
+      "ipa": "/ˈaβlo aˈβlo/",
+      "soundUnitSlugs": [
+        "es-lexical-stress"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "hablo-hablo-a77062ff7c.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/hablo-hablo-a77062ff7c.mp3",
+      "bytes": 27629
+    },
+    {
       "key": "hacia",
       "text": "hacia",
       "ipa": "/ˈaθja/",
@@ -1917,6 +2201,25 @@
       "audioSrc": "/audio/language-packs/es-ES/jardin-152b0c982f.mp3"
     },
     {
+      "key": "javier trabaja por la mañana.",
+      "text": "Javier trabaja por la mañana.",
+      "ipa": "/x a/",
+      "soundUnitSlugs": [
+        "es-a",
+        "es-x"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "javier-trabaja-por-la-manana-865f503df4.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/javier-trabaja-por-la-manana-865f503df4.mp3",
+      "bytes": 51453
+    },
+    {
       "key": "jefe",
       "text": "jefe",
       "ipa": "/ˈxefe/",
@@ -2018,6 +2321,46 @@
       ],
       "fileName": "la-casa-esta-cerca-20e0d18dc4.mp3",
       "audioSrc": "/audio/language-packs/es-ES/la-casa-esta-cerca-20e0d18dc4.mp3"
+    },
+    {
+      "key": "la casa está cerca de la plaza.",
+      "text": "La casa está cerca de la plaza.",
+      "ipa": "/a e θ/",
+      "soundUnitSlugs": [
+        "es-a",
+        "es-e",
+        "es-theta"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "la-casa-esta-cerca-de-la-plaza-dac8a78214.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/la-casa-esta-cerca-de-la-plaza-dac8a78214.mp3",
+      "bytes": 51453
+    },
+    {
+      "key": "la ciudad tiene cinco universidades.",
+      "text": "La ciudad tiene cinco universidades.",
+      "ipa": "/θj s/",
+      "soundUnitSlugs": [
+        "es-diphthongs-j",
+        "es-s",
+        "es-theta"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "la-ciudad-tiene-cinco-universidades-2fa07c8eb2.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/la-ciudad-tiene-cinco-universidades-2fa07c8eb2.mp3",
+      "bytes": 62737
     },
     {
       "key": "la duda",
@@ -2422,6 +2765,23 @@
       "audioSrc": "/audio/language-packs/es-ES/medico-c83be04260.mp3"
     },
     {
+      "key": "medico médico",
+      "text": "medico médico",
+      "ipa": "/meˈðiko ˈmeðiko/",
+      "soundUnitSlugs": [
+        "es-lexical-stress"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "medico-medico-69c0a58c3f.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/medico-medico-69c0a58c3f.mp3",
+      "bytes": 27629
+    },
+    {
       "key": "médico práctico",
       "text": "médico práctico",
       "ipa": "/ˈmeðiko ˈpɾaktiko/",
@@ -2503,6 +2863,26 @@
       "audioSrc": "/audio/language-packs/es-ES/mi-amigo-dice-hola-dbbbcfbd31.mp3"
     },
     {
+      "key": "mi amigo dice que todo va bien.",
+      "text": "Mi amigo dice que todo va bien.",
+      "ipa": "/ð ɣ j/",
+      "soundUnitSlugs": [
+        "es-d",
+        "es-diphthongs-j",
+        "es-g"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "mi-amigo-dice-que-todo-va-bien-9d90ee71d0.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/mi-amigo-dice-que-todo-va-bien-9d90ee71d0.mp3",
+      "bytes": 50199
+    },
+    {
       "key": "mi niño",
       "text": "mi niño",
       "ipa": "/mi ˈniɲo/",
@@ -2521,6 +2901,28 @@
       ],
       "fileName": "mi-nombre-3ed4ff026c.mp3",
       "audioSrc": "/audio/language-packs/es-ES/mi-nombre-3ed4ff026c.mp3"
+    },
+    {
+      "key": "mi perro corre por la plaza. la niña compra pan, queso y zumo por la mañana.",
+      "text": "Mi perro corre por la plaza. La niña compra pan, queso y zumo por la mañana.",
+      "ipa": "Mi perro corre por la plaza. La niña compra pan, queso y zumo por la mañana.",
+      "soundUnitSlugs": [
+        "es-a",
+        "es-e",
+        "es-tap-r",
+        "es-theta",
+        "es-trill-r"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "diagnostic-passage",
+        "phoneme-keyword"
+      ],
+      "fileName": "mi-perro-corre-por-la-plaza-la-nina-compra-4d4bed99c7.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/mi-perro-corre-por-la-plaza-la-nina-compra-4d4bed99c7.mp3",
+      "bytes": 113311
     },
     {
       "key": "mi vida",
@@ -2760,6 +3162,40 @@
       "audioSrc": "/audio/language-packs/es-ES/novia-3eb1762b32.mp3"
     },
     {
+      "key": "nueve puertas",
+      "text": "nueve puertas",
+      "ipa": "/ˈnweβe ˈpweɾtas/",
+      "soundUnitSlugs": [
+        "es-diphthongs-w"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "nueve-puertas-10bfcb54c5.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/nueve-puertas-10bfcb54c5.mp3",
+      "bytes": 30137
+    },
+    {
+      "key": "numero número",
+      "text": "numero número",
+      "ipa": "/nuˈmeɾo ˈnumeɾo/",
+      "soundUnitSlugs": [
+        "es-lexical-stress"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "numero-numero-62bba63370.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/numero-numero-62bba63370.mp3",
+      "bytes": 26375
+    },
+    {
       "key": "ocho",
       "text": "ocho",
       "ipa": "/ˈotʃo/",
@@ -2920,6 +3356,41 @@
       "audioSrc": "/audio/language-packs/es-ES/papa-hablo-bc778b2924.mp3"
     },
     {
+      "key": "papá habló con el médico.",
+      "text": "Papá habló con el médico.",
+      "ipa": "stress",
+      "soundUnitSlugs": [
+        "es-lexical-stress"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "papa-hablo-con-el-medico-2106aec056.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/papa-hablo-con-el-medico-2106aec056.mp3",
+      "bytes": 41839
+    },
+    {
+      "key": "papa y papá",
+      "text": "papa y papá",
+      "ipa": "/ˈpapa i paˈpa/",
+      "soundUnitSlugs": [
+        "es-lexical-stress"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "papa-y-papa-d448642f38.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/papa-y-papa-d448642f38.mp3",
+      "bytes": 30137
+    },
+    {
       "key": "para",
       "text": "para",
       "ipa": "/ˈpaɾa/",
@@ -2970,6 +3441,25 @@
       "audioSrc": "/audio/language-packs/es-ES/pero-98fc7b3476.mp3"
     },
     {
+      "key": "pero mi perro corre rápido.",
+      "text": "Pero mi perro corre rápido.",
+      "ipa": "/ɾ r/",
+      "soundUnitSlugs": [
+        "es-tap-r",
+        "es-trill-r"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "pero-mi-perro-corre-rapido-01d2882083.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/pero-mi-perro-corre-rapido-01d2882083.mp3",
+      "bytes": 47691
+    },
+    {
       "key": "perro",
       "text": "perro",
       "ipa": "/ˈpero/",
@@ -2988,6 +3478,23 @@
         "es-i"
       ],
       "audioSrc": "/audio/language-packs/es-ES/peso-b0c7efa6f3.mp3"
+    },
+    {
+      "key": "piedra pequeña",
+      "text": "piedra pequeña",
+      "ipa": "/ˈpjeðɾa peˈkeɲa/",
+      "soundUnitSlugs": [
+        "es-diphthongs-j"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "piedra-pequena-33d8528a45.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/piedra-pequena-33d8528a45.mp3",
+      "bytes": 33062
     },
     {
       "key": "piñata",
@@ -3071,6 +3578,23 @@
       "audioSrc": "/audio/language-packs/es-ES/practico-548110f34f.mp3"
     },
     {
+      "key": "practico practicó",
+      "text": "practico practicó",
+      "ipa": "/pɾakˈtiko pɾaktiˈko/",
+      "soundUnitSlugs": [
+        "es-lexical-stress"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "practico-practico-4d5bba2f9c.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/practico-practico-4d5bba2f9c.mp3",
+      "bytes": 37660
+    },
+    {
       "key": "primero",
       "text": "primero",
       "ipa": "/pɾiˈmeɾo/",
@@ -3144,6 +3668,23 @@
       "audioSrc": "/audio/language-packs/es-ES/puerta-16924b922b.mp3"
     },
     {
+      "key": "puerta nueva",
+      "text": "puerta nueva",
+      "ipa": "/ˈpweɾta ˈnweβa/",
+      "soundUnitSlugs": [
+        "es-diphthongs-w"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "puerta-nueva-ec3001063b.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/puerta-nueva-ec3001063b.mp3",
+      "bytes": 29301
+    },
+    {
       "key": "queso",
       "text": "queso",
       "ipa": "/ˈkeso/",
@@ -3162,6 +3703,23 @@
       ],
       "fileName": "radio-d432c3525b.mp3",
       "audioSrc": "/audio/language-packs/es-ES/radio-d432c3525b.mp3"
+    },
+    {
+      "key": "radio antiguo",
+      "text": "radio antiguo",
+      "ipa": "/ˈraðjo anˈtiɣwo/",
+      "soundUnitSlugs": [
+        "es-diphthongs-j"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "radio-antiguo-d60afb8ad4.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/radio-antiguo-d60afb8ad4.mp3",
+      "bytes": 32226
     },
     {
       "key": "rápido",
@@ -3341,6 +3899,23 @@
       "audioSrc": "/audio/language-packs/es-ES/sal-caf8dae170.mp3"
     },
     {
+      "key": "sala",
+      "text": "sala",
+      "ipa": "/ˈsala/",
+      "soundUnitSlugs": [
+        "es-s"
+      ],
+      "kinds": [
+        "word"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "sala-d564bc7a33.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/sala-d564bc7a33.mp3",
+      "bytes": 17598
+    },
+    {
       "key": "salud",
       "text": "salud",
       "ipa": "/saˈluð/",
@@ -3454,6 +4029,23 @@
       "audioSrc": "/audio/language-packs/es-ES/si-5e06bd15f9.mp3"
     },
     {
+      "key": "siempre",
+      "text": "siempre",
+      "ipa": "/ˈsjempɾe/",
+      "soundUnitSlugs": [
+        "es-s"
+      ],
+      "kinds": [
+        "word"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "siempre-59c834d8be.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/siempre-59c834d8be.mp3",
+      "bytes": 21777
+    },
+    {
       "key": "silla",
       "text": "silla",
       "ipa": "/ˈsiʝa/",
@@ -3514,6 +4106,23 @@
       ],
       "fileName": "subrayar-31c50d62fc.mp3",
       "audioSrc": "/audio/language-packs/es-ES/subrayar-31c50d62fc.mp3"
+    },
+    {
+      "key": "suelo fuerte",
+      "text": "suelo fuerte",
+      "ipa": "/ˈswelo ˈfweɾte/",
+      "soundUnitSlugs": [
+        "es-diphthongs-w"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "suelo-fuerte-4765d88402.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/suelo-fuerte-4765d88402.mp3",
+      "bytes": 28465
     },
     {
       "key": "sueño",
@@ -3592,6 +4201,23 @@
       "audioSrc": "/audio/language-packs/es-ES/tengo-una-pregunta-fd971a1a21.mp3"
     },
     {
+      "key": "termino terminó",
+      "text": "termino terminó",
+      "ipa": "/teɾˈmino teɾmiˈno/",
+      "soundUnitSlugs": [
+        "es-lexical-stress"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "termino-termino-be93a616ae.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/termino-termino-be93a616ae.mp3",
+      "bytes": 37660
+    },
+    {
       "key": "tiempo",
       "text": "tiempo",
       "ipa": "/ˈtjempo/",
@@ -3601,6 +4227,23 @@
       ],
       "fileName": "tiempo-a5da6d9c96.mp3",
       "audioSrc": "/audio/language-packs/es-ES/tiempo-a5da6d9c96.mp3"
+    },
+    {
+      "key": "tiene tiempo",
+      "text": "tiene tiempo",
+      "ipa": "/ˈtjene ˈtjempo/",
+      "soundUnitSlugs": [
+        "es-diphthongs-j"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "tiene-tiempo-6eb50ff2ae.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/tiene-tiempo-6eb50ff2ae.mp3",
+      "bytes": 29301
     },
     {
       "key": "tierra",
@@ -3614,6 +4257,25 @@
       "audioSrc": "/audio/language-packs/es-ES/tierra-c7039f8547.mp3"
     },
     {
+      "key": "tierra y cielo son palabras con diptongos.",
+      "text": "Tierra y cielo son palabras con diptongos.",
+      "ipa": "/j/",
+      "soundUnitSlugs": [
+        "es-diphthongs-j",
+        "es-theta"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "tierra-y-cielo-son-palabras-con-diptongos-df7ea775bf.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/tierra-y-cielo-son-palabras-con-diptongos-df7ea775bf.mp3",
+      "bytes": 74022
+    },
+    {
       "key": "todo",
       "text": "todo",
       "ipa": "/ˈtoðo/",
@@ -3622,6 +4284,23 @@
       ],
       "fileName": "todo-05f20a7178.mp3",
       "audioSrc": "/audio/language-packs/es-ES/todo-05f20a7178.mp3"
+    },
+    {
+      "key": "tomate",
+      "text": "tomate",
+      "ipa": "/toˈmate/",
+      "soundUnitSlugs": [
+        "es-syllable-rhythm"
+      ],
+      "kinds": [
+        "word"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "tomate-5f85c4fe0e.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/tomate-5f85c4fe0e.mp3",
+      "bytes": 20524
     },
     {
       "key": "trabajo",
@@ -3766,6 +4445,25 @@
       "audioSrc": "/audio/language-packs/es-ES/un-gato-cb0821b10a.mp3"
     },
     {
+      "key": "un gato duerme en un banco.",
+      "text": "Un gato duerme en un banco.",
+      "ipa": "nasal place",
+      "soundUnitSlugs": [
+        "es-g",
+        "es-nasal-place"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "un-gato-duerme-en-un-banco-735edd3736.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/un-gato-duerme-en-un-banco-735edd3736.mp3",
+      "bytes": 47273
+    },
+    {
       "key": "un niño",
       "text": "un niño",
       "ipa": "/un ˈniɲo/",
@@ -3804,6 +4502,26 @@
       ],
       "fileName": "una-familia-grande-e90f1cd1a7.mp3",
       "audioSrc": "/audio/language-packs/es-ES/una-familia-grande-e90f1cd1a7.mp3"
+    },
+    {
+      "key": "una familia vive en madrid.",
+      "text": "Una familia vive en Madrid.",
+      "ipa": "/u i ð/",
+      "soundUnitSlugs": [
+        "es-d",
+        "es-i",
+        "es-u"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "una-familia-vive-en-madrid-811b386164.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/una-familia-vive-en-madrid-811b386164.mp3",
+      "bytes": 46437
     },
     {
       "key": "una luna",
@@ -3937,6 +4655,23 @@
       "audioSrc": "/audio/language-packs/es-ES/viaje-4db7412397.mp3"
     },
     {
+      "key": "viaje diario",
+      "text": "viaje diario",
+      "ipa": "/ˈbjaxe ˈdjaɾjo/",
+      "soundUnitSlugs": [
+        "es-diphthongs-j"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "viaje-diario-9ebfc3b939.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/viaje-diario-9ebfc3b939.mp3",
+      "bytes": 31391
+    },
+    {
       "key": "vida",
       "text": "vida",
       "ipa": "/ˈbiða/",
@@ -4049,6 +4784,24 @@
       "audioSrc": "/audio/language-packs/es-ES/yo-llamo-e5b42c87f0.mp3"
     },
     {
+      "key": "yo llevo la llave amarilla.",
+      "text": "Yo llevo la llave amarilla.",
+      "ipa": "/ʝ/",
+      "soundUnitSlugs": [
+        "es-y-ll"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "yo-llevo-la-llave-amarilla-9adc7800bb.mp3",
+      "audioSrc": "/audio/language-packs/es-ES/yo-llevo-la-llave-amarilla-9adc7800bb.mp3",
+      "bytes": 44347
+    },
+    {
       "key": "zapatería",
       "text": "zapatería",
       "ipa": "/θapateˈɾia/",
@@ -4088,5 +4841,6 @@
       "fileName": "zona-azul-b2453ca887.mp3",
       "audioSrc": "/audio/language-packs/es-ES/zona-azul-b2453ca887.mp3"
     }
-  ]
+  ],
+  "updatedAt": "2026-06-11T08:26:06.310Z"
 }

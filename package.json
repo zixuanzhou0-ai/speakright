@@ -26,6 +26,8 @@
     "desktop:ui-smoke": "node scripts/desktop-ui-smoke.mjs",
     "desktop:live-validation": "node scripts/desktop-live-validation.mjs --azure-mode=high",
     "desktop:live-validation:full": "node scripts/desktop-live-validation.mjs --azure-mode=full",
+    "audio:parity:dry-run": "node scripts/multilingual-audio-parity-report.mjs --dry-run",
+    "audio:parity:generate": "node scripts/multilingual-audio-parity-generate.mjs --confirm",
     "desktop:release-report": "node scripts/desktop-release-report.mjs",
     "desktop:installer-smoke": "node scripts/desktop-installer-smoke.mjs",
     "desktop:release-gate": "node scripts/desktop-release-gate.mjs",

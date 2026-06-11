@@ -55,6 +55,10 @@ uses the online dictionary only as a fallback. Spanish, French, and Russian
 word/phrase audio is already bundled in the desktop app. Users do not install
 language audio packs separately.
 
+Spanish, French, and Russian are bundled at the current 24-item-per-sound-unit
+learning-density target. The parity dry-run is still useful as a zero-cost audit:
+it does not call ElevenLabs and should report no missing language-pack audio.
+
 Release validation is intentionally conservative with ElevenLabs credits:
 normal validation checks the usage endpoint only and does not generate fresh
 audio. Free-form read-along TTS can still use ElevenLabs after the user enters a
@@ -97,8 +101,10 @@ hardening pass. Previous release-validation baseline: `94be1d4`.
 
 - Recommended launch path: `npm run desktop:launch-release`.
 - Build shape: Tauri static bundle, not `localhost`.
-- Bundled asset check: English `1464/1464`, Spanish `398/398`, French
-  `509/509`, Russian `407/407`, videos `210/210`.
+- Bundled asset check before the latest audio expansion: English `1464/1464`,
+  Spanish `398/398`, French `509/509`, Russian `407/407`, videos `210/210`.
+- Multilingual audio parity after generation: Spanish `440/440`, French
+  `545/545`, Russian `460/460`, total missing `0`.
 - Azure live validation: `220/220` sampled pronunciation assessments passed.
 - ElevenLabs validation usage: usage query only, `0` generated TTS characters.
 - Release UI smoke: Settings, English, Spanish, French, Russian, drill, free

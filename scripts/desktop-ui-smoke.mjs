@@ -216,10 +216,14 @@ async function evaluate(cdp, expression) {
     returnByValue: true,
   });
   if (result.exceptionDetails) {
+    const exception = result.exceptionDetails.exception;
+    const description =
+      exception?.description ??
+      exception?.value ??
+      result.exceptionDetails.text ??
+      "unknown exception";
     throw new Error(
-      `Desktop UI smoke evaluation failed: ${
-        result.exceptionDetails.text ?? "unknown exception"
-      }`,
+      `Desktop UI smoke evaluation failed: ${description}`,
     );
   }
   return result.result?.value;
@@ -238,21 +242,125 @@ async function waitForCondition(cdp, expression, label) {
   );
 }
 
+async function currentPathname(cdp) {
+  return evaluate(cdp, "window.location.pathname");
+}
+
+async function clickRouteLink(cdp, pathname) {
+  const deadline = Date.now() + 10_000;
+  let target = null;
+  while (Date.now() < deadline) {
+    target = await evaluate(
+      cdp,
+      `
+(() => {
+  const pathname = ${JSON.stringify(pathname)};
+  const anchors = [...document.querySelectorAll("a[href]")];
+  const link = anchors.find((anchor) => {
+    const attr = anchor.getAttribute("href");
+    let parsedPathname = attr ?? "";
+    try {
+      parsedPathname = new URL(anchor.href, window.location.href).pathname;
+    } catch {
+      // Keep the raw href attribute for comparison.
+    }
+    return attr === pathname || parsedPathname === pathname;
+  });
+  if (!link) {
+    return {
+      ok: false,
+      reason: "missing-link",
+      links: anchors.slice(0, 20).map((anchor) => ({
+        text: anchor.innerText.trim(),
+        attr: anchor.getAttribute("href"),
+        href: anchor.href
+      }))
+    };
+  }
+  link.scrollIntoView({ block: "center", inline: "center" });
+  const rect = link.getBoundingClientRect();
+  return {
+    ok: rect.width > 0 && rect.height > 0,
+    reason: rect.width > 0 && rect.height > 0 ? "ok" : "not-visible",
+    x: rect.left + rect.width / 2,
+    y: rect.top + rect.height / 2,
+    text: link.innerText.trim(),
+    attr: link.getAttribute("href"),
+    href: link.href
+  };
+})()
+`,
+    );
+    if (target?.ok) break;
+    await delay(250);
+  }
+  if (!target?.ok) {
+    throw new Error(
+      `Could not find visible route link for ${pathname}: ${JSON.stringify(
+        target,
+      )}`,
+    );
+  }
+  await cdp.send("Input.dispatchMouseEvent", {
+    type: "mouseMoved",
+    x: target.x,
+    y: target.y,
+  });
+  await cdp.send("Input.dispatchMouseEvent", {
+    type: "mousePressed",
+    x: target.x,
+    y: target.y,
+    button: "left",
+    clickCount: 1,
+  });
+  await cdp.send("Input.dispatchMouseEvent", {
+    type: "mouseReleased",
+    x: target.x,
+    y: target.y,
+    button: "left",
+    clickCount: 1,
+  });
+  await delay(300);
+}
+
 async function navigate(cdp, pathname, expectedSelector) {
-  await evaluate(
-    cdp,
-    `window.location.assign(new URL(${JSON.stringify(pathname)}, window.location.href).href); "navigating";`,
-  );
+  if ((await currentPathname(cdp)) !== pathname) {
+    if (pathname.startsWith("/phonemes/")) {
+      const current = await currentPathname(cdp);
+      if (!current.startsWith("/phonemes")) {
+        await clickRouteLink(cdp, "/phonemes");
+        await waitForCondition(
+          cdp,
+          `
+(() => ({
+  ok:
+    window.location.pathname.startsWith("/phonemes") &&
+    document.readyState !== "loading" &&
+    !!document.querySelector('[data-smoke="phoneme-detail-page"]'),
+  href: window.location.href,
+  bodyText: document.body.innerText.slice(0, 500)
+}))()
+`,
+          "/phonemes shell to render",
+        );
+      }
+    }
+    if ((await currentPathname(cdp)) !== pathname) {
+      await clickRouteLink(cdp, pathname);
+    }
+  }
   await waitForCondition(
     cdp,
     `
 (() => {
   const bodyText = document.body ? document.body.innerText : "";
+  const expectedPathname = ${JSON.stringify(pathname)};
   const releaseServedFromDevServer =
     (window.location.protocol === "http:" || window.location.protocol === "https:") &&
     ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname);
   return {
     ok:
+      window.location.pathname === expectedPathname &&
       document.readyState !== "loading" &&
       !!document.querySelector(${JSON.stringify(expectedSelector)}) &&
       bodyText.trim().length > 20 &&

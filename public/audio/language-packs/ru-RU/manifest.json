@@ -13,11 +13,11 @@
     "style": 0.03,
     "use_speaker_boost": true
   },
-  "itemCount": 407,
-  "generated": 399,
+  "itemCount": 460,
+  "generated": 452,
   "skipped": 0,
   "failed": 0,
-  "estimatedCredits": 2470,
+  "estimatedCredits": 3354,
   "failures": [],
   "items": [
     {
@@ -396,6 +396,23 @@
       "audioSrc": "/audio/language-packs/ru-RU/word-a1e007f6a2.mp3"
     },
     {
+      "key": "вокзал открыт",
+      "text": "вокзал открыт",
+      "ipa": "/vɐgˈzal ɐtˈkrɨt/",
+      "soundUnitSlugs": [
+        "ru-stress-reduction"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "item-c73f4408b1.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-c73f4408b1.mp3",
+      "bytes": 27211
+    },
+    {
       "key": "вокзал рядом",
       "text": "вокзал рядом",
       "ipa": "/vɐgˈzal ˈrʲadəm/",
@@ -415,6 +432,23 @@
       ],
       "fileName": "word-c12816ac81.mp3",
       "audioSrc": "/audio/language-packs/ru-RU/word-c12816ac81.mp3"
+    },
+    {
+      "key": "врач строгий",
+      "text": "врач строгий",
+      "ipa": "/vratɕ ˈstrogʲɪj/",
+      "soundUnitSlugs": [
+        "ru-clusters"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "item-d27c8de558.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-d27c8de558.mp3",
+      "bytes": 24703
     },
     {
       "key": "время",
@@ -448,6 +482,25 @@
       ],
       "fileName": "--9d5f786fad.mp3",
       "audioSrc": "/audio/language-packs/ru-RU/--9d5f786fad.mp3"
+    },
+    {
+      "key": "встреча завтра утром.",
+      "text": "Встреча завтра утром.",
+      "ipa": "clusters + assimilation",
+      "soundUnitSlugs": [
+        "ru-clusters",
+        "ru-voicing-assimilation"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "item-616a3c890f.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-616a3c890f.mp3",
+      "bytes": 29301
     },
     {
       "key": "вторник",
@@ -575,6 +628,23 @@
       "audioSrc": "/audio/language-packs/ru-RU/--8804672dc6.mp3"
     },
     {
+      "key": "город спит",
+      "text": "город спит",
+      "ipa": "/ˈgorət spʲit/",
+      "soundUnitSlugs": [
+        "ru-final-devoicing"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "item-e631902b86.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-e631902b86.mp3",
+      "bytes": 22613
+    },
+    {
       "key": "группа",
       "text": "группа",
       "ipa": "/ˈgrupə/",
@@ -583,6 +653,23 @@
       ],
       "fileName": "word-1bb841b2ea.mp3",
       "audioSrc": "/audio/language-packs/ru-RU/word-1bb841b2ea.mp3"
+    },
+    {
+      "key": "группа студентов",
+      "text": "группа студентов",
+      "ipa": "/ˈgrupə stʊˈdʲentəf/",
+      "soundUnitSlugs": [
+        "ru-clusters"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "item-607667bde6.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-607667bde6.mp3",
+      "bytes": 27211
     },
     {
       "key": "да",
@@ -638,6 +725,24 @@
       ],
       "fileName": "word-e2d65893aa.mp3",
       "audioSrc": "/audio/language-packs/ru-RU/word-e2d65893aa.mp3"
+    },
+    {
+      "key": "день и дом звучат по-разному.",
+      "text": "День и дом звучат по-разному.",
+      "ipa": "/d dʲ/",
+      "soundUnitSlugs": [
+        "ru-soft-t-d"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "item-aa1bf05f8f.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-aa1bf05f8f.mp3",
+      "bytes": 39750
     },
     {
       "key": "десять",
@@ -754,6 +859,40 @@
       "audioSrc": "/audio/language-packs/ru-RU/word-b2a5198ed5.mp3"
     },
     {
+      "key": "дорога далеко",
+      "text": "дорога далеко",
+      "ipa": "/dɐˈrogə dəlʲɪˈko/",
+      "soundUnitSlugs": [
+        "ru-stress-reduction"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "item-35a5dde082.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-35a5dde082.mp3",
+      "bytes": 26375
+    },
+    {
+      "key": "дорога назад",
+      "text": "дорога назад",
+      "ipa": "/dɐˈrogə nɐˈzat/",
+      "soundUnitSlugs": [
+        "ru-unstressed-o-a"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "item-6e7bfd5b95.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-6e7bfd5b95.mp3",
+      "bytes": 25539
+    },
+    {
       "key": "дорогой",
       "text": "дорогой",
       "ipa": "/dərɐˈgoj/",
@@ -795,6 +934,42 @@
       ],
       "fileName": "--fda78e1775.mp3",
       "audioSrc": "/audio/language-packs/ru-RU/--fda78e1775.mp3"
+    },
+    {
+      "key": "друг ждёт у гаража.",
+      "text": "Друг ждёт у гаража.",
+      "ipa": "final devoicing",
+      "soundUnitSlugs": [
+        "ru-final-devoicing",
+        "ru-sh-zh"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "item-86f2da9212.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-86f2da9212.mp3",
+      "bytes": 30973
+    },
+    {
+      "key": "друг пришёл",
+      "text": "друг пришёл",
+      "ipa": "/druk prʲɪˈʂol/",
+      "soundUnitSlugs": [
+        "ru-final-devoicing"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "item-a8bbdb644e.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-a8bbdb644e.mp3",
+      "bytes": 23449
     },
     {
       "key": "дуб",
@@ -848,6 +1023,23 @@
       "audioSrc": "/audio/language-packs/ru-RU/word-4373affd9c.mp3"
     },
     {
+      "key": "её имя",
+      "text": "её имя",
+      "ipa": "/jɪˈjo ˈimʲə/",
+      "soundUnitSlugs": [
+        "ru-iotated-vowels"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "item-8d86bfb25c.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-8d86bfb25c.mp3",
+      "bytes": 20942
+    },
+    {
       "key": "ёж",
       "text": "ёж",
       "ipa": "/joʂ/",
@@ -866,6 +1058,23 @@
       ],
       "fileName": "word-1a32ce6748.mp3",
       "audioSrc": "/audio/language-packs/ru-RU/word-1a32ce6748.mp3"
+    },
+    {
+      "key": "ёлка яркая",
+      "text": "ёлка яркая",
+      "ipa": "/ˈjolkə ˈjarkəjə/",
+      "soundUnitSlugs": [
+        "ru-iotated-vowels"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "item-78c1d89cb7.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-78c1d89cb7.mp3",
+      "bytes": 24285
     },
     {
       "key": "ест есть",
@@ -1051,6 +1260,52 @@
       ],
       "fileName": "word-93d085e99c.mp3",
       "audioSrc": "/audio/language-packs/ru-RU/word-93d085e99c.mp3"
+    },
+    {
+      "key": "здравствуйте, студент.",
+      "text": "Здравствуйте, студент.",
+      "ipa": "clusters",
+      "soundUnitSlugs": [
+        "ru-clusters"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "item-77b8923809.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-77b8923809.mp3",
+      "bytes": 29301
+    },
+    {
+      "key": "здравствуйте. сегодня студент идёт в школу, читает русский текст, встречает друга и говорит спасибо.",
+      "text": "Здравствуйте. Сегодня студент идёт в школу, читает русский текст, встречает друга и говорит спасибо.",
+      "ipa": "Здра́вствуйте. Сего́дня студе́нт идёт в шко́лу, чита́ет ру́сский текст, встреча́ет дру́га и говори́т спаси́бо.",
+      "soundUnitSlugs": [
+        "ru-ch",
+        "ru-clusters",
+        "ru-final-devoicing",
+        "ru-hard-soft",
+        "ru-soft-s-z",
+        "ru-soft-t-d",
+        "ru-stress-reduction",
+        "ru-ts",
+        "ru-unstressed-e-ya",
+        "ru-unstressed-o-a",
+        "ru-voicing-assimilation"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "diagnostic-passage",
+        "phoneme-keyword"
+      ],
+      "fileName": "item-7992b71bb4.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-7992b71bb4.mp3",
+      "bytes": 129611
     },
     {
       "key": "земля",
@@ -1248,6 +1503,23 @@
       ],
       "fileName": "word-285fcfcc46.mp3",
       "audioSrc": "/audio/language-packs/ru-RU/word-285fcfcc46.mp3"
+    },
+    {
+      "key": "класс большой",
+      "text": "класс большой",
+      "ipa": "/klas bɐlʲˈʂoj/",
+      "soundUnitSlugs": [
+        "ru-clusters"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "item-47bb98ef3c.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-47bb98ef3c.mp3",
+      "bytes": 23449
     },
     {
       "key": "ключ",
@@ -1509,6 +1781,24 @@
       "audioSrc": "/audio/language-packs/ru-RU/---11abea7f0d.mp3"
     },
     {
+      "key": "лук и люк - разные слова.",
+      "text": "Лук и люк - разные слова.",
+      "ipa": "/l lʲ/",
+      "soundUnitSlugs": [
+        "ru-soft-n-l-r"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "item-256b96f549.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-256b96f549.mp3",
+      "bytes": 34316
+    },
+    {
       "key": "лук люк",
       "text": "лук люк",
       "ipa": "/luk/ /lʲuk/",
@@ -1575,6 +1865,23 @@
       "audioSrc": "/audio/language-packs/ru-RU/word-dea5c61b97.mp3"
     },
     {
+      "key": "магазин закрыт",
+      "text": "магазин закрыт",
+      "ipa": "/məgɐˈzʲin zɐˈkrɨt/",
+      "soundUnitSlugs": [
+        "ru-stress-reduction"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "item-12eb7e59d2.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-12eb7e59d2.mp3",
+      "bytes": 25539
+    },
+    {
       "key": "май",
       "text": "май",
       "ipa": "/maj/",
@@ -1604,6 +1911,25 @@
       ],
       "fileName": "--ba6505d4cf.mp3",
       "audioSrc": "/audio/language-packs/ru-RU/--ba6505d4cf.mp3"
+    },
+    {
+      "key": "мама дома.",
+      "text": "Мама дома.",
+      "ipa": "/ˈmamə ˈdomə/",
+      "soundUnitSlugs": [
+        "ru-a",
+        "ru-stress-reduction"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "item-7a8a190834.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-7a8a190834.mp3",
+      "bytes": 20942
     },
     {
       "key": "мат",
@@ -1665,6 +1991,23 @@
       ],
       "fileName": "---82199aed27.mp3",
       "audioSrc": "/audio/language-packs/ru-RU/---82199aed27.mp3"
+    },
+    {
+      "key": "машина у дома",
+      "text": "машина у дома",
+      "ipa": "/mɐˈʂinə u ˈdomə/",
+      "soundUnitSlugs": [
+        "ru-stress-reduction"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "item-4d211c3dad.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-4d211c3dad.mp3",
+      "bytes": 26375
     },
     {
       "key": "мёд",
@@ -1796,6 +2139,25 @@
       "audioSrc": "/audio/language-packs/ru-RU/word-5ff3982c7f.mp3"
     },
     {
+      "key": "мой поезд идёт на юг.",
+      "text": "Мой поезд идёт на юг.",
+      "ipa": "/j/",
+      "soundUnitSlugs": [
+        "ru-iotated-vowels",
+        "ru-j"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "item-3b39806070.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-3b39806070.mp3",
+      "bytes": 29301
+    },
+    {
       "key": "мой чай",
       "text": "мой чай",
       "ipa": "/moj tɕaj/",
@@ -1838,6 +2200,23 @@
       "audioSrc": "/audio/language-packs/ru-RU/--15b1bb7d0b.mp3"
     },
     {
+      "key": "молоко холодное",
+      "text": "молоко холодное",
+      "ipa": "/məlɐˈko ˈxolədnəjə/",
+      "soundUnitSlugs": [
+        "ru-unstressed-o-a"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "item-f3f1585c83.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-f3f1585c83.mp3",
+      "bytes": 27629
+    },
+    {
       "key": "море",
       "text": "море",
       "ipa": "/ˈmorʲe/",
@@ -1870,6 +2249,23 @@
       "audioSrc": "/audio/language-packs/ru-RU/word-2d4e532143.mp3"
     },
     {
+      "key": "москва большая",
+      "text": "Москва большая",
+      "ipa": "/mɐˈskva bɐlʲˈʂajə/",
+      "soundUnitSlugs": [
+        "ru-unstressed-o-a"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "item-09ec347cdc.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-09ec347cdc.mp3",
+      "bytes": 25539
+    },
+    {
       "key": "москва сегодня",
       "text": "Москва сегодня",
       "ipa": "/mɐˈskva sʲɪˈvodnʲə/",
@@ -1879,6 +2275,25 @@
       ],
       "fileName": "--535758da26.mp3",
       "audioSrc": "/audio/language-packs/ru-RU/--535758da26.mp3"
+    },
+    {
+      "key": "москва сегодня холодная.",
+      "text": "Москва сегодня холодная.",
+      "ipa": "/ɐ ə/",
+      "soundUnitSlugs": [
+        "ru-unstressed-e-ya",
+        "ru-unstressed-o-a"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "item-1b6c8c742a.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-1b6c8c742a.mp3",
+      "bytes": 30973
     },
     {
       "key": "мост",
@@ -1899,6 +2314,23 @@
       ],
       "fileName": "word-012952f8c8.mp3",
       "audioSrc": "/audio/language-packs/ru-RU/word-012952f8c8.mp3"
+    },
+    {
+      "key": "моя семья",
+      "text": "моя семья",
+      "ipa": "/mɐˈja sʲɪmʲˈja/",
+      "soundUnitSlugs": [
+        "ru-iotated-vowels"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "item-84867175a8.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-84867175a8.mp3",
+      "bytes": 22613
     },
     {
       "key": "музей",
@@ -2015,6 +2447,23 @@
       "audioSrc": "/audio/language-packs/ru-RU/word-014413c1cc.mp3"
     },
     {
+      "key": "новая юбка",
+      "text": "новая юбка",
+      "ipa": "/ˈnovəjə ˈjupkə/",
+      "soundUnitSlugs": [
+        "ru-iotated-vowels"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "item-8ab57ef014.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-8ab57ef014.mp3",
+      "bytes": 24703
+    },
+    {
       "key": "новый",
       "text": "новый",
       "ipa": "/ˈnovɨj/",
@@ -2056,6 +2505,23 @@
       ],
       "fileName": "--2a4195211d.mp3",
       "audioSrc": "/audio/language-packs/ru-RU/--2a4195211d.mp3"
+    },
+    {
+      "key": "нож тупой",
+      "text": "нож тупой",
+      "ipa": "/noʂ tʊˈpoj/",
+      "soundUnitSlugs": [
+        "ru-final-devoicing"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "item-953ef94dfc.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-953ef94dfc.mp3",
+      "bytes": 22613
     },
     {
       "key": "номер",
@@ -2132,6 +2598,23 @@
       "audioSrc": "/audio/language-packs/ru-RU/word-f663f7daa0.mp3"
     },
     {
+      "key": "окно открыто",
+      "text": "окно открыто",
+      "ipa": "/ɐkˈno ɐtˈkrɨtə/",
+      "soundUnitSlugs": [
+        "ru-unstressed-o-a"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "item-09833aa574.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-09833aa574.mp3",
+      "bytes": 24703
+    },
+    {
       "key": "около",
       "text": "около",
       "ipa": "/ˈokələ/",
@@ -2140,6 +2623,23 @@
       ],
       "fileName": "word-3b80f9db93.mp3",
       "audioSrc": "/audio/language-packs/ru-RU/word-3b80f9db93.mp3"
+    },
+    {
+      "key": "она дома",
+      "text": "она дома",
+      "ipa": "/ɐˈna ˈdomə/",
+      "soundUnitSlugs": [
+        "ru-unstressed-o-a"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "item-e5bd5984db.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-e5bd5984db.mp3",
+      "bytes": 20524
     },
     {
       "key": "орех",
@@ -2323,6 +2823,23 @@
       ],
       "fileName": "word-82b2008359.mp3",
       "audioSrc": "/audio/language-packs/ru-RU/word-82b2008359.mp3"
+    },
+    {
+      "key": "погода хорошая",
+      "text": "погода хорошая",
+      "ipa": "/pɐˈgodə xɐˈroʂəjə/",
+      "soundUnitSlugs": [
+        "ru-stress-reduction"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "item-bd34cd196d.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-bd34cd196d.mp3",
+      "bytes": 25539
     },
     {
       "key": "под столом",
@@ -2520,6 +3037,24 @@
       "audioSrc": "/audio/language-packs/ru-RU/--49166507f9.mp3"
     },
     {
+      "key": "пять билетов лежат на столе.",
+      "text": "Пять билетов лежат на столе.",
+      "ipa": "/pʲ bʲ/",
+      "soundUnitSlugs": [
+        "ru-soft-labials"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "item-13eea0fb8d.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-13eea0fb8d.mp3",
+      "bytes": 38078
+    },
+    {
       "key": "пятьдесят",
       "text": "пятьдесят",
       "ipa": "/pʲɪdʲɪˈsʲat/",
@@ -2540,6 +3075,23 @@
       ],
       "fileName": "word-1bbeed785c.mp3",
       "audioSrc": "/audio/language-packs/ru-RU/word-1bbeed785c.mp3"
+    },
+    {
+      "key": "работа сегодня",
+      "text": "работа сегодня",
+      "ipa": "/rɐˈbotə sʲɪˈvodnʲə/",
+      "soundUnitSlugs": [
+        "ru-stress-reduction"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "item-bdd5574416.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-bdd5574416.mp3",
+      "bytes": 26375
     },
     {
       "key": "рад",
@@ -2590,6 +3142,23 @@
       ],
       "fileName": "word-6015033429.mp3",
       "audioSrc": "/audio/language-packs/ru-RU/word-6015033429.mp3"
+    },
+    {
+      "key": "ребята рядом",
+      "text": "ребята рядом",
+      "ipa": "/rʲɪˈbʲatə ˈrʲadəm/",
+      "soundUnitSlugs": [
+        "ru-unstressed-e-ya"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "item-f50bf51267.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-f50bf51267.mp3",
+      "bytes": 24703
     },
     {
       "key": "река",
@@ -2727,6 +3296,24 @@
       "audioSrc": "/audio/language-packs/ru-RU/word-020caccd24.mp3"
     },
     {
+      "key": "сад зимой синий.",
+      "text": "Сад зимой синий.",
+      "ipa": "/s sʲ zʲ/",
+      "soundUnitSlugs": [
+        "ru-soft-s-z"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "item-49958f6f36.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-49958f6f36.mp3",
+      "bytes": 27629
+    },
+    {
       "key": "сад и сено",
       "text": "сад и сено",
       "ipa": "/sat i ˈsʲenə/",
@@ -2735,6 +3322,23 @@
       ],
       "fileName": "---9d2a1529cf.mp3",
       "audioSrc": "/audio/language-packs/ru-RU/---9d2a1529cf.mp3"
+    },
+    {
+      "key": "сад пустой",
+      "text": "сад пустой",
+      "ipa": "/sat pʊˈstoj/",
+      "soundUnitSlugs": [
+        "ru-final-devoicing"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "item-aaac4817cb.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-aaac4817cb.mp3",
+      "bytes": 23449
     },
     {
       "key": "сам",
@@ -2807,6 +3411,25 @@
       "audioSrc": "/audio/language-packs/ru-RU/--44b8a4c56d.mp3"
     },
     {
+      "key": "сделать быстро трудно.",
+      "text": "Сделать быстро трудно.",
+      "ipa": "voicing assimilation",
+      "soundUnitSlugs": [
+        "ru-soft-t-d",
+        "ru-voicing-assimilation"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "item-11891c4fa6.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-11891c4fa6.mp3",
+      "bytes": 29301
+    },
+    {
       "key": "сегодня",
       "text": "сегодня",
       "ipa": "/sʲɪˈvodnʲə/",
@@ -2816,6 +3439,23 @@
       ],
       "fileName": "word-42f85ce119.mp3",
       "audioSrc": "/audio/language-packs/ru-RU/word-42f85ce119.mp3"
+    },
+    {
+      "key": "сегодня вечером",
+      "text": "сегодня вечером",
+      "ipa": "/sʲɪˈvodnʲə ˈvʲetɕɪrəm/",
+      "soundUnitSlugs": [
+        "ru-unstressed-e-ya"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "item-8f98e2f8a9.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-8f98e2f8a9.mp3",
+      "bytes": 25539
     },
     {
       "key": "семь",
@@ -2843,6 +3483,23 @@
       "audioSrc": "/audio/language-packs/ru-RU/word-51496baf88.mp3"
     },
     {
+      "key": "семья дома",
+      "text": "семья дома",
+      "ipa": "/sʲɪmʲˈja ˈdomə/",
+      "soundUnitSlugs": [
+        "ru-stress-reduction"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "item-4f11143a09.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-4f11143a09.mp3",
+      "bytes": 22613
+    },
+    {
       "key": "семья едет",
       "text": "семья едет",
       "ipa": "/sʲɪmʲˈja ˈjedʲɪt/",
@@ -2861,6 +3518,23 @@
       ],
       "fileName": "--a84446c2a0.mp3",
       "audioSrc": "/audio/language-packs/ru-RU/--a84446c2a0.mp3"
+    },
+    {
+      "key": "семья приехала",
+      "text": "семья приехала",
+      "ipa": "/sʲɪmʲˈja prʲɪˈjexələ/",
+      "soundUnitSlugs": [
+        "ru-unstressed-e-ya"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "item-e383ac134c.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-e383ac134c.mp3",
+      "bytes": 27211
     },
     {
       "key": "семья сегодня",
@@ -2990,6 +3664,23 @@
       "audioSrc": "/audio/language-packs/ru-RU/word-a610e889c9.mp3"
     },
     {
+      "key": "снег идёт",
+      "text": "снег идёт",
+      "ipa": "/snʲek ɪˈdʲot/",
+      "soundUnitSlugs": [
+        "ru-final-devoicing"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "item-d03770e34e.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-d03770e34e.mp3",
+      "bytes": 21777
+    },
+    {
       "key": "собака",
       "text": "собака",
       "ipa": "/sɐˈbakə/",
@@ -3010,6 +3701,23 @@
       ],
       "fileName": "---0ca7788a6a.mp3",
       "audioSrc": "/audio/language-packs/ru-RU/---0ca7788a6a.mp3"
+    },
+    {
+      "key": "собака голодная",
+      "text": "собака голодная",
+      "ipa": "/sɐˈbakə ˈgolədnəjə/",
+      "soundUnitSlugs": [
+        "ru-unstressed-o-a"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "item-2431109a4f.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-2431109a4f.mp3",
+      "bytes": 27629
     },
     {
       "key": "сок",
@@ -3102,6 +3810,23 @@
       ],
       "fileName": "word-132877adc0.mp3",
       "audioSrc": "/audio/language-packs/ru-RU/word-132877adc0.mp3"
+    },
+    {
+      "key": "страна красивая",
+      "text": "страна красивая",
+      "ipa": "/strɐˈna krɐˈsʲivəjə/",
+      "soundUnitSlugs": [
+        "ru-clusters"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "item-d1d27cb321.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-d1d27cb321.mp3",
+      "bytes": 27629
     },
     {
       "key": "строить",
@@ -3288,6 +4013,24 @@
       "audioSrc": "/audio/language-packs/ru-RU/--567567accd.mp3"
     },
     {
+      "key": "текст простой, но группа большая.",
+      "text": "Текст простой, но группа большая.",
+      "ipa": "clusters",
+      "soundUnitSlugs": [
+        "ru-clusters"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "item-65d040e221.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-65d040e221.mp3",
+      "bytes": 42675
+    },
+    {
       "key": "телефон",
       "text": "телефон",
       "ipa": "/tʲɪlʲɪˈfon/",
@@ -3297,6 +4040,23 @@
       ],
       "fileName": "word-cbe451c037.mp3",
       "audioSrc": "/audio/language-packs/ru-RU/word-cbe451c037.mp3"
+    },
+    {
+      "key": "телефон на столе",
+      "text": "телефон на столе",
+      "ipa": "/tʲɪlʲɪˈfon nɐ stɐˈlʲe/",
+      "soundUnitSlugs": [
+        "ru-stress-reduction"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "item-4326e04861.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-4326e04861.mp3",
+      "bytes": 27629
     },
     {
       "key": "тень",
@@ -3318,6 +4078,23 @@
       ],
       "fileName": "word-02497c86c3.mp3",
       "audioSrc": "/audio/language-packs/ru-RU/word-02497c86c3.mp3"
+    },
+    {
+      "key": "тетрадь лежит",
+      "text": "тетрадь лежит",
+      "ipa": "/tʲɪˈtratʲ lʲɪˈʐɨt/",
+      "soundUnitSlugs": [
+        "ru-unstressed-e-ya"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "item-87f74c1f30.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-87f74c1f30.mp3",
+      "bytes": 24703
     },
     {
       "key": "тётя",
@@ -3514,6 +4291,24 @@
       ],
       "fileName": "word-2e56abbcf6.mp3",
       "audioSrc": "/audio/language-packs/ru-RU/word-2e56abbcf6.mp3"
+    },
+    {
+      "key": "уголь лежит у двери.",
+      "text": "Уголь лежит у двери.",
+      "ipa": "/ʲ/",
+      "soundUnitSlugs": [
+        "ru-soft-sign"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "item-fdbe370914.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-fdbe370914.mp3",
+      "bytes": 28465
     },
     {
       "key": "ужин",
@@ -3722,6 +4517,23 @@
       "audioSrc": "/audio/language-packs/ru-RU/---ded4133e5c.mp3"
     },
     {
+      "key": "хлеб свежий",
+      "text": "хлеб свежий",
+      "ipa": "/xlʲep ˈsvʲeʐɨj/",
+      "soundUnitSlugs": [
+        "ru-final-devoicing"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "item-46d2eeeeb5.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-46d2eeeeb5.mp3",
+      "bytes": 24703
+    },
+    {
       "key": "хоккей",
       "text": "хоккей",
       "ipa": "/xɐˈkʲej/",
@@ -3773,6 +4585,25 @@
       ],
       "fileName": "--5e35b8db18.mp3",
       "audioSrc": "/audio/language-packs/ru-RU/--5e35b8db18.mp3"
+    },
+    {
+      "key": "хорошо, спасибо.",
+      "text": "Хорошо, спасибо.",
+      "ipa": "/x spɐˈsʲibə/",
+      "soundUnitSlugs": [
+        "ru-stress-reduction",
+        "ru-x"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "item-90e97d22bb.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-90e97d22bb.mp3",
+      "bytes": 28465
     },
     {
       "key": "хочу",
@@ -3850,6 +4681,24 @@
       "audioSrc": "/audio/language-packs/ru-RU/word-77e83705c0.mp3"
     },
     {
+      "key": "центр улицы рядом.",
+      "text": "Центр улицы рядом.",
+      "ipa": "/ts/",
+      "soundUnitSlugs": [
+        "ru-ts"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "item-01fe5377ca.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-01fe5377ca.mp3",
+      "bytes": 30973
+    },
+    {
       "key": "цепь",
       "text": "цепь",
       "ipa": "/tsepʲ/",
@@ -3903,6 +4752,25 @@
       ],
       "fileName": "---450a2815ea.mp3",
       "audioSrc": "/audio/language-packs/ru-RU/---450a2815ea.mp3"
+    },
+    {
+      "key": "чай и щи горячие.",
+      "text": "Чай и щи горячие.",
+      "ipa": "/tɕ ɕː/",
+      "soundUnitSlugs": [
+        "ru-ch",
+        "ru-shch"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "item-462b56bf62.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-462b56bf62.mp3",
+      "bytes": 29301
     },
     {
       "key": "час",
@@ -4163,6 +5031,25 @@
       "audioSrc": "/audio/language-packs/ru-RU/word-8f30281037.mp3"
     },
     {
+      "key": "это билет в театр.",
+      "text": "Это билет в театр.",
+      "ipa": "/e/",
+      "soundUnitSlugs": [
+        "ru-e",
+        "ru-unstressed-e-ya"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "item-f6a03551cc.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-f6a03551cc.mp3",
+      "bytes": 27629
+    },
+    {
       "key": "это лес",
       "text": "это лес",
       "ipa": "/ˈetə lʲes/",
@@ -4213,6 +5100,23 @@
       "audioSrc": "/audio/language-packs/ru-RU/word-70053e470c.mp3"
     },
     {
+      "key": "юный юрист",
+      "text": "юный юрист",
+      "ipa": "/ˈjunɨj jʊˈrʲist/",
+      "soundUnitSlugs": [
+        "ru-iotated-vowels"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "item-2c77a4b367.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-2c77a4b367.mp3",
+      "bytes": 23449
+    },
+    {
       "key": "я",
       "text": "я",
       "ipa": "/ja/",
@@ -4223,6 +5127,23 @@
       "audioSrc": "/audio/language-packs/ru-RU/word-4f566fb5e3.mp3"
     },
     {
+      "key": "я дома",
+      "text": "я дома",
+      "ipa": "/ja ˈdomə/",
+      "soundUnitSlugs": [
+        "ru-iotated-vowels"
+      ],
+      "kinds": [
+        "phrase"
+      ],
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "fileName": "item-6edb668ac8.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-6edb668ac8.mp3",
+      "bytes": 19688
+    },
+    {
       "key": "я люблю",
       "text": "я люблю",
       "ipa": "/ja lʲʊˈblʲu/",
@@ -4231,6 +5152,26 @@
       ],
       "fileName": "--2979433d30.mp3",
       "audioSrc": "/audio/language-packs/ru-RU/--2979433d30.mp3"
+    },
+    {
+      "key": "я люблю русский язык.",
+      "text": "Я люблю русский язык.",
+      "ipa": "/ruskij jɪˈzɨk/",
+      "soundUnitSlugs": [
+        "ru-hard-soft",
+        "ru-iotated-vowels",
+        "ru-y"
+      ],
+      "kinds": [
+        "sentence"
+      ],
+      "sources": [
+        "phoneme-keyword",
+        "sentence"
+      ],
+      "fileName": "item-8d56e0dafc.mp3",
+      "audioSrc": "/audio/language-packs/ru-RU/item-8d56e0dafc.mp3",
+      "bytes": 28465
     },
     {
       "key": "язык",
@@ -4265,5 +5206,6 @@
       "fileName": "word-4646f6111e.mp3",
       "audioSrc": "/audio/language-packs/ru-RU/word-4646f6111e.mp3"
     }
-  ]
+  ],
+  "updatedAt": "2026-06-11T08:30:54.976Z"
 }
