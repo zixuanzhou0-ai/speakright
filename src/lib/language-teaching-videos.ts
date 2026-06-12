@@ -11,6 +11,7 @@ export interface LanguageTeachingVideoAsset {
   videoSrc: string;
   durationSeconds: number;
   soundUnitSlugs: string[];
+  exactSoundUnitSlugs?: string[];
   focus: "overview" | "vowels" | "stress" | "rhythm" | "rule" | "contrast";
 }
 
@@ -118,6 +119,7 @@ export const LANGUAGE_TEACHING_VIDEO_ASSETS: LanguageTeachingVideoAsset[] = [
     videoSrc: "/videos/language-assets/es-ES/youtube-lessons/MqQWUsHbmdI.mp4",
     durationSeconds: 472,
     soundUnitSlugs: ["es-lexical-stress"],
+    exactSoundUnitSlugs: ["es-lexical-stress"],
     focus: "stress",
   },
   {
@@ -129,6 +131,7 @@ export const LANGUAGE_TEACHING_VIDEO_ASSETS: LanguageTeachingVideoAsset[] = [
     videoSrc: "/videos/language-assets/es-ES/youtube-lessons/a_y0qGSC-ZY.mp4",
     durationSeconds: 323,
     soundUnitSlugs: ["es-syllable-rhythm"],
+    exactSoundUnitSlugs: ["es-syllable-rhythm"],
     focus: "rhythm",
   },
   {
@@ -162,6 +165,7 @@ export const LANGUAGE_TEACHING_VIDEO_ASSETS: LanguageTeachingVideoAsset[] = [
     videoSrc: "/videos/language-assets/fr-FR/youtube-lessons/yRCD8vgohZo.mp4",
     durationSeconds: 534,
     soundUnitSlugs: ["fr-liaison"],
+    exactSoundUnitSlugs: ["fr-liaison"],
     focus: "rule",
   },
   {
@@ -173,6 +177,7 @@ export const LANGUAGE_TEACHING_VIDEO_ASSETS: LanguageTeachingVideoAsset[] = [
     videoSrc: "/videos/language-assets/fr-FR/youtube-lessons/sSbOX4sMdLA.mp4",
     durationSeconds: 445,
     soundUnitSlugs: ["fr-enchainement", "fr-elision"],
+    exactSoundUnitSlugs: ["fr-enchainement", "fr-elision"],
     focus: "rule",
   },
   {
@@ -184,6 +189,7 @@ export const LANGUAGE_TEACHING_VIDEO_ASSETS: LanguageTeachingVideoAsset[] = [
     videoSrc: "/videos/language-assets/fr-FR/youtube-lessons/7bjno3LPyfA.mp4",
     durationSeconds: 1345,
     soundUnitSlugs: ["fr-final-consonant-silence"],
+    exactSoundUnitSlugs: ["fr-final-consonant-silence"],
     focus: "rule",
   },
   {
@@ -206,6 +212,9 @@ export const LANGUAGE_TEACHING_VIDEO_ASSETS: LanguageTeachingVideoAsset[] = [
     videoSrc: "/videos/language-assets/ru-RU/youtube-lessons/YrOFy4u7cyM.mp4",
     durationSeconds: 553,
     soundUnitSlugs: russianHardSoftUnits,
+    exactSoundUnitSlugs: russianHardSoftUnits.filter(
+      (slug) => slug !== "ru-iotated-vowels",
+    ),
     focus: "contrast",
   },
   {
@@ -221,6 +230,11 @@ export const LANGUAGE_TEACHING_VIDEO_ASSETS: LanguageTeachingVideoAsset[] = [
       "ru-unstressed-o-a",
       "ru-unstressed-e-ya",
     ],
+    exactSoundUnitSlugs: [
+      "ru-stress-reduction",
+      "ru-unstressed-o-a",
+      "ru-unstressed-e-ya",
+    ],
     focus: "stress",
   },
   {
@@ -232,6 +246,7 @@ export const LANGUAGE_TEACHING_VIDEO_ASSETS: LanguageTeachingVideoAsset[] = [
     videoSrc: "/videos/language-assets/ru-RU/youtube-lessons/imiXGhO-Kc0.mp4",
     durationSeconds: 760,
     soundUnitSlugs: ["ru-final-devoicing", "ru-voicing-assimilation"],
+    exactSoundUnitSlugs: ["ru-voicing-assimilation"],
     focus: "rule",
   },
   {
@@ -243,6 +258,7 @@ export const LANGUAGE_TEACHING_VIDEO_ASSETS: LanguageTeachingVideoAsset[] = [
     videoSrc: "/videos/language-assets/ru-RU/youtube-lessons/XtRFEQfrQJw.mp4",
     durationSeconds: 583,
     soundUnitSlugs: ["ru-clusters"],
+    exactSoundUnitSlugs: ["ru-clusters"],
     focus: "rule",
   },
 ];
@@ -256,6 +272,19 @@ export function getTeachingVideosForSoundUnit(
   return LANGUAGE_TEACHING_VIDEO_ASSETS.filter(
     (asset) =>
       asset.languageId === languageId && asset.soundUnitSlugs.includes(slug),
+  );
+}
+
+export function getExactTeachingVideosForSoundUnit(
+  languageId: LanguageId,
+  slug: string,
+): LanguageTeachingVideoAsset[] {
+  if (languageId === "en-US") return [];
+
+  return LANGUAGE_TEACHING_VIDEO_ASSETS.filter(
+    (asset) =>
+      asset.languageId === languageId &&
+      (asset.exactSoundUnitSlugs ?? []).includes(slug),
   );
 }
 

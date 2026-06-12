@@ -11,6 +11,7 @@ import {
 import { useMemo, useState } from "react";
 import { DesktopExternalLink } from "@/components/common/desktop-external-link";
 import { SpanishSoundsOfSpeechVideoPanel } from "@/components/phoneme/spanish-sounds-of-speech-video-panel";
+import type { SoundUnitSourceAlignment } from "@/lib/language-source-alignment";
 import type { LanguageTeachingVideoAsset } from "@/lib/language-teaching-videos";
 import type { SpanishSoundVideoSet } from "@/lib/spanish-sounds-of-speech-videos";
 import type { PhonemeTeachingResource } from "@/types/phoneme";
@@ -31,6 +32,7 @@ interface VideoPlayerProps {
   resources?: PhonemeTeachingResource[];
   spanishVideoSet?: SpanishSoundVideoSet;
   teachingVideos?: LanguageTeachingVideoAsset[];
+  sourceAlignment?: SoundUnitSourceAlignment;
 }
 
 const RESOURCE_ICON = {
@@ -169,6 +171,7 @@ export function VideoPlayer({
   resources = [],
   spanishVideoSet,
   teachingVideos = [],
+  sourceAlignment,
 }: VideoPlayerProps) {
   const videoSrc = localSrc ?? `/videos/phonemes/${slug}.mp4`;
   const lessonSources = useMemo(
@@ -195,17 +198,35 @@ export function VideoPlayer({
       >
         <div className="mb-3 text-center">
           <p className="text-sm font-medium text-foreground">
-            {visibleResources.length > 0
-              ? "外部 IPA / 发音教学资源"
-              : "教学视频素材准备中"}
+            {sourceAlignment
+              ? "暂无精准本地视频"
+              : visibleResources.length > 0
+                ? "外部 IPA / 发音教学资源"
+                : "教学视频素材准备中"}
           </p>
           <p className="mt-1 text-xs text-muted-foreground/80">
-            {label ?? "待补充授权教学视频"}
+            {sourceAlignment?.note ?? label ?? "待补充授权教学视频"}
           </p>
         </div>
 
+        {sourceAlignment && (
+          <div className="mb-3 rounded-lg border bg-background/75 px-3 py-2 text-left">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+              规则重点
+            </p>
+            <p className="mt-1 text-xs leading-relaxed text-foreground">
+              {sourceAlignment.ruleSummary}
+            </p>
+          </div>
+        )}
+
         {visibleResources.length > 0 ? (
           <div className="grid gap-2">
+            {sourceAlignment && (
+              <p className="text-[11px] font-medium text-muted-foreground">
+                参考资料
+              </p>
+            )}
             {visibleResources.map((resource) => {
               const Icon = RESOURCE_ICON[resource.kind];
 

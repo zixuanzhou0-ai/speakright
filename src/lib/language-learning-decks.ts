@@ -195,7 +195,7 @@ export const LANGUAGE_LEARNING_DECKS: Record<DeckLanguageId, LanguageLearningDec
       {
         text: "La casa está cerca de la plaza.",
         ipaHint: "/a e θ/",
-        targetUnitSlugs: ["es-a", "es-e", "es-theta"],
+        targetUnitSlugs: ["es-a", "es-e", "es-theta", "es-l"],
         focus: "纯元音和 es-ES /θ/",
       },
       {
@@ -219,8 +219,8 @@ export const LANGUAGE_LEARNING_DECKS: Record<DeckLanguageId, LanguageLearningDec
       {
         text: "Cinco zapatos son azules.",
         ipaHint: "/θ s/",
-        targetUnitSlugs: ["es-theta"],
-        focus: "Castilian c/z",
+        targetUnitSlugs: ["es-theta", "es-o"],
+        focus: "Castilian c/z 和稳定 /o/",
       },
       {
         text: "Una familia vive en Madrid.",
@@ -449,8 +449,8 @@ export const LANGUAGE_LEARNING_DECKS: Record<DeckLanguageId, LanguageLearningDec
       {
         text: "Tu veux du café ?",
         ipaHint: "/y ø/",
-        targetUnitSlugs: ["fr-y", "fr-eu-close"],
-        focus: "前圆唇元音",
+        targetUnitSlugs: ["fr-y", "fr-eu-close", "fr-e"],
+        focus: "前圆唇元音和 fermé /e/",
       },
       {
         text: "Un bon vin blanc.",
@@ -497,8 +497,8 @@ export const LANGUAGE_LEARNING_DECKS: Record<DeckLanguageId, LanguageLearningDec
       {
         text: "Une fille lit près de la porte.",
         ipaHint: "/j a ɔ/",
-        targetUnitSlugs: ["fr-glide-j", "fr-a", "fr-o-open"],
-        focus: "/j/ glide 与 /a ɔ/",
+        targetUnitSlugs: ["fr-glide-j", "fr-a", "fr-o-open", "fr-i", "fr-e-open"],
+        focus: "/j/ glide 与 /i a ɛ ɔ/",
       },
       {
         text: "Oui, nous allons au bureau.",
@@ -592,6 +592,7 @@ export const LANGUAGE_LEARNING_DECKS: Record<DeckLanguageId, LanguageLearningDec
         "ru-soft-t-d",
         "ru-soft-s-z",
         "ru-ts",
+        "ru-ts-ch-shch",
         "ru-ch",
         "ru-final-devoicing",
         "ru-voicing-assimilation",
@@ -619,13 +620,13 @@ export const LANGUAGE_LEARNING_DECKS: Record<DeckLanguageId, LanguageLearningDec
       { left: "река", right: "рука", ipa: "/rʲɪˈka/ ~ /rʊˈka/", targetUnitSlug: "ru-r", focus: "软/硬 r 和元音弱化" },
     ],
     sentenceDeck: [
-      { text: "Мама дома.", stressText: "Ма́ма до́ма.", ipaHint: "/ˈmamə ˈdomə/", targetUnitSlugs: ["ru-a", "ru-stress-reduction"], focus: "重音和非重读弱化" },
-      { text: "Я люблю русский язык.", stressText: "Я люблю́ ру́сский язы́к.", ipaHint: "/ruskij jɪˈzɨk/", targetUnitSlugs: ["ru-y", "ru-hard-soft", "ru-iotated-vowels"], focus: "/ɨ/、硬软辅音和 iotated vowels" },
+      { text: "Мама дома.", stressText: "Ма́ма до́ма.", ipaHint: "/ˈmamə ˈdomə/", targetUnitSlugs: ["ru-a", "ru-o", "ru-stress-reduction"], focus: "重音、/o/ 和非重读弱化" },
+      { text: "Я люблю русский язык.", stressText: "Я люблю́ ру́сский язы́к.", ipaHint: "/ruskij jɪˈzɨk/", targetUnitSlugs: ["ru-y", "ru-u", "ru-r", "ru-hard-soft", "ru-iotated-vowels"], focus: "/ɨ/、/u/、颤音、硬软辅音和 iotated vowels" },
       { text: "Здравствуйте, студент.", stressText: "Здра́вствуйте, студе́нт.", ipaHint: "clusters", targetUnitSlugs: ["ru-clusters"], focus: "辅音丛" },
-      { text: "Чай и щи горячие.", stressText: "Чай и щи горя́чие.", ipaHint: "/tɕ ɕː/", targetUnitSlugs: ["ru-ch", "ru-shch"], focus: "ч/щ 对比" },
+      { text: "Чай и щи горячие.", stressText: "Чай и щи горя́чие.", ipaHint: "/tɕ ɕː/", targetUnitSlugs: ["ru-ch", "ru-shch", "ru-ts-ch-shch"], focus: "ч/щ 和 ц/ч/щ 组对比" },
       { text: "Хорошо, спасибо.", stressText: "Хорошо́, спаси́бо.", ipaHint: "/x spɐˈsʲibə/", targetUnitSlugs: ["ru-x", "ru-stress-reduction"], focus: "/x/ 与弱化" },
       { text: "Встреча завтра утром.", stressText: "Встре́ча за́втра у́тром.", ipaHint: "clusters + assimilation", targetUnitSlugs: ["ru-clusters", "ru-voicing-assimilation"], focus: "辅音丛和清浊同化" },
-      { text: "Это билет в театр.", stressText: "Э́то биле́т в теа́тр.", ipaHint: "/e/", targetUnitSlugs: ["ru-e", "ru-unstressed-e-ya"], focus: "/e/ 与 е/э" },
+      { text: "Это билет в театр.", stressText: "Э́то биле́т в теа́тр.", ipaHint: "/e i/", targetUnitSlugs: ["ru-e", "ru-i", "ru-unstressed-e-ya"], focus: "/e/、/i/ 与 е/э" },
       { text: "День и дом звучат по-разному.", stressText: "День и дом звуча́т по-ра́зному.", ipaHint: "/d dʲ/", targetUnitSlugs: ["ru-soft-t-d"], focus: "硬/软 д" },
       { text: "Сад зимой синий.", stressText: "Сад зимо́й си́ний.", ipaHint: "/s sʲ zʲ/", targetUnitSlugs: ["ru-soft-s-z"], focus: "с/з 软化" },
       { text: "Лук и люк - разные слова.", stressText: "Лук и люк - ра́зные слова́.", ipaHint: "/l lʲ/", targetUnitSlugs: ["ru-soft-n-l-r"], focus: "л/ль 对比" },

@@ -8,7 +8,11 @@ import { PhonemePlayButton } from "@/components/phoneme/phoneme-play-button";
 import { VideoPlayer } from "@/components/phoneme/video-player";
 import { Button } from "@/components/ui/button";
 import { getSpanishSoundVideoSet } from "@/lib/spanish-sounds-of-speech-videos";
-import { getTeachingVideosForSoundUnit } from "@/lib/language-teaching-videos";
+import { getExactTeachingVideosForSoundUnit } from "@/lib/language-teaching-videos";
+import {
+  getSoundUnitSourceAlignment,
+  shouldShowLocalVideoAsPrimary,
+} from "@/lib/language-source-alignment";
 import type { LanguageProfile } from "@/types/language";
 import type { KeywordEntry, PhonemeData } from "@/types/phoneme";
 
@@ -62,10 +66,19 @@ export function PhonemeStudyCard({
   const previousEnabled = canGoPrevious ?? wordHistoryLength > 0;
   const [selectedVoice, setSelectedVoice] = useState<"blue" | "pink">("blue");
   const spanishVideoSet =
-    phoneme.languageId === "es-ES"
+    phoneme.languageId === "es-ES" &&
+    shouldShowLocalVideoAsPrimary(phoneme.languageId, phoneme.slug)
       ? getSpanishSoundVideoSet(phoneme.slug)
       : undefined;
-  const teachingVideos = getTeachingVideosForSoundUnit(
+  const teachingVideos = getExactTeachingVideosForSoundUnit(
+    phoneme.languageId ?? "en-US",
+    phoneme.slug,
+  );
+  const sourceAlignment = getSoundUnitSourceAlignment(
+    phoneme.languageId ?? "en-US",
+    phoneme.slug,
+  );
+  const hasExactLocalVideo = shouldShowLocalVideoAsPrimary(
     phoneme.languageId ?? "en-US",
     phoneme.slug,
   );
@@ -74,12 +87,13 @@ export function PhonemeStudyCard({
     <div className="shrink-0 rounded-xl border bg-card shadow-sm overflow-hidden">
       <VideoPlayer
         slug={phoneme.slug}
-        available={phoneme.video?.status === "ready"}
+        available={phoneme.video?.status === "ready" && hasExactLocalVideo}
         label={phoneme.video?.label}
         localSrc={phoneme.video?.localSrc}
         resources={phoneme.teachingResources}
         spanishVideoSet={spanishVideoSet}
         teachingVideos={teachingVideos}
+        sourceAlignment={sourceAlignment ?? undefined}
       />
       <div className="px-4 py-3">
         {/* IPA + play + emoji */}

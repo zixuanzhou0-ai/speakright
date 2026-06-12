@@ -76,6 +76,29 @@ describe("language learning decks", () => {
     }
   });
 
+  it("covers every non-English sound unit in diagnosis and sentence practice", () => {
+    for (const languageId of DECK_LANGUAGES) {
+      const deck = LANGUAGE_LEARNING_DECKS[languageId];
+      const diagnosisTargets = new Set([
+        ...deck.diagnosticWords.map((word) => word.targetUnitSlug),
+        ...deck.diagnosticPassage.targetUnitSlugs,
+      ]);
+      const sentenceTargets = new Set(
+        deck.sentenceDeck.flatMap((item) => item.targetUnitSlugs),
+      );
+
+      const missingDiagnosis = getLanguagePhonemes(languageId)
+        .map((phoneme) => phoneme.slug)
+        .filter((slug) => !diagnosisTargets.has(slug));
+      const missingSentence = getLanguagePhonemes(languageId)
+        .map((phoneme) => phoneme.slug)
+        .filter((slug) => !sentenceTargets.has(slug));
+
+      expect(missingDiagnosis).toEqual([]);
+      expect(missingSentence).toEqual([]);
+    }
+  });
+
   it("does not keep known weak Spanish pseudo-minimal pairs", () => {
     const spanishPairs = LANGUAGE_LEARNING_DECKS["es-ES"].contrastDeck.map(
       (item) => `${item.left}~${item.right}`,
