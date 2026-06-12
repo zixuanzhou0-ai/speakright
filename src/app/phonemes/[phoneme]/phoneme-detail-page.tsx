@@ -152,7 +152,7 @@ export function PhonemeDetailPage() {
 
   // Annotate syllables with stress data (static IPA lookup → legacy local cache).
   const stressedSyllables = useSyllableStress(
-    languageId === "en-US" ? (currentWord?.word ?? null) : null,
+    currentWord?.word ?? null,
     selectedWordSyllables,
   );
 

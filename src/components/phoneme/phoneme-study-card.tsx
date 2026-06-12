@@ -8,6 +8,7 @@ import { PhonemePlayButton } from "@/components/phoneme/phoneme-play-button";
 import { VideoPlayer } from "@/components/phoneme/video-player";
 import { Button } from "@/components/ui/button";
 import { getSpanishSoundVideoSet } from "@/lib/spanish-sounds-of-speech-videos";
+import { getTeachingVideosForSoundUnit } from "@/lib/language-teaching-videos";
 import type { LanguageProfile } from "@/types/language";
 import type { KeywordEntry, PhonemeData } from "@/types/phoneme";
 
@@ -64,6 +65,10 @@ export function PhonemeStudyCard({
     phoneme.languageId === "es-ES"
       ? getSpanishSoundVideoSet(phoneme.slug)
       : undefined;
+  const teachingVideos = getTeachingVideosForSoundUnit(
+    phoneme.languageId ?? "en-US",
+    phoneme.slug,
+  );
 
   return (
     <div className="shrink-0 rounded-xl border bg-card shadow-sm overflow-hidden">
@@ -74,6 +79,7 @@ export function PhonemeStudyCard({
         localSrc={phoneme.video?.localSrc}
         resources={phoneme.teachingResources}
         spanishVideoSet={spanishVideoSet}
+        teachingVideos={teachingVideos}
       />
       <div className="px-4 py-3">
         {/* IPA + play + emoji */}

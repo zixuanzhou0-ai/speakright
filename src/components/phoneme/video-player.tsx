@@ -1,8 +1,17 @@
 "use client";
 
-import { ExternalLink, Film, Headphones, Languages } from "lucide-react";
+import {
+  BookOpen,
+  ExternalLink,
+  Film,
+  Headphones,
+  Languages,
+  Video,
+} from "lucide-react";
+import { useMemo, useState } from "react";
 import { DesktopExternalLink } from "@/components/common/desktop-external-link";
 import { SpanishSoundsOfSpeechVideoPanel } from "@/components/phoneme/spanish-sounds-of-speech-video-panel";
+import type { LanguageTeachingVideoAsset } from "@/lib/language-teaching-videos";
 import type { SpanishSoundVideoSet } from "@/lib/spanish-sounds-of-speech-videos";
 import type { PhonemeTeachingResource } from "@/types/phoneme";
 
@@ -21,6 +30,7 @@ interface VideoPlayerProps {
   className?: string;
   resources?: PhonemeTeachingResource[];
   spanishVideoSet?: SpanishSoundVideoSet;
+  teachingVideos?: LanguageTeachingVideoAsset[];
 }
 
 const RESOURCE_ICON = {
@@ -32,6 +42,10 @@ const RESOURCE_ICON = {
 } as const;
 
 function localLanguageVideoWidthClass(src: string): string | null {
+  if (src.includes("/youtube-lessons/")) {
+    return "w-full";
+  }
+
   if (src.includes("/videos/language-assets/ru-RU/")) {
     return "w-[min(100%,220px)]";
   }
@@ -56,6 +70,99 @@ function localLanguageVideoWidthClass(src: string): string | null {
   return null;
 }
 
+interface LocalVideoSource {
+  id: string;
+  label: string;
+  description: string;
+  localSrc: string;
+  kind: "official" | "lesson";
+}
+
+function LocalVideoPanel({
+  slug,
+  sources,
+  className,
+}: {
+  slug: string;
+  sources: LocalVideoSource[];
+  className?: string;
+}) {
+  const [selection, setSelection] = useState({ slug, index: 0 });
+  const selectedIndex = selection.slug === slug ? selection.index : 0;
+  const selectedSource = sources[selectedIndex] ?? sources[0];
+  const widthClass = localLanguageVideoWidthClass(selectedSource.localSrc);
+  const videoClass = widthClass
+    ? `block h-auto max-h-[285px] max-w-full rounded-lg border bg-black shadow-sm ${widthClass}`
+    : "w-full rounded-lg border";
+
+  return (
+    <div
+      className={`overflow-hidden rounded-lg border bg-background ${className ?? ""}`}
+    >
+      <div className="flex items-center justify-between gap-3 border-b bg-muted/20 px-3 py-2">
+        <div className="min-w-0">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+            {selectedSource.kind === "lesson" ? "教学讲解" : "发音视频"}
+          </p>
+          <p className="truncate text-xs text-muted-foreground/80">
+            {selectedSource.description}
+          </p>
+        </div>
+      </div>
+
+      <div className="flex justify-center bg-muted/15 px-2 py-2">
+        <video
+          key={selectedSource.localSrc}
+          src={selectedSource.localSrc}
+          controls
+          preload="metadata"
+          className={videoClass}
+        >
+          <track kind="captions" />
+        </video>
+      </div>
+
+      {sources.length > 1 && (
+        <div className="flex gap-2 overflow-x-auto border-t bg-gradient-to-b from-muted/20 to-background px-3 py-2 sm:flex-wrap sm:overflow-visible">
+          {sources.map((source, index) => {
+            const isSelected = source.id === selectedSource.id;
+            const Icon = source.kind === "lesson" ? BookOpen : Video;
+
+            return (
+              <button
+                key={source.id}
+                type="button"
+                aria-pressed={isSelected}
+                onClick={() => setSelection({ slug, index })}
+                className={`inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full border px-3 text-xs font-medium transition-colors ${
+                  isSelected
+                    ? "border-primary/40 bg-primary/10 text-primary shadow-sm"
+                    : "border-border bg-background text-muted-foreground hover:border-primary/30 hover:bg-muted/40 hover:text-foreground"
+                }`}
+              >
+                <Icon className="h-3.5 w-3.5" />
+                <span>{source.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function lessonSourcesFromAssets(
+  teachingVideos: LanguageTeachingVideoAsset[],
+): LocalVideoSource[] {
+  return teachingVideos.map((lesson) => ({
+    id: `lesson-${lesson.id}`,
+    label: "教学讲解",
+    description: `${lesson.author} · ${lesson.title}`,
+    localSrc: lesson.videoSrc,
+    kind: "lesson",
+  }));
+}
+
 export function VideoPlayer({
   slug,
   available = true,
@@ -64,10 +171,25 @@ export function VideoPlayer({
   className,
   resources = [],
   spanishVideoSet,
+  teachingVideos = [],
 }: VideoPlayerProps) {
   const videoSrc = localSrc ?? `/videos/phonemes/${slug}.mp4`;
+  const lessonSources = useMemo(
+    () => lessonSourcesFromAssets(teachingVideos),
+    [teachingVideos],
+  );
 
   if (!available) {
+    if (lessonSources.length > 0) {
+      return (
+        <LocalVideoPanel
+          slug={slug}
+          sources={lessonSources}
+          className={className}
+        />
+      );
+    }
+
     const visibleResources = resources.slice(0, 3);
 
     return (
@@ -127,6 +249,26 @@ export function VideoPlayer({
     return (
       <SpanishSoundsOfSpeechVideoPanel
         videoSet={spanishVideoSet}
+        className={className}
+        teachingVideos={teachingVideos}
+      />
+    );
+  }
+
+  if (lessonSources.length > 0) {
+    return (
+      <LocalVideoPanel
+        slug={slug}
+        sources={[
+          {
+            id: "official",
+            label: "口型/舌位",
+            description: label ?? "本地发音示范",
+            localSrc: videoSrc,
+            kind: "official",
+          },
+          ...lessonSources,
+        ]}
         className={className}
       />
     );

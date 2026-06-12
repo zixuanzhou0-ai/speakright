@@ -4,6 +4,7 @@ import { Howl } from "howler";
 import { Volume2 } from "lucide-react";
 import { motion } from "motion/react";
 import { useCallback, useRef, useState } from "react";
+import { SyllableScoreGrid } from "@/components/scoring/syllable-score-grid";
 import {
   Tooltip,
   TooltipContent,
@@ -11,9 +12,8 @@ import {
 } from "@/components/ui/tooltip";
 import {
   getAssessmentPhonemeLabel,
-  getPhonemeAudioUrl,
+  getPhonemeAudioInfo,
   normalizeAssessmentPhoneme,
-  syllableToIpa,
 } from "@/lib/azure-phoneme-map";
 import { getBarColor } from "@/lib/score-utils";
 import { cn } from "@/lib/utils";
@@ -25,15 +25,11 @@ let activeHowl: Howl | null = null;
 let activePhonemeKey = "";
 
 function playPhonemeAudio(
-  azureCode: string,
-  languageId: LanguageId,
+  audioUrl: string,
   key: string,
   onStart: () => void,
   onEnd: () => void,
 ) {
-  const url = getPhonemeAudioUrl(azureCode, languageId);
-  if (!url) return;
-
   // Stop any currently playing phoneme
   if (activeHowl) {
     activeHowl.stop();
@@ -44,7 +40,7 @@ function playPhonemeAudio(
   onStart();
 
   activeHowl = new Howl({
-    src: [url],
+    src: [audioUrl],
     html5: true,
     onend: () => {
       activePhonemeKey = "";
@@ -74,21 +70,22 @@ export function PhonemeBlock({
 }) {
   const score = Math.round(ph.accuracyScore);
   const isGood = ph.accuracyScore >= 60;
-  const audioUrl = getPhonemeAudioUrl(ph.phoneme, languageId);
-  const hasAudio = !!audioUrl;
+  const audioInfo = getPhonemeAudioInfo(ph.phoneme, languageId);
+  const hasAudio = !!audioInfo;
   const [isPlaying, setIsPlaying] = useState(false);
   const clickTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const blockKey = `${ph.phoneme}-${index}`;
 
   const handlePlay = useCallback(() => {
+    if (!audioInfo) return;
+
     playPhonemeAudio(
-      ph.phoneme,
-      languageId,
+      audioInfo.url,
       blockKey,
       () => setIsPlaying(true),
       () => setIsPlaying(false),
     );
-  }, [ph.phoneme, languageId, blockKey]);
+  }, [audioInfo, blockKey]);
 
   const handleClick = useCallback(() => {
     if (!hasAudio) return;
@@ -173,7 +170,10 @@ export function PhonemeBlock({
         </span>
         {hasAudio && (
           <span className="ml-1.5 text-xs text-muted-foreground">
-            · 点击播放
+            ·{" "}
+            {audioInfo.kind === "word-example"
+              ? `点击播放示例 ${audioInfo.label}`
+              : "点击播放"}
           </span>
         )}
         {!hasAudio && (
@@ -201,7 +201,7 @@ export function PhonemeHighlight({
     normalizeAssessmentPhoneme(ph.phoneme),
   );
   const hasAnyAudio = visiblePhonemes.some((ph) =>
-    getPhonemeAudioUrl(ph.phoneme, languageId),
+    getPhonemeAudioInfo(ph.phoneme, languageId),
   );
   const breakdownLabel = languageId === "en-US" ? "音标拆解" : "发音拆解";
 
@@ -246,43 +246,9 @@ export function PhonemeHighlight({
       {syllables && syllables.length > 1 && (
         <div>
           <p className="mb-2 text-sm font-semibold text-muted-foreground">
-            音节
+            音节评分
           </p>
-          <div className="flex flex-wrap items-center gap-1">
-            {syllables.map((s, i) => {
-              const isGood = s.accuracyScore >= 60;
-              const isPrimary = s.stress === "primary";
-              const isSecondary = s.stress === "secondary";
-              const hasStress = isPrimary || isSecondary;
-              const stressPrefix = isPrimary ? "ˈ" : isSecondary ? "ˌ" : "";
-              return (
-                <span
-                  key={`${s.syllable}-${s.accuracyScore}-${s.stress ?? "none"}`}
-                  className="inline-flex items-center gap-1"
-                >
-                  {i > 0 && <span className="text-muted-foreground/50">·</span>}
-                  <span
-                    className={cn(
-                      "font-ipa inline-flex items-baseline gap-0.5 rounded px-1.5 py-0.5 text-sm",
-                      !isGood
-                        ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300"
-                        : isPrimary
-                          ? "bg-primary/20 font-bold text-primary"
-                          : hasStress
-                            ? "bg-primary/15 text-primary"
-                            : "bg-muted text-muted-foreground",
-                    )}
-                  >
-                    {stressPrefix}
-                    {syllableToIpa(s.syllable)}
-                    <sup className="text-xs opacity-70">
-                      {Math.round(s.accuracyScore)}
-                    </sup>
-                  </span>
-                </span>
-              );
-            })}
-          </div>
+          <SyllableScoreGrid syllables={syllables} />
         </div>
       )}
     </div>

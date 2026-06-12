@@ -1,4 +1,5 @@
 import { getLanguagePhonemes } from "@/lib/language-phonemes";
+import { getAssessmentSegmentAudioInfo } from "@/lib/assessment-segment-audio";
 import type { LanguageId } from "@/types/language";
 
 /**
@@ -108,19 +109,64 @@ export const azureToChartWord: Record<string, string> = {
 };
 
 /**
- * 获取 Azure 音素编码对应的 IPA Chart 音频 URL
+ * 获取 Azure 音素编码对应的 IPA Chart / 本地拆解音频信息。
+ *
+ * 非英语先查评分拆解音频库存，避免把 /k/ /t/ 这类普通段音误播成
+ * broad rule/contrast sound unit 的代理素材；再回退到课程 sound unit 音频。
+ */
+export interface PhonemeAudioInfo {
+  url: string;
+  kind: "chart" | "sound-unit" | "word-example";
+  label: string;
+  description?: string;
+}
+
+export function getPhonemeAudioInfo(
+  azureCode: string,
+  languageId: LanguageId = "en-US",
+): PhonemeAudioInfo | null {
+  if (languageId !== "en-US") {
+    const segmentAudio = getAssessmentSegmentAudioInfo(azureCode, languageId);
+    if (segmentAudio) {
+      return {
+        url: segmentAudio.audioUrl,
+        kind: segmentAudio.kind,
+        label: `${segmentAudio.displayIpa} · ${segmentAudio.exampleText}`,
+        description: segmentAudio.note,
+      };
+    }
+
+    const resolvedUnit = resolveAssessmentPhonemeUnit(azureCode, languageId);
+    return resolvedUnit?.audioUrl
+      ? {
+          url: resolvedUnit.audioUrl,
+          kind: "sound-unit",
+          label: resolvedUnit.displayIpa,
+          description: "本地发音单位音频",
+        }
+      : null;
+  }
+
+  const chartWord = azureToChartWord[azureCode.toLowerCase()];
+  return chartWord
+    ? {
+        url: `/audio/ipa/phoneme/${chartWord}.mp3`,
+        kind: "chart",
+        label: toIpa(azureCode),
+        description: "IPA Chart 本地音频",
+      }
+    : null;
+}
+
+/**
+ * 获取 Azure 音素编码对应的可播放音频 URL。
  * @returns 音频 URL 或 null（未映射的音素）
  */
 export function getPhonemeAudioUrl(
   azureCode: string,
   languageId: LanguageId = "en-US",
 ): string | null {
-  if (languageId !== "en-US") {
-    return resolveAssessmentPhonemeUnit(azureCode, languageId)?.audioUrl ?? null;
-  }
-
-  const chartWord = azureToChartWord[azureCode.toLowerCase()];
-  return chartWord ? `/audio/ipa/phoneme/${chartWord}.mp3` : null;
+  return getPhonemeAudioInfo(azureCode, languageId)?.url ?? null;
 }
 
 export function getAssessmentPhonemeLabel(

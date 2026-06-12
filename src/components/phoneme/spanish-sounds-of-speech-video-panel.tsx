@@ -1,7 +1,8 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, Film, Video } from "lucide-react";
+import { BookOpen, ChevronLeft, ChevronRight, Film, Video } from "lucide-react";
 import { useMemo, useState } from "react";
+import type { LanguageTeachingVideoAsset } from "@/lib/language-teaching-videos";
 import type {
   SpanishSoundVideoClip,
   SpanishSoundVideoSet,
@@ -10,14 +11,16 @@ import type {
 interface SpanishSoundsOfSpeechVideoPanelProps {
   videoSet: SpanishSoundVideoSet;
   className?: string;
+  teachingVideos?: LanguageTeachingVideoAsset[];
 }
 
 interface SpanishPanelClip {
   id: string;
-  kind: SpanishSoundVideoClip["kind"] | "animation";
+  kind: SpanishSoundVideoClip["kind"] | "animation" | "lesson";
   label: string;
   word?: string;
   localSrc: string;
+  title?: string;
 }
 
 function chipClassName(isSelected: boolean): string {
@@ -32,10 +35,12 @@ function chipClassName(isSelected: boolean): string {
 function clipLabel(clip: SpanishPanelClip): string {
   if (clip.kind === "animation") return "Animation";
   if (clip.kind === "target") return "Video";
+  if (clip.kind === "lesson") return "教学讲解";
   return clip.word ?? clip.label;
 }
 
 function videoWidthClassForClip(clip: SpanishPanelClip): string {
+  if (clip.kind === "lesson") return "w-full";
   return clip.kind === "animation"
     ? "w-[min(100%,360px)]"
     : "w-[min(100%,370px)]";
@@ -44,6 +49,7 @@ function videoWidthClassForClip(clip: SpanishPanelClip): string {
 export function SpanishSoundsOfSpeechVideoPanel({
   videoSet,
   className,
+  teachingVideos = [],
 }: SpanishSoundsOfSpeechVideoPanelProps) {
   const [selection, setSelection] = useState({
     slug: videoSet.slug,
@@ -65,6 +71,13 @@ export function SpanishSoundsOfSpeechVideoPanel({
         word: clip.word,
         localSrc: clip.localSrc,
       })),
+      ...teachingVideos.map((lesson) => ({
+        id: `lesson-${lesson.id}`,
+        kind: "lesson" as const,
+        label: "教学讲解",
+        localSrc: lesson.videoSrc,
+        title: lesson.title,
+      })),
       {
         id: `${videoSet.slug}-animation`,
         kind: "animation",
@@ -72,7 +85,7 @@ export function SpanishSoundsOfSpeechVideoPanel({
         localSrc: videoSet.animationSrc,
       },
     ],
-    [videoSet],
+    [videoSet, teachingVideos],
   );
 
   const selectedIndex = selection.slug === videoSet.slug ? selection.index : 0;
@@ -107,6 +120,8 @@ export function SpanishSoundsOfSpeechVideoPanel({
           <p className="truncate text-xs text-muted-foreground/80">
             {selectedClip.kind === "animation"
               ? "舌位动画"
+              : selectedClip.kind === "lesson"
+                ? `教学讲解 · ${selectedClip.title ?? selectedClip.label}`
               : selectedClip.kind === "target"
                 ? "目标音真人示范"
                 : `例词视频 · ${selectedClip.word ?? selectedClip.label}`}
@@ -149,7 +164,8 @@ export function SpanishSoundsOfSpeechVideoPanel({
       <div className="flex gap-2 overflow-x-auto border-t bg-gradient-to-b from-muted/20 to-background px-3 py-2 sm:flex-wrap sm:overflow-visible">
         {clips.map((clip) => {
           const isSelected = clip.id === selectedClip.id;
-          const Icon = clip.kind === "animation" ? Film : Video;
+          const Icon =
+            clip.kind === "lesson" ? BookOpen : clip.kind === "animation" ? Film : Video;
 
           return (
             <button

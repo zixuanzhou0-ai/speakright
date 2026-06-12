@@ -2,6 +2,7 @@ import type React from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { VideoPlayer } from "@/components/phoneme/video-player";
+import { getTeachingVideosForSoundUnit } from "@/lib/language-teaching-videos";
 import { getSpanishSoundVideoSet } from "@/lib/spanish-sounds-of-speech-videos";
 
 vi.mock("@/components/common/desktop-external-link", () => ({
@@ -136,6 +137,54 @@ describe("VideoPlayer", () => {
     expect(
       screen.getByText("External Spanish pronunciation resource"),
     ).toBeInTheDocument();
+  });
+
+  it("uses local teaching lessons instead of external fallback cards for rule units", () => {
+    render(
+      <VideoPlayer
+        slug="fr-liaison"
+        available={false}
+        resources={[
+          {
+            title: "External French resource",
+            url: "https://example.com/french",
+            kind: "ipa",
+          },
+        ]}
+        teachingVideos={getTeachingVideosForSoundUnit("fr-FR", "fr-liaison")}
+      />,
+    );
+
+    expect(document.querySelector("video")).toHaveAttribute(
+      "src",
+      "/videos/language-assets/fr-FR/youtube-lessons/yRCD8vgohZo.mp4",
+    );
+    expect(screen.getByText("教学讲解")).toBeInTheDocument();
+    expect(screen.queryByText("外部 IPA / 发音教学资源")).not.toBeInTheDocument();
+    expect(screen.queryByText("External French resource")).not.toBeInTheDocument();
+  });
+
+  it("lets non-Spanish local language videos switch to a local teaching lesson", () => {
+    render(
+      <VideoPlayer
+        slug="fr-i"
+        available
+        label="Phonétique.ca 本地法语口型/舌位视频"
+        localSrc="/videos/language-assets/fr-FR/articulation/fr-i.mp4"
+        teachingVideos={getTeachingVideosForSoundUnit("fr-FR", "fr-i")}
+      />,
+    );
+
+    expect(document.querySelector("video")).toHaveAttribute(
+      "src",
+      "/videos/language-assets/fr-FR/articulation/fr-i.mp4",
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: /教学讲解/ }));
+    expect(document.querySelector("video")).toHaveAttribute(
+      "src",
+      "/videos/language-assets/fr-FR/youtube-lessons/Ihh8xoLXrrU.mp4",
+    );
   });
 
   it("sizes non-Spanish local language videos without forcing 16:9", () => {

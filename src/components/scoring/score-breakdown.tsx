@@ -3,7 +3,7 @@
 import { motion, useSpring, useTransform } from "motion/react";
 import { useEffect } from "react";
 import { PhonemeBlock } from "@/components/scoring/phoneme-highlight";
-import { syllableToIpa } from "@/lib/azure-phoneme-map";
+import { SyllableScoreGrid } from "@/components/scoring/syllable-score-grid";
 import {
   getBarColor,
   getScoreBg,
@@ -153,45 +153,9 @@ function CompactLayout({
           <>
             <div className="my-2 border-t" />
             <p className="mb-1.5 text-xs font-semibold text-muted-foreground">
-              音节
+              音节评分
             </p>
-            <div className="flex flex-wrap items-center gap-1">
-              {syllables.map((s, i) => {
-                const isGood = s.accuracyScore >= 60;
-                const isPrimary = s.stress === "primary";
-                const isSecondary = s.stress === "secondary";
-                const hasStress = isPrimary || isSecondary;
-                const stressPrefix = isPrimary ? "ˈ" : isSecondary ? "ˌ" : "";
-                return (
-                  <span
-                    key={`${s.syllable}-${s.accuracyScore}-${s.stress ?? "none"}`}
-                    className="inline-flex items-center gap-1"
-                  >
-                    {i > 0 && (
-                      <span className="text-muted-foreground/50">·</span>
-                    )}
-                    <span
-                      className={cn(
-                        "font-ipa inline-flex items-baseline gap-0.5 rounded px-1.5 py-0.5 text-sm",
-                        !isGood
-                          ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300"
-                          : isPrimary
-                            ? "bg-primary/20 font-bold text-primary"
-                            : hasStress
-                              ? "bg-primary/15 text-primary"
-                              : "bg-muted text-muted-foreground",
-                      )}
-                    >
-                      {stressPrefix}
-                      {syllableToIpa(s.syllable)}
-                      <sup className="text-xs opacity-70">
-                        {Math.round(s.accuracyScore)}
-                      </sup>
-                    </span>
-                  </span>
-                );
-              })}
-            </div>
+            <SyllableScoreGrid syllables={syllables} compact />
           </>
         )}
       </div>
