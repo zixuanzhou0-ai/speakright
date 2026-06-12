@@ -3,7 +3,6 @@
 import { motion, useSpring, useTransform } from "motion/react";
 import { useEffect } from "react";
 import { PhonemeBlock } from "@/components/scoring/phoneme-highlight";
-import { SyllableScoreGrid } from "@/components/scoring/syllable-score-grid";
 import {
   getBarColor,
   getScoreBg,
@@ -98,12 +97,10 @@ function CompactLayout({
   result,
   showProsody,
   phonemes,
-  syllables,
 }: {
   result: AzureAssessmentResult;
   showProsody: boolean;
   phonemes: AzurePhoneme[];
-  syllables?: AzureSyllable[];
 }) {
   return (
     <div className="grid grid-cols-1 gap-3 md:grid-cols-[80px_100px_1fr]">
@@ -148,16 +145,6 @@ function CompactLayout({
             />
           ))}
         </div>
-
-        {syllables && syllables.length > 1 && (
-          <>
-            <div className="my-2 border-t" />
-            <p className="mb-1.5 text-xs font-semibold text-muted-foreground">
-              音节评分
-            </p>
-            <SyllableScoreGrid syllables={syllables} compact />
-          </>
-        )}
       </div>
     </div>
   );
@@ -208,7 +195,6 @@ export function ScoreBreakdown({
   result,
   showProsody = true,
   phonemes,
-  syllables,
 }: ScoreBreakdownProps) {
   if (phonemes && phonemes.length > 0) {
     return (
@@ -216,7 +202,6 @@ export function ScoreBreakdown({
         result={result}
         showProsody={showProsody}
         phonemes={phonemes}
-        syllables={syllables}
       />
     );
   }

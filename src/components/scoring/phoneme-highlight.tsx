@@ -4,7 +4,6 @@ import { Howl } from "howler";
 import { Volume2 } from "lucide-react";
 import { motion } from "motion/react";
 import { useCallback, useRef, useState } from "react";
-import { SyllableScoreGrid } from "@/components/scoring/syllable-score-grid";
 import {
   Tooltip,
   TooltipContent,
@@ -194,7 +193,6 @@ interface PhonemeHighlightProps {
 
 export function PhonemeHighlight({
   phonemes,
-  syllables,
   languageId = "en-US",
 }: PhonemeHighlightProps) {
   const visiblePhonemes = phonemes.filter((ph) =>
@@ -206,7 +204,7 @@ export function PhonemeHighlight({
   const breakdownLabel = languageId === "en-US" ? "音标拆解" : "发音拆解";
 
   return (
-    <div className="space-y-4 rounded-xl border bg-card p-4">
+    <div className="rounded-xl border bg-card p-4">
       {/* Phoneme view */}
       <div>
         <div className="mb-2 flex items-center gap-2">
@@ -242,15 +240,6 @@ export function PhonemeHighlight({
         )}
       </div>
 
-      {/* Syllable view (hidden for single-syllable words) */}
-      {syllables && syllables.length > 1 && (
-        <div>
-          <p className="mb-2 text-sm font-semibold text-muted-foreground">
-            音节评分
-          </p>
-          <SyllableScoreGrid syllables={syllables} />
-        </div>
-      )}
     </div>
   );
 }

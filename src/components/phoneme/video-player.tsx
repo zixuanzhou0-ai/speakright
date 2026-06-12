@@ -99,18 +99,15 @@ function LocalVideoPanel({
     <div
       className={`overflow-hidden rounded-lg border bg-background ${className ?? ""}`}
     >
-      <div className="flex items-center justify-between gap-3 border-b bg-muted/20 px-3 py-2">
+      <div className="border-b bg-muted/10 px-3 py-1.5">
         <div className="min-w-0">
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
             {selectedSource.kind === "lesson" ? "教学讲解" : "发音视频"}
           </p>
-          <p className="truncate text-xs text-muted-foreground/80">
-            {selectedSource.description}
-          </p>
         </div>
       </div>
 
-      <div className="flex justify-center bg-muted/15 px-2 py-2">
+      <div className="flex justify-center bg-muted/15 px-2 py-1.5">
         <video
           key={selectedSource.localSrc}
           src={selectedSource.localSrc}
@@ -123,7 +120,7 @@ function LocalVideoPanel({
       </div>
 
       {sources.length > 1 && (
-        <div className="flex gap-2 overflow-x-auto border-t bg-gradient-to-b from-muted/20 to-background px-3 py-2 sm:flex-wrap sm:overflow-visible">
+        <div className="grid grid-cols-2 gap-1.5 border-t bg-gradient-to-b from-muted/20 to-background px-2 py-1.5">
           {sources.map((source, index) => {
             const isSelected = source.id === selectedSource.id;
             const Icon = source.kind === "lesson" ? BookOpen : Video;
@@ -134,14 +131,14 @@ function LocalVideoPanel({
                 type="button"
                 aria-pressed={isSelected}
                 onClick={() => setSelection({ slug, index })}
-                className={`inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full border px-3 text-xs font-medium transition-colors ${
+                className={`inline-flex h-7 min-w-0 items-center justify-center gap-1 rounded-full border px-2 text-[11px] font-medium transition-colors ${
                   isSelected
                     ? "border-primary/40 bg-primary/10 text-primary shadow-sm"
                     : "border-border bg-background text-muted-foreground hover:border-primary/30 hover:bg-muted/40 hover:text-foreground"
                 }`}
               >
                 <Icon className="h-3.5 w-3.5" />
-                <span>{source.label}</span>
+                <span className="truncate">{source.label}</span>
               </button>
             );
           })}
