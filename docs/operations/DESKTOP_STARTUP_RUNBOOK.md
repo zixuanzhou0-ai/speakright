@@ -112,10 +112,11 @@ the release-readiness or user-testing entrypoint.
 - English word-card audio is bundled in `public/audio/words/` with `blue` and
   `pink` voice variants; Youdao is only the online fallback.
 - Spanish, French, and Russian word/phrase audio is bundled in
-  `public/audio/language-packs/`.
+  `public/audio/language-packs/` with `blue` and `pink` voice variants.
 - Spanish, French, and Russian audio density is now tracked by
   `npm run audio:parity:dry-run`; the target is 24 practice items per sound
-  unit, and the latest report has no missing language-pack audio.
+  unit with two local voice files per item, and the latest report has no missing
+  language-pack audio.
 - Multilingual audio packs are not installed from Settings anymore.
 - Local articulation/video assets live under `public/videos/language-assets/`.
 - API keys are not stored in Git and are excluded from learning-data export.
@@ -288,3 +289,39 @@ release notes and installation guide keep the unsigned warning visible.
   - French: `545/545`, missing `0`.
   - Russian: `460/460`, missing `0`.
 - Routine dry-run checks still make zero ElevenLabs API calls.
+
+## 2026-06-11 Multilingual Dual-Voice Expansion
+
+- Upgraded Spanish, French, and Russian language-pack manifests to v2 with
+  `blue` and `pink` local audio variants for every bundled item.
+- Primary voices remain:
+  - Spanish: `Marco Cruz`
+  - French: `Clément`
+  - Russian: `Valeria`
+- Secondary voices selected from ElevenLabs voices metadata and generated once:
+  - Spanish: `Lydia`
+  - French: `Rachel`
+  - Russian: `Sergey`
+- Final zero-cost dry-run results:
+  - Spanish: `880` existing audio files, `0` missing.
+  - French: `1090` existing audio files, `0` missing.
+  - Russian: `920` existing audio files, `0` missing.
+  - Total missing: `0`.
+- Estimated approved one-time generation size: about `10645` characters.
+  Routine validation must not regenerate these files.
+- The phoneme detail card now has a compact A/B standard-voice selector. Manual
+  QA should check both voices for at least a few words in each language.
+- Validation after the dual-voice expansion:
+  - `npm.cmd run test`: `75` files and `380` tests passed.
+  - `npm.cmd run typecheck`: passed.
+  - `npm.cmd run lint`: passed; Biome checked `317` files.
+  - `npm.cmd run build:desktop-frontend`: passed; `144` static pages generated.
+  - `npm.cmd run audio:parity:dry-run`: Spanish `880`, French `1090`, Russian
+    `920`, total missing `0`.
+  - `npm.cmd run desktop:live-validation`: English `1464`, Spanish `880`,
+    French `1090`, Russian `920`, videos `210`, Azure `220/220`, ElevenLabs
+    generated characters `0`.
+  - `npm.cmd run validate:desktop`: passed, including Tauri build, UI smoke,
+    release smoke, release report, and installer smoke.
+  - `npm.cmd run desktop:release-gate`: failed only because EXE/MSI/NSIS
+    artifacts are unsigned.

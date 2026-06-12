@@ -14,6 +14,8 @@ not included in this release track.
   exports.
 - Spanish, French, and Russian word/phrase audio is bundled under
   `public/audio/language-packs/`; users do not install these packs separately.
+  Each bundled item now has `blue` and `pink` voice variants, matching the
+  English local-audio model.
 - Local articulation assets live under `public/videos/language-assets/`.
 
 ## Development
@@ -71,9 +73,9 @@ not generate new audio unless an explicit smoke flag is set outside the normal
 release checklist.
 
 `audio:parity:dry-run` checks the Spanish, French, and Russian learning-density
-contract without calling ElevenLabs. It writes
+and dual-voice audio contract without calling ElevenLabs. It writes
 `src-tauri/target/audio-parity/gap-report.json` and verifies that every required
-single-voice language-pack audio item is present.
+language-pack item has both `blue` and `pink` local files.
 
 `desktop:preflight` checks the active workspace, release executable, and running
 `speakright.exe` process before release-style testing. It never closes the app
@@ -90,22 +92,32 @@ README/docs-only changes run the lightweight Docs Check workflow.
 
 - The current Windows artifacts are for controlled testing unless code signing
   is complete.
-- Last controlled-test verification: 2026-06-11, after the preflight/UI-smoke
-  hardening pass.
+- Last controlled-test verification: 2026-06-11, after the multilingual
+  dual-voice expansion and full desktop validation pass.
 - Previous release-validation baseline: `94be1d4`
   (`chore: tighten desktop release validation`).
 - Latest release-hardening pass added non-English low-evidence diagnosis gates,
   `desktop:preflight`, `desktop:ui-smoke`, and docs-only CI path filtering; the
   final local `validate:desktop` pass completed successfully.
-- Verified bundled assets before the audio-density expansion: English word audio
-  `1464/1464`, Spanish language-pack audio `398/398`, French language-pack
-  audio `509/509`, Russian language-pack audio `407/407`, local videos `210/210`.
+- Verified bundled assets after the multilingual dual-voice expansion: English
+  word audio `1464/1464`, Spanish language-pack audio `880/880`, French
+  language-pack audio `1090/1090`, Russian language-pack audio `920/920`, local
+  videos `210/210`.
 - Multilingual audio-density expansion target: 24 practice items per Spanish,
   French, and Russian sound unit. The latest dry-run after generation reports
-  Spanish `440/440`, French `545/545`, Russian `460/460`, total missing `0`.
+  Spanish `440 x 2`, French `545 x 2`, Russian `460 x 2`, total missing `0`.
+- Secondary voices selected for the experimental language packs: Spanish
+  `Lydia`, French `Rachel`, Russian `Sergey`; the original primary voices
+  remain Spanish `Marco Cruz`, French `Clément`, Russian `Valeria`.
+- Latest automated validation after the dual-voice expansion:
+  `npm.cmd run test` passed `75` files / `380` tests;
+  `npm.cmd run typecheck`, `npm.cmd run lint`,
+  `npm.cmd run build:desktop-frontend`, `npm.cmd run desktop:live-validation`,
+  and `npm.cmd run validate:desktop` passed.
 - Verified Azure live sample: `220/220` pronunciation-assessment calls passed.
-- ElevenLabs was usage-checked only during validation; estimated TTS characters
-  used were `0`.
+- ElevenLabs usage during normal validation remains `0` generated characters.
+  The one-time multilingual secondary-voice generation was approved separately
+  and estimated at about `10645` characters.
 - Public release gate still fails only because EXE/MSI/NSIS artifacts are
   unsigned.
 - Non-English pronunciation scoring remains experimental; `evidenceMastery`

@@ -10,10 +10,22 @@ const PACK_LANGUAGES = ["es-ES", "fr-FR", "ru-RU"] as const;
 interface StaticPackManifest {
   languageId: (typeof PACK_LANGUAGES)[number];
   itemCount: number;
+  voiceSlots?: Array<"blue" | "pink">;
+  voices?: Partial<
+    Record<
+      "blue" | "pink",
+      {
+        voiceId: string;
+        voiceName: string;
+        modelId: string;
+      }
+    >
+  >;
   items: Array<{
     key: string;
     text: string;
     audioSrc: string;
+    audioByVoice?: Partial<Record<"blue" | "pink", string>>;
   }>;
 }
 
@@ -37,6 +49,9 @@ describe("static multilingual language audio packs", () => {
       expect(manifest.languageId).toBe(languageId);
       expect(manifest.itemCount).toBe(manifest.items.length);
       expect(manifest.itemCount).toBeGreaterThan(300);
+      expect(manifest.voiceSlots).toEqual(["blue", "pink"]);
+      expect(manifest.voices?.blue?.voiceId).toBeTruthy();
+      expect(manifest.voices?.pink?.voiceId).toBeTruthy();
 
       const keys = new Set<string>();
       for (const item of manifest.items) {
@@ -47,9 +62,23 @@ describe("static multilingual language audio packs", () => {
         );
         expect(keys.has(item.key)).toBe(false);
         keys.add(item.key);
+        expect(item.audioByVoice?.blue).toBe(item.audioSrc);
+        expect(item.audioByVoice?.pink).toMatch(
+          new RegExp(`^/audio/language-packs/${languageId}/.+\\.mp3$`),
+        );
 
-        const filePath = join(PROJECT_ROOT, "public", item.audioSrc.replace(/^\//, ""));
-        expect(existsSync(filePath)).toBe(true);
+        for (const voiceSlot of ["blue", "pink"] as const) {
+          const audioSrc = item.audioByVoice?.[voiceSlot];
+          expect(audioSrc).toMatch(
+            new RegExp(`^/audio/language-packs/${languageId}/.+\\.mp3$`),
+          );
+          const filePath = join(
+            PROJECT_ROOT,
+            "public",
+            String(audioSrc).replace(/^\//, ""),
+          );
+          expect(existsSync(filePath)).toBe(true);
+        }
       }
     }
   });
@@ -66,16 +95,24 @@ describe("static multilingual language audio packs", () => {
     for (const languageId of PACK_LANGUAGES) {
       const manifest = loadManifest(languageId);
       const keys = new Set(
-        manifest.items.flatMap((item) => [
-          normalizeAudioPackText(item.key),
-          normalizeAudioPackText(item.text),
-        ]),
+        manifest.items.flatMap((item) =>
+          (["blue", "pink"] as const).flatMap((voiceSlot) => {
+            if (!item.audioByVoice?.[voiceSlot]) return [];
+            return [
+              `${voiceSlot}:${normalizeAudioPackText(item.key)}`,
+              `${voiceSlot}:${normalizeAudioPackText(item.text)}`,
+            ];
+          }),
+        ),
       );
 
       const missing = LANGUAGE_LEARNING_DECKS[
         languageId
       ].diagnosticWords.filter(
-        (word) => !keys.has(normalizeAudioPackText(word.text)),
+        (word) =>
+          !(["blue", "pink"] as const).every((voiceSlot) =>
+            keys.has(`${voiceSlot}:${normalizeAudioPackText(word.text)}`),
+          ),
       );
 
       expect(missing.map((word) => word.text)).toEqual([]);
@@ -86,17 +123,25 @@ describe("static multilingual language audio packs", () => {
     for (const languageId of PACK_LANGUAGES) {
       const manifest = loadManifest(languageId);
       const keys = new Set(
-        manifest.items.flatMap((item) => [
-          normalizeAudioPackText(item.key),
-          normalizeAudioPackText(item.text),
-        ]),
+        manifest.items.flatMap((item) =>
+          (["blue", "pink"] as const).flatMap((voiceSlot) => {
+            if (!item.audioByVoice?.[voiceSlot]) return [];
+            return [
+              `${voiceSlot}:${normalizeAudioPackText(item.key)}`,
+              `${voiceSlot}:${normalizeAudioPackText(item.text)}`,
+            ];
+          }),
+        ),
       );
       const deck = LANGUAGE_LEARNING_DECKS[languageId];
       const requiredTexts = [
         ...deck.contrastDeck.flatMap((item) => [item.left, item.right]),
       ];
       const missing = Array.from(new Set(requiredTexts)).filter(
-        (text) => !keys.has(normalizeAudioPackText(text)),
+        (text) =>
+          !(["blue", "pink"] as const).every((voiceSlot) =>
+            keys.has(`${voiceSlot}:${normalizeAudioPackText(text)}`),
+          ),
       );
 
       expect(missing).toEqual([]);

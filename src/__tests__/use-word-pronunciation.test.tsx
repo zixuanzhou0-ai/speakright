@@ -87,12 +87,38 @@ describe("useWordPronunciation", () => {
       expect(mocks.getStaticLanguageAudioPackEntry).toHaveBeenCalledWith(
         "es-ES",
         "hola",
+        "blue",
       );
     });
     expect(URL.createObjectURL).not.toHaveBeenCalled();
     expect(mocks.getLanguageAudioPackEntry).not.toHaveBeenCalled();
     expect(mocks.fetchPronunciation).not.toHaveBeenCalled();
     expect(mocks.howlSources).toEqual(["/audio/language-packs/es-ES/hola.mp3"]);
+  });
+
+  it("passes the requested voice slot to bundled non-English packs", async () => {
+    mocks.getStaticLanguageAudioPackEntry.mockResolvedValue({
+      audioSrc: "/audio/language-packs/fr-FR/bonjour-pink.mp3",
+      voiceSlot: "pink",
+    });
+    const { result } = renderHook(() => useWordPronunciation());
+
+    await act(async () => {
+      result.current.playWord("bonjour", "pink", "fr-FR");
+    });
+
+    await waitFor(() => {
+      expect(mocks.getStaticLanguageAudioPackEntry).toHaveBeenCalledWith(
+        "fr-FR",
+        "bonjour",
+        "pink",
+      );
+    });
+    expect(mocks.getLanguageAudioPackEntry).not.toHaveBeenCalled();
+    expect(mocks.fetchPronunciation).not.toHaveBeenCalled();
+    expect(mocks.howlSources).toEqual([
+      "/audio/language-packs/fr-FR/bonjour-pink.mp3",
+    ]);
   });
 
   it("uses the active non-English language audio pack before Youdao fallback", async () => {

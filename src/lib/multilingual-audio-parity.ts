@@ -13,9 +13,12 @@ export const MULTILINGUAL_AUDIO_PARITY_LANGUAGES = [
 export const MULTILINGUAL_AUDIO_PARITY_TARGET_PER_UNIT = 24;
 export const MULTILINGUAL_AUDIO_PARITY_RULE_PHRASE_TARGET = 16;
 export const MULTILINGUAL_AUDIO_PARITY_RULE_ANCHOR_TARGET = 8;
+export const MULTILINGUAL_AUDIO_PARITY_VOICE_SLOTS = ["blue", "pink"] as const;
 
 export type MultilingualAudioParityLanguageId =
   (typeof MULTILINGUAL_AUDIO_PARITY_LANGUAGES)[number];
+export type MultilingualAudioParityVoiceSlot =
+  (typeof MULTILINGUAL_AUDIO_PARITY_VOICE_SLOTS)[number];
 
 export type MultilingualPracticeItemKind =
   | "word"
@@ -80,6 +83,11 @@ export interface MultilingualAudioParityReport {
     missingAudioItems: number;
     estimatedNewCharacters: number;
   };
+}
+
+export interface MultilingualMissingAudioItem {
+  text: string;
+  voiceSlot: MultilingualAudioParityVoiceSlot;
 }
 
 function cleanText(text: string): string {
@@ -248,16 +256,40 @@ export function getTextsMissingFromStaticAudioPack(
   items: MultilingualPracticeItem[],
   audioKeys: ReadonlySet<string>,
 ): string[] {
-  const missing = new Set<string>();
+  return getMissingAudioItemsFromStaticAudioPack(items, audioKeys).map(
+    (item) => `${item.text} [${item.voiceSlot}]`,
+  );
+}
+
+export function getAudioParityKey(
+  voiceSlot: MultilingualAudioParityVoiceSlot,
+  text: string,
+): string {
+  return `${voiceSlot}:${normalizeAudioPackText(text)}`;
+}
+
+export function getMissingAudioItemsFromStaticAudioPack(
+  items: MultilingualPracticeItem[],
+  audioKeys: ReadonlySet<string>,
+): MultilingualMissingAudioItem[] {
+  const missing = new Map<string, MultilingualMissingAudioItem>();
 
   for (const item of items) {
-    const key = normalizeAudioPackText(item.text);
-    if (!audioKeys.has(key)) {
-      missing.add(item.text);
+    for (const voiceSlot of MULTILINGUAL_AUDIO_PARITY_VOICE_SLOTS) {
+      const key = getAudioParityKey(voiceSlot, item.text);
+      if (!audioKeys.has(key)) {
+        missing.set(`${voiceSlot}:${normalizeAudioPackText(item.text)}`, {
+          text: item.text,
+          voiceSlot,
+        });
+      }
     }
   }
 
-  return [...missing].sort((a, b) => a.localeCompare(b));
+  return [...missing.values()].sort(
+    (a, b) =>
+      a.text.localeCompare(b.text) || a.voiceSlot.localeCompare(b.voiceSlot),
+  );
 }
 
 function isRuleLikeUnit(unit: PhonemeData): boolean {
@@ -326,7 +358,7 @@ export function summarizeMultilingualAudioParity(
   );
   const uniqueTexts = new Set(items.map((item) => normalizeAudioPackText(item.text)));
   const missingAudio = audioKeys
-    ? getTextsMissingFromStaticAudioPack(items, audioKeys)
+    ? getMissingAudioItemsFromStaticAudioPack(items, audioKeys)
     : [];
 
   return {
@@ -338,7 +370,7 @@ export function summarizeMultilingualAudioParity(
     existingAudioItems: audioKeys?.size ?? 0,
     missingAudioItems: missingAudio.length,
     estimatedNewCharacters: missingAudio.reduce(
-      (sum, text) => sum + Array.from(text).length,
+      (sum, item) => sum + Array.from(item.text).length,
       0,
     ),
     units: unitSummaries,

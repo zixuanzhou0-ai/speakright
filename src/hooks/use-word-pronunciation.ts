@@ -139,6 +139,7 @@ export function useWordPronunciation(): UseWordPronunciationReturn {
         const staticEntry = await getStaticLanguageAudioPackEntry(
           languageId,
           normalizedWord,
+          fallbackVoice,
         );
         if (staticEntry) {
           playHowl(staticEntry.audioSrc);

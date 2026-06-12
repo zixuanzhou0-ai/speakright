@@ -467,22 +467,31 @@ async function auditLanguagePack(languageId) {
     `public/audio/language-packs/${languageId}/manifest.json`,
   );
   const failures = [];
+  let filesChecked = 0;
   for (const item of manifest.items ?? []) {
-    const info = await fileInfo(localPathFromPublicSrc(item.audioSrc));
-    if (!info.exists || info.bytes <= 0) {
-      failures.push({
-        key: item.key,
-        text: item.text,
-        path: item.audioSrc,
-        reason: "missing",
-      });
+    const audioByVoice = item.audioByVoice ?? { blue: item.audioSrc };
+    for (const [voiceSlot, audioSrc] of Object.entries(audioByVoice)) {
+      filesChecked += 1;
+      const info = await fileInfo(localPathFromPublicSrc(audioSrc));
+      if (!info.exists || info.bytes <= 0) {
+        failures.push({
+          key: item.key,
+          text: item.text,
+          voiceSlot,
+          path: audioSrc,
+          reason: "missing",
+        });
+      }
     }
   }
   return {
     languageId,
     itemCount: manifest.items?.length ?? 0,
+    filesChecked,
+    voiceSlots: manifest.voiceSlots ?? ["blue"],
     manifestItemCount: manifest.itemCount,
     voiceName: manifest.voiceName,
+    voices: manifest.voices ?? null,
     modelId: manifest.modelId,
     failures,
   };
@@ -861,7 +870,7 @@ async function main() {
   console.log(`Desktop live validation report: ${reportPath}`);
   console.log(
     `Local audio checked: English ${englishAudio.filesChecked}, language packs ${packs
-      .map((pack) => `${pack.languageId}:${pack.itemCount}`)
+      .map((pack) => `${pack.languageId}:${pack.filesChecked}`)
       .join(", ")}`,
   );
   console.log(`Videos checked: ${videos.filesChecked}`);

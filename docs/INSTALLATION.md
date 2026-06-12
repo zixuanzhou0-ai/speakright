@@ -56,8 +56,9 @@ word/phrase audio is already bundled in the desktop app. Users do not install
 language audio packs separately.
 
 Spanish, French, and Russian are bundled at the current 24-item-per-sound-unit
-learning-density target. The parity dry-run is still useful as a zero-cost audit:
-it does not call ElevenLabs and should report no missing language-pack audio.
+learning-density target with two local voice variants per item. The parity
+dry-run is still useful as a zero-cost audit: it does not call ElevenLabs and
+should report no missing language-pack audio.
 
 Release validation is intentionally conservative with ElevenLabs credits:
 normal validation checks the usage endpoint only and does not generate fresh
@@ -96,20 +97,28 @@ No cloud backend is required for this release.
 
 ## Current Internal-Test Status
 
-Last controlled-test verification: 2026-06-11, after the preflight/UI-smoke
-hardening pass. Previous release-validation baseline: `94be1d4`.
+Last controlled-test verification: 2026-06-11, after the multilingual
+dual-voice expansion and full desktop validation pass. Previous
+release-validation baseline before this local pass: `94be1d4`.
 
 - Recommended launch path: `npm run desktop:launch-release`.
 - Build shape: Tauri static bundle, not `localhost`.
-- Bundled asset check before the latest audio expansion: English `1464/1464`,
-  Spanish `398/398`, French `509/509`, Russian `407/407`, videos `210/210`.
-- Multilingual audio parity after generation: Spanish `440/440`, French
-  `545/545`, Russian `460/460`, total missing `0`.
+- Bundled asset check after the latest audio expansion: English `1464/1464`,
+  Spanish `880/880`, French `1090/1090`, Russian `920/920`, videos `210/210`.
+- Multilingual audio parity after generation: Spanish `440 x 2`, French
+  `545 x 2`, Russian `460 x 2`, total missing `0`.
+- Secondary voices selected for the experimental packs: Spanish `Lydia`, French
+  `Rachel`, Russian `Sergey`; the original primary voices remain bundled.
 - Azure live validation: `220/220` sampled pronunciation assessments passed.
 - ElevenLabs validation usage: usage query only, `0` generated TTS characters.
+  The approved one-time secondary-voice expansion is separate from routine
+  validation and is not rerun during installer testing.
 - Release UI smoke: Settings, English, Spanish, French, Russian, drill, free
   practice, and diagnosis opened from the Release EXE; runtime was not
   `localhost`.
+- Latest automated validation after the dual-voice expansion: `75` test files
+  and `380` tests passed; typecheck, lint, static frontend build,
+  `desktop:live-validation`, and `validate:desktop` passed.
 - Public-release blocker: Windows EXE/MSI/NSIS artifacts are still unsigned.
 
 For the 2026-06-12 internal-test pass, use the installed app or Release EXE

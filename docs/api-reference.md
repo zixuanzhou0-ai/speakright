@@ -27,6 +27,11 @@ shown in release artifacts.
   audio.
 - Spanish, French, and Russian word/phrase packs are bundled under
   `public/audio/language-packs/`; users do not install them in Settings.
+  Each manifest item carries `audioByVoice.blue` and `audioByVoice.pink`.
+- Current bundled experimental-language voices:
+  - Spanish: `Marco Cruz` primary and `Lydia` secondary.
+  - French: `Clément` primary and `Rachel` secondary.
+  - Russian: `Valeria` primary and `Sergey` secondary.
 - Missing bundled audio may fall back to ElevenLabs only when the user has
   configured a key.
 - Release validation must not batch-generate ElevenLabs audio. The normal

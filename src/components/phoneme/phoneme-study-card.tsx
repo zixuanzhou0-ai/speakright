@@ -3,6 +3,7 @@
 import { ChevronLeft, ChevronRight, Loader2, Volume2 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
+import { useState } from "react";
 import { PhonemePlayButton } from "@/components/phoneme/phoneme-play-button";
 import { VideoPlayer } from "@/components/phoneme/video-player";
 import { Button } from "@/components/ui/button";
@@ -58,6 +59,7 @@ export function PhonemeStudyCard({
   const hasLocalPhonemeAssets = phoneme.languageId === "en-US";
   const displayWord = currentWord?.stressText ?? currentWord?.word;
   const previousEnabled = canGoPrevious ?? wordHistoryLength > 0;
+  const [selectedVoice, setSelectedVoice] = useState<"blue" | "pink">("blue");
   const spanishVideoSet =
     phoneme.languageId === "es-ES"
       ? getSpanishSoundVideoSet(phoneme.slug)
@@ -148,21 +150,40 @@ export function PhonemeStudyCard({
                   animate={{ x: 0, opacity: 1 }}
                   exit={{ x: wordDirection > 0 ? -120 : 120, opacity: 0 }}
                   transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                  className="flex items-center justify-center gap-2"
+                  className="flex min-w-0 flex-col items-center justify-center gap-0.5 px-1"
                 >
                   <motion.span
                     animate={{ scale: isWordActive ? 1.05 : 1 }}
-                    className={`text-2xl font-bold transition-colors ${isWordActive ? "text-primary" : ""}`}
+                    className={`max-w-full truncate text-center text-xl font-bold leading-tight transition-colors sm:text-2xl ${isWordActive ? "text-primary" : ""}`}
                   >
                     {displayWord}
                   </motion.span>
                   <span
-                    className={`font-mono text-sm ${isWordActive ? "text-primary/70" : "text-muted-foreground"}`}
+                    className={`max-w-full break-all text-center font-mono text-xs leading-tight sm:text-sm ${isWordActive ? "text-primary/70" : "text-muted-foreground"}`}
                   >
                     {currentWord.ipa}
                   </span>
                 </motion.div>
               </AnimatePresence>
+            </div>
+
+            <div className="flex shrink-0 overflow-hidden rounded-full border bg-muted/30 p-0.5">
+              {(["blue", "pink"] as const).map((voice) => (
+                <button
+                  type="button"
+                  key={voice}
+                  aria-label={`使用${voice === "blue" ? "A" : "B"}声线`}
+                  title={`标准发音 ${voice === "blue" ? "A" : "B"}`}
+                  onClick={() => setSelectedVoice(voice)}
+                  className={`h-6 w-6 rounded-full text-[11px] font-semibold transition-colors ${
+                    selectedVoice === voice
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:bg-background"
+                  }`}
+                >
+                  {voice === "blue" ? "A" : "B"}
+                </button>
+              ))}
             </div>
 
             <motion.button
@@ -172,7 +193,7 @@ export function PhonemeStudyCard({
               onClick={() => {
                 onStopPlayback();
                 onStopChartAudio();
-                onPlayWord(currentWord.word, "blue");
+                onPlayWord(currentWord.word, selectedVoice);
               }}
               disabled={wordIsLoading}
               className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full cursor-pointer hover:bg-primary/10 hover:text-primary text-muted-foreground disabled:opacity-50"

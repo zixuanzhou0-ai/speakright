@@ -71,7 +71,7 @@ function installTypeScriptRequireHook() {
   };
 }
 
-function loadManifestAudioKeys(languageId, normalizeAudioPackText) {
+function loadManifestAudioKeys(languageId, getAudioParityKey) {
   const manifestPath = resolve(
     ROOT,
     "public",
@@ -86,12 +86,22 @@ function loadManifestAudioKeys(languageId, normalizeAudioPackText) {
   }
 
   const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
-  return new Set(
-    manifest.items.flatMap((item) => [
-      normalizeAudioPackText(item.key),
-      normalizeAudioPackText(item.text),
-    ]),
-  );
+  const keys = new Set();
+
+  for (const item of manifest.items ?? []) {
+    const audioByVoice = item.audioByVoice ?? {
+      blue: item.audioSrc,
+    };
+    for (const [voiceSlot, audioSrc] of Object.entries(audioByVoice)) {
+      if (!audioSrc) continue;
+      const audioPath = resolve(ROOT, "public", String(audioSrc).replace(/^\//, ""));
+      if (!existsSync(audioPath)) continue;
+      keys.add(getAudioParityKey(voiceSlot, item.key));
+      keys.add(getAudioParityKey(voiceSlot, item.text));
+    }
+  }
+
+  return keys;
 }
 
 function main() {
@@ -101,17 +111,15 @@ function main() {
   const {
     MULTILINGUAL_AUDIO_PARITY_LANGUAGES,
     buildMultilingualAudioParityReport,
+    getAudioParityKey,
   } = Module.createRequire(import.meta.url)(
     resolve(ROOT, "src", "lib", "multilingual-audio-parity.ts"),
-  );
-  const { normalizeAudioPackText } = Module.createRequire(import.meta.url)(
-    resolve(ROOT, "src", "lib", "language-audio-pack-cache.ts"),
   );
 
   const audioKeysByLanguage = Object.fromEntries(
     MULTILINGUAL_AUDIO_PARITY_LANGUAGES.map((languageId) => [
       languageId,
-      loadManifestAudioKeys(languageId, normalizeAudioPackText),
+      loadManifestAudioKeys(languageId, getAudioParityKey),
     ]),
   );
   const report = buildMultilingualAudioParityReport(audioKeysByLanguage);

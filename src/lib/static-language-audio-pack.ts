@@ -7,6 +7,11 @@ interface StaticLanguageAudioPackItem {
   ipa?: string;
   soundUnitSlugs: string[];
   audioSrc: string;
+  audioByVoice?: Partial<Record<StaticLanguageAudioVoiceSlot, string>>;
+  fileName?: string;
+  fileNameByVoice?: Partial<Record<StaticLanguageAudioVoiceSlot, string>>;
+  bytes?: number;
+  bytesByVoice?: Partial<Record<StaticLanguageAudioVoiceSlot, number>>;
 }
 
 interface StaticLanguageAudioPackManifest {
@@ -15,8 +20,19 @@ interface StaticLanguageAudioPackManifest {
   modelId: string;
   voiceId: string;
   voiceName: string;
+  voices?: Partial<Record<StaticLanguageAudioVoiceSlot, StaticLanguageAudioPackVoice>>;
+  voiceSlots?: StaticLanguageAudioVoiceSlot[];
   itemCount: number;
   items: StaticLanguageAudioPackItem[];
+}
+
+export type StaticLanguageAudioVoiceSlot = "blue" | "pink";
+
+interface StaticLanguageAudioPackVoice {
+  slot: StaticLanguageAudioVoiceSlot;
+  voiceId: string;
+  voiceName: string;
+  modelId: string;
 }
 
 export interface StaticLanguageAudioPackSummary {
@@ -24,6 +40,7 @@ export interface StaticLanguageAudioPackSummary {
   itemCount: number;
   modelId: string;
   voiceName: string;
+  voiceSlots: StaticLanguageAudioVoiceSlot[];
 }
 
 export interface StaticLanguageAudioPackEntry extends StaticLanguageAudioPackItem {
@@ -31,6 +48,7 @@ export interface StaticLanguageAudioPackEntry extends StaticLanguageAudioPackIte
   modelId: string;
   voiceId: string;
   voiceName: string;
+  voiceSlot: StaticLanguageAudioVoiceSlot;
 }
 
 const manifestCache = new Map<
@@ -62,6 +80,7 @@ async function getManifest(
 export async function getStaticLanguageAudioPackEntry(
   languageId: ElevenLabsPackLanguageId,
   text: string,
+  voiceSlot: StaticLanguageAudioVoiceSlot = "blue",
 ): Promise<StaticLanguageAudioPackEntry | null> {
   const manifest = await getManifest(languageId);
   if (!manifest) return null;
@@ -74,12 +93,20 @@ export async function getStaticLanguageAudioPackEntry(
   );
   if (!item) return null;
 
+  const audioSrc =
+    item.audioByVoice?.[voiceSlot] ?? (voiceSlot === "blue" ? item.audioSrc : null);
+  if (!audioSrc) return null;
+
+  const selectedVoice = manifest.voices?.[voiceSlot];
+
   return {
     ...item,
+    audioSrc,
     languageId,
-    modelId: manifest.modelId,
-    voiceId: manifest.voiceId,
-    voiceName: manifest.voiceName,
+    modelId: selectedVoice?.modelId ?? manifest.modelId,
+    voiceId: selectedVoice?.voiceId ?? manifest.voiceId,
+    voiceName: selectedVoice?.voiceName ?? manifest.voiceName,
+    voiceSlot,
   };
 }
 
@@ -93,6 +120,7 @@ export async function getStaticLanguageAudioPackSummary(
     itemCount: manifest.itemCount,
     modelId: manifest.modelId,
     voiceName: manifest.voiceName,
+    voiceSlots: manifest.voiceSlots ?? ["blue"],
   };
 }
 

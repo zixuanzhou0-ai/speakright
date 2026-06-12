@@ -1,7 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { normalizeAudioPackText } from "@/lib/language-audio-pack-cache";
 import { getLanguagePhonemeBySlug } from "@/lib/language-phonemes";
 import {
   MULTILINGUAL_AUDIO_PARITY_LANGUAGES,
@@ -9,6 +8,7 @@ import {
   MULTILINGUAL_AUDIO_PARITY_RULE_PHRASE_TARGET,
   MULTILINGUAL_AUDIO_PARITY_TARGET_PER_UNIT,
   buildMultilingualAudioParityReport,
+  getAudioParityKey,
   getMultilingualPracticeItems,
   isRuleLikeParityUnit,
   summarizeMultilingualAudioParity,
@@ -22,6 +22,7 @@ interface StaticLanguageAudioPackManifest {
     key: string;
     text: string;
     audioSrc: string;
+    audioByVoice?: Partial<Record<"blue" | "pink", string>>;
   }>;
 }
 
@@ -38,12 +39,16 @@ function loadAudioKeys(languageId: MultilingualAudioParityLanguageId) {
     readFileSync(manifestPath, "utf8"),
   ) as StaticLanguageAudioPackManifest;
 
-  return new Set(
-    manifest.items.flatMap((item) => [
-      normalizeAudioPackText(item.key),
-      normalizeAudioPackText(item.text),
-    ]),
-  );
+  const keys = new Set<string>();
+  for (const item of manifest.items) {
+    const audioByVoice = item.audioByVoice ?? { blue: item.audioSrc };
+    for (const [voiceSlot, audioSrc] of Object.entries(audioByVoice)) {
+      if (!audioSrc) continue;
+      keys.add(getAudioParityKey(voiceSlot as "blue" | "pink", item.key));
+      keys.add(getAudioParityKey(voiceSlot as "blue" | "pink", item.text));
+    }
+  }
+  return keys;
 }
 
 describe("multilingual audio parity contract", () => {
@@ -121,9 +126,9 @@ describe("multilingual audio parity contract", () => {
     expect(report.totals.requiredItems).toBe(
       75 * MULTILINGUAL_AUDIO_PARITY_TARGET_PER_UNIT,
     );
-    expect(report.totals.existingAudioItems).toBeGreaterThan(1200);
-    expect(report.totals.missingAudioItems).toBeGreaterThanOrEqual(0);
-    expect(report.totals.estimatedNewCharacters).toBeGreaterThanOrEqual(0);
+    expect(report.totals.existingAudioItems).toBe(2890);
+    expect(report.totals.missingAudioItems).toBe(0);
+    expect(report.totals.estimatedNewCharacters).toBe(0);
   });
 
   it("keeps existing language pack manifest entries pointing to real files", () => {
@@ -141,12 +146,17 @@ describe("multilingual audio parity contract", () => {
       ) as StaticLanguageAudioPackManifest;
 
       for (const item of manifest.items) {
-        const filePath = join(
-          PROJECT_ROOT,
-          "public",
-          item.audioSrc.replace(/^\//, ""),
-        );
-        expect(existsSync(filePath)).toBe(true);
+        expect(item.audioByVoice?.blue).toBe(item.audioSrc);
+        for (const voiceSlot of ["blue", "pink"] as const) {
+          const audioSrc = item.audioByVoice?.[voiceSlot];
+          expect(audioSrc).toBeTruthy();
+          const filePath = join(
+            PROJECT_ROOT,
+            "public",
+            String(audioSrc).replace(/^\//, ""),
+          );
+          expect(existsSync(filePath)).toBe(true);
+        }
       }
     }
   });
