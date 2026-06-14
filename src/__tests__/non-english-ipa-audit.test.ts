@@ -1,7 +1,10 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   buildNonEnglishIpaAuditInput,
   buildNonEnglishIpaAuditRows,
+  type NonEnglishIpaAuditInput,
 } from "@/lib/non-english-ipa-audit";
 import { getLanguagePhonemes } from "@/lib/language-phonemes";
 
@@ -61,5 +64,20 @@ describe("non-English IPA audit input", () => {
     expect(input.rows.some((row) => row.auditRole === "ipa-transcription")).toBe(
       true,
     );
+  });
+
+  it("keeps the tracked audit JSON synchronized with current source data", () => {
+    const trackedPath = resolve(
+      process.cwd(),
+      "docs",
+      "operations",
+      "non-english-ipa-audit-input.json",
+    );
+    const tracked = JSON.parse(
+      readFileSync(trackedPath, "utf8"),
+    ) as NonEnglishIpaAuditInput;
+    const current = buildNonEnglishIpaAuditInput(tracked.generatedAt);
+
+    expect(tracked).toEqual(current);
   });
 });
