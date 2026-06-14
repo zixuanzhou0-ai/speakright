@@ -38,6 +38,10 @@ E:\SpeakRightDesktopRepo\src-tauri\target\release\speakright.exe
 - Open-source readiness tests now include a tracked-text-file guard for obvious
   real private-key/API-token formats; failures report only path, line, and
   pattern name, not the matched secret text.
+- Open-source readiness tests also lock the public developer/release npm
+  scripts, including `test`, `typecheck`, `lint`, `desktop:preflight`,
+  `desktop:launch-release`, dry-run audio audits, and the public release gate.
+  Routine validation scripts are checked so they do not call audio generation.
 
 ## Current Local Worktree
 

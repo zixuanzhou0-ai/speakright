@@ -128,6 +128,59 @@ describe("open-source readiness files", () => {
     expect(handoffDocs).not.toContain("PID was `70112`");
   });
 
+  it("keeps public developer and release npm scripts explicit and zero-generation by default", () => {
+    const packageJson = JSON.parse(read("package.json")) as {
+      private?: boolean;
+      repository?: { url?: string };
+      scripts?: Record<string, string>;
+    };
+    const scripts = packageJson.scripts ?? {};
+
+    expect(packageJson.private).toBe(true);
+    expect(packageJson.repository?.url).toContain("speakright-desktop");
+
+    for (const scriptName of [
+      "test",
+      "typecheck",
+      "lint",
+      "build:desktop-frontend",
+      "desktop:build",
+      "desktop:preflight",
+      "desktop:launch-release",
+      "desktop:ui-smoke",
+      "audio:parity:dry-run",
+      "audio:loudness:dry-run",
+      "ipa:audit:export",
+      "validate:internal-release",
+      "validate:public-release",
+    ]) {
+      expect(scripts[scriptName], scriptName).toEqual(expect.any(String));
+    }
+
+    expect(scripts["desktop:preflight"]).toContain("desktop-preflight");
+    expect(scripts["desktop:launch-release"]).toContain(
+      "desktop-launch-release",
+    );
+    expect(scripts["audio:parity:dry-run"]).toContain("--dry-run");
+    expect(scripts["audio:loudness:dry-run"]).toContain("--dry-run");
+    expect(scripts["validate:public-release"]).toContain("validate:release");
+    expect(scripts["validate:release"]).toContain("desktop:release-gate");
+
+    const routineValidationScripts = [
+      scripts.validate,
+      scripts["validate:desktop"],
+      scripts["validate:desktop-ci"],
+      scripts["validate:internal-release"],
+      scripts["validate:public-release"],
+    ].join("\n");
+
+    expect(routineValidationScripts).not.toContain("audio:parity:generate");
+    expect(routineValidationScripts).not.toContain(
+      "audio:parity:generate-secondary",
+    );
+    expect(routineValidationScripts).not.toContain("generate-word-audio");
+  });
+
   it("keeps tracked source files free of obvious real secret formats", () => {
     const findings: string[] = [];
 
