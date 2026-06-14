@@ -213,6 +213,12 @@ git status --short --branch
   separated. Word and sentence drill recording cards render `recorderError`
   inline, so a failed microphone start is visible to the learner instead of
   leaving the drill card in a quiet idle state.
+- Azure Speech connection, assessment, and transcription failures now surface
+  Chinese action messages instead of raw English service errors. The client
+  separates no-speech recordings, key/region auth mismatch, unreachable
+  network/proxy, timeout, quota/rate-limit, service failures, and empty
+  transcription responses before those errors reach phoneme detail, assessment,
+  sentences, or drill UI.
 
 ## Latest Verification
 
@@ -235,7 +241,9 @@ Current gate summary:
 - Focused recorder-startup tests passed: `2` files and `11` tests, covering
   actionable microphone error messages, stream cleanup after recorder
   initialization failure, and visible drill-card errors.
-- Full tests passed: `96` files and `530` tests.
+- Focused Azure failure-message tests passed: `1` file and `10` tests, covering
+  Chinese auth, network, no-speech, NoMatch, and empty-transcription errors.
+- Full tests passed: `96` files and `536` tests.
 - Typecheck, lint (`352` files checked), and static desktop frontend build
   passed.
 - Release EXE build passed and rebuilt EXE, MSI, and NSIS artifacts.

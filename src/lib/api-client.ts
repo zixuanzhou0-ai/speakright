@@ -7,7 +7,10 @@
  */
 
 import { getCoachMode } from "@/lib/api-keys";
-import { assertAzureRegion, getAzureRegionValidationError } from "@/lib/azure-config";
+import {
+  assertAzureRegion,
+  getAzureRegionValidationError,
+} from "@/lib/azure-config";
 import { parseAzureResult } from "@/lib/azure-speech";
 import { buildL1ErrorContext, matchL1Errors } from "@/lib/l1-error-patterns";
 import { getDesktopLlmPolicyError } from "@/lib/llm-providers";
@@ -19,6 +22,82 @@ import type { AzureAssessmentResult } from "@/types/azure";
 import type { LanguageId } from "@/types/language";
 
 // ─── Azure ──────────────────────────────────────────────
+
+function truncateServiceDetail(text: string): string {
+  return text.replace(/\s+/g, " ").trim().slice(0, 220);
+}
+
+function buildAzureHttpErrorMessage(
+  action: "auth" | "assessment" | "transcription",
+  status: number,
+  body = "",
+): string {
+  const detail = truncateServiceDetail(body);
+  const suffix = detail ? `（${detail}）` : "";
+
+  if (status === 400 && /No speech/i.test(body)) {
+    return "没有检测到清晰语音，请靠近麦克风、读完目标内容后重新录音。";
+  }
+
+  if (status === 401 || status === 403) {
+    return "Azure Speech 认证失败，请检查设置页里的 Subscription Key 和区域是否匹配。";
+  }
+
+  if (status === 404) {
+    return "Azure Speech 区域或服务终结点不可用，请检查设置页里的 Azure 区域。";
+  }
+
+  if (status === 408 || status === 504) {
+    return "Azure Speech 请求超时，请检查网络后重试。";
+  }
+
+  if (status === 429) {
+    return "Azure Speech 请求过于频繁或额度已用尽，请稍后重试或检查 Azure 配额。";
+  }
+
+  if (status >= 500) {
+    return `Azure Speech 服务暂时不可用，请稍后重试。${suffix}`;
+  }
+
+  if (action === "auth") {
+    return `Azure Speech 连接测试失败（HTTP ${status}）。${suffix}`;
+  }
+
+  if (action === "transcription") {
+    return `Azure Speech 转写失败（HTTP ${status}）。${suffix}`;
+  }
+
+  return `Azure Speech 评分失败（HTTP ${status}）。${suffix}`;
+}
+
+function buildAzureNetworkErrorMessage(error: unknown): string {
+  if (error instanceof DOMException && error.name === "AbortError") {
+    return "Azure Speech 请求已取消，请重试。";
+  }
+
+  const message = error instanceof Error ? error.message : String(error);
+  if (
+    error instanceof TypeError ||
+    /fetch|network|dns|timeout|timed out|connection|offline|refused/i.test(
+      message,
+    )
+  ) {
+    return "无法连接 Azure Speech，请检查网络、代理或 Azure 区域后重试。";
+  }
+
+  return `Azure Speech 请求失败：${truncateServiceDetail(message) || "未知错误"}`;
+}
+
+function assertAzureSpeechMatch(raw: Record<string, unknown>): void {
+  if (
+    raw.RecognitionStatus === "NoMatch" ||
+    raw.RecognitionStatus === "InitialSilenceTimeout"
+  ) {
+    throw new Error(
+      "没有检测到清晰语音，请靠近麦克风、读完目标内容后重新录音。",
+    );
+  }
+}
 
 /**
  * Test Azure credentials by fetching an auth token.
@@ -33,15 +112,20 @@ export async function testAzure(
   }
   const normalizedRegion = assertAzureRegion(region);
   const tokenUrl = `https://${normalizedRegion}.api.cognitive.microsoft.com/sts/v1.0/issueToken`;
-  const res = await apiFetch(tokenUrl, {
-    method: "POST",
-    headers: { "Ocp-Apim-Subscription-Key": key },
-  });
+  let res: Response;
+  try {
+    res = await apiFetch(tokenUrl, {
+      method: "POST",
+      headers: { "Ocp-Apim-Subscription-Key": key },
+    });
+  } catch (error) {
+    return { success: false, error: buildAzureNetworkErrorMessage(error) };
+  }
   if (!res.ok) {
     const text = await res.text();
     return {
       success: false,
-      error: `Azure auth failed (${res.status}): ${text}`,
+      error: buildAzureHttpErrorMessage("auth", res.status, text),
     };
   }
   return { success: true };
@@ -81,34 +165,30 @@ export async function assessPronunciation(
   // CORS for tauri://localhost origin, so native fetch from WebView would fail.
   // Convert Blob → Uint8Array so the body survives IPC serialization.
   const audioBytes = new Uint8Array(await audioBlob.arrayBuffer());
-  const res = await apiFetch(url, {
-    method: "POST",
-    headers: {
-      "Ocp-Apim-Subscription-Key": key,
-      "Content-Type": "audio/wav",
-      "Pronunciation-Assessment": pronConfigBase64,
-      Accept: "application/json",
-    },
-    body: audioBytes,
-  });
+  let res: Response;
+  try {
+    res = await apiFetch(url, {
+      method: "POST",
+      headers: {
+        "Ocp-Apim-Subscription-Key": key,
+        "Content-Type": "audio/wav",
+        "Pronunciation-Assessment": pronConfigBase64,
+        Accept: "application/json",
+      },
+      body: audioBytes,
+    });
+  } catch (error) {
+    throw new Error(buildAzureNetworkErrorMessage(error));
+  }
 
   if (!res.ok) {
     const text = await res.text();
-    if (res.status === 400 && text.includes("No speech")) {
-      throw new Error("No speech detected. Please try again.");
-    }
-    throw new Error(`Azure assessment failed (${res.status}): ${text}`);
+    throw new Error(buildAzureHttpErrorMessage("assessment", res.status, text));
   }
 
-  const raw = await res.json();
+  const raw = (await res.json()) as Record<string, unknown>;
 
-  // Check for no-match
-  if (
-    raw.RecognitionStatus === "NoMatch" ||
-    raw.RecognitionStatus === "InitialSilenceTimeout"
-  ) {
-    throw new Error("No speech detected. Please try again.");
-  }
+  assertAzureSpeechMatch(raw);
 
   return parseAzureResult(raw);
 }
@@ -122,28 +202,30 @@ export async function transcribeSpeech(
   const normalizedRegion = assertAzureRegion(region);
   const url = `https://${normalizedRegion}.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language=${encodeURIComponent(language)}&format=detailed`;
   const audioBytes = new Uint8Array(await audioBlob.arrayBuffer());
-  const res = await apiFetch(url, {
-    method: "POST",
-    headers: {
-      "Ocp-Apim-Subscription-Key": key,
-      "Content-Type": "audio/wav",
-      Accept: "application/json",
-    },
-    body: audioBytes,
-  });
+  let res: Response;
+  try {
+    res = await apiFetch(url, {
+      method: "POST",
+      headers: {
+        "Ocp-Apim-Subscription-Key": key,
+        "Content-Type": "audio/wav",
+        Accept: "application/json",
+      },
+      body: audioBytes,
+    });
+  } catch (error) {
+    throw new Error(buildAzureNetworkErrorMessage(error));
+  }
 
   if (!res.ok) {
     const text = await res.text();
-    throw new Error(`Azure transcription failed (${res.status}): ${text}`);
+    throw new Error(
+      buildAzureHttpErrorMessage("transcription", res.status, text),
+    );
   }
 
   const raw = (await res.json()) as Record<string, unknown>;
-  if (
-    raw.RecognitionStatus === "NoMatch" ||
-    raw.RecognitionStatus === "InitialSilenceTimeout"
-  ) {
-    throw new Error("No speech detected. Please try again.");
-  }
+  assertAzureSpeechMatch(raw);
   const nbest = raw.NBest as Array<Record<string, unknown>> | undefined;
   const best = nbest?.[0];
   const transcript =
@@ -152,7 +234,7 @@ export async function transcribeSpeech(
     (raw.DisplayText as string | undefined) ??
     "";
   if (!transcript.trim()) {
-    throw new Error("No transcript returned from Azure.");
+    throw new Error("Azure Speech 没有返回可用转写文本，请重新录音后再试。");
   }
   return transcript.trim();
 }
@@ -282,7 +364,9 @@ export async function searchElevenLabsVoices(
   });
   if (!res.ok) {
     const errText = await res.text();
-    throw new Error(`ElevenLabs voice search error (${res.status}): ${errText}`);
+    throw new Error(
+      `ElevenLabs voice search error (${res.status}): ${errText}`,
+    );
   }
 
   const data = await res.json();

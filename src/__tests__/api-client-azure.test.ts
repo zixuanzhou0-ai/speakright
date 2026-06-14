@@ -65,4 +65,91 @@ describe("Azure desktop API client", () => {
 
     expect(mocks.apiFetch).not.toHaveBeenCalled();
   });
+
+  it("returns a Chinese Azure auth error for invalid credentials", async () => {
+    mocks.apiFetch.mockResolvedValueOnce(
+      new Response("invalid subscription key", { status: 401 }),
+    );
+
+    await expect(testAzure("bad-key", "eastus")).resolves.toEqual({
+      success: false,
+      error:
+        "Azure Speech 认证失败，请检查设置页里的 Subscription Key 和区域是否匹配。",
+    });
+  });
+
+  it("returns a Chinese Azure network error when connection testing cannot reach Azure", async () => {
+    mocks.apiFetch.mockRejectedValueOnce(new TypeError("Failed to fetch"));
+
+    await expect(testAzure("secret", "eastus")).resolves.toEqual({
+      success: false,
+      error: "无法连接 Azure Speech，请检查网络、代理或 Azure 区域后重试。",
+    });
+  });
+
+  it("throws a Chinese no-speech message for Azure assessment silence", async () => {
+    mocks.apiFetch.mockResolvedValueOnce(
+      new Response("No speech detected", { status: 400 }),
+    );
+
+    await expect(
+      assessPronunciation(
+        new Blob(["audio"], { type: "audio/wav" }),
+        "hello",
+        "secret",
+        "eastus",
+      ),
+    ).rejects.toThrow(
+      "没有检测到清晰语音，请靠近麦克风、读完目标内容后重新录音。",
+    );
+  });
+
+  it("throws a Chinese Azure assessment network error", async () => {
+    mocks.apiFetch.mockRejectedValueOnce(new TypeError("network offline"));
+
+    await expect(
+      assessPronunciation(
+        new Blob(["audio"], { type: "audio/wav" }),
+        "hello",
+        "secret",
+        "eastus",
+      ),
+    ).rejects.toThrow(
+      "无法连接 Azure Speech，请检查网络、代理或 Azure 区域后重试。",
+    );
+  });
+
+  it("throws a Chinese no-speech message for Azure NoMatch responses", async () => {
+    mocks.apiFetch.mockResolvedValueOnce(
+      Response.json({ RecognitionStatus: "NoMatch" }),
+    );
+
+    await expect(
+      assessPronunciation(
+        new Blob(["audio"], { type: "audio/wav" }),
+        "hello",
+        "secret",
+        "eastus",
+      ),
+    ).rejects.toThrow(
+      "没有检测到清晰语音，请靠近麦克风、读完目标内容后重新录音。",
+    );
+  });
+
+  it("throws a Chinese message when Azure transcription returns no text", async () => {
+    mocks.apiFetch.mockResolvedValueOnce(
+      Response.json({
+        RecognitionStatus: "Success",
+        NBest: [{}],
+      }),
+    );
+
+    await expect(
+      transcribeSpeech(
+        new Blob(["audio"], { type: "audio/wav" }),
+        "secret",
+        "eastus",
+      ),
+    ).rejects.toThrow("Azure Speech 没有返回可用转写文本，请重新录音后再试。");
+  });
 });

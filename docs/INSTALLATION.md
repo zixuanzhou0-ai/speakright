@@ -202,8 +202,11 @@ If recording does not work:
 
 If pronunciation scoring fails:
 
-- Confirm Azure key and region.
-- Confirm network access.
+- Read the in-app Chinese error message first. It distinguishes missing speech,
+  invalid key/region, unreachable network/proxy, timeout, quota/rate-limit, and
+  temporary Azure service failure.
+- Confirm Azure key and region match the same Azure Speech resource.
+- Confirm network access and proxy/firewall settings.
 - Try a short word first.
 
 If TTS fails:
