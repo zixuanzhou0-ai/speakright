@@ -1110,14 +1110,22 @@ async function assertMainRoutes(cdp) {
     (Boolean(document.querySelector('[data-smoke="sentences-page"]')) &&
       Boolean(document.querySelector('[data-smoke="sentence-input-card"]')) &&
       Boolean(document.querySelector('[data-smoke="sentence-recording-card"]')));
+  const assessmentHooksReady =
+    routePath !== "/assessment" ||
+    (Boolean(document.querySelector('[data-smoke="assessment-page"]')) &&
+      Boolean(document.querySelector('[data-smoke="assessment-intro-card"]')) &&
+      Boolean(document.querySelector('[data-smoke="assessment-start-button"]')) &&
+      Boolean(document.querySelector('[data-smoke="assessment-passage-link"]')));
   return {
     ok:
       bodyText.trim().length > 20 &&
       sentenceHooksReady &&
+      assessmentHooksReady &&
       !bodyText.includes("Merriam-Webster") &&
       !bodyText.includes("多语言发音包") &&
       !bodyText.includes("无法访问此页面"),
     sentenceHooksReady,
+    assessmentHooksReady,
     bodyText: bodyText.slice(0, 800)
   };
 })()
@@ -1233,6 +1241,12 @@ async function assertNarrowViewportRoutes(cdp) {
     (Boolean(document.querySelector('[data-smoke="sentences-page"]')) &&
       Boolean(document.querySelector('[data-smoke="sentence-input-card"]')) &&
       Boolean(document.querySelector('[data-smoke="sentence-recording-card"]')));
+  const assessmentHooksReady =
+    routePath !== "/assessment" ||
+    (Boolean(document.querySelector('[data-smoke="assessment-page"]')) &&
+      Boolean(document.querySelector('[data-smoke="assessment-intro-card"]')) &&
+      Boolean(document.querySelector('[data-smoke="assessment-start-button"]')) &&
+      Boolean(document.querySelector('[data-smoke="assessment-passage-link"]')));
   const visibleButtons = [...document.querySelectorAll("button,a")].filter((element) => {
     const rect = element.getBoundingClientRect();
     return rect.width > 0 && rect.height > 0;
@@ -1245,9 +1259,11 @@ async function assertNarrowViewportRoutes(cdp) {
     ok:
       bodyText.trim().length > 20 &&
       sentenceHooksReady &&
+      assessmentHooksReady &&
       buttonTextReadable &&
       document.documentElement.scrollWidth <= window.innerWidth + 24,
     sentenceHooksReady,
+    assessmentHooksReady,
     buttonTextReadable,
     scrollWidth: document.documentElement.scrollWidth,
     innerWidth: window.innerWidth,
@@ -1396,6 +1412,12 @@ async function assertLowHeightViewportRoutes(cdp) {
     (Boolean(document.querySelector('[data-smoke="sentences-page"]')) &&
       Boolean(document.querySelector('[data-smoke="sentence-input-card"]')) &&
       Boolean(document.querySelector('[data-smoke="sentence-recording-card"]')));
+  const assessmentHooksReady =
+    routePath !== "/assessment" ||
+    (Boolean(document.querySelector('[data-smoke="assessment-page"]')) &&
+      Boolean(document.querySelector('[data-smoke="assessment-intro-card"]')) &&
+      Boolean(document.querySelector('[data-smoke="assessment-start-button"]')) &&
+      Boolean(document.querySelector('[data-smoke="assessment-passage-link"]')));
   const visibleInteractive = [...document.querySelectorAll("button,a")].filter((element) => {
     const rect = element.getBoundingClientRect();
     return rect.width > 0 && rect.height > 0;
@@ -1409,9 +1431,11 @@ async function assertLowHeightViewportRoutes(cdp) {
       window.innerHeight === 560 &&
       bodyText.trim().length > 20 &&
       sentenceHooksReady &&
+      assessmentHooksReady &&
       interactiveTextReadable &&
       document.documentElement.scrollWidth <= window.innerWidth + 24,
     sentenceHooksReady,
+    assessmentHooksReady,
     interactiveTextReadable,
     scrollWidth: document.documentElement.scrollWidth,
     innerWidth: window.innerWidth,
@@ -1545,6 +1569,7 @@ async function smoke() {
         "scoringTileAudioPolicy=ok",
         "practiceAudioLabels=ok",
         "freePracticeSmoke=ok",
+        "assessmentSmoke=ok",
         "narrowViewport=ok",
         "lowHeightViewport=ok",
         "releaseServedFromDevServer=false",

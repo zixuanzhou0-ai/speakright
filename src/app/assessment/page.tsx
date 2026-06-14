@@ -440,7 +440,10 @@ export default function AssessmentPage() {
               exit={{ opacity: 0, y: -20 }}
               className="max-w-2xl mx-auto space-y-4"
             >
-              <div className="rounded-xl border bg-card p-8 shadow-sm text-center space-y-4">
+              <div
+                className="rounded-xl border bg-card p-8 shadow-sm text-center space-y-4"
+                data-smoke="assessment-intro-card"
+              >
                 <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
                   <Mic className="h-8 w-8 text-primary" />
                 </div>
@@ -458,6 +461,7 @@ export default function AssessmentPage() {
                     onClick={handleStart}
                     size="lg"
                     className="gap-2 cursor-pointer"
+                    data-smoke="assessment-start-button"
                   >
                     开始快速诊断
                     <ArrowRight className="h-4 w-4" />
@@ -467,6 +471,7 @@ export default function AssessmentPage() {
                       variant="outline"
                       size="lg"
                       className="gap-2 cursor-pointer"
+                      data-smoke="assessment-passage-link"
                     >
                       <BookOpenCheck className="h-4 w-4" />
                       全音覆盖朗读

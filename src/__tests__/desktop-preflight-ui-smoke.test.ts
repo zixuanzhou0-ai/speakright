@@ -78,6 +78,10 @@ describe("desktop preflight and UI smoke", () => {
     expect(script).toContain("sentence-input-card");
     expect(script).toContain("sentence-recording-card");
     expect(script).toContain("/assessment");
+    expect(script).toContain("assessmentHooksReady");
+    expect(script).toContain("assessment-intro-card");
+    expect(script).toContain("assessment-start-button");
+    expect(script).toContain("assessment-passage-link");
     expect(script).toContain("/progress");
     expect(script).toContain("direct: true");
     expect(script).toContain("progress-experimental-blocker");
@@ -122,6 +126,7 @@ describe("desktop preflight and UI smoke", () => {
     expect(script).toContain('ariaLabel !== "播放单词发音"');
     expect(script).toContain("practiceAudioLabels=ok");
     expect(script).toContain("freePracticeSmoke=ok");
+    expect(script).toContain("assessmentSmoke=ok");
     expect(script).toContain("aria-disabled");
     expect(script).toContain("videoSelectorReady");
     expect(script).toContain("videoSelectorCount");
