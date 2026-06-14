@@ -20,6 +20,7 @@ import {
   normalizeAzureRegion,
 } from "@/lib/azure-config";
 import { type ConnectionState, ConnectionStatus } from "./connection-status";
+import { getSettingsUserFacingError } from "./user-facing-error";
 
 export function AzureConfigCard() {
   const [key, setKey] = useState("");
@@ -77,9 +78,14 @@ export function AzureConfigCard() {
         setStatus("error");
         setStatusMsg(result.error ?? "连接失败");
       }
-    } catch {
+    } catch (error) {
       setStatus("error");
-      setStatusMsg("网络错误");
+      setStatusMsg(
+        getSettingsUserFacingError(
+          error,
+          "Azure Speech 连接测试失败，请检查网络、代理或区域配置后重试。",
+        ),
+      );
     }
   };
 

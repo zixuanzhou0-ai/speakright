@@ -15,6 +15,7 @@ import { useLanguageConfig } from "@/hooks/use-api-keys";
 import { fetchPronunciation } from "@/lib/api-client";
 import { getLanguageProfile } from "@/lib/language-profiles";
 import { type ConnectionState, ConnectionStatus } from "./connection-status";
+import { getSettingsUserFacingError } from "./user-facing-error";
 
 export function PronunciationConfigCard() {
   const [status, setStatus] = useState<ConnectionState>("idle");
@@ -61,15 +62,22 @@ export function PronunciationConfigCard() {
         onstop: () => setIsTesting(false),
         onloaderror: () => {
           setStatus("error");
-          setStatusMsg("音频加载失败");
+          setStatusMsg(
+            "有道测试音频加载失败，请稍后重试；已内置的本地练习音频不受影响。",
+          );
           setIsTesting(false);
         },
       });
       howlRef.current = howl;
       howl.play();
-    } catch {
+    } catch (error) {
       setStatus("error");
-      setStatusMsg("网络错误");
+      setStatusMsg(
+        getSettingsUserFacingError(
+          error,
+          "无法连接有道在线发音，请检查网络后重试；已内置的本地练习音频不受影响。",
+        ),
+      );
       setIsTesting(false);
     }
   };

@@ -23,6 +23,7 @@ import { useElevenLabsConfig } from "@/hooks/use-api-keys";
 import { testElevenLabs } from "@/lib/api-client";
 import { setElevenLabsConfig } from "@/lib/api-keys";
 import { type ConnectionState, ConnectionStatus } from "./connection-status";
+import { getSettingsUserFacingError } from "./user-facing-error";
 
 const ELEVENLABS_VOICES = [
   { voice_id: "RaFzMbMIfqBcIurH6XF9", name: "Eryn" },
@@ -91,9 +92,14 @@ export function ElevenLabsConfigCard() {
         setStatus("error");
         setStatusMsg(result.error ?? "连接失败");
       }
-    } catch {
+    } catch (error) {
       setStatus("error");
-      setStatusMsg("网络错误");
+      setStatusMsg(
+        getSettingsUserFacingError(
+          error,
+          "ElevenLabs 连接测试失败，请检查网络、代理或 API Key 后重试。",
+        ),
+      );
     }
   };
 

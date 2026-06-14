@@ -208,6 +208,9 @@ If pronunciation scoring fails:
 - Read the in-app Chinese error message first. It distinguishes missing speech,
   invalid key/region, unreachable network/proxy, timeout, quota/rate-limit, and
   temporary Azure service failure.
+- If a Settings test button fails, the status line should keep the same
+  actionable Chinese reason instead of a generic "network error" or raw English
+  exception.
 - Confirm Azure key and region match the same Azure Speech resource.
 - Confirm network access and proxy/firewall settings.
 - Try a short word first.
@@ -217,6 +220,8 @@ If AI coach feedback fails:
 - Read the in-app Chinese error message first. It distinguishes missing LLM
   key, desktop endpoint policy blocks, invalid key/provider/model, unreachable
   network/proxy, timeout, quota/rate-limit, and temporary provider failure.
+- The Settings test button preserves actionable Chinese provider errors and
+  keeps long messages wrap-ready in narrow windows.
 - Confirm the selected provider, model, and API key match the same provider.
 - For desktop builds, custom arbitrary LLM domains are blocked until the domain
   is added to the Tauri allowlist and CSP.
@@ -228,6 +233,8 @@ If TTS fails:
 - Read the in-app Chinese error message first. It distinguishes missing
   ElevenLabs configuration, invalid key, unavailable voice/model, network/proxy
   failure, timeout, quota/rate-limit, service failure, and too-long text.
+- The Settings test button preserves actionable Chinese provider errors; raw
+  English fetch exceptions are replaced with a Chinese network/proxy hint.
 - Confirm ElevenLabs key.
 - Check quota/usage in Settings.
 - Confirm the installed desktop build includes `audio/words` and

@@ -27,6 +27,7 @@ import { isTauriEnvironment } from "@/lib/tauri-runtime";
 import { cn } from "@/lib/utils";
 import type { ProviderName } from "@/types/llm";
 import { type ConnectionState, ConnectionStatus } from "./connection-status";
+import { getSettingsUserFacingError } from "./user-facing-error";
 
 export function LlmConfigCard() {
   const [provider, setProvider] = useState<ProviderName>("claude");
@@ -153,9 +154,14 @@ export function LlmConfigCard() {
         setStatus("error");
         setStatusMsg(result.error ?? "连接失败");
       }
-    } catch {
+    } catch (error) {
       setStatus("error");
-      setStatusMsg("网络错误");
+      setStatusMsg(
+        getSettingsUserFacingError(
+          error,
+          "AI 教练连接测试失败，请检查网络、代理或 provider 配置后重试。",
+        ),
+      );
     }
   };
 

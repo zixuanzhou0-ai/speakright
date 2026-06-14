@@ -236,6 +236,10 @@ git status --short --branch
   text, too-long text, missing dictionary entry, network failure, timeout,
   rate-limit, and provider outage while keeping bundled local audio as the
   first-choice path.
+- Settings connection-test status now preserves actionable Chinese provider
+  messages for Azure, ElevenLabs, AI coach, and Youdao, replaces raw English
+  fetch failures with Chinese network/proxy guidance, and wraps long status
+  messages in narrow Settings layouts.
 
 ## Latest Verification
 
@@ -269,8 +273,11 @@ Current gate summary:
 - Focused audio failure-message tests passed: `3` files and `23` tests,
   covering Chinese ElevenLabs connection/TTS errors, no-provider standard-demo
   guidance, and online dictionary fallback failure reasons.
-- Full tests passed: `99` files and `551` tests.
-- Typecheck, lint (`355` files checked), and static desktop frontend build
+- Focused Settings connection-status tests passed: `2` files and `8` tests,
+  covering Azure, ElevenLabs, AI coach, Youdao, raw English fetch fallback, and
+  long status wrapping.
+- Full tests passed: `100` files and `556` tests.
+- Typecheck, lint (`357` files checked), and static desktop frontend build
   passed.
 - Release EXE build passed and rebuilt EXE, MSI, and NSIS artifacts.
 - Release EXE preflight passed; no localhost startup is part of the release

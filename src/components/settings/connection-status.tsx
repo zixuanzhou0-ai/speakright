@@ -11,10 +11,10 @@ interface ConnectionStatusProps {
 
 export function ConnectionStatus({ state, message }: ConnectionStatusProps) {
   return (
-    <div className="flex items-center gap-2 text-sm">
+    <div className="flex min-w-0 items-center gap-2 text-sm">
       <span
         className={cn(
-          "h-2.5 w-2.5 rounded-full",
+          "h-2.5 w-2.5 shrink-0 rounded-full",
           state === "idle" && "bg-muted-foreground/40",
           state === "testing" && "animate-pulse bg-yellow-500",
           state === "success" && "bg-green-500",
@@ -23,7 +23,7 @@ export function ConnectionStatus({ state, message }: ConnectionStatusProps) {
       />
       <span
         className={cn(
-          "text-muted-foreground",
+          "min-w-0 break-words text-muted-foreground",
           state === "success" && "text-green-600 dark:text-green-400",
           state === "error" && "text-red-600 dark:text-red-400",
         )}
