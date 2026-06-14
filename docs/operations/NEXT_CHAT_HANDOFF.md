@@ -156,6 +156,10 @@ git status --short --branch
 - Non-English diagnosis now records omission/insertion/mispronunciation counts
   in the evidence summary. Omission or insertion miscues block trusted overall
   scores and produce an insufficient-evidence retest message.
+- Diagnosis issue cards now keep formal mastery stage badges for English only.
+  Spanish/French/Russian reports show `experimental 练习观察` plus the
+  experimental mastery blocker instead of `阶段` / `下一层` / `阶段分`, so scoring
+  feedback does not imply formal non-English mastery.
 - Russian final-devoicing wording is now aligned across the course card, AI
   coach rules, and source-alignment summaries: final voiced obstruents devoice
   before pauses or voiceless consonants, but connected speech before voiced
