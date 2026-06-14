@@ -333,6 +333,48 @@ export default function TrainingPackPage() {
     );
   }
 
+  if (!canRecordFormalMastery(languageId)) {
+    return (
+      <div
+        className="h-full flex flex-col overflow-y-auto px-6 py-4 scrollbar-thin"
+        data-smoke="pack-runner-experimental-blocker"
+      >
+        <Link href="/drill" className="mb-4 inline-flex items-center gap-2">
+          <ArrowLeft className="h-4 w-4" />
+          返回刻意练习
+        </Link>
+        <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col justify-center">
+          <div className="rounded-xl border bg-card p-6 text-center shadow-sm">
+            <Target className="mx-auto h-10 w-10 text-primary" />
+            <h1 className="mt-3 break-words text-2xl font-bold [overflow-wrap:anywhere]">
+              {languageProfile.shortLabel}暂不使用英语训练包
+            </h1>
+            <p className="mt-2 break-words text-sm text-muted-foreground [overflow-wrap:anywhere]">
+              当前页面是英语深度训练包。{languageProfile.shortLabel}仍为
+              experimental，请使用当前语言的单词、句子、对比训练或发音诊断；这里不会混入英语训练包，也不会生成正式
+              mastery。
+            </p>
+            <div className="mt-5 flex flex-wrap justify-center gap-2">
+              <Link href="/drill/word">
+                <Button className="cursor-pointer">当前语言单词训练</Button>
+              </Link>
+              <Link href="/drill/contrast">
+                <Button variant="outline" className="cursor-pointer">
+                  当前语言对比训练
+                </Button>
+              </Link>
+              <Link href="/drill">
+                <Button variant="outline" className="cursor-pointer">
+                  返回训练首页
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const defaultStartLevelId =
     lessonBrief?.startLevelId ?? courseMap?.startLevelId ?? requestedLevelId;
 

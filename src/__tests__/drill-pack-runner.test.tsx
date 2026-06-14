@@ -4,6 +4,7 @@ import TrainingPackPage from "@/app/drill/pack/[packId]/pack-runner-client";
 
 const mocks = vi.hoisted(() => ({
   searchParams: new URLSearchParams(),
+  languageId: "en-US",
 }));
 
 vi.mock("next/navigation", () => ({
@@ -12,7 +13,7 @@ vi.mock("next/navigation", () => ({
 }));
 
 vi.mock("@/hooks/use-api-keys", () => ({
-  useLanguageConfig: () => ({ languageId: "en-US" }),
+  useLanguageConfig: () => ({ languageId: mocks.languageId }),
 }));
 
 vi.mock("@/hooks/use-azure-assessment", () => ({
@@ -74,6 +75,7 @@ describe("drill pack runner start flow", () => {
   beforeEach(() => {
     localStorage.clear();
     mocks.searchParams = new URLSearchParams();
+    mocks.languageId = "en-US";
   });
 
   it("starts final-consonants from the intro primary action", () => {
@@ -99,5 +101,19 @@ describe("drill pack runner start flow", () => {
     expect(screen.queryByText("课前任务单")).not.toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "先听准，再说准" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "听辨 ABX" })).toBeInTheDocument();
+  });
+
+  it("blocks direct English pack routes for experimental languages", () => {
+    mocks.languageId = "es-ES";
+
+    render(<TrainingPackPage />);
+
+    expect(screen.getByText("西语暂不使用英语训练包")).toBeInTheDocument();
+    expect(screen.getByText(/这里不会混入英语训练包/)).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "当前语言单词训练" }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("词尾别吞")).not.toBeInTheDocument();
+    expect(screen.queryByText("课前任务单")).not.toBeInTheDocument();
   });
 });

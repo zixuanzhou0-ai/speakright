@@ -199,6 +199,8 @@ README/docs-only changes run the lightweight Docs Check workflow.
   through the shared header playback policy.
 - Recording replay and benchmark playback now use the shared audio-player hook,
   so repeated replay clicks stop the previous blob and cleanup stays centralized.
-- Advanced pack-runner and HVPT perception mastery writes are gated by the
-  English-only formal mastery policy, so Spanish, French, and Russian remain
+- Direct advanced pack-runner routes now show an experimental-language blocker
+  instead of loading English training packs for Spanish, French, or Russian.
+  HVPT perception and formal mastery writes remain gated by the English-only
+  formal mastery policy, so Spanish, French, and Russian stay
   practice/feedback-only experimental modules.

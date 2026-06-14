@@ -180,7 +180,10 @@ git status --short --branch
 - Formal mastery recording is English-only. Non-English free practice and
   advanced drill pages may score and provide feedback, but they should not write
   formal mastery/evidenceMastery while the languages remain experimental.
-  Advanced pack-runner and HVPT perception writes are gated by
+  Direct English advanced pack-runner routes now show the
+  `pack-runner-experimental-blocker` page for Spanish/French/Russian instead of
+  loading English pack content in an experimental-language context. HVPT
+  perception writes and any remaining formal mastery writes are gated by
   `canRecordFormalMastery(languageId)`.
 
 ## Latest Verification
@@ -193,8 +196,10 @@ Current gate summary:
 
 - Focused AI-coach trust tests passed: `3` files and `20` tests, including the
   non-English full-score guard against `完美` / `已掌握` overclaims.
+- Focused advanced-training boundary tests passed: `2` files and `7` tests,
+  including direct English pack-route blocking for experimental languages.
 - Open-source handoff/readiness plus IPA audit export drift tests passed.
-- Full tests passed: `93` files and `515` tests.
+- Full tests passed: `93` files and `516` tests.
 - Typecheck, lint, and static desktop frontend build passed.
 - Release EXE preflight passed; no localhost startup is part of the release
   path.

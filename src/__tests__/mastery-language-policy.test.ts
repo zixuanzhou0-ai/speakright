@@ -38,6 +38,8 @@ describe("mastery language policy", () => {
     );
 
     expect(source).toContain("canRecordFormalMastery(languageId)");
+    expect(source).toContain("!canRecordFormalMastery(languageId)");
+    expect(source).toContain("pack-runner-experimental-blocker");
     expect(source).toContain("const mastered = canPromoteMastery &&");
     expect(source).toContain("if (canPromoteMastery) {");
     expect(source).toContain("saveMasteryProfile(profile)");

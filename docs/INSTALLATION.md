@@ -135,8 +135,9 @@ before the local RC audit: `94be1d4`.
   conservative: it may report that no obvious issue was found in the recording,
   but it must not call the result perfect or mastered.
 - Spanish, French, and Russian advanced training remains feedback-only for
-  formal mastery; pack-runner and HVPT perception mastery writes are gated by
-  the English-only formal mastery policy.
+  formal mastery; direct English pack-runner routes show an experimental
+  blocker for these languages, and HVPT perception plus formal mastery writes
+  stay gated by the English-only formal mastery policy.
 - Public-release blocker: Windows EXE/MSI/NSIS artifacts are still unsigned.
 
 For the 2026-06-14 internal-test pass, use the installed app or Release EXE
