@@ -42,11 +42,14 @@ Expected result for a fully settled release branch:
 Desktop preflight passed.
 ```
 
+Recent settled handoffs may instead show `main...origin/main [ahead N]` after a
+GitHub Git Data API push fallback. In that case, compare the GitHub `main` ref
+and the local-vs-remote tree SHA before assuming content is unpushed. Do not use
+`git reset` only to make the local tracking ref look tidy.
+
 If `git status` shows local edits, preserve them unless the user explicitly asks
-to discard them. Current settled handoffs should normally show
-`main...origin/main`; if a future handoff records local edits, treat that
-handoff as the source of truth and continue the work rather than cleaning it for
-cosmetic reasons.
+to discard them. Treat the current handoff as the source of truth and continue
+the work rather than cleaning it for cosmetic reasons.
 
 3. Start the already-built Release EXE:
 

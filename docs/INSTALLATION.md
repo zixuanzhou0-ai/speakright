@@ -149,7 +149,10 @@ docs/operations/DESKTOP_STARTUP_RUNBOOK.md
 
 That handoff records the latest local non-English layout fixes, the validation
 commands already run, and any current local worktree caveats. A settled RC
-branch should show `main...origin/main` before you start new changes.
+branch should have no uncommitted file edits before you start new changes.
+If `git status` still reports `main...origin/main [ahead N]` after recent
+GitHub API fallback pushes, verify the GitHub `main` ref and local-vs-remote
+tree SHA before treating the content as unpushed.
 
 Recommended developer launch order for release-style testing:
 

@@ -130,8 +130,10 @@ describe("open-source readiness files", () => {
     expect(docs).not.toContain("ahead of `origin/main` by local commits");
     expect(docs).not.toContain("main...origin/main [ahead 5]");
     expect(docs).not.toContain("documented uncommitted release-tightening");
+    expect(docs).not.toContain("A settled RC branch should show `main...origin/main`");
     expect(handoff).toContain("GitHub Git Data API push fallback");
     expect(handoff).toContain("local-vs-remote tree SHA comparison");
+    expect(docs).toContain("local-vs-remote tree SHA");
     expect(evidence).toContain("GitHub API");
     expect(evidence).toContain("tree SHA");
   });
