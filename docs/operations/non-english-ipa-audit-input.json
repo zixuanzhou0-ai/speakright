@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-14T05:51:15.593Z",
+  "generatedAt": "2026-06-14T06:23:30.549Z",
   "purpose": "SpeakRight Desktop final user-visible es-ES/fr-FR/ru-RU IPA audit input for GPT Research or expert review",
   "confirmedPolicy": {
     "global": "two-layer display: phoneme or dictionary anchor plus learner-facing training realization",
@@ -16551,7 +16551,7 @@
       "unitDisplayIpa": "elision",
       "itemIndex": 10,
       "text": "l'homme écoute",
-      "currentIpa": "/lɔm ekut/",
+      "currentIpa": "/lɔmekut/",
       "currentDisplayType": "phrase",
       "sourceFile": "src/lib/language-phonemes.ts",
       "sourceNotes": "Final expanded UI corpus from language-sound-units, language-keyword-expansions, and language-learning-decks."
@@ -16716,7 +16716,7 @@
       "unitDisplayIpa": "elision",
       "itemIndex": 21,
       "text": "l'école ouvre",
-      "currentIpa": "/lekɔl uvʁ/",
+      "currentIpa": "/lekɔluvʁ/",
       "currentDisplayType": "phrase",
       "sourceFile": "src/lib/language-phonemes.ts",
       "sourceNotes": "Final expanded UI corpus from language-sound-units, language-keyword-expansions, and language-learning-decks."
@@ -19626,7 +19626,7 @@
       "unitDisplayIpa": "/x/",
       "itemIndex": 23,
       "text": "хлеб на кухне",
-      "currentIpa": "/xlʲep nɐ ˈkuxnʲe/",
+      "currentIpa": "/xlʲeb nɐ ˈkuxnʲe/",
       "currentDisplayType": "phrase",
       "sourceFile": "src/lib/language-phonemes.ts",
       "sourceNotes": "Final expanded UI corpus from language-sound-units, language-keyword-expansions, and language-learning-decks."
@@ -20856,7 +20856,7 @@
       "unitDisplayIpa": "/CC(C)/",
       "itemIndex": 9,
       "text": "класс большой",
-      "currentIpa": "/klas bɐlʲˈʂoj/",
+      "currentIpa": "/klaz bɐlʲˈʂoj/",
       "currentDisplayType": "phrase",
       "sourceFile": "src/lib/language-phonemes.ts",
       "sourceNotes": "Final expanded UI corpus from language-sound-units, language-keyword-expansions, and language-learning-decks."
@@ -20931,7 +20931,7 @@
       "unitDisplayIpa": "/CC(C)/",
       "itemIndex": 14,
       "text": "хлеб на кухне",
-      "currentIpa": "/xlʲep nɐ ˈkuxnʲe/",
+      "currentIpa": "/xlʲeb nɐ ˈkuxnʲe/",
       "currentDisplayType": "phrase",
       "sourceFile": "src/lib/language-phonemes.ts",
       "sourceNotes": "Final expanded UI corpus from language-sound-units, language-keyword-expansions, and language-learning-decks."
@@ -25581,7 +25581,7 @@
       "unitDisplayIpa": "final devoicing",
       "itemIndex": 14,
       "text": "Сад зимой синий.",
-      "currentIpa": "/sat zʲɪˈmoj ˈsʲinʲɪj/",
+      "currentIpa": "/sad zʲɪˈmoj ˈsʲinʲɪj/",
       "currentDisplayType": "sentence",
       "sourceFile": "src/lib/language-phonemes.ts",
       "sourceNotes": "Final expanded UI corpus from language-sound-units, language-keyword-expansions, and language-learning-decks."
@@ -25611,7 +25611,7 @@
       "unitDisplayIpa": "final devoicing",
       "itemIndex": 16,
       "text": "друг дома",
-      "currentIpa": "/druk ˈdomə/",
+      "currentIpa": "/drug ˈdomə/",
       "currentDisplayType": "phrase",
       "sourceFile": "src/lib/language-phonemes.ts",
       "sourceNotes": "Final expanded UI corpus from language-sound-units, language-keyword-expansions, and language-learning-decks."
@@ -25626,7 +25626,7 @@
       "unitDisplayIpa": "final devoicing",
       "itemIndex": 17,
       "text": "город большой",
-      "currentIpa": "/ˈgorət bɐlʲˈʂoj/",
+      "currentIpa": "/ˈgorəd bɐlʲˈʂoj/",
       "currentDisplayType": "phrase",
       "sourceFile": "src/lib/language-phonemes.ts",
       "sourceNotes": "Final expanded UI corpus from language-sound-units, language-keyword-expansions, and language-learning-decks."
@@ -25641,7 +25641,7 @@
       "unitDisplayIpa": "final devoicing",
       "itemIndex": 18,
       "text": "нож острый",
-      "currentIpa": "/noʂ ˈostrɨj/",
+      "currentIpa": "/noʐ ˈostrɨj/",
       "currentDisplayType": "phrase",
       "sourceFile": "src/lib/language-phonemes.ts",
       "sourceNotes": "Final expanded UI corpus from language-sound-units, language-keyword-expansions, and language-learning-decks."
@@ -25716,7 +25716,7 @@
       "unitDisplayIpa": "final devoicing",
       "itemIndex": 23,
       "text": "снег идёт",
-      "currentIpa": "/snʲek ɪˈdʲot/",
+      "currentIpa": "/snʲeg ɪˈdʲot/",
       "currentDisplayType": "phrase",
       "sourceFile": "src/lib/language-phonemes.ts",
       "sourceNotes": "Final expanded UI corpus from language-sound-units, language-keyword-expansions, and language-learning-decks."

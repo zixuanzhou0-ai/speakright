@@ -284,6 +284,16 @@ Start with the Release EXE and inspect these areas before adding new features:
 - Remaining audit work: continue from the new `1736`-row final UI corpus and
   ask GPT Research for a full row-level table, especially for French schwa
   style variants and Russian broad-vs-finer accepted variants.
+- Second GPT Research pass was applied for high-confidence rows:
+  - French connected-speech/enchainement rows now use `/lɔmekut/`,
+    `/lekɔluvʁ/`, and `/dakɔʁ avɛkɛl/`.
+  - Russian connected-speech rows now preserve/restore voiced obstruents in
+    `Сад зимой синий.`, `друг дома`, `город большой`, `нож острый`,
+    `снег идёт`, `класс большой`, and `хлеб на кухне`.
+  - `поезд идёт` remains `needs-review`; do not auto-change it without a more
+    direct source.
+  - Some final UI rows are compact deck focus hints rather than full IPA. Treat
+    those as practice-focus hints during future audit passes.
 
 ## Prompt For The Next Codex Chat
 

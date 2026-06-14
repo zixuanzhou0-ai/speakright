@@ -435,6 +435,11 @@ release notes and installation guide keep the unsigned warning visible.
   phoneme display layer for `/b d g/`, while `[β ð ɣ]` remains available in
   allophone teaching/scoring resources. French and Russian changes still need
   row-level sourced audit output before bulk edits.
+- The second GPT Research pass produced high-confidence row-level fixes:
+  French phrase rows now use connected-speech IPA for enchainement, and Russian
+  high-risk phrase rows now use broad connected-speech voicing before voiced,
+  sonorant, or vowel-onset words. `поезд идёт` remains `needs-review`, and deck
+  focus hints such as `/s sʲ zʲ/` should not be mistaken for full sentence IPA.
 - Tomorrow's manual test should start with:
 
 ```bat

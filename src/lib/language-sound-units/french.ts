@@ -695,7 +695,7 @@ export const FRENCH_PHONEMES: PhonemeData[] = [
       },
       { word: "jusqu'à", ipa: "/ʒyska/" },
       { word: "n'est-ce pas", ipa: "/nɛs pa/" },
-      { word: "l'homme écoute", ipa: "/lɔm ekut/" },
+      { word: "l'homme écoute", ipa: "/lɔmekut/" },
       { word: "l'eau", ipa: "/lo/" },
       { word: "j'écoute", ipa: "/ʒekut/" },
       { word: "j'arrive", ipa: "/ʒaʁiv/" },

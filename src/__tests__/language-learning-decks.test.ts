@@ -267,6 +267,51 @@ describe("language learning decks", () => {
     }
   });
 
+  it("keeps high-risk French connected-speech rows in the phrase layer", () => {
+    const expectedIpaByUnitAndText = new Map([
+      ["fr-elision:l'homme écoute", "/lɔmekut/"],
+      ["fr-elision:l'école ouvre", "/lekɔluvʁ/"],
+      ["fr-elision:d'accord avec elle", "/dakɔʁ avɛkɛl/"],
+    ]);
+
+    for (const [key, expectedIpa] of expectedIpaByUnitAndText) {
+      const [slug, text] = key.split(":");
+      const keyword = getLanguagePhonemeBySlug("fr-FR", slug)?.keywords.find(
+        (candidate) => candidate.word === text,
+      );
+
+      expect(keyword?.ipa, key).toBe(expectedIpa);
+    }
+  });
+
+  it("keeps high-risk Russian connected-speech rows aligned to broad realization", () => {
+    const expectedIpaByUnitAndText = new Map([
+      ["ru-final-devoicing:Сад зимой синий.", "/sad zʲɪˈmoj ˈsʲinʲɪj/"],
+      ["ru-final-devoicing:друг дома", "/drug ˈdomə/"],
+      ["ru-final-devoicing:город большой", "/ˈgorəd bɐlʲˈʂoj/"],
+      ["ru-final-devoicing:нож острый", "/noʐ ˈostrɨj/"],
+      ["ru-final-devoicing:снег идёт", "/snʲeg ɪˈdʲot/"],
+      ["ru-clusters:класс большой", "/klaz bɐlʲˈʂoj/"],
+      ["ru-clusters:хлеб на кухне", "/xlʲeb nɐ ˈkuxnʲe/"],
+    ]);
+
+    for (const [key, expectedIpa] of expectedIpaByUnitAndText) {
+      const [slug, text] = key.split(":");
+      const keyword = getLanguagePhonemeBySlug("ru-RU", slug)?.keywords.find(
+        (candidate) => candidate.word === text,
+      );
+
+      expect(keyword?.ipa, key).toBe(expectedIpa);
+    }
+
+    const needsReviewKeyword = getLanguagePhonemeBySlug(
+      "ru-RU",
+      "ru-final-devoicing",
+    )?.keywords.find((keyword) => keyword.word === "поезд идёт");
+
+    expect(needsReviewKeyword?.ipa).toBe("/ˈpojɪst ɪˈdʲot/");
+  });
+
   it("does not show diagnostic passages as carousel practice words", () => {
     for (const languageId of DECK_LANGUAGES) {
       const deck = LANGUAGE_LEARNING_DECKS[languageId];

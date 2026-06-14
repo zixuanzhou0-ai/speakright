@@ -38,11 +38,33 @@ French `fr-FR`:
 - Phrase and sentence cards may show connected-speech realization when liaison, enchainement, elision, schwa, or final-consonant behavior changes what the learner should say.
 - Rule units are training rules, not exact single-phoneme audio sources.
 
+2026-06-14 applied audit result:
+
+- High-risk phrase rows now use connected-speech display for enchainement where
+  the learner should not pause at the written word boundary:
+  `l'homme écoute` -> `/lɔmekut/`, `l'école ouvre` -> `/lekɔluvʁ/`, and
+  `d'accord avec elle` remains `/dakɔʁ avɛkɛl/`.
+- Schwa-sensitive variants such as `petit ami` remain a follow-up UI/design
+  task. They should be represented as careful-anchor plus natural-speech
+  variants rather than forced into one narrow answer.
+
 Russian `ru-RU`:
 
 - Stress and broad training realization must be visible because spelling-only or abstract phoneme-only display hides vowel reduction, palatalization, devoicing, and assimilation.
 - A lexical/phoneme layer may be secondary, but the learner-facing line must tell the user what to pronounce.
 - Stress marks are required for ambiguous or training-critical words.
+
+2026-06-14 applied audit result:
+
+- High-risk phrase rows now preserve/restore voiced obstruents before voiced,
+  sonorant, or vowel-onset words in broad connected-speech display:
+  `Сад зимой синий.`, `друг дома`, `город большой`, `нож острый`, `снег идёт`,
+  `класс большой`, and `хлеб на кухне`.
+- `поезд идёт` remains `needs-review`; do not force it to a single answer until
+  a direct正音/source confirmation is available for the course standard.
+- Some deck sentence entries intentionally use compact focus hints such as
+  `/s sʲ zʲ/` instead of full sentence IPA. Future audit exports should treat
+  those as `focus-hint`, not as a full `recommendedIpa` candidate.
 
 ## Scoring Alignment
 
