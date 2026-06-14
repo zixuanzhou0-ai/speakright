@@ -35,24 +35,34 @@ import type { MasteryProfile } from "@/types/training";
 export default function ProgressPage() {
   const { languageId } = useLanguageConfig();
   const languageProfile = getLanguageProfile(languageId);
+  const canShowFormalProgress = canRecordFormalMastery(languageId);
   const [recordings, setRecordings] = useState<BenchmarkRecordingMeta[]>([]);
   const [profile, setProfile] = useState<MasteryProfile | null>(null);
   const playback = useAudioPlayer();
   const benchmarkGroups = useMemo(
-    () => summarizeBenchmarkGroups(recordings),
-    [recordings],
+    () => (canShowFormalProgress ? summarizeBenchmarkGroups(recordings) : []),
+    [canShowFormalProgress, recordings],
   );
   const trend = useMemo(
-    () => benchmarkGroups[0]?.trend ?? summarizeBenchmarkTrend([]),
-    [benchmarkGroups],
+    () =>
+      canShowFormalProgress
+        ? (benchmarkGroups[0]?.trend ?? summarizeBenchmarkTrend([]))
+        : summarizeBenchmarkTrend([]),
+    [benchmarkGroups, canShowFormalProgress],
   );
 
   useEffect(() => {
+    if (!canShowFormalProgress) {
+      setRecordings([]);
+      setProfile(null);
+      return;
+    }
     setRecordings(listBenchmarkRecordings());
     setProfile(loadMasteryProfile());
-  }, []);
+  }, [canShowFormalProgress]);
 
   const refreshRecordings = () => {
+    if (!canShowFormalProgress) return;
     setRecordings(listBenchmarkRecordings());
   };
 
@@ -73,7 +83,7 @@ export default function ProgressPage() {
     playback.playBlob(blob);
   };
 
-  if (!canRecordFormalMastery(languageId)) {
+  if (!canShowFormalProgress) {
     return (
       <div
         className="h-full overflow-y-auto px-6 py-4 scrollbar-thin"

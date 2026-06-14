@@ -5,6 +5,25 @@ import ProgressPage from "@/app/progress/page";
 
 const mocks = vi.hoisted(() => ({
   languageId: "en-US",
+  listBenchmarkRecordings: vi.fn(() => []),
+  loadMasteryProfile: vi.fn(() => ({
+    version: 1,
+    updatedAt: 1_718_000_000_000,
+    packs: {
+      "s-th": {
+        packId: "s-th",
+        status: "mastered",
+        masteryState: "transferred",
+        lastScore: 92,
+        bestScore: 94,
+        attempts: 3,
+        passedAttempts: 3,
+        failedAttempts: 0,
+        lastPracticedAt: 1_718_000_000_000,
+      },
+    },
+    sessions: [],
+  })),
 }));
 
 vi.mock("next/link", () => ({
@@ -37,7 +56,7 @@ vi.mock("@/lib/benchmark-archive", () => ({
   clearBenchmarkRecordings: vi.fn(),
   deleteBenchmarkRecording: vi.fn(),
   getBenchmarkAudioBlob: vi.fn(),
-  listBenchmarkRecordings: () => [],
+  listBenchmarkRecordings: mocks.listBenchmarkRecordings,
   summarizeBenchmarkGroups: () => [],
   summarizeBenchmarkTrend: () => ({
     count: 0,
@@ -47,29 +66,14 @@ vi.mock("@/lib/benchmark-archive", () => ({
 }));
 
 vi.mock("@/lib/mastery-profile", () => ({
-  loadMasteryProfile: () => ({
-    version: 1,
-    updatedAt: 1_718_000_000_000,
-    packs: {
-      "s-th": {
-        packId: "s-th",
-        status: "mastered",
-        masteryState: "transferred",
-        lastScore: 92,
-        bestScore: 94,
-        attempts: 3,
-        passedAttempts: 3,
-        failedAttempts: 0,
-        lastPracticedAt: 1_718_000_000_000,
-      },
-    },
-    sessions: [],
-  }),
+  loadMasteryProfile: mocks.loadMasteryProfile,
 }));
 
 describe("ProgressPage language boundary", () => {
   beforeEach(() => {
     mocks.languageId = "en-US";
+    mocks.listBenchmarkRecordings.mockClear();
+    mocks.loadMasteryProfile.mockClear();
   });
 
   it("shows the formal progress archive for English", async () => {
@@ -78,6 +82,8 @@ describe("ProgressPage language boundary", () => {
     expect(screen.getByText("进步档案")).toBeInTheDocument();
     expect(await screen.findByText("已掌握包")).toBeInTheDocument();
     expect(await screen.findByText("已迁移")).toBeInTheDocument();
+    expect(mocks.listBenchmarkRecordings).toHaveBeenCalledTimes(1);
+    expect(mocks.loadMasteryProfile).toHaveBeenCalledTimes(1);
     expect(
       screen.queryByText(/不显示正式英语 mastery 档案/),
     ).not.toBeInTheDocument();
@@ -99,5 +105,7 @@ describe("ProgressPage language boundary", () => {
     expect(screen.queryByText("已掌握包")).not.toBeInTheDocument();
     expect(screen.queryByText("最近训练状态")).not.toBeInTheDocument();
     expect(screen.queryByText("阶段变化")).not.toBeInTheDocument();
+    expect(mocks.listBenchmarkRecordings).not.toHaveBeenCalled();
+    expect(mocks.loadMasteryProfile).not.toHaveBeenCalled();
   });
 });

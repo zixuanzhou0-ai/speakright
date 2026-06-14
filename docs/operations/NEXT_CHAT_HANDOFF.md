@@ -188,7 +188,8 @@ git status --short --branch
 - Direct progress-archive access is language-gated too: English still shows the
   formal archive, while Spanish/French/Russian show
   `progress-experimental-blocker` instead of English mastery archive metrics or
-  stage wording.
+  stage wording. The blocker path also avoids loading the formal mastery profile
+  or benchmark archive data for experimental languages.
 
 ## Latest Verification
 
