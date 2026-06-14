@@ -17,7 +17,10 @@
 - [ ] I did not use localhost/dev server as the release acceptance path.
 - [ ] I did not generate ElevenLabs audio or spend TTS credits.
 - [ ] Spanish, French, and Russian remain experimental.
-- [ ] Any IPA update has source evidence, or is marked `needs-review`.
+- [ ] Any IPA `update` has two independent sources or one primary authority plus
+      one dictionary/textbook corroboration.
+- [ ] I did not change `needs-review` IPA rows without stronger follow-up
+      evidence.
 - [ ] I did not add API keys, tokens, recordings, private user data, or
       unreviewed third-party media.
 

@@ -109,11 +109,16 @@ describe("open-source readiness files", () => {
     expect(featureRequest).toContain("Release EXE");
     expect(featureRequest).toContain("experimental-language boundary");
     expect(featureRequest).toContain("ElevenLabs");
-    expect(ipaAudit).toContain("Use two sources");
+    expect(ipaAudit).toContain("Audit role");
+    expect(ipaAudit).toContain("one primary");
+    expect(ipaAudit).toContain("dictionary/textbook corroboration");
+    expect(ipaAudit).toContain("deck-focus-hint");
     expect(ipaAudit).toContain("needs-review");
     expect(pullRequest).toContain("I did not use localhost/dev server");
     expect(pullRequest).toContain("I did not generate ElevenLabs audio");
     expect(pullRequest).toContain("Spanish, French, and Russian remain experimental");
+    expect(pullRequest).toContain("two independent sources");
+    expect(pullRequest).toContain("I did not change `needs-review` IPA rows");
   });
 
   it("keeps current handoff docs from claiming stale local dirty state", () => {

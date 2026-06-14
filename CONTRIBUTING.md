@@ -72,9 +72,16 @@ Use the policy in:
 docs/operations/IPA_DISPLAY_AUDIT_STRATEGY.md
 ```
 
-Only apply IPA edits that have reliable source evidence. Rows marked
-`needs-review` should stay unchanged until a stronger source or expert review
-is available.
+Only apply IPA edits that have reliable source evidence:
+
+- `update` rows should have two independent sources, or one primary authority
+  plus one dictionary/textbook corroboration.
+- `variant-accepted` rows should explain the accepted variant and the UI layer
+  it belongs to.
+- Rows marked `needs-review` should stay unchanged until a stronger source or
+  expert review is available.
+- `deck-focus-hint` rows are focus cues, not full sentence IPA, unless a later
+  sourced audit explicitly promotes them.
 
 ## Pull Request Checklist
 
