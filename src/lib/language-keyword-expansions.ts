@@ -630,8 +630,8 @@ const EXTRA_KEYWORD_OPTIONS: Partial<Record<LanguageId, Record<string, KeywordEn
       { word: "l'école ouvre", ipa: "/lekɔluvʁ/" },
       { word: "c'est ici", ipa: "/sɛtisi/" },
       { word: "qu'il arrive", ipa: "/kilaʁiv/" },
-      { word: "d'accord avec elle", ipa: "/dakɔʁ avɛk ɛl/" },
-      { word: "l'homme écoute", ipa: "/lɔm ekut/" },
+      { word: "d'accord avec elle", ipa: "/dakɔʁ avɛkɛl/" },
+      { word: "l'homme écoute", ipa: "/lɔmekut/" },
     ],
   },
   "ru-RU": {

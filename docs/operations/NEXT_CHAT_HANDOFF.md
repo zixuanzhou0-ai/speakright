@@ -234,6 +234,9 @@ Start with the Release EXE and inspect these areas before adding new features:
 - Second GPT Research pass was applied for high-confidence rows:
   - French connected-speech/enchainement rows now use `/lɔmekut/`,
     `/lekɔluvʁ/`, and `/dakɔʁ avɛkɛl/`.
+  - French extra keyword source rows now also use the same connected-speech
+    forms, and the non-English audit test rejects stale word-boundary IPA such
+    as `/lɔm ekut/` and `/dakɔʁ avɛk ɛl/`.
   - Russian connected-speech rows now preserve/restore voiced obstruents in
     `Сад зимой синий.`, `друг дома`, `город большой`, `нож острый`,
     `снег идёт`, `класс большой`, and `хлеб на кухне`.

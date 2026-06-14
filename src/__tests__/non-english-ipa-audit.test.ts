@@ -53,6 +53,32 @@ describe("non-English IPA audit input", () => {
     });
   });
 
+  it("keeps high-risk French connected-speech rows out of stale word-boundary IPA", () => {
+    const rows = buildNonEnglishIpaAuditRows();
+    const expectedFrenchRows = new Map([
+      ["l'homme écoute", "/lɔmekut/"],
+      ["l'école ouvre", "/lekɔluvʁ/"],
+      ["d'accord avec elle", "/dakɔʁ avɛkɛl/"],
+    ]);
+    const staleIpa = new Set(["/lɔm ekut/", "/lekɔl uvʁ/", "/dakɔʁ avɛk ɛl/"]);
+
+    for (const [text, expectedIpa] of expectedFrenchRows) {
+      const matches = rows.filter(
+        (row) =>
+          row.languageId === "fr-FR" &&
+          row.unitSlug === "fr-elision" &&
+          row.text === text &&
+          row.auditRole === "ipa-transcription",
+      );
+
+      expect(matches.map((row) => row.currentIpa), text).toContain(expectedIpa);
+      expect(
+        matches.some((row) => staleIpa.has(row.currentIpa)),
+        text,
+      ).toBe(false);
+    }
+  });
+
   it("asks external reviewers to echo auditRole in returned tables", () => {
     const input = buildNonEnglishIpaAuditInput("2026-06-14T00:00:00.000Z");
 
