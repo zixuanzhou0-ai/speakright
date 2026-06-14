@@ -63,10 +63,10 @@ git status --short --branch
   main...origin/main
 
 npm.cmd exec vitest run src/__tests__/open-source-readiness.test.ts src/__tests__/non-english-ipa-audit.test.ts --reporter=verbose
-  2 files / 8 tests passed
+  2 files / 9 tests passed
 
 npm.cmd run test
-  91 files / 500 tests passed
+  91 files / 501 tests passed
 
 npm.cmd run typecheck
   passed

@@ -139,15 +139,10 @@ README/docs-only changes run the lightweight Docs Check workflow.
 - Secondary voices selected for the experimental language packs: Spanish
   `Lydia`, French `Rachel`, Russian `Sergey`; the original primary voices
   remain Spanish `Marco Cruz`, French `Clément`, Russian `Valeria`.
-- Latest automated validation after the RC evidence audit and exact
-  header-clip scoring-audio pass:
-  `npm.cmd run test` passed `89` files / `489` tests;
-  `npm.cmd run typecheck`, `npm.cmd run lint`,
-  `npm.cmd run build:desktop-frontend`, `npm.cmd run desktop:build`,
-  `npm.cmd run desktop:preflight`, `npm.cmd run desktop:ui-smoke`,
-  `npm.cmd run audio:parity:dry-run`, and
-  the latest recorded `npm.cmd run audio:loudness:dry-run` passed. Biome
-  checked `341` files.
+- Latest settled-main validation results are centralized in
+  `docs/operations/RC_EVIDENCE_AUDIT.md`. The current RC gate covers full tests,
+  typecheck, lint, static desktop frontend build, Release EXE preflight,
+  Release EXE UI smoke, and Release EXE launch from the static Tauri bundle.
 - Verified Azure live sample: `220/220` pronunciation-assessment calls passed.
 - ElevenLabs usage during normal validation remains `0` generated characters.
   The one-time multilingual secondary-voice generation was approved separately

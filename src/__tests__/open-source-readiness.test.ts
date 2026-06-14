@@ -59,4 +59,21 @@ describe("open-source readiness files", () => {
     expect(docs).not.toContain("main...origin/main [ahead 5]");
     expect(docs).not.toContain("documented uncommitted release-tightening");
   });
+
+  it("keeps validation result counts centralized in the RC evidence audit", () => {
+    const readme = read("README.md");
+    const installation = read("docs/INSTALLATION.md");
+    const handoffDocs = [
+      readme,
+      installation,
+      read("docs/operations/DESKTOP_STARTUP_RUNBOOK.md"),
+      read("docs/operations/NEXT_CHAT_HANDOFF.md"),
+    ].join("\n");
+
+    expect(readme).toContain("docs/operations/RC_EVIDENCE_AUDIT.md");
+    expect(installation).toContain("docs/operations/RC_EVIDENCE_AUDIT.md");
+    expect(handoffDocs).not.toMatch(/89\s+(?:files|test files).*489\s+tests/);
+    expect(handoffDocs).not.toContain("Biome checked 341 files");
+    expect(handoffDocs).not.toContain("PID was `70112`");
+  });
 });

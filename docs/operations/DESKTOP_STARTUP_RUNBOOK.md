@@ -399,10 +399,12 @@ release notes and installation guide keep the unsigned warning visible.
   - Additional audio/resource/mastery focused tests: `6` files and `44` tests,
     then `6` files and `28` tests, passed.
   - Mastery/HVPT policy focused tests: `4` files and `22` tests passed.
-  - `npm.cmd run test`: `89` files and `489` tests passed.
-  - `npm.cmd run typecheck`: passed.
-  - `npm.cmd run lint`: passed; Biome checked `341` files.
-  - `npm.cmd run build:desktop-frontend`: passed; `144` static pages generated.
+  - Latest settled-main validation results are centralized in
+    `docs/operations/RC_EVIDENCE_AUDIT.md` to avoid stale counts across
+    multiple handoff documents.
+  - `npm.cmd run test`, `npm.cmd run typecheck`, `npm.cmd run lint`, and
+    `npm.cmd run build:desktop-frontend` passed in the latest settled-main
+    gate.
   - `npm.cmd run desktop:build`: passed; rebuilt Release EXE, MSI, and NSIS.
   - `npm.cmd run desktop:preflight`: passed.
   - `npm.cmd run desktop:ui-smoke`: passed from Release EXE with centered target

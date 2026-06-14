@@ -125,12 +125,10 @@ before the local RC audit: `94be1d4`.
   word audio also uses a shared playback boost, and bundled language-pack
   read-along playback keeps that boost on replay; online fallback audio is
   unchanged and routine validation still does not generate ElevenLabs audio.
-- Latest automated validation for the local RC audit and exact header-clip
-  scoring-audio pass: `89` test files and `489` tests passed; typecheck, lint
-  (`341` files), static frontend build,
-  `desktop:build`, `desktop:preflight`, `desktop:ui-smoke`, and
-  `audio:parity:dry-run` passed; the latest recorded
-  `audio:loudness:dry-run` also passed after playback-layer gain.
+- Latest settled-main validation results are centralized in
+  `docs/operations/RC_EVIDENCE_AUDIT.md`. The current RC gate covers full tests,
+  typecheck, lint, static desktop frontend build, Release EXE preflight,
+  Release EXE UI smoke, and Release EXE launch from the static Tauri bundle.
 - Non-English diagnosis keeps scoring experimental: omission/insertion evidence
   blocks trusted overall scores and asks for retest instead of implying mastery.
 - Spanish, French, and Russian advanced training remains feedback-only for
