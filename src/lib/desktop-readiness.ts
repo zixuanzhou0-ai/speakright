@@ -27,6 +27,10 @@ export interface DesktopMicSignalEvaluation {
   reason?: "low-signal" | "too-short";
 }
 
+export type DesktopMicFailureReason = NonNullable<
+  DesktopMicSignalEvaluation["reason"]
+>;
+
 export type DesktopReadinessStepId =
   | "azure"
   | "microphone"
@@ -110,6 +114,15 @@ export function evaluateDesktopMicSignal({
   return passed ? { passed } : { passed: false, reason: "low-signal" };
 }
 
+export function getDesktopMicFailureMessage(
+  reason: DesktopMicFailureReason,
+): string {
+  if (reason === "too-short") {
+    return "麦克风检测时间太短，请保持窗口打开并完整读一句话后再重试。";
+  }
+  return "麦克风输入太低，请靠近麦克风、确认没有静音，并完整读一句话后重试。";
+}
+
 export function isDesktopMicCheckFresh(
   check: DesktopMicCheck | null,
   now = Date.now(),
@@ -135,9 +148,7 @@ export function saveDesktopMicCheck(
   const evaluation = evaluateDesktopMicSignal(check);
   if (!evaluation.passed) {
     throw new Error(
-      evaluation.reason === "too-short"
-        ? "Desktop microphone readiness requires a longer signal sample."
-        : "Desktop microphone readiness requires real input signal.",
+      getDesktopMicFailureMessage(evaluation.reason ?? "low-signal"),
     );
   }
   const item: DesktopMicCheck = {

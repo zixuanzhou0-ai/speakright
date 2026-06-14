@@ -19,6 +19,7 @@ import {
   buildDesktopReadinessSummary,
   DESKTOP_MIC_SAMPLE_MS,
   evaluateDesktopMicSignal,
+  getDesktopMicFailureMessage,
   readDesktopMicCheck,
   saveDesktopMicCheck,
   type DesktopMicCheck,
@@ -77,6 +78,25 @@ function micStatusText(status: MicStatus, check: DesktopMicCheck | null): string
   if (status === "too-short") return "样本太短";
   if (status === "error") return "检测失败";
   return "待检测";
+}
+
+function micStatusHint(status: MicStatus): string | null {
+  if (status === "unsupported") {
+    return "当前环境无法直接检测麦克风，请确认正在使用 Release EXE，并检查 Windows 麦克风权限。";
+  }
+  if (status === "denied") {
+    return "系统拒绝了麦克风访问，请在 Windows 隐私设置中允许 SpeakRight 使用麦克风后重试。";
+  }
+  if (status === "low-signal") {
+    return getDesktopMicFailureMessage("low-signal");
+  }
+  if (status === "too-short") {
+    return getDesktopMicFailureMessage("too-short");
+  }
+  if (status === "error") {
+    return "麦克风检测失败，请确认设备已连接、未被其他应用占用，然后重试。";
+  }
+  return null;
 }
 
 async function measureMicSignal(stream: MediaStream): Promise<DesktopMicSignal | null> {
@@ -157,6 +177,8 @@ export function DesktopReadinessCard({
   );
 
   if (summary.complete) return null;
+
+  const micHint = micStatusHint(micStatus);
 
   const handleMicCheck = async () => {
     if (!supportsMicrophoneCheck()) {
@@ -240,6 +262,16 @@ export function DesktopReadinessCard({
               );
             })}
           </div>
+          {micHint && (
+            <div
+              className="mt-3 flex items-start gap-2 rounded-lg border border-destructive/25 bg-destructive/5 px-3 py-2 text-sm text-destructive"
+              data-smoke="microphone-readiness-error"
+              role="alert"
+            >
+              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+              <span>{micHint}</span>
+            </div>
+          )}
         </div>
 
         <div className="flex shrink-0 flex-wrap gap-2">
@@ -257,7 +289,8 @@ export function DesktopReadinessCard({
               variant={
                 micStatus === "denied" ||
                 micStatus === "low-signal" ||
-                micStatus === "too-short"
+                micStatus === "too-short" ||
+                micStatus === "error"
                   ? "destructive"
                   : "outline"
               }

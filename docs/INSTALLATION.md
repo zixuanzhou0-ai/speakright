@@ -194,6 +194,9 @@ If recording does not work:
 - Read the in-app Chinese error message first. It distinguishes denied
   permission, missing microphone, device-busy startup failure, unsupported
   recorder runtime, and generic startup failure.
+- The first-run checklist also shows a Chinese microphone-check hint for
+  unsupported desktop microphone access, denied permission, low input signal,
+  or a sample that was too short to trust.
 - Check Windows microphone permission and confirm SpeakRight is allowed to use
   the microphone.
 - If the device is busy, close other apps that may be using the microphone.

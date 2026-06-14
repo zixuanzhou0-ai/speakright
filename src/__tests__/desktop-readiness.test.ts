@@ -136,14 +136,14 @@ describe("desktop readiness", () => {
         peakLevel: 0.002,
         sampledMs: DESKTOP_MIC_MIN_SAMPLE_MS,
       }),
-    ).toThrow("requires real input signal");
+    ).toThrow("麦克风输入太低");
     expect(() =>
       saveDesktopMicCheck({
         rmsLevel: DESKTOP_MIC_MIN_RMS_LEVEL,
         peakLevel: DESKTOP_MIC_MIN_PEAK_LEVEL,
         sampledMs: DESKTOP_MIC_MIN_SAMPLE_MS - 1,
       }),
-    ).toThrow("requires a longer signal sample");
+    ).toThrow("麦克风检测时间太短");
     expect(localStorage.getItem(DESKTOP_MIC_CHECK_KEY)).toBeNull();
   });
 
