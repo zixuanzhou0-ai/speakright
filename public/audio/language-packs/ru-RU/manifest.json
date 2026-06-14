@@ -1279,7 +1279,7 @@
     {
       "key": "город большой",
       "text": "город большой",
-      "ipa": "/ˈgorət bɐlʲˈʂoj/",
+      "ipa": "/ˈgorəd bɐlʲˈʂoj/",
       "soundUnitSlugs": [
         "ru-final-devoicing"
       ],
@@ -1898,7 +1898,7 @@
     {
       "key": "друг дома",
       "text": "друг дома",
-      "ipa": "/druk ˈdomə/",
+      "ipa": "/drug ˈdomə/",
       "soundUnitSlugs": [
         "ru-final-devoicing"
       ],
@@ -3087,7 +3087,7 @@
     {
       "key": "класс большой",
       "text": "класс большой",
-      "ipa": "/klas bɐlʲˈʂoj/",
+      "ipa": "/klaz bɐlʲˈʂoj/",
       "soundUnitSlugs": [
         "ru-clusters"
       ],
@@ -5122,7 +5122,7 @@
     {
       "key": "нож острый",
       "text": "нож острый",
-      "ipa": "/noʂ ˈostrɨj/",
+      "ipa": "/noʐ ˈostrɨj/",
       "soundUnitSlugs": [
         "ru-final-devoicing"
       ],
@@ -7524,7 +7524,7 @@
     {
       "key": "снег идёт",
       "text": "снег идёт",
-      "ipa": "/snʲek ɪˈdʲot/",
+      "ipa": "/snʲeg ɪˈdʲot/",
       "soundUnitSlugs": [
         "ru-final-devoicing"
       ],
@@ -9291,7 +9291,7 @@
     {
       "key": "хлеб на кухне",
       "text": "хлеб на кухне",
-      "ipa": "/xlʲep nɐ ˈkuxnʲe/",
+      "ipa": "/xlʲeb nɐ ˈkuxnʲe/",
       "soundUnitSlugs": [
         "ru-x"
       ],

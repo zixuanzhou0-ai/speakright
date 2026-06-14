@@ -44,6 +44,9 @@ French `fr-FR`:
   the learner should not pause at the written word boundary:
   `l'homme écoute` -> `/lɔmekut/`, `l'école ouvre` -> `/lekɔluvʁ/`, and
   `d'accord avec elle` remains `/dakɔʁ avɛkɛl/`.
+- The bundled French language-pack audio manifest keeps the same IPA metadata
+  for these applied rows, so local preview/audio-pack metadata does not drift
+  back to isolated word-boundary IPA.
 - Schwa-sensitive variants such as `petit ami` remain a follow-up UI/design
   task. They should be represented as careful-anchor plus natural-speech
   variants rather than forced into one narrow answer.
@@ -60,6 +63,8 @@ Russian `ru-RU`:
   sonorant, or vowel-onset words in broad connected-speech display:
   `Сад зимой синий.`, `друг дома`, `город большой`, `нож острый`, `снег идёт`,
   `класс большой`, and `хлеб на кухне`.
+- The bundled Russian language-pack audio manifest keeps the same IPA metadata
+  for the applied connected-speech rows that are present in the manifest.
 - `поезд идёт` remains `needs-review`; do not force it to a single answer until
   a direct正音/source confirmation is available for the course standard.
 - Some deck sentence entries intentionally use compact focus hints such as

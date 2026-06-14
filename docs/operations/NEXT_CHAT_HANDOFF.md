@@ -50,6 +50,10 @@ E:\SpeakRightDesktopRepo\src-tauri\target\release\speakright.exe
   at `docs/operations/non-english-ipa-reviewed-findings.json`. It records which
   GPT Research/high-risk rows were applied, which broad variants were accepted,
   and which rows remain `needs-review`.
+- Language-pack audio manifests now keep their IPA metadata aligned with the
+  sourced reviewed findings for applied French connected-speech rows and Russian
+  connected-speech voicing rows. The Russian `поезд идёт` manifest entry remains
+  unchanged because that row is still `needs-review`.
 - Open-source readiness tests also lock the public developer/release npm
   scripts, including `test`, `typecheck`, `lint`, `desktop:preflight`,
   `desktop:launch-release`, dry-run audio audits, and the public release gate.
@@ -181,6 +185,11 @@ git status --short --branch
   before pauses or voiceless consonants, but connected speech before voiced
   consonants, sonorants, or vowels must be treated as connected-speech
   realization rather than isolated word-final devoicing.
+- French and Russian language-pack manifest IPA metadata now matches the same
+  applied reviewed findings as the course/audit corpus for `l'homme écoute`,
+  `l'école ouvre`, `друг дома`, `город большой`, `нож острый`, `снег идёт`,
+  `класс большой`, and `хлеб на кухне`. The static audio-pack asset test guards
+  those rows and also confirms `поезд идёт` stays on its `needs-review` IPA.
 - `desktop:ui-smoke` now includes both `narrowViewport=ok` and
   `lowHeightViewport=ok`, covering Settings, long rule detail pages, drill, free
   practice, and diagnosis from the Release EXE. The narrow and low-height detail
@@ -215,7 +224,9 @@ Current gate summary:
   including the direct `/progress` experimental blocker and updated Release
   smoke route coverage.
 - Open-source handoff/readiness plus IPA audit export drift tests passed.
-- Full tests passed: `94` files and `518` tests.
+- Static language-pack manifest IPA drift tests passed for the applied French
+  and Russian reviewed findings.
+- Full tests passed: `94` files and `519` tests.
 - Typecheck, lint, and static desktop frontend build passed.
 - Release EXE preflight passed; no localhost startup is part of the release
   path.

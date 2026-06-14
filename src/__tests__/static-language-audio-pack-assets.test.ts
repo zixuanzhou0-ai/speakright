@@ -24,6 +24,7 @@ interface StaticPackManifest {
   items: Array<{
     key: string;
     text: string;
+    ipa?: string;
     audioSrc: string;
     audioByVoice?: Partial<Record<"blue" | "pink", string>>;
   }>;
@@ -153,6 +154,45 @@ describe("static multilingual language audio packs", () => {
       const deck = LANGUAGE_LEARNING_DECKS[languageId];
       expect(deck.diagnosticPassage.text.trim().length).toBeGreaterThan(0);
       expect(deck.sentenceDeck.map((item) => item.text.trim())).not.toContain("");
+    }
+  });
+
+  it("keeps language-pack IPA metadata aligned with sourced reviewed findings", () => {
+    const expectations: Array<{
+      languageId: (typeof PACK_LANGUAGES)[number];
+      text: string;
+      ipa: string;
+    }> = [
+      { languageId: "fr-FR", text: "l'homme écoute", ipa: "/lɔmekut/" },
+      { languageId: "fr-FR", text: "l'école ouvre", ipa: "/lekɔluvʁ/" },
+      { languageId: "ru-RU", text: "друг дома", ipa: "/drug ˈdomə/" },
+      {
+        languageId: "ru-RU",
+        text: "город большой",
+        ipa: "/ˈgorəd bɐlʲˈʂoj/",
+      },
+      { languageId: "ru-RU", text: "нож острый", ipa: "/noʐ ˈostrɨj/" },
+      { languageId: "ru-RU", text: "снег идёт", ipa: "/snʲeg ɪˈdʲot/" },
+      { languageId: "ru-RU", text: "класс большой", ipa: "/klaz bɐlʲˈʂoj/" },
+      {
+        languageId: "ru-RU",
+        text: "хлеб на кухне",
+        ipa: "/xlʲeb nɐ ˈkuxnʲe/",
+      },
+      {
+        languageId: "ru-RU",
+        text: "поезд идёт",
+        ipa: "/ˈpojɪst ɪˈdʲot/",
+      },
+    ];
+
+    for (const { languageId, text, ipa } of expectations) {
+      const item = loadManifest(languageId).items.find(
+        (entry) => normalizeAudioPackText(entry.text) === normalizeAudioPackText(text),
+      );
+
+      expect(item, `${languageId}:${text}`).toBeDefined();
+      expect(item?.ipa).toBe(ipa);
     }
   });
 });
