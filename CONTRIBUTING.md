@@ -14,6 +14,8 @@ cd /d E:\SpeakRightDesktopRepo
 ```
 
 Do not use the older browser workspace for desktop release work.
+Use `SUPPORT.md` when you are unsure whether a report belongs in a public issue,
+an IPA audit issue, or a private security report.
 
 ## Development Setup
 

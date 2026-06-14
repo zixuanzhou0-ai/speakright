@@ -66,6 +66,8 @@ For the current Release Candidate evidence matrix, see
   redistributing packaged builds.
 - Contribution rules are in `CONTRIBUTING.md`.
 - Community behavior expectations are in `CODE_OF_CONDUCT.md`.
+- Support routing for issues, IPA audits, private reports, and paid-provider
+  boundaries is in `SUPPORT.md`.
 - Security reporting and secret-handling guidance are in `SECURITY.md`.
 - `.env.example` is documentation only; do not commit real API keys, recordings,
   learning-data exports, tokens, or private user data.

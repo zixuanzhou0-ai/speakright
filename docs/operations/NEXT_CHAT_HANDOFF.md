@@ -32,14 +32,17 @@ E:\SpeakRightDesktopRepo\src-tauri\target\release\speakright.exe
 - The current Release Candidate evidence matrix is
   `docs/operations/RC_EVIDENCE_AUDIT.md`.
 - Public repository governance files now exist: `LICENSE`, `CONTRIBUTING.md`,
-  `CODE_OF_CONDUCT.md`, `SECURITY.md`, `THIRD_PARTY_NOTICES.md`, issue
-  templates, PR template, and `.env.example`. The MIT license covers source code
-  and source documentation; bundled media assets are explicitly documented as a
-  separate rights boundary.
+  `CODE_OF_CONDUCT.md`, `SUPPORT.md`, `SECURITY.md`, `THIRD_PARTY_NOTICES.md`,
+  issue templates, PR template, and `.env.example`. The MIT license covers source
+  code and source documentation; bundled media assets are explicitly documented
+  as a separate rights boundary.
 - The public conduct policy keeps accent, learner-recording, IPA, and
   experimental-language discussion respectful and evidence-first; vulnerabilities,
   leaked credentials, private recordings, and private learning-data exports are
   routed to `SECURITY.md`, not public issues.
+- `SUPPORT.md` now routes Release EXE bugs, IPA audit disputes, private
+  security/privacy reports, and paid-provider/audio-generation requests to the
+  right public or private channel.
 - Open-source readiness tests now include a tracked-text-file guard for obvious
   real private-key/API-token formats; failures report only path, line, and
   pattern name, not the matched secret text.

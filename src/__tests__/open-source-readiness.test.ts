@@ -65,6 +65,7 @@ describe("open-source readiness files", () => {
       "LICENSE",
       "CODE_OF_CONDUCT.md",
       "CONTRIBUTING.md",
+      "SUPPORT.md",
       "SECURITY.md",
       "THIRD_PARTY_NOTICES.md",
       ".env.example",
@@ -92,14 +93,20 @@ describe("open-source readiness files", () => {
     const codeOfConduct = read("CODE_OF_CONDUCT.md");
     const contributing = read("CONTRIBUTING.md");
     const security = read("SECURITY.md");
+    const support = read("SUPPORT.md");
 
     expect(codeOfConduct).toContain("evidence-first");
     expect(codeOfConduct).toContain("Do not post API keys");
     expect(codeOfConduct).toContain("Spanish, French, and Russian");
     expect(contributing).toContain("CODE_OF_CONDUCT.md");
+    expect(contributing).toContain("SUPPORT.md");
     expect(contributing).toContain("Release EXE");
     expect(contributing).toContain("Do not generate ElevenLabs audio");
     expect(contributing).toContain("Spanish, French, and Russian are experimental");
+    expect(support).toContain("Release EXE");
+    expect(support).toContain("SECURITY.md");
+    expect(support).toContain("needs-review");
+    expect(support).toContain("Do not ask contributors to generate ElevenLabs audio");
     expect(security).toContain("Windows artifacts are currently unsigned");
   });
 
