@@ -49,11 +49,18 @@ E:\SpeakRightDesktopRepo\src-tauri\target\release\speakright.exe
 
 ## Current Local Worktree
 
-At the time of the latest settled handoff, `main` was aligned with
-`origin/main` and no local `speakright.exe` process was expected to be running.
-If `git status --short --branch` shows local edits in a future chat, preserve
-them unless the user explicitly asks to discard them; do not clean the worktree
-just to make the status look tidy.
+At the time of the latest settled handoff, the working tree had no local file
+edits and no local `speakright.exe` process was expected to be running. The
+local branch may still show `main...origin/main [ahead N]` because several
+recent rounds used the GitHub Git Data API push fallback after HTTPS
+push/fetch failed or rejected a non-fast-forward update. Treat the GitHub `main`
+ref and a local-vs-remote tree SHA comparison as authoritative before assuming
+content is unpushed. Do not use `git reset` merely to make the local tracking
+ref look tidy.
+
+If `git status --short --branch` shows local file edits in a future chat,
+preserve them unless the user explicitly asks to discard them; do not clean the
+worktree just to make the status look tidy.
 
 Run this first in the next chat:
 

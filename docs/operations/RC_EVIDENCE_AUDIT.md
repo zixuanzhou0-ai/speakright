@@ -60,7 +60,9 @@ Latest settled-main RC pass for tomorrow's manual testing:
 
 ```text
 git status --short --branch
-  main...origin/main
+  local tracking ref may show main...origin/main [ahead N] after GitHub API
+  push fallback; verify GitHub main ref and local-vs-remote tree SHA before
+  treating the content as unpushed
 
 npm.cmd exec vitest run src/__tests__/non-english-ipa-audit.test.ts src/__tests__/language-learning-decks.test.ts --reporter=verbose
   2 files / 18 tests passed

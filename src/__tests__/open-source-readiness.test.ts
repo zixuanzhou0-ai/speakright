@@ -117,17 +117,23 @@ describe("open-source readiness files", () => {
   });
 
   it("keeps current handoff docs from claiming stale local dirty state", () => {
+    const handoff = read("docs/operations/NEXT_CHAT_HANDOFF.md");
+    const evidence = read("docs/operations/RC_EVIDENCE_AUDIT.md");
     const docs = [
       read("docs/INSTALLATION.md"),
       read("docs/operations/DESKTOP_STARTUP_RUNBOOK.md"),
-      read("docs/operations/NEXT_CHAT_HANDOFF.md"),
-      read("docs/operations/RC_EVIDENCE_AUDIT.md"),
+      handoff,
+      evidence,
     ].join("\n");
 
     expect(docs).not.toContain("known uncommitted work");
     expect(docs).not.toContain("ahead of `origin/main` by local commits");
     expect(docs).not.toContain("main...origin/main [ahead 5]");
     expect(docs).not.toContain("documented uncommitted release-tightening");
+    expect(handoff).toContain("GitHub Git Data API push fallback");
+    expect(handoff).toContain("local-vs-remote tree SHA comparison");
+    expect(evidence).toContain("GitHub API");
+    expect(evidence).toContain("tree SHA");
   });
 
   it("keeps validation result counts centralized in the RC evidence audit", () => {
