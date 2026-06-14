@@ -164,6 +164,23 @@ describe("desktop preflight and UI smoke", () => {
     expect(llmCard).toContain("break-words");
   });
 
+  it("keeps quick assessment recording and scoring failures visible inline", () => {
+    const assessmentPage = readProjectFile("src/app/assessment/page.tsx");
+    const recorderAlerts =
+      assessmentPage.match(/data-smoke="assessment-recorder-error"/g) ?? [];
+    const azureAlerts =
+      assessmentPage.match(/data-smoke="assessment-azure-error"/g) ?? [];
+
+    expect(recorderAlerts).toHaveLength(2);
+    expect(azureAlerts).toHaveLength(2);
+    expect(assessmentPage).toContain('role="alert"');
+    expect(assessmentPage).toContain("{recorder.error}");
+    expect(assessmentPage).toContain("{azure.error}");
+    expect(assessmentPage).not.toContain(
+      'message: azure.error || "评估失败"',
+    );
+  });
+
   it("keeps recording and benchmark replay on the shared audio player hook", () => {
     const replayPages = [
       "src/app/drill/prosody/page.tsx",

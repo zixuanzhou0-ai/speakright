@@ -113,6 +113,10 @@ git status --short --branch
   the test button and connection status do not crowd each other. Release EXE
   smoke now checks this row exists at runtime, wraps, avoids horizontal
   overflow, and has no overlapping child controls.
+- Quick diagnosis word and paragraph recording cards now show recorder startup
+  errors and Azure scoring errors inline with `role="alert"`, so missing
+  microphone permission, missing Azure keys, network failure, or quota failure
+  does not look like a frozen assessment step.
 - Scoring phoneme tiles now use stable duplicate-safe keys, clean up delayed
   click timers on unmount, and stop/unload the previous short audio safely when
   another tile is played.

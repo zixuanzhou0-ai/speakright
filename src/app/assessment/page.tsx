@@ -340,10 +340,7 @@ export default function AssessmentPage() {
       assessmentParagraph,
       languageProfile.azureLocale,
     );
-    if (!result) {
-      setPhase({ type: "error", message: azure.error || "评估失败" });
-      return;
-    }
+    if (!result) return;
 
     paragraphResultRef.current = result;
     paragraphQualityRef.current = qualityReport;
@@ -592,6 +589,25 @@ export default function AssessmentPage() {
                     compact
                   />
 
+                  {recorder.error && (
+                    <p
+                      role="alert"
+                      data-smoke="assessment-recorder-error"
+                      className="max-w-md text-center text-sm text-destructive"
+                    >
+                      {recorder.error}
+                    </p>
+                  )}
+                  {azure.error && (
+                    <p
+                      role="alert"
+                      data-smoke="assessment-azure-error"
+                      className="max-w-md text-center text-sm text-destructive"
+                    >
+                      {azure.error}
+                    </p>
+                  )}
+
                   {recorder.audioBlob &&
                     !recorder.isRecording &&
                     !azure.isLoading && (
@@ -691,6 +707,25 @@ export default function AssessmentPage() {
                     report={recordingQuality.report}
                     compact
                   />
+
+                  {recorder.error && (
+                    <p
+                      role="alert"
+                      data-smoke="assessment-recorder-error"
+                      className="max-w-md text-center text-sm text-destructive"
+                    >
+                      {recorder.error}
+                    </p>
+                  )}
+                  {azure.error && (
+                    <p
+                      role="alert"
+                      data-smoke="assessment-azure-error"
+                      className="max-w-md text-center text-sm text-destructive"
+                    >
+                      {azure.error}
+                    </p>
+                  )}
 
                   {recorder.audioBlob &&
                     !recorder.isRecording &&
