@@ -35,6 +35,9 @@ E:\SpeakRightDesktopRepo\src-tauri\target\release\speakright.exe
   `SECURITY.md`, `THIRD_PARTY_NOTICES.md`, issue templates, PR template, and
   `.env.example`. The MIT license covers source code and source documentation;
   bundled media assets are explicitly documented as a separate rights boundary.
+- Open-source readiness tests now include a tracked-text-file guard for obvious
+  real private-key/API-token formats; failures report only path, line, and
+  pattern name, not the matched secret text.
 
 ## Current Local Worktree
 

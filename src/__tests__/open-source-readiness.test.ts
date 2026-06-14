@@ -1,11 +1,62 @@
+import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import { extname, join } from "node:path";
 import { describe, expect, it } from "vitest";
 
 const projectRoot = process.cwd();
 
 function read(path: string): string {
   return readFileSync(join(projectRoot, path), "utf8");
+}
+
+function trackedFiles(): string[] {
+  return execFileSync("git", ["ls-files", "-z"], {
+    cwd: projectRoot,
+    encoding: "utf8",
+  })
+    .split("\0")
+    .filter(Boolean);
+}
+
+const SCANNED_TEXT_EXTENSIONS = new Set([
+  "",
+  ".bat",
+  ".cjs",
+  ".css",
+  ".example",
+  ".html",
+  ".js",
+  ".json",
+  ".lock",
+  ".md",
+  ".mjs",
+  ".rs",
+  ".toml",
+  ".ts",
+  ".tsx",
+  ".txt",
+  ".yml",
+  ".yaml",
+]);
+
+const SECRET_PATTERNS = [
+  { name: "private-key-block", regex: /-----BEGIN [A-Z ]*PRIVATE KEY-----/ },
+  { name: "openai-key", regex: /sk-(?:proj-)?[A-Za-z0-9_-]{40,}/ },
+  { name: "anthropic-key", regex: /sk-ant-[A-Za-z0-9_-]{40,}/ },
+  { name: "elevenlabs-key", regex: /sk_[A-Za-z0-9]{32,}/ },
+  { name: "github-token", regex: /(?:github_pat_[A-Za-z0-9_]{20,}|gh[pousr]_[A-Za-z0-9_]{30,})/ },
+  { name: "google-api-key", regex: /AIza[0-9A-Za-z_-]{35}/ },
+  { name: "aws-access-key", regex: /AKIA[0-9A-Z]{16}/ },
+  { name: "slack-token", regex: /xox[baprs]-[A-Za-z0-9-]{30,}/ },
+];
+
+function shouldScanTrackedFile(path: string): boolean {
+  if (path.startsWith("public/audio/")) return false;
+  if (path.startsWith("public/images/")) return false;
+  if (path.startsWith("public/videos/")) return false;
+  if (path.startsWith("src-tauri/icons/")) return false;
+
+  return SCANNED_TEXT_EXTENSIONS.has(extname(path));
 }
 
 describe("open-source readiness files", () => {
@@ -75,5 +126,24 @@ describe("open-source readiness files", () => {
     expect(handoffDocs).not.toMatch(/89\s+(?:files|test files).*489\s+tests/);
     expect(handoffDocs).not.toContain("Biome checked 341 files");
     expect(handoffDocs).not.toContain("PID was `70112`");
+  });
+
+  it("keeps tracked source files free of obvious real secret formats", () => {
+    const findings: string[] = [];
+
+    for (const path of trackedFiles().filter(shouldScanTrackedFile)) {
+      const text = read(path);
+      if (text.includes("\0")) continue;
+
+      for (const pattern of SECRET_PATTERNS) {
+        const match = pattern.regex.exec(text);
+        if (!match) continue;
+
+        const line = text.slice(0, match.index).split(/\r?\n/).length;
+        findings.push(`${path}:${line}:${pattern.name}`);
+      }
+    }
+
+    expect(findings).toEqual([]);
   });
 });
