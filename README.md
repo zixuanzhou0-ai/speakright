@@ -81,6 +81,7 @@ npm run desktop:ui-smoke
 npm run desktop:live-validation
 npm run audio:parity:dry-run
 npm run audio:loudness:dry-run
+npm run ipa:audit:export
 npm run validate:internal-release
 ```
 
@@ -101,6 +102,10 @@ language-pack item has both `blue` and `pink` local files.
 word A/B audio and IPA chart normal/slow word audio against teaching-video
 loudness after playback-layer gain. It writes
 `src-tauri/target/audio-loudness/report.json` and makes zero ElevenLabs calls.
+
+`ipa:audit:export` regenerates the tracked Spanish/French/Russian IPA audit
+input under `docs/operations/non-english-ipa-audit-input.json`, including
+`auditRole` markers that separate full IPA rows from deck focus hints.
 
 `desktop:preflight` checks the active workspace, release executable, and running
 `speakright.exe` process before release-style testing. It never closes the app

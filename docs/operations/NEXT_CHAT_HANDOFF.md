@@ -277,6 +277,12 @@ Start with the Release EXE and inspect these areas before adding new features:
   It now contains the final expanded UI corpus with `1736` rows: Spanish `516`,
   French `599`, Russian `621`. The earlier `988`-row file covered only base
   sound-unit arrays.
+- The audit input is now reproducible with `npm.cmd run ipa:audit:export`.
+  Rows include `auditRole`: `ipa-transcription` for real IPA rows and
+  `deck-focus-hint` for `language-learning-decks` sentence `ipaHint` rows. The
+  current export keeps the same `1736` total rows and marks `34` deck focus
+  hints so GPT Research does not mistake compact cues such as `/s sʲ zʲ/` for
+  complete sentence IPA.
 - The next audit step is not bulk editing. Send that JSON through GPT Research
   or expert review using the prompt in `IPA_DISPLAY_AUDIT_STRATEGY.md`, then
   only apply rows with sourced `update` or `variant-accepted` verdicts.

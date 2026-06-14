@@ -1,0 +1,65 @@
+import { describe, expect, it } from "vitest";
+import {
+  buildNonEnglishIpaAuditInput,
+  buildNonEnglishIpaAuditRows,
+} from "@/lib/non-english-ipa-audit";
+import { getLanguagePhonemes } from "@/lib/language-phonemes";
+
+describe("non-English IPA audit input", () => {
+  it("exports the final expanded Spanish/French/Russian UI corpus", () => {
+    const rows = buildNonEnglishIpaAuditRows();
+    const expectedRowCount = (["es-ES", "fr-FR", "ru-RU"] as const)
+      .flatMap((languageId) => getLanguagePhonemes(languageId))
+      .reduce((total, soundUnit) => total + soundUnit.keywords.length, 0);
+
+    expect(rows).toHaveLength(expectedRowCount);
+    expect(rows).toHaveLength(1736);
+  });
+
+  it("marks deck sentence IPA hints as focus cues instead of full transcriptions", () => {
+    const rows = buildNonEnglishIpaAuditRows();
+    const russianSofteningHint = rows.find(
+      (row) =>
+        row.languageId === "ru-RU" &&
+        row.unitSlug === "ru-soft-s-z" &&
+        row.text === "Сад зимой синий." &&
+        row.currentIpa === "/s sʲ zʲ/",
+    );
+
+    expect(russianSofteningHint).toMatchObject({
+      auditRole: "deck-focus-hint",
+      sourceFile: "src/lib/language-learning-decks.ts",
+      currentDisplayType: "sentence",
+    });
+    expect(russianSofteningHint?.sourceNotes).toContain(
+      "do not treat currentIpa as a full sentence transcription",
+    );
+
+    const russianConnectedSpeechRow = rows.find(
+      (row) =>
+        row.languageId === "ru-RU" &&
+        row.unitSlug === "ru-final-devoicing" &&
+        row.text === "Сад зимой синий." &&
+        row.currentIpa === "/sad zʲɪˈmoj ˈsʲinʲɪj/",
+    );
+
+    expect(russianConnectedSpeechRow).toMatchObject({
+      auditRole: "ipa-transcription",
+      sourceFile: "src/lib/language-phonemes.ts",
+      currentDisplayType: "sentence",
+    });
+  });
+
+  it("asks external reviewers to echo auditRole in returned tables", () => {
+    const input = buildNonEnglishIpaAuditInput("2026-06-14T00:00:00.000Z");
+
+    expect(input.requiredOutputFields).toContain("auditRole");
+    expect(input.rowCount).toBe(input.rows.length);
+    expect(input.rows.some((row) => row.auditRole === "deck-focus-hint")).toBe(
+      true,
+    );
+    expect(input.rows.some((row) => row.auditRole === "ipa-transcription")).toBe(
+      true,
+    );
+  });
+});

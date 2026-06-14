@@ -104,6 +104,20 @@ file is generated from the final expanded learner-facing corpus assembled by
 and learning-deck entries.
 
 Each row includes `languageId`, `unitSlug`, `unitDisplayIpa`, `text`, `currentIpa`, `currentDisplayType`, and source file location.
+Each row also includes `auditRole`:
+
+- `ipa-transcription`: the row is intended to be reviewed as a current IPA
+  transcription for the displayed word, phrase, or sentence.
+- `deck-focus-hint`: the row comes from `language-learning-decks`
+  `sentenceDeck.ipaHint`; it is a practice-focus cue and must not be treated as
+  a full sentence transcription or a `recommendedIpa` candidate unless a later
+  sourced audit explicitly promotes it.
+
+Regenerate the tracked file after source-data changes with:
+
+```powershell
+npm.cmd run ipa:audit:export
+```
 
 ## GPT Research Prompt
 
@@ -125,7 +139,7 @@ Use this prompt with the exported JSON:
 - 俄语：Gramota、Большой орфоэпический словарь、权威俄语正音/重音资料、可信 IPA 词典资料。
 
 请输出 CSV 或 Markdown 表格，字段必须包含：
-languageId, unitSlug, text, currentIpa, recommendedIpa, ipaType, accentStandard, source1Name, source1Url, source1Evidence, source2Name, source2Url, source2Evidence, verdict, notes
+languageId, unitSlug, text, currentIpa, auditRole, recommendedIpa, ipaType, accentStandard, source1Name, source1Url, source1Evidence, source2Name, source2Url, source2Evidence, verdict, notes
 
 verdict 只能使用：
 - ok
@@ -146,6 +160,7 @@ ipaType 只能使用：
 3. 对短语和句子，说明是否需要 connected-speech 版本。
 4. 对西语地区差异、法语可选 schwa/liaison、俄语正音变体，明确是否是可接受变体。
 5. 对不能确认的条目写 needs-review，并说明需要查哪个词典或专家确认。
+6. 如果 auditRole 是 deck-focus-hint，请先判断它作为“训练焦点提示”是否误导；不要默认把它当作完整句子 IPA 去纠错。
 ```
 
 ## Implementation Rule After Research Returns
