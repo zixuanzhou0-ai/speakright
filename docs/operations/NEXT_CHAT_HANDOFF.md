@@ -160,6 +160,10 @@ git status --short --branch
 - Non-English diagnosis now records omission/insertion/mispronunciation counts
   in the evidence summary. Omission or insertion miscues block trusted overall
   scores and produce an insufficient-evidence retest message.
+- AI coach prompts now keep full-score non-English feedback conservative:
+  Spanish, French, and Russian may say `本次录音没有发现明显问题`, but they must not
+  write `完美` or `已掌握`, and they still keep a light retest or practice
+  suggestion because the language modules remain experimental.
 - Diagnosis issue cards now keep formal mastery stage badges for English only.
   Spanish/French/Russian reports show `experimental 练习观察` plus the
   experimental mastery blocker instead of `阶段` / `下一层` / `阶段分`, so scoring
@@ -187,10 +191,14 @@ handoff do not drift apart.
 
 Current gate summary:
 
+- Focused AI-coach trust tests passed: `3` files and `20` tests, including the
+  non-English full-score guard against `完美` / `已掌握` overclaims.
 - Open-source handoff/readiness plus IPA audit export drift tests passed.
-- Full tests, typecheck, lint, and static desktop frontend build passed.
+- Full tests passed: `93` files and `515` tests.
+- Typecheck, lint, and static desktop frontend build passed.
 - Release EXE preflight passed; no localhost startup is part of the release
   path.
+- Release EXE build passed and rebuilt EXE, MSI, and NSIS artifacts.
 - Release EXE UI smoke passed with `scoringTileAudioPolicy=ok`,
   `narrowViewport=ok`, `lowHeightViewport=ok`, and
   `releaseServedFromDevServer=false`.

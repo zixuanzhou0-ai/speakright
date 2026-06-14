@@ -178,6 +178,9 @@ README/docs-only changes run the lightweight Docs Check workflow.
   `releaseServedFromDevServer=false`.
 - Non-English diagnosis now treats omission/insertion miscues as insufficient
   evidence for a trusted overall score while preserving practice feedback.
+- AI coach prompts now treat Spanish, French, and Russian full-score recordings
+  conservatively: they can say no obvious issue was found in this recording, but
+  they must not call the result perfect or mastered.
 - Local bundled word and language-pack A/B audio now uses peak-safe Web Audio
   gain for playback-level loudness matching; very quiet local word clips can use
   up to `12x` peak-safe gain when decoded peaks permit it. IPA chart normal/slow

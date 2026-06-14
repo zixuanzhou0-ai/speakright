@@ -131,6 +131,9 @@ before the local RC audit: `94be1d4`.
   Release EXE UI smoke, and Release EXE launch from the static Tauri bundle.
 - Non-English diagnosis keeps scoring experimental: omission/insertion evidence
   blocks trusted overall scores and asks for retest instead of implying mastery.
+- AI coach feedback keeps Spanish, French, and Russian full-score recordings
+  conservative: it may report that no obvious issue was found in the recording,
+  but it must not call the result perfect or mastered.
 - Spanish, French, and Russian advanced training remains feedback-only for
   formal mastery; pack-runner and HVPT perception mastery writes are gated by
   the English-only formal mastery policy.

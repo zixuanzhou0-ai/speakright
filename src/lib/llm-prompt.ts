@@ -191,6 +191,9 @@ export function buildFeedbackPrompt(
   const highScoreExtras = buildHighScoreExtras(languageId, sentenceMode);
 
   const sectionNumber = sentenceMode ? "六" : "五";
+  const perfectScoreRule = isEnglish
+    ? '- 所有分数都满分时，summary 写"完美。没有问题。"，其余标签内容留空'
+    : '- 即使所有分数都满分，summary 也只能写"本次录音没有发现明显问题"，不要写"完美"，不要说"已掌握"，并保留 1 条轻量复测或巩固建议';
 
   return `${COACH_PERSONAS[coachMode]}
 ${languageCoachContext}
@@ -342,5 +345,5 @@ ${highScoreExtras}
 - 每个 XML 标签必须成对出现
 - practice_now 永远要写，除非 summary 是"完美。没有问题。"
 - priority_fixes 是用户最先看到的详细内容，必须最实用、最具可操作性
-- 所有分数都满分时，summary 写"完美。没有问题。"，其余标签内容留空`;
+${perfectScoreRule}`;
 }

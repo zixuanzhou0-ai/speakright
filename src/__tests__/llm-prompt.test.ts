@@ -106,4 +106,30 @@ describe("LLM feedback prompt", () => {
       "非英语音素、单次录音、规则/语流目标默认最多只能写\"中\"或\"薄\"",
     );
   });
+
+  it("does not let perfect-score instructions overclaim non-English mastery", () => {
+    const spanishPrompt = buildFeedbackPrompt(
+      "canción",
+      SAMPLE_RESULT,
+      "phoneme",
+      "normal",
+      "es-ES",
+    );
+    const englishPrompt = buildFeedbackPrompt(
+      "think",
+      SAMPLE_RESULT,
+      "phoneme",
+      "normal",
+      "en-US",
+    );
+
+    expect(spanishPrompt).toContain(
+      "即使所有分数都满分，summary 也只能写\"本次录音没有发现明显问题\"",
+    );
+    expect(spanishPrompt).toContain("不要写\"完美\"");
+    expect(spanishPrompt).toContain("不要说\"已掌握\"");
+    expect(spanishPrompt).not.toContain('summary 写"完美。没有问题。"');
+
+    expect(englishPrompt).toContain('summary 写"完美。没有问题。"');
+  });
 });
