@@ -147,10 +147,7 @@ describe("desktop LLM network policy", () => {
 
   it("keeps ready provider base URLs as OpenAI-compatible roots", () => {
     for (const [providerName, preset] of Object.entries(PRESET_PROVIDERS)) {
-      if (
-        providerName === "custom" ||
-        preset.status === "needsManualConfig"
-      ) {
+      if (providerName === "custom" || preset.status === "needsManualConfig") {
         continue;
       }
       expect(preset.models.length, providerName).toBeGreaterThan(0);
@@ -245,6 +242,40 @@ describe("desktop LLM network policy", () => {
     });
   });
 
+  it("returns Chinese LLM test errors for auth and network failures", async () => {
+    mocks.apiFetch.mockResolvedValueOnce(
+      new Response("invalid_api_key", { status: 401 }),
+    );
+
+    await expect(
+      testLlm({
+        apiKey: "bad-key",
+        provider: "gpt",
+        baseUrl: "https://api.openai.com/v1",
+        model: "gpt-5.4-mini",
+      }),
+    ).resolves.toMatchObject({
+      success: false,
+      error:
+        "AI 教练认证失败，请检查设置页里的 LLM API Key、Provider 和模型是否匹配。",
+    });
+
+    mocks.apiFetch.mockRejectedValueOnce(new TypeError("Failed to fetch"));
+
+    await expect(
+      testLlm({
+        apiKey: "secret",
+        provider: "gpt",
+        baseUrl: "https://api.openai.com/v1",
+        model: "gpt-5.4-mini",
+      }),
+    ).resolves.toMatchObject({
+      success: false,
+      error:
+        "无法连接 AI 教练服务，请检查网络、代理或 LLM provider 配置后重试。",
+    });
+  });
+
   it("returns a stream error for blocked custom desktop LLM feedback", async () => {
     mocks.isTauriEnvironment.mockReturnValue(true);
 
@@ -264,6 +295,54 @@ describe("desktop LLM network policy", () => {
       DESKTOP_LLM_POLICY_MESSAGE,
     );
     expect(mocks.apiFetch).not.toHaveBeenCalled();
+  });
+
+  it("returns Chinese stream errors for LLM provider failures", async () => {
+    mocks.apiFetch.mockResolvedValueOnce(
+      new Response("quota exhausted", { status: 429 }),
+    );
+
+    const stream = streamLlmFeedback(
+      {
+        apiKey: "secret",
+        provider: "gpt",
+        baseUrl: "https://api.openai.com/v1",
+        model: "gpt-5.4-mini",
+      },
+      "think",
+      { words: [] } as unknown as AzureAssessmentResult,
+    );
+    const { value } = await stream.getReader().read();
+
+    expect(new TextDecoder().decode(value)).toContain(
+      "AI 教练请求过于频繁或额度不足，请稍后重试或检查 provider 额度。",
+    );
+  });
+
+  it("returns Chinese stream errors for LLM network failures", async () => {
+    mocks.apiFetch.mockRejectedValueOnce(new TypeError("Failed to fetch"));
+
+    const stream = streamLlmFeedback(
+      {
+        apiKey: "secret",
+        provider: "gpt",
+        baseUrl: "https://api.openai.com/v1",
+        model: "gpt-5.4-mini",
+      },
+      "think",
+      { words: [] } as unknown as AzureAssessmentResult,
+    );
+    const reader = stream.getReader();
+    let output = "";
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      output += new TextDecoder().decode(value);
+    }
+
+    expect(output).toContain(
+      "无法连接 AI 教练服务，请检查网络、代理或 LLM provider 配置后重试。",
+    );
   });
 
   it("translates Anthropic stream events into local feedback SSE chunks", async () => {

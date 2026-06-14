@@ -25,6 +25,51 @@ const EMPTY_FEEDBACK: FeedbackData = {
   details: "",
 };
 
+function truncateFeedbackError(text: string): string {
+  return text.replace(/\s+/g, " ").trim().slice(0, 220);
+}
+
+export function normalizeLlmFeedbackError(error: unknown): string {
+  const raw =
+    error instanceof Error
+      ? error.message
+      : typeof error === "string"
+        ? error
+        : String(error);
+  const message = truncateFeedbackError(raw);
+
+  if (!message) return "AI 教练反馈生成失败，请稍后重试。";
+  if (/[\u4e00-\u9fff]/.test(message)) return message;
+
+  if (/No response body/i.test(message)) {
+    return "AI 教练接口没有返回可读内容，请稍后重试或检查 provider 配置。";
+  }
+
+  if (
+    /401|403|auth|unauthorized|forbidden|api key|invalid key/i.test(message)
+  ) {
+    return "AI 教练认证失败，请检查设置页里的 LLM API Key、Provider 和模型是否匹配。";
+  }
+
+  if (/429|quota|rate limit|too many requests|insufficient/i.test(message)) {
+    return "AI 教练请求过于频繁或额度不足，请稍后重试或检查 provider 额度。";
+  }
+
+  if (/400|404|model|base url|endpoint|not found/i.test(message)) {
+    return "AI 教练请求配置无效，请检查 Provider、Base URL 和 Model。";
+  }
+
+  if (
+    /fetch|network|dns|timeout|timed out|connection|offline|refused/i.test(
+      message,
+    )
+  ) {
+    return "无法连接 AI 教练服务，请检查网络、代理或 LLM provider 配置后重试。";
+  }
+
+  return `AI 教练反馈生成失败：${message}`;
+}
+
 export function parseFeedback(raw: string, streaming: boolean): FeedbackData {
   const extract = (tag: string): string => {
     const openTag = `<${tag}>`;
@@ -155,6 +200,10 @@ export function useLlmFeedback(): UseLlmFeedbackReturn {
             if (data === "[DONE]") break;
             try {
               const parsed = JSON.parse(data);
+              if (parsed.error) {
+                setError(normalizeLlmFeedbackError(parsed.error));
+                continue;
+              }
               if (parsed.content) {
                 accRef.current += parsed.content;
                 setFeedback(parseFeedback(accRef.current, true));
@@ -179,7 +228,7 @@ export function useLlmFeedback(): UseLlmFeedbackReturn {
         // AbortError is expected when user starts a new recording — don't show error
         if (e instanceof DOMException && e.name === "AbortError") return;
         console.error("[LLM Feedback]", e);
-        setError(e instanceof Error ? e.message : "AI 反馈生成失败");
+        setError(normalizeLlmFeedbackError(e));
       } finally {
         setIsStreaming(false);
       }

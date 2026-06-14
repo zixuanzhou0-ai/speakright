@@ -219,6 +219,12 @@ git status --short --branch
   network/proxy, timeout, quota/rate-limit, service failures, and empty
   transcription responses before those errors reach phoneme detail, assessment,
   sentences, or drill UI.
+- AI coach LLM connection tests and stream failures now surface Chinese action
+  messages for auth mismatch, invalid provider/model/base URL, network/proxy,
+  timeout, quota/rate-limit, service failure, and desktop endpoint-policy
+  blocks. `useLlmFeedback` now handles `data: {"error": ...}` SSE chunks, so a
+  provider failure no longer finishes silently with no feedback and no visible
+  error.
 
 ## Latest Verification
 
@@ -243,8 +249,11 @@ Current gate summary:
   initialization failure, and visible drill-card errors.
 - Focused Azure failure-message tests passed: `1` file and `10` tests, covering
   Chinese auth, network, no-speech, NoMatch, and empty-transcription errors.
-- Full tests passed: `96` files and `536` tests.
-- Typecheck, lint (`352` files checked), and static desktop frontend build
+- Focused LLM failure-message tests passed: `3` files and `20` tests, covering
+  Chinese Settings connection errors, stream provider/network errors, and
+  visible `useLlmFeedback` error handling for SSE error chunks.
+- Full tests passed: `97` files and `543` tests.
+- Typecheck, lint (`353` files checked), and static desktop frontend build
   passed.
 - Release EXE build passed and rebuilt EXE, MSI, and NSIS artifacts.
 - Release EXE preflight passed; no localhost startup is part of the release

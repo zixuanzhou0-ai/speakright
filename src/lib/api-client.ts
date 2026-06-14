@@ -502,6 +502,55 @@ function buildLlmEndpoint(config: LlmConfig): string {
     : `${config.baseUrl}/chat/completions`;
 }
 
+function buildLlmServiceErrorMessage(status: number, body = ""): string {
+  const detail = truncateServiceDetail(body);
+  const suffix = detail ? `（${detail}）` : "";
+
+  if (status === 400) {
+    return `AI 教练请求配置无效，请检查 Provider、Base URL、Model 和提示长度。${suffix}`;
+  }
+
+  if (status === 401 || status === 403) {
+    return "AI 教练认证失败，请检查设置页里的 LLM API Key、Provider 和模型是否匹配。";
+  }
+
+  if (status === 404) {
+    return "AI 教练接口或模型不可用，请检查 Provider、Base URL 和 Model。";
+  }
+
+  if (status === 408 || status === 504) {
+    return "AI 教练请求超时，请检查网络或稍后重试。";
+  }
+
+  if (status === 429) {
+    return "AI 教练请求过于频繁或额度不足，请稍后重试或检查 provider 额度。";
+  }
+
+  if (status >= 500) {
+    return `AI 教练服务暂时不可用，请稍后重试。${suffix}`;
+  }
+
+  return `AI 教练请求失败（HTTP ${status}）。${suffix}`;
+}
+
+function buildLlmNetworkErrorMessage(error: unknown): string {
+  if (error instanceof DOMException && error.name === "AbortError") {
+    return "AI 教练请求已取消，请重试。";
+  }
+
+  const message = error instanceof Error ? error.message : String(error);
+  if (
+    error instanceof TypeError ||
+    /fetch|network|dns|timeout|timed out|connection|offline|refused/i.test(
+      message,
+    )
+  ) {
+    return "无法连接 AI 教练服务，请检查网络、代理或 LLM provider 配置后重试。";
+  }
+
+  return `AI 教练请求失败：${truncateServiceDetail(message) || "未知错误"}`;
+}
+
 function buildLlmBody({
   config,
   messages,
@@ -560,25 +609,33 @@ export async function testLlm(
     return { success: false, error: blockedReason };
   }
 
-  const res = await apiFetch(buildLlmEndpoint(config), {
-    method: "POST",
-    headers: buildLlmHeaders(config),
-    body: JSON.stringify(
-      buildLlmBody({
-        config,
-        messages: [
-          { role: "user", content: "Say hello in Chinese, one sentence only." },
-        ],
-        maxTokens: 50,
-      }),
-    ),
-  });
+  let res: Response;
+  try {
+    res = await apiFetch(buildLlmEndpoint(config), {
+      method: "POST",
+      headers: buildLlmHeaders(config),
+      body: JSON.stringify(
+        buildLlmBody({
+          config,
+          messages: [
+            {
+              role: "user",
+              content: "Say hello in Chinese, one sentence only.",
+            },
+          ],
+          maxTokens: 50,
+        }),
+      ),
+    });
+  } catch (error) {
+    return { success: false, error: buildLlmNetworkErrorMessage(error) };
+  }
 
   if (!res.ok) {
     const text = await res.text();
     return {
       success: false,
-      error: `LLM test failed (${res.status}): ${text}`,
+      error: buildLlmServiceErrorMessage(res.status, text),
     };
   }
 
@@ -646,7 +703,9 @@ export function streamLlmFeedback(
         if (!res.ok) {
           const text = await res.text();
           controller.enqueue(
-            encoder.encode(`data: ${JSON.stringify({ error: text })}\n\n`),
+            encoder.encode(
+              `data: ${JSON.stringify({ error: buildLlmServiceErrorMessage(res.status, text) })}\n\n`,
+            ),
           );
           controller.close();
           return;
@@ -725,7 +784,9 @@ export function streamLlmFeedback(
         } else {
           console.error("[LLM Stream]", err);
           controller.enqueue(
-            encoder.encode(`data: ${JSON.stringify({ error: msg })}\n\n`),
+            encoder.encode(
+              `data: ${JSON.stringify({ error: buildLlmNetworkErrorMessage(err) })}\n\n`,
+            ),
           );
         }
       } finally {

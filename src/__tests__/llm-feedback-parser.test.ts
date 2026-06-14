@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { parseFeedback } from "@/hooks/use-llm-feedback";
+import {
+  normalizeLlmFeedbackError,
+  parseFeedback,
+} from "@/hooks/use-llm-feedback";
 
 describe("llm feedback parser", () => {
   it("extracts the practice_now action layer", () => {
@@ -31,5 +34,19 @@ describe("llm feedback parser", () => {
 
     expect(parsed.summary).toBe("plain feedback");
     expect(parsed.practiceNow).toBe("");
+  });
+
+  it("normalizes raw LLM provider errors to Chinese user-facing messages", () => {
+    expect(
+      normalizeLlmFeedbackError("LLM test failed (401): invalid key"),
+    ).toBe(
+      "AI 教练认证失败，请检查设置页里的 LLM API Key、Provider 和模型是否匹配。",
+    );
+    expect(normalizeLlmFeedbackError("TypeError: Failed to fetch")).toBe(
+      "无法连接 AI 教练服务，请检查网络、代理或 LLM provider 配置后重试。",
+    );
+    expect(normalizeLlmFeedbackError("rate limit exceeded")).toBe(
+      "AI 教练请求过于频繁或额度不足，请稍后重试或检查 provider 额度。",
+    );
   });
 });

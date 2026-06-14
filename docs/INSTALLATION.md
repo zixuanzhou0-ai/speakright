@@ -209,6 +209,17 @@ If pronunciation scoring fails:
 - Confirm network access and proxy/firewall settings.
 - Try a short word first.
 
+If AI coach feedback fails:
+
+- Read the in-app Chinese error message first. It distinguishes missing LLM
+  key, desktop endpoint policy blocks, invalid key/provider/model, unreachable
+  network/proxy, timeout, quota/rate-limit, and temporary provider failure.
+- Confirm the selected provider, model, and API key match the same provider.
+- For desktop builds, custom arbitrary LLM domains are blocked until the domain
+  is added to the Tauri allowlist and CSP.
+- Scoring can still work without AI coach feedback because Azure Speech provides
+  the numeric assessment.
+
 If TTS fails:
 
 - Confirm ElevenLabs key.
