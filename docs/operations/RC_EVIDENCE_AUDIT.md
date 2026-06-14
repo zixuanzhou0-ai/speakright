@@ -23,6 +23,7 @@ claimed as complete.
 | Non-English IPA audit exports are reproducible, distinguish full IPA rows from deck focus hints, keep sourced review decisions machine-checkable, and keep bundled language-pack IPA metadata aligned | `src/lib/non-english-ipa-audit.ts`, `scripts/export-non-english-ipa-audit-input.mjs`, `docs/operations/non-english-ipa-audit-input.json`, `docs/operations/non-english-ipa-reviewed-findings.json`, `docs/operations/IPA_DISPLAY_AUDIT_STRATEGY.md`, `public/audio/language-packs/fr-FR/manifest.json`, `public/audio/language-packs/ru-RU/manifest.json`, `src/__tests__/non-english-ipa-audit.test.ts`, `src/__tests__/non-english-ipa-reviewed-findings.test.ts`, `src/__tests__/static-language-audio-pack-assets.test.ts`, `npm.cmd run ipa:audit:export`; the current tracked export contains `1736` rows and marks `34` `deck-focus-hint` rows so compact practice cues are not mistaken for complete sentence IPA, the test compares the tracked JSON against the current source-built output to catch stale audit exports, high-risk French connected-speech rows reject stale word-boundary IPA, Spanish audit `currentIpa` rows stay phoneme-first for `/b d g/` while explicit allophone unit labels may keep `[β ð ɣ]`, the static language-pack asset test locks applied French/Russian manifest IPA metadata against stale word-boundary or isolated-devoicing strings, and the reviewed-findings ledger locks applied `update`, accepted `variant-accepted`, and unchanged `needs-review` rows such as Russian `поезд идёт` against accidental drift |
 | Repeated or noisy non-English practice text is constrained | `src/lib/language-keyword-expansions.ts`, `src/__tests__/language-learning-decks.test.ts`, `src/__tests__/spanish-sound-examples.test.ts` |
 | Non-English diagnosis avoids trusted perfect scores when evidence is thin, mismatched, omitted, or inserted | `src/lib/diagnosis-engine.ts`, `src/lib/assessment-evidence-engine.ts`, `src/types/diagnosis.ts`, `src/__tests__/diagnosis-engine.test.ts`, `src/__tests__/assessment-evidence-engine.test.ts`, `scripts/desktop-ui-smoke.mjs` |
+| Recording startup failures show actionable Chinese messages and do not leave drill users stuck without visible feedback | `src/hooks/use-recorder.ts`, `src/components/drill/drill-recording.tsx`, `src/app/drill/word/page.tsx`, `src/app/drill/sentence/page.tsx`, `src/components/sentences/sentence-recording-card.tsx`, `src/app/phonemes/[phoneme]/phoneme-detail-page.tsx`, `src/app/assessment/page.tsx`, `src/app/assessment/passage/page.tsx`, `src/__tests__/use-recorder.test.tsx`, `src/__tests__/drill-recording.test.tsx`; denied permission, missing microphone, busy device, unsupported recorder runtime, unsupported microphone access, and generic startup failures map to separate Chinese messages, recorder initialization failure stops any opened stream, and word/sentence drill cards render `recorderError` inline |
 | AI coach feedback stays tied to the selected language, target text, IPA/evidence boundaries, and conservative non-English status; desktop LLM provider selection does not allow arbitrary endpoints or paid live calls during routine validation | `src/lib/llm-prompt.ts`, `src/lib/language-feedback-rules.ts`, `src/lib/language-source-alignment.ts`, `src/lib/llm-providers.ts`, `src/lib/api-client.ts`, `src/components/settings/llm-config-card.tsx`, `src-tauri/tauri.conf.json`, `docs/api-reference.md`, `src/__tests__/llm-prompt.test.ts`, `src/__tests__/language-feedback-rules.test.ts`, `src/__tests__/language-source-alignment.test.ts`, `src/__tests__/llm-desktop-policy.test.ts`, `src/__tests__/llm-config-card.test.tsx`, `src/__tests__/desktop-preflight-ui-smoke.test.ts`; prompts include the target text, current `languageId`, Azure JSON evidence, language-specific coaching rules, explicit non-English experimental evidence limits, and a ban on claiming mastery from a single recording; non-English full-score feedback must say only `本次录音没有发现明显问题`, must not say `完美` or `已掌握`, and must keep a light retest or practice suggestion; Russian final-devoicing coach guidance and source summaries distinguish pause/voiceless-consonant devoicing from connected speech before voiced consonants, sonorants, or vowels; MiniMax and Xiaomi MiMo remain manual-config providers until exact official OpenAI-compatible endpoint/model information is confirmed |
 | Detail-page scoring breakdowns, detail header speakers, and list-card IPA clicks show honest target reference and stable clickable short-audio tiles | `src/lib/detail-assessment-breakdown.ts`, `src/components/scoring/phoneme-highlight.tsx`, `src/components/phoneme/phoneme-play-button.tsx`, `src/components/phoneme/phoneme-card.tsx`, `src/hooks/use-audio-player.ts`, `src/lib/assessment-segment-audio.ts`, `src/lib/azure-phoneme-map.ts`, `src/lib/audio-playback-policy.ts`, `src/lib/language-phoneme-resources.ts`, `src/lib/local-language-assets.ts`, `src/__tests__/detail-assessment-breakdown.test.ts`, `src/__tests__/phoneme-highlight.test.tsx`, `src/__tests__/phoneme-play-button.test.tsx`, `src/__tests__/phoneme-card.test.tsx`, `src/__tests__/assessment-segment-audio.test.ts`, `src/__tests__/audio-playback-policy.test.ts`, `src/__tests__/use-audio-player.test.tsx`, `src/__tests__/azure-phoneme-map-language-parity.test.ts`, `src/__tests__/language-phoneme-resources.test.ts`, `scripts/desktop-ui-smoke.mjs`; non-English scoring tiles reuse the exact same left/detail sound-unit header clip (`phonemeAudio.localSrc`) or stay visible but unclickable, never falling back to word examples, rule/prosody clips, proxy media, or video audio; Spanish `/β/ /ð/ /ɣ/` allophone clips do not masquerade as plain `/b/ /d/ /g/`; English chart clicks are capped at `560ms`, and local non-English header/scoring sound-unit clips are capped at `500ms` through the shared header playback policy |
 | Recording replay and benchmark playback use centralized audio cleanup | `src/app/drill/prosody/page.tsx`, `src/app/drill/scenarios/page.tsx`, `src/app/drill/spontaneous/page.tsx`, `src/app/progress/page.tsx`, `src/hooks/use-audio-player.ts`, `src/__tests__/desktop-preflight-ui-smoke.test.ts`; source policy forbids raw `new Audio(...)` replay in these user-facing pages |
@@ -106,14 +107,19 @@ npm.cmd exec vitest run src/__tests__/progress-page.test.tsx src/__tests__/deskt
   experimental path does not read the formal mastery profile or benchmark
   archive
 
+npm.cmd exec vitest run src/__tests__/use-recorder.test.tsx src/__tests__/drill-recording.test.tsx --reporter=verbose
+  2 files / 11 tests passed; recorder startup failures map to actionable
+  Chinese messages, opened streams are stopped after recorder initialization
+  failure, and word/sentence drill recording cards render recorder errors inline
+
 npm.cmd run test
-  94 files / 519 tests passed
+  96 files / 530 tests passed
 
 npm.cmd run typecheck
   passed
 
 npm.cmd run lint
-  passed; 350 files checked
+  passed; 352 files checked
 
 npm.cmd run build:desktop-frontend
   passed; 144 static pages generated
@@ -122,7 +128,9 @@ npm.cmd run desktop:build
   passed; rebuilt Release EXE, MSI, and NSIS artifacts
 
 npm.cmd run desktop:preflight
-  passed; Release EXE exists, no running speakright.exe, no localhost startup
+  passed; Release EXE exists, no running speakright.exe, no localhost startup;
+  during the pre-commit verification run it correctly reported the expected
+  dirty worktree from this local fix
 
 npm.cmd run desktop:ui-smoke
   passed; Release EXE runtime, centered target text, no target-text ellipsis,

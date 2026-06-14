@@ -207,6 +207,12 @@ git status --short --branch
   `progress-experimental-blocker` instead of English mastery archive metrics or
   stage wording. The blocker path also avoids loading the formal mastery profile
   or benchmark archive data for experimental languages.
+- Recording startup failures now surface actionable Chinese messages instead of
+  a generic permission prompt: denied permission, missing microphone, busy
+  device, unsupported recorder runtime, and generic startup failure are
+  separated. Word and sentence drill recording cards render `recorderError`
+  inline, so a failed microphone start is visible to the learner instead of
+  leaving the drill card in a quiet idle state.
 
 ## Latest Verification
 
@@ -226,11 +232,16 @@ Current gate summary:
 - Open-source handoff/readiness plus IPA audit export drift tests passed.
 - Static language-pack manifest IPA drift tests passed for the applied French
   and Russian reviewed findings.
-- Full tests passed: `94` files and `519` tests.
-- Typecheck, lint, and static desktop frontend build passed.
-- Release EXE preflight passed; no localhost startup is part of the release
-  path.
+- Focused recorder-startup tests passed: `2` files and `11` tests, covering
+  actionable microphone error messages, stream cleanup after recorder
+  initialization failure, and visible drill-card errors.
+- Full tests passed: `96` files and `530` tests.
+- Typecheck, lint (`352` files checked), and static desktop frontend build
+  passed.
 - Release EXE build passed and rebuilt EXE, MSI, and NSIS artifacts.
+- Release EXE preflight passed; no localhost startup is part of the release
+  path. During the pre-commit verification run it correctly reported the
+  expected dirty worktree from this local fix.
 - Release EXE UI smoke passed with `scoringTileAudioPolicy=ok`,
   `narrowViewport=ok`, `lowHeightViewport=ok`, and
   `releaseServedFromDevServer=false`; the smoke script now includes `/progress`

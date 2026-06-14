@@ -63,116 +63,117 @@ export default function WordDrillPage() {
   return (
     <LanguageModuleGate moduleName="单词训练" readinessKey="wordPractice">
       <div className="h-full flex flex-col px-6 py-4 overflow-y-auto scrollbar-thin">
-      {/* Header */}
-      <div className="mb-4 flex items-center gap-3 shrink-0">
-        <Link
-          href="/drill"
-          className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-muted transition-colors cursor-pointer"
-        >
-          <ArrowLeft className="h-4 w-4" />
-        </Link>
-        <h1 className="text-2xl font-bold">单词训练</h1>
-        {drill.config &&
-          drill.phase.type !== "configuring" &&
-          drill.phase.type !== "completed" && (
-            <span className="text-sm text-muted-foreground">
-              {getLanguagePhonemeBySlug(languageId, drill.config.phonemeSlug)
-                ?.ipa ?? getPhonemeBySlug(drill.config.phonemeSlug)?.ipa}
-            </span>
+        {/* Header */}
+        <div className="mb-4 flex items-center gap-3 shrink-0">
+          <Link
+            href="/drill"
+            className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-muted transition-colors cursor-pointer"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Link>
+          <h1 className="text-2xl font-bold">单词训练</h1>
+          {drill.config &&
+            drill.phase.type !== "configuring" &&
+            drill.phase.type !== "completed" && (
+              <span className="text-sm text-muted-foreground">
+                {getLanguagePhonemeBySlug(languageId, drill.config.phonemeSlug)
+                  ?.ipa ?? getPhonemeBySlug(drill.config.phonemeSlug)?.ipa}
+              </span>
+            )}
+        </div>
+
+        {/* State machine-driven content */}
+        <div className="flex-1 max-w-2xl mx-auto w-full">
+          {drill.phase.type === "configuring" && (
+            <DrillConfig kind="word" onStart={handleStart} />
           )}
-      </div>
 
-      {/* State machine-driven content */}
-      <div className="flex-1 max-w-2xl mx-auto w-full">
-        {drill.phase.type === "configuring" && (
-          <DrillConfig kind="word" onStart={handleStart} />
-        )}
+          {drill.phase.type === "phonemeLesson" && drill.config && (
+            <PhonemeLessonView
+              config={drill.config}
+              onReady={drill.finishPhonemeLesson}
+              wordAudio={wordAudio}
+              languageId={languageId}
+            />
+          )}
 
-        {drill.phase.type === "phonemeLesson" && drill.config && (
-          <PhonemeLessonView
-            config={drill.config}
-            onReady={drill.finishPhonemeLesson}
-            wordAudio={wordAudio}
-            languageId={languageId}
-          />
-        )}
+          {drill.phase.type === "teaching" && (
+            <DrillTeaching
+              item={drill.phase.item}
+              index={drill.phase.index}
+              total={drill.items.length}
+              isPlaying={wordAudio.isPlaying}
+              isLoading={wordAudio.isLoading}
+              audioError={wordAudio.error}
+              onPlay={handlePlayReference}
+              onReady={drill.finishTeaching}
+            />
+          )}
 
-        {drill.phase.type === "teaching" && (
-          <DrillTeaching
-            item={drill.phase.item}
-            index={drill.phase.index}
-            total={drill.items.length}
-            isPlaying={wordAudio.isPlaying}
-            isLoading={wordAudio.isLoading}
-            audioError={wordAudio.error}
-            onPlay={handlePlayReference}
-            onReady={drill.finishTeaching}
-          />
-        )}
-
-        {(drill.phase.type === "readyToRecord" ||
-          drill.phase.type === "recording" ||
-          drill.phase.type === "assessing") && (
-          <DrillRecording
-            item={
-              drill.phase.type === "readyToRecord"
-                ? drill.phase.item
-                : drill.phase.type === "recording"
+          {(drill.phase.type === "readyToRecord" ||
+            drill.phase.type === "recording" ||
+            drill.phase.type === "assessing") && (
+            <DrillRecording
+              item={
+                drill.phase.type === "readyToRecord"
                   ? drill.phase.item
-                  : drill.items[drill.currentIndex]
-            }
-            index={drill.currentIndex}
-            total={drill.items.length}
-            isRecording={drill.isRecording}
-            isAssessing={drill.isAssessing}
-            audioBlob={drill.audioBlob}
-            stream={drill.recorderStream}
-            onStartRecording={drill.startRecording}
-            onStopRecording={drill.stopRecording}
-          />
-        )}
+                  : drill.phase.type === "recording"
+                    ? drill.phase.item
+                    : drill.items[drill.currentIndex]
+              }
+              index={drill.currentIndex}
+              total={drill.items.length}
+              isRecording={drill.isRecording}
+              isAssessing={drill.isAssessing}
+              audioBlob={drill.audioBlob}
+              stream={drill.recorderStream}
+              recorderError={drill.recorderError}
+              onStartRecording={drill.startRecording}
+              onStopRecording={drill.stopRecording}
+            />
+          )}
 
-        {drill.phase.type === "feedback" && (
-          <DrillFeedback
-            item={drill.phase.item}
-            index={drill.phase.index}
-            total={drill.items.length}
-            attempt={drill.phase.attempt}
-            passed={drill.phase.passed}
-            attemptCount={drill.phase.attemptCount}
-            maxAttempts={drill.maxAttempts}
-            passThreshold={drill.config?.passThreshold ?? 70}
-            onNext={drill.nextItem}
-            onRetry={drill.retryItem}
-            onSkip={drill.skipItem}
-            onPlayReference={handlePlayReference}
-            audioError={wordAudio.error}
-          />
-        )}
+          {drill.phase.type === "feedback" && (
+            <DrillFeedback
+              item={drill.phase.item}
+              index={drill.phase.index}
+              total={drill.items.length}
+              attempt={drill.phase.attempt}
+              passed={drill.phase.passed}
+              attemptCount={drill.phase.attemptCount}
+              maxAttempts={drill.maxAttempts}
+              passThreshold={drill.config?.passThreshold ?? 70}
+              onNext={drill.nextItem}
+              onRetry={drill.retryItem}
+              onSkip={drill.skipItem}
+              onPlayReference={handlePlayReference}
+              audioError={wordAudio.error}
+            />
+          )}
 
-        {drill.phase.type === "completed" && (
-          <DrillSummaryCard
-            summary={drill.phase.summary}
-            onRestart={handleRestart}
-            onBack={drill.reset}
-          />
-        )}
+          {drill.phase.type === "completed" && (
+            <DrillSummaryCard
+              summary={drill.phase.summary}
+              onRestart={handleRestart}
+              onBack={drill.reset}
+            />
+          )}
 
-        {drill.phase.type === "error" && (
-          <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-center dark:border-red-900 dark:bg-red-950/30">
-            <p className="text-red-700 dark:text-red-400">
-              {drill.phase.message}
-            </p>
-            <button
-              type="button"
-              onClick={drill.retryItem}
-              className="mt-3 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground cursor-pointer"
-            >
-              重试
-            </button>
-          </div>
-        )}
-      </div>
+          {drill.phase.type === "error" && (
+            <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-center dark:border-red-900 dark:bg-red-950/30">
+              <p className="text-red-700 dark:text-red-400">
+                {drill.phase.message}
+              </p>
+              <button
+                type="button"
+                onClick={drill.retryItem}
+                className="mt-3 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground cursor-pointer"
+              >
+                重试
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </LanguageModuleGate>
   );

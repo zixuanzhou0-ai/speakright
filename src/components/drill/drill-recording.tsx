@@ -19,6 +19,7 @@ interface DrillRecordingProps {
   isAssessing: boolean;
   audioBlob: Blob | null;
   stream: MediaStream | null;
+  recorderError?: string | null;
   onStartRecording: () => void;
   onStopRecording: () => void;
 }
@@ -31,6 +32,7 @@ export function DrillRecording({
   isAssessing,
   audioBlob,
   stream,
+  recorderError,
   onStartRecording,
   onStopRecording,
 }: DrillRecordingProps) {
@@ -74,6 +76,15 @@ export function DrillRecording({
         />
 
         <WaveformDisplay audioBlob={audioBlob} stream={stream} />
+
+        {recorderError && (
+          <p
+            role="alert"
+            className="max-w-md text-center text-sm text-destructive"
+          >
+            {recorderError}
+          </p>
+        )}
 
         {isAssessing && (
           <motion.div

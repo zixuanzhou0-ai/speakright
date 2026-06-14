@@ -191,8 +191,14 @@ not `localhost`, and does not record audio or call ElevenLabs TTS.
 
 If recording does not work:
 
-- Check Windows microphone permission.
-- Restart the app after changing microphone permissions.
+- Read the in-app Chinese error message first. It distinguishes denied
+  permission, missing microphone, device-busy startup failure, unsupported
+  recorder runtime, and generic startup failure.
+- Check Windows microphone permission and confirm SpeakRight is allowed to use
+  the microphone.
+- If the device is busy, close other apps that may be using the microphone.
+- Restart SpeakRight after changing microphone permissions or reconnecting the
+  microphone.
 
 If pronunciation scoring fails:
 
