@@ -87,6 +87,10 @@ The GitHub-tracked audit input file is:
 
 `docs/operations/non-english-ipa-audit-input.json`
 
+The tracked reviewed-findings ledger is:
+
+`docs/operations/non-english-ipa-reviewed-findings.json`
+
 A generated local copy may also exist at:
 
 `E:/SpeakRightDesktopRepo/src-tauri/target/ipa-audit/non-english-ipa-audit-input.json`
@@ -118,6 +122,14 @@ Regenerate the tracked file after source-data changes with:
 ```powershell
 npm.cmd run ipa:audit:export
 ```
+
+After applying a sourced review result, record the row in
+`non-english-ipa-reviewed-findings.json` before or with the code change. This
+ledger separates `update`, `variant-accepted`, and `needs-review` rows and is
+checked by `src/__tests__/non-english-ipa-reviewed-findings.test.ts`. Rows such
+as Russian `поезд идёт` stay unchanged until the ledger is updated with stronger
+evidence; Spanish source-unit allophone rows may keep `[β ð ɣ]`, but the final
+audit corpus must remain phoneme-first.
 
 ## GPT Research Prompt
 

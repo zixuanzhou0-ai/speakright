@@ -1,0 +1,404 @@
+{
+  "reviewedAt": "2026-06-14",
+  "purpose": "Machine-readable ledger for sourced high-risk Spanish, French, and Russian IPA audit decisions that have been applied or intentionally held for review.",
+  "policy": {
+    "spanish": "Final learner-facing es-ES IPA stays phoneme-first for /b d g/ while source-unit allophone teaching may keep [β ð ɣ].",
+    "french": "Word rows use dictionary-style IPA; phrase and sentence rows may use connected-speech IPA when enchainement, elision, liaison, schwa, or final-consonant behavior changes what learners should say.",
+    "russian": "Learner-facing ru-RU phrase rows use broad training realization with stress and connected-speech voicing where the evidence is high confidence; unresolved rows remain needs-review."
+  },
+  "findings": [
+    {
+      "languageId": "es-ES",
+      "unitSlug": "es-y-ll",
+      "text": "yo",
+      "auditRole": "ipa-transcription",
+      "verdict": "ok",
+      "ipaType": "phoneme",
+      "implementationStatus": "confirmed-current",
+      "expectedCurrentIpa": "/ʝo/",
+      "notes": "Reference row for the current es-ES yeismo course target.",
+      "sources": [
+        {
+          "name": "RAE DPD",
+          "url": "https://www.rae.es/dpd/ayuda/representacion-de-sonidos"
+        },
+        {
+          "name": "SpeakRight Spanish source policy",
+          "url": "https://github.com/zixuanzhou0-ai/speakright-desktop/blob/main/src/lib/language-sound-units/spanish.ts"
+        }
+      ]
+    },
+    {
+      "languageId": "es-ES",
+      "unitSlug": "es-y-ll",
+      "text": "llave",
+      "auditRole": "ipa-transcription",
+      "verdict": "update",
+      "ipaType": "phoneme",
+      "implementationStatus": "guarded-final-corpus",
+      "expectedCurrentIpa": "/ˈʝabe/",
+      "forbiddenFinalIpa": ["/ˈʝaβe/"],
+      "notes": "The final UI corpus should show the phoneme layer; [β] remains allowed only in explicit allophone teaching/scoring resources.",
+      "sources": [
+        {
+          "name": "RAE Ortografia",
+          "url": "https://www.rae.es/ortograf%C3%ADa/representaci%C3%B3n-gr%C3%A1fica-del-fonema-b"
+        },
+        {
+          "name": "RAE DPD",
+          "url": "https://www.rae.es/dpd/ayuda/representacion-de-sonidos"
+        }
+      ]
+    },
+    {
+      "languageId": "es-ES",
+      "unitSlug": "es-y-ll",
+      "text": "ayuda",
+      "auditRole": "ipa-transcription",
+      "verdict": "update",
+      "ipaType": "phoneme",
+      "implementationStatus": "guarded-final-corpus",
+      "expectedCurrentIpa": "/aˈʝuda/",
+      "forbiddenFinalIpa": ["/aˈʝuða/"],
+      "notes": "The final UI corpus should keep /d/ as the default phoneme-layer anchor; [ð] belongs to the training-realization layer.",
+      "sources": [
+        {
+          "name": "RAE DPD",
+          "url": "https://www.rae.es/dpd/ayuda/representacion-de-sonidos"
+        },
+        {
+          "name": "RAE Ortografia",
+          "url": "https://www.rae.es/ortograf%C3%ADa/representaci%C3%B3n-gr%C3%A1fica-del-fonema-b"
+        }
+      ]
+    },
+    {
+      "languageId": "es-ES",
+      "unitSlug": "es-y-ll",
+      "text": "lluvia",
+      "auditRole": "ipa-transcription",
+      "verdict": "update",
+      "ipaType": "phoneme",
+      "implementationStatus": "guarded-final-corpus",
+      "expectedCurrentIpa": "/ˈʝubja/",
+      "forbiddenFinalIpa": ["/ˈʝuβja/"],
+      "notes": "The final UI corpus should keep /b/ as the default phoneme-layer anchor.",
+      "sources": [
+        {
+          "name": "RAE Ortografia",
+          "url": "https://www.rae.es/ortograf%C3%ADa/representaci%C3%B3n-gr%C3%A1fica-del-fonema-b"
+        },
+        {
+          "name": "RAE DPD",
+          "url": "https://www.rae.es/dpd/ayuda/representacion-de-sonidos"
+        }
+      ]
+    },
+    {
+      "languageId": "es-ES",
+      "unitSlug": "es-y-ll",
+      "text": "llegar",
+      "auditRole": "ipa-transcription",
+      "verdict": "update",
+      "ipaType": "phoneme",
+      "implementationStatus": "guarded-final-corpus",
+      "expectedCurrentIpa": "/ʝeˈgaɾ/",
+      "forbiddenFinalIpa": ["/ʝeˈɣaɾ/"],
+      "notes": "The final UI corpus should keep /g/ as the default phoneme-layer anchor; [ɣ] belongs to the allophone realization layer.",
+      "sources": [
+        {
+          "name": "RAE DPD",
+          "url": "https://www.rae.es/dpd/ayuda/representacion-de-sonidos"
+        },
+        {
+          "name": "RAE Ortografia",
+          "url": "https://www.rae.es/ortograf%C3%ADa/representaci%C3%B3n-gr%C3%A1fica-del-fonema-b"
+        }
+      ]
+    },
+    {
+      "languageId": "fr-FR",
+      "unitSlug": "fr-elision",
+      "text": "d'accord avec elle",
+      "auditRole": "ipa-transcription",
+      "verdict": "update",
+      "ipaType": "connected-speech",
+      "implementationStatus": "applied",
+      "expectedCurrentIpa": "/dakɔʁ avɛkɛl/",
+      "forbiddenFinalIpa": ["/dakɔʁ avɛk ɛl/"],
+      "notes": "Keep the enchainement of final /k/ into elle visible at the phrase layer.",
+      "sources": [
+        {
+          "name": "OQLF Banque de depannage linguistique",
+          "url": "https://vitrinelinguistique.oqlf.gouv.qc.ca/23541/la-prononciation/liaisons/la-liaison"
+        },
+        {
+          "name": "UMass Grammaire phonetique du francais",
+          "url": "https://bpb-us-e2.wpmucdn.com/websites.umass.edu/dist/c/2494/files/2014/01/GPF-Ch51.pdf"
+        }
+      ]
+    },
+    {
+      "languageId": "fr-FR",
+      "unitSlug": "fr-elision",
+      "text": "l'homme écoute",
+      "auditRole": "ipa-transcription",
+      "verdict": "update",
+      "ipaType": "connected-speech",
+      "implementationStatus": "applied",
+      "expectedCurrentIpa": "/lɔmekut/",
+      "forbiddenFinalIpa": ["/lɔm ekut/"],
+      "notes": "Keep the connected-speech phrase layer rather than isolated word-boundary IPA.",
+      "sources": [
+        {
+          "name": "OQLF Banque de depannage linguistique",
+          "url": "https://vitrinelinguistique.oqlf.gouv.qc.ca/23541/la-prononciation/liaisons/la-liaison"
+        },
+        {
+          "name": "UMass Grammaire phonetique du francais",
+          "url": "https://bpb-us-e2.wpmucdn.com/websites.umass.edu/dist/c/2494/files/2014/01/GPF-Ch51.pdf"
+        }
+      ]
+    },
+    {
+      "languageId": "fr-FR",
+      "unitSlug": "fr-elision",
+      "text": "l'école ouvre",
+      "auditRole": "ipa-transcription",
+      "verdict": "update",
+      "ipaType": "connected-speech",
+      "implementationStatus": "applied",
+      "expectedCurrentIpa": "/lekɔluvʁ/",
+      "forbiddenFinalIpa": ["/lekɔl uvʁ/"],
+      "notes": "Keep the final /l/ linked into ouvre in phrase-level display.",
+      "sources": [
+        {
+          "name": "OQLF Banque de depannage linguistique",
+          "url": "https://vitrinelinguistique.oqlf.gouv.qc.ca/23541/la-prononciation/liaisons/la-liaison"
+        },
+        {
+          "name": "UMass Grammaire phonetique du francais",
+          "url": "https://bpb-us-e2.wpmucdn.com/websites.umass.edu/dist/c/2494/files/2014/01/GPF-Ch51.pdf"
+        }
+      ]
+    },
+    {
+      "languageId": "fr-FR",
+      "unitSlug": "fr-liaison",
+      "text": "petit ami",
+      "auditRole": "ipa-transcription",
+      "verdict": "variant-accepted",
+      "ipaType": "variant",
+      "implementationStatus": "accepted-current",
+      "expectedCurrentIpa": "/pətitami/",
+      "notes": "Current broad UI form is accepted for this RC; a later UI pass should expose careful anchor plus natural-speech variants instead of forcing one narrow answer.",
+      "sources": [
+        {
+          "name": "Wiktionnaire petit ami",
+          "url": "https://fr.wiktionary.org/wiki/petit_ami"
+        },
+        {
+          "name": "Wiktionnaire fenetre",
+          "url": "https://fr.wiktionary.org/wiki/fen%C3%AAtre"
+        }
+      ]
+    },
+    {
+      "languageId": "fr-FR",
+      "unitSlug": "fr-elision",
+      "text": "j'aime encore",
+      "auditRole": "ipa-transcription",
+      "verdict": "variant-accepted",
+      "ipaType": "variant",
+      "implementationStatus": "accepted-current",
+      "expectedCurrentIpa": "/ʒɛm ɑ̃kɔʁ/",
+      "notes": "Current broad phrase display is acceptable; a later connected-speech variant can be added as a secondary layer.",
+      "sources": [
+        {
+          "name": "OQLF Banque de depannage linguistique",
+          "url": "https://vitrinelinguistique.oqlf.gouv.qc.ca/23541/la-prononciation/liaisons/la-liaison"
+        },
+        {
+          "name": "Wiktionnaire encore",
+          "url": "https://fr.wiktionary.org/wiki/encore"
+        }
+      ]
+    },
+    {
+      "languageId": "ru-RU",
+      "unitSlug": "ru-final-devoicing",
+      "text": "Сад зимой синий.",
+      "auditRole": "ipa-transcription",
+      "verdict": "update",
+      "ipaType": "connected-speech",
+      "implementationStatus": "applied",
+      "expectedCurrentIpa": "/sad zʲɪˈmoj ˈsʲinʲɪj/",
+      "forbiddenFinalIpa": ["/sat zʲɪˈmoj ˈsʲinʲɪj/"],
+      "notes": "Connected speech before the voiced consonant in зимой should not be displayed as isolated pause-form devoicing.",
+      "sources": [
+        {
+          "name": "Gramota positional devoicing and voicing",
+          "url": "https://gramota.ru/biblioteka/spravochniki/russkij-yazyk-kratkij-teoreticheskij-kurs-dlya-shkolnikov/pozicionnoe-oglushenie-ozvonchenie"
+        },
+        {
+          "name": "Hayes Russian voicing assimilation",
+          "url": "https://brucehayes.org/papers/HayesRussianVoicingAssimilation1984.pdf"
+        }
+      ]
+    },
+    {
+      "languageId": "ru-RU",
+      "unitSlug": "ru-final-devoicing",
+      "text": "друг дома",
+      "auditRole": "ipa-transcription",
+      "verdict": "update",
+      "ipaType": "connected-speech",
+      "implementationStatus": "applied",
+      "expectedCurrentIpa": "/drug ˈdomə/",
+      "forbiddenFinalIpa": ["/druk ˈdomə/"],
+      "notes": "Connected speech before voiced /d/ should keep the broad voiced realization.",
+      "sources": [
+        {
+          "name": "Gramota positional devoicing and voicing",
+          "url": "https://gramota.ru/biblioteka/spravochniki/russkij-yazyk-kratkij-teoreticheskij-kurs-dlya-shkolnikov/pozicionnoe-oglushenie-ozvonchenie"
+        },
+        {
+          "name": "Hayes Russian voicing assimilation",
+          "url": "https://brucehayes.org/papers/HayesRussianVoicingAssimilation1984.pdf"
+        }
+      ]
+    },
+    {
+      "languageId": "ru-RU",
+      "unitSlug": "ru-final-devoicing",
+      "text": "город большой",
+      "auditRole": "ipa-transcription",
+      "verdict": "update",
+      "ipaType": "connected-speech",
+      "implementationStatus": "applied",
+      "expectedCurrentIpa": "/ˈgorəd bɐlʲˈʂoj/",
+      "forbiddenFinalIpa": ["/ˈgorət bɐlʲˈʂoj/"],
+      "notes": "Connected speech before voiced /b/ should keep the broad voiced realization.",
+      "sources": [
+        {
+          "name": "Gramota positional devoicing and voicing",
+          "url": "https://gramota.ru/biblioteka/spravochniki/russkij-yazyk-kratkij-teoreticheskij-kurs-dlya-shkolnikov/pozicionnoe-oglushenie-ozvonchenie"
+        },
+        {
+          "name": "Hayes Russian voicing assimilation",
+          "url": "https://brucehayes.org/papers/HayesRussianVoicingAssimilation1984.pdf"
+        }
+      ]
+    },
+    {
+      "languageId": "ru-RU",
+      "unitSlug": "ru-final-devoicing",
+      "text": "снег идёт",
+      "auditRole": "ipa-transcription",
+      "verdict": "update",
+      "ipaType": "connected-speech",
+      "implementationStatus": "applied",
+      "expectedCurrentIpa": "/snʲeg ɪˈdʲot/",
+      "forbiddenFinalIpa": ["/snʲek ɪˈdʲot/"],
+      "notes": "Connected speech before a vowel-onset word should not stay at isolated final devoicing.",
+      "sources": [
+        {
+          "name": "Gramota positional devoicing and voicing",
+          "url": "https://gramota.ru/biblioteka/spravochniki/russkij-yazyk-kratkij-teoreticheskij-kurs-dlya-shkolnikov/pozicionnoe-oglushenie-ozvonchenie"
+        },
+        {
+          "name": "Rezvukhina CLA-ACL 2020",
+          "url": "https://cla-acl.ca/pdfs/actes-2020/Rezvukhina_CLA-ACL2020.pdf"
+        }
+      ]
+    },
+    {
+      "languageId": "ru-RU",
+      "unitSlug": "ru-final-devoicing",
+      "text": "нож острый",
+      "auditRole": "ipa-transcription",
+      "verdict": "update",
+      "ipaType": "connected-speech",
+      "implementationStatus": "applied",
+      "expectedCurrentIpa": "/noʐ ˈostrɨj/",
+      "forbiddenFinalIpa": ["/noʂ ˈostrɨj/"],
+      "notes": "Connected speech before a vowel-onset word should keep the broad voiced realization.",
+      "sources": [
+        {
+          "name": "Gramota positional devoicing and voicing",
+          "url": "https://gramota.ru/biblioteka/spravochniki/russkij-yazyk-kratkij-teoreticheskij-kurs-dlya-shkolnikov/pozicionnoe-oglushenie-ozvonchenie"
+        },
+        {
+          "name": "Rezvukhina CLA-ACL 2020",
+          "url": "https://cla-acl.ca/pdfs/actes-2020/Rezvukhina_CLA-ACL2020.pdf"
+        }
+      ]
+    },
+    {
+      "languageId": "ru-RU",
+      "unitSlug": "ru-clusters",
+      "text": "класс большой",
+      "auditRole": "ipa-transcription",
+      "verdict": "update",
+      "ipaType": "connected-speech",
+      "implementationStatus": "applied",
+      "expectedCurrentIpa": "/klaz bɐlʲˈʂoj/",
+      "forbiddenFinalIpa": ["/klas bɐlʲˈʂoj/"],
+      "notes": "Connected speech before voiced /b/ should show voicing assimilation rather than an isolated cluster reading.",
+      "sources": [
+        {
+          "name": "Gramota positional devoicing and voicing",
+          "url": "https://gramota.ru/biblioteka/spravochniki/russkij-yazyk-kratkij-teoreticheskij-kurs-dlya-shkolnikov/pozicionnoe-oglushenie-ozvonchenie"
+        },
+        {
+          "name": "Hayes Russian voicing assimilation",
+          "url": "https://brucehayes.org/papers/HayesRussianVoicingAssimilation1984.pdf"
+        }
+      ]
+    },
+    {
+      "languageId": "ru-RU",
+      "unitSlug": "ru-clusters",
+      "text": "хлеб на кухне",
+      "auditRole": "ipa-transcription",
+      "verdict": "update",
+      "ipaType": "connected-speech",
+      "implementationStatus": "applied",
+      "expectedCurrentIpa": "/xlʲeb nɐ ˈkuxnʲe/",
+      "forbiddenFinalIpa": ["/xlʲep nɐ ˈkuxnʲe/"],
+      "notes": "Connected speech before sonorant /n/ should not be displayed as isolated pause-form devoicing.",
+      "sources": [
+        {
+          "name": "Gramota positional devoicing and voicing",
+          "url": "https://gramota.ru/biblioteka/spravochniki/russkij-yazyk-kratkij-teoreticheskij-kurs-dlya-shkolnikov/pozicionnoe-oglushenie-ozvonchenie"
+        },
+        {
+          "name": "Rezvukhina CLA-ACL 2020",
+          "url": "https://cla-acl.ca/pdfs/actes-2020/Rezvukhina_CLA-ACL2020.pdf"
+        }
+      ]
+    },
+    {
+      "languageId": "ru-RU",
+      "unitSlug": "ru-final-devoicing",
+      "text": "поезд идёт",
+      "auditRole": "ipa-transcription",
+      "verdict": "needs-review",
+      "ipaType": "variant",
+      "implementationStatus": "unchanged-needs-review",
+      "expectedCurrentIpa": "/ˈpojɪst ɪˈdʲot/",
+      "blockedCandidateIpa": ["/ˈpojɪzd ɪˈdʲot/"],
+      "notes": "Do not change this row without a more direct course-standard or orthoepic source for the -зд cluster in this phrase.",
+      "sources": [
+        {
+          "name": "Gramota positional devoicing and voicing",
+          "url": "https://gramota.ru/biblioteka/spravochniki/russkij-yazyk-kratkij-teoreticheskij-kurs-dlya-shkolnikov/pozicionnoe-oglushenie-ozvonchenie"
+        },
+        {
+          "name": "Hayes Russian voicing assimilation",
+          "url": "https://brucehayes.org/papers/HayesRussianVoicingAssimilation1984.pdf"
+        }
+      ]
+    }
+  ]
+}

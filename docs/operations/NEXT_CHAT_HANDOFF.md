@@ -38,6 +38,10 @@ E:\SpeakRightDesktopRepo\src-tauri\target\release\speakright.exe
 - Open-source readiness tests now include a tracked-text-file guard for obvious
   real private-key/API-token formats; failures report only path, line, and
   pattern name, not the matched secret text.
+- Sourced non-English IPA review decisions now have a tracked structured ledger
+  at `docs/operations/non-english-ipa-reviewed-findings.json`. It records which
+  GPT Research/high-risk rows were applied, which broad variants were accepted,
+  and which rows remain `needs-review`.
 - Open-source readiness tests also lock the public developer/release npm
   scripts, including `test`, `typecheck`, `lint`, `desktop:preflight`,
   `desktop:launch-release`, dry-run audio audits, and the public release gate.
@@ -247,6 +251,11 @@ Start with the Release EXE and inspect these areas before adding new features:
   current export keeps the same `1736` total rows and marks `34` deck focus
   hints so GPT Research does not mistake compact cues such as `/s sʲ zʲ/` for
   complete sentence IPA.
+- The reviewed-findings ledger is now checked by
+  `src/__tests__/non-english-ipa-reviewed-findings.test.ts`. It locks the
+  high-risk Spanish source-leak guardrails, French connected-speech updates,
+  French accepted broad variants, Russian connected-speech updates, and the
+  Russian `поезд идёт` `needs-review` hold.
 - The next audit step is not bulk editing. Send that JSON through GPT Research
   or expert review using the prompt in `IPA_DISPLAY_AUDIT_STRATEGY.md`, then
   only apply rows with sourced `update` or `variant-accepted` verdicts.
