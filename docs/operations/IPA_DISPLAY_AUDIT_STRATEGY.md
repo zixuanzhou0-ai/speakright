@@ -21,6 +21,17 @@ Spanish `es-ES`:
 - Show `[β ð ɣ]` as realization/allophone guidance where useful, but do not pretend these are independent main course phonemes unless the unit is explicitly training that realization.
 - Stress and syllable rhythm units should focus on stress placement and rhythm, not on inventing extra clickable single-phoneme audio.
 
+2026-06-14 applied audit result:
+
+- The final learner-facing Spanish keyword IPA is normalized to the phoneme
+  layer for `/b d g/`; keyword IPA should not expose `[β ð ɣ]` as the default
+  main display.
+- Spanish `/b/ -> [β]`, `/d/ -> [ð]`, and `/g/ -> [ɣ]` units may still teach the
+  allophone realization in labels, descriptions, assessment aliases, and exact
+  header clips.
+- Right-side scoring tiles may still map recognized `[β ð ɣ]` segments to their
+  verified exact local header clips, but word cards should remain phoneme-first.
+
 French `fr-FR`:
 
 - Word cards should show dictionary-style pronunciation.
@@ -58,11 +69,17 @@ A generated local copy may also exist at:
 
 `E:/SpeakRightDesktopRepo/src-tauri/target/ipa-audit/non-english-ipa-audit-input.json`
 
-It contains 988 rows:
+It now contains the final expanded UI corpus rather than only the base source
+arrays. Current count: 1736 rows.
 
-- `es-ES`: 263 rows
-- `fr-FR`: 353 rows
-- `ru-RU`: 372 rows
+- `es-ES`: 516 rows
+- `fr-FR`: 599 rows
+- `ru-RU`: 621 rows
+
+The earlier 988-row audit input covered only base sound-unit arrays. The current
+file is generated from the final expanded learner-facing corpus assembled by
+`src/lib/language-phonemes.ts`, including base sound units, keyword expansions,
+and learning-deck entries.
 
 Each row includes `languageId`, `unitSlug`, `unitDisplayIpa`, `text`, `currentIpa`, `currentDisplayType`, and source file location.
 

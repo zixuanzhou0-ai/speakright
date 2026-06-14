@@ -425,10 +425,16 @@ release notes and installation guide keep the unsigned warning visible.
 - IPA display and audit policy is now documented in
   `docs/operations/IPA_DISPLAY_AUDIT_STRATEGY.md`. The non-English audit input
   generated from the current source data is tracked at
-  `docs/operations/non-english-ipa-audit-input.json` with `988` rows: Spanish
-  `263`, French `353`, Russian `372`. A generated local copy may also exist in
-  `src-tauri/target/ipa-audit/`. Use the prompt in that document for GPT
-  Research or expert review before changing IPA strings in bulk.
+  `docs/operations/non-english-ipa-audit-input.json` with the final expanded UI
+  corpus: `1736` rows, Spanish `516`, French `599`, Russian `621`. A generated
+  local copy may also exist in `src-tauri/target/ipa-audit/`. Use the prompt in
+  that document for GPT Research or expert review before changing IPA strings
+  in bulk.
+- The first public-repo GPT Research pass was applied only where it produced
+  clear high-impact guidance: final Spanish keyword IPA is now normalized to the
+  phoneme display layer for `/b d g/`, while `[β ð ɣ]` remains available in
+  allophone teaching/scoring resources. French and Russian changes still need
+  row-level sourced audit output before bulk edits.
 - Tomorrow's manual test should start with:
 
 ```bat

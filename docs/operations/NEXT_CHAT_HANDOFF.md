@@ -270,10 +270,20 @@ Start with the Release EXE and inspect these areas before adding new features:
   `docs/operations/non-english-ipa-audit-input.json`. A local generated copy may
   also exist at
   `E:/SpeakRightDesktopRepo/src-tauri/target/ipa-audit/non-english-ipa-audit-input.json`.
-  It contains `988` rows: Spanish `263`, French `353`, Russian `372`.
+  It now contains the final expanded UI corpus with `1736` rows: Spanish `516`,
+  French `599`, Russian `621`. The earlier `988`-row file covered only base
+  sound-unit arrays.
 - The next audit step is not bulk editing. Send that JSON through GPT Research
   or expert review using the prompt in `IPA_DISPLAY_AUDIT_STRATEGY.md`, then
   only apply rows with sourced `update` or `variant-accepted` verdicts.
+- First GPT Research pass after the repo became public confirmed the high-risk
+  trend: Spanish was mixing `/b d g/` phoneme-layer targets with `[β ð ɣ]`
+  realization-layer IPA in learner-facing keyword rows. The code now normalizes
+  final Spanish keyword IPA to the phoneme layer while preserving allophone
+  teaching labels, assessment aliases, and exact header clips for scoring.
+- Remaining audit work: continue from the new `1736`-row final UI corpus and
+  ask GPT Research for a full row-level table, especially for French schwa
+  style variants and Russian broad-vs-finer accepted variants.
 
 ## Prompt For The Next Codex Chat
 

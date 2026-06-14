@@ -96,7 +96,7 @@ export const SPANISH_PHONEMES: PhonemeData[] = [
   unit({
     languageId: "es-ES",
     slug: "es-bv",
-    ipa: "/b ~ β/",
+    ipa: "/b/ -> [β]",
     name: "Spanish b/v stop and approximant",
     category: "consonant",
     soundUnitType: "contrast",
@@ -111,12 +111,12 @@ export const SPANISH_PHONEMES: PhonemeData[] = [
     ],
     difficulty: "high",
     description:
-      "词首或鼻音后更像 /b/；两个元音之间放松成 /β/，双唇接近但不要咬下唇读英语 /v/。",
+      "词首或鼻音后更像 /b/；两个元音之间放松成 [β]，双唇接近但不要咬下唇读英语 /v/。",
   }),
   unit({
     languageId: "es-ES",
     slug: "es-d",
-    ipa: "/d ~ ð/",
+    ipa: "/d/ -> [ð]",
     name: "Spanish d stop and approximant",
     category: "consonant",
     example: "dedo",
@@ -135,7 +135,7 @@ export const SPANISH_PHONEMES: PhonemeData[] = [
   unit({
     languageId: "es-ES",
     slug: "es-g",
-    ipa: "/g ~ ɣ/",
+    ipa: "/g/ -> [ɣ]",
     name: "Spanish g stop and approximant",
     category: "consonant",
     example: "gato",
@@ -148,7 +148,7 @@ export const SPANISH_PHONEMES: PhonemeData[] = [
       { word: "lago", ipa: "/ˈlaɣo/" },
     ],
     difficulty: "medium",
-    description: "元音间放松为 /ɣ/，舌后部接近软腭但不完全堵住气流。",
+    description: "元音间放松为 [ɣ]，舌后部接近软腭但不完全堵住气流。",
   }),
   unit({
     languageId: "es-ES",

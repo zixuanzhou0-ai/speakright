@@ -1027,6 +1027,20 @@ function mergeKeywordEntries(
   return prioritizeDiverseKeywords(merged).slice(0, MAX_KEYWORD_OPTIONS_PER_UNIT);
 }
 
+export function spanishPhonemeLayerIpa(ipa: string): string {
+  return ipa.replace(/β/g, "b").replace(/ð/g, "d").replace(/ɣ/g, "g");
+}
+
+function normalizeKeywordDisplayLayer(
+  languageId: LanguageId,
+  keyword: KeywordEntry,
+): KeywordEntry {
+  if (languageId !== "es-ES") return keyword;
+
+  const ipa = spanishPhonemeLayerIpa(keyword.ipa);
+  return ipa === keyword.ipa ? keyword : { ...keyword, ipa };
+}
+
 function splitContrastIpa(ipa: string): [string, string] {
   const parts = ipa.split("~").map((part) => part.trim());
   if (parts.length >= 2) return [parts[0], parts[1]];
@@ -1109,7 +1123,9 @@ export function expandLanguageKeywordOptions(
 
     return {
       ...soundUnit,
-      keywords,
+      keywords: keywords.map((keyword) =>
+        normalizeKeywordDisplayLayer(languageId, keyword),
+      ),
       notes:
         soundUnit.keywords.length >= MIN_KEYWORD_OPTIONS_PER_UNIT
           ? soundUnit.notes

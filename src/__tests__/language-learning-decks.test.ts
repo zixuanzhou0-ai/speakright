@@ -236,6 +236,37 @@ describe("language learning decks", () => {
     }
   });
 
+  it("keeps Spanish keyword IPA phoneme-first for b/d/g allophones", () => {
+    const spanishUnits = getLanguagePhonemes("es-ES");
+    const realizationLayerKeywords = spanishUnits.flatMap((soundUnit) =>
+      soundUnit.keywords
+        .filter((keyword) => /[βðɣ]/.test(keyword.ipa))
+        .map((keyword) => `${soundUnit.slug}:${keyword.word}:${keyword.ipa}`),
+    );
+
+    expect(realizationLayerKeywords).toEqual([]);
+
+    const expectedIpaByUnitAndWord = new Map([
+      ["es-a:agua", "/ˈagwa/"],
+      ["es-a:nada", "/ˈnada/"],
+      ["es-bv:bebé", "/beˈbe/"],
+      ["es-bv:saber", "/saˈbeɾ/"],
+      ["es-d:dedo", "/ˈdedo/"],
+      ["es-d:verde", "/ˈbeɾde/"],
+      ["es-g:lago", "/ˈlago/"],
+      ["es-g:juego", "/ˈxwego/"],
+    ]);
+
+    for (const [key, expectedIpa] of expectedIpaByUnitAndWord) {
+      const [slug, word] = key.split(":");
+      const keyword = getLanguagePhonemeBySlug("es-ES", slug)?.keywords.find(
+        (candidate) => candidate.word === word,
+      );
+
+      expect(keyword?.ipa, key).toBe(expectedIpa);
+    }
+  });
+
   it("does not show diagnostic passages as carousel practice words", () => {
     for (const languageId of DECK_LANGUAGES) {
       const deck = LANGUAGE_LEARNING_DECKS[languageId];
