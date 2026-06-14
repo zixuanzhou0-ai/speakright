@@ -18,6 +18,10 @@ import {
   type DiagnosisReviewItem,
 } from "@/lib/diagnosis-review-package";
 import { loadMasteryProfile } from "@/lib/mastery-profile";
+import {
+  canRecordFormalMastery,
+  getExperimentalMasteryBlocker,
+} from "@/lib/mastery-language-policy";
 import { getScoreBg } from "@/lib/score-utils";
 import { getTrainingPack } from "@/lib/training-packs";
 import { buildTrainingPrescription } from "@/lib/training-prescription";
@@ -209,6 +213,7 @@ export function AssessmentReport({ result, onRetake }: AssessmentReportProps) {
                   prescriptionItem={prescriptionItem}
                   reviewItem={reviewByIssueId.get(issue.id)}
                   profile={profile}
+                  languageId={result.languageId ?? "en-US"}
                 />
               );
             })}
@@ -395,14 +400,18 @@ function IssueCard({
   prescriptionItem,
   reviewItem,
   profile,
+  languageId,
 }: {
   issue: DiagnosisIssue;
   prescriptionItem?: TrainingPrescriptionItem;
   reviewItem?: DiagnosisReviewItem;
   profile?: MasteryProfile | null;
+  languageId: NonNullable<DiagnosisReport["languageId"]>;
 }) {
   const packId = prescriptionItem?.packId ?? issue.recommendedPackIds[0];
   const pack = packId ? getTrainingPack(packId) : null;
+  const canShowFormalMastery = canRecordFormalMastery(languageId);
+  const experimentalMasteryBlocker = getExperimentalMasteryBlocker(languageId);
   const retestFirst =
     reviewItem?.suggestedAction === "retest" ||
     issue.confidence === "low" ||
@@ -453,16 +462,22 @@ function IssueCard({
       <p className="text-sm text-muted-foreground">{issue.impact}</p>
       <p className="mt-3 text-sm font-medium">{issue.fixCue}</p>
       <div className="mt-3 flex flex-wrap gap-1.5">
-        <Badge variant="outline">
-          阶段 {MASTERY_STATE_LABELS[masteryState]}
-        </Badge>
-        {nextLayer && (
-          <Badge variant="outline">下一层 {LAYER_LABELS[nextLayer]}</Badge>
-        )}
-        {stageScore != null && stageCeiling != null && (
-          <Badge variant="outline">
-            阶段分 {stageScore}/{stageCeiling}
-          </Badge>
+        {canShowFormalMastery ? (
+          <>
+            <Badge variant="outline">
+              阶段 {MASTERY_STATE_LABELS[masteryState]}
+            </Badge>
+            {nextLayer && (
+              <Badge variant="outline">下一层 {LAYER_LABELS[nextLayer]}</Badge>
+            )}
+            {stageScore != null && stageCeiling != null && (
+              <Badge variant="outline">
+                阶段分 {stageScore}/{stageCeiling}
+              </Badge>
+            )}
+          </>
+        ) : (
+          <Badge variant="secondary">experimental 练习观察</Badge>
         )}
         {issue.confidence && (
           <Badge variant="outline">置信度 {issue.confidence}</Badge>
@@ -476,6 +491,11 @@ function IssueCard({
           </Badge>
         ))}
       </div>
+      {!canShowFormalMastery && experimentalMasteryBlocker && (
+        <p className="mt-2 text-xs text-muted-foreground">
+          {experimentalMasteryBlocker}
+        </p>
+      )}
       {(prescriptionItem?.learningObjective || levelTitle) && (
         <div
           className={cn(

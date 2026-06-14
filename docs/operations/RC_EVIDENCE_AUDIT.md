@@ -13,7 +13,7 @@ claimed as complete.
 | --- | --- |
 | Current workspace is `E:\SpeakRightDesktopRepo`; release testing uses the Release EXE, not localhost | `README.md`, `docs/INSTALLATION.md`, `docs/operations/DESKTOP_STARTUP_RUNBOOK.md`, `scripts/desktop-preflight.mjs`, `scripts/desktop-ui-smoke.mjs`, `npm.cmd run desktop:preflight`, `npm.cmd run desktop:ui-smoke` |
 | English is the stable baseline; Spanish, French, and Russian remain experimental | `README.md`, `docs/INSTALLATION.md`, `docs/operations/NEXT_CHAT_HANDOFF.md`, `src/app/drill/page.tsx`, `src/lib/mastery-language-policy.ts`, `src/__tests__/mastery-language-policy.test.ts` |
-| Non-English practice can score and provide feedback but cannot write formal mastery/evidenceMastery | `src/lib/mastery-language-policy.ts`, `src/app/sentences/page.tsx`, `src/app/drill/pack/[packId]/pack-runner-client.tsx`, `src/app/drill/perception/page.tsx`, `src/app/drill/prosody/page.tsx`, `src/app/drill/scenarios/page.tsx`, `src/app/drill/spontaneous/page.tsx`, `src/__tests__/mastery-language-policy.test.ts`, `src/__tests__/mastery-profile.test.ts` |
+| Non-English practice can score and provide feedback but cannot write formal mastery/evidenceMastery or display diagnosis issues as formal mastery stages | `src/lib/mastery-language-policy.ts`, `src/components/assessment/assessment-report.tsx`, `src/app/sentences/page.tsx`, `src/app/drill/pack/[packId]/pack-runner-client.tsx`, `src/app/drill/perception/page.tsx`, `src/app/drill/prosody/page.tsx`, `src/app/drill/scenarios/page.tsx`, `src/app/drill/spontaneous/page.tsx`, `src/__tests__/assessment-report.test.tsx`, `src/__tests__/mastery-language-policy.test.ts`, `src/__tests__/mastery-profile.test.ts`; diagnosis issue cards keep formal mastery badges for English but show `experimental 练习观察` plus the experimental blocker for Spanish/French/Russian instead of `阶段` / `下一层` / `阶段分` badges |
 | Words, phrases, sentences, IPA, and examples are centered, wrap in full, and avoid ellipsis/truncation | `src/lib/practice-text-presentation.ts`, `src/components/phoneme/phoneme-study-card.tsx`, `src/components/layout/sidebar-phoneme-list.tsx`, `src/components/audio/read-along-text.tsx`, `src/components/sentences/sentence-input-card.tsx`, `src/components/scoring/word-highlight.tsx`, `src/components/settings/language-config-card.tsx`, `src/components/settings/usage-monitor.tsx`, `src/__tests__/practice-text-presentation.test.ts`, `src/__tests__/phoneme-study-card.test.tsx`, `src/__tests__/sidebar-phoneme-list.test.tsx`, `src/__tests__/desktop-preflight-ui-smoke.test.ts`, `scripts/desktop-ui-smoke.mjs` |
 | Non-English rule units without local target audio do not show clickable speaker buttons | `src/lib/language-source-alignment.ts`, `src/components/phoneme/phoneme-study-card.tsx`, `src/components/drill/drill-phoneme-lesson.tsx`, `src/components/phoneme/phoneme-card.tsx`, `src/__tests__/phoneme-study-card.test.tsx`, `src/__tests__/language-source-alignment.test.ts`, `scripts/desktop-ui-smoke.mjs` |
 | Proxy or generic videos are not presented as exact teaching videos | `src/lib/language-source-alignment.ts`, `src/lib/language-teaching-videos.ts`, `src/components/phoneme/video-player.tsx`, `src/components/drill/drill-phoneme-lesson.tsx`, `src/__tests__/language-teaching-videos.test.ts`, `src/__tests__/video-player.test.tsx`, `scripts/desktop-ui-smoke.mjs` |
@@ -74,6 +74,9 @@ npm.cmd exec vitest run src/__tests__/russian-language-content.test.ts src/__tes
 npm.cmd exec vitest run src/__tests__/language-feedback-rules.test.ts src/__tests__/language-source-alignment.test.ts src/__tests__/russian-language-content.test.ts --reporter=verbose
   3 files / 13 tests passed
 
+npm.cmd exec vitest run src/__tests__/assessment-report.test.tsx src/__tests__/mastery-language-policy.test.ts src/__tests__/diagnosis-engine.test.ts --reporter=verbose
+  3 files / 16 tests passed
+
 npm.cmd exec vitest run src/__tests__/open-source-readiness.test.ts --reporter=verbose
   1 file / 8 tests passed
 
@@ -81,13 +84,13 @@ npm.cmd exec vitest run src/__tests__/llm-prompt.test.ts src/__tests__/llm-deskt
   4 files / 25 tests passed
 
 npm.cmd run test
-  91 files / 509 tests passed
+  92 files / 511 tests passed
 
 npm.cmd run typecheck
   passed
 
 npm.cmd run lint
-  passed; 346 files checked
+  passed; 347 files checked
 
 npm.cmd run build:desktop-frontend
   passed; 144 static pages generated
