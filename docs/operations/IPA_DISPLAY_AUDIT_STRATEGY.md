@@ -165,7 +165,20 @@ ipaType 只能使用：
 
 ## Implementation Rule After Research Returns
 
-Do not bulk-replace IPA blindly. Import the returned audit as a reviewed table, then apply only rows with `verdict = update` or `variant-accepted` and at least one strong source. Rows marked `needs-review` should stay unchanged until manually confirmed.
+Do not bulk-replace IPA blindly. Import the returned audit as a reviewed table,
+then apply only rows with `verdict = update` or `variant-accepted` after the
+evidence fields are checked:
+
+- `update` rows should have two independent source URLs or one primary authority
+  plus one dictionary/textbook corroboration.
+- `variant-accepted` rows should name the accepted variant, the UI layer it
+  belongs to, and at least one strong source explaining why the current display
+  is acceptable for learners.
+- `needs-review` rows must stay unchanged until a later manual review supplies
+  stronger evidence.
+- Spanish `currentIpa` in the exported learner-facing audit corpus should remain
+  phoneme-first for `/b d g/`; `[β ð ɣ]` may appear in explicit allophone unit
+  labels and scoring aliases, but not as leaked default keyword IPA.
 
 After applying changes, run:
 
