@@ -79,6 +79,29 @@ describe("non-English IPA audit input", () => {
     }
   });
 
+  it("keeps Spanish audit transcriptions phoneme-first while preserving explicit allophone unit labels", () => {
+    const rows = buildNonEnglishIpaAuditRows();
+    const spanishTranscriptionRows = rows.filter(
+      (row) =>
+        row.languageId === "es-ES" && row.auditRole === "ipa-transcription",
+    );
+    const realizationLayerLeaks = spanishTranscriptionRows
+      .filter((row) => /[βðɣ]/.test(row.currentIpa))
+      .map((row) => `${row.unitSlug}:${row.text}:${row.currentIpa}`);
+
+    expect(realizationLayerLeaks).toEqual([]);
+
+    const unitDisplayBySlug = new Map(
+      rows
+        .filter((row) => row.languageId === "es-ES")
+        .map((row) => [row.unitSlug, row.unitDisplayIpa]),
+    );
+
+    expect(unitDisplayBySlug.get("es-bv")).toBe("/b/ -> [β]");
+    expect(unitDisplayBySlug.get("es-d")).toBe("/d/ -> [ð]");
+    expect(unitDisplayBySlug.get("es-g")).toBe("/g/ -> [ɣ]");
+  });
+
   it("asks external reviewers to echo auditRole in returned tables", () => {
     const input = buildNonEnglishIpaAuditInput("2026-06-14T00:00:00.000Z");
 
