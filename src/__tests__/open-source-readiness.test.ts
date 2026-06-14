@@ -97,6 +97,25 @@ describe("open-source readiness files", () => {
     expect(security).toContain("Windows artifacts are currently unsigned");
   });
 
+  it("keeps public issue and PR templates aligned with release and privacy boundaries", () => {
+    const bugReport = read(".github/ISSUE_TEMPLATE/bug_report.md");
+    const featureRequest = read(".github/ISSUE_TEMPLATE/feature_request.md");
+    const ipaAudit = read(".github/ISSUE_TEMPLATE/ipa_audit.md");
+    const pullRequest = read(".github/pull_request_template.md");
+
+    expect(bugReport).toContain("Release EXE");
+    expect(bugReport).toContain("Spanish, French, or Russian");
+    expect(bugReport).toContain("Do not attach API keys");
+    expect(featureRequest).toContain("Release EXE");
+    expect(featureRequest).toContain("experimental-language boundary");
+    expect(featureRequest).toContain("ElevenLabs");
+    expect(ipaAudit).toContain("Use two sources");
+    expect(ipaAudit).toContain("needs-review");
+    expect(pullRequest).toContain("I did not use localhost/dev server");
+    expect(pullRequest).toContain("I did not generate ElevenLabs audio");
+    expect(pullRequest).toContain("Spanish, French, and Russian remain experimental");
+  });
+
   it("keeps current handoff docs from claiming stale local dirty state", () => {
     const docs = [
       read("docs/INSTALLATION.md"),

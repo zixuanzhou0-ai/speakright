@@ -18,6 +18,9 @@ What should SpeakRight do?
 
 Which language, page, or flow is affected?
 
+If this affects Spanish, French, or Russian, keep the proposal within the
+experimental-language boundary unless it includes a separate evidence plan.
+
 ## Acceptance Criteria
 
 - [ ]
@@ -27,3 +30,7 @@ Which language, page, or flow is affected?
 ## Notes
 
 Mention any audio, video, scoring, or privacy implications.
+
+For release-facing desktop behavior, acceptance should be checked through the
+Release EXE, not a localhost/dev-server tab. Do not request new ElevenLabs
+audio generation unless the need and expected quota impact are explicit.

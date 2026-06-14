@@ -35,6 +35,11 @@ What happened instead?
 
 Screenshots, logs, or exact page/unit/word:
 
+Do not attach API keys, raw microphone recordings, or private learning-data
+exports. If the issue affects Spanish, French, or Russian, note that those
+modules are currently experimental and describe the specific misleading or
+broken behavior.
+
 ## Checks
 
 - [ ] I tested with the Release EXE when reporting a release/user issue.

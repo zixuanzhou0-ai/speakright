@@ -42,6 +42,10 @@ E:\SpeakRightDesktopRepo\src-tauri\target\release\speakright.exe
   scripts, including `test`, `typecheck`, `lint`, `desktop:preflight`,
   `desktop:launch-release`, dry-run audio audits, and the public release gate.
   Routine validation scripts are checked so they do not call audio generation.
+- Issue and PR templates now keep the same public-maintenance boundaries visible:
+  Release EXE for user-facing desktop checks, no API keys/raw recordings/private
+  exports, no unconfirmed ElevenLabs generation, and Spanish/French/Russian as
+  experimental unless a separate evidence plan exists.
 
 ## Current Local Worktree
 
