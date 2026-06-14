@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { auditLanguageCoverage } from "@/lib/language-content-audit";
 import { REQUIRED_RUSSIAN_UNITS } from "@/lib/language-critical-units";
 import { LANGUAGE_LEARNING_DECKS } from "@/lib/language-learning-decks";
+import { getLanguagePhonemeBySlug } from "@/lib/language-phonemes";
 import {
   expectDeckTargetsResolvable,
   expectRequiredUnits,
@@ -21,6 +22,17 @@ describe("Russian pronunciation content", () => {
     const audit = auditLanguageCoverage("ru-RU");
 
     expect(audit.russianKeywordsWithoutStress).toEqual([]);
+  });
+
+  it("explains final devoicing without hiding connected-speech voicing", () => {
+    const finalDevoicing = getLanguagePhonemeBySlug(
+      "ru-RU",
+      "ru-final-devoicing",
+    );
+
+    expect(finalDevoicing?.description).toContain("停顿或清辅音前");
+    expect(finalDevoicing?.description).toContain("连到浊辅音、响音或元音前");
+    expect(finalDevoicing?.description).not.toContain("在词尾不保持浊音");
   });
 
   it("expands Russian diagnostic, contrast, and sentence decks", () => {

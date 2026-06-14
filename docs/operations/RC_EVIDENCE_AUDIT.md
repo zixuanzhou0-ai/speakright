@@ -19,7 +19,7 @@ claimed as complete.
 | Proxy or generic videos are not presented as exact teaching videos | `src/lib/language-source-alignment.ts`, `src/lib/language-teaching-videos.ts`, `src/components/phoneme/video-player.tsx`, `src/components/drill/drill-phoneme-lesson.tsx`, `src/__tests__/language-teaching-videos.test.ts`, `src/__tests__/video-player.test.tsx`, `scripts/desktop-ui-smoke.mjs` |
 | Spanish/French/Russian local dual-voice audio has zero missing required items and dry-run makes no ElevenLabs calls | `scripts/multilingual-audio-parity-report.mjs`, `src/__tests__/multilingual-audio-parity.test.ts`, `src/__tests__/static-language-audio-pack-assets.test.ts`, `npm.cmd run audio:parity:dry-run` |
 | Local A/B word audio, IPA chart normal/slow word audio, and bundled language-pack read-along playback are louder and closer to video playback without regenerating TTS or allowing obvious clipping | `src/hooks/use-word-pronunciation.ts`, `src/hooks/use-audio-player.ts`, `src/hooks/use-tts-aligned.ts`, `src/lib/audio-normalization.ts`, `src/lib/audio-playback-policy.ts`, `src/components/phoneme/phoneme-card.tsx`, `src/components/phoneme/phoneme-study-card.tsx`, `scripts/audio-loudness-audit.mjs`, `src/__tests__/audio-normalization.test.ts`, `src/__tests__/use-word-pronunciation.test.tsx`, `src/__tests__/use-audio-player.test.tsx`, `src/__tests__/use-tts-aligned.test.tsx`, `src/__tests__/phoneme-card.test.tsx`, `src/__tests__/phoneme-study-card.test.tsx`, `npm.cmd run audio:loudness:dry-run`; the cached normalization helper, active playback hook, and read-along local-pack path preserve language-pack fallback gain before peak-safe limiting where applicable, very quiet decoded local word clips can reach up to `12x` peak-safe gain when peaks permit it, IPA chart normal/slow word playback uses a shared boost, bundled read-along replay keeps its gain, and representative A/B plus chart-word samples are compared against teaching-video loudness without ElevenLabs calls |
-| Spanish 22, French 26, and Russian 27 sound units are covered by diagnosis and sentence practice; contrast and sentence decks meet launch-density targets | `src/lib/language-learning-decks.ts`, `src/lib/language-sound-units/*.ts`, `src/__tests__/language-learning-decks.test.ts`, `src/__tests__/spanish-language-content.test.ts`, `src/__tests__/french-language-content.test.ts`, `src/__tests__/russian-language-content.test.ts` |
+| Spanish 22, French 26, and Russian 27 sound units are covered by diagnosis and sentence practice; contrast and sentence decks meet launch-density targets | `src/lib/language-learning-decks.ts`, `src/lib/language-sound-units/*.ts`, `src/__tests__/language-learning-decks.test.ts`, `src/__tests__/spanish-language-content.test.ts`, `src/__tests__/french-language-content.test.ts`, `src/__tests__/russian-language-content.test.ts`; the Russian final-devoicing unit now explains that final voiced obstruents devoice before pauses or voiceless consonants but connected speech before voiced consonants, sonorants, or vowels must be handled as connected-speech realization rather than isolated word-final devoicing |
 | Non-English IPA audit exports are reproducible and distinguish full IPA rows from deck focus hints | `src/lib/non-english-ipa-audit.ts`, `scripts/export-non-english-ipa-audit-input.mjs`, `docs/operations/non-english-ipa-audit-input.json`, `docs/operations/IPA_DISPLAY_AUDIT_STRATEGY.md`, `src/__tests__/non-english-ipa-audit.test.ts`, `npm.cmd run ipa:audit:export`; the current tracked export contains `1736` rows and marks `34` `deck-focus-hint` rows so compact practice cues are not mistaken for complete sentence IPA, the test compares the tracked JSON against the current source-built output to catch stale audit exports, high-risk French connected-speech rows reject stale word-boundary IPA, Spanish audit `currentIpa` rows stay phoneme-first for `/b d g/` while explicit allophone unit labels may keep `[β ð ɣ]`, and the audit strategy requires sourced `update` / `variant-accepted` evidence while leaving `needs-review` unchanged |
 | Repeated or noisy non-English practice text is constrained | `src/lib/language-keyword-expansions.ts`, `src/__tests__/language-learning-decks.test.ts`, `src/__tests__/spanish-sound-examples.test.ts` |
 | Non-English diagnosis avoids trusted perfect scores when evidence is thin, mismatched, omitted, or inserted | `src/lib/diagnosis-engine.ts`, `src/lib/assessment-evidence-engine.ts`, `src/types/diagnosis.ts`, `src/__tests__/diagnosis-engine.test.ts`, `src/__tests__/assessment-evidence-engine.test.ts`, `scripts/desktop-ui-smoke.mjs` |
@@ -68,6 +68,9 @@ git status --short --branch
 npm.cmd exec vitest run src/__tests__/non-english-ipa-audit.test.ts src/__tests__/language-learning-decks.test.ts src/__tests__/open-source-readiness.test.ts --reporter=verbose
   3 files / 27 tests passed
 
+npm.cmd exec vitest run src/__tests__/russian-language-content.test.ts src/__tests__/language-learning-decks.test.ts src/__tests__/non-english-ipa-audit.test.ts --reporter=verbose
+  3 files / 24 tests passed
+
 npm.cmd exec vitest run src/__tests__/open-source-readiness.test.ts --reporter=verbose
   1 file / 8 tests passed
 
@@ -75,7 +78,7 @@ npm.cmd exec vitest run src/__tests__/llm-prompt.test.ts src/__tests__/llm-deskt
   4 files / 25 tests passed
 
 npm.cmd run test
-  91 files / 507 tests passed
+  91 files / 508 tests passed
 
 npm.cmd run typecheck
   passed
@@ -85,6 +88,9 @@ npm.cmd run lint
 
 npm.cmd run build:desktop-frontend
   passed; 144 static pages generated
+
+npm.cmd run desktop:build
+  passed; rebuilt Release EXE, MSI, and NSIS artifacts
 
 npm.cmd run desktop:preflight
   passed; Release EXE exists, no running speakright.exe, no localhost startup

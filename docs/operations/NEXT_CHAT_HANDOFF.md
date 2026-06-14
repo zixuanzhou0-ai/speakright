@@ -258,6 +258,10 @@ Start with the Release EXE and inspect these areas before adding new features:
   - Russian connected-speech rows now preserve/restore voiced obstruents in
     `Сад зимой синий.`, `друг дома`, `город большой`, `нож острый`,
     `снег идёт`, `класс большой`, and `хлеб на кухне`.
+  - The Russian `词尾清化` learner-facing description now says final voiced
+    obstruents devoice before pauses or voiceless consonants, but connected
+    speech before voiced consonants, sonorants, or vowels must be handled as
+    connected-speech realization rather than isolated word-final devoicing.
   - `поезд идёт` remains `needs-review`; do not auto-change it without a more
     direct source.
   - Some final UI rows are compact deck focus hints rather than full IPA. Treat

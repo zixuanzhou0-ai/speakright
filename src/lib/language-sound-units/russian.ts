@@ -694,7 +694,7 @@ export const RUSSIAN_PHONEMES: PhonemeData[] = [
     ],
     difficulty: "high",
     description:
-      "词尾有声辅音常清化：拼写上的 б/д/г/ж/з 在词尾不保持浊音。",
+      "停顿或清辅音前，词尾 б/д/г/ж/з 常清化；但连到浊辅音、响音或元音前时要按语流处理，不能把每个词都孤立清化。",
   }),
   unit({
     languageId: "ru-RU",
