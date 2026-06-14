@@ -124,7 +124,13 @@ describe("settings key hydration", () => {
 
       render(<UsageMonitor />);
 
-      expect(screen.getByText("未配置 API Key")).toBeInTheDocument();
+      expect(
+        screen.getByText(/未配置 ElevenLabs API Key/),
+      ).toBeInTheDocument();
+      expect(screen.getByText(/本地单词音频/)).toHaveAttribute(
+        "data-smoke",
+        "elevenlabs-usage-empty",
+      );
       expect(mocks.fetchElevenLabsUsage).not.toHaveBeenCalled();
 
       await act(async () => {

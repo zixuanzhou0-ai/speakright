@@ -82,6 +82,9 @@ interface ElevenLabsData {
   nextResetUnix: number;
 }
 
+const ELEVENLABS_USAGE_NOT_CONFIGURED_MESSAGE =
+  "未配置 ElevenLabs API Key。句子/短语标准示范和跟读高亮需要配置；本地单词音频和已内置语言包音频可继续使用。";
+
 function ElevenLabsUsageCard() {
   const [data, setData] = useState<ElevenLabsData | null>(null);
   const [loading, setLoading] = useState(false);
@@ -90,7 +93,8 @@ function ElevenLabsUsageCard() {
 
   const fetchUsage = useCallback(async () => {
     if (!config?.apiKey) {
-      setError("未配置 API Key");
+      setData(null);
+      setError(ELEVENLABS_USAGE_NOT_CONFIGURED_MESSAGE);
       return;
     }
 
@@ -160,7 +164,12 @@ function ElevenLabsUsageCard() {
       </CardHeader>
       <CardContent>
         {error ? (
-          <p className="text-sm text-muted-foreground">{error}</p>
+          <p
+            className="break-words text-sm text-muted-foreground [overflow-wrap:anywhere]"
+            data-smoke="elevenlabs-usage-empty"
+          >
+            {error}
+          </p>
         ) : data ? (
           <div className="flex items-center gap-4">
             <div className="relative">

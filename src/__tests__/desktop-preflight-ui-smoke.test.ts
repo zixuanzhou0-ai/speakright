@@ -158,6 +158,9 @@ describe("desktop preflight and UI smoke", () => {
     expect(languageCard).toContain("overflow-wrap:anywhere");
     expect(languageCard).not.toContain("line-clamp");
     expect(usageMonitor).toContain('data-smoke="usage-history-target"');
+    expect(usageMonitor).toContain('data-smoke="elevenlabs-usage-empty"');
+    expect(usageMonitor).toContain("未配置 ElevenLabs API Key");
+    expect(usageMonitor).toContain("本地单词音频");
     expect(usageMonitor).toContain("overflow-wrap:anywhere");
     expect(usageMonitor).not.toContain("truncate");
     expect(pronunciationCard).toContain('data-smoke="pronunciation-test-row"');

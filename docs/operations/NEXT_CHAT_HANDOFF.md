@@ -114,6 +114,9 @@ git status --short --branch
 - Free-practice word mode now also renders `wordAudio.error` inline under the
   input/listen controls and clears stale word-audio errors when the learner
   changes text or clears the session.
+- Settings usage monitor now shows an explicit first-run ElevenLabs empty state:
+  sentence/phrase demos need an API Key, while local word audio and built-in
+  language-pack audio can still be used.
 - Spanish `词重音` and `音节节奏`, and French `词尾静音`, had duplicate examples
   reduced. Continue auditing all Spanish/French/Russian units for repeated text.
 - Spanish video buttons were shortened and allowed to wrap so they do not crowd
