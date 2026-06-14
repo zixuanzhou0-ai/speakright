@@ -57,7 +57,7 @@ const RULE_SUMMARIES: Record<string, string> = {
   "ru-iotated-vowels":
     "я/е/ё/ю 在词首、元音后或 ь/ъ 后通常带 /j/；在辅音后主要标记前一个辅音软化。",
   "ru-final-devoicing":
-    "俄语词尾有声辅音常清化，如 друг 按 /druk/ 收尾；这不是拼写错误，而是词尾规则。",
+    "俄语词尾有声辅音在停顿或清辅音前常清化，如 друг 单独读作 /druk/；连到浊辅音、响音或元音前要按语流处理，不要把每个词都孤立清化。",
   "ru-voicing-assimilation":
     "相邻辅音会互相影响清浊，如 встреча 中 в 在清辅音前读成 [f]。",
   "ru-clusters":

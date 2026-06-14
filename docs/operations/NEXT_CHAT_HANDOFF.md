@@ -156,6 +156,11 @@ git status --short --branch
 - Non-English diagnosis now records omission/insertion/mispronunciation counts
   in the evidence summary. Omission or insertion miscues block trusted overall
   scores and produce an insufficient-evidence retest message.
+- Russian final-devoicing wording is now aligned across the course card, AI
+  coach rules, and source-alignment summaries: final voiced obstruents devoice
+  before pauses or voiceless consonants, but connected speech before voiced
+  consonants, sonorants, or vowels must be treated as connected-speech
+  realization rather than isolated word-final devoicing.
 - `desktop:ui-smoke` now includes both `narrowViewport=ok` and
   `lowHeightViewport=ok`, covering Settings, long rule detail pages, drill, free
   practice, and diagnosis from the Release EXE. The narrow and low-height detail

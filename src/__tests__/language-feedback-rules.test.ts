@@ -75,6 +75,15 @@ describe("language feedback rules", () => {
     expect(buildLanguageFeedbackPromptContext("ru-RU")).toMatch(
       /重音|soft|clusters/,
     );
+
+    const finalDevoicing = matches.find(
+      (match) => match.rule.id === "russian-final-devoicing",
+    )?.rule;
+    expect(finalDevoicing?.guidance).toContain("停顿或清辅音前");
+    expect(finalDevoicing?.guidance).toContain("浊辅音、响音或元音前");
+    expect(finalDevoicing?.guidance).not.toContain("词尾有声辅音要清化");
+    expect(finalDevoicing?.practiceCue).toContain("друг дома");
+    expect(finalDevoicing?.practiceCue).toContain("снег идёт");
   });
 
   it("does not inject non-English rules into English feedback", () => {

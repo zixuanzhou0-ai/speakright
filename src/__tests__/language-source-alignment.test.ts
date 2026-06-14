@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { getLanguagePhonemeBySlug } from "@/lib/language-phonemes";
-import { shouldShowSoundUnitHeaderAudio } from "@/lib/language-source-alignment";
+import {
+  getSoundUnitSourceAlignment,
+  shouldShowSoundUnitHeaderAudio,
+} from "@/lib/language-source-alignment";
 import type { LanguageId } from "@/types/language";
 
 function unit(languageId: LanguageId, slug: string) {
@@ -45,5 +48,13 @@ describe("language source alignment", () => {
         unit("ru-RU", "ru-final-devoicing"),
       ),
     ).toBe(false);
+  });
+
+  it("keeps Russian final-devoicing source guidance connected-speech aware", () => {
+    const alignment = getSoundUnitSourceAlignment("ru-RU", "ru-final-devoicing");
+
+    expect(alignment?.ruleSummary).toContain("停顿或清辅音前");
+    expect(alignment?.ruleSummary).toContain("浊辅音、响音或元音前");
+    expect(alignment?.ruleSummary).not.toContain("这不是拼写错误，而是词尾规则");
   });
 });

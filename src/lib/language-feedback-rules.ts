@@ -143,8 +143,8 @@ export const LANGUAGE_FEEDBACK_RULES: LanguageFeedbackRule[] = [
     languageId: "ru-RU",
     title: "final devoicing",
     triggerSlugs: ["ru-final-devoicing"],
-    guidance: "词尾有声辅音要清化：друг 结尾像 /k/，нож 结尾像 /ʂ/。",
-    practiceCue: "друг, город, нож, гараж；先读拼写，再读实际清化。",
+    guidance: "停顿或清辅音前，词尾 б/д/г/ж/з 常清化；但连到浊辅音、响音或元音前时要按语流判断，不能把每个词都孤立清化。",
+    practiceCue: "друг, город, нож, гараж；再对比 друг дома, снег идёт，先看后面的音再决定清化或保持浊音。",
   },
   {
     id: "russian-voicing-assimilation",
