@@ -291,7 +291,7 @@ Current gate summary:
   path. During the pre-commit verification run it correctly reported the
   expected dirty worktree from this local fix.
 - Release EXE UI smoke passed with `scoringTileAudioPolicy=ok`,
-  `narrowViewport=ok`, `lowHeightViewport=ok`, and
+  `practiceAudioLabels=ok`, `narrowViewport=ok`, `lowHeightViewport=ok`, and
   `releaseServedFromDevServer=false`; the smoke script now includes `/progress`
   in the main, narrow-window, and low-height route passes.
 - Release EXE launch passed from the static Tauri bundle, and the test process

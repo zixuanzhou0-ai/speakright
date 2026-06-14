@@ -113,6 +113,10 @@ describe("desktop preflight and UI smoke", () => {
     expect(script).toContain("voiceSelectorReady");
     expect(script).toContain("practice-word-audio");
     expect(script).toContain("wordAudioReady");
+    expect(script).toContain("expectPracticeAudioLabelIncludes");
+    expect(script).toContain("expectedPracticeAudioLabelIncludes");
+    expect(script).toContain('ariaLabel !== "播放单词发音"');
+    expect(script).toContain("practiceAudioLabels=ok");
     expect(script).toContain("aria-disabled");
     expect(script).toContain("videoSelectorReady");
     expect(script).toContain("videoSelectorCount");
