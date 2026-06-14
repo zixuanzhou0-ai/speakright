@@ -150,60 +150,22 @@ git status --short --branch
 
 ## Latest Verification
 
-The latest local verification after the RC evidence audit, centered-text,
-audio-playback, small-bug smoke tightening, and exact header-clip scoring-audio
-pass passed:
+The latest settled-main command results are centralized in
+`docs/operations/RC_EVIDENCE_AUDIT.md` so README, installation notes, and this
+handoff do not drift apart.
 
-```bat
-npm.cmd exec vitest run src/__tests__/assessment-segment-audio.test.ts src/__tests__/phoneme-highlight.test.tsx src/__tests__/azure-phoneme-map-language-parity.test.ts src/__tests__/language-phoneme-resources.test.ts src/__tests__/phoneme-play-button.test.tsx src/__tests__/audio-playback-policy.test.ts --reporter=verbose
-npm.cmd exec vitest run src/__tests__/desktop-preflight-ui-smoke.test.ts --reporter=verbose
-npm.cmd exec vitest run src/__tests__/desktop-preflight-ui-smoke.test.ts src/__tests__/language-source-alignment.test.ts src/__tests__/phoneme-study-card.test.tsx src/__tests__/practice-text-presentation.test.ts --reporter=verbose
-npm.cmd run test
-npm.cmd run typecheck
-npm.cmd run lint
-npm.cmd run build:desktop-frontend
-npm.cmd run desktop:preflight
-npm.cmd run desktop:build
-npm.cmd run desktop:ui-smoke
-npm.cmd run audio:parity:dry-run
-npm.cmd run audio:loudness:dry-run
-npm.cmd run desktop:launch-release
-```
+Current gate summary:
 
-Results:
-
-- Focused exact scoring-audio tests: 6 files / 57 tests passed, including
-  left/right header-clip parity, Spanish/French/Russian exact alias inventory,
-  unclickable unverified tiles, and header/scoring short playback.
-- Desktop UI smoke script self-test: 1 file / 7 tests passed after the scoring
-  tile policy was updated to require at least one exact playable header clip and
-  at least one locked unverified tile.
-- Focused UI/source/text tests: 4 files / 18 tests passed.
-- Full tests: 89 files / 489 tests passed.
-- Typecheck: passed.
-- Lint: passed; Biome checked 341 files.
-- Static desktop frontend build: passed; 144 static pages generated.
-- Desktop release build: passed; rebuilt `speakright.exe`, MSI, and NSIS.
-- Desktop preflight: passed; Release EXE exists and no localhost is started.
-- Desktop UI smoke: passed from Release EXE, including centered reading-target
-  text, no ellipsis/nowrap, no practice-button overlap, expected header-audio
-  visibility/clickability readiness, video selector
-  wrapping/no-overlap/no-overflow, Settings/usage
-  long-text wrapping, Settings pronunciation-test row wrapping/no-overlap, A/B
-  selector and word-audio button visibility/clickability/label runtime checks,
-  scoring-breakdown visibility/readability/no-overflow runtime checks in
-  normal, narrow, and low-height detail windows, scoring tile exact-audio policy
-  runtime checks with one playable exact header clip and one locked unverified
-  tile, `scoringTileAudioPolicy=ok`, `narrowViewport=ok`,
-  `lowHeightViewport=ok`, and `releaseServedFromDevServer=false`.
-- Audio parity dry-run: passed; Spanish 880 existing / 0 missing, French 1090 /
-  0 missing, Russian 920 / 0 missing; no ElevenLabs calls.
-- Audio loudness dry-run: latest recorded pass; reference video mean `-14.7 dB`, word floor
-  `-21.6 dB`; representative English, Spanish, French, Russian A/B word
-  samples and IPA chart normal/slow word samples passed after playback-layer
-  gain; no ElevenLabs calls. It was not rerun during the exact-header
-  scoring-tile pass because that pass did not change loudness math.
-- Release EXE launch: passed; latest manual-test process PID was `70112`.
+- Open-source handoff/readiness plus IPA audit export drift tests passed.
+- Full tests, typecheck, lint, and static desktop frontend build passed.
+- Release EXE preflight passed; no localhost startup is part of the release
+  path.
+- Release EXE UI smoke passed with `scoringTileAudioPolicy=ok`,
+  `narrowViewport=ok`, `lowHeightViewport=ok`, and
+  `releaseServedFromDevServer=false`.
+- Release EXE launch passed from the static Tauri bundle, and the test process
+  was closed after verification.
+- No ElevenLabs generation or TTS spend is part of this validation path.
 
 For tomorrow's manual test session, start with:
 
