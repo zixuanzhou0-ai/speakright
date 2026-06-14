@@ -18,7 +18,7 @@ const ERROR_LABELS: Record<string, string> = {
 
 export function WordHighlight({ words, onWordClick }: WordHighlightProps) {
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap justify-center gap-2 text-center">
       {words.map((word, i) => {
         const isCorrect = word.errorType === "None" && word.accuracyScore >= 60;
         const hasError = word.errorType !== "None";
@@ -39,7 +39,7 @@ export function WordHighlight({ words, onWordClick }: WordHighlightProps) {
             }}
             onClick={() => onWordClick?.(word)}
             className={cn(
-              "relative rounded-md px-2 py-1 text-lg font-mono transition-colors",
+              "relative inline-flex max-w-full items-center justify-center whitespace-normal rounded-md px-2 py-1 text-center text-lg font-mono transition-colors break-words [overflow-wrap:anywhere]",
               isCorrect && "bg-primary/15 text-primary",
               !isCorrect &&
                 "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",

@@ -1,0 +1,130 @@
+# SpeakRight Desktop RC Evidence Audit
+
+Date: 2026-06-14
+
+This audit records the evidence used for the Release Candidate quality gate.
+It is intentionally evidence-first: if an item is not covered by a file,
+automated test, release-window smoke, or validation command, it should not be
+claimed as complete.
+
+## Evidence Matrix
+
+| RC requirement | Evidence source |
+| --- | --- |
+| Current workspace is `E:\SpeakRightDesktopRepo`; release testing uses the Release EXE, not localhost | `README.md`, `docs/INSTALLATION.md`, `docs/operations/DESKTOP_STARTUP_RUNBOOK.md`, `scripts/desktop-preflight.mjs`, `scripts/desktop-ui-smoke.mjs`, `npm.cmd run desktop:preflight`, `npm.cmd run desktop:ui-smoke` |
+| English is the stable baseline; Spanish, French, and Russian remain experimental | `README.md`, `docs/INSTALLATION.md`, `docs/operations/NEXT_CHAT_HANDOFF.md`, `src/app/drill/page.tsx`, `src/lib/mastery-language-policy.ts`, `src/__tests__/mastery-language-policy.test.ts` |
+| Non-English practice can score and provide feedback but cannot write formal mastery/evidenceMastery | `src/lib/mastery-language-policy.ts`, `src/app/sentences/page.tsx`, `src/app/drill/pack/[packId]/pack-runner-client.tsx`, `src/app/drill/perception/page.tsx`, `src/app/drill/prosody/page.tsx`, `src/app/drill/scenarios/page.tsx`, `src/app/drill/spontaneous/page.tsx`, `src/__tests__/mastery-language-policy.test.ts`, `src/__tests__/mastery-profile.test.ts` |
+| Words, phrases, sentences, IPA, and examples are centered, wrap in full, and avoid ellipsis/truncation | `src/lib/practice-text-presentation.ts`, `src/components/phoneme/phoneme-study-card.tsx`, `src/components/layout/sidebar-phoneme-list.tsx`, `src/components/audio/read-along-text.tsx`, `src/components/sentences/sentence-input-card.tsx`, `src/components/scoring/word-highlight.tsx`, `src/components/settings/language-config-card.tsx`, `src/components/settings/usage-monitor.tsx`, `src/__tests__/practice-text-presentation.test.ts`, `src/__tests__/phoneme-study-card.test.tsx`, `src/__tests__/sidebar-phoneme-list.test.tsx`, `src/__tests__/desktop-preflight-ui-smoke.test.ts`, `scripts/desktop-ui-smoke.mjs` |
+| Non-English rule units without local target audio do not show clickable speaker buttons | `src/lib/language-source-alignment.ts`, `src/components/phoneme/phoneme-study-card.tsx`, `src/components/drill/drill-phoneme-lesson.tsx`, `src/components/phoneme/phoneme-card.tsx`, `src/__tests__/phoneme-study-card.test.tsx`, `src/__tests__/language-source-alignment.test.ts`, `scripts/desktop-ui-smoke.mjs` |
+| Proxy or generic videos are not presented as exact teaching videos | `src/lib/language-source-alignment.ts`, `src/lib/language-teaching-videos.ts`, `src/components/phoneme/video-player.tsx`, `src/components/drill/drill-phoneme-lesson.tsx`, `src/__tests__/language-teaching-videos.test.ts`, `src/__tests__/video-player.test.tsx`, `scripts/desktop-ui-smoke.mjs` |
+| Spanish/French/Russian local dual-voice audio has zero missing required items and dry-run makes no ElevenLabs calls | `scripts/multilingual-audio-parity-report.mjs`, `src/__tests__/multilingual-audio-parity.test.ts`, `src/__tests__/static-language-audio-pack-assets.test.ts`, `npm.cmd run audio:parity:dry-run` |
+| Local A/B word audio, IPA chart normal/slow word audio, and bundled language-pack read-along playback are louder and closer to video playback without regenerating TTS or allowing obvious clipping | `src/hooks/use-word-pronunciation.ts`, `src/hooks/use-audio-player.ts`, `src/hooks/use-tts-aligned.ts`, `src/lib/audio-normalization.ts`, `src/lib/audio-playback-policy.ts`, `src/components/phoneme/phoneme-card.tsx`, `src/components/phoneme/phoneme-study-card.tsx`, `scripts/audio-loudness-audit.mjs`, `src/__tests__/audio-normalization.test.ts`, `src/__tests__/use-word-pronunciation.test.tsx`, `src/__tests__/use-audio-player.test.tsx`, `src/__tests__/use-tts-aligned.test.tsx`, `src/__tests__/phoneme-card.test.tsx`, `src/__tests__/phoneme-study-card.test.tsx`, `npm.cmd run audio:loudness:dry-run`; the cached normalization helper, active playback hook, and read-along local-pack path preserve language-pack fallback gain before peak-safe limiting where applicable, very quiet decoded local word clips can reach up to `12x` peak-safe gain when peaks permit it, IPA chart normal/slow word playback uses a shared boost, bundled read-along replay keeps its gain, and representative A/B plus chart-word samples are compared against teaching-video loudness without ElevenLabs calls |
+| Spanish 22, French 26, and Russian 27 sound units are covered by diagnosis and sentence practice; contrast and sentence decks meet launch-density targets | `src/lib/language-learning-decks.ts`, `src/lib/language-sound-units/*.ts`, `src/__tests__/language-learning-decks.test.ts`, `src/__tests__/spanish-language-content.test.ts`, `src/__tests__/french-language-content.test.ts`, `src/__tests__/russian-language-content.test.ts` |
+| Repeated or noisy non-English practice text is constrained | `src/lib/language-keyword-expansions.ts`, `src/__tests__/language-learning-decks.test.ts`, `src/__tests__/spanish-sound-examples.test.ts` |
+| Non-English diagnosis avoids trusted perfect scores when evidence is thin, mismatched, omitted, or inserted | `src/lib/diagnosis-engine.ts`, `src/lib/assessment-evidence-engine.ts`, `src/types/diagnosis.ts`, `src/__tests__/diagnosis-engine.test.ts`, `src/__tests__/assessment-evidence-engine.test.ts`, `scripts/desktop-ui-smoke.mjs` |
+| Detail-page scoring breakdowns, detail header speakers, and list-card IPA clicks show honest target reference and stable clickable short-audio tiles | `src/lib/detail-assessment-breakdown.ts`, `src/components/scoring/phoneme-highlight.tsx`, `src/components/phoneme/phoneme-play-button.tsx`, `src/components/phoneme/phoneme-card.tsx`, `src/hooks/use-audio-player.ts`, `src/lib/assessment-segment-audio.ts`, `src/lib/azure-phoneme-map.ts`, `src/lib/audio-playback-policy.ts`, `src/lib/language-phoneme-resources.ts`, `src/lib/local-language-assets.ts`, `src/__tests__/detail-assessment-breakdown.test.ts`, `src/__tests__/phoneme-highlight.test.tsx`, `src/__tests__/phoneme-play-button.test.tsx`, `src/__tests__/phoneme-card.test.tsx`, `src/__tests__/assessment-segment-audio.test.ts`, `src/__tests__/audio-playback-policy.test.ts`, `src/__tests__/use-audio-player.test.tsx`, `src/__tests__/azure-phoneme-map-language-parity.test.ts`, `src/__tests__/language-phoneme-resources.test.ts`, `scripts/desktop-ui-smoke.mjs`; non-English scoring tiles reuse the exact same left/detail sound-unit header clip (`phonemeAudio.localSrc`) or stay visible but unclickable, never falling back to word examples, rule/prosody clips, proxy media, or video audio; Spanish `/β/ /ð/ /ɣ/` allophone clips do not masquerade as plain `/b/ /d/ /g/`; English chart clicks are capped at `560ms`, and local non-English header/scoring sound-unit clips are capped at `500ms` through the shared header playback policy |
+| Recording replay and benchmark playback use centralized audio cleanup | `src/app/drill/prosody/page.tsx`, `src/app/drill/scenarios/page.tsx`, `src/app/drill/spontaneous/page.tsx`, `src/app/progress/page.tsx`, `src/hooks/use-audio-player.ts`, `src/__tests__/desktop-preflight-ui-smoke.test.ts`; source policy forbids raw `new Audio(...)` replay in these user-facing pages |
+| Release-window smoke covers likely user-visible regressions | `scripts/desktop-ui-smoke.mjs`: settings, English detail, Spanish `/es-a`, Spanish stress/rhythm, French `/fr-i`, schwa, liaison, enchainement, elision, final consonant silence, Russian `/ru-a`, stress/reduction/rule units, `/drill`, `/sentences`, `/assessment`; verifies not localhost, no text ellipsis/nowrap on detail task text, no practice-button overlap, expected header-audio visibility/clickability readiness, A/B voice selector and word-audio button visibility/clickability/label runtime readiness, video selector visibility/no-overlap/no-overflow and wrapping labels, Settings/usage/pronunciation-test long-control wrapping and pronunciation-test row no-overlap, scoring-breakdown placeholder or target IPA reference visibility/readability/no-overflow readiness in normal, narrow, and low-height detail windows, scoring tile exact-audio policy runtime readiness with one playable exact header clip, one locked unverified tile, `scoringTileAudioPolicy=ok`, `narrowViewport=ok`, and `lowHeightViewport=ok` |
+| Public release remains blocked until Windows signing is complete | `README.md`, `docs/INSTALLATION.md`, `docs/operations/DESKTOP_STARTUP_RUNBOOK.md` |
+
+## Required RC Commands
+
+Run from `E:\SpeakRightDesktopRepo`:
+
+```bat
+npm.cmd run test
+npm.cmd run typecheck
+npm.cmd run lint
+npm.cmd run build:desktop-frontend
+npm.cmd run desktop:build
+npm.cmd run desktop:preflight
+npm.cmd run desktop:ui-smoke
+npm.cmd run audio:parity:dry-run
+npm.cmd run audio:loudness:dry-run
+npm.cmd run desktop:launch-release
+```
+
+`audio:parity:dry-run` must report zero missing language-pack items and must not
+call ElevenLabs generation. `audio:loudness:dry-run` is a local ffmpeg-based
+playback-gain audit for representative A/B word audio and IPA chart normal/slow
+word audio versus teaching-video loudness; it also makes zero ElevenLabs calls.
+`desktop:live-validation` remains a provider/resource gate for full controlled
+release checks; the previous Azure live baseline was `220/220`, but it was not
+rerun during this playback/UI RC pass.
+
+## Latest Local Command Results
+
+Latest local RC pass for tomorrow's manual testing:
+
+```text
+git status --short --branch
+  main...origin/main [ahead 5], with documented dirty release-tightening work
+
+npm.cmd exec vitest run src/__tests__/assessment-segment-audio.test.ts src/__tests__/phoneme-highlight.test.tsx src/__tests__/azure-phoneme-map-language-parity.test.ts src/__tests__/language-phoneme-resources.test.ts src/__tests__/phoneme-play-button.test.tsx src/__tests__/audio-playback-policy.test.ts --reporter=verbose
+  6 files / 57 tests passed
+
+npm.cmd exec vitest run src/__tests__/desktop-preflight-ui-smoke.test.ts --reporter=verbose
+  1 file / 7 tests passed
+
+npm.cmd exec vitest run src/__tests__/desktop-preflight-ui-smoke.test.ts src/__tests__/language-source-alignment.test.ts src/__tests__/phoneme-study-card.test.tsx src/__tests__/practice-text-presentation.test.ts --reporter=verbose
+  4 files / 18 tests passed
+
+npm.cmd run test
+  89 files / 489 tests passed
+
+npm.cmd run typecheck
+  passed
+
+npm.cmd run lint
+  passed; 341 files checked
+
+npm.cmd run build:desktop-frontend
+  passed; 144 static pages generated
+
+npm.cmd run desktop:build
+  passed; rebuilt speakright.exe, MSI, and NSIS artifacts
+
+npm.cmd run desktop:preflight
+  passed; Release EXE exists, no running speakright.exe, no localhost startup
+
+npm.cmd run desktop:ui-smoke
+  passed; Release EXE runtime, centered target text, no target-text ellipsis,
+  no practice-button overlap, expected header-audio visibility/clickability readiness,
+  A/B selector and word-audio button visibility/clickability/label runtime
+  checks, video selector
+  visibility/no-overlap/no-overflow, Settings/usage long-text wrapping,
+  Settings pronunciation-test row no-overlap, scoring-breakdown
+  visibility/readability/no-overflow runtime checks in normal, narrow, and
+  low-height detail windows,
+  exact scoring-tile audio policy with a playable header clip and a locked
+  unverified tile,
+  scoringTileAudioPolicy=ok,
+  narrowViewport=ok, lowHeightViewport=ok,
+  releaseServedFromDevServer=false
+
+npm.cmd run audio:parity:dry-run
+  Spanish 880 existing / 0 missing; French 1090 existing / 0 missing;
+  Russian 920 existing / 0 missing; no ElevenLabs calls
+
+npm.cmd run desktop:launch-release
+  passed; latest manual-test process PID 70112
+```
+
+For tomorrow, start from:
+
+```bat
+cd /d E:\SpeakRightDesktopRepo
+npm.cmd run desktop:preflight
+npm.cmd run desktop:launch-release
+```
+
+## Limits
+
+- `audio:loudness:dry-run` was not rerun during the exact-header scoring-tile
+  pass; the latest recorded loudness pass remains the previous playback-layer
+  gain audit.
+- `es-ES`, `fr-FR`, and `ru-RU` are experimental and must not be described as
+  formally mastered.
+- The RC gate does not generate new TTS audio.
+- Controlled internal testing may continue with unsigned Windows artifacts;
+  public release still requires code signing.

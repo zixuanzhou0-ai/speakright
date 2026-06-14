@@ -27,15 +27,18 @@ describe("SidebarPhonemeList layout", () => {
     renderWithLanguage("en-US", "ee");
 
     const englishItem = screen.getByText("/iː/").closest("a");
+    const englishExample = screen.getByText("green");
 
     expect(englishItem).toHaveClass("flex");
-    expect(englishItem).toHaveClass("whitespace-nowrap");
+    expect(englishItem).not.toHaveClass("whitespace-nowrap");
+    expect(englishExample).toHaveClass("text-center");
+    expect(englishExample).toHaveClass("break-words");
   });
 
   it("uses a wrapping two-line layout for long French rule units", () => {
     renderWithLanguage("fr-FR", "fr-final-consonant-silence");
 
-    const ruleLabel = screen.getByText("silent final C");
+    const ruleLabel = screen.getByText("词尾静音");
     const frenchItem = ruleLabel.closest("a");
 
     expect(frenchItem).toHaveClass("grid");
@@ -46,7 +49,7 @@ describe("SidebarPhonemeList layout", () => {
   it("uses a wrapping two-line layout for Spanish rhythm units", () => {
     renderWithLanguage("es-ES", "es-syllable-rhythm");
 
-    const rhythmLabel = screen.getByText("syllable timing");
+    const rhythmLabel = screen.getByText("音节节奏");
     const spanishItem = rhythmLabel.closest("a");
 
     expect(spanishItem).toHaveClass("grid");
@@ -57,7 +60,7 @@ describe("SidebarPhonemeList layout", () => {
   it("uses a wrapping two-line layout for Russian rule units", () => {
     renderWithLanguage("ru-RU", "ru-voicing-assimilation");
 
-    const ruleLabel = screen.getByText("voicing assimilation");
+    const ruleLabel = screen.getByText("清浊同化");
     const russianItem = ruleLabel.closest("a");
 
     expect(russianItem).toHaveClass("grid");

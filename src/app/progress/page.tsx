@@ -15,6 +15,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useAudioPlayer } from "@/hooks/use-audio-player";
 import {
   type BenchmarkRecordingMeta,
   clearBenchmarkRecordings,
@@ -31,6 +32,7 @@ import type { MasteryProfile } from "@/types/training";
 export default function ProgressPage() {
   const [recordings, setRecordings] = useState<BenchmarkRecordingMeta[]>([]);
   const [profile, setProfile] = useState<MasteryProfile | null>(null);
+  const playback = useAudioPlayer();
   const benchmarkGroups = useMemo(
     () => summarizeBenchmarkGroups(recordings),
     [recordings],
@@ -63,10 +65,7 @@ export default function ProgressPage() {
   const playRecording = async (id: string) => {
     const blob = await getBenchmarkAudioBlob(id);
     if (!blob) return;
-    const url = URL.createObjectURL(blob);
-    const audio = new Audio(url);
-    audio.onended = () => URL.revokeObjectURL(url);
-    await audio.play();
+    playback.playBlob(blob);
   };
 
   const handleDeleteRecording = async (id: string) => {

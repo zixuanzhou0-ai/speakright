@@ -16,6 +16,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useLanguageConfig } from "@/hooks/use-api-keys";
 import { useWordPronunciation } from "@/hooks/use-word-pronunciation";
+import { getLanguageProfile } from "@/lib/language-profiles";
+import {
+  getCenteredReadableTextClassName,
+  getPracticeTextDensity,
+} from "@/lib/practice-text-presentation";
 import {
   buildHvptSession,
   buildHvptTrainingSession,
@@ -35,6 +40,7 @@ import {
   recordTrainingSession,
   saveMasteryProfile,
 } from "@/lib/mastery-profile";
+import { canRecordFormalMastery } from "@/lib/mastery-language-policy";
 
 type PlayingSlot = "A" | "B" | "X" | null;
 
@@ -64,6 +70,8 @@ export default function PerceptionDrillPage() {
   const [trials, setTrials] = useState<HvptTrial[]>([]);
   const [activeSlot, setActiveSlot] = useState<PlayingSlot>(null);
   const { languageId } = useLanguageConfig();
+  const languageProfile = getLanguageProfile(languageId);
+  const canRecordHvptMastery = canRecordFormalMastery(languageId);
   const pronunciation = useWordPronunciation();
 
   const recommendedIds = useMemo(
@@ -136,7 +144,11 @@ export default function PerceptionDrillPage() {
   };
 
   const finishWithSummary = (summary: HvptSummary) => {
-    if (!selectedContrast || typeof window === "undefined") {
+    if (
+      !selectedContrast ||
+      typeof window === "undefined" ||
+      !canRecordHvptMastery
+    ) {
       setPhase({ type: "completed", summary });
       return;
     }
@@ -171,6 +183,34 @@ export default function PerceptionDrillPage() {
     setActiveSlot(null);
     setPhase({ type: "select" });
   };
+
+  if (!canRecordHvptMastery) {
+    return (
+      <div className="h-full flex flex-col px-6 py-4 overflow-y-auto scrollbar-thin">
+        <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col justify-center">
+          <div className="rounded-xl border bg-card p-6 text-center shadow-sm">
+            <Headphones className="mx-auto h-10 w-10 text-primary" />
+            <h1 className="mt-3 text-2xl font-bold">
+              {languageProfile.shortLabel}听辨训练开发中
+            </h1>
+            <p className="mt-2 text-sm text-muted-foreground">
+              当前高变异 ABX 听辨题库仍是英语专属。西语、法语、俄语保持 experimental，不混入英语听辨材料。
+            </p>
+            <div className="mt-5 flex flex-wrap justify-center gap-2">
+              <Link href="/drill/contrast">
+                <Button className="cursor-pointer">先做对比训练</Button>
+              </Link>
+              <Link href="/drill">
+                <Button variant="outline" className="cursor-pointer">
+                  返回训练首页
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const correctCount = responses.filter((response) => {
     const trial = trials.find((item) => item.id === response.trialId);
@@ -232,7 +272,7 @@ export default function PerceptionDrillPage() {
                   whileHover={{ y: -2 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => startSession(contrast)}
-                  className="rounded-xl border bg-card p-4 text-left shadow-sm hover:border-primary/50 cursor-pointer"
+                  className="rounded-xl border bg-card p-4 text-center shadow-sm hover:border-primary/50 cursor-pointer"
                 >
                   <div className="mb-2 flex items-center justify-between gap-3">
                     <Headphones className="h-5 w-5 text-primary" />
@@ -240,10 +280,10 @@ export default function PerceptionDrillPage() {
                       通过线 {Math.round(contrast.passRate * 100)}%
                     </Badge>
                   </div>
-                  <p className="font-mono text-xl font-bold">
+                  <p className="break-words text-center font-mono text-xl font-bold [overflow-wrap:anywhere]">
                     {contrast.label}
                   </p>
-                  <p className="mt-2 text-sm text-muted-foreground">
+                  <p className="mt-2 text-center text-sm text-muted-foreground">
                     {contrast.learnerRisk}
                   </p>
                 </motion.button>
@@ -358,7 +398,12 @@ export default function PerceptionDrillPage() {
               {phase.correct ? "听对了" : "这次混淆了"}
             </h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              X 是 {currentTrial.xIsA ? "A" : "B"} · 词是 {currentTrial.xWord}
+              X 是 {currentTrial.xIsA ? "A" : "B"} · 词是{" "}
+              <span
+                className={`inline-block font-semibold ${getCenteredReadableTextClassName(getPracticeTextDensity(currentTrial.xWord))}`}
+              >
+                {currentTrial.xWord}
+              </span>
             </p>
             <div className="mt-5 flex justify-center gap-3">
               <Button
@@ -392,11 +437,11 @@ export default function PerceptionDrillPage() {
             </p>
             <div className="mt-5 grid gap-3 md:grid-cols-2">
               {phase.trials.map((trial) => (
-                <div key={trial.id} className="rounded-lg border p-3">
-                  <p className="text-sm font-semibold">
+                <div key={trial.id} className="rounded-lg border p-3 text-center">
+                  <p className="break-words text-center text-sm font-semibold [overflow-wrap:anywhere]">
                     {trial.wordA} / {trial.wordB}
                   </p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-center text-xs text-muted-foreground">
                     {trial.context}
                   </p>
                   <div className="mt-3 flex gap-2">

@@ -18,6 +18,7 @@ import { WaveformDisplay } from "@/components/audio/waveform-display";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useLanguageConfig } from "@/hooks/use-api-keys";
+import { useAudioPlayer } from "@/hooks/use-audio-player";
 import { useAzureAssessment } from "@/hooks/use-azure-assessment";
 import { useRecorder } from "@/hooks/use-recorder";
 import { useRecordingQuality } from "@/hooks/use-recording-quality";
@@ -29,7 +30,12 @@ import {
   recordFreePracticeTransfer,
 } from "@/lib/free-practice-transfer";
 import { getLanguageProfile } from "@/lib/language-profiles";
+import { canRecordFormalMastery } from "@/lib/mastery-language-policy";
 import { loadMasteryProfile, saveMasteryProfile } from "@/lib/mastery-profile";
+import {
+  getCenteredReadableTextClassName,
+  getPracticeTextDensity,
+} from "@/lib/practice-text-presentation";
 import { reliabilityFromRecordingQuality } from "@/lib/recording-quality";
 import {
   buildTransferPromptPlan,
@@ -49,6 +55,7 @@ export default function ScenariosPage() {
   const recorder = useRecorder({ maxDurationMs: 45_000 });
   const assessment = useAzureAssessment();
   const tts = useTtsAligned();
+  const replayAudio = useAudioPlayer();
   const quality = useRecordingQuality(recorder.audioBlob, {
     expectedMode: "sentence",
     minDurationMs: 1_000,
@@ -58,14 +65,18 @@ export default function ScenariosPage() {
     setProfile(loadMasteryProfile());
   }, []);
 
+  const canUseMasteryTransfer = canRecordFormalMastery(languageId);
+  const transferProfile = canUseMasteryTransfer ? profile : null;
   const plan = useMemo(
-    () => buildTransferPromptPlan(scenarioId, profile),
-    [scenarioId, profile],
+    () => buildTransferPromptPlan(scenarioId, transferProfile),
+    [scenarioId, transferProfile],
   );
 
   const textToRead = userText.trim() || plan.scenario.sentenceFrame;
+  const promptDensity = getPracticeTextDensity(plan.prompt, "sentence");
 
   const resetRecording = () => {
+    replayAudio.stop();
     recorder.reset();
     assessment.reset();
     quality.reset();
@@ -88,13 +99,17 @@ export default function ScenariosPage() {
     );
     if (!result) return;
     const transferSummary = analyzeFreePracticeTransfer({
-      profile,
+      profile: transferProfile,
       result,
       text: textToRead,
       mode: "sentence",
     });
     setSummary(transferSummary);
-    if (profile && transferSummary.evidences.length > 0) {
+    if (
+      canUseMasteryTransfer &&
+      profile &&
+      transferSummary.evidences.length > 0
+    ) {
       const reliability = reliabilityFromRecordingQuality(quality.report, {
         evidenceStrength:
           transferSummary.evidences.length >= 2 ? "strong" : "fair",
@@ -158,17 +173,21 @@ export default function ScenariosPage() {
                 setUserText("");
                 resetRecording();
               }}
-              className={`w-full rounded-xl border bg-card p-4 text-left shadow-sm cursor-pointer ${
+              className={`w-full rounded-xl border bg-card p-4 text-center shadow-sm cursor-pointer ${
                 scenarioId === scenario.id
                   ? "border-primary bg-primary/5"
                   : "hover:border-primary/40"
               }`}
             >
-              <div className="mb-2 flex items-center justify-between">
-                <p className="font-semibold">{scenario.title}</p>
+              <div className="mb-2 flex flex-wrap items-center justify-center gap-2">
+                <p className="break-words font-semibold [overflow-wrap:anywhere]">
+                  {scenario.title}
+                </p>
                 <Badge variant="outline">{scenario.kind}</Badge>
               </div>
-              <p className="text-xs text-muted-foreground">{scenario.goal}</p>
+              <p className="break-words text-xs text-muted-foreground [overflow-wrap:anywhere]">
+                {scenario.goal}
+              </p>
             </motion.button>
           ))}
         </aside>
@@ -180,16 +199,24 @@ export default function ScenariosPage() {
               <h2 className="text-xl font-bold">{plan.scenario.title}</h2>
             </div>
             <div className="rounded-xl border bg-background p-4">
-              <p className="text-sm font-semibold">任务</p>
-              <p className="mt-1 text-sm text-muted-foreground whitespace-pre-line">
+              <p className="text-center text-sm font-semibold">任务</p>
+              <p
+                className={`${getCenteredReadableTextClassName(
+                  promptDensity,
+                )} mt-1 whitespace-pre-line text-muted-foreground`}
+              >
                 {plan.prompt}
               </p>
-              <p className="mt-4 text-sm font-medium text-primary">
+              <p className="mt-4 break-words text-center text-sm font-medium text-primary [overflow-wrap:anywhere]">
                 {plan.coachingFocus}
               </p>
-              <div className="mt-3 flex flex-wrap gap-2">
+              <div className="mt-3 flex flex-wrap justify-center gap-2">
                 {plan.targetWords.slice(0, 8).map((word) => (
-                  <Badge key={word} variant="secondary">
+                  <Badge
+                    key={word}
+                    variant="secondary"
+                    className="max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]"
+                  >
                     {word}
                   </Badge>
                 ))}
@@ -257,14 +284,10 @@ export default function ScenariosPage() {
               <RecordingQualityPanel report={quality.report} compact />
               <RecordingActions
                 hasRecording={!!recorder.audioBlob}
-                isPlaying={false}
+                isPlaying={replayAudio.isPlaying}
                 isAssessing={assessment.isLoading}
                 onReplay={() => {
-                  if (!recorder.audioBlob) return;
-                  const url = URL.createObjectURL(recorder.audioBlob);
-                  const audio = new Audio(url);
-                  audio.onended = () => URL.revokeObjectURL(url);
-                  audio.play();
+                  if (recorder.audioBlob) replayAudio.playBlob(recorder.audioBlob);
                 }}
                 onClear={resetRecording}
                 onAssess={submit}
@@ -301,18 +324,20 @@ export default function ScenariosPage() {
                       key={`${evidence.packId}-${evidence.levelId}`}
                       className="rounded-lg border p-4"
                     >
-                      <div className="flex items-center justify-between gap-3">
-                        <p className="font-semibold">{evidence.packTitle}</p>
+                      <div className="flex flex-wrap items-center justify-center gap-3 text-center">
+                        <p className="break-words font-semibold [overflow-wrap:anywhere]">
+                          {evidence.packTitle}
+                        </p>
                         <Badge
                           variant={evidence.passed ? "default" : "secondary"}
                         >
                           {evidence.targetScore}/{evidence.threshold}
                         </Badge>
                       </div>
-                      <p className="mt-2 text-sm text-muted-foreground">
+                      <p className="mt-2 break-words text-center text-sm text-muted-foreground [overflow-wrap:anywhere]">
                         {evidence.reason}
                       </p>
-                      <p className="mt-2 text-sm font-medium text-primary">
+                      <p className="mt-2 break-words text-center text-sm font-medium text-primary [overflow-wrap:anywhere]">
                         下一次只改：{evidence.nextCue}
                       </p>
                     </div>

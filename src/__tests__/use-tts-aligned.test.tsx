@@ -10,6 +10,7 @@ const mocks = vi.hoisted(() => ({
   getTtsFromCache: vi.fn(),
   setTtsToCache: vi.fn(),
   resumeAudioContext: vi.fn(),
+  Howl: vi.fn(),
 }));
 
 vi.mock("@/lib/api-client", () => ({
@@ -40,7 +41,7 @@ vi.mock("howler", () => ({
       resume: mocks.resumeAudioContext,
     },
   },
-  Howl: vi.fn().mockImplementation(function (
+  Howl: mocks.Howl.mockImplementation(function (
     this: unknown,
     options: {
       onplay?: () => void;
@@ -228,6 +229,36 @@ describe("useTtsAligned", () => {
     expect(mocks.elevenLabsTtsAligned).not.toHaveBeenCalled();
   });
 
+  it("keeps static language-pack playback gain when replaying", async () => {
+    mocks.getStaticLanguageAudioPackEntry.mockResolvedValueOnce({
+      audioSrc: "/audio/language-packs/fr-FR/bonjour-pink-acf26f7271.mp3",
+    });
+    const { result } = renderHook(() => useTtsAligned());
+
+    await act(async () => {
+      await result.current.speak("bonjour", { languageId: "fr-FR" });
+    });
+
+    act(() => {
+      result.current.replay();
+    });
+
+    expect(mocks.Howl).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({
+        html5: false,
+        volume: 12,
+      }),
+    );
+    expect(mocks.Howl).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({
+        html5: false,
+        volume: 12,
+      }),
+    );
+  });
+
   it("prefers a static local language pack before using a configured TTS provider", async () => {
     mocks.getStaticLanguageAudioPackEntry.mockResolvedValueOnce({
       audioSrc: "/audio/language-packs/es-ES/hola.mp3",
@@ -245,6 +276,26 @@ describe("useTtsAligned", () => {
     expect(mocks.elevenLabsTtsAligned).not.toHaveBeenCalled();
     expect(mocks.setTtsToCache).not.toHaveBeenCalled();
     expect(mocks.resumeAudioContext).toHaveBeenCalled();
+  });
+
+  it("keeps playback gain for static local language-pack audio", async () => {
+    mocks.getStaticLanguageAudioPackEntry.mockResolvedValueOnce({
+      audioSrc: "/audio/language-packs/fr-FR/bonjour-pink-acf26f7271.mp3",
+    });
+    const { result } = renderHook(() => useTtsAligned());
+
+    await act(async () => {
+      await result.current.speak("bonjour", { languageId: "fr-FR" });
+    });
+
+    expect(mocks.Howl).toHaveBeenCalledWith(
+      expect.objectContaining({
+        src: ["blob:test-audio"],
+        html5: false,
+        volume: 12,
+      }),
+    );
+    expect(mocks.elevenLabsTtsAligned).not.toHaveBeenCalled();
   });
 
   it("ignores a stale pending TTS response after reset", async () => {

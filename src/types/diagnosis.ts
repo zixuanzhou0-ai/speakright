@@ -48,6 +48,9 @@ export interface DiagnosisEvidenceSummary {
   wordLevelEvidenceCount: number;
   matchedReferenceWords: number;
   referenceMatchRatio: number;
+  omissionCount: number;
+  insertionCount: number;
+  mispronunciationCount: number;
   thinFeatureCount: number;
   lowConfidenceFeatures: string[];
   notes: string[];

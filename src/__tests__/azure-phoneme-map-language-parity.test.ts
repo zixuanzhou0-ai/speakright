@@ -117,21 +117,30 @@ describe("multilingual Azure phoneme map parity", () => {
   });
 
   it("resolves multilingual assessment phonemes to local playback assets", () => {
-    expect(getPhonemeAudioUrl("a", "es-ES")).toMatch(
-      /^\/(?:audio|videos)\/language-assets\/es-ES\//,
+    expect(getPhonemeAudioUrl("a", "es-ES")).toBe(
+      "/audio/language-assets/es-ES/header-clips/es-a.m4a",
     );
-    expect(getPhonemeAudioUrl("eh", "fr-FR")).toMatch(
-      /^\/(?:audio|videos)\/language-assets\/fr-FR\//,
+    expect(getPhonemeAudioUrl("u", "es-ES")).toBe(
+      "/audio/language-assets/es-ES/header-clips/es-u.m4a",
     );
-    expect(getPhonemeAudioUrl("ax", "fr-FR")).toMatch(
-      /^\/(?:audio|videos)\/language-assets\/fr-FR\//,
+    expect(getPhonemeAudioUrl("eh", "fr-FR")).toBe(
+      "/audio/language-assets/fr-FR/header-clips/fr-e-open.m4a",
     );
-    expect(getPhonemeAudioUrl("ʁ", "fr-FR")).toMatch(
-      /^\/(?:audio|videos)\/language-assets\/fr-FR\//,
+    expect(getPhonemeAudioUrl("ax", "fr-FR")).toBe(
+      "/audio/language-assets/fr-FR/header-clips/fr-schwa.m4a",
     );
-    expect(getPhonemeAudioUrl("ɨ", "ru-RU")).toMatch(
-      /^\/(?:audio|videos)\/language-assets\/ru-RU\//,
+    expect(getPhonemeAudioUrl("ʁ", "fr-FR")).toBe(
+      "/audio/language-assets/fr-FR/header-clips/fr-r.m4a",
     );
+    expect(getPhonemeAudioUrl("ɨ", "ru-RU")).toBe(
+      "/audio/language-assets/ru-RU/header-clips/ru-y.m4a",
+    );
+    expect(getPhonemeAudioUrl("k", "es-ES")).toBeNull();
+    expect(getPhonemeAudioUrl("p", "fr-FR")).toBeNull();
+    expect(getPhonemeAudioUrl("tʲ", "ru-RU")).toBeNull();
+    expect(getPhonemeAudioUrl("ʐ", "ru-RU")).toBeNull();
+    expect(getPhonemeAudioUrl("ɱ", "es-ES")).toBeNull();
+    expect(getPhonemeAudioUrl("final devoicing", "ru-RU")).toBeNull();
     expect(getPhonemeAudioUrl("iy", "en-US")).toBe(
       "/audio/ipa/phoneme/green.mp3",
     );
@@ -140,6 +149,8 @@ describe("multilingual Azure phoneme map parity", () => {
 
   it("keeps non-English assessment phoneme labels visible instead of empty slashes", () => {
     expect(getAssessmentPhonemeLabel("", "fr-FR")).toBe("—");
+    expect(getAssessmentPhonemeLabel("m", "es-ES")).toBe("/m/");
+    expect(getAssessmentPhonemeLabel("n", "es-ES")).toBe("/n/");
     expect(getAssessmentPhonemeLabel("eh", "fr-FR")).toBe("/ɛ/");
     expect(getAssessmentPhonemeLabel("ax", "fr-FR")).toBe("/ə/");
     expect(getAssessmentPhonemeLabel("ʁ", "fr-FR")).toBe("/ʁ/");

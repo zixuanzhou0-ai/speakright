@@ -1,5 +1,6 @@
 import { getLanguagePhonemes } from "@/lib/language-phonemes";
 import { getAssessmentSegmentAudioInfo } from "@/lib/assessment-segment-audio";
+import { getSoundUnitHeaderPlaybackOptions } from "@/lib/audio-playback-policy";
 import type { LanguageId } from "@/types/language";
 
 /**
@@ -111,14 +112,18 @@ export const azureToChartWord: Record<string, string> = {
 /**
  * 获取 Azure 音素编码对应的 IPA Chart / 本地拆解音频信息。
  *
- * 非英语先查评分拆解音频库存，避免把 /k/ /t/ 这类普通段音误播成
- * broad rule/contrast sound unit 的代理素材；再回退到课程 sound unit 音频。
+ * 非英语评分 tile 只复用左侧/详情页同一 sound unit 的本地 header clip。
+ * 没有精确 header clip 映射时返回 null，让 tile 保留分数但不可点击，
+ * 避免把示例词、rule/prosody/contrast 或代理素材误播成单音标。
  */
 export interface PhonemeAudioInfo {
   url: string;
-  kind: "chart" | "sound-unit" | "word-example";
+  kind: "chart" | "sound-unit";
   label: string;
   description?: string;
+  startMs?: number;
+  maxDurationMs?: number;
+  fadeOutMs?: number;
 }
 
 export function getPhonemeAudioInfo(
@@ -128,23 +133,27 @@ export function getPhonemeAudioInfo(
   if (languageId !== "en-US") {
     const segmentAudio = getAssessmentSegmentAudioInfo(azureCode, languageId);
     if (segmentAudio) {
+      const playback = getSoundUnitHeaderPlaybackOptions({
+        phonemeAudio: {
+          kind: "local",
+          label: segmentAudio.soundUnitLabel,
+          source: "local header clip",
+          localSrc: segmentAudio.audioUrl,
+          languageId,
+        },
+      });
+      if (!playback) return null;
+
       return {
         url: segmentAudio.audioUrl,
         kind: segmentAudio.kind,
-        label: `${segmentAudio.displayIpa} · ${segmentAudio.exampleText}`,
+        label: segmentAudio.displayIpa,
         description: segmentAudio.note,
+        ...playback,
       };
     }
 
-    const resolvedUnit = resolveAssessmentPhonemeUnit(azureCode, languageId);
-    return resolvedUnit?.audioUrl
-      ? {
-          url: resolvedUnit.audioUrl,
-          kind: "sound-unit",
-          label: resolvedUnit.displayIpa,
-          description: "本地发音单位音频",
-        }
-      : null;
+    return null;
   }
 
   const chartWord = azureToChartWord[azureCode.toLowerCase()];
@@ -154,6 +163,7 @@ export function getPhonemeAudioInfo(
         kind: "chart",
         label: toIpa(azureCode),
         description: "IPA Chart 本地音频",
+        ...getSoundUnitHeaderPlaybackOptions({ chartWord }),
       }
     : null;
 }
@@ -178,8 +188,8 @@ export function getAssessmentPhonemeLabel(
   const normalized = normalizeAssessmentPhoneme(azureCode);
   if (!normalized) return "—";
 
-  const match = resolveAssessmentPhonemeUnit(azureCode, languageId);
-  if (match?.displayIpa) return match.displayIpa;
+  const segmentAudio = getAssessmentSegmentAudioInfo(azureCode, languageId);
+  if (segmentAudio?.displayIpa) return segmentAudio.displayIpa;
 
   const englishMappedIpa = azureToIpa[normalized];
   return `/${englishMappedIpa ?? normalized}/`;

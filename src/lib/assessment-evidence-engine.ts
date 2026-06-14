@@ -481,6 +481,18 @@ export function summarizeAssessmentAnalyses(
     (sum, analysis) => sum + analysis.alignment.matchedReferenceWordCount,
     0,
   );
+  const omissionCount = analyses.reduce(
+    (sum, analysis) => sum + analysis.alignment.omissionCount,
+    0,
+  );
+  const insertionCount = analyses.reduce(
+    (sum, analysis) => sum + analysis.alignment.insertionCount,
+    0,
+  );
+  const mispronunciationCount = analyses.reduce(
+    (sum, analysis) => sum + analysis.alignment.mispronunciationCount,
+    0,
+  );
   const referenceMatchRatio =
     wordLevelEvidenceCount > 0
       ? matchedReferenceWords / wordLevelEvidenceCount
@@ -512,6 +524,9 @@ export function summarizeAssessmentAnalyses(
     wordLevelEvidenceCount,
     matchedReferenceWords,
     referenceMatchRatio,
+    omissionCount,
+    insertionCount,
+    mispronunciationCount,
     thinFeatureCount,
     lowConfidenceFeatures,
     notes: notes.slice(0, 6),

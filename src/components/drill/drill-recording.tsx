@@ -3,6 +3,11 @@
 import { motion } from "motion/react";
 import { RecordButton } from "@/components/audio/record-button";
 import { WaveformDisplay } from "@/components/audio/waveform-display";
+import {
+  getCenteredMonoTextClassName,
+  getCenteredProminentTextClassName,
+  getPracticeTextDensity,
+} from "@/lib/practice-text-presentation";
 import type { DrillItem } from "@/types/drill";
 import { DrillProgress } from "./drill-progress";
 
@@ -29,6 +34,8 @@ export function DrillRecording({
   onStartRecording,
   onStopRecording,
 }: DrillRecordingProps) {
+  const textDensity = getPracticeTextDensity(item.text);
+
   return (
     <div className="space-y-6">
       <DrillProgress current={index} total={total} />
@@ -38,14 +45,20 @@ export function DrillRecording({
         animate={{ opacity: 1, y: 0 }}
         className="flex flex-col items-center gap-4 rounded-xl border bg-card p-8 shadow-sm"
       >
-        <span className="text-3xl font-bold">{item.text}</span>
+        <span
+          className={`font-bold ${getCenteredProminentTextClassName(textDensity)}`}
+        >
+          {item.text}
+        </span>
         {item.ipa && (
-          <span className="font-mono text-base text-muted-foreground">
+          <span
+            className={`font-mono text-muted-foreground ${getCenteredMonoTextClassName(textDensity)}`}
+          >
             {item.ipa}
           </span>
         )}
 
-        <p className="text-sm text-muted-foreground">
+        <p className="text-center text-sm text-muted-foreground">
           {isRecording
             ? "正在录音，请朗读上方单词..."
             : isAssessing

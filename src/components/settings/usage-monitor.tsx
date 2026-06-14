@@ -261,9 +261,14 @@ function AzureUsageCard() {
               {usage.history.map((h) => (
                 <div
                   key={`${h.timestamp}-${h.target}-${h.durationSeconds}`}
-                  className="flex justify-between text-xs text-muted-foreground"
+                  className="flex items-start justify-between gap-2 text-xs text-muted-foreground"
                 >
-                  <span className="truncate max-w-[140px]">{h.target}</span>
+                  <span
+                    className="min-w-0 flex-1 break-words leading-snug [overflow-wrap:anywhere]"
+                    data-smoke="usage-history-target"
+                  >
+                    {h.target}
+                  </span>
                   <span className="shrink-0 tabular-nums">
                     {h.durationSeconds}s
                   </span>

@@ -6,6 +6,11 @@ import { WordHighlight } from "@/components/scoring/word-highlight";
 import { Badge } from "@/components/ui/badge";
 import type { FeedbackData } from "@/hooks/use-llm-feedback";
 import type { FreePracticeTransferSummary } from "@/lib/free-practice-transfer";
+import {
+  getCenteredCompactTextClassName,
+  getCenteredReadableTextClassName,
+  getPracticeTextDensity,
+} from "@/lib/practice-text-presentation";
 import type {
   AzureAssessmentResult,
   AzureSyllable,
@@ -44,6 +49,10 @@ export function SentenceResultsColumn({
   transferSummary,
 }: SentenceResultsColumnProps) {
   const breakdownLabel = languageId === "en-US" ? "音标拆解" : "发音拆解";
+  const selectedWordDensity = getPracticeTextDensity(
+    selectedWord?.word ?? "",
+    "word",
+  );
 
   if (!hasResult) {
     return (
@@ -64,7 +73,7 @@ export function SentenceResultsColumn({
       <div className="shrink-0 rounded-xl border bg-card px-4 py-4 shadow-sm">
         {result && (
           <section>
-            <h2 className="mb-3 text-sm font-semibold text-muted-foreground">
+            <h2 className="mb-3 text-center text-sm font-semibold text-muted-foreground">
               逐词评分（点击查看音素详情）
             </h2>
             <WordHighlight words={result.words} onWordClick={onWordClick} />
@@ -73,8 +82,15 @@ export function SentenceResultsColumn({
 
         {selectedWord && selectedWord.phonemes.length > 0 ? (
           <section className="mt-4 border-t pt-4">
-            <h2 className="mb-3 text-sm font-semibold text-muted-foreground">
-              &quot;{selectedWord.word}&quot; 音素详情
+            <h2 className="mb-3 text-center text-sm font-semibold text-muted-foreground">
+              <span className="block">音素详情</span>
+              <span
+                className={`${getCenteredCompactTextClassName(
+                  selectedWordDensity,
+                )} mt-1 font-mono text-foreground`}
+              >
+                {selectedWord.word}
+              </span>
             </h2>
             <PhonemeHighlight
               phonemes={selectedWord.phonemes}
@@ -117,12 +133,12 @@ function TransferEvidenceCard({
 }) {
   return (
     <div className="shrink-0 rounded-xl border bg-card px-4 py-4 shadow-sm">
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <div>
+      <div className="mb-3 flex flex-wrap items-center justify-center gap-2 text-center">
+        <div className="max-w-full">
           <h2 className="text-sm font-semibold text-muted-foreground">
             迁移证据已回流
           </h2>
-          <p className="mt-1 text-xs text-muted-foreground">
+          <p className="mt-1 break-words text-xs text-muted-foreground [overflow-wrap:anywhere]">
             这次自由练习命中了当前训练目标，已写入学习记忆和复习队列。
           </p>
         </div>
@@ -136,10 +152,12 @@ function TransferEvidenceCard({
             key={`${item.packId}-${item.levelId}`}
             className="rounded-lg border bg-background p-3"
           >
-            <div className="flex flex-wrap items-start justify-between gap-2">
-              <div>
-                <p className="text-sm font-semibold">{item.packTitle}</p>
-                <p className="mt-1 text-xs text-muted-foreground">
+            <div className="flex flex-wrap items-start justify-center gap-2 text-center">
+              <div className="max-w-full">
+                <p className="break-words text-sm font-semibold [overflow-wrap:anywhere]">
+                  {item.packTitle}
+                </p>
+                <p className="mt-1 break-words text-xs text-muted-foreground [overflow-wrap:anywhere]">
                   {item.reason}
                 </p>
               </div>
@@ -152,7 +170,14 @@ function TransferEvidenceCard({
                 <p className="text-xs font-semibold text-muted-foreground">
                   命中词
                 </p>
-                <p className="mt-1 text-sm">
+                <p
+                  className={`${getCenteredReadableTextClassName(
+                    getPracticeTextDensity(
+                      item.matchedWords.slice(0, 6).join(", "),
+                      "phrase",
+                    ),
+                  )} mt-1 font-mono`}
+                >
                   {item.matchedWords.slice(0, 6).join(", ")}
                 </p>
               </div>
@@ -160,7 +185,7 @@ function TransferEvidenceCard({
                 <p className="text-xs font-semibold text-muted-foreground">
                   下一次只改
                 </p>
-                <p className="mt-1 text-sm font-medium text-primary">
+                <p className="mt-1 break-words text-center text-sm font-medium text-primary [overflow-wrap:anywhere]">
                   {item.passed
                     ? "这次能迁移到自己的句子里，下一轮换新句子复测。"
                     : item.nextCue}

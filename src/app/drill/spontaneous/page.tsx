@@ -15,6 +15,8 @@ import { RecordingQualityPanel } from "@/components/audio/recording-quality-pane
 import { WaveformDisplay } from "@/components/audio/waveform-display";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useLanguageConfig } from "@/hooks/use-api-keys";
+import { useAudioPlayer } from "@/hooks/use-audio-player";
 import { useRecorder } from "@/hooks/use-recorder";
 import { useRecordingQuality } from "@/hooks/use-recording-quality";
 import { assessPronunciation, transcribeSpeech } from "@/lib/api-client";
@@ -25,7 +27,12 @@ import {
   type FreePracticeTransferSummary,
   recordFreePracticeTransfer,
 } from "@/lib/free-practice-transfer";
+import { canRecordFormalMastery } from "@/lib/mastery-language-policy";
 import { loadMasteryProfile, saveMasteryProfile } from "@/lib/mastery-profile";
+import {
+  getCenteredReadableTextClassName,
+  getPracticeTextDensity,
+} from "@/lib/practice-text-presentation";
 import { reliabilityFromRecordingQuality } from "@/lib/recording-quality";
 import { buildReviewQueue } from "@/lib/review-queue";
 import { TRAINING_PACKS } from "@/lib/training-packs";
@@ -50,6 +57,7 @@ const PROMPTS = [
 ];
 
 export default function SpontaneousPage() {
+  const { languageId } = useLanguageConfig();
   const [profile, setProfile] = useState<MasteryProfile | null>(null);
   const [promptId, setPromptId] = useState(PROMPTS[0].id);
   const [transcript, setTranscript] = useState("");
@@ -59,6 +67,7 @@ export default function SpontaneousPage() {
   const [error, setError] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const recorder = useRecorder({ maxDurationMs: 60_000 });
+  const replayAudio = useAudioPlayer();
   const quality = useRecordingQuality(recorder.audioBlob, {
     expectedMode: "paragraph",
     minDurationMs: 2_000,
@@ -72,13 +81,16 @@ export default function SpontaneousPage() {
     () => PROMPTS.find((item) => item.id === promptId) ?? PROMPTS[0],
     [promptId],
   );
+  const promptDensity = getPracticeTextDensity(prompt.prompt, "sentence");
+  const canUseMasteryTransfer = canRecordFormalMastery(languageId);
+  const transferProfile = canUseMasteryTransfer ? profile : null;
 
   const targetPacks = useMemo(() => {
-    if (!profile) return [];
-    const reviewPackIds = buildReviewQueue(profile)
+    if (!transferProfile) return [];
+    const reviewPackIds = buildReviewQueue(transferProfile)
       .slice(0, 3)
       .map((item) => item.packId);
-    const activePackIds = Object.values(profile.packs)
+    const activePackIds = Object.values(transferProfile.packs)
       .filter((pack) => pack.status !== "mastered")
       .sort((a, b) => (b.failureStreak ?? 0) - (a.failureStreak ?? 0))
       .map((pack) => pack.packId);
@@ -86,9 +98,10 @@ export default function SpontaneousPage() {
       .map((packId) => TRAINING_PACKS.find((pack) => pack.id === packId))
       .filter((pack): pack is (typeof TRAINING_PACKS)[number] => !!pack)
       .slice(0, 3);
-  }, [profile]);
+  }, [transferProfile]);
 
   const resetRecording = () => {
+    replayAudio.stop();
     recorder.reset();
     quality.reset();
     setTranscript("");
@@ -125,11 +138,11 @@ export default function SpontaneousPage() {
         config.region,
       );
       const transferSummary = {
-        ...analyzeFreePracticeTransfer({
-          profile,
-          result,
-          text: nextTranscript,
-          mode: "sentence",
+          ...analyzeFreePracticeTransfer({
+            profile: transferProfile,
+            result,
+            text: nextTranscript,
+            mode: "sentence",
         }),
         transferLayer: "spontaneous" as const,
       };
@@ -141,7 +154,11 @@ export default function SpontaneousPage() {
             ? "即兴表达转写后命中当前目标，可作为 spontaneous 迁移证据。"
             : "即兴表达录音存在质量提示，本次只作为观察，不提升掌握度。",
       });
-      if (profile && transferSummary.evidences.length > 0) {
+      if (
+        canUseMasteryTransfer &&
+        profile &&
+        transferSummary.evidences.length > 0
+      ) {
         const recorded = recordFreePracticeTransfer(
           profile,
           transferSummary,
@@ -198,14 +215,16 @@ export default function SpontaneousPage() {
                 setPromptId(item.id);
                 resetRecording();
               }}
-              className={`w-full rounded-xl border bg-card p-4 text-left shadow-sm cursor-pointer ${
+              className={`w-full rounded-xl border bg-card p-4 text-center shadow-sm cursor-pointer ${
                 promptId === item.id
                   ? "border-primary bg-primary/5"
                   : "hover:border-primary/40"
               }`}
             >
-              <p className="font-semibold">{item.title}</p>
-              <p className="mt-2 text-xs text-muted-foreground">
+              <p className="break-words font-semibold [overflow-wrap:anywhere]">
+                {item.title}
+              </p>
+              <p className="mt-2 break-words text-xs text-muted-foreground [overflow-wrap:anywhere]">
                 {item.prompt}
               </p>
             </button>
@@ -218,15 +237,23 @@ export default function SpontaneousPage() {
               <MessageCircleQuestion className="h-5 w-5 text-primary" />
               <h2 className="text-xl font-bold">{prompt.title}</h2>
             </div>
-            <p className="rounded-xl border bg-background p-5 text-lg leading-relaxed">
+            <p
+              className={`${getCenteredReadableTextClassName(
+                promptDensity,
+              )} rounded-xl border bg-background p-5`}
+            >
               {prompt.prompt}
             </p>
-            <div className="mt-4 flex flex-wrap gap-2">
+            <div className="mt-4 flex flex-wrap justify-center gap-2">
               {targetPacks.length === 0 ? (
                 <Badge variant="outline">没有当前弱点时只保存 benchmark</Badge>
               ) : (
                 targetPacks.map((pack) => (
-                  <Badge key={pack.id} variant="secondary">
+                  <Badge
+                    key={pack.id}
+                    variant="secondary"
+                    className="max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]"
+                  >
                     观察 {pack.title}
                   </Badge>
                 ))
@@ -253,14 +280,10 @@ export default function SpontaneousPage() {
               <RecordingQualityPanel report={quality.report} compact />
               <RecordingActions
                 hasRecording={!!recorder.audioBlob}
-                isPlaying={false}
+                isPlaying={replayAudio.isPlaying}
                 isAssessing={isProcessing}
                 onReplay={() => {
-                  if (!recorder.audioBlob) return;
-                  const url = URL.createObjectURL(recorder.audioBlob);
-                  const audio = new Audio(url);
-                  audio.onended = () => URL.revokeObjectURL(url);
-                  audio.play();
+                  if (recorder.audioBlob) replayAudio.playBlob(recorder.audioBlob);
                 }}
                 onClear={resetRecording}
                 onAssess={submit}
@@ -287,7 +310,13 @@ export default function SpontaneousPage() {
               {transcript && (
                 <div className="mt-3 rounded-lg border bg-background p-4">
                   <p className="text-xs text-muted-foreground">Azure 转写</p>
-                  <p className="mt-1 text-sm">{transcript}</p>
+                  <p
+                    className={`${getCenteredReadableTextClassName(
+                      getPracticeTextDensity(transcript, "sentence"),
+                    )} mt-1`}
+                  >
+                    {transcript}
+                  </p>
                 </div>
               )}
               {summary?.evidences.length ? (
@@ -297,18 +326,20 @@ export default function SpontaneousPage() {
                       key={evidence.packId}
                       className="rounded-lg border p-4"
                     >
-                      <div className="flex items-center justify-between gap-3">
-                        <p className="font-semibold">{evidence.packTitle}</p>
+                      <div className="flex flex-wrap items-center justify-center gap-3 text-center">
+                        <p className="break-words font-semibold [overflow-wrap:anywhere]">
+                          {evidence.packTitle}
+                        </p>
                         <Badge
                           variant={evidence.passed ? "default" : "secondary"}
                         >
                           {evidence.targetScore}/{evidence.threshold}
                         </Badge>
                       </div>
-                      <p className="mt-2 text-sm text-muted-foreground">
+                      <p className="mt-2 break-words text-center text-sm text-muted-foreground [overflow-wrap:anywhere]">
                         {evidence.reason}
                       </p>
-                      <p className="mt-2 text-sm font-medium text-primary">
+                      <p className="mt-2 break-words text-center text-sm font-medium text-primary [overflow-wrap:anywhere]">
                         下一次只改：{evidence.nextCue}
                       </p>
                     </div>

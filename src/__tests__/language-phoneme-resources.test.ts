@@ -5,6 +5,7 @@ import {
   LOCAL_LANGUAGE_PHONEME_ASSETS,
   getLocalLanguagePhonemeAsset,
 } from "@/lib/local-language-assets";
+import { getAllAssessmentSegmentAudioRegistryEntries } from "@/lib/assessment-segment-audio";
 import { getLanguageResourceSite } from "@/lib/language-resource-sites";
 import { getLanguagePhonemes } from "@/lib/language-phonemes";
 import { RUSSIAN_PHONEMES } from "@/lib/language-sound-units/russian";
@@ -101,6 +102,77 @@ describe("non-English phoneme resource parity", () => {
     );
 
     expect(unresolvedLocalUnits).toEqual([]);
+  });
+
+  it("never exposes local videos as header phoneme audio sources", () => {
+    const videoBackedAudioSources = NON_ENGLISH_LANGUAGES.flatMap((languageId) =>
+      getLanguagePhonemes(languageId)
+        .map((soundUnit) => soundUnit as ResourceBackedPhoneme)
+        .filter((soundUnit) =>
+          /\.(mp4|m4v|webm)(?:$|\?)/i.test(
+            soundUnit.phonemeAudio?.localSrc ?? "",
+          ),
+        )
+        .map((soundUnit) => `${languageId}:${soundUnit.slug}`),
+    );
+
+    expect(videoBackedAudioSources).toEqual([]);
+  });
+
+  it("only marks exact local header clips as assessment scoring audio", () => {
+    const registry = getAllAssessmentSegmentAudioRegistryEntries();
+    const registryKeys = new Set(
+      registry.map((entry) => `${entry.languageId}:${entry.soundUnitSlug}`),
+    );
+
+    for (const asset of LOCAL_LANGUAGE_PHONEME_ASSETS) {
+      if (asset.isProxyForAssessment) {
+        expect(asset.exactAssessmentAliases ?? []).toEqual([]);
+        expect(registryKeys.has(`${asset.languageId}:${asset.slug}`)).toBe(
+          false,
+        );
+        continue;
+      }
+
+      if (!asset.exactAssessmentAliases?.length) continue;
+
+      expect(asset.audioIpa, `${asset.languageId}:${asset.slug}`).toMatch(
+        /^\/.+\/$/,
+      );
+      expect(asset.audioSrc, `${asset.languageId}:${asset.slug}`).toMatch(
+        /^\/audio\/language-assets\/.+\/header-clips\/.+\.m4a$/,
+      );
+      expect(registryKeys.has(`${asset.languageId}:${asset.slug}`)).toBe(true);
+    }
+  });
+
+  it("does not reuse proxy/rule clips for right-side single-phoneme playback", () => {
+    const blockedSlugs = [
+      "es-nasal-place",
+      "ru-hard-soft",
+      "ru-soft-sign",
+      "ru-iotated-vowels",
+      "ru-soft-t-d",
+      "ru-soft-s-z",
+      "ru-soft-n-l-r",
+      "ru-soft-labials",
+      "ru-stress-reduction",
+      "ru-unstressed-o-a",
+      "ru-unstressed-e-ya",
+      "ru-final-devoicing",
+      "ru-voicing-assimilation",
+      "ru-clusters",
+    ];
+
+    const playableSlugs = new Set(
+      getAllAssessmentSegmentAudioRegistryEntries().map(
+        (entry) => entry.soundUnitSlug,
+      ),
+    );
+
+    for (const slug of blockedSlugs) {
+      expect(playableSlugs.has(slug), slug).toBe(false);
+    }
   });
 
   it("surfaces local asset notes and known source metadata through video metadata", () => {

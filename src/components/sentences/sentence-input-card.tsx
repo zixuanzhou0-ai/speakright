@@ -7,6 +7,11 @@ import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
 import type { FreePracticeTargetPreview } from "@/lib/free-practice-transfer";
+import {
+  getCenteredMonoTextClassName,
+  getCenteredReadableTextClassName,
+  getPracticeTextDensity,
+} from "@/lib/practice-text-presentation";
 
 const MAX_CHARS = 150;
 const WARN_CHARS = 120;
@@ -58,6 +63,11 @@ export function SentenceInputCard({
   onListen,
 }: SentenceInputCardProps) {
   const charCount = sentence.length;
+  const trimmedTextDensity = getPracticeTextDensity(
+    trimmedText,
+    isWordMode ? "word" : "sentence",
+  );
+  const ipaDensity = getPracticeTextDensity(wordIpa ?? "", "phrase");
 
   return (
     <div className="rounded-xl border bg-card px-4 py-4 shadow-sm space-y-3 min-h-0 overflow-hidden">
@@ -232,11 +242,19 @@ export function SentenceInputCard({
                 transition={{ duration: 0.3 }}
                 className="relative flex flex-col items-center gap-1 rounded-lg border bg-muted/30 px-6 py-5"
               >
-                <span className="font-ipa text-2xl font-bold text-primary">
+                <span
+                  className={`${getCenteredReadableTextClassName(
+                    trimmedTextDensity,
+                  )} font-ipa font-bold text-primary`}
+                >
                   {trimmedText}
                 </span>
                 {wordIpa && (
-                  <span className="font-ipa text-base text-muted-foreground">
+                  <span
+                    className={`${getCenteredMonoTextClassName(
+                      ipaDensity,
+                    )} font-ipa text-muted-foreground`}
+                  >
                     {wordIpa}
                   </span>
                 )}
@@ -307,7 +325,7 @@ function TargetPreviewPanel({
   if (preview.targets.length > 0) {
     return (
       <div className="rounded-lg border bg-primary/5 p-3">
-        <div className="mb-2 flex items-center gap-2">
+        <div className="mb-2 flex flex-wrap items-center justify-center gap-2 text-center">
           <Target className="h-3.5 w-3.5 text-primary" />
           <p className="text-xs font-semibold text-muted-foreground">
             这句话命中当前目标
@@ -316,17 +334,17 @@ function TargetPreviewPanel({
         <div className="space-y-2">
           {preview.targets.map((target) => (
             <div key={target.packId} className="text-sm">
-              <div className="flex flex-wrap items-center gap-1.5">
+              <div className="flex flex-wrap items-center justify-center gap-1.5 text-center">
                 <Badge
                   variant={target.source === "review" ? "default" : "secondary"}
                 >
                   {target.packTitle}
                 </Badge>
-                <span className="text-xs text-muted-foreground">
+                <span className="break-words text-center text-xs text-muted-foreground [overflow-wrap:anywhere]">
                   目标音 {target.targetPhonemes.join(" / ")}
                 </span>
               </div>
-              <p className="mt-1 text-xs text-muted-foreground">
+              <p className="mt-1 break-words text-center text-xs text-muted-foreground [overflow-wrap:anywhere]">
                 命中词：{target.matchedWords.join(", ")}
               </p>
             </div>
@@ -341,21 +359,25 @@ function TargetPreviewPanel({
 
   return (
     <div className="rounded-lg border border-dashed bg-muted/30 p-3">
-      <div className="mb-2 flex items-center gap-2">
+      <div className="mb-2 flex flex-wrap items-center justify-center gap-2 text-center">
         <Target className="h-3.5 w-3.5 text-muted-foreground" />
         <p className="text-xs font-semibold text-muted-foreground">
           当前句子还没命中今日目标
         </p>
       </div>
-      <div className="flex flex-wrap items-center gap-1.5">
+      <div className="flex flex-wrap items-center justify-center gap-1.5 text-center">
         <Badge variant="outline">{suggestion.packTitle}</Badge>
         {suggestion.words.slice(0, 4).map((word) => (
-          <Badge key={word} variant="secondary">
+          <Badge
+            key={word}
+            variant="secondary"
+            className="max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]"
+          >
             {word}
           </Badge>
         ))}
       </div>
-      <p className="mt-2 text-xs text-muted-foreground">
+      <p className="mt-2 break-words text-center text-xs text-muted-foreground [overflow-wrap:anywhere]">
         可参考：{suggestion.prompt}
       </p>
     </div>

@@ -26,6 +26,7 @@
     "desktop:ui-smoke": "node scripts/desktop-ui-smoke.mjs",
     "desktop:live-validation": "node scripts/desktop-live-validation.mjs --azure-mode=high",
     "desktop:live-validation:full": "node scripts/desktop-live-validation.mjs --azure-mode=full",
+    "audio:loudness:dry-run": "node scripts/audio-loudness-audit.mjs --dry-run",
     "audio:parity:dry-run": "node scripts/multilingual-audio-parity-report.mjs --dry-run",
     "audio:parity:generate": "node scripts/multilingual-audio-parity-generate.mjs --confirm",
     "audio:parity:secondary:dry-run": "node scripts/multilingual-audio-secondary-voice-generate.mjs --dry-run",

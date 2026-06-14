@@ -45,10 +45,14 @@ npm run desktop:run-release
 For the daily desktop startup checklist, see
 `docs/operations/DESKTOP_STARTUP_RUNBOOK.md`.
 
-For the next manual-testing pass on 2026-06-12, start with the runbook's
-`Start Tomorrow: 2026-06-12` checklist. The first pass should use the Release EXE
-and cover Settings, English, Spanish, French, Russian, drill, free practice, and
-diagnosis before adding new work.
+For the next Codex chat or manual-testing pass, start with
+`docs/operations/NEXT_CHAT_HANDOFF.md` and the runbook's `Start Next Chat`
+checklist. The first pass should use the Release EXE and cover Settings,
+English, Spanish, French, Russian, drill, free practice, and diagnosis before
+adding new work.
+
+For the current Release Candidate evidence matrix, see
+`docs/operations/RC_EVIDENCE_AUDIT.md`.
 
 ## Validation
 
@@ -61,6 +65,7 @@ npm run desktop:preflight
 npm run desktop:ui-smoke
 npm run desktop:live-validation
 npm run audio:parity:dry-run
+npm run audio:loudness:dry-run
 npm run validate:internal-release
 ```
 
@@ -77,6 +82,11 @@ and dual-voice audio contract without calling ElevenLabs. It writes
 `src-tauri/target/audio-parity/gap-report.json` and verifies that every required
 language-pack item has both `blue` and `pink` local files.
 
+`audio:loudness:dry-run` uses local ffmpeg analysis to compare representative
+word A/B audio and IPA chart normal/slow word audio against teaching-video
+loudness after playback-layer gain. It writes
+`src-tauri/target/audio-loudness/report.json` and makes zero ElevenLabs calls.
+
 `desktop:preflight` checks the active workspace, release executable, and running
 `speakright.exe` process before release-style testing. It never closes the app
 for you; close SpeakRight manually before building. `desktop:ui-smoke` launches
@@ -92,8 +102,8 @@ README/docs-only changes run the lightweight Docs Check workflow.
 
 - The current Windows artifacts are for controlled testing unless code signing
   is complete.
-- Last controlled-test verification: 2026-06-11, after the multilingual
-  dual-voice expansion and full desktop validation pass.
+- Last controlled-test verification: 2026-06-13, after the RC audio playback,
+  multilingual layout, evidence, and Release EXE smoke tightening pass.
 - Previous release-validation baseline: `94be1d4`
   (`chore: tighten desktop release validation`).
 - Latest release-hardening pass added non-English low-evidence diagnosis gates,
@@ -102,18 +112,22 @@ README/docs-only changes run the lightweight Docs Check workflow.
 - Verified bundled assets after the multilingual dual-voice expansion: English
   word audio `1464/1464`, Spanish language-pack audio `880/880`, French
   language-pack audio `1090/1090`, Russian language-pack audio `920/920`, local
-  videos `210/210`.
+  videos `224/224`.
 - Multilingual audio-density expansion target: 24 practice items per Spanish,
   French, and Russian sound unit. The latest dry-run after generation reports
   Spanish `440 x 2`, French `545 x 2`, Russian `460 x 2`, total missing `0`.
 - Secondary voices selected for the experimental language packs: Spanish
   `Lydia`, French `Rachel`, Russian `Sergey`; the original primary voices
   remain Spanish `Marco Cruz`, French `Clément`, Russian `Valeria`.
-- Latest automated validation after the dual-voice expansion:
-  `npm.cmd run test` passed `75` files / `380` tests;
+- Latest automated validation after the RC evidence audit and exact
+  header-clip scoring-audio pass:
+  `npm.cmd run test` passed `89` files / `489` tests;
   `npm.cmd run typecheck`, `npm.cmd run lint`,
-  `npm.cmd run build:desktop-frontend`, `npm.cmd run desktop:live-validation`,
-  and `npm.cmd run validate:desktop` passed.
+  `npm.cmd run build:desktop-frontend`, `npm.cmd run desktop:build`,
+  `npm.cmd run desktop:preflight`, `npm.cmd run desktop:ui-smoke`,
+  `npm.cmd run audio:parity:dry-run`, and
+  the latest recorded `npm.cmd run audio:loudness:dry-run` passed. Biome
+  checked `341` files.
 - Verified Azure live sample: `220/220` pronunciation-assessment calls passed.
 - ElevenLabs usage during normal validation remains `0` generated characters.
   The one-time multilingual secondary-voice generation was approved separately
@@ -123,3 +137,50 @@ README/docs-only changes run the lightweight Docs Check workflow.
 - Non-English pronunciation scoring remains experimental; `evidenceMastery`
   stays disabled for `es-ES`, `fr-FR`, and `ru-RU` until provider probes and
   language-specific evidence gates are finished.
+- Latest local RC handoff on 2026-06-14 tightened non-English practice-card
+  readability, one-shot sound-unit speakers across detail and list cards,
+  exact scoring-breakdown sound-unit audio,
+  local A/B word-audio gain, and formal mastery gating. Long words, phrases,
+  sentences, and IPA are shown in full; rule units use Chinese labels; speaker
+  buttons are hidden when no local target audio exists, and the header speaker
+  component now refuses external-only or browser-TTS fallback audio. This pass
+  is documented in `docs/operations/NEXT_CHAT_HANDOFF.md`.
+- The current RC evidence audit is tracked in
+  `docs/operations/RC_EVIDENCE_AUDIT.md`. It records the proof matrix for
+  Release EXE testing, experimental-language boundaries, non-English audio and
+  video honesty, centered/wrapping target text, and the English-only formal
+  mastery policy.
+- The latest Release EXE smoke enforces centered reading targets in addition to
+  no ellipsis/nowrap, no practice-button overlap, honest clickable header audio,
+  wrapping
+  video selector labels plus selector no-overlap/no-overflow runtime checks,
+  Settings/usage long-text wrapping, Settings pronunciation-test row
+  wrapping/no-overlap runtime checks, A/B voice selector and word-audio button
+  visibility/clickability/label runtime checks, scoring-breakdown
+  visibility/readability/no-overflow runtime checks plus scoring-tile
+  short-audio policy checks including narrow-window and low-height detail
+  passes, and
+  `releaseServedFromDevServer=false`.
+- Non-English diagnosis now treats omission/insertion miscues as insufficient
+  evidence for a trusted overall score while preserving practice feedback.
+- Local bundled word and language-pack A/B audio now uses peak-safe Web Audio
+  gain for playback-level loudness matching; very quiet local word clips can use
+  up to `12x` peak-safe gain when decoded peaks permit it. IPA chart normal/slow
+  word audio now gets a shared playback-layer boost as well. Free-practice
+  read-along playback keeps the same boost when it serves a bundled
+  language-pack clip, including replay. Online fallback audio is unchanged and
+  no ElevenLabs generation is part of this validation path.
+- The shared audio-player hook now refuses video-backed sources, so a missed
+  upstream guard cannot make a speaker button play a teaching-video track.
+- Scoring-breakdown phoneme tiles now reuse the exact same left/detail
+  sound-unit header clip (`phonemeAudio.localSrc`) when a verified single-IPA
+  alias exists. Unverified, proxy, rule, prosody, or composite segments stay
+  visible but unclickable; they no longer fall back to word examples, rule
+  audio, proxy media, or teaching-video audio. English chart clicks are capped
+  at `560ms`, and local non-English header/scoring clips are capped at `500ms`
+  through the shared header playback policy.
+- Recording replay and benchmark playback now use the shared audio-player hook,
+  so repeated replay clicks stop the previous blob and cleanup stays centralized.
+- Advanced pack-runner and HVPT perception mastery writes are gated by the
+  English-only formal mastery policy, so Spanish, French, and Russian remain
+  practice/feedback-only experimental modules.

@@ -122,7 +122,10 @@ function LocalVideoPanel({
       </div>
 
       {sources.length > 1 && (
-        <div className="grid grid-cols-2 gap-1.5 border-t bg-gradient-to-b from-muted/20 to-background px-2 py-1.5">
+        <div
+          className="flex flex-wrap gap-1.5 border-t bg-gradient-to-b from-muted/20 to-background px-2 py-1.5"
+          data-smoke="video-selector"
+        >
           {sources.map((source, index) => {
             const isSelected = source.id === selectedSource.id;
             const Icon = source.kind === "lesson" ? BookOpen : Video;
@@ -133,14 +136,16 @@ function LocalVideoPanel({
                 type="button"
                 aria-pressed={isSelected}
                 onClick={() => setSelection({ slug, index })}
-                className={`inline-flex h-7 min-w-0 items-center justify-center gap-1 rounded-full border px-2 text-[11px] font-medium transition-colors ${
+                className={`inline-flex min-h-7 min-w-0 max-w-full items-center justify-center gap-1 rounded-full border px-2 py-1 text-[11px] font-medium leading-tight transition-colors ${
                   isSelected
                     ? "border-primary/40 bg-primary/10 text-primary shadow-sm"
                     : "border-border bg-background text-muted-foreground hover:border-primary/30 hover:bg-muted/40 hover:text-foreground"
                 }`}
               >
                 <Icon className="h-3.5 w-3.5" />
-                <span className="truncate">{source.label}</span>
+                <span className="whitespace-normal break-words text-center [overflow-wrap:anywhere]">
+                  {source.label}
+                </span>
               </button>
             );
           })}
@@ -194,9 +199,9 @@ export function VideoPlayer({
 
     return (
       <div
-        className={`flex aspect-video w-full flex-col justify-center rounded-lg border border-dashed bg-muted/25 p-4 ${className ?? ""}`}
+        className={`flex w-full flex-col justify-center rounded-lg border border-dashed bg-muted/25 p-3 ${className ?? ""}`}
       >
-        <div className="mb-3 text-center">
+        <div className="mb-2 text-center">
           <p className="text-sm font-medium text-foreground">
             {sourceAlignment
               ? "暂无精准本地视频"
@@ -210,7 +215,7 @@ export function VideoPlayer({
         </div>
 
         {sourceAlignment && (
-          <div className="mb-3 rounded-lg border bg-background/75 px-3 py-2 text-left">
+          <div className="mb-2 rounded-lg border bg-background/75 px-3 py-2 text-center">
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
               规则重点
             </p>
@@ -221,7 +226,7 @@ export function VideoPlayer({
         )}
 
         {visibleResources.length > 0 ? (
-          <div className="grid gap-2">
+          <div className="grid gap-1.5">
             {sourceAlignment && (
               <p className="text-[11px] font-medium text-muted-foreground">
                 参考资料
@@ -234,17 +239,17 @@ export function VideoPlayer({
                 <DesktopExternalLink
                   key={`${resource.kind}-${resource.url}`}
                   href={resource.url}
-                  className="group flex items-center gap-3 rounded-lg border bg-background/70 px-3 py-2 text-left transition-colors hover:border-primary/50 hover:bg-primary/5"
+                  className="group flex items-start gap-3 rounded-lg border bg-background/70 px-3 py-2 text-center transition-colors hover:border-primary/50 hover:bg-primary/5"
                 >
                   <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
                     <Icon className="h-4 w-4" />
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate text-xs font-medium text-foreground">
+                    <span className="block whitespace-normal break-words text-center text-xs font-medium leading-snug text-foreground [overflow-wrap:anywhere]">
                       {resource.title}
                     </span>
                     {resource.description && (
-                      <span className="mt-0.5 block line-clamp-1 text-[11px] text-muted-foreground">
+                      <span className="mt-0.5 block whitespace-normal break-words text-center text-[11px] leading-snug text-muted-foreground [overflow-wrap:anywhere]">
                         {resource.description}
                       </span>
                     )}

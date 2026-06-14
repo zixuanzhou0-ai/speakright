@@ -3,6 +3,10 @@
 import { Check, RotateCcw, SkipForward, Volume2 } from "lucide-react";
 import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
+import {
+  getCenteredProminentTextClassName,
+  getPracticeTextDensity,
+} from "@/lib/practice-text-presentation";
 import type { DrillAttempt, DrillItem } from "@/types/drill";
 import { DrillProgress } from "./drill-progress";
 
@@ -39,6 +43,7 @@ export function DrillFeedback({
 }: DrillFeedbackProps) {
   const canRetry = !passed && attemptCount < maxAttempts;
   const mustDecide = !passed && attemptCount >= maxAttempts;
+  const textDensity = getPracticeTextDensity(item.text);
 
   return (
     <div className="space-y-6">
@@ -49,7 +54,11 @@ export function DrillFeedback({
         animate={{ opacity: 1, scale: 1 }}
         className="flex flex-col items-center gap-5 rounded-xl border bg-card p-8 shadow-sm"
       >
-        <span className="text-3xl font-bold">{item.text}</span>
+        <span
+          className={`font-bold ${getCenteredProminentTextClassName(textDensity)}`}
+        >
+          {item.text}
+        </span>
 
         {/* Score display */}
         <motion.div
@@ -109,7 +118,7 @@ export function DrillFeedback({
         {/* Pronunciation tip for failed attempts */}
         {!passed && item.description && (
           <div className="w-full rounded-lg border border-red-200 bg-red-50 p-3 dark:border-red-900 dark:bg-red-950/30">
-            <p className="text-sm text-red-700 dark:text-red-400">
+            <p className="text-center text-sm text-red-700 dark:text-red-400">
               💡 {item.description}
             </p>
           </div>
@@ -156,7 +165,7 @@ export function DrillFeedback({
               <p className="text-sm text-muted-foreground">
                 已尝试 {maxAttempts} 次，先慢速拆解再继续：
               </p>
-              <div className="max-w-md rounded-lg border border-red-200 bg-red-50 p-3 text-left text-sm text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-400">
+              <div className="max-w-md rounded-lg border border-red-200 bg-red-50 p-3 text-center text-sm text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-400">
                 先只模仿目标音的口型，再读单词前半段，最后读完整内容。慢一点，目标音素过线比整词分更重要。
               </div>
               <div className="flex gap-2">

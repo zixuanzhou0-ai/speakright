@@ -2,6 +2,10 @@
 
 import { motion } from "motion/react";
 import type { WordTiming } from "@/hooks/use-tts-aligned";
+import {
+  getCenteredReadableTextClassName,
+  getPracticeTextDensity,
+} from "@/lib/practice-text-presentation";
 import { cn } from "@/lib/utils";
 
 interface ReadAlongTextProps {
@@ -24,9 +28,15 @@ export function ReadAlongText({
   currentTime,
 }: ReadAlongTextProps) {
   const words = text.split(/\s+/).filter(Boolean);
+  const density = getPracticeTextDensity(text, "sentence");
 
   return (
-    <div className="flex min-h-[80px] flex-wrap gap-x-2 gap-y-1 rounded-lg border bg-muted/20 px-5 py-4 text-2xl leading-relaxed">
+    <div
+      className={cn(
+        "flex min-h-[80px] flex-wrap justify-center gap-x-2 gap-y-1 rounded-lg border bg-muted/20 px-5 py-4 font-mono",
+        getCenteredReadableTextClassName(density),
+      )}
+    >
       {words.map((word, i) => {
         const timing = wordTimings[i];
         let state: "past" | "current" | "future" = "future";
@@ -47,7 +57,7 @@ export function ReadAlongText({
             }}
             transition={springTransition}
             className={cn(
-              "inline-block rounded px-1 py-0.5 font-mono transition-colors duration-200",
+              "inline-flex max-w-full justify-center rounded px-1 py-0.5 text-center transition-colors duration-200 [overflow-wrap:anywhere]",
               state === "current" && "bg-primary/20 text-primary font-semibold",
               state === "past" && "text-muted-foreground",
               state === "future" && "text-foreground",

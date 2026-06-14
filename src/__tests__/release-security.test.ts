@@ -66,6 +66,32 @@ describe("release security configuration", () => {
     expect(urls.every((url) => !url.startsWith("http://"))).toBe(true);
   });
 
+  it("keeps current verified LLM origins in desktop network policy only", () => {
+    const capability = readJson<{
+      permissions: Array<
+        | string
+        | {
+            identifier?: string;
+            allow?: Array<{ url?: string }>;
+          }
+      >;
+    }>("src-tauri/capabilities/default.json");
+
+    const urls = capability.permissions.flatMap((permission) =>
+      typeof permission === "string"
+        ? []
+        : (permission.allow ?? []).map((item) => item.url ?? ""),
+    );
+    const connectSrc = cspDirectives().get("connect-src") ?? "";
+
+    expect(urls).toContain("https://api.moonshot.ai/**");
+    expect(urls).toContain("https://api.z.ai/**");
+    expect(connectSrc).toContain("https://api.moonshot.ai");
+    expect(connectSrc).toContain("https://api.z.ai");
+    expect(urls.join("\n")).not.toMatch(/minimax|mimo|xiaomi/i);
+    expect(connectSrc).not.toMatch(/minimax|mimo|xiaomi/i);
+  });
+
   it("keeps Tauri HTTP permission scoped to the allowlisted default object", () => {
     const capability = readJson<{
       permissions: Array<

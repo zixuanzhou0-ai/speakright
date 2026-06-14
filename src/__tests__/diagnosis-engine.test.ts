@@ -277,6 +277,76 @@ describe("buildDiagnosisReport", () => {
     expect(report.scoreStatusReason).toContain("目标语言材料不匹配");
   });
 
+  it("withholds non-English scores when otherwise high evidence contains omission or insertion miscues", () => {
+    const report = buildDiagnosisReport({
+      languageId: "es-ES",
+      wordRecordings: [],
+      paragraphText:
+        "Mi casa está cerca de la plaza. El perro corre por la calle.",
+      paragraphResult: resultForWords(
+        [
+          {
+            word: "Mi",
+            phonemes: [{ phoneme: "i", accuracyScore: 100 }],
+          },
+          {
+            word: "casa",
+            phonemes: [{ phoneme: "a", accuracyScore: 100 }],
+            errorType: "Omission",
+          },
+          {
+            word: "está",
+            phonemes: [{ phoneme: "a", accuracyScore: 100 }],
+          },
+          {
+            word: "cerca",
+            phonemes: [{ phoneme: "e", accuracyScore: 100 }],
+          },
+          {
+            word: "de",
+            phonemes: [{ phoneme: "e", accuracyScore: 100 }],
+          },
+          {
+            word: "la",
+            phonemes: [{ phoneme: "a", accuracyScore: 100 }],
+          },
+          {
+            word: "plaza",
+            phonemes: [{ phoneme: "a", accuracyScore: 100 }],
+          },
+          {
+            word: "el",
+            phonemes: [{ phoneme: "e", accuracyScore: 100 }],
+          },
+          {
+            word: "perro",
+            phonemes: [{ phoneme: "r", accuracyScore: 100 }],
+          },
+          {
+            word: "corre",
+            phonemes: [{ phoneme: "r", accuracyScore: 100 }],
+          },
+          {
+            word: "calle",
+            phonemes: [{ phoneme: "ʎ", accuracyScore: 100 }],
+          },
+        ],
+        {
+          pronunciationScore: 100,
+          accuracyScore: 100,
+          fluencyScore: 100,
+          completenessScore: 100,
+          prosodyScore: 100,
+        },
+      ),
+    });
+
+    expect(report.scoreStatus).toBe("insufficient-evidence");
+    expect(report.overallScore).toBe(0);
+    expect(report.evidenceSummary?.omissionCount).toBe(1);
+    expect(report.scoreStatusReason).toContain("漏读或多读");
+  });
+
   it("withholds non-English scores when Azure returns words but no usable phoneme alignment", () => {
     const report = buildDiagnosisReport({
       languageId: "fr-FR",

@@ -1,7 +1,10 @@
 import { getExactTeachingVideosForSoundUnit } from "@/lib/language-teaching-videos";
 import { getLocalLanguagePhonemeAsset } from "@/lib/local-language-assets";
 import { getLanguagePhonemeBySlug } from "@/lib/language-phonemes";
+import { isRuleLikeSoundUnit } from "@/lib/language-sound-unit-groups";
+import { isPlayableHeaderAudioSrc } from "@/lib/audio-playback-policy";
 import type { LanguageId } from "@/types/language";
+import type { PhonemeData } from "@/types/phoneme";
 
 export type PrimaryVideoCoverage = "exact" | "reference" | "proxy" | "none";
 
@@ -83,6 +86,23 @@ export function shouldShowLocalVideoAsPrimary(
   if (languageId === "en-US") return true;
   if (NON_EXACT_LOCAL_VIDEO_SLUGS.has(slug)) return false;
   return Boolean(getLocalLanguagePhonemeAsset(languageId, slug));
+}
+
+export function shouldShowSoundUnitHeaderAudio(
+  languageId: LanguageId,
+  phoneme: PhonemeData,
+): boolean {
+  if (languageId === "en-US") {
+    return Boolean(phoneme.chartWord || phoneme.phonemeAudio?.localSrc);
+  }
+
+  if (!isPlayableHeaderAudioSrc(phoneme.phonemeAudio?.localSrc)) return false;
+
+  if (isRuleLikeSoundUnit(phoneme)) {
+    return shouldShowLocalVideoAsPrimary(languageId, phoneme.slug);
+  }
+
+  return true;
 }
 
 export function getSoundUnitSourceAlignment(

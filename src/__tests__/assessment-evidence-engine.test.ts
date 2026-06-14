@@ -129,6 +129,31 @@ describe("assessment evidence engine", () => {
     expect(summary.recommendedAction).toBe("request-more-samples");
   });
 
+  it("summarizes hard miscues even when a recording remains otherwise usable", () => {
+    const analysis = analyzeAssessmentEvidence({
+      label: "西语短文",
+      referenceText: "Mi casa esta cerca de la plaza",
+      source: "paragraph",
+      languageId: "es-ES",
+      result: result([
+        word("Mi", [{ phoneme: "i", accuracyScore: 96 }]),
+        word("casa", [{ phoneme: "a", accuracyScore: 96 }], "Omission"),
+        word("esta", [{ phoneme: "a", accuracyScore: 96 }]),
+        word("cerca", [{ phoneme: "e", accuracyScore: 96 }]),
+        word("de", [{ phoneme: "e", accuracyScore: 96 }]),
+        word("la", [{ phoneme: "a", accuracyScore: 96 }]),
+        word("plaza", [{ phoneme: "a", accuracyScore: 96 }]),
+      ]),
+    });
+
+    const summary = summarizeAssessmentAnalyses([analysis]);
+
+    expect(analysis.usable).toBe(true);
+    expect(summary.omissionCount).toBe(1);
+    expect(summary.insertionCount).toBe(0);
+    expect(summary.wordLevelEvidenceCount).toBe(6);
+  });
+
   it("uses Unicode tokenization for non-English diagnosis text", () => {
     const analysis = analyzeAssessmentEvidence({
       label: "法语短句",

@@ -10,6 +10,7 @@ import {
   getSoundUnitDisplayTypeLabel,
 } from "@/lib/language-sound-unit-groups";
 import { getLanguageProfile } from "@/lib/language-profiles";
+import { getSoundUnitReadableLabel } from "@/lib/practice-text-presentation";
 import { getBestScoreForPhoneme } from "@/lib/score-history";
 import { cn } from "@/lib/utils";
 import type { LanguageId } from "@/types/language";
@@ -52,13 +53,14 @@ function SidebarSoundUnitItem({
   compact: boolean;
 }) {
   const example = phoneme.chartWord ?? phoneme.example;
+  const displayLabel = compact ? phoneme.ipa : getSoundUnitReadableLabel(phoneme);
 
   if (compact) {
     return (
       <Link
         href={`/phonemes/${phoneme.slug}`}
         className={cn(
-          "flex items-center gap-2 rounded-md px-2 py-1.5 text-xs whitespace-nowrap transition-colors",
+          "flex items-center gap-2 rounded-md px-2 py-1.5 text-xs transition-colors",
           isActive
             ? "bg-primary/10 text-foreground border-l-2 border-primary pl-1.5"
             : "hover:bg-accent/50 text-sidebar-foreground/70",
@@ -67,7 +69,7 @@ function SidebarSoundUnitItem({
         <span className="w-10 shrink-0 font-mono text-sm text-primary text-center inline-block">
           {phoneme.ipa}
         </span>
-        <span className="flex-1 truncate capitalize text-muted-foreground">
+        <span className="min-w-0 flex-1 whitespace-normal break-words text-center capitalize text-muted-foreground [overflow-wrap:anywhere]">
           {example}
         </span>
         <ScoreBadge score={score} />
@@ -85,11 +87,11 @@ function SidebarSoundUnitItem({
           : "hover:bg-accent/50 text-sidebar-foreground/70",
       )}
     >
-      <span className="min-w-0 break-words font-mono text-sm leading-tight text-primary">
-        {phoneme.ipa}
+      <span className="min-w-0 break-words text-center text-sm font-semibold leading-tight text-primary [overflow-wrap:anywhere]">
+        {displayLabel}
       </span>
       <ScoreBadge score={score} />
-      <span className="col-span-2 min-w-0 break-words leading-snug text-muted-foreground">
+      <span className="col-span-2 min-w-0 break-words text-center leading-snug text-muted-foreground [overflow-wrap:anywhere]">
         {example}
       </span>
     </Link>

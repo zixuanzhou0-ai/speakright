@@ -4,6 +4,8 @@ import {
   DESKTOP_LLM_POLICY_MESSAGE,
   getDesktopLlmPolicyError,
   normalizeStoredProvider,
+  PRESET_PROVIDERS,
+  PROVIDER_NAMES,
 } from "@/lib/llm-providers";
 import type { AzureAssessmentResult } from "@/types/azure";
 
@@ -31,7 +33,25 @@ describe("desktop LLM network policy", () => {
       getDesktopLlmPolicyError("gpt", "https://api.openai.com/v1"),
     ).toBeNull();
     expect(
+      getDesktopLlmPolicyError("moonshot", "https://api.moonshot.ai/v1"),
+    ).toBeNull();
+    expect(
+      getDesktopLlmPolicyError("moonshot", "https://api.moonshot.cn/v1"),
+    ).toBeNull();
+    expect(
+      getDesktopLlmPolicyError("glm", "https://api.z.ai/api/paas/v4"),
+    ).toBeNull();
+    expect(
+      getDesktopLlmPolicyError("glm", "https://open.bigmodel.cn/api/paas/v4"),
+    ).toBeNull();
+    expect(
       getDesktopLlmPolicyError("custom", "https://llm.example.com/v1"),
+    ).toBe(DESKTOP_LLM_POLICY_MESSAGE);
+    expect(
+      getDesktopLlmPolicyError("minimax", "https://api.minimax.example/v1"),
+    ).toBe(DESKTOP_LLM_POLICY_MESSAGE);
+    expect(
+      getDesktopLlmPolicyError("mimo", "https://api.mimo.example/v1"),
     ).toBe(DESKTOP_LLM_POLICY_MESSAGE);
     expect(getDesktopLlmPolicyError("gpt", "not a url")).toBe(
       DESKTOP_LLM_POLICY_MESSAGE,
@@ -43,9 +63,104 @@ describe("desktop LLM network policy", () => {
 
   it("normalizes damaged stored provider names before rendering settings", () => {
     expect(normalizeStoredProvider("gpt")).toBe("gpt");
+    expect(normalizeStoredProvider("minimax")).toBe("minimax");
+    expect(normalizeStoredProvider("mimo")).toBe("mimo");
     expect(normalizeStoredProvider("custom")).toBe("custom");
     expect(normalizeStoredProvider("custom", true)).toBe("claude");
     expect(normalizeStoredProvider("unknown-provider")).toBe("claude");
+  });
+
+  it("keeps the preset registry on current stable provider chips", () => {
+    expect(PROVIDER_NAMES).toEqual([
+      "claude",
+      "gpt",
+      "gemini",
+      "deepseek",
+      "qwen",
+      "glm",
+      "moonshot",
+      "doubao",
+      "minimax",
+      "mimo",
+      "custom",
+    ]);
+    expect(PRESET_PROVIDERS.claude.models).toEqual([
+      "claude-opus-4-8",
+      "claude-sonnet-4-6",
+      "claude-haiku-4-5-20251001",
+    ]);
+    expect(PRESET_PROVIDERS.gpt.models).toEqual([
+      "gpt-5.5",
+      "gpt-5.4",
+      "gpt-5.4-mini",
+      "gpt-5.4-nano",
+    ]);
+    expect(PRESET_PROVIDERS.gemini.models).toEqual([
+      "gemini-3.5-flash",
+      "gemini-3.1-pro",
+      "gemini-3.1-flash-lite",
+    ]);
+    expect(PRESET_PROVIDERS.deepseek.models).toEqual([
+      "deepseek-v4-pro",
+      "deepseek-v4-flash",
+    ]);
+    expect(PRESET_PROVIDERS.qwen.models).toEqual([
+      "qwen3-max",
+      "qwen3.5-plus",
+      "qwen3.5-flash",
+    ]);
+    expect(PRESET_PROVIDERS.glm).toMatchObject({
+      label: "GLM / Z.ai",
+      baseUrl: "https://api.z.ai/api/paas/v4",
+      models: ["glm-5.1", "glm-5", "glm-5-turbo"],
+    });
+    expect(PRESET_PROVIDERS.moonshot).toMatchObject({
+      label: "Kimi",
+      baseUrl: "https://api.moonshot.ai/v1",
+      models: ["kimi-k2.7-code", "kimi-k2.6", "kimi-k2.5"],
+    });
+
+    const deprecatedModels = new Set([
+      "o3-mini",
+      "deepseek-chat",
+      "deepseek-reasoner",
+      "kimi-k2-thinking",
+    ]);
+    const defaultModelChips = Object.values(PRESET_PROVIDERS).flatMap(
+      (provider) => provider.models,
+    );
+    for (const model of deprecatedModels) {
+      expect(defaultModelChips).not.toContain(model);
+    }
+  });
+
+  it("keeps unverifiable MiniMax and MiMo endpoints out of ready presets", () => {
+    for (const providerName of ["minimax", "mimo"] as const) {
+      expect(PRESET_PROVIDERS[providerName]).toMatchObject({
+        status: "needsManualConfig",
+        baseUrl: "",
+        models: [],
+        baseUrlEditable: true,
+      });
+    }
+  });
+
+  it("keeps ready provider base URLs as OpenAI-compatible roots", () => {
+    for (const [providerName, preset] of Object.entries(PRESET_PROVIDERS)) {
+      if (
+        providerName === "custom" ||
+        preset.status === "needsManualConfig"
+      ) {
+        continue;
+      }
+      expect(preset.models.length, providerName).toBeGreaterThan(0);
+      expect(preset.baseUrl, providerName).toMatch(/^https:\/\//);
+      expect(preset.baseUrl, providerName).not.toMatch(
+        /\/(chat\/completions|messages)\/?$/,
+      );
+      expect(preset.baseUrl, providerName).not.toMatch(/\/$/);
+      expect(preset.docsUrl, providerName).toMatch(/^https:\/\//);
+    }
   });
 
   it("blocks custom desktop LLM tests before calling network fetch", async () => {

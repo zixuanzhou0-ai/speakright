@@ -82,7 +82,7 @@ describe("VideoPlayer", () => {
       />,
     );
 
-    fireEvent.click(screen.getByRole("button", { name: /Animation/ }));
+    fireEvent.click(screen.getByRole("button", { name: /动画/ }));
     expect(document.querySelector("video")).toHaveAttribute(
       "src",
       "/videos/language-assets/es-ES/animation/es-a.mp4",
@@ -185,6 +185,26 @@ describe("VideoPlayer", () => {
       "src",
       "/videos/language-assets/fr-FR/youtube-lessons/Ihh8xoLXrrU.mp4",
     );
+  });
+
+  it("lets local video selector labels wrap instead of truncating", () => {
+    render(
+      <VideoPlayer
+        slug="fr-i"
+        available
+        label="Phonétique.ca 本地法语口型/舌位视频"
+        localSrc="/videos/language-assets/fr-FR/articulation/fr-i.mp4"
+        teachingVideos={getTeachingVideosForSoundUnit("fr-FR", "fr-i")}
+      />,
+    );
+
+    const selectorButton = screen.getByRole("button", { name: /教学讲解/ });
+    const label = selectorButton.querySelector("span");
+
+    expect(selectorButton).not.toHaveClass("h-7");
+    expect(label).not.toHaveClass("truncate");
+    expect(label).toHaveClass("break-words");
+    expect(label).toHaveClass("text-center");
   });
 
   it("sizes non-Spanish local language videos without forcing 16:9", () => {

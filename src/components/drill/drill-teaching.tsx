@@ -3,6 +3,11 @@
 import { Loader2, Volume2 } from "lucide-react";
 import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
+import {
+  getCenteredMonoTextClassName,
+  getCenteredProminentTextClassName,
+  getPracticeTextDensity,
+} from "@/lib/practice-text-presentation";
 import type { DrillItem } from "@/types/drill";
 import { DrillProgress } from "./drill-progress";
 
@@ -27,6 +32,8 @@ export function DrillTeaching({
   onPlay,
   onReady,
 }: DrillTeachingProps) {
+  const textDensity = getPracticeTextDensity(item.text);
+
   return (
     <div className="space-y-6">
       <DrillProgress current={index} total={total} />
@@ -41,13 +48,15 @@ export function DrillTeaching({
           key={item.text}
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="text-4xl font-bold"
+          className={`font-bold ${getCenteredProminentTextClassName(textDensity)}`}
         >
           {item.text}
         </motion.span>
 
         {item.ipa && (
-          <span className="font-mono text-lg text-muted-foreground">
+          <span
+            className={`font-mono text-muted-foreground ${getCenteredMonoTextClassName(textDensity)}`}
+          >
             {item.ipa}
           </span>
         )}
@@ -83,7 +92,7 @@ export function DrillTeaching({
             <p className="text-sm font-medium text-muted-foreground">
               💡 发音要领
             </p>
-            <p className="mt-1 text-sm">{item.description}</p>
+            <p className="mt-1 text-center text-sm">{item.description}</p>
           </div>
         )}
 

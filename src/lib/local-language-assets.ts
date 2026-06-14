@@ -12,6 +12,15 @@ export interface LocalLanguagePhonemeAsset {
   audioSrc?: string;
   folderName?: string;
   notes?: string[];
+  audioIpa?: string;
+  exactAssessmentAliases?: string[];
+  isProxyForAssessment?: boolean;
+}
+
+interface ExactAssessmentAudioMetadata {
+  audioIpa?: string;
+  exactAssessmentAliases?: string[];
+  isProxyForAssessment?: boolean;
 }
 
 const SPANISH_SOUNDS_OF_SPEECH_BASE =
@@ -26,8 +35,10 @@ const SEEING_SPEECH_ATTRIBUTION =
 function spanishAnimationAsset(
   slug: string,
   folderName: string,
+  metadata?: ExactAssessmentAudioMetadata,
 ): LocalLanguagePhonemeAsset {
   const videoSrc = `/videos/language-assets/es-ES/animation/${slug}.mp4`;
+  const audioSrc = `/audio/language-assets/es-ES/header-clips/${slug}.m4a`;
 
   return {
     languageId: "es-ES",
@@ -37,10 +48,11 @@ function spanishAnimationAsset(
     source: "University of Iowa Sounds of Speech Spanish",
     sourceUrl: `${SPANISH_SOUNDS_OF_SPEECH_BASE}/${folderName}/animation/${folderName}.mp4`,
     videoSrc,
-    audioSrc: videoSrc,
+    audioSrc,
+    ...metadata,
     notes: [
       "User stated authorization to bundle these official website resources locally on 2026-06-08.",
-      "The MP4 includes an AAC track, so the same local asset can back the sound-unit play button.",
+      "Header speaker uses a short derived audio clip from the local asset, not the full MP4 track.",
     ],
   };
 }
@@ -48,8 +60,10 @@ function spanishAnimationAsset(
 function frenchPhonetiqueAsset(
   slug: string,
   resourcePath: string,
+  metadata?: ExactAssessmentAudioMetadata,
 ): LocalLanguagePhonemeAsset {
   const videoSrc = `/videos/language-assets/fr-FR/articulation/${slug}.mp4`;
+  const audioSrc = `/audio/language-assets/fr-FR/header-clips/${slug}.m4a`;
 
   return {
     languageId: "fr-FR",
@@ -59,10 +73,12 @@ function frenchPhonetiqueAsset(
     source: "Phonétique.ca / University of Sheffield IPA symbols",
     sourceUrl: `${FRENCH_PHONETIQUE_BASE}/${resourcePath}`,
     videoSrc,
-    audioSrc: videoSrc,
+    audioSrc,
+    ...metadata,
     notes: [
       "User stated authorization to bundle these official website resources locally on 2026-06-08.",
       "Phonetique.ca credits University of Sheffield IPA symbols for the French vowel/consonant videos.",
+      "Header speaker uses a short derived audio clip from the local asset, not the full MP4 track.",
       "Phrase-level units such as liaison, enchaînement, elision, and silent final consonants still need separate rule videos.",
     ],
   };
@@ -73,10 +89,10 @@ function russianSeeingSpeechAsset(
   fileStem: string,
   notes: string[],
   options?: {
-    audioSrc?: string;
+    headerAudioSrc?: string;
     label?: string;
     sourceUrl?: string;
-  },
+  } & ExactAssessmentAudioMetadata,
 ): LocalLanguagePhonemeAsset {
   return {
     languageId: "ru-RU",
@@ -89,86 +105,241 @@ function russianSeeingSpeechAsset(
     attribution: SEEING_SPEECH_ATTRIBUTION,
     videoSrc: `/videos/language-assets/ru-RU/seeing-speech/${fileStem}.mp4`,
     audioSrc:
-      options?.audioSrc ??
-      `/audio/language-assets/ru-RU/seeing-speech/${fileStem}.m4a`,
+      options?.headerAudioSrc ??
+      `/audio/language-assets/ru-RU/header-clips/${fileStem}.m4a`,
+    audioIpa: options?.audioIpa,
+    exactAssessmentAliases: options?.exactAssessmentAliases,
+    isProxyForAssessment: options?.isProxyForAssessment,
     notes: [
       "User stated noncommercial educational/open-source use on 2026-06-08.",
-      "Original Seeing Speech MP4 is kept unmodified; .m4a is extracted from the local MP4 for app audio playback.",
+      "Original Seeing Speech MP4 is kept unmodified; header speaker uses a short derived audio clip.",
       ...notes,
     ],
   };
 }
 
 export const LOCAL_LANGUAGE_PHONEME_ASSETS: LocalLanguagePhonemeAsset[] = [
-  spanishAnimationAsset("es-a", "a-sound"),
-  spanishAnimationAsset("es-e", "e-sound"),
-  spanishAnimationAsset("es-i", "i-sound"),
-  spanishAnimationAsset("es-o", "o-sound"),
-  spanishAnimationAsset("es-u", "u-sound"),
-  spanishAnimationAsset("es-bv", "beta-low-sound"),
-  spanishAnimationAsset("es-d", "eth-low-sound"),
-  spanishAnimationAsset("es-g", "gamma-sound"),
-  spanishAnimationAsset("es-theta", "theta-sound"),
-  spanishAnimationAsset("es-x", "chi-sound"),
-  spanishAnimationAsset("es-ny", "n-left-sound"),
-  spanishAnimationAsset("es-tap-r", "r-short-sound"),
-  spanishAnimationAsset("es-trill-r", "r-rolled-sound"),
-  spanishAnimationAsset("es-s", "s-sound"),
-  spanishAnimationAsset("es-ch", "ch-sound"),
-  spanishAnimationAsset("es-y-ll", "yot-sound"),
-  spanishAnimationAsset("es-l", "l-sound"),
-  spanishAnimationAsset("es-nasal-place", "n-right1-sound"),
-  spanishAnimationAsset("es-diphthongs-j", "j-sound"),
-  spanishAnimationAsset("es-diphthongs-w", "w-sound"),
-  frenchPhonetiqueAsset("fr-i", "Tb_Resources/i2.mp4"),
-  frenchPhonetiqueAsset("fr-y", "Tb_Resources/u2.mp4"),
-  frenchPhonetiqueAsset("fr-u", "Tb_Resources/ou2.mp4"),
-  frenchPhonetiqueAsset("fr-e", "Tb_Resources/e-ferme2.mp4"),
-  frenchPhonetiqueAsset("fr-e-open", "Tb_Resources/e-ouvert2.mp4"),
-  frenchPhonetiqueAsset("fr-eu-close", "Tb_Resources/eu-ferme2.mp4"),
-  frenchPhonetiqueAsset("fr-eu-open", "Tb_Resources/eu-ouvert2.mp4"),
-  frenchPhonetiqueAsset("fr-an", "Tb_Resources/an2.mp4"),
-  frenchPhonetiqueAsset("fr-in", "Tb_Resources/in2.mp4"),
-  frenchPhonetiqueAsset("fr-on", "Tb_Resources/on2.mp4"),
-  frenchPhonetiqueAsset("fr-a", "Tb_Resources/a-anterieur2.mp4"),
-  frenchPhonetiqueAsset("fr-schwa", "Tb_Resources/schwa2.mp4"),
-  frenchPhonetiqueAsset("fr-o-close", "Tb_Resources/o-ferme2.mp4"),
-  frenchPhonetiqueAsset("fr-o-open", "Tb_Resources/o-ouvert2.mp4"),
-  frenchPhonetiqueAsset("fr-un", "Tb_Resources/un2.mp4"),
-  frenchPhonetiqueAsset("fr-r", "C_Resources/r.mp4"),
-  frenchPhonetiqueAsset("fr-sh", "C_Resources/ch.mp4"),
-  frenchPhonetiqueAsset("fr-zh", "C_Resources/j.mp4"),
-  frenchPhonetiqueAsset("fr-ny", "C_Resources/gn.mp4"),
-  frenchPhonetiqueAsset("fr-glide-j", "C_Resources/y.mp4"),
-  frenchPhonetiqueAsset("fr-glide-hui", "C_Resources/ua.mp4"),
-  frenchPhonetiqueAsset("fr-glide-w", "C_Resources/w.mp4"),
+  spanishAnimationAsset("es-a", "a-sound", {
+    audioIpa: "/a/",
+    exactAssessmentAliases: ["a"],
+  }),
+  spanishAnimationAsset("es-e", "e-sound", {
+    audioIpa: "/e/",
+    exactAssessmentAliases: ["e"],
+  }),
+  spanishAnimationAsset("es-i", "i-sound", {
+    audioIpa: "/i/",
+    exactAssessmentAliases: ["i"],
+  }),
+  spanishAnimationAsset("es-o", "o-sound", {
+    audioIpa: "/o/",
+    exactAssessmentAliases: ["o"],
+  }),
+  spanishAnimationAsset("es-u", "u-sound", {
+    audioIpa: "/u/",
+    exactAssessmentAliases: ["u"],
+  }),
+  spanishAnimationAsset("es-bv", "beta-low-sound", {
+    audioIpa: "/β/",
+    exactAssessmentAliases: ["β", "β̞"],
+  }),
+  spanishAnimationAsset("es-d", "eth-low-sound", {
+    audioIpa: "/ð/",
+    exactAssessmentAliases: ["ð", "ð̞"],
+  }),
+  spanishAnimationAsset("es-g", "gamma-sound", {
+    audioIpa: "/ɣ/",
+    exactAssessmentAliases: ["ɣ", "ɣ̞"],
+  }),
+  spanishAnimationAsset("es-theta", "theta-sound", {
+    audioIpa: "/θ/",
+    exactAssessmentAliases: ["θ", "th"],
+  }),
+  spanishAnimationAsset("es-x", "chi-sound", {
+    audioIpa: "/x/",
+    exactAssessmentAliases: ["x", "h"],
+  }),
+  spanishAnimationAsset("es-ny", "n-left-sound", {
+    audioIpa: "/ɲ/",
+    exactAssessmentAliases: ["ɲ", "ny"],
+  }),
+  spanishAnimationAsset("es-tap-r", "r-short-sound", {
+    audioIpa: "/ɾ/",
+    exactAssessmentAliases: ["ɾ"],
+  }),
+  spanishAnimationAsset("es-trill-r", "r-rolled-sound", {
+    audioIpa: "/r/",
+    exactAssessmentAliases: ["r"],
+  }),
+  spanishAnimationAsset("es-s", "s-sound", {
+    audioIpa: "/s/",
+    exactAssessmentAliases: ["s"],
+  }),
+  spanishAnimationAsset("es-ch", "ch-sound", {
+    audioIpa: "/tʃ/",
+    exactAssessmentAliases: ["ch", "tʃ", "t͡ʃ"],
+  }),
+  spanishAnimationAsset("es-y-ll", "yot-sound", {
+    audioIpa: "/ʝ/",
+    exactAssessmentAliases: ["ʝ", "ʎ", "y", "ll"],
+  }),
+  spanishAnimationAsset("es-l", "l-sound", {
+    audioIpa: "/l/",
+    exactAssessmentAliases: ["l"],
+  }),
+  spanishAnimationAsset("es-nasal-place", "n-right1-sound", {
+    isProxyForAssessment: true,
+  }),
+  spanishAnimationAsset("es-diphthongs-j", "j-sound", {
+    audioIpa: "/j/",
+    exactAssessmentAliases: ["j", "i̯"],
+  }),
+  spanishAnimationAsset("es-diphthongs-w", "w-sound", {
+    audioIpa: "/w/",
+    exactAssessmentAliases: ["w", "u̯"],
+  }),
+  frenchPhonetiqueAsset("fr-i", "Tb_Resources/i2.mp4", {
+    audioIpa: "/i/",
+    exactAssessmentAliases: ["i"],
+  }),
+  frenchPhonetiqueAsset("fr-y", "Tb_Resources/u2.mp4", {
+    audioIpa: "/y/",
+    exactAssessmentAliases: ["y"],
+  }),
+  frenchPhonetiqueAsset("fr-u", "Tb_Resources/ou2.mp4", {
+    audioIpa: "/u/",
+    exactAssessmentAliases: ["u"],
+  }),
+  frenchPhonetiqueAsset("fr-e", "Tb_Resources/e-ferme2.mp4", {
+    audioIpa: "/e/",
+    exactAssessmentAliases: ["e"],
+  }),
+  frenchPhonetiqueAsset("fr-e-open", "Tb_Resources/e-ouvert2.mp4", {
+    audioIpa: "/ɛ/",
+    exactAssessmentAliases: ["ɛ", "eh"],
+  }),
+  frenchPhonetiqueAsset("fr-eu-close", "Tb_Resources/eu-ferme2.mp4", {
+    audioIpa: "/ø/",
+    exactAssessmentAliases: ["ø"],
+  }),
+  frenchPhonetiqueAsset("fr-eu-open", "Tb_Resources/eu-ouvert2.mp4", {
+    audioIpa: "/œ/",
+    exactAssessmentAliases: ["œ"],
+  }),
+  frenchPhonetiqueAsset("fr-an", "Tb_Resources/an2.mp4", {
+    audioIpa: "/ɑ̃/",
+    exactAssessmentAliases: ["ɑ̃", "ã", "an"],
+  }),
+  frenchPhonetiqueAsset("fr-in", "Tb_Resources/in2.mp4", {
+    audioIpa: "/ɛ̃/",
+    exactAssessmentAliases: ["ɛ̃", "in"],
+  }),
+  frenchPhonetiqueAsset("fr-on", "Tb_Resources/on2.mp4", {
+    audioIpa: "/ɔ̃/",
+    exactAssessmentAliases: ["ɔ̃", "õ", "on"],
+  }),
+  frenchPhonetiqueAsset("fr-a", "Tb_Resources/a-anterieur2.mp4", {
+    audioIpa: "/a/",
+    exactAssessmentAliases: ["a"],
+  }),
+  frenchPhonetiqueAsset("fr-schwa", "Tb_Resources/schwa2.mp4", {
+    audioIpa: "/ə/",
+    exactAssessmentAliases: ["ə", "ax"],
+  }),
+  frenchPhonetiqueAsset("fr-o-close", "Tb_Resources/o-ferme2.mp4", {
+    audioIpa: "/o/",
+    exactAssessmentAliases: ["o"],
+  }),
+  frenchPhonetiqueAsset("fr-o-open", "Tb_Resources/o-ouvert2.mp4", {
+    audioIpa: "/ɔ/",
+    exactAssessmentAliases: ["ɔ"],
+  }),
+  frenchPhonetiqueAsset("fr-un", "Tb_Resources/un2.mp4", {
+    audioIpa: "/œ̃/",
+    exactAssessmentAliases: ["œ̃", "un"],
+  }),
+  frenchPhonetiqueAsset("fr-r", "C_Resources/r.mp4", {
+    audioIpa: "/ʁ/",
+    exactAssessmentAliases: ["ʁ", "r", "χ"],
+  }),
+  frenchPhonetiqueAsset("fr-sh", "C_Resources/ch.mp4", {
+    audioIpa: "/ʃ/",
+    exactAssessmentAliases: ["ʃ", "sh"],
+  }),
+  frenchPhonetiqueAsset("fr-zh", "C_Resources/j.mp4", {
+    audioIpa: "/ʒ/",
+    exactAssessmentAliases: ["ʒ", "zh"],
+  }),
+  frenchPhonetiqueAsset("fr-ny", "C_Resources/gn.mp4", {
+    audioIpa: "/ɲ/",
+    exactAssessmentAliases: ["ɲ", "ny"],
+  }),
+  frenchPhonetiqueAsset("fr-glide-j", "C_Resources/y.mp4", {
+    audioIpa: "/j/",
+    exactAssessmentAliases: ["j"],
+  }),
+  frenchPhonetiqueAsset("fr-glide-hui", "C_Resources/ua.mp4", {
+    audioIpa: "/ɥ/",
+    exactAssessmentAliases: ["ɥ"],
+  }),
+  frenchPhonetiqueAsset("fr-glide-w", "C_Resources/w.mp4", {
+    audioIpa: "/w/",
+    exactAssessmentAliases: ["w"],
+  }),
   russianSeeingSpeechAsset("ru-a", "ru-a", [
     "Russian а /a/ primary local asset.",
-  ]),
+  ], {
+    audioIpa: "/a/",
+    exactAssessmentAliases: ["a"],
+  }),
   russianSeeingSpeechAsset("ru-o", "ru-o", [
     "Russian stressed о /o/ primary local asset.",
-  ]),
+  ], {
+    audioIpa: "/o/",
+    exactAssessmentAliases: ["o"],
+  }),
   russianSeeingSpeechAsset("ru-i", "ru-i", [
     "Russian и /i/ primary local asset.",
-  ]),
+  ], {
+    audioIpa: "/i/",
+    exactAssessmentAliases: ["i"],
+  }),
   russianSeeingSpeechAsset("ru-y", "ru-y", [
     "Russian ы /ɨ/ primary local asset; Commons /ɨ/ audio is available as extra reference.",
-  ]),
+  ], {
+    audioIpa: "/ɨ/",
+    exactAssessmentAliases: ["ɨ"],
+  }),
   russianSeeingSpeechAsset("ru-u", "ru-u", [
     "Russian у /u/ primary local asset.",
-  ]),
+  ], {
+    audioIpa: "/u/",
+    exactAssessmentAliases: ["u"],
+  }),
   russianSeeingSpeechAsset("ru-e", "ru-e", [
     "Russian stressed э/е /e/ primary local asset.",
-  ]),
+  ], {
+    audioIpa: "/e/",
+    exactAssessmentAliases: ["e", "ɛ"],
+  }),
   russianSeeingSpeechAsset("ru-r", "ru-r", [
     "Russian trilled р /r/ primary local asset; palatalized trill audio is also available.",
-  ]),
+  ], {
+    audioIpa: "/r/",
+    exactAssessmentAliases: ["r"],
+  }),
   russianSeeingSpeechAsset("ru-x", "ru-x", [
     "Russian х /x/ primary local asset.",
-  ]),
+  ], {
+    audioIpa: "/x/",
+    exactAssessmentAliases: ["x", "h"],
+  }),
   russianSeeingSpeechAsset("ru-ts", "ru-ts", [
     "Russian ц /ts/ primary local asset; Commons /ts/ audio is available as extra reference.",
-  ]),
+  ], {
+    audioIpa: "/ts/",
+    exactAssessmentAliases: ["ts", "t͡s"],
+  }),
   russianSeeingSpeechAsset(
     "ru-ch",
     "ru-shch-proxy",
@@ -176,7 +347,9 @@ export const LOCAL_LANGUAGE_PHONEME_ASSETS: LocalLanguagePhonemeAsset[] = [
       "Video proxy: Seeing Speech /ɕ/ shows the soft alveolo-palatal area; audio is Commons /tɕ/, closer to Russian ч.",
     ],
     {
-      audioSrc: "/audio/language-assets/ru-RU/commons/ru-ch.ogg",
+      headerAudioSrc: "/audio/language-assets/ru-RU/header-clips/ru-ch.m4a",
+      audioIpa: "/tɕ/",
+      exactAssessmentAliases: ["tɕ", "t͡ɕ", "tʃ", "ch"],
     },
   ),
   russianSeeingSpeechAsset(
@@ -186,57 +359,93 @@ export const LOCAL_LANGUAGE_PHONEME_ASSETS: LocalLanguagePhonemeAsset[] = [
       "Proxy: Commons/Seeing Speech asset is /ɕ/; Russian щ target should be taught as long/soft /ɕː/.",
     ],
     {
-      audioSrc: "/audio/language-assets/ru-RU/commons/ru-shch-proxy.ogg",
+      headerAudioSrc: "/audio/language-assets/ru-RU/header-clips/ru-shch.m4a",
+      audioIpa: "/ɕː/",
+      exactAssessmentAliases: ["ɕː", "ʃː"],
     },
   ),
   russianSeeingSpeechAsset("ru-sh-zh", "ru-sh", [
     "ш/ж contrast: ш is primary; ж is bundled as a related local asset.",
-  ]),
+  ], {
+    audioIpa: "/ʂ/",
+    exactAssessmentAliases: ["ʂ", "ʃ", "sh"],
+  }),
   russianSeeingSpeechAsset("ru-ts-ch-shch", "ru-ts", [
     "ц/ч/щ group: ц /ts/ is primary; ч and щ use Commons audio plus /ɕ/ proxy video.",
-  ]),
+  ], {
+    isProxyForAssessment: true,
+  }),
   russianSeeingSpeechAsset("ru-hard-soft", "ru-j", [
     "Proxy: /j/ MRI shows palatal tongue-body raising, but Russian soft consonants are not a full added й.",
-  ]),
+  ], {
+    isProxyForAssessment: true,
+  }),
   russianSeeingSpeechAsset("ru-soft-sign", "ru-j", [
     "Proxy: ь marks palatalization and is not pronounced as an independent /j/ sound.",
-  ]),
+  ], {
+    isProxyForAssessment: true,
+  }),
   russianSeeingSpeechAsset("ru-j", "ru-j", [
     "Russian й /j/ primary local asset.",
-  ]),
+  ], {
+    audioIpa: "/j/",
+    exactAssessmentAliases: ["j", "y"],
+  }),
   russianSeeingSpeechAsset("ru-iotated-vowels", "ru-j", [
     "Iotated vowels: /j/ onset or softening marker depending on position; /j/ video is a rule proxy.",
-  ]),
+  ], {
+    isProxyForAssessment: true,
+  }),
   russianSeeingSpeechAsset("ru-soft-t-d", "ru-t", [
     "Soft т/д contrast: hard /t/ is primary anchor; /d/ is a related local asset.",
-  ]),
+  ], {
+    isProxyForAssessment: true,
+  }),
   russianSeeingSpeechAsset("ru-soft-s-z", "ru-s", [
     "Soft с/з contrast: hard /s/ is primary anchor; /z/ is a related local asset.",
-  ]),
+  ], {
+    isProxyForAssessment: true,
+  }),
   russianSeeingSpeechAsset("ru-soft-n-l-r", "ru-l", [
     "Soft н/л/р contrast: /l/ is primary anchor; /n/, /r/, and palatalized trill audio are related.",
-  ]),
+  ], {
+    isProxyForAssessment: true,
+  }),
   russianSeeingSpeechAsset("ru-soft-labials", "ru-p", [
     "Soft labials: /p/ is primary anchor; /b m f v/ are related local assets.",
-  ]),
+  ], {
+    isProxyForAssessment: true,
+  }),
   russianSeeingSpeechAsset("ru-stress-reduction", "ru-reduction-schwa", [
     "Rule/prosody unit: this is a reduced-vowel quality reference, not a full stress lesson by itself.",
-  ]),
+  ], {
+    isProxyForAssessment: true,
+  }),
   russianSeeingSpeechAsset("ru-unstressed-o-a", "ru-reduction-open-back", [
     "Unstressed о/а reduction: open/back/centralized vowel quality reference.",
-  ]),
+  ], {
+    isProxyForAssessment: true,
+  }),
   russianSeeingSpeechAsset("ru-unstressed-e-ya", "ru-reduction-schwa", [
     "Unstressed е/я reduction: schwa/central-vowel proxy; lesson must still explain [ɪ] and softening environment.",
-  ]),
+  ], {
+    isProxyForAssessment: true,
+  }),
   russianSeeingSpeechAsset("ru-final-devoicing", "ru-k", [
     "Final devoicing: /k/ is primary because current example друг ends as /druk/.",
-  ]),
+  ], {
+    isProxyForAssessment: true,
+  }),
   russianSeeingSpeechAsset("ru-voicing-assimilation", "ru-v", [
     "Voicing assimilation: /v/ is primary anchor; related assets cover devoiced/voiced counterparts.",
-  ]),
+  ], {
+    isProxyForAssessment: true,
+  }),
   russianSeeingSpeechAsset("ru-clusters", "ru-t", [
     "Cluster unit has no single-phoneme perfect video; use /t/ as segment anchor and rely on Russian word/phrase drills.",
-  ]),
+  ], {
+    isProxyForAssessment: true,
+  }),
 ];
 
 export function getLocalLanguagePhonemeAsset(

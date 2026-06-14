@@ -30,7 +30,10 @@ import {
   getLanguageProfile,
 } from "@/lib/language-profiles";
 import { isRuleLikeSoundUnit } from "@/lib/language-sound-unit-groups";
-import { normalizeAssessmentPhoneme } from "@/lib/azure-phoneme-map";
+import {
+  collectDetailAssessmentPhonemes,
+  collectDetailAssessmentSyllables,
+} from "@/lib/detail-assessment-breakdown";
 import {
   getPracticedWordsForLanguage,
   markWordPracticedForLanguage,
@@ -39,82 +42,27 @@ import { addScore, scoreHistoryKey } from "@/lib/score-history";
 import { getAdjacentSpanishWord } from "@/lib/spanish-sound-examples";
 import { getWordPool } from "@/lib/word-pool";
 import { selectNextWord } from "@/lib/word-selector";
-import type { AzureAssessmentResult, AzurePhoneme } from "@/types/azure";
+import type { AzureAssessmentResult } from "@/types/azure";
 import type { KeywordEntry } from "@/types/phoneme";
 
-const IPA_COMBINING_MARKS = new Set([
-  "ː",
-  "ʲ",
-  "ʷ",
-  "̃",
-  "̯",
-  "̞",
-  "̩",
-  "̥",
-  "̬",
-  "̪",
-  "̟",
-  "̠",
-  "̝",
-  "̜",
-  "̹",
-  "̺",
-  "̻",
-]);
-
-function segmentIpaForAssessment(ipa?: string): string[] {
-  const cleaned = (ipa ?? "")
-    .normalize("NFC")
-    .replace(/[/[\]ˈˌ.\s]/g, "")
-    .replace(/[͜͡]/g, "");
-
-  const chars = Array.from(cleaned);
-  const tokens: string[] = [];
-
-  for (let index = 0; index < chars.length; index++) {
-    let token = chars[index];
-    const next = chars[index + 1];
-
-    if (token === "t" && ["ʃ", "ɕ", "s"].includes(next)) {
-      token += next;
-      index++;
-    } else if (token === "d" && ["ʒ", "z"].includes(next)) {
-      token += next;
-      index++;
-    }
-
-    while (IPA_COMBINING_MARKS.has(chars[index + 1])) {
-      token += chars[index + 1];
-      index++;
-    }
-
-    if (normalizeAssessmentPhoneme(token)) tokens.push(token);
-  }
-
-  return tokens;
-}
-
-function hydrateAssessmentPhonemes(
-  phonemes: AzurePhoneme[],
-  fallbackIpa?: string,
-): AzurePhoneme[] {
-  const fallbackTokens = segmentIpaForAssessment(fallbackIpa);
-
-  return phonemes
-    .map((phoneme, index) => {
-      const rawPhoneme =
-        typeof phoneme.phoneme === "string" ? phoneme.phoneme : "";
-      if (normalizeAssessmentPhoneme(rawPhoneme)) {
-        return { ...phoneme, phoneme: rawPhoneme };
-      }
-
-      return {
-        ...phoneme,
-        phoneme: fallbackTokens[index] ?? rawPhoneme,
-      };
-    })
-    .filter((phoneme) => normalizeAssessmentPhoneme(phoneme.phoneme));
-}
+const SMOKE_ASSESSMENT_TILE_PHONEMES: Record<
+  string,
+  { phoneme: string; accuracyScore: number }[]
+> = {
+  "en-US": [{ phoneme: "iy", accuracyScore: 88 }],
+  "es-ES": [
+    { phoneme: "a", accuracyScore: 72 },
+    { phoneme: "k", accuracyScore: 68 },
+  ],
+  "fr-FR": [
+    { phoneme: "t", accuracyScore: 72 },
+    { phoneme: "ʁ", accuracyScore: 70 },
+  ],
+  "ru-RU": [
+    { phoneme: "a", accuracyScore: 74 },
+    { phoneme: "t", accuracyScore: 69 },
+  ],
+};
 
 export function PhonemeDetailPage() {
   const params = useParams<{ phoneme: string }>();
@@ -131,6 +79,8 @@ export function PhonemeDetailPage() {
   const wordAudio = useWordPronunciation();
   const [lastChartPlay, setLastChartPlay] = useState<"normal" | "slow">("slow");
   const [wordDirection, setWordDirection] = useState<number>(1);
+  const [showSmokeAssessmentTiles, setShowSmokeAssessmentTiles] =
+    useState(false);
   const autoAssessTriggered = useRef(false);
 
   const sessionPrefix = `phonemes:${languageId}:${params.phoneme}`;
@@ -193,6 +143,22 @@ export function PhonemeDetailPage() {
     [phoneme],
   );
   const [practicedCount, setPracticedCount] = useState(0);
+  const smokeAssessmentTilePhonemes = useMemo(
+    () =>
+      showSmokeAssessmentTiles
+        ? (SMOKE_ASSESSMENT_TILE_PHONEMES[languageId] ??
+          SMOKE_ASSESSMENT_TILE_PHONEMES["en-US"])
+        : [],
+    [languageId, showSmokeAssessmentTiles],
+  );
+
+  useEffect(() => {
+    setShowSmokeAssessmentTiles(
+      new URLSearchParams(window.location.search).get("smokeAssessmentTiles") ===
+        "1",
+    );
+  }, []);
+
   useEffect(() => {
     setPracticedCount(
       getPracticedWordsForLanguage(languageId, phoneme?.slug ?? "").length,
@@ -309,14 +275,10 @@ export function PhonemeDetailPage() {
     );
 
     if (result) {
-      if (result.words[0]?.phonemes) {
-        setSelectedWordPhonemes(
-          hydrateAssessmentPhonemes(result.words[0].phonemes, currentWord?.ipa),
-        );
-      }
-      if (result.words[0]?.syllables) {
-        setSelectedWordSyllables(result.words[0].syllables);
-      }
+      setSelectedWordPhonemes(
+        collectDetailAssessmentPhonemes(result, currentWord?.ipa),
+      );
+      setSelectedWordSyllables(collectDetailAssessmentSyllables(result));
       addScore(
         scoreHistoryKey(languageId, phoneme?.slug ?? "", currentWordStr),
         result.pronunciationScore,
@@ -449,7 +411,7 @@ export function PhonemeDetailPage() {
             onSetWordDirection={setWordDirection}
             onSetLastChartPlay={setLastChartPlay}
             onPlayWord={(word, voice) => wordAudio.playWord(word, voice, languageId)}
-            onPlayChartAudio={(path) => chartAudio.play(path)}
+            onPlayChartAudio={(path, options) => chartAudio.play(path, options)}
             onStopPlayback={() => playback.stop()}
             onStopWordAudio={() => wordAudio.stop()}
             onStopChartAudio={() => chartAudio.stop()}
@@ -532,9 +494,23 @@ export function PhonemeDetailPage() {
                 phonemes={selectedWordPhonemes}
                 syllables={stressedSyllables}
                 languageId={languageId}
+                expectedText={currentWord?.word}
+                expectedIpa={currentWord?.ipa}
               />
+            ) : smokeAssessmentTilePhonemes.length > 0 ? (
+              <div data-smoke="assessment-phoneme-tile-fixture">
+                <PhonemeHighlight
+                  phonemes={smokeAssessmentTilePhonemes}
+                  languageId={languageId}
+                  expectedText={currentWord?.word ?? phoneme?.name}
+                  expectedIpa={currentWord?.ipa ?? phoneme?.ipa}
+                />
+              </div>
             ) : (
-              <div className="flex h-20 items-center justify-center rounded-lg border border-dashed bg-muted/20">
+              <div
+                className="flex h-20 items-center justify-center rounded-lg border border-dashed bg-muted/20"
+                data-smoke="assessment-breakdown-placeholder"
+              >
                 <p className="text-center text-sm text-muted-foreground">
                   录音并评分后将在此显示{breakdownLabel}
                 </p>

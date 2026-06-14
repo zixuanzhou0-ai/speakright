@@ -18,6 +18,7 @@ import { testLlm } from "@/lib/api-client";
 import { setLlmConfig } from "@/lib/api-keys";
 import {
   DESKTOP_LLM_POLICY_MESSAGE,
+  getDesktopLlmPolicyError,
   normalizeStoredProvider,
   PRESET_PROVIDERS,
   PROVIDER_NAMES,
@@ -43,7 +44,9 @@ export function LlmConfigCard() {
     if (saved) {
       const nextProvider = normalizeStoredProvider(saved.provider, isDesktop);
       const nextPreset = PRESET_PROVIDERS[nextProvider];
-      const canUseSavedEndpoint = nextProvider === "custom" && !isDesktop;
+      const canUseSavedEndpoint =
+        (nextProvider === "custom" && !isDesktop) ||
+        nextPreset.baseUrlEditable === true;
       setProvider(nextProvider);
       setApiKey(saved.apiKey ?? "");
       setBaseUrl(
@@ -64,6 +67,9 @@ export function LlmConfigCard() {
   const preset = PRESET_PROVIDERS[provider];
   const isCustom = provider === "custom";
   const desktopCustomBlocked = isDesktop && isCustom;
+  const needsManualConfig = preset.status === "needsManualConfig";
+  const canEditBaseUrl =
+    (isCustom && !desktopCustomBlocked) || preset.baseUrlEditable === true;
 
   const handleProviderChange = (p: ProviderName) => {
     if (isDesktop && p === "custom") {
@@ -79,6 +85,17 @@ export function LlmConfigCard() {
   const handleSave = () => {
     if (desktopCustomBlocked) {
       toast.error(DESKTOP_LLM_POLICY_MESSAGE);
+      return;
+    }
+    if (needsManualConfig && (!baseUrl.trim() || !model.trim())) {
+      toast.error("请填写官方 Base URL 和模型名称");
+      return;
+    }
+    const desktopPolicyError = isDesktop
+      ? getDesktopLlmPolicyError(provider, baseUrl.trim())
+      : null;
+    if (desktopPolicyError) {
+      toast.error(desktopPolicyError);
       return;
     }
     if (!apiKey.trim()) {
@@ -98,6 +115,21 @@ export function LlmConfigCard() {
     if (desktopCustomBlocked) {
       setStatus("error");
       setStatusMsg(DESKTOP_LLM_POLICY_MESSAGE);
+      return;
+    }
+    if (needsManualConfig && (!baseUrl.trim() || !model.trim())) {
+      const message = "请先填写官方 Base URL 和模型名称";
+      toast.error(message);
+      setStatus("error");
+      setStatusMsg(message);
+      return;
+    }
+    const desktopPolicyError = isDesktop
+      ? getDesktopLlmPolicyError(provider, baseUrl.trim())
+      : null;
+    if (desktopPolicyError) {
+      setStatus("error");
+      setStatusMsg(desktopPolicyError);
       return;
     }
     if (!apiKey.trim() || !baseUrl.trim()) {
@@ -144,6 +176,8 @@ export function LlmConfigCard() {
               <button
                 key={p}
                 type="button"
+                data-provider={p}
+                data-smoke="llm-provider-chip"
                 onClick={() => handleProviderChange(p)}
                 disabled={isDesktop && p === "custom"}
                 title={
@@ -152,7 +186,7 @@ export function LlmConfigCard() {
                     : undefined
                 }
                 className={cn(
-                  "rounded-full border px-3 py-1 text-sm transition-colors",
+                  "max-w-full rounded-full border px-3 py-1 text-center text-sm transition-colors break-words",
                   provider === p
                     ? "border-primary bg-primary text-primary-foreground"
                     : "border-border hover:bg-accent",
@@ -177,6 +211,30 @@ export function LlmConfigCard() {
           </div>
         )}
 
+        {needsManualConfig && (
+          <div
+            className="flex gap-2 rounded-lg border border-border bg-muted/50 p-3 text-sm text-muted-foreground"
+            data-provider={provider}
+            data-smoke="llm-manual-provider-note"
+          >
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+            <div className="min-w-0 space-y-1">
+              <p className="font-medium text-foreground">
+                {preset.label} 需要以官方 API 文档填写 Base URL 和模型名称。
+              </p>
+              {isDesktop && (
+                <p>
+                  桌面版不会放开任意 LLM 域名；官方 endpoint 确认并加入
+                  Tauri allowlist/CSP 后才能测试连接。
+                </p>
+              )}
+              {preset.docsUrl && (
+                <p className="break-all text-xs">{preset.docsUrl}</p>
+              )}
+            </div>
+          </div>
+        )}
+
         <div className="space-y-2">
           <Label htmlFor="llm-key">API Key</Label>
           <Input
@@ -195,7 +253,8 @@ export function LlmConfigCard() {
             placeholder="https://api.example.com/v1"
             value={baseUrl}
             onChange={(e) => setBaseUrl(e.target.value)}
-            disabled={!isCustom || desktopCustomBlocked}
+            disabled={!canEditBaseUrl || desktopCustomBlocked}
+            data-smoke="llm-base-url"
           />
         </div>
 
@@ -213,9 +272,11 @@ export function LlmConfigCard() {
                 <button
                   key={m}
                   type="button"
+                  data-model={m}
+                  data-smoke="llm-model-chip"
                   onClick={() => setModel(m)}
                   className={cn(
-                    "rounded-full border px-2.5 py-0.5 text-xs transition-colors cursor-pointer",
+                    "rounded-full border px-2.5 py-0.5 text-center text-xs transition-colors break-all cursor-pointer",
                     model === m
                       ? "border-primary bg-primary/10 text-primary"
                       : "border-border hover:bg-accent",

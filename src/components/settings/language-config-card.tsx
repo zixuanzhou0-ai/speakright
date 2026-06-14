@@ -55,21 +55,23 @@ export function LanguageConfigCard() {
               data-selected={selected ? "true" : "false"}
               onClick={() => handleSelect(profile.id)}
               className={cn(
-                "rounded-lg border p-4 text-left transition-colors",
+                "rounded-lg border p-4 text-center transition-colors",
                 selected
                   ? "border-primary bg-primary/5"
                   : "border-border hover:border-primary/40",
               )}
             >
               <div className="flex items-start justify-between gap-3">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium">{profile.displayName}</span>
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center justify-center gap-2">
+                    <span className="break-words font-medium [overflow-wrap:anywhere]">
+                      {profile.displayName}
+                    </span>
                     <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">
                       {statusLabel(profile.status)}
                     </span>
                   </div>
-                  <p className="mt-0.5 text-xs text-muted-foreground">
+                  <p className="mt-0.5 break-words text-center text-xs text-muted-foreground [overflow-wrap:anywhere]">
                     {profile.nativeName} · Azure {profile.azureLocale}
                   </p>
                 </div>
@@ -96,7 +98,10 @@ export function LanguageConfigCard() {
               </div>
 
               {audit.missingCapabilities.length > 0 && (
-                <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">
+                <p
+                  className="mt-2 break-words text-center text-xs leading-snug text-muted-foreground [overflow-wrap:anywhere]"
+                  data-smoke="language-option-missing"
+                >
                   待补：{missingPreview}
                   {audit.missingCapabilities.length > 3 ? "…" : ""}
                 </p>

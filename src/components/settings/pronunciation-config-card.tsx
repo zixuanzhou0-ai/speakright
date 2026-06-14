@@ -89,7 +89,10 @@ export function PronunciationConfigCard() {
           有道在线兜底无需配置 API Key。发布包内置的英语、西语、法语、俄语练习词会优先走本地音频。
         </div>
 
-        <div className="flex items-center gap-3">
+        <div
+          className="flex flex-wrap items-center gap-3"
+          data-smoke="pronunciation-test-row"
+        >
           <Button variant="outline" onClick={handleTest} disabled={isTesting}>
             <Volume2 className="mr-1.5 h-4 w-4" />
             测试有道发音

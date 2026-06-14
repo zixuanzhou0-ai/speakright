@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import { AudioPlayerButton } from "@/components/audio/audio-player";
 import { useAudioPlayer } from "@/hooks/use-audio-player";
-import { openDesktopExternalUrl } from "@/lib/desktop-external-url";
+import {
+  getSoundUnitHeaderPlaybackOptions,
+  isPlayableHeaderAudioSrc,
+} from "@/lib/audio-playback-policy";
 import type { PhonemeAudioSource } from "@/types/phoneme";
 
 interface PhonemePlayButtonProps {
@@ -18,64 +20,33 @@ export function PhonemePlayButton({
   onBeforePlay,
 }: PhonemePlayButtonProps) {
   const { play, isPlaying, isLoading } = useAudioPlayer();
-  const [isSpeaking, setIsSpeaking] = useState(false);
+  const canPlayLocalHeaderAudio = isPlayableHeaderAudioSrc(
+    phonemeAudio?.localSrc,
+  );
 
-  if (!chartWord && !phonemeAudio) return null;
-
-  const openExternalReference = () => {
-    if (!phonemeAudio?.url) return;
-    void openDesktopExternalUrl(phonemeAudio.url);
-  };
-
-  const playBrowserSpeech = () => {
-    if (
-      !phonemeAudio?.text ||
-      typeof window === "undefined" ||
-      !("speechSynthesis" in window)
-    ) {
-      openExternalReference();
-      return;
-    }
-
-    const utterance = new SpeechSynthesisUtterance(phonemeAudio.text);
-    utterance.lang = phonemeAudio.languageId ?? "en-US";
-    utterance.rate = 0.82;
-    utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = () => {
-      setIsSpeaking(false);
-      openExternalReference();
-    };
-
-    window.speechSynthesis.cancel();
-    setIsSpeaking(true);
-    window.speechSynthesis.speak(utterance);
-  };
+  if (!chartWord && !canPlayLocalHeaderAudio) return null;
 
   const handleClick = () => {
     onBeforePlay?.();
+    const playbackOptions = getSoundUnitHeaderPlaybackOptions({
+      chartWord,
+      phonemeAudio,
+    });
 
     if (chartWord) {
-      play(`/audio/ipa/phoneme/${chartWord}.mp3`);
+      play(`/audio/ipa/phoneme/${chartWord}.mp3`, playbackOptions);
       return;
     }
 
-    if (phonemeAudio?.localSrc) {
-      play(phonemeAudio.localSrc);
-      return;
+    if (canPlayLocalHeaderAudio && phonemeAudio?.localSrc && playbackOptions) {
+      play(phonemeAudio.localSrc, playbackOptions);
     }
-
-    if (phonemeAudio?.kind === "tts-example") {
-      playBrowserSpeech();
-      return;
-    }
-
-    openExternalReference();
   };
 
   return (
     <AudioPlayerButton
       onClick={handleClick}
-      isPlaying={isPlaying || isSpeaking}
+      isPlaying={isPlaying}
       isLoading={isLoading}
       size="lg"
     />

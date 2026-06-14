@@ -97,14 +97,14 @@ No cloud backend is required for this release.
 
 ## Current Internal-Test Status
 
-Last controlled-test verification: 2026-06-11, after the multilingual
-dual-voice expansion and full desktop validation pass. Previous
-release-validation baseline before this local pass: `94be1d4`.
+Current controlled-test track: Release Candidate evidence audit, documented in
+`docs/operations/RC_EVIDENCE_AUDIT.md`. Previous release-validation baseline
+before the local RC audit: `94be1d4`.
 
 - Recommended launch path: `npm run desktop:launch-release`.
 - Build shape: Tauri static bundle, not `localhost`.
 - Bundled asset check after the latest audio expansion: English `1464/1464`,
-  Spanish `880/880`, French `1090/1090`, Russian `920/920`, videos `210/210`.
+  Spanish `880/880`, French `1090/1090`, Russian `920/920`, videos `224/224`.
 - Multilingual audio parity after generation: Spanish `440 x 2`, French
   `545 x 2`, Russian `460 x 2`, total missing `0`.
 - Secondary voices selected for the experimental packs: Spanish `Lydia`, French
@@ -115,15 +115,42 @@ release-validation baseline before this local pass: `94be1d4`.
   validation and is not rerun during installer testing.
 - Release UI smoke: Settings, English, Spanish, French, Russian, drill, free
   practice, and diagnosis opened from the Release EXE; runtime was not
-  `localhost`.
-- Latest automated validation after the dual-voice expansion: `75` test files
-  and `380` tests passed; typecheck, lint, static frontend build,
-  `desktop:live-validation`, and `validate:desktop` passed.
+  `localhost`. The current smoke also checks detail task text readability,
+  centered reading targets, expected header-audio visibility, no
+  practice-button overlap, wrapping video selector labels, Settings/usage
+  long-text wrapping, scoring-breakdown smoke hooks, exact scoring-tile audio
+  policy, narrow-window layout, and low-height layout.
+- Local word and language-pack A/B audio now uses playback-layer, peak-safe Web
+  Audio gain for loudness matching with teaching videos. IPA chart normal/slow
+  word audio also uses a shared playback boost, and bundled language-pack
+  read-along playback keeps that boost on replay; online fallback audio is
+  unchanged and routine validation still does not generate ElevenLabs audio.
+- Latest automated validation for the local RC audit and exact header-clip
+  scoring-audio pass: `89` test files and `489` tests passed; typecheck, lint
+  (`341` files), static frontend build,
+  `desktop:build`, `desktop:preflight`, `desktop:ui-smoke`, and
+  `audio:parity:dry-run` passed; the latest recorded
+  `audio:loudness:dry-run` also passed after playback-layer gain.
+- Non-English diagnosis keeps scoring experimental: omission/insertion evidence
+  blocks trusted overall scores and asks for retest instead of implying mastery.
+- Spanish, French, and Russian advanced training remains feedback-only for
+  formal mastery; pack-runner and HVPT perception mastery writes are gated by
+  the English-only formal mastery policy.
 - Public-release blocker: Windows EXE/MSI/NSIS artifacts are still unsigned.
 
-For the 2026-06-12 internal-test pass, use the installed app or Release EXE
+For the 2026-06-14 internal-test pass, use the installed app or Release EXE
 first. Only rebuild if the executable is missing, stale after code changes, or
 manual QA finds a bug that needs a code fix.
+
+For the next Codex chat, first read:
+
+```text
+docs/operations/NEXT_CHAT_HANDOFF.md
+docs/operations/DESKTOP_STARTUP_RUNBOOK.md
+```
+
+That handoff records the latest local non-English layout fixes, the validation
+commands already run, and the known uncommitted work that must not be reverted.
 
 Recommended developer launch order for release-style testing:
 

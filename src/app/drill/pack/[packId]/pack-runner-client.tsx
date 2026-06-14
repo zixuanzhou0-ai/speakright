@@ -57,11 +57,22 @@ import {
 } from "@/lib/lesson-brief";
 import { getLanguageProfile } from "@/lib/language-profiles";
 import {
+  canRecordFormalMastery,
+  getExperimentalMasteryBlocker,
+} from "@/lib/mastery-language-policy";
+import {
   evaluateSessionMastery,
   loadMasteryProfile,
   recordTrainingSession,
   saveMasteryProfile,
 } from "@/lib/mastery-profile";
+import {
+  getCenteredCompactTextClassName,
+  getCenteredMonoTextClassName,
+  getCenteredProminentTextClassName,
+  getCenteredReadableTextClassName,
+  getPracticeTextDensity,
+} from "@/lib/practice-text-presentation";
 import {
   type RecordingQualityReport,
   reliabilityFromRecordingQuality,
@@ -475,10 +486,12 @@ export default function TrainingPackPage() {
     const usedTargetFallback =
       results.some((result) => result.analysis.usedFallback) ||
       remediationResults.some((result) => result.usedFallback);
+    const canPromoteMastery = canRecordFormalMastery(languageId);
     const promotionBlockers = [
       usedTargetFallback
         ? "目标音素未成功对齐，本轮整体分只作反馈，不提升掌握度。"
         : null,
+      getExperimentalMasteryBlocker(languageId),
     ].filter((item): item is string => item !== null);
     const qualityIssues = qualityReportsRef.current.flatMap((report) =>
       report.issues.map((issue) => issue.title),
@@ -537,13 +550,15 @@ export default function TrainingPackPage() {
       mastered: false,
     };
     summary.reviewItems = buildSessionReviewItems(summary);
-    const mastered = evaluateSessionMastery(summary);
+    const mastered = canPromoteMastery && evaluateSessionMastery(summary);
     const completedSummary = { ...summary, mastered };
-    const profile = recordTrainingSession(
-      loadMasteryProfile(),
-      completedSummary,
-    );
-    saveMasteryProfile(profile);
+    if (canPromoteMastery) {
+      const profile = recordTrainingSession(
+        loadMasteryProfile(),
+        completedSummary,
+      );
+      saveMasteryProfile(profile);
+    }
     setPhase({ type: "completed", summary: completedSummary });
   };
 
@@ -1222,7 +1237,7 @@ function CourseMapLevelCard({
       type="button"
       onClick={() => onStartLevel?.(level.startLevelId)}
       className={cn(
-        "min-h-[116px] rounded-lg border p-3 text-left transition-all hover:-translate-y-0.5 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary cursor-pointer",
+        "min-h-[116px] rounded-lg border p-3 text-center transition-all hover:-translate-y-0.5 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary cursor-pointer",
         compact && "min-h-[104px] p-2.5",
         courseMapStatusClass(level.status),
       )}
@@ -1243,9 +1258,13 @@ function CourseMapLevelCard({
           {courseMapStatusLabel(level.status)}
         </Badge>
       </div>
-      <p className="mt-2 line-clamp-2 text-sm font-semibold">{level.title}</p>
-      <p className="mt-1 text-xs text-muted-foreground">{level.passRuleText}</p>
-      <div className="mt-2 flex flex-wrap gap-1 text-[11px] text-muted-foreground">
+      <p className="mt-2 break-words text-sm font-semibold [overflow-wrap:anywhere]">
+        {level.title}
+      </p>
+      <p className="mt-1 break-words text-xs text-muted-foreground [overflow-wrap:anywhere]">
+        {level.passRuleText}
+      </p>
+      <div className="mt-2 flex flex-wrap justify-center gap-1 text-[11px] text-muted-foreground">
         {level.bestScore > 0 && <span>最佳 {level.bestScore}</span>}
         {level.attempts > 0 && <span>{level.attempts} 次</span>}
         {level.dueTaskCount > 0 && <span>复习 {level.dueTaskCount}</span>}
@@ -1253,13 +1272,13 @@ function CourseMapLevelCard({
         {level.lockedByLevelId && <span>先补 #{level.lockedByLevelId}</span>}
       </div>
       {!compact && (
-        <div className="mt-2 flex gap-1.5 text-xs text-muted-foreground">
+        <div className="mt-2 flex justify-center gap-1.5 text-center text-xs text-muted-foreground">
           {hasWarning ? (
             <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-destructive" />
           ) : (
             <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
           )}
-          <p className="line-clamp-2">
+          <p className="break-words [overflow-wrap:anywhere]">
             {level.lockReason ?? level.reviewReason ?? level.coachCue}
           </p>
         </div>
@@ -1513,6 +1532,9 @@ function ArticulationStep({
   item: TrainingCourseItem;
   onNext: () => void;
 }) {
+  const itemText = item.displayText ?? item.text;
+  const itemDensity = getPracticeTextDensity(itemText);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -1520,20 +1542,26 @@ function ArticulationStep({
       className="rounded-xl border bg-card p-6 shadow-sm"
     >
       <Badge variant="secondary">{level.title}</Badge>
-      <h2 className="mt-4 text-2xl font-bold">
-        {item.displayText ?? item.text}
+      <h2
+        className={`${getCenteredProminentTextClassName(
+          itemDensity,
+        )} mt-4 font-bold`}
+      >
+        {itemText}
       </h2>
-      <p className="mt-3 text-base leading-relaxed">{item.focusPoint}</p>
+      <p className="mx-auto mt-3 max-w-xl break-words text-center text-base leading-relaxed [overflow-wrap:anywhere]">
+        {item.focusPoint}
+      </p>
       <div className="mt-4 grid gap-3 md:grid-cols-2">
         <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-4">
           <p className="text-sm font-semibold text-red-600">常见错误</p>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mt-1 break-words text-center text-sm text-muted-foreground [overflow-wrap:anywhere]">
             {item.commonMistake}
           </p>
         </div>
         <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">
           <p className="text-sm font-semibold text-primary">通过感觉</p>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mt-1 break-words text-center text-sm text-muted-foreground [overflow-wrap:anywhere]">
             {item.successCue}
           </p>
         </div>
@@ -1624,6 +1652,9 @@ function RecordingStep({
         failedAttempts,
       })
     : null;
+  const itemText = item.displayText ?? item.text;
+  const itemDensity = getPracticeTextDensity(itemText);
+  const ipaDensity = getPracticeTextDensity(item.ipa ?? "", "phrase");
 
   return (
     <motion.div
@@ -1632,15 +1663,23 @@ function RecordingStep({
       className="rounded-xl border bg-card p-6 text-center shadow-sm"
     >
       <Badge variant="secondary">{level.title}</Badge>
-      <h2 className="mt-4 text-3xl font-bold">
-        {item.displayText ?? item.text}
+      <h2
+        className={`${getCenteredProminentTextClassName(
+          itemDensity,
+        )} mt-4 font-bold`}
+      >
+        {itemText}
       </h2>
       {item.ipa && (
-        <p className="mt-2 font-mono text-sm text-muted-foreground">
+        <p
+          className={`${getCenteredMonoTextClassName(
+            ipaDensity,
+          )} mt-2 font-mono text-muted-foreground`}
+        >
           {item.ipa}
         </p>
       )}
-      <p className="mx-auto mt-3 max-w-xl text-sm text-muted-foreground">
+      <p className="mx-auto mt-3 max-w-xl break-words text-center text-sm text-muted-foreground [overflow-wrap:anywhere]">
         {item.focusPoint}
       </p>
 
@@ -1718,12 +1757,12 @@ function RecordingStep({
             </div>
           )}
           {lastAttempt.patterns.length > 0 && (
-            <div className="mt-4 rounded-lg border bg-background p-3 text-left text-sm">
+            <div className="mt-4 rounded-lg border bg-background p-3 text-center text-sm">
               <p className="font-semibold">识别到的错因</p>
-              <p className="mt-1 text-muted-foreground">
+              <p className="mt-1 break-words text-muted-foreground [overflow-wrap:anywhere]">
                 {lastAttempt.patterns[0].coachExplanation}
               </p>
-              <p className="mt-2 font-medium text-primary">
+              <p className="mt-2 break-words font-medium text-primary [overflow-wrap:anywhere]">
                 下一次只改：{lastAttempt.analysis.nextCue}
               </p>
               {lastAttempt.analysis.scoreGap >= 12 && (
@@ -1735,18 +1774,18 @@ function RecordingStep({
             </div>
           )}
           {!lastAttempt.passed && lastAttempt.patterns.length === 0 && (
-            <div className="mt-4 rounded-lg border bg-background p-3 text-left text-sm">
+            <div className="mt-4 rounded-lg border bg-background p-3 text-center text-sm">
               <p className="font-semibold">下一次只改一个动作</p>
-              <p className="mt-1 text-primary">
+              <p className="mt-1 break-words text-primary [overflow-wrap:anywhere]">
                 {lastAttempt.analysis.nextCue}
               </p>
             </div>
           )}
           {deepCoach && <DeepPracticeCoachPanel coach={deepCoach} />}
           {showRemediation && remediation && (
-            <div className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-left text-sm dark:border-red-900 dark:bg-red-950/20">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="font-semibold text-red-700 dark:text-red-400">
+            <div className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-center text-sm dark:border-red-900 dark:bg-red-950/20">
+              <div className="flex flex-wrap items-center justify-center gap-2">
+                <p className="break-words font-semibold text-red-700 dark:text-red-400 [overflow-wrap:anywhere]">
                   {remediation.title}
                 </p>
                 <Badge variant="outline">
@@ -1755,11 +1794,20 @@ function RecordingStep({
               </div>
               {currentRemediationStep && (
                 <div className="mt-3 rounded-lg bg-background/85 p-3">
-                  <p className="font-medium">{currentRemediationStep.prompt}</p>
-                  <p className="mt-1 text-xs text-muted-foreground">
+                  <p className="break-words font-medium [overflow-wrap:anywhere]">
+                    {currentRemediationStep.prompt}
+                  </p>
+                  <p
+                    className={`${getCenteredReadableTextClassName(
+                      getPracticeTextDensity(
+                        currentRemediationStep.text,
+                        "phrase",
+                      ),
+                    )} mt-1 text-muted-foreground`}
+                  >
                     {currentRemediationStep.text}
                   </p>
-                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
                     <Button
                       type="button"
                       size="sm"
@@ -1827,7 +1875,7 @@ function RecordingStep({
                       </div>
                       <p
                         className={cn(
-                          "mt-2 text-sm font-medium",
+                          "mt-2 break-words text-center text-sm font-medium [overflow-wrap:anywhere]",
                           remediationAttempt.passed
                             ? "text-primary"
                             : "text-red-500",
@@ -1908,11 +1956,15 @@ function DeepPracticeCoachPanel({ coach }: { coach: DeepPracticeCoach }) {
         : "border-amber-500/25 bg-amber-500/10";
 
   return (
-    <div className={cn("mt-4 rounded-lg border p-4 text-left text-sm", tone)}>
-      <div className="flex flex-wrap items-start justify-between gap-2">
-        <div>
-          <p className="font-semibold">{coach.title}</p>
-          <p className="mt-1 text-muted-foreground">{coach.diagnosis}</p>
+    <div className={cn("mt-4 rounded-lg border p-4 text-center text-sm", tone)}>
+      <div className="flex flex-wrap items-start justify-center gap-2">
+        <div className="max-w-full">
+          <p className="break-words font-semibold [overflow-wrap:anywhere]">
+            {coach.title}
+          </p>
+          <p className="mt-1 break-words text-muted-foreground [overflow-wrap:anywhere]">
+            {coach.diagnosis}
+          </p>
         </div>
         <Badge
           variant={coach.status === "stuck-prep" ? "destructive" : "secondary"}
@@ -1926,13 +1978,17 @@ function DeepPracticeCoachPanel({ coach }: { coach: DeepPracticeCoach }) {
           <p className="text-xs font-semibold uppercase text-muted-foreground">
             身体检查
           </p>
-          <p className="mt-1 font-medium">{coach.bodyCheck}</p>
+          <p className="mt-1 break-words font-medium [overflow-wrap:anywhere]">
+            {coach.bodyCheck}
+          </p>
         </div>
         <div className="rounded-md bg-background/80 p-3">
           <p className="text-xs font-semibold uppercase text-muted-foreground">
             回听检查
           </p>
-          <p className="mt-1 font-medium">{coach.listeningCheck}</p>
+          <p className="mt-1 break-words font-medium [overflow-wrap:anywhere]">
+            {coach.listeningCheck}
+          </p>
         </div>
       </div>
 
@@ -1946,16 +2002,24 @@ function DeepPracticeCoachPanel({ coach }: { coach: DeepPracticeCoach }) {
               key={`${step.label}-${step.text}`}
               className="rounded-md bg-muted/40 p-2"
             >
-              <div className="flex items-center gap-2">
+              <div className="flex items-center justify-center gap-2">
                 <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
                   {index + 1}
                 </span>
-                <p className="font-medium">{step.label}</p>
+                <p className="break-words font-medium [overflow-wrap:anywhere]">
+                  {step.label}
+                </p>
               </div>
-              <p className="mt-1 text-xs text-muted-foreground">
+              <p className="mt-1 break-words text-xs text-muted-foreground [overflow-wrap:anywhere]">
                 {step.instruction}
               </p>
-              <p className="mt-1 font-mono text-xs text-primary">{step.text}</p>
+              <p
+                className={`${getCenteredCompactTextClassName(
+                  getPracticeTextDensity(step.text, "phrase"),
+                )} mt-1 font-mono text-primary`}
+              >
+                {step.text}
+              </p>
             </div>
           ))}
         </div>
@@ -1966,13 +2030,17 @@ function DeepPracticeCoachPanel({ coach }: { coach: DeepPracticeCoach }) {
           <p className="text-xs font-semibold uppercase text-muted-foreground">
             继续规则
           </p>
-          <p className="mt-1 text-muted-foreground">{coach.moveOnRule}</p>
+          <p className="mt-1 break-words text-muted-foreground [overflow-wrap:anywhere]">
+            {coach.moveOnRule}
+          </p>
         </div>
         <div className="rounded-md bg-background/80 p-3">
           <p className="text-xs font-semibold uppercase text-muted-foreground">
             自检问题
           </p>
-          <p className="mt-1 text-muted-foreground">{coach.reflectionPrompt}</p>
+          <p className="mt-1 break-words text-muted-foreground [overflow-wrap:anywhere]">
+            {coach.reflectionPrompt}
+          </p>
         </div>
       </div>
     </div>
@@ -2043,7 +2111,7 @@ function CompletedStep({
           </div>
         </div>
         {(summary.remediationResults?.length ?? 0) > 0 && (
-          <div className="mt-3 rounded-lg border bg-background p-3 text-left text-sm">
+          <div className="mt-3 rounded-lg border bg-background p-3 text-center text-sm">
             <p className="font-semibold">补救效果</p>
             <div className="mt-2 grid gap-2 md:grid-cols-2">
               {summary.remediationResults?.slice(-4).map((item) => (
@@ -2051,7 +2119,13 @@ function CompletedStep({
                   key={`${item.pathId}-${item.stepIndex}-${item.text}-${item.targetScore}`}
                   className="rounded-md bg-muted/40 p-2"
                 >
-                  <p className="font-medium">{item.text}</p>
+                  <p
+                    className={`${getCenteredCompactTextClassName(
+                      getPracticeTextDensity(item.text, "phrase"),
+                    )} font-medium`}
+                  >
+                    {item.text}
+                  </p>
                   <p className="text-xs text-muted-foreground">
                     {item.beforeTargetScore} → {item.targetScore} ·{" "}
                     {item.passed ? "有效" : "继续拆解"}
@@ -2082,11 +2156,13 @@ function CompletedStep({
             </div>
           ))}
         </div>
-        <div className="mt-5 rounded-lg border bg-background p-4 text-left">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <div>
-              <p className="text-sm font-semibold">{debrief.headline}</p>
-              <p className="mt-1 text-sm text-muted-foreground">
+        <div className="mt-5 rounded-lg border bg-background p-4 text-center">
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            <div className="max-w-full">
+              <p className="break-words text-sm font-semibold [overflow-wrap:anywhere]">
+                {debrief.headline}
+              </p>
+              <p className="mt-1 break-words text-sm text-muted-foreground [overflow-wrap:anywhere]">
                 {debrief.mainFinding}
               </p>
             </div>
@@ -2096,7 +2172,7 @@ function CompletedStep({
               </Badge>
             )}
           </div>
-          <p className="mt-3 text-sm font-medium text-primary">
+          <p className="mt-3 break-words text-sm font-medium text-primary [overflow-wrap:anywhere]">
             {debrief.nextActionReason}
           </p>
           <div className="mt-3 grid gap-2 md:grid-cols-3">
@@ -2105,7 +2181,9 @@ function CompletedStep({
                 <span className="mr-2 font-semibold text-primary">
                   {index + 1}
                 </span>
-                <span className="text-muted-foreground">{step}</span>
+                <span className="break-words text-muted-foreground [overflow-wrap:anywhere]">
+                  {step}
+                </span>
               </div>
             ))}
           </div>

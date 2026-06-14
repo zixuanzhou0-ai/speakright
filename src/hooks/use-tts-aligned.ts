@@ -4,6 +4,7 @@ import { Howl, Howler } from "howler";
 import { useCallback, useRef, useState } from "react";
 import { elevenLabsTtsAligned } from "@/lib/api-client";
 import { getElevenLabsConfig } from "@/lib/api-keys";
+import { getLocalAudioPlaybackVolume } from "@/lib/audio-normalization";
 import {
   getElevenLabsLanguagePack,
   isElevenLabsPackLanguageId,
@@ -124,18 +125,23 @@ function resolveSpeakOptions(
 async function loadLocalLanguagePackBlob(
   languageId: LanguageId,
   text: string,
-): Promise<Blob | null> {
+): Promise<{ blob: Blob; audioSrc?: string } | null> {
   if (!isElevenLabsPackLanguageId(languageId)) return null;
 
   try {
     const staticEntry = await getStaticLanguageAudioPackEntry(languageId, text);
     if (staticEntry) {
       const response = await fetch(staticEntry.audioSrc);
-      if (response.ok) return response.blob();
+      if (response.ok) {
+        return {
+          blob: await response.blob(),
+          audioSrc: staticEntry.audioSrc,
+        };
+      }
     }
 
     const installedEntry = await getLanguageAudioPackEntry(languageId, text);
-    return installedEntry?.audioBlob ?? null;
+    return installedEntry ? { blob: installedEntry.audioBlob } : null;
   } catch {
     return null;
   }
@@ -153,6 +159,7 @@ export function useTtsAligned(): UseTtsAlignedReturn {
   const blobUrlRef = useRef<string | null>(null);
   const lastAudioBlobRef = useRef<Blob | null>(null);
   const lastWordTimingsRef = useRef<WordTiming[]>([]);
+  const lastPlaybackOptionsRef = useRef<{ volume?: number; html5?: boolean }>({});
   const requestIdRef = useRef(0);
 
   const cleanup = useCallback(() => {
@@ -181,7 +188,11 @@ export function useTtsAligned(): UseTtsAlignedReturn {
   }, []);
 
   const playBlob = useCallback(
-    (blob: Blob, timings: WordTiming[]) => {
+    (
+      blob: Blob,
+      timings: WordTiming[],
+      options: { volume?: number; html5?: boolean } = {},
+    ) => {
       cleanup();
       setWordTimings(timings);
       setCurrentTime(0);
@@ -192,7 +203,8 @@ export function useTtsAligned(): UseTtsAlignedReturn {
       const howl = new Howl({
         src: [url],
         format: ["mp3"],
-        html5: true,
+        html5: options.html5 ?? true,
+        volume: options.volume ?? 1,
         onplay: () => {
           setIsPlaying(true);
           startTimeTracking();
@@ -237,6 +249,7 @@ export function useTtsAligned(): UseTtsAlignedReturn {
     setCurrentTime(0);
     lastAudioBlobRef.current = null;
     lastWordTimingsRef.current = [];
+    lastPlaybackOptionsRef.current = {};
   }, [cleanup]);
 
   const speak = useCallback(
@@ -257,10 +270,17 @@ export function useTtsAligned(): UseTtsAlignedReturn {
       const localBlob = await loadLocalLanguagePackBlob(languageId, text);
       if (requestIdRef.current !== requestId) return;
       if (localBlob) {
-        lastAudioBlobRef.current = localBlob;
+        const playbackOptions = {
+          html5: !localBlob.audioSrc,
+          volume: localBlob.audioSrc
+            ? getLocalAudioPlaybackVolume(localBlob.audioSrc)
+            : 1,
+        };
+        lastAudioBlobRef.current = localBlob.blob;
         lastWordTimingsRef.current = [];
+        lastPlaybackOptionsRef.current = playbackOptions;
         setIsLoading(false);
-        playBlob(localBlob, []);
+        playBlob(localBlob.blob, [], playbackOptions);
         return;
       }
 
@@ -287,6 +307,7 @@ export function useTtsAligned(): UseTtsAlignedReturn {
             : [];
           lastAudioBlobRef.current = blob;
           lastWordTimingsRef.current = timings;
+          lastPlaybackOptionsRef.current = {};
           setIsLoading(false);
           playBlob(blob, timings);
           return;
@@ -341,6 +362,7 @@ export function useTtsAligned(): UseTtsAlignedReturn {
         // Store for replay
         lastAudioBlobRef.current = blob;
         lastWordTimingsRef.current = timings;
+        lastPlaybackOptionsRef.current = {};
 
         setIsLoading(false);
         playBlob(blob, timings);
@@ -350,10 +372,17 @@ export function useTtsAligned(): UseTtsAlignedReturn {
         const localBlob = await loadLocalLanguagePackBlob(languageId, text);
         if (requestIdRef.current !== requestId) return;
         if (localBlob) {
-          lastAudioBlobRef.current = localBlob;
+          const playbackOptions = {
+            html5: !localBlob.audioSrc,
+            volume: localBlob.audioSrc
+              ? getLocalAudioPlaybackVolume(localBlob.audioSrc)
+              : 1,
+          };
+          lastAudioBlobRef.current = localBlob.blob;
           lastWordTimingsRef.current = [];
+          lastPlaybackOptionsRef.current = playbackOptions;
           setIsLoading(false);
-          playBlob(localBlob, []);
+          playBlob(localBlob.blob, [], playbackOptions);
           return;
         }
         const details = e instanceof Error ? `（${e.message}）` : "";
@@ -366,7 +395,11 @@ export function useTtsAligned(): UseTtsAlignedReturn {
 
   const replay = useCallback(() => {
     if (!lastAudioBlobRef.current) return;
-    playBlob(lastAudioBlobRef.current, lastWordTimingsRef.current);
+    playBlob(
+      lastAudioBlobRef.current,
+      lastWordTimingsRef.current,
+      lastPlaybackOptionsRef.current,
+    );
   }, [playBlob]);
 
   return {

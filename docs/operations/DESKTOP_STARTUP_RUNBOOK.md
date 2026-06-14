@@ -1,6 +1,6 @@
 # Desktop Startup Runbook
 
-Last verified: 2026-06-11
+Last verified: 2026-06-14
 
 This repository is the current SpeakRight Desktop workspace:
 
@@ -13,13 +13,21 @@ current desktop app. If Microsoft Edge shows `localhost refused`, that is not th
 desktop app by itself; it usually means a browser tab is pointed at a dev URL
 while the dev server is not running.
 
-## Start Tomorrow: 2026-06-12
+## Start Next Chat
 
 For user testing and release acceptance, start the static Release EXE. This is
 the same runtime shape as the packaged desktop app and does not depend on
 `localhost` or the Next dev server.
 
-1. Confirm the repository is clean and on the current desktop repo:
+1. Read the current handoff before changing code:
+
+```bat
+cd /d E:\SpeakRightDesktopRepo
+type docs\operations\NEXT_CHAT_HANDOFF.md
+type docs\operations\RC_EVIDENCE_AUDIT.md
+```
+
+2. Confirm the repository and current worktree state:
 
 ```bat
 cd /d E:\SpeakRightDesktopRepo
@@ -27,24 +35,32 @@ git status --short --branch
 npm run desktop:preflight
 ```
 
-Expected result:
+Expected result for a fully settled release branch:
 
 ```text
 ## main...origin/main
 Desktop preflight passed.
 ```
 
-2. Start the already-built Release EXE:
+If `git status` shows local edits, preserve them unless the user explicitly asks
+to discard them. The 2026-06-12 handoff intentionally records local UI/content
+work that should continue in the next chat.
+
+Current RC-handoff state may instead show `main...origin/main [ahead 5]` plus
+the documented uncommitted release-tightening files. That is expected for this
+local handoff; do not clean or revert the worktree just to make preflight quiet.
+
+3. Start the already-built Release EXE:
 
 ```bat
 cd /d E:\SpeakRightDesktopRepo
 npm run desktop:launch-release
 ```
 
-3. Use the app window that opens from Tauri. Do not use a browser tab pointed at
+4. Use the app window that opens from Tauri. Do not use a browser tab pointed at
    `localhost`.
 
-4. Begin manual QA with this order:
+5. Begin manual QA with this order:
 
 - Settings: confirm language switch, Azure, ElevenLabs, LLM, data/privacy, and
   release info are visible.
@@ -161,10 +177,29 @@ npm run audio:parity:dry-run
 The dry-run writes `src-tauri\target\audio-parity\gap-report.json`, checks
 Spanish/French/Russian audio coverage, and makes zero ElevenLabs API calls.
 
+Run the local A/B loudness dry-run after playback-gain changes:
+
+```bat
+npm run audio:loudness:dry-run
+```
+
+The loudness dry-run uses local ffmpeg `volumedetect` on representative teaching
+videos, bundled A/B word audio, and IPA chart normal/slow word audio, writes
+`src-tauri\target\audio-loudness\report.json`, and makes zero ElevenLabs API
+calls.
+
 Use `desktop:ui-smoke` for release-window page coverage. It opens Settings,
 English, Spanish, French, Russian, drill, free practice, and diagnosis routes,
 checks that the runtime is not `localhost`, and avoids recording, Azure live
-scoring, and ElevenLabs TTS generation.
+scoring, and ElevenLabs TTS generation. It also checks detail-page reading
+targets for centered text, no ellipsis/nowrap, no practice-button overlap,
+expected header-audio visibility/clickability readiness, wrapping video selector labels plus selector
+no-overlap/no-overflow runtime checks, Settings/usage long-text wrapping,
+Settings pronunciation-test row wrapping/no-overlap runtime checks, A/B voice
+selector and word-audio button visibility/clickability/label runtime checks,
+scoring-breakdown visibility/readability/no-overflow runtime checks, scoring
+tile short-audio policy checks, and a narrow desktop window plus low-height
+window pass that also check scoring-breakdown readiness.
 
 Do not run ElevenLabs TTS smoke or audio generation scripts during routine
 startup or manual QA. If bundled audio is missing, record the missing item first
@@ -271,6 +306,141 @@ release notes and installation guide keep the unsigned warning visible.
 - Only rebuild with `npm run desktop:run-release` after code changes or if the
   release executable is missing.
 
+## 2026-06-12 Non-English Layout Handoff
+
+- Current local work has moved from layout-only fixes to RC evidence auditing.
+  The proof matrix lives in `docs\operations\RC_EVIDENCE_AUDIT.md`.
+- Latest local changes make practice targets show the full word, phrase, or
+  sentence to read; long IPA and hints wrap instead of truncating.
+- Non-English rule units now use Chinese labels such as `规则训练 · 音节节奏`
+  and `规则训练 · 词尾静音` rather than large raw labels like `syllable timing`
+  or `silent final C`.
+- Header speaker buttons are hidden when a non-English sound unit has no real
+  local target-sound audio; the UI should not jump to external reference pages
+  from a fake speaker control.
+- Spanish `词重音` and `音节节奏`, plus French `词尾静音`, had repeated or same-root
+  examples reduced. Continue checking all non-English sound units for duplicate
+  training text and ugly wrapping before calling the UI stable.
+- Focused verification already run for this local pass:
+  - `npm.cmd run test -- phoneme-study-card language-learning-decks practice-text-presentation sidebar video-player`
+  - `npm.cmd run typecheck`
+  - `npm.cmd run lint`
+  - `npm.cmd run desktop:build`
+  - `npm.cmd run desktop:launch-release`
+- The latest Release EXE path remains:
+  `E:\SpeakRightDesktopRepo\src-tauri\target\release\speakright.exe`.
+
+## 2026-06-12 RC Evidence Audit
+
+- Added `docs\operations\RC_EVIDENCE_AUDIT.md` as the release-candidate proof
+  matrix. It maps each RC requirement to source files, tests, smoke checks, or
+  validation commands.
+- Formal mastery recording remains English-only. Spanish, French, and Russian
+  can practice, score, and receive feedback, but they stay experimental and do
+  not write formal mastery/evidenceMastery.
+- `desktop:ui-smoke` is the authoritative Release EXE smoke for UI regressions:
+  it checks Settings, English, Spanish, French, Russian, drill, free practice,
+  diagnosis, detail task text readability, expected header-audio
+  visibility/clickability readiness, no practice-button overlap, wrapping video
+  selector labels, and that the app is not served from localhost.
+- Use `audio:parity:dry-run` for the non-English audio gate; it must remain a
+  zero-generation audit.
+
+## 2026-06-14 Tomorrow Test Readiness
+
+- Release EXE was rebuilt after the RC audio/playback, mastery-gating,
+  small-bug smoke tightening, and exact header-clip scoring-audio pass:
+  `E:\SpeakRightDesktopRepo\src-tauri\target\release\speakright.exe`.
+- The Release EXE smoke now covers centered/wrapping target text, scoring
+  breakdown hooks, Settings/usage long text, Settings pronunciation-test row
+  wrapping/no-overlap runtime checks, A/B voice selector and word-audio button
+  visibility/clickability/label runtime checks, video selector
+  no-overlap/no-overflow runtime checks, a
+  narrow desktop window, and a low-height desktop window.
+- Non-English diagnosis remains experimental and now treats omission/insertion
+  miscues as insufficient evidence for trusted overall scores.
+- Bundled local A/B word audio now uses peak-safe Web Audio gain at playback
+  time so English and Spanish/French/Russian local word examples are closer to
+  teaching video loudness without regenerating TTS or allowing obvious clipping.
+  The cached normalization helper uses the same language-pack fallback gain as
+  the active playback hook, and very quiet decoded clips can reach up to `12x`
+  peak-safe gain when their peaks permit it, so future local-audio call sites do
+  not bypass A/B loudness compensation. Bundled language-pack read-along
+  playback now keeps that boost on first play and replay instead of losing it
+  after converting a local file to a blob.
+- Header speakers and scoring-breakdown phoneme tiles use short local clips.
+  Right-side assessment tiles for Spanish, French, and Russian now reuse the
+  exact same left/detail sound-unit header clip (`phonemeAudio.localSrc`) when
+  a verified single-IPA alias exists. Unverified, proxy, rule, prosody, or
+  composite segments stay visible but unclickable; they do not fall back to
+  word examples, rule audio, proxy media, or teaching-video audio. Source policy
+  forbids exposing video files as phoneme-audio `localSrc`. The shared
+  audio-player hook also refuses video-backed sources as a final guard against
+  long teaching-video audio playing from a speaker button. Scoring tiles also
+  reject video-backed audio URLs before constructing a `Howl`, so a missed
+  upstream guard cannot play a full teaching-video track from the assessment
+  breakdown. The header speaker component also refuses external-only references
+  and browser-TTS fallback audio, so page-level filtering is no longer the only
+  guard.
+- Advanced pack-runner and HVPT perception mastery writes are now gated by
+  `canRecordFormalMastery(languageId)`, keeping Spanish, French, and Russian
+  practice/feedback-only while experimental.
+- Latest local verification:
+  - Focused exact scoring-audio tests: `6` files and `57` tests passed,
+    including left/right header-clip parity, Spanish/French/Russian exact alias
+    inventory, unclickable unverified tiles, and header/scoring short playback.
+  - Desktop UI smoke script self-test: `1` file and `7` tests passed after the
+    smoke policy was updated to require one exact playable header clip and one
+    locked unverified tile.
+  - Focused audio/playback tests: `9` files and `65` tests passed, including
+    list-card IPA one-shot playback, chart-word volume policy, bundled
+    language-pack read-along gain, and replay gain.
+  - Additional low-level audio guard tests are now included in the focused
+    audio/playback set.
+  - Focused UI/source/text tests: `4` files and `18` tests passed.
+  - Additional audio/resource/mastery focused tests: `6` files and `44` tests,
+    then `6` files and `28` tests, passed.
+  - Mastery/HVPT policy focused tests: `4` files and `22` tests passed.
+  - `npm.cmd run test`: `89` files and `489` tests passed.
+  - `npm.cmd run typecheck`: passed.
+  - `npm.cmd run lint`: passed; Biome checked `341` files.
+  - `npm.cmd run build:desktop-frontend`: passed; `144` static pages generated.
+  - `npm.cmd run desktop:build`: passed; rebuilt Release EXE, MSI, and NSIS.
+  - `npm.cmd run desktop:preflight`: passed.
+  - `npm.cmd run desktop:ui-smoke`: passed from Release EXE with centered target
+    text assertions, scoring-breakdown visibility/readability checks in normal,
+    narrow, and low-height detail windows,
+    `scoringTileAudioPolicy=ok`,
+    Settings/usage wrapping,
+    `narrowViewport=ok`, `lowHeightViewport=ok`, and
+    `releaseServedFromDevServer=false`.
+  - `npm.cmd run audio:parity:dry-run`: Spanish `880`, French `1090`, Russian
+    `920`, total missing `0`, no ElevenLabs calls.
+  - Latest recorded `npm.cmd run audio:loudness:dry-run`: reference video mean `-14.7 dB`,
+    word floor `-21.6 dB`; representative English, Spanish, French, Russian
+    A/B word samples, plus IPA chart normal/slow word samples, passed after
+    playback-layer gain; no ElevenLabs calls. It was not rerun during the
+    exact-header scoring-tile pass because that pass did not change loudness
+    math.
+- IPA display and audit policy is now documented in
+  `docs/operations/IPA_DISPLAY_AUDIT_STRATEGY.md`. The non-English audit input
+  generated from the current source data is tracked at
+  `docs/operations/non-english-ipa-audit-input.json` with `988` rows: Spanish
+  `263`, French `353`, Russian `372`. A generated local copy may also exist in
+  `src-tauri/target/ipa-audit/`. Use the prompt in that document for GPT
+  Research or expert review before changing IPA strings in bulk.
+- Tomorrow's manual test should start with:
+
+```bat
+cd /d E:\SpeakRightDesktopRepo
+git status --short --branch
+npm.cmd run desktop:preflight
+npm.cmd run desktop:launch-release
+```
+
+- If `desktop:preflight` reports an existing `speakright.exe`, close that app
+  window first. Do not switch to localhost or dev mode for acceptance testing.
+
 ## 2026-06-11 Multilingual Audio Parity Dry-Run
 
 - Added `npm run audio:parity:dry-run`.
@@ -319,7 +489,7 @@ release notes and installation guide keep the unsigned warning visible.
   - `npm.cmd run audio:parity:dry-run`: Spanish `880`, French `1090`, Russian
     `920`, total missing `0`.
   - `npm.cmd run desktop:live-validation`: English `1464`, Spanish `880`,
-    French `1090`, Russian `920`, videos `210`, Azure `220/220`, ElevenLabs
+    French `1090`, Russian `920`, videos `224`, Azure `220/220`, ElevenLabs
     generated characters `0`.
   - `npm.cmd run validate:desktop`: passed, including Tauri build, UI smoke,
     release smoke, release report, and installer smoke.

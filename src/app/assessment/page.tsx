@@ -42,6 +42,12 @@ import {
 import { getAnyLanguagePhonemeBySlug } from "@/lib/language-phonemes";
 import { getLanguageProfile } from "@/lib/language-profiles";
 import { getPhonemeBySlug } from "@/lib/phoneme-data";
+import {
+  getCenteredMonoTextClassName,
+  getCenteredProminentTextClassName,
+  getCenteredReadableTextClassName,
+  getPracticeTextDensity,
+} from "@/lib/practice-text-presentation";
 import { buildTrainingPrescription } from "@/lib/training-prescription";
 import type {
   AssessmentPhase,
@@ -402,6 +408,13 @@ export default function AssessmentPage() {
       : phase.type === "adaptive"
         ? phase.words[phase.index]
         : null;
+  const currentWordDensity = currentWord
+    ? getPracticeTextDensity(currentWord.word)
+    : "short";
+  const paragraphDensity = getPracticeTextDensity(
+    assessmentParagraph,
+    "sentence",
+  );
 
   return (
     <LanguageModuleGate moduleName="发音诊断" readinessKey="diagnosis">
@@ -516,8 +529,14 @@ export default function AssessmentPage() {
                       </Badge>
                     ))}
                   </div>
-                  <span className="text-4xl font-bold">{currentWord.word}</span>
-                  <span className="block font-mono text-lg text-muted-foreground">
+                  <span
+                    className={`font-bold ${getCenteredProminentTextClassName(currentWordDensity)}`}
+                  >
+                    {currentWord.word}
+                  </span>
+                  <span
+                    className={`block font-mono text-muted-foreground ${getCenteredMonoTextClassName(currentWordDensity)}`}
+                  >
                     {currentWord.ipa}
                   </span>
                   {currentWord.purpose && (
@@ -611,10 +630,14 @@ export default function AssessmentPage() {
               </div>
 
               <div className="rounded-xl border bg-card p-6 shadow-sm space-y-4">
-                <p className="text-sm text-muted-foreground">
+                <p className="text-center text-sm text-muted-foreground">
                   请按自然语速朗读以下短文。这里主要检测重音、弱读、连读、停顿和流利度。
                 </p>
-                <p className="text-base leading-relaxed">
+                <p
+                  className={getCenteredReadableTextClassName(
+                    paragraphDensity,
+                  )}
+                >
                   {assessmentParagraph}
                 </p>
                 <div>

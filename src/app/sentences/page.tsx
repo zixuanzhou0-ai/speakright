@@ -30,6 +30,7 @@ import {
   recordFreePracticeTransfer,
 } from "@/lib/free-practice-transfer";
 import { getLanguageProfile } from "@/lib/language-profiles";
+import { canRecordFormalMastery } from "@/lib/mastery-language-policy";
 import { loadMasteryProfile, saveMasteryProfile } from "@/lib/mastery-profile";
 import { reliabilityFromRecordingQuality } from "@/lib/recording-quality";
 import { addScore } from "@/lib/score-history";
@@ -52,6 +53,7 @@ export default function SentencesPage() {
 
   const isWordMode = !isSentence(sentence);
   const trimmedText = sentence.trim();
+  const canUseMasteryTransfer = canRecordFormalMastery(languageId);
 
   const wordIpa = useWordIpa(isWordMode ? trimmedText : "");
   const [hasPlayedWord, setHasPlayedWord] = useState(false);
@@ -78,14 +80,14 @@ export default function SentencesPage() {
   const previousTrimmedTextRef = useRef(trimmedText);
   const targetPreview = useMemo(
     () =>
-      trimmedText
+      trimmedText && canUseMasteryTransfer
         ? buildFreePracticeTargetPreview({
             profile,
             text: trimmedText,
             mode: isWordMode ? "word" : "sentence",
           })
         : null,
-    [profile, trimmedText, isWordMode],
+    [profile, trimmedText, isWordMode, canUseMasteryTransfer],
   );
 
   // ── Session restore/save ──
@@ -229,35 +231,40 @@ export default function SentencesPage() {
       const text = sentence.trim();
       const histKey = `${languageId}:${text.slice(0, 50)}:${text.length}`;
       addScore(histKey, result.pronunciationScore);
-      const profile = loadMasteryProfile();
-      const transfer = analyzeFreePracticeTransfer({
-        profile,
-        result,
-        text,
-        mode: isSentence(text) ? "sentence" : "word",
-      });
-      if (transfer.evidences.length > 0) {
-        const reliability = reliabilityFromRecordingQuality(
-          recordingQuality.report,
-          {
-            evidenceStrength:
-              transfer.evidences.length >= 2 ? "strong" : "fair",
-            note:
-              recordingQuality.report?.issues.length === 0
-                ? "自由练习命中当前目标且录音质量稳定，可计入迁移证据。"
-                : "自由练习录音存在质量提示，本次只作为观察，不提升掌握度。",
-          },
-        );
-        const recorded = recordFreePracticeTransfer(
+
+      if (canUseMasteryTransfer) {
+        const profile = loadMasteryProfile();
+        const transfer = analyzeFreePracticeTransfer({
           profile,
-          transfer,
-          reliability,
-        );
-        saveMasteryProfile(recorded.profile);
-        setProfile(recorded.profile);
-        setTransferSummary(recorded.summary);
+          result,
+          text,
+          mode: isSentence(text) ? "sentence" : "word",
+        });
+        if (transfer.evidences.length > 0) {
+          const reliability = reliabilityFromRecordingQuality(
+            recordingQuality.report,
+            {
+              evidenceStrength:
+                transfer.evidences.length >= 2 ? "strong" : "fair",
+              note:
+                recordingQuality.report?.issues.length === 0
+                  ? "自由练习命中当前目标且录音质量稳定，可计入迁移证据。"
+                  : "自由练习录音存在质量提示，本次只作为观察，不提升掌握度。",
+            },
+          );
+          const recorded = recordFreePracticeTransfer(
+            profile,
+            transfer,
+            reliability,
+          );
+          saveMasteryProfile(recorded.profile);
+          setProfile(recorded.profile);
+          setTransferSummary(recorded.summary);
+        } else {
+          setTransferSummary(transfer);
+        }
       } else {
-        setTransferSummary(transfer);
+        setTransferSummary(null);
       }
       llm.requestFeedback(
         text,
@@ -274,6 +281,7 @@ export default function SentencesPage() {
     recordingQuality,
     languageId,
     languageProfile.azureLocale,
+    canUseMasteryTransfer,
   ]);
 
   useEffect(() => {

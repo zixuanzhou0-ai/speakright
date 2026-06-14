@@ -11,6 +11,10 @@ import {
 } from "@/lib/language-sound-unit-groups";
 import { getLanguagePhonemes } from "@/lib/language-phonemes";
 import { getLanguageProfile } from "@/lib/language-profiles";
+import {
+  getCenteredMonoTextClassName,
+  getPracticeTextDensity,
+} from "@/lib/practice-text-presentation";
 import type { DrillKind } from "@/types/drill";
 import type { PhonemeData } from "@/types/phoneme";
 
@@ -165,6 +169,8 @@ function PhonemeChip({
   selected: boolean;
   onClick: () => void;
 }) {
+  const exampleDensity = getPracticeTextDensity(phoneme.example);
+
   return (
     <motion.button
       type="button"
@@ -177,8 +183,12 @@ function PhonemeChip({
           : "border-border hover:border-primary/50"
       }`}
     >
-      <span className="font-mono text-lg font-bold">{phoneme.ipa}</span>
-      <span className="text-[10px] text-muted-foreground truncate w-full">
+      <span className="max-w-full break-words text-center font-mono text-lg font-bold [overflow-wrap:anywhere]">
+        {phoneme.ipa}
+      </span>
+      <span
+        className={`min-h-7 w-full font-medium text-muted-foreground ${getCenteredMonoTextClassName(exampleDensity)}`}
+      >
         {phoneme.example}
       </span>
     </motion.button>

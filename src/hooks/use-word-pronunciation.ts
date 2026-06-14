@@ -1,8 +1,14 @@
 "use client";
 
 import { Howl, Howler } from "howler";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { fetchPronunciation } from "@/lib/api-client";
+import {
+  calculateAudioNormalization,
+  getLocalAudioPlaybackVolume,
+  selectPeakSafePlaybackGain,
+  shouldNormalizeLocalAudioSrc,
+} from "@/lib/audio-normalization";
 import { isElevenLabsPackLanguageId } from "@/lib/elevenlabs-language-packs";
 import { getLanguageAudioPackEntry } from "@/lib/language-audio-pack-cache";
 import { getStaticLanguageAudioPackEntry } from "@/lib/static-language-audio-pack";
@@ -37,14 +43,68 @@ function resumeHowlerAudioContext(): void {
   }
 }
 
+function getSharedAudioContext(): AudioContext | null {
+  const ctx = Howler.ctx as AudioContext | undefined;
+  if (
+    !ctx ||
+    typeof ctx.decodeAudioData !== "function" ||
+    typeof ctx.createBufferSource !== "function" ||
+    typeof ctx.createGain !== "function"
+  ) {
+    return null;
+  }
+
+  return ctx;
+}
+
 export function useWordPronunciation(): UseWordPronunciationReturn {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const howlRef = useRef<Howl | null>(null);
+  const webAudioSourceRef = useRef<AudioBufferSourceNode | null>(null);
+  const webAudioGainRef = useRef<GainNode | null>(null);
   const blobUrlRef = useRef<string | null>(null);
+  const playRequestIdRef = useRef(0);
+  const mountedRef = useRef(true);
+
+  const setSafeIsPlaying = useCallback((value: boolean) => {
+    if (mountedRef.current) setIsPlaying(value);
+  }, []);
+
+  const setSafeIsLoading = useCallback((value: boolean) => {
+    if (mountedRef.current) setIsLoading(value);
+  }, []);
+
+  const setSafeError = useCallback((value: string | null) => {
+    if (mountedRef.current) setError(value);
+  }, []);
 
   const cleanup = useCallback(() => {
+    if (webAudioSourceRef.current) {
+      const source = webAudioSourceRef.current;
+      webAudioSourceRef.current = null;
+      source.onended = null;
+      try {
+        source.stop();
+      } catch {
+        // Already stopped or not started.
+      }
+      try {
+        source.disconnect();
+      } catch {
+        // Ignore Web Audio cleanup races.
+      }
+    }
+    if (webAudioGainRef.current) {
+      const gainNode = webAudioGainRef.current;
+      webAudioGainRef.current = null;
+      try {
+        gainNode.disconnect();
+      } catch {
+        // Ignore Web Audio cleanup races.
+      }
+    }
     if (howlRef.current) {
       howlRef.current.unload();
       howlRef.current = null;
@@ -61,55 +121,172 @@ export function useWordPronunciation(): UseWordPronunciationReturn {
       {
         format = "mp3",
         onLoadError,
+        requestId,
+        normalizeVolume = false,
       }: {
         format?: string;
         onLoadError?: () => void;
+        requestId?: number;
+        normalizeVolume?: boolean;
       } = {},
     ) => {
+      if (requestId !== undefined && requestId !== playRequestIdRef.current) {
+        return;
+      }
+
+      const shouldUseLocalBoost =
+        normalizeVolume && shouldNormalizeLocalAudioSrc(src);
+      const volume = shouldUseLocalBoost
+        ? Math.min(getLocalAudioPlaybackVolume(src), 1)
+        : 1;
+
       const howl = new Howl({
         src: [src],
         format: [format],
-        html5: true,
+        html5: !shouldUseLocalBoost,
+        volume,
         onplay: () => {
-          setIsLoading(false);
-          setIsPlaying(true);
+          if (
+            requestId !== undefined &&
+            requestId !== playRequestIdRef.current
+          ) {
+            return;
+          }
+          setSafeIsLoading(false);
+          setSafeIsPlaying(true);
         },
-        onend: () => setIsPlaying(false),
-        onstop: () => setIsPlaying(false),
+        onend: () => setSafeIsPlaying(false),
+        onstop: () => setSafeIsPlaying(false),
         onloaderror: () => {
+          if (
+            requestId !== undefined &&
+            requestId !== playRequestIdRef.current
+          ) {
+            return;
+          }
           if (onLoadError) {
             onLoadError();
             return;
           }
-          setIsLoading(false);
-          setIsPlaying(false);
-          setError("音频加载失败，请稍后重试。");
+          setSafeIsLoading(false);
+          setSafeIsPlaying(false);
+          setSafeError("音频加载失败，请稍后重试。");
           console.warn(`[Pronunciation] Audio failed to load: ${src}`);
         },
       });
       howlRef.current = howl;
       howl.play();
     },
-    [],
+    [setSafeError, setSafeIsLoading, setSafeIsPlaying],
+  );
+
+  const playLocalWebAudio = useCallback(
+    async (
+      src: string,
+      {
+        onLoadError,
+        requestId,
+      }: {
+        onLoadError?: () => void;
+        requestId?: number;
+      } = {},
+    ) => {
+      if (requestId !== undefined && requestId !== playRequestIdRef.current) {
+        return;
+      }
+
+      const audioContext = getSharedAudioContext();
+      if (!audioContext || typeof fetch !== "function") {
+        playHowl(src, { normalizeVolume: true, onLoadError, requestId });
+        return;
+      }
+
+      try {
+        if (audioContext.state === "suspended") {
+          await audioContext.resume();
+        }
+
+        const response = await fetch(src);
+        if (requestId !== undefined && requestId !== playRequestIdRef.current) {
+          return;
+        }
+        if (!response.ok) {
+          throw new Error(`Local audio request failed: ${response.status}`);
+        }
+
+        const encodedAudio = await response.arrayBuffer();
+        const audioBuffer = await audioContext.decodeAudioData(
+          encodedAudio.slice(0),
+        );
+        if (requestId !== undefined && requestId !== playRequestIdRef.current) {
+          return;
+        }
+
+        const source = audioContext.createBufferSource();
+        const gainNode = audioContext.createGain();
+        const normalization = calculateAudioNormalization(audioBuffer);
+        const packFallbackGain = getLocalAudioPlaybackVolume(src);
+
+        source.buffer = audioBuffer;
+        gainNode.gain.value = selectPeakSafePlaybackGain(
+          normalization,
+          packFallbackGain,
+        );
+        source.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+
+        webAudioSourceRef.current = source;
+        webAudioGainRef.current = gainNode;
+        source.onended = () => {
+          if (webAudioSourceRef.current === source) {
+            webAudioSourceRef.current = null;
+          }
+          if (webAudioGainRef.current === gainNode) {
+            webAudioGainRef.current = null;
+          }
+          setSafeIsPlaying(false);
+        };
+
+        setSafeIsLoading(false);
+        setSafeIsPlaying(true);
+        source.start(0);
+      } catch (error) {
+        if (requestId !== undefined && requestId !== playRequestIdRef.current) {
+          return;
+        }
+        if (onLoadError) {
+          onLoadError();
+          return;
+        }
+        setSafeIsLoading(false);
+        setSafeIsPlaying(false);
+        setSafeError("音频加载失败，请稍后重试。");
+        console.warn(`[Pronunciation] Local audio failed to play: ${src}`, error);
+      }
+    },
+    [playHowl, setSafeError, setSafeIsLoading, setSafeIsPlaying],
   );
 
   const playYoudaoFallback = useCallback(
-    async (word: string) => {
+    async (word: string, requestId?: number) => {
       cleanup();
-      setIsLoading(true);
+      setSafeIsLoading(true);
       try {
         const blob = await fetchPronunciation(word);
+        if (requestId !== undefined && requestId !== playRequestIdRef.current) {
+          return;
+        }
         const url = URL.createObjectURL(blob);
         blobUrlRef.current = url;
-        playHowl(url);
+        playHowl(url, { requestId });
       } catch (error) {
-        setIsLoading(false);
-        setIsPlaying(false);
-        setError("在线发音兜底失败。");
+        setSafeIsLoading(false);
+        setSafeIsPlaying(false);
+        setSafeError("在线发音兜底失败。");
         console.warn(`[Pronunciation] Youdao fallback failed for "${word}":`, error);
       }
     },
-    [cleanup, playHowl],
+    [cleanup, playHowl, setSafeError, setSafeIsLoading, setSafeIsPlaying],
   );
 
   const playWord = useCallback(
@@ -122,14 +299,18 @@ export function useWordPronunciation(): UseWordPronunciationReturn {
       if (!normalizedWord) return;
 
       resumeHowlerAudioContext();
+      const requestId = playRequestIdRef.current + 1;
+      playRequestIdRef.current = requestId;
       cleanup();
-      setIsLoading(true);
-      setError(null);
+      setSafeIsLoading(true);
+      setSafeError(null);
 
       if (languageId === "en-US") {
-        playHowl(getEnglishWordAudioSrc(normalizedWord, fallbackVoice), {
+        const localSrc = getEnglishWordAudioSrc(normalizedWord, fallbackVoice);
+        void playLocalWebAudio(localSrc, {
+          requestId,
           onLoadError: () => {
-            void playYoudaoFallback(normalizedWord);
+            void playYoudaoFallback(normalizedWord, requestId);
           },
         });
         return;
@@ -142,7 +323,9 @@ export function useWordPronunciation(): UseWordPronunciationReturn {
           fallbackVoice,
         );
         if (staticEntry) {
-          playHowl(staticEntry.audioSrc);
+          void playLocalWebAudio(staticEntry.audioSrc, {
+            requestId,
+          });
           return;
         }
 
@@ -150,31 +333,49 @@ export function useWordPronunciation(): UseWordPronunciationReturn {
         if (cached) {
           const url = URL.createObjectURL(cached.audioBlob);
           blobUrlRef.current = url;
-          playHowl(url);
+          playHowl(url, { requestId });
           return;
         }
 
-        setIsLoading(false);
-        setIsPlaying(false);
-        setError(`暂无「${normalizedWord}」的本地标准发音。`);
+        setSafeIsLoading(false);
+        setSafeIsPlaying(false);
+        setSafeError(`暂无「${normalizedWord}」的本地标准发音。`);
         console.warn(
           `[Pronunciation] Missing local ${languageId} pronunciation for "${normalizedWord}"`,
         );
         return;
       }
 
-      await playYoudaoFallback(normalizedWord);
+      await playYoudaoFallback(normalizedWord, requestId);
     },
-    [cleanup, playHowl, playYoudaoFallback],
+    [
+      cleanup,
+      playHowl,
+      playLocalWebAudio,
+      playYoudaoFallback,
+      setSafeError,
+      setSafeIsLoading,
+      setSafeIsPlaying,
+    ],
   );
 
   const stop = useCallback(() => {
+    playRequestIdRef.current += 1;
     cleanup();
-    setIsPlaying(false);
-    setIsLoading(false);
-  }, [cleanup]);
+    setSafeIsPlaying(false);
+    setSafeIsLoading(false);
+  }, [cleanup, setSafeIsLoading, setSafeIsPlaying]);
 
-  const clearError = useCallback(() => setError(null), []);
+  const clearError = useCallback(() => setSafeError(null), [setSafeError]);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      playRequestIdRef.current += 1;
+      cleanup();
+    };
+  }, [cleanup]);
 
   return { playWord, isLoading, isPlaying, error, stop, clearError };
 }

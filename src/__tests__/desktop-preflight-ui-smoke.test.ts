@@ -76,8 +76,89 @@ describe("desktop preflight and UI smoke", () => {
     expect(script).toContain("/assessment");
     expect(script).toContain("releaseServedFromDevServer=false");
     expect(script).toContain("data-smoke=\"language-option\"");
+    expect(script).toContain("textIsCentered");
+    expect(script).toContain("textAlign === \"center\"");
+    expect(script).toContain("assertNarrowViewportRoutes");
+    expect(script).toContain("narrowViewport=ok");
+    expect(script).toContain("assertLowHeightViewportRoutes");
+    expect(script).toContain("lowHeightViewport=ok");
+    expect(script).toContain("window.innerHeight === 560");
+    expect(script).toContain("assessment-breakdown-placeholder");
+    expect(script).toContain("assessment-target-ipa-reference");
+    expect(script).toContain("breakdownSmokeReady");
+    expect(script).toContain("breakdownViewportSmokeReady");
+    expect(script).toContain("assertScoringTileAudioPolicy");
+    expect(script).toContain("smokeAssessmentTiles=1");
+    expect(script).toContain("assessment-phoneme-tile-fixture");
+    expect(script).toContain("assessment-phoneme-tile");
+    expect(script).toContain("data-audio-max-duration-ms");
+    expect(script).toContain("tileAudioPolicyReady");
+    expect(script).toContain("hasPlayableExactHeaderClip");
+    expect(script).toContain("hasLockedUnverifiedTile");
+    expect(script).toContain("tilePoliciesAreStrict");
+    expect(script).toContain("scoringTileAudioPolicy=ok");
+    expect(script).toContain("usage-history-target");
+    expect(script).toContain("pronunciation-test-row");
+    expect(script).toContain("childrenDoNotOverlap");
+    expect(script).toContain("pronunciationRowsWrap");
+    expect(script).toContain("llm-provider-chip");
+    expect(script).toContain("GLM / Z.ai");
+    expect(script).toContain("Xiaomi MiMo");
+    expect(script).toContain("llmProvidersWrap");
+    expect(script).toContain("practice-voice-selector");
+    expect(script).toContain("voiceSelectorReady");
+    expect(script).toContain("practice-word-audio");
+    expect(script).toContain("wordAudioReady");
+    expect(script).toContain("aria-disabled");
+    expect(script).toContain("videoSelectorReady");
+    expect(script).toContain("videoSelectorCount");
+    expect(script).toContain("headerAudioReady");
+    expect(script).toContain(".includes(\"发音\")");
     expect(script).not.toContain("MediaRecorder");
     expect(script).not.toContain("elevenlabs");
     expect(script).not.toContain("generate-word-audio");
+  });
+
+  it("keeps Settings and usage text from falling back to ellipsis", () => {
+    const languageCard = readProjectFile(
+      "src/components/settings/language-config-card.tsx",
+    );
+    const usageMonitor = readProjectFile(
+      "src/components/settings/usage-monitor.tsx",
+    );
+    const pronunciationCard = readProjectFile(
+      "src/components/settings/pronunciation-config-card.tsx",
+    );
+    const llmCard = readProjectFile(
+      "src/components/settings/llm-config-card.tsx",
+    );
+
+    expect(languageCard).toContain('data-smoke="language-option-missing"');
+    expect(languageCard).toContain("overflow-wrap:anywhere");
+    expect(languageCard).not.toContain("line-clamp");
+    expect(usageMonitor).toContain('data-smoke="usage-history-target"');
+    expect(usageMonitor).toContain("overflow-wrap:anywhere");
+    expect(usageMonitor).not.toContain("truncate");
+    expect(pronunciationCard).toContain('data-smoke="pronunciation-test-row"');
+    expect(pronunciationCard).toContain("flex flex-wrap items-center gap-3");
+    expect(llmCard).toContain('data-smoke="llm-provider-chip"');
+    expect(llmCard).toContain('data-smoke="llm-manual-provider-note"');
+    expect(llmCard).toContain("break-words");
+  });
+
+  it("keeps recording and benchmark replay on the shared audio player hook", () => {
+    const replayPages = [
+      "src/app/drill/prosody/page.tsx",
+      "src/app/drill/scenarios/page.tsx",
+      "src/app/drill/spontaneous/page.tsx",
+      "src/app/progress/page.tsx",
+    ];
+
+    for (const pagePath of replayPages) {
+      const source = readProjectFile(pagePath);
+      expect(source, pagePath).toContain("useAudioPlayer");
+      expect(source, pagePath).toContain("playBlob");
+      expect(source, pagePath).not.toContain("new Audio(");
+    }
   });
 });

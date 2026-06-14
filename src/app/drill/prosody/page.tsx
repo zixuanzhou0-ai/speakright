@@ -18,6 +18,7 @@ import { WaveformDisplay } from "@/components/audio/waveform-display";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useLanguageConfig } from "@/hooks/use-api-keys";
+import { useAudioPlayer } from "@/hooks/use-audio-player";
 import { useAzureAssessment } from "@/hooks/use-azure-assessment";
 import { useRecorder } from "@/hooks/use-recorder";
 import { useRecordingQuality } from "@/hooks/use-recording-quality";
@@ -35,6 +36,11 @@ import {
   type ProsodyAnalysis,
 } from "@/lib/prosody-training";
 import { getLanguageProfile } from "@/lib/language-profiles";
+import { canRecordFormalMastery } from "@/lib/mastery-language-policy";
+import {
+  getCenteredReadableTextClassName,
+  getPracticeTextDensity,
+} from "@/lib/practice-text-presentation";
 
 export default function ProsodyPage() {
   const { languageId } = useLanguageConfig();
@@ -44,6 +50,7 @@ export default function ProsodyPage() {
   const recorder = useRecorder({ maxDurationMs: 35_000 });
   const assessment = useAzureAssessment();
   const tts = useTtsAligned();
+  const replayAudio = useAudioPlayer();
   const quality = useRecordingQuality(recorder.audioBlob, {
     expectedMode: "sentence",
     minDurationMs: 1_200,
@@ -55,8 +62,10 @@ export default function ProsodyPage() {
       PROSODY_EXERCISES[0],
     [selectedId],
   );
+  const exerciseDensity = getPracticeTextDensity(exercise.displayText, "sentence");
 
   const resetRecording = () => {
+    replayAudio.stop();
     recorder.reset();
     assessment.reset();
     quality.reset();
@@ -80,11 +89,13 @@ export default function ProsodyPage() {
     if (!result) return;
     const nextAnalysis = analyzeProsodyAttempt(exercise, result);
     setAnalysis(nextAnalysis);
-    const profile = recordTrainingSession(
-      loadMasteryProfile(),
-      buildProsodyTrainingSession(exercise, nextAnalysis),
-    );
-    saveMasteryProfile(profile);
+    if (canRecordFormalMastery(languageId)) {
+      const profile = recordTrainingSession(
+        loadMasteryProfile(),
+        buildProsodyTrainingSession(exercise, nextAnalysis),
+      );
+      saveMasteryProfile(profile);
+    }
     try {
       await saveBenchmarkRecording(recorder.audioBlob, {
         source: "prosody",
@@ -130,17 +141,21 @@ export default function ProsodyPage() {
                 setSelectedId(item.id);
                 resetRecording();
               }}
-              className={`w-full rounded-xl border bg-card p-4 text-left shadow-sm transition-colors cursor-pointer ${
+              className={`w-full rounded-xl border bg-card p-4 text-center shadow-sm transition-colors cursor-pointer ${
                 selectedId === item.id
                   ? "border-primary bg-primary/5"
                   : "hover:border-primary/40"
               }`}
             >
-              <div className="mb-2 flex items-center justify-between gap-2">
-                <p className="font-semibold">{item.title}</p>
+              <div className="mb-2 flex flex-wrap items-center justify-center gap-2">
+                <p className="break-words font-semibold [overflow-wrap:anywhere]">
+                  {item.title}
+                </p>
                 <Badge variant="outline">{item.kind}</Badge>
               </div>
-              <p className="text-xs text-muted-foreground">{item.coachCue}</p>
+              <p className="break-words text-xs text-muted-foreground [overflow-wrap:anywhere]">
+                {item.coachCue}
+              </p>
             </motion.button>
           ))}
         </aside>
@@ -175,23 +190,35 @@ export default function ProsodyPage() {
             </div>
 
             <div className="rounded-xl border bg-background p-5">
-              <p className="font-mono text-2xl leading-relaxed">
+              <p
+                className={`${getCenteredReadableTextClassName(
+                  exerciseDensity,
+                )} font-mono`}
+              >
                 {exercise.displayText}
               </p>
-              <p className="mt-4 text-sm font-medium text-primary">
+              <p className="mt-4 break-words text-center text-sm font-medium text-primary [overflow-wrap:anywhere]">
                 这一题只练：{exercise.coachCue}
               </p>
-              <p className="mt-2 text-sm text-muted-foreground">
+              <p className="mt-2 break-words text-center text-sm text-muted-foreground [overflow-wrap:anywhere]">
                 模式：{exercise.targetPattern}
               </p>
-              <div className="mt-4 flex flex-wrap gap-2">
+              <div className="mt-4 flex flex-wrap justify-center gap-2">
                 {exercise.focusWords.map((word) => (
-                  <Badge key={word} variant="secondary">
+                  <Badge
+                    key={word}
+                    variant="secondary"
+                    className="max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]"
+                  >
                     重读 {word}
                   </Badge>
                 ))}
                 {exercise.weakWords.slice(0, 4).map((word) => (
-                  <Badge key={word} variant="outline">
+                  <Badge
+                    key={word}
+                    variant="outline"
+                    className="max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]"
+                  >
                     弱读 {word}
                   </Badge>
                 ))}
@@ -223,13 +250,10 @@ export default function ProsodyPage() {
               <RecordingQualityPanel report={quality.report} compact />
               <RecordingActions
                 hasRecording={!!recorder.audioBlob}
-                isPlaying={false}
+                isPlaying={replayAudio.isPlaying}
                 isAssessing={assessment.isLoading}
                 onReplay={() => {
-                  const audio = recorder.audioBlob
-                    ? URL.createObjectURL(recorder.audioBlob)
-                    : null;
-                  if (audio) new Audio(audio).play();
+                  if (recorder.audioBlob) replayAudio.playBlob(recorder.audioBlob);
                 }}
                 onClear={resetRecording}
                 onAssess={submit}
@@ -272,30 +296,30 @@ export default function ProsodyPage() {
               </div>
               <div className="mt-4 rounded-lg border border-primary/20 bg-primary/5 p-4">
                 <p className="text-sm font-semibold">下一次只改一个动作</p>
-                <p className="mt-1 text-sm text-muted-foreground">
+                <p className="mt-1 break-words text-center text-sm text-muted-foreground [overflow-wrap:anywhere]">
                   {analysis.nextCue}
                 </p>
               </div>
               {analysis.missingFocusWords.length > 0 && (
-                <p className="mt-3 text-sm text-muted-foreground">
+                <p className="mt-3 break-words text-center text-sm text-muted-foreground [overflow-wrap:anywhere]">
                   漏读/识别不足的重点词：
                   {analysis.missingFocusWords.join(", ")}
                 </p>
               )}
               {analysis.overHeavyFunctionWords.length > 0 && (
-                <p className="mt-2 text-sm text-muted-foreground">
+                <p className="mt-2 break-words text-center text-sm text-muted-foreground [overflow-wrap:anywhere]">
                   可能过重的功能词：
                   {analysis.overHeavyFunctionWords.join(", ")}
                 </p>
               )}
               {analysis.missingExpectedPauses.length > 0 && (
-                <p className="mt-2 text-sm text-muted-foreground">
+                <p className="mt-2 break-words text-center text-sm text-muted-foreground [overflow-wrap:anywhere]">
                   缺少停顿的位置：
                   {analysis.missingExpectedPauses.join(", ")}
                 </p>
               )}
               {analysis.unexpectedPauses.length > 0 && (
-                <p className="mt-2 text-sm text-muted-foreground">
+                <p className="mt-2 break-words text-center text-sm text-muted-foreground [overflow-wrap:anywhere]">
                   不该断开的地方：
                   {analysis.unexpectedPauses.join(", ")}
                 </p>

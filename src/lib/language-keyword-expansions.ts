@@ -4,7 +4,52 @@ import { LANGUAGE_LEARNING_DECKS } from "@/lib/language-learning-decks";
 import type { DeckLanguageId } from "@/lib/language-learning-decks";
 
 const MIN_KEYWORD_OPTIONS_PER_UNIT = 24;
-const MAX_KEYWORD_OPTIONS_PER_UNIT = 36;
+const MIN_DIVERSE_KEYWORD_OPTIONS_PER_UNIT = 20;
+const MAX_KEYWORD_OPTIONS_PER_UNIT = 24;
+const PRACTICE_TOKEN_REPEAT_LIMIT = 3;
+
+const TOKEN_STOP_WORDS = new Set([
+  "a",
+  "au",
+  "aux",
+  "avec",
+  "con",
+  "dans",
+  "de",
+  "del",
+  "des",
+  "du",
+  "el",
+  "elle",
+  "en",
+  "et",
+  "i",
+  "il",
+  "la",
+  "le",
+  "les",
+  "mi",
+  "moi",
+  "no",
+  "por",
+  "que",
+  "qui",
+  "se",
+  "tu",
+  "un",
+  "una",
+  "une",
+  "y",
+  "yo",
+  "в",
+  "и",
+  "к",
+  "на",
+  "но",
+  "с",
+  "у",
+  "я",
+]);
 
 const RUSSIAN_DECK_STRESS_TEXT: Record<string, string> = {
   "дома": "до́ма",
@@ -298,13 +343,13 @@ const EXTRA_KEYWORD_OPTIONS: Partial<Record<LanguageId, Record<string, KeywordEn
       { word: "nueve puertas", ipa: "/ˈnweβe ˈpweɾtas/" },
     ],
     "es-lexical-stress": [
-      { word: "papa y papá", ipa: "/ˈpapa i paˈpa/" },
-      { word: "hablo habló", ipa: "/ˈaβlo aˈβlo/" },
-      { word: "termino terminó", ipa: "/teɾˈmino teɾmiˈno/" },
       { word: "camino caminó", ipa: "/kaˈmino kamiˈno/" },
-      { word: "practico practicó", ipa: "/pɾakˈtiko pɾaktiˈko/" },
+      { word: "hablo habló", ipa: "/ˈaβlo aˈβlo/" },
       { word: "medico médico", ipa: "/meˈðiko ˈmeðiko/" },
       { word: "numero número", ipa: "/nuˈmeɾo ˈnumeɾo/" },
+      { word: "papa y papá", ipa: "/ˈpapa i paˈpa/" },
+      { word: "practico practicó", ipa: "/pɾakˈtiko pɾaktiˈko/" },
+      { word: "termino terminó", ipa: "/teɾˈmino teɾmiˈno/" },
     ],
     "es-syllable-rhythm": [
       { word: "sábado", ipa: "/ˈsaβaðo/" },
@@ -552,9 +597,9 @@ const EXTRA_KEYWORD_OPTIONS: Partial<Record<LanguageId, Record<string, KeywordEn
       { word: "samedi matin", ipa: "/samdi matɛ̃/" },
     ],
     "fr-final-consonant-silence": [
-      { word: "petit chat", ipa: "/pəti ʃa/" },
-      { word: "grand tapis", ipa: "/gʁɑ̃ tapi/" },
-      { word: "beaucoup trop", ipa: "/boku tʁo/" },
+      { word: "vin blanc", ipa: "/vɛ̃ blɑ̃/" },
+      { word: "Un bon vin blanc.", ipa: "/œ̃ bɔ̃ vɛ̃ blɑ̃/" },
+      { word: "J'aime le bon vin blanc.", ipa: "/ʒɛm lə bɔ̃ vɛ̃ blɑ̃/" },
       { word: "le prix bas", ipa: "/lə pʁi ba/" },
       { word: "un mot court", ipa: "/œ̃ mo kuʁ/" },
       { word: "trois amis", ipa: "/tʁwɑzami/" },
@@ -821,22 +866,6 @@ const EXTRA_KEYWORD_OPTIONS: Partial<Record<LanguageId, Record<string, KeywordEn
       { word: "нож тупой", ipa: "/noʂ tʊˈpoj/" },
     ],
     "ru-stress-reduction": [
-      { word: "телефон", ipa: "/tʲɪlʲɪˈfon/" },
-      { word: "машина", ipa: "/mɐˈʂinə/" },
-      { word: "дорога", ipa: "/dɐˈrogə/" },
-      { word: "Москва", ipa: "/mɐˈskva/" },
-      { word: "окно", ipa: "/ɐkˈno/" },
-      { word: "собака", ipa: "/sɐˈbakə/" },
-      { word: "магазин", ipa: "/məgɐˈzʲin/" },
-      { word: "вокзал", ipa: "/vɐgˈzal/" },
-      { word: "семья", ipa: "/sʲɪmʲˈja/" },
-      { word: "погода", ipa: "/pɐˈgodə/" },
-      { word: "понедельник", ipa: "/pənʲɪˈdʲelʲnʲɪk/" },
-      { word: "интересно", ipa: "/ɪntʲɪˈrʲesnə/" },
-      { word: "молоко", ipa: "/məlɐˈko/" },
-      { word: "хорошо", ipa: "/xərɐˈʂo/" },
-      { word: "сегодня", ipa: "/sʲɪˈvodnʲə/" },
-      { word: "работа", ipa: "/rɐˈbotə/" },
       { word: "молоко дома", ipa: "/məlɐˈko ˈdomə/" },
       { word: "Москва сегодня", ipa: "/mɐˈskva sʲɪˈvodnʲə/" },
       { word: "телефон на столе", ipa: "/tʲɪlʲɪˈfon nɐ stɐˈlʲe/" },
@@ -847,8 +876,37 @@ const EXTRA_KEYWORD_OPTIONS: Partial<Record<LanguageId, Record<string, KeywordEn
       { word: "вокзал открыт", ipa: "/vɐgˈzal ɐtˈkrɨt/" },
       { word: "семья дома", ipa: "/sʲɪmʲˈja ˈdomə/" },
       { word: "магазин закрыт", ipa: "/məgɐˈzʲin zɐˈkrɨt/" },
+      { word: "Москва сегодня холодная.", ipa: "/mɐˈskva sʲɪˈvodnʲə ˈxolədnəjə/" },
+      { word: "мама дома", ipa: "/ˈmamə ˈdomə/" },
+      { word: "Хорошо, спасибо.", ipa: "/xərɐˈʂo spɐˈsʲibə/" },
+      { word: "телефон", ipa: "/tʲɪlʲɪˈfon/" },
+      { word: "машина", ipa: "/mɐˈʂinə/" },
+      { word: "дорога", ipa: "/dɐˈrogə/" },
+      { word: "Москва", ipa: "/mɐˈskva/" },
+      { word: "пять билетов", ipa: "/pʲætʲ bʲɪˈlʲetəf/" },
+      { word: "учитель читает", ipa: "/ʊˈtɕitʲɪlʲ tɕɪˈtajɪt/" },
+      { word: "магазин", ipa: "/məgɐˈzʲin/" },
+      { word: "вокзал", ipa: "/vɐgˈzal/" },
+      { word: "семья", ipa: "/sʲɪmʲˈja/" },
+      { word: "погода", ipa: "/pɐˈgodə/" },
+      { word: "понедельник", ipa: "/pənʲɪˈdʲelʲnʲɪk/" },
+      { word: "интересно", ipa: "/ɪntʲɪˈrʲesnə/" },
+      { word: "молоко", ipa: "/məlɐˈko/" },
+      { word: "хорошо", ipa: "/xərɐˈʂo/" },
+      { word: "сегодня", ipa: "/sʲɪˈvodnʲə/" },
+      { word: "работа", ipa: "/rɐˈbotə/" },
     ],
     "ru-clusters": [
+      { word: "встреча завтра", ipa: "/ˈfstrʲetɕə ˈzaftrə/" },
+      { word: "текст простой", ipa: "/tʲekst prɐˈstoj/" },
+      { word: "врач строгий", ipa: "/vratɕ ˈstrogʲɪj/" },
+      { word: "класс большой", ipa: "/klas bɐlʲˈʂoj/" },
+      { word: "страна красивая", ipa: "/strɐˈna krɐˈsʲivəjə/" },
+      { word: "группа студентов", ipa: "/ˈgrupə stʊˈdʲentəf/" },
+      { word: "Текст простой, но группа большая.", ipa: "/tʲekst prɐˈstoj no ˈgrupə bɐlʲˈʂajə/" },
+      { word: "Здравствуйте, студент.", ipa: "/ˈzdrastvʊjtʲe stʊˈdʲent/" },
+      { word: "хлеб на кухне", ipa: "/xlʲep nɐ ˈkuxnʲe/" },
+      { word: "стол около окна", ipa: "/stol ˈokələ ɐkˈna/" },
       { word: "вторник", ipa: "/ˈftornʲɪk/" },
       { word: "класс", ipa: "/klas/" },
       { word: "дождь", ipa: "/doʂtʲ/" },
@@ -865,18 +923,87 @@ const EXTRA_KEYWORD_OPTIONS: Partial<Record<LanguageId, Record<string, KeywordEn
       { word: "группа", ipa: "/ˈgrupə/" },
       { word: "время", ipa: "/ˈvrʲemʲə/" },
       { word: "строить", ipa: "/ˈstroɪtʲ/" },
-      { word: "встреча завтра", ipa: "/ˈfstrʲetɕə ˈzaftrə/" },
-      { word: "текст простой", ipa: "/tʲekst prɐˈstoj/" },
-      { word: "врач строгий", ipa: "/vratɕ ˈstrogʲɪj/" },
-      { word: "класс большой", ipa: "/klas bɐlʲˈʂoj/" },
-      { word: "страна красивая", ipa: "/strɐˈna krɐˈsʲivəjə/" },
-      { word: "группа студентов", ipa: "/ˈgrupə stʊˈdʲentəf/" },
     ],
   },
 };
 
 function keywordKey(keyword: KeywordEntry): string {
   return keyword.word.trim().toLocaleLowerCase();
+}
+
+function normalizePracticeText(text: string): string {
+  return text
+    .trim()
+    .toLocaleLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[’']/g, "")
+    .replace(/[^\p{L}\p{N}\s-]/gu, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function practiceTokens(keyword: KeywordEntry): string[] {
+  return normalizePracticeText(keyword.word)
+    .split(/\s+/)
+    .filter((token) => token.length > 1 && !TOKEN_STOP_WORDS.has(token));
+}
+
+function tokenCounts(tokens: string[]): Map<string, number> {
+  const counts = new Map<string, number>();
+  for (const token of tokens) {
+    counts.set(token, (counts.get(token) ?? 0) + 1);
+  }
+  return counts;
+}
+
+function wouldOverusePracticeToken(
+  runningCounts: Map<string, number>,
+  keyword: KeywordEntry,
+): boolean {
+  const counts = tokenCounts(practiceTokens(keyword));
+
+  for (const [token, count] of counts) {
+    if ((runningCounts.get(token) ?? 0) + count > PRACTICE_TOKEN_REPEAT_LIMIT) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function addPracticeTokenCounts(
+  runningCounts: Map<string, number>,
+  keyword: KeywordEntry,
+): void {
+  for (const [token, count] of tokenCounts(practiceTokens(keyword))) {
+    runningCounts.set(token, (runningCounts.get(token) ?? 0) + count);
+  }
+}
+
+function prioritizeDiverseKeywords(keywords: KeywordEntry[]): KeywordEntry[] {
+  const selected: KeywordEntry[] = [];
+  const deferred: KeywordEntry[] = [];
+  const runningCounts = new Map<string, number>();
+
+  for (const keyword of keywords) {
+    if (wouldOverusePracticeToken(runningCounts, keyword)) {
+      deferred.push(keyword);
+      continue;
+    }
+
+    selected.push(keyword);
+    addPracticeTokenCounts(runningCounts, keyword);
+  }
+
+  if (selected.length >= MIN_DIVERSE_KEYWORD_OPTIONS_PER_UNIT) {
+    return selected;
+  }
+
+  return [
+    ...selected,
+    ...deferred.slice(0, MIN_DIVERSE_KEYWORD_OPTIONS_PER_UNIT - selected.length),
+  ];
 }
 
 function mergeKeywordEntries(
@@ -897,7 +1024,7 @@ function mergeKeywordEntries(
     merged.push(keyword);
   }
 
-  return merged.slice(0, MAX_KEYWORD_OPTIONS_PER_UNIT);
+  return prioritizeDiverseKeywords(merged).slice(0, MAX_KEYWORD_OPTIONS_PER_UNIT);
 }
 
 function splitContrastIpa(ipa: string): [string, string] {
@@ -939,13 +1066,6 @@ function deckKeywordsForUnit(
         stressText: word.stressText,
       });
     }
-  }
-
-  if (deck.diagnosticPassage.targetUnitSlugs.includes(slug)) {
-    keywords.push({
-      word: deck.diagnosticPassage.text,
-      ipa: deck.diagnosticPassage.stressText ?? deck.diagnosticPassage.text,
-    });
   }
 
   for (const contrast of deck.contrastDeck) {

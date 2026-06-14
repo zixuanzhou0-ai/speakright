@@ -287,6 +287,13 @@ function scoreStatusForReport(
         "证据不足：存在漏读、多读或低质量录音，本次不生成综合分。",
     };
   }
+  if (summary.omissionCount > 0 || summary.insertionCount > 0) {
+    return {
+      scoreStatus: "insufficient-evidence",
+      scoreStatusReason:
+        "证据不足：存在漏读或多读，本次只保留练习反馈，不生成可信综合分。",
+    };
+  }
   if (
     summary.wordLevelEvidenceCount < 4 ||
     summary.totalObservedWords < 4

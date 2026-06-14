@@ -20,6 +20,12 @@ import {
 } from "@/lib/language-learning-decks";
 import { getLanguagePhonemeBySlug } from "@/lib/language-phonemes";
 import { getLanguageProfile } from "@/lib/language-profiles";
+import {
+  getCenteredMonoTextClassName,
+  getCenteredProminentTextClassName,
+  getCenteredReadableTextClassName,
+  getPracticeTextDensity,
+} from "@/lib/practice-text-presentation";
 import type { MinimalPairSet } from "@/lib/minimal-pairs";
 import { MINIMAL_PAIR_SETS } from "@/lib/minimal-pairs";
 import type {
@@ -106,6 +112,12 @@ export default function ContrastDrillPage() {
     selectedSet && phase.type !== "select" && phase.type !== "completed"
       ? selectedSet.pairs[phase.pairIndex]
       : null;
+  const pairADensity = currentPair
+    ? getPracticeTextDensity(currentPair.wordA)
+    : "short";
+  const pairBDensity = currentPair
+    ? getPracticeTextDensity(currentPair.wordB)
+    : "short";
 
   const handlePlayA = () => {
     if (currentPair) wordAudio.playWord(currentPair.wordA, "blue", languageId);
@@ -325,12 +337,12 @@ export default function ContrastDrillPage() {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => handleSelectSet(set)}
-                  className="rounded-xl border bg-card p-4 text-left shadow-sm hover:border-primary/50 transition-colors cursor-pointer"
+                  className="rounded-xl border bg-card p-4 text-center shadow-sm hover:border-primary/50 transition-colors cursor-pointer"
                 >
-                  <span className="font-mono text-lg font-bold">
+                  <span className="block max-w-full break-words text-center font-mono text-lg font-bold [overflow-wrap:anywhere]">
                     {set.label}
                   </span>
-                  <p className="mt-1 text-xs text-muted-foreground">
+                  <p className="mt-1 break-words text-center text-xs text-muted-foreground [overflow-wrap:anywhere]">
                     {set.pairs[0].wordA} / {set.pairs[0].wordB} ...
                   </p>
                 </motion.button>
@@ -354,10 +366,14 @@ export default function ContrastDrillPage() {
             <div className="rounded-xl border bg-card p-8 shadow-sm">
               <div className="grid grid-cols-2 gap-6 text-center">
                 <div className="space-y-2">
-                  <span className="text-3xl font-bold">
+                  <span
+                    className={`font-bold ${getCenteredProminentTextClassName(pairADensity)}`}
+                  >
                     {currentPair.wordA}
                   </span>
-                  <span className="block font-mono text-sm text-muted-foreground">
+                  <span
+                    className={`block font-mono text-muted-foreground ${getCenteredMonoTextClassName(pairADensity)}`}
+                  >
                     {currentPair.ipaA}
                   </span>
                   <motion.button
@@ -375,10 +391,14 @@ export default function ContrastDrillPage() {
                   </motion.button>
                 </div>
                 <div className="space-y-2">
-                  <span className="text-3xl font-bold">
+                  <span
+                    className={`font-bold ${getCenteredProminentTextClassName(pairBDensity)}`}
+                  >
                     {currentPair.wordB}
                   </span>
-                  <span className="block font-mono text-sm text-muted-foreground">
+                  <span
+                    className={`block font-mono text-muted-foreground ${getCenteredMonoTextClassName(pairBDensity)}`}
+                  >
                     {currentPair.ipaB}
                   </span>
                   <motion.button
@@ -418,7 +438,11 @@ export default function ContrastDrillPage() {
             className="rounded-xl border bg-card p-8 shadow-sm text-center space-y-4"
           >
             <p className="text-sm text-muted-foreground">请读：</p>
-            <span className="text-4xl font-bold">{currentPair.wordA}</span>
+            <span
+              className={`font-bold ${getCenteredProminentTextClassName(pairADensity)}`}
+            >
+              {currentPair.wordA}
+            </span>
             <RecordButton
               isRecording={recorder.isRecording}
               onStart={() => recorder.startRecording()}
@@ -443,7 +467,11 @@ export default function ContrastDrillPage() {
             className="rounded-xl border bg-card p-8 shadow-sm text-center space-y-4"
           >
             <p className="text-sm text-muted-foreground">很好！现在请读：</p>
-            <span className="text-4xl font-bold">{currentPair.wordB}</span>
+            <span
+              className={`font-bold ${getCenteredProminentTextClassName(pairBDensity)}`}
+            >
+              {currentPair.wordB}
+            </span>
             <RecordButton
               isRecording={recorder.isRecording}
               onStart={() => recorder.startRecording()}
@@ -469,7 +497,11 @@ export default function ContrastDrillPage() {
           >
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <span className="text-xl font-bold">{currentPair.wordA}</span>
+                <span
+                  className={`font-bold ${getCenteredReadableTextClassName(pairADensity)}`}
+                >
+                  {currentPair.wordA}
+                </span>
                 <div
                   className={`mt-2 inline-flex h-16 w-16 items-center justify-center rounded-xl text-white ${phase.scoreA >= threshold ? "bg-primary" : "bg-red-500"}`}
                 >
@@ -477,7 +509,11 @@ export default function ContrastDrillPage() {
                 </div>
               </div>
               <div>
-                <span className="text-xl font-bold">{currentPair.wordB}</span>
+                <span
+                  className={`font-bold ${getCenteredReadableTextClassName(pairBDensity)}`}
+                >
+                  {currentPair.wordB}
+                </span>
                 <div
                   className={`mt-2 inline-flex h-16 w-16 items-center justify-center rounded-xl text-white ${phase.scoreB >= threshold ? "bg-primary" : "bg-red-500"}`}
                 >

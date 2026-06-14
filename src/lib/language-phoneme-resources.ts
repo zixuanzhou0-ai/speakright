@@ -550,7 +550,7 @@ export function attachLanguagePhonemeResources(
             label: `${localAsset.label}：${phoneme.ipa}`,
             source: localAsset.source,
             description: "本地授权素材，优先用于该发音单位的播放按钮。",
-            localSrc: localAsset.audioSrc ?? localAsset.videoSrc,
+            localSrc: localAsset.audioSrc,
             url: localAsset.sourceUrl,
             languageId,
           }
