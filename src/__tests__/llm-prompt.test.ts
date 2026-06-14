@@ -85,4 +85,25 @@ describe("LLM feedback prompt", () => {
     expect(prompt).toContain("不能用单个整体分数证明");
     expect(prompt).toContain("当前证据不足");
   });
+
+  it("keeps non-English AI coach feedback tied to target text, language, and evidence strength", () => {
+    const prompt = buildFeedbackPrompt(
+      "canción",
+      SAMPLE_RESULT,
+      "phoneme",
+      "hard",
+      "es-ES",
+    );
+
+    expect(prompt).toContain("学生练习内容：canción");
+    expect(prompt).toContain("当前语言：es-ES");
+    expect(prompt).toContain('"word": "sample"');
+    expect(prompt).toContain('"phoneme": "a"');
+    expect(prompt).toContain("单次录音只能给本次反馈");
+    expect(prompt).toContain("不能说\"你已经掌握\"");
+    expect(prompt).toContain("当前语言仍是实验评分链路");
+    expect(prompt).toContain(
+      "非英语音素、单次录音、规则/语流目标默认最多只能写\"中\"或\"薄\"",
+    );
+  });
 });
