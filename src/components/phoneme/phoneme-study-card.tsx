@@ -88,6 +88,16 @@ function NonEnglishPracticeTask({
   const secondaryTextClassName = getCenteredMonoTextClassName(
     practiceText.density,
   );
+  const audioLabel =
+    practiceText.mode === "word"
+      ? "播放单词发音"
+      : practiceText.mode === "phrase"
+        ? "播放短语发音"
+        : practiceText.mode === "sentence"
+          ? "播放句子发音"
+          : practiceText.density === "sentence"
+            ? "播放规则句子发音"
+            : "播放规则练习发音";
 
   return (
     <div
@@ -182,7 +192,8 @@ function NonEnglishPracticeTask({
         <motion.button
           type="button"
           data-smoke="practice-word-audio"
-          aria-label="播放单词发音"
+          aria-label={audioLabel}
+          title={audioLabel}
           whileHover={{ scale: 1.12 }}
           whileTap={{ scale: 0.9 }}
           onClick={() => {

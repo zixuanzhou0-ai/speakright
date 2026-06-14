@@ -92,8 +92,11 @@ describe("PhonemeStudyCard non-English reading layout", () => {
       document.querySelector('[data-smoke="practice-word-audio"]'),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: "播放单词发音" }),
+      screen.getByRole("button", { name: "播放规则句子发音" }),
     ).toHaveAttribute("data-smoke", "practice-word-audio");
+    expect(
+      screen.queryByRole("button", { name: "播放单词发音" }),
+    ).not.toBeInTheDocument();
 
     const fullTask = screen.getByText("Buenos dias, muchas gracias.");
     expect(fullTask).toBeInTheDocument();
@@ -106,6 +109,39 @@ describe("PhonemeStudyCard non-English reading layout", () => {
     expect(ipa).toBeInTheDocument();
     expect(ipa).toHaveClass("text-center");
     expect(ipa).toHaveStyle({ textAlign: "center" });
+  });
+
+  it("labels long Russian rule playback as a sentence and keeps the full text visible", () => {
+    const russianStressUnit = getLanguagePhonemeBySlug(
+      "ru-RU",
+      "ru-stress-reduction",
+    );
+
+    expect(russianStressUnit).toBeDefined();
+    if (!russianStressUnit) return;
+
+    renderCard({
+      phoneme: russianStressUnit,
+      currentWord: {
+        word: "Здравствуйте, встретиться с сестрой трудно.",
+        ipa: "/ˈzdrastvʊjtʲe ˈfstrʲetʲɪt͡sə s sʲɪˈstroj ˈtrudnə/",
+      },
+    });
+
+    const fullTask = screen.getByText(
+      "Здравствуйте, встретиться с сестрой трудно.",
+    );
+    expect(fullTask).toBeInTheDocument();
+    expect(fullTask).toHaveClass("break-words");
+    expect(fullTask).toHaveClass("text-center");
+    expect(fullTask).not.toHaveClass("truncate");
+
+    expect(
+      screen.getByRole("button", { name: "播放规则句子发音" }),
+    ).toHaveAttribute("data-smoke", "practice-word-audio");
+    expect(
+      screen.queryByRole("button", { name: "播放单词发音" }),
+    ).not.toBeInTheDocument();
   });
 
   it("hides proxy header audio for non-English rule units", () => {

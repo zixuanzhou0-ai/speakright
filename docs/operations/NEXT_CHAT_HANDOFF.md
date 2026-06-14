@@ -240,6 +240,10 @@ git status --short --branch
   messages for Azure, ElevenLabs, AI coach, and Youdao, replaces raw English
   fetch failures with Chinese network/proxy guidance, and wraps long status
   messages in narrow Settings layouts.
+- Non-English detail A/B playback labels now match the task type. Rule,
+  phrase, and sentence practice no longer expose a word-only "播放单词发音"
+  accessible label; long Russian Cyrillic rule sentences remain centered,
+  wrap-ready, and untruncated.
 
 ## Latest Verification
 
@@ -276,7 +280,10 @@ Current gate summary:
 - Focused Settings connection-status tests passed: `2` files and `8` tests,
   covering Azure, ElevenLabs, AI coach, Youdao, raw English fetch fallback, and
   long status wrapping.
-- Full tests passed: `100` files and `556` tests.
+- Focused phoneme detail presentation tests passed: `2` files and `9` tests,
+  covering non-English full text visibility, Russian long Cyrillic rule text,
+  and task-accurate A/B playback labels.
+- Full tests passed: `100` files and `557` tests.
 - Typecheck, lint (`357` files checked), and static desktop frontend build
   passed.
 - Release EXE build passed and rebuilt EXE, MSI, and NSIS artifacts.
