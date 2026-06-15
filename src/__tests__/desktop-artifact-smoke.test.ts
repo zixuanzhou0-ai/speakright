@@ -61,10 +61,21 @@ describe("desktop artifact smoke wiring", () => {
     expect(launchScript).toContain("Use the existing app window");
     expect(launchScript).toContain("Running PIDs:");
     expect(launchScript).toContain("SpeakRight release launch failed");
-    expect(launchScript).toContain('childProcess.once("spawn"');
-    expect(launchScript).toContain('childProcess.once("error"');
+    expect(launchScript).toContain("writeSync");
+    expect(launchScript).toContain("writeLine(2");
+    expect(launchScript).not.toContain("writeLine(1");
+    expect(launchScript).toContain("launch requested");
     expect(launchScript).toContain("PID:");
+    expect(launchScript).toContain("child.unref()");
     expect(launchScript).toContain("does not start localhost");
+    expect(launchScript.indexOf("launch requested")).toBeLessThan(
+      launchScript.indexOf("spawn(executable"),
+    );
+    expect(launchScript.indexOf("does not start localhost")).toBeLessThan(
+      launchScript.indexOf("spawn(executable"),
+    );
+    expect(launchScript).not.toContain("console.log");
+    expect(launchScript).not.toContain('once("spawn"');
     expect(launchScript).not.toContain("next dev");
     expect(launchScript).not.toContain("3002");
   });

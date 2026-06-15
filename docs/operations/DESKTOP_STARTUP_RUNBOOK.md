@@ -62,6 +62,8 @@ If `desktop:launch-release` reports that `speakright.exe` is already running,
 use the existing SpeakRight window or close it before launching another Release
 EXE. The command prints the running process IDs so the operator can identify the
 stale app process without falling back to a localhost browser tab.
+On a normal launch, it prints the Release EXE path, the child process PID, and a
+reminder that it does not start localhost or the Next dev server.
 
 4. Use the app window that opens from Tauri. Do not use a browser tab pointed at
    `localhost`.
@@ -120,6 +122,8 @@ build.
 `desktop:launch-release` also refuses to open a second Release EXE when
 `speakright.exe` is already running; it reports the running PID list and leaves
 the existing app process untouched.
+On success, it writes launch status to the terminal before detaching the Release
+EXE process, so a successful command should not look like a blank no-op.
 
 Expected process after startup:
 

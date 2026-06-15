@@ -120,10 +120,11 @@ input under `docs/operations/non-english-ipa-audit-input.json`, including
 `speakright.exe` process before release-style testing. It never closes the app
 for you; close SpeakRight manually before building. `desktop:launch-release`
 also refuses to open a second `speakright.exe`, reports the running process IDs,
-and only confirms launch after the Release EXE spawn event. `desktop:ui-smoke`
-launches the Release EXE, opens Settings, English, Spanish, French, Russian,
-drill, free practice, and diagnosis routes, and confirms the runtime is not
-served from `localhost`.
+and prints a visible launch request, Release EXE path, child PID, and no-localhost
+boundary before it detaches the app process. `desktop:ui-smoke` launches the
+Release EXE, opens Settings, English, Spanish, French, Russian, drill, free
+practice, and diagnosis routes, and confirms the runtime is not served from
+`localhost`.
 
 GitHub Actions are split by change type: source, public asset, script,
 `src-tauri`, or package changes still run the full Windows desktop build, while

@@ -1,5 +1,5 @@
 import { execFile, spawn } from "node:child_process";
-import { existsSync } from "node:fs";
+import { existsSync, writeSync } from "node:fs";
 import path from "node:path";
 import { promisify } from "node:util";
 
@@ -30,8 +30,16 @@ function releaseExecutablePath() {
 const executable = releaseExecutablePath();
 
 function fail(message) {
-  console.error(`SpeakRight release launch failed: ${message}`);
+  writeLine(2, `SpeakRight release launch failed: ${message}`);
   process.exit(1);
+}
+
+function writeLine(fd, message) {
+  writeSync(fd, `${message}\n`);
+}
+
+function formatError(error) {
+  return error instanceof Error ? error.message : String(error);
 }
 
 async function runningSpeakRightProcesses() {
@@ -88,19 +96,21 @@ if (running.length > 0) {
   );
 }
 
-const child = await new Promise((resolve, reject) => {
-  const childProcess = spawn(executable, [], {
+writeLine(2, "SpeakRight release desktop app launch requested.");
+writeLine(2, `Executable: ${executable}`);
+writeLine(2, "This command does not start localhost or the Next dev server.");
+
+let child;
+try {
+  child = spawn(executable, [], {
     detached: true,
     stdio: "ignore",
     windowsHide: false,
   });
-  childProcess.once("spawn", () => resolve(childProcess));
-  childProcess.once("error", reject);
-});
+} catch (error) {
+  fail(`could not start release executable. ${formatError(error)}`);
+}
+
+writeLine(2, `PID: ${child.pid ?? "unknown"}`);
 
 child.unref();
-
-console.log("SpeakRight release desktop app launched.");
-console.log(`Executable: ${executable}`);
-console.log(`PID: ${child.pid ?? "unknown"}`);
-console.log("This command does not start localhost or the Next dev server.");

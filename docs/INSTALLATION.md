@@ -221,6 +221,8 @@ does not stop the process for you.
 `desktop:launch-release` has the same non-destructive duplicate-process guard:
 it refuses to open another Release EXE, prints the running PID list, and leaves
 the existing SpeakRight window untouched.
+On a normal launch it prints the Release EXE path, the child process PID, and a
+reminder that the command does not start localhost or the Next dev server.
 
 ## Troubleshooting
 

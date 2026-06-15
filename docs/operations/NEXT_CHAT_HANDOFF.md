@@ -72,9 +72,9 @@ E:\SpeakRightDesktopRepo\src-tauri\target\release\speakright.exe
   `desktop:launch-release`, dry-run audio audits, and the public release gate.
   Routine validation scripts are checked so they do not call audio generation.
 - `desktop:launch-release` has its own Release-process guard. On Windows it
-  refuses to open a second `speakright.exe`, prints the running PID list, waits
-  for the OS spawn event, and prints the launched PID; it still never starts
-  localhost or the Next dev server.
+  refuses to open a second `speakright.exe`, prints the running PID list, and on
+  normal launch prints a visible launch request, Release EXE path, child PID,
+  and no-localhost reminder before detaching the app process.
 - Drill feedback action buttons now wrap and stay centered after three failed
   attempts, so the `再听一遍` / `跳过此词` controls do not force horizontal
   overflow in narrow windows.
@@ -122,8 +122,9 @@ git status --short --branch
 
 - The Release launch script is now self-contained: even if a maintainer skips
   `desktop:preflight`, `desktop:launch-release` refuses stale duplicate
-  `speakright.exe` processes, reports PIDs, and confirms the spawned Release
-  process ID.
+  `speakright.exe` processes, reports PIDs, and writes visible terminal status
+  before detaching the Release process so the command does not look like a blank
+  no-op.
 - Non-English practice cards now prioritize the text the user must read.
   Words, phrases, and sentences should be visible in full instead of using
   ellipsis.
