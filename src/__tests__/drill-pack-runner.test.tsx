@@ -5,6 +5,8 @@ import TrainingPackPage from "@/app/drill/pack/[packId]/pack-runner-client";
 const mocks = vi.hoisted(() => ({
   searchParams: new URLSearchParams(),
   languageId: "en-US",
+  wordAudioClearError: vi.fn(),
+  ttsReset: vi.fn(),
 }));
 
 vi.mock("next/navigation", () => ({
@@ -38,6 +40,7 @@ vi.mock("@/hooks/use-word-pronunciation", () => ({
   useWordPronunciation: () => ({
     playWord: vi.fn(),
     stop: vi.fn(),
+    clearError: mocks.wordAudioClearError,
     isLoading: false,
     isPlaying: false,
   }),
@@ -65,7 +68,7 @@ vi.mock("@/hooks/use-recording-quality", () => ({
 vi.mock("@/hooks/use-tts-aligned", () => ({
   useTtsAligned: () => ({
     speak: vi.fn(),
-    reset: vi.fn(),
+    reset: mocks.ttsReset,
     isLoading: false,
     isPlaying: false,
   }),
@@ -76,6 +79,8 @@ describe("drill pack runner start flow", () => {
     localStorage.clear();
     mocks.searchParams = new URLSearchParams();
     mocks.languageId = "en-US";
+    mocks.wordAudioClearError.mockClear();
+    mocks.ttsReset.mockClear();
   });
 
   it("starts final-consonants from the intro primary action", () => {
@@ -90,6 +95,8 @@ describe("drill pack runner start flow", () => {
     expect(screen.getByRole("heading", { name: "先听准，再说准" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "听辨 ABX" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "X = A" })).toBeInTheDocument();
+    expect(mocks.wordAudioClearError).toHaveBeenCalled();
+    expect(mocks.ttsReset).toHaveBeenCalled();
   });
 
   it("starts final-consonants when clicking an unlocked course map level", () => {

@@ -378,8 +378,14 @@ export default function TrainingPackPage() {
   const defaultStartLevelId =
     lessonBrief?.startLevelId ?? courseMap?.startLevelId ?? requestedLevelId;
 
+  const clearReferenceAudioState = () => {
+    wordAudio.clearError();
+    tts.reset();
+  };
+
   const resetSession = (levelId = defaultStartLevelId) => {
     startedAtRef.current = Date.now();
+    clearReferenceAudioState();
     setActiveSlot(null);
     setXIsA(Math.random() > 0.5);
     setPerceptionCorrect(0);
@@ -434,6 +440,7 @@ export default function TrainingPackPage() {
     if (phase.type !== "course" || !currentLevel) return;
     const nextItem = phase.position.itemIndex + 1;
     const next = nextCoursePosition(course, phase.position);
+    clearReferenceAudioState();
     recorder.reset();
     recordingQuality.reset();
     azure.reset();
@@ -521,6 +528,7 @@ export default function TrainingPackPage() {
   };
 
   const completeSession = () => {
+    clearReferenceAudioState();
     const levelSummaries = course.levels.map((level) =>
       toLevelSummary(level, levelStats[level.id] ?? emptySnapshot(level)),
     );
@@ -606,8 +614,7 @@ export default function TrainingPackPage() {
 
   const playReference = () => {
     if (!currentItem) return;
-    wordAudio.clearError();
-    tts.reset();
+    clearReferenceAudioState();
     const reference = getCourseItemPlaybackText(currentItem);
     if (reference.split(/\s+/).length > 1) {
       tts.speak(reference, { speed: 0.85, languageId });
@@ -617,8 +624,7 @@ export default function TrainingPackPage() {
   };
 
   const playRemediationText = (text: string) => {
-    wordAudio.clearError();
-    tts.reset();
+    clearReferenceAudioState();
     if (text.split(/\s+/).length > 1) {
       tts.speak(text, { speed: 0.75, languageId });
     } else {
@@ -628,8 +634,7 @@ export default function TrainingPackPage() {
 
   const playSlot = (slot: ActiveSlot) => {
     if (!currentItem || !slot) return;
-    wordAudio.clearError();
-    tts.reset();
+    clearReferenceAudioState();
     const wordA = currentItem.text;
     const wordB = currentItem.contrastText ?? currentItem.text;
     const word =
@@ -666,6 +671,7 @@ export default function TrainingPackPage() {
   const nextPerception = () => {
     if (phase.type !== "course" || !currentLevel) return;
     const nextIndex = phase.position.itemIndex + 1;
+    clearReferenceAudioState();
     setPerceptionAnswer(null);
     setActiveSlot(null);
     setXIsA(Math.random() > 0.5);
@@ -791,6 +797,7 @@ export default function TrainingPackPage() {
   };
 
   const retryCurrent = () => {
+    clearReferenceAudioState();
     setLastAttempt(null);
     setRemediationStepIndex(0);
     setRemediationAttempt(null);
@@ -800,6 +807,7 @@ export default function TrainingPackPage() {
   };
 
   const startRemediationRecording = () => {
+    clearReferenceAudioState();
     recorder.reset();
     recordingQuality.reset();
     azure.reset();
@@ -1030,6 +1038,7 @@ export default function TrainingPackPage() {
                 onPlayReference={playReference}
                 onPlayRemediationText={playRemediationText}
                 onStartRecording={() => {
+                  clearReferenceAudioState();
                   recorder.reset();
                   recordingQuality.reset();
                   azure.reset();

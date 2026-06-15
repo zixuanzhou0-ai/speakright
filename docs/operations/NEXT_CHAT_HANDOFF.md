@@ -163,6 +163,10 @@ git status --short --branch
 - Perception ABX now clears stale pronunciation errors when starting/restarting
   a session, advancing to the next question, or completing the run, so one
   failed speaker click does not pollute the following question.
+- Pack-runner now uses one `clearReferenceAudioState()` path before starting or
+  restarting a course, moving items/levels, retrying, and starting normal or
+  remediation recording, so stale reference-audio/TTS errors do not linger into
+  the scoring card.
 - Recorder runtime interruptions are no longer treated as usable recordings.
   If `MediaRecorder.onerror` fires after recording starts, the hook stops the
   stream, discards any partial audio, and shows a Chinese recovery message about

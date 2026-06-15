@@ -322,6 +322,7 @@ describe("desktop preflight and UI smoke", () => {
     expect(packRunner).toContain(
       "assessmentError={recorder.error ?? azure.error}",
     );
+    expect(packRunner).toContain("clearReferenceAudioState");
     expect(packRunner).toContain("wordAudio.clearError()");
     expect(packRunner).toContain("tts.reset()");
     expect(packRunner).toContain('role="alert"');
