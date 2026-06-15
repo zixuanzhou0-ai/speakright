@@ -31,6 +31,16 @@ const mocks = vi.hoisted(() => ({
   }>,
 }));
 
+function createDeferred<T>() {
+  let resolve!: (value: T | PromiseLike<T>) => void;
+  let reject!: (reason?: unknown) => void;
+  const promise = new Promise<T>((innerResolve, innerReject) => {
+    resolve = innerResolve;
+    reject = innerReject;
+  });
+  return { promise, resolve, reject };
+}
+
 vi.mock("@/lib/api-client", () => ({
   fetchPronunciation: mocks.fetchPronunciation,
 }));
@@ -378,6 +388,44 @@ describe("useWordPronunciation", () => {
     });
     expect(mocks.fetchSources).toEqual(["/audio/words/blue/hello.mp3"]);
     expect(mocks.howlSources).toEqual(["blob:pronunciation"]);
+  });
+
+  it("ignores stale online fallback errors after a newer word starts playing", async () => {
+    const deferred = createDeferred<Blob>();
+    mocks.failNextLocalAudio = true;
+    mocks.fetchPronunciation.mockReturnValueOnce(deferred.promise);
+    const { result } = renderHook(() => useWordPronunciation());
+
+    await act(async () => {
+      result.current.playWord("hello", "blue", "en-US");
+    });
+
+    await waitFor(() => {
+      expect(mocks.fetchPronunciation).toHaveBeenCalledWith("hello");
+    });
+
+    await act(async () => {
+      result.current.playWord("world", "blue", "en-US");
+    });
+
+    await waitFor(() => {
+      expect(mocks.fetchSources).toEqual([
+        "/audio/words/blue/hello.mp3",
+        "/audio/words/blue/world.mp3",
+      ]);
+    });
+    await waitFor(() => {
+      expect(result.current.isPlaying).toBe(true);
+    });
+
+    await act(async () => {
+      deferred.reject(new Error("Failed to fetch"));
+      await deferred.promise.catch(() => undefined);
+    });
+
+    expect(result.current.error).toBeNull();
+    expect(result.current.isPlaying).toBe(true);
+    expect(mocks.howlSources).toEqual([]);
   });
 
   it("shows the online dictionary failure reason when English fallback fails", async () => {

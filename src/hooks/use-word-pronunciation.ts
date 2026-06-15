@@ -88,6 +88,10 @@ export function useWordPronunciation(): UseWordPronunciationReturn {
     if (mountedRef.current) setError(value);
   }, []);
 
+  const isStaleRequest = useCallback((requestId?: number) => {
+    return requestId !== undefined && requestId !== playRequestIdRef.current;
+  }, []);
+
   const cleanup = useCallback(() => {
     if (webAudioSourceRef.current) {
       const source = webAudioSourceRef.current;
@@ -284,13 +288,12 @@ export function useWordPronunciation(): UseWordPronunciationReturn {
       setSafeIsLoading(true);
       try {
         const blob = await fetchPronunciation(word);
-        if (requestId !== undefined && requestId !== playRequestIdRef.current) {
-          return;
-        }
+        if (isStaleRequest(requestId)) return;
         const url = URL.createObjectURL(blob);
         blobUrlRef.current = url;
         playHowl(url, { requestId });
       } catch (error) {
+        if (isStaleRequest(requestId)) return;
         setSafeIsLoading(false);
         setSafeIsPlaying(false);
         setSafeError(getPronunciationFallbackErrorMessage(error));
@@ -300,7 +303,14 @@ export function useWordPronunciation(): UseWordPronunciationReturn {
         );
       }
     },
-    [cleanup, playHowl, setSafeError, setSafeIsLoading, setSafeIsPlaying],
+    [
+      cleanup,
+      isStaleRequest,
+      playHowl,
+      setSafeError,
+      setSafeIsLoading,
+      setSafeIsPlaying,
+    ],
   );
 
   const playWord = useCallback(
@@ -336,6 +346,7 @@ export function useWordPronunciation(): UseWordPronunciationReturn {
           normalizedWord,
           fallbackVoice,
         );
+        if (isStaleRequest(requestId)) return;
         if (staticEntry) {
           void playLocalWebAudio(staticEntry.audioSrc, {
             requestId,
@@ -347,6 +358,7 @@ export function useWordPronunciation(): UseWordPronunciationReturn {
           languageId,
           normalizedWord,
         );
+        if (isStaleRequest(requestId)) return;
         if (cached) {
           const url = URL.createObjectURL(cached.audioBlob);
           blobUrlRef.current = url;
@@ -367,6 +379,7 @@ export function useWordPronunciation(): UseWordPronunciationReturn {
     },
     [
       cleanup,
+      isStaleRequest,
       playHowl,
       playLocalWebAudio,
       playYoudaoFallback,

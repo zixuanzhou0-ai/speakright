@@ -154,6 +154,9 @@ git status --short --branch
   playback, recorder, and Azure assessment failures inline. Pack-runner clears
   stale reference-audio errors before starting a new reference/perception clip,
   so an old failed speaker click does not mask the current task.
+- Shared word pronunciation playback now also ignores stale online-dictionary
+  fallback failures after a newer word starts playing, so fast A/B or free
+  practice speaker clicks do not inherit an old failed request.
 - Recorder runtime interruptions are no longer treated as usable recordings.
   If `MediaRecorder.onerror` fires after recording starts, the hook stops the
   stream, discards any partial audio, and shows a Chinese recovery message about

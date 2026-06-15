@@ -129,6 +129,14 @@ describe("desktop preflight and UI smoke", () => {
     expect(
       readProjectFile("src/components/sentences/sentence-input-card.tsx"),
     ).toContain("free-practice-word-audio-error");
+    const wordPronunciationHook = readProjectFile(
+      "src/hooks/use-word-pronunciation.ts",
+    );
+    expect(wordPronunciationHook).toContain("isStaleRequest");
+    expect(wordPronunciationHook).toContain("playRequestIdRef.current");
+    expect(wordPronunciationHook).toContain(
+      "if (isStaleRequest(requestId)) return;",
+    );
     expect(script).toContain("assessmentSmoke=ok");
     expect(script).toContain("aria-disabled");
     expect(script).toContain("videoSelectorReady");
