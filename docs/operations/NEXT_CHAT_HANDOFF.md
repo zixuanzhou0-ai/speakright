@@ -179,6 +179,11 @@ git status --short --branch
   average, and completion time. Release EXE smoke seeds an English mastery
   profile locally so these rows are checked in main/narrow/low-height passes
   without touching experimental-language mastery.
+- Perception ABX focused-review and completion action rows now wrap instead of
+  forcing all result buttons onto one narrow-window row. Release EXE smoke also
+  covers `/drill/perception` in main, narrow, and low-height route passes under
+  an experimental-language context, where it must show the blocker instead of
+  loading English-only HVPT material.
 - Quick diagnosis word and paragraph recording cards now show recorder startup
   errors and Azure scoring errors inline with `role="alert"`, so missing
   microphone permission, missing Azure keys, network failure, or quota failure
@@ -373,6 +378,9 @@ Current gate summary:
 - Focused progress-archive boundary tests passed: `3` files and `13` tests,
   including the direct `/progress` experimental blocker and updated Release
   smoke route coverage.
+- Focused perception-drill action-row tests passed: `2` files and `14` tests,
+  covering inline ABX audio errors, wrap-ready result actions, and Release smoke
+  route coverage for the experimental-language blocker path.
 - Open-source handoff/readiness plus IPA audit export drift tests passed.
 - Static language-pack manifest IPA drift tests passed for the applied French
   and Russian reviewed findings.
@@ -396,8 +404,8 @@ Current gate summary:
 - Focused phoneme detail presentation tests passed: `2` files and `9` tests,
   covering non-English full text visibility, Russian long Cyrillic rule text,
   and task-accurate A/B playback labels.
-- Full tests passed: `100` files and `557` tests.
-- Typecheck, lint (`357` files checked), and static desktop frontend build
+- Full tests passed: `106` files and `596` tests.
+- Typecheck, lint (`364` files checked), and static desktop frontend build
   passed.
 - Release EXE build passed and rebuilt EXE, MSI, and NSIS artifacts.
 - Release EXE preflight passed; no localhost startup is part of the release
@@ -407,10 +415,10 @@ Current gate summary:
   `practiceAudioLabels=ok`, `freePracticeSmoke=ok`, `assessmentSmoke=ok`,
   `narrowViewport=ok`, `lowHeightViewport=ok`, and
   `releaseServedFromDevServer=false`; the smoke script now includes `/progress`
-  in the main, narrow-window, and low-height route passes, `/sentences` waits
-  for the actual free-practice page plus input/recording cards, and
-  `/assessment` waits for the intro card plus start/passage actions instead of
-  only checking the page container.
+  and `/drill/perception` in the main, narrow-window, and low-height route
+  passes, `/sentences` waits for the actual free-practice page plus
+  input/recording cards, and `/assessment` waits for the intro card plus
+  start/passage actions instead of only checking the page container.
 - Release EXE launch passed from the static Tauri bundle, and the test process
   was closed after verification.
 - No ElevenLabs generation or TTS spend is part of this validation path.

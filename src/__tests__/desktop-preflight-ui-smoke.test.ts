@@ -75,6 +75,9 @@ describe("desktop preflight and UI smoke", () => {
     expect(script).toContain("/drill/prosody");
     expect(script).toContain("prosodyHooksReady");
     expect(script).toContain("prosody-exercise-header");
+    expect(script).toContain("/drill/perception");
+    expect(script).toContain("perceptionHooksReady");
+    expect(script).toContain("perception-experimental-blocker");
     expect(script).toContain("/sentences");
     expect(script).toContain('selector: \'[data-smoke="sentences-page"]\'');
     expect(script).toContain("sentenceHooksReady");
@@ -96,7 +99,7 @@ describe("desktop preflight and UI smoke", () => {
     expect(script).toContain("direct: true");
     expect(script).toContain("progress-experimental-blocker");
     expect(script).toContain(
-      "routes=/drill,/drill/prosody,/sentences,/assessment,/progress",
+      "routes=/drill,/drill/prosody,/drill/perception,/sentences,/assessment,/progress",
     );
     expect(script).toContain("releaseServedFromDevServer=false");
     expect(script).toContain("data-smoke=\"language-option\"");
@@ -354,6 +357,19 @@ describe("desktop preflight and UI smoke", () => {
     expect(contrastPage).toContain('role="alert"');
 
     expect(perceptionPage).toContain('data-smoke="perception-audio-error"');
+    expect(perceptionPage).toContain('data-smoke="perception-page"');
+    expect(perceptionPage).toContain(
+      'data-smoke="perception-experimental-blocker"',
+    );
+    expect(perceptionPage).toContain(
+      'data-smoke="perception-focused-review-actions"',
+    );
+    expect(perceptionPage).toContain(
+      'data-smoke="perception-completed-actions"',
+    );
+    expect(perceptionPage).toContain(
+      "flex flex-wrap justify-center gap-3 sm:justify-end",
+    );
     expect(perceptionPage).toContain("{pronunciation.error}");
     expect(perceptionPage).toContain("pronunciation.clearError()");
     expect(perceptionPage).toContain("setActiveSlot(null)");

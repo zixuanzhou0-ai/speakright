@@ -1389,6 +1389,11 @@ async function assertMainRoutes(cdp) {
       selector: '[data-smoke="prosody-page"]',
       direct: true,
     },
+    {
+      path: "/drill/perception",
+      selector: '[data-smoke="perception-experimental-blocker"]',
+      direct: true,
+    },
     { path: "/sentences", selector: '[data-smoke="sentences-page"]' },
     { path: "/assessment", selector: '[data-smoke="assessment-page"]' },
     {
@@ -1421,18 +1426,24 @@ async function assertMainRoutes(cdp) {
     routePath !== "/drill/prosody" ||
     (Boolean(document.querySelector('[data-smoke="prosody-page"]')) &&
       Boolean(document.querySelector('[data-smoke="prosody-exercise-header"]')));
+  const perceptionHooksReady =
+    routePath !== "/drill/perception" ||
+    (Boolean(document.querySelector('[data-smoke="perception-page"]')) &&
+      Boolean(document.querySelector('[data-smoke="perception-experimental-blocker"]')));
   return {
     ok:
       bodyText.trim().length > 20 &&
       sentenceHooksReady &&
       assessmentHooksReady &&
       prosodyHooksReady &&
+      perceptionHooksReady &&
       !bodyText.includes("Merriam-Webster") &&
       !bodyText.includes("多语言发音包") &&
       !bodyText.includes("无法访问此页面"),
     sentenceHooksReady,
     assessmentHooksReady,
     prosodyHooksReady,
+    perceptionHooksReady,
     bodyText: bodyText.slice(0, 800)
   };
 })()
@@ -1536,6 +1547,11 @@ async function assertNarrowViewportRoutes(cdp) {
         selector: '[data-smoke="prosody-page"]',
         direct: true,
       },
+      {
+        path: "/drill/perception",
+        selector: '[data-smoke="perception-experimental-blocker"]',
+        direct: true,
+      },
       { path: "/sentences", selector: '[data-smoke="sentences-page"]' },
       { path: "/assessment", selector: '[data-smoke="assessment-page"]' },
       {
@@ -1566,6 +1582,10 @@ async function assertNarrowViewportRoutes(cdp) {
     routePath !== "/drill/prosody" ||
     (Boolean(document.querySelector('[data-smoke="prosody-page"]')) &&
       Boolean(document.querySelector('[data-smoke="prosody-exercise-header"]')));
+  const perceptionHooksReady =
+    routePath !== "/drill/perception" ||
+    (Boolean(document.querySelector('[data-smoke="perception-page"]')) &&
+      Boolean(document.querySelector('[data-smoke="perception-experimental-blocker"]')));
   const visibleButtons = [...document.querySelectorAll("button,a")].filter((element) => {
     const rect = element.getBoundingClientRect();
     return rect.width > 0 && rect.height > 0;
@@ -1580,11 +1600,13 @@ async function assertNarrowViewportRoutes(cdp) {
       sentenceHooksReady &&
       assessmentHooksReady &&
       prosodyHooksReady &&
+      perceptionHooksReady &&
       buttonTextReadable &&
       document.documentElement.scrollWidth <= window.innerWidth + 24,
     sentenceHooksReady,
     assessmentHooksReady,
     prosodyHooksReady,
+    perceptionHooksReady,
     buttonTextReadable,
     scrollWidth: document.documentElement.scrollWidth,
     innerWidth: window.innerWidth,
@@ -1721,6 +1743,11 @@ async function assertLowHeightViewportRoutes(cdp) {
         selector: '[data-smoke="prosody-page"]',
         direct: true,
       },
+      {
+        path: "/drill/perception",
+        selector: '[data-smoke="perception-experimental-blocker"]',
+        direct: true,
+      },
       { path: "/sentences", selector: '[data-smoke="sentences-page"]' },
       { path: "/assessment", selector: '[data-smoke="assessment-page"]' },
       {
@@ -1751,6 +1778,10 @@ async function assertLowHeightViewportRoutes(cdp) {
     routePath !== "/drill/prosody" ||
     (Boolean(document.querySelector('[data-smoke="prosody-page"]')) &&
       Boolean(document.querySelector('[data-smoke="prosody-exercise-header"]')));
+  const perceptionHooksReady =
+    routePath !== "/drill/perception" ||
+    (Boolean(document.querySelector('[data-smoke="perception-page"]')) &&
+      Boolean(document.querySelector('[data-smoke="perception-experimental-blocker"]')));
   const visibleInteractive = [...document.querySelectorAll("button,a")].filter((element) => {
     const rect = element.getBoundingClientRect();
     return rect.width > 0 && rect.height > 0;
@@ -1766,11 +1797,13 @@ async function assertLowHeightViewportRoutes(cdp) {
       sentenceHooksReady &&
       assessmentHooksReady &&
       prosodyHooksReady &&
+      perceptionHooksReady &&
       interactiveTextReadable &&
       document.documentElement.scrollWidth <= window.innerWidth + 24,
     sentenceHooksReady,
     assessmentHooksReady,
     prosodyHooksReady,
+    perceptionHooksReady,
     interactiveTextReadable,
     scrollWidth: document.documentElement.scrollWidth,
     innerWidth: window.innerWidth,
@@ -1901,7 +1934,7 @@ async function smoke() {
         `details=${details
           .map((item) => `${item.languageId}:${item.slug}`)
           .join(",")}`,
-        "routes=/drill,/drill/prosody,/sentences,/assessment,/progress",
+        "routes=/drill,/drill/prosody,/drill/perception,/sentences,/assessment,/progress",
         "scoringTileAudioPolicy=ok",
         "practiceAudioLabels=ok",
         "freePracticeSmoke=ok",

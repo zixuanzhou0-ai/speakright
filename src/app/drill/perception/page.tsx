@@ -192,9 +192,15 @@ export default function PerceptionDrillPage() {
 
   if (!canRecordHvptMastery) {
     return (
-      <div className="h-full flex flex-col px-6 py-4 overflow-y-auto scrollbar-thin">
+      <div
+        data-smoke="perception-page"
+        className="h-full flex flex-col px-6 py-4 overflow-y-auto scrollbar-thin"
+      >
         <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col justify-center">
-          <div className="rounded-xl border bg-card p-6 text-center shadow-sm">
+          <div
+            data-smoke="perception-experimental-blocker"
+            className="rounded-xl border bg-card p-6 text-center shadow-sm"
+          >
             <Headphones className="mx-auto h-10 w-10 text-primary" />
             <h1 className="mt-3 text-2xl font-bold">
               {languageProfile.shortLabel}听辨训练开发中
@@ -224,7 +230,10 @@ export default function PerceptionDrillPage() {
   }).length;
 
   return (
-    <div className="h-full flex flex-col px-6 py-4 overflow-y-auto scrollbar-thin">
+    <div
+      data-smoke="perception-page"
+      className="h-full flex flex-col px-6 py-4 overflow-y-auto scrollbar-thin"
+    >
       <div className="mb-4 flex items-center gap-3 shrink-0">
         <Link
           href="/drill"
@@ -485,7 +494,10 @@ export default function PerceptionDrillPage() {
                 </div>
               ))}
             </div>
-            <div className="mt-6 flex justify-end gap-3">
+            <div
+              data-smoke="perception-focused-review-actions"
+              className="mt-6 flex flex-wrap justify-center gap-3 sm:justify-end"
+            >
               <Button
                 type="button"
                 variant="outline"
@@ -568,7 +580,10 @@ export default function PerceptionDrillPage() {
                 </p>
               </div>
             </div>
-            <div className="mt-6 flex justify-center gap-3">
+            <div
+              data-smoke="perception-completed-actions"
+              className="mt-6 flex flex-wrap justify-center gap-3"
+            >
               <Button
                 type="button"
                 variant="outline"
