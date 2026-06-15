@@ -12,7 +12,7 @@ claimed as complete.
 | RC requirement | Evidence source |
 | --- | --- |
 | Current workspace is `E:\SpeakRightDesktopRepo`; release testing uses the Release EXE, not localhost; public install docs explain download, source build, first launch, and degraded no-key/no-network/no-microphone/missing-local-audio states | `README.md`, `docs/INSTALLATION.md`, `docs/operations/DESKTOP_STARTUP_RUNBOOK.md`, `scripts/desktop-preflight.mjs`, `scripts/desktop-launch-release.mjs`, `scripts/desktop-ui-smoke.mjs`, `src/__tests__/open-source-readiness.test.ts`, `npm.cmd run desktop:preflight`, `npm.cmd run desktop:launch-release`, `npm.cmd run desktop:ui-smoke`; `desktop:launch-release` refuses duplicate `speakright.exe` Release processes, reports running PIDs, prints a visible launch request, Release EXE path, child PID, and no-localhost boundary before detaching the app process |
-| Startup local-data migration failures do not block API-key hydration or app startup | `src/components/layout/key-hydrator.tsx`, `src/__tests__/key-hydrator.test.tsx`; the startup hydrator catches local data migration/storage failures, shows a fixed Chinese toast explaining that the app will continue to start and that Settings can export diagnostics or reset local data, and still calls `hydrateKeys()` so configured provider keys or settings can load even if local learning-data migration is unavailable |
+| Startup local-data migration and theme persistence failures do not block API-key hydration or app startup | `src/components/layout/key-hydrator.tsx`, `src/components/layout/theme-provider.tsx`, `src/__tests__/key-hydrator.test.tsx`, `src/__tests__/theme-provider.test.tsx`; the startup hydrator catches local data migration/storage failures, shows a fixed Chinese toast explaining that the app will continue to start and that Settings can export diagnostics or reset local data, and still calls `hydrateKeys()` so configured provider keys or settings can load even if local learning-data migration is unavailable; theme preference reads and writes are best-effort, so blocked or invalid theme storage falls back to `system` without blanking the shell, while a live theme toggle still updates the rendered UI |
 | English is the stable baseline; Spanish, French, and Russian remain experimental | `README.md`, `docs/INSTALLATION.md`, `docs/operations/NEXT_CHAT_HANDOFF.md`, `src/app/drill/page.tsx`, `src/lib/mastery-language-policy.ts`, `src/__tests__/mastery-language-policy.test.ts` |
 | Non-English practice can score and provide feedback but cannot load English advanced training packs, write formal mastery/evidenceMastery, display diagnosis issues as formal mastery stages, or show/read English progress archives | `src/lib/mastery-language-policy.ts`, `src/components/assessment/assessment-report.tsx`, `src/app/sentences/page.tsx`, `src/app/progress/page.tsx`, `src/app/assessment/passage/page.tsx`, `src/app/drill/evidence/page.tsx`, `src/app/drill/pack/[packId]/pack-runner-client.tsx`, `src/app/drill/perception/page.tsx`, `src/app/drill/prosody/page.tsx`, `src/app/drill/scenarios/page.tsx`, `src/app/drill/spontaneous/page.tsx`, `src/__tests__/assessment-report.test.tsx`, `src/__tests__/drill-pack-runner.test.tsx`, `src/__tests__/progress-page.test.tsx`, `src/__tests__/mastery-language-policy.test.ts`, `src/__tests__/mastery-profile.test.ts`; direct English pack-runner routes show `pack-runner-experimental-blocker` for Spanish/French/Russian instead of loading English pack content; direct `/progress` access shows `progress-experimental-blocker` for Spanish/French/Russian instead of English mastery archive metrics, and the blocker path does not call the formal mastery profile or benchmark archive loaders; direct `/drill/evidence` access shows `evidence-experimental-blocker` for Spanish/French/Russian and does not read the formal mastery profile; direct `/assessment/passage` access shows `assessment-passage-experimental-blocker` for Spanish/French/Russian instead of loading the English coverage passage or English training-pack evidence; diagnosis issue cards keep formal mastery badges for English but show `experimental 练习观察` plus the experimental blocker for Spanish/French/Russian instead of `阶段` / `下一层` / `阶段分` badges |
 | Words, phrases, sentences, IPA, and examples are centered, wrap in full, avoid ellipsis/truncation, and use accurate playback labels | `src/lib/practice-text-presentation.ts`, `src/components/phoneme/phoneme-study-card.tsx`, `src/components/drill/drill-feedback.tsx`, `src/app/assessment/passage/page.tsx`, `src/app/drill/evidence/page.tsx`, `src/app/drill/pack/[packId]/pack-runner-client.tsx`, `src/app/drill/word/page.tsx`, `src/app/drill/sentence/page.tsx`, `src/app/drill/contrast/page.tsx`, `src/app/drill/prosody/page.tsx`, `src/app/drill/perception/page.tsx`, `src/app/drill/scenarios/page.tsx`, `src/app/drill/spontaneous/page.tsx`, `src/app/progress/page.tsx`, `src/components/assessment/assessment-report.tsx`, `src/components/layout/sidebar-phoneme-list.tsx`, `src/components/audio/read-along-text.tsx`, `src/components/sentences/sentence-input-card.tsx`, `src/components/scoring/word-highlight.tsx`, `src/components/settings/language-config-card.tsx`, `src/components/settings/usage-monitor.tsx`, `src/__tests__/practice-text-presentation.test.ts`, `src/__tests__/phoneme-study-card.test.tsx`, `src/__tests__/drill-feedback.test.tsx`, `src/__tests__/assessment-report.test.tsx`, `src/__tests__/sentence-input-card.test.tsx`, `src/__tests__/progress-page.test.tsx`, `src/__tests__/sidebar-phoneme-list.test.tsx`, `src/__tests__/desktop-preflight-ui-smoke.test.ts`, `scripts/desktop-ui-smoke.mjs`; non-English detail A/B playback buttons label rule sentences as rule/sentence playback instead of saying word playback, long Cyrillic rule text remains centered/wrap-ready/untruncated, failed drill feedback actions wrap instead of forcing a narrow-window horizontal row, diagnosis-report prescription CTAs wrap long pack titles instead of clipping them, the free-practice input/listen row wraps while keeping the text input readable, English word/sentence/contrast drill page headers and initial config cards wrap in narrow Release windows, full-passage diagnosis, training-evidence, and training-pack direct-route headers/intro/blocker text wrap in Release routes, the prosody drill exercise title/pass-line/demo button stack cleanly on narrow screens, perception focused-review and completion action rows wrap instead of forcing a single narrow-window button row, English scenario/spontaneous transfer page headers wrap without pushing the back button out of narrow layouts, Progress benchmark rows stack score/date above replay/delete controls on narrow screens, and Progress recent-session rows wrap pack titles plus stage/date metadata instead of forcing a single line |
@@ -67,40 +67,45 @@ rerun during this playback/UI RC pass.
 
 ## Latest Local Command Results
 
-Latest local focused pass for Settings data-summary storage recovery and the full RC gate:
+Latest local focused pass for theme-persistence storage recovery and the full RC gate:
 
 ```text
 git status --short --branch
   ## main...origin/main
+  If normal `git push` is unavailable, use the documented GitHub API fallback
+  and verify the local-vs-remote tree SHA before treating content as pushed
 
-npx.cmd biome check --fix src/lib/data-registry.ts src/components/settings/data-control-card.tsx src/__tests__/data-registry.test.ts src/__tests__/settings-key-hydration.test.tsx src/__tests__/desktop-preflight-ui-smoke.test.ts docs/operations/RC_EVIDENCE_AUDIT.md docs/operations/DESKTOP_STARTUP_RUNBOOK.md docs/operations/NEXT_CHAT_HANDOFF.md
+npx.cmd biome check --fix src/components/layout/theme-provider.tsx src/__tests__/theme-provider.test.tsx docs/operations/RC_EVIDENCE_AUDIT.md docs/operations/DESKTOP_STARTUP_RUNBOOK.md docs/operations/NEXT_CHAT_HANDOFF.md
   passed; no fixes needed after the final docs update
 
-npm.cmd run test -- src/__tests__/data-registry.test.ts src/__tests__/settings-key-hydration.test.tsx src/__tests__/desktop-preflight-ui-smoke.test.ts
-  3 files / 36 tests passed; degraded local-data summary reads, the Settings
-  data-summary warning, preserved diagnostic export/reset controls, and static
-  Release smoke coverage are locked
+npm.cmd run test -- src/__tests__/theme-provider.test.tsx
+  1 file / 2 tests passed; blocked theme reads fall back to `system`, and
+  blocked theme writes still allow the live theme to update
+
+npm.cmd run test -- src/__tests__/theme-provider.test.tsx src/__tests__/open-source-readiness.test.ts
+  2 files / 11 tests passed; theme persistence recovery and the public
+  handoff/evidence GitHub API fallback guard are both locked
 
 npm.cmd run test
-  111 files / 623 tests passed
+  112 files / 625 tests passed
 
 npm.cmd run typecheck
   passed
 
 npm.cmd run lint
-  passed; 370 files checked
+  passed; 371 files checked
 
 npm.cmd run build:desktop-frontend
   passed; 144 static pages generated
 
 npm.cmd run desktop:build
-  passed; rebuilt the Release EXE, MSI, and NSIS artifacts after the Settings
-  data/privacy frontend change
+  passed; rebuilt the Release EXE, MSI, and NSIS artifacts after the theme
+  provider shell change
 
 npm.cmd run desktop:preflight
   passed; Release EXE exists, no running speakright.exe, no localhost startup;
   during verification it correctly reported the expected dirty worktree from this
-  Settings data-summary recovery fix
+  theme-persistence recovery fix
 
 npm.cmd run desktop:ui-smoke
   passed; Release EXE runtime, centered target text, no target-text ellipsis,
@@ -132,7 +137,7 @@ npm.cmd run desktop:ui-smoke
 
 npm.cmd run desktop:launch-release
   passed; command printed `SpeakRight release desktop app launch requested`,
-  the Release EXE path, `PID: 59828`, and the no-localhost reminder; the Release
+  the Release EXE path, `PID: 27908`, and the no-localhost reminder; the Release
   EXE opened from `src-tauri\target\release\speakright.exe` and was verified as
   a running `speakright.exe` process
 
@@ -152,7 +157,7 @@ npm.cmd run desktop:launch-release
 ## Limits
 
 - `audio:parity:dry-run` and `audio:loudness:dry-run` were not rerun during the
-  Settings data-summary recovery pass; the latest recorded audio
+  theme-persistence recovery pass; the latest recorded audio
   dry-runs remain the previous playback-layer audits.
 - `es-ES`, `fr-FR`, and `ru-RU` are experimental and must not be described as
   formally mastered.

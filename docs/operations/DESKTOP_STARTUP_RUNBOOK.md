@@ -89,6 +89,10 @@ reminder that it does not start localhost or the Next dev server.
   read/write local storage, the app should still continue startup, keep API key
   hydration running, and show a Chinese warning telling the learner to use
   Settings to export diagnostics or reset local data if problems continue.
+  Theme preference storage is also best-effort: blocked or invalid theme storage
+  should fall back to the system theme without blanking the desktop shell, and a
+  live theme toggle should still update the current window even if persistence
+  fails.
 - Local storage failures: if score trend or practice-history persistence is
   blocked by quota/permissions, phoneme detail, free practice, and drill scoring
   should still show the current result and display a Chinese warning that local
