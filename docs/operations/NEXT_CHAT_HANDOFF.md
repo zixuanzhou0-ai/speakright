@@ -131,6 +131,10 @@ git status --short --branch
   errors and Azure scoring errors inline with `role="alert"`, so missing
   microphone permission, missing Azure keys, network failure, or quota failure
   does not look like a frozen assessment step.
+- Recorder runtime interruptions are no longer treated as usable recordings.
+  If `MediaRecorder.onerror` fires after recording starts, the hook stops the
+  stream, discards any partial audio, and shows a Chinese recovery message about
+  microphone permission/device/busy-state interruption.
 - Scoring phoneme tiles now use stable duplicate-safe keys, clean up delayed
   click timers on unmount, and stop/unload the previous short audio safely when
   another tile is played.

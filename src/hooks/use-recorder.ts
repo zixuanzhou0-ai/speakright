@@ -11,6 +11,10 @@ const UNSUPPORTED_MIC_MESSAGE =
 const UNSUPPORTED_RECORDER_MESSAGE =
   "当前桌面运行环境不支持录音编码，请更新系统 WebView 或重启 SpeakRight 后重试。";
 
+function getRecorderEventError(event: Event): unknown {
+  return "error" in event ? event.error : event;
+}
+
 export function getRecorderStartErrorMessage(error: unknown): string {
   if (error instanceof DOMException) {
     if (
@@ -54,6 +58,37 @@ export function getRecorderStartErrorMessage(error: unknown): string {
   return "录音启动失败，请检查麦克风、系统权限和是否被其他应用占用后重试。";
 }
 
+export function getRecorderRuntimeErrorMessage(error: unknown): string {
+  const cause = error instanceof Event ? getRecorderEventError(error) : error;
+
+  if (cause instanceof DOMException) {
+    if (
+      cause.name === "NotAllowedError" ||
+      cause.name === "PermissionDeniedError" ||
+      cause.name === "SecurityError"
+    ) {
+      return "录音过程中麦克风权限被系统撤销，请在 Windows 隐私设置中允许 SpeakRight 使用麦克风后重录。";
+    }
+
+    if (
+      cause.name === "NotFoundError" ||
+      cause.name === "DevicesNotFoundError"
+    ) {
+      return "录音过程中麦克风断开，请重新连接或启用麦克风后重录。";
+    }
+
+    if (cause.name === "NotReadableError" || cause.name === "TrackStartError") {
+      return "录音过程中麦克风被其他应用占用或中断，请关闭占用麦克风的应用后重录。";
+    }
+
+    if (cause.name === "AbortError") {
+      return "录音过程中麦克风中断，请重新插拔设备或重启 SpeakRight 后重录。";
+    }
+  }
+
+  return "录音过程中断，请检查麦克风、系统权限和是否被其他应用占用后重录。";
+}
+
 interface UseRecorderOptions {
   /**
    * Maximum recording duration in milliseconds before auto-stop.
@@ -93,6 +128,7 @@ export function useRecorder(
 
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
+  const runtimeErrorRef = useRef(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -121,6 +157,7 @@ export function useRecorder(
     setElapsedSeconds(0);
     setAutoStopped(false);
     chunksRef.current = [];
+    runtimeErrorRef.current = false;
 
     if (
       typeof navigator === "undefined" ||
@@ -151,10 +188,35 @@ export function useRecorder(
         if (e.data.size > 0) chunksRef.current.push(e.data);
       };
 
+      recorder.onerror = (event) => {
+        runtimeErrorRef.current = true;
+        chunksRef.current = [];
+        clearTimers();
+        setRawBlob(null);
+        setAudioBlob(null);
+        setError(getRecorderRuntimeErrorMessage(event));
+
+        if (recorder.state === "recording") {
+          recorder.stop();
+        } else {
+          for (const t of openedStream.getTracks()) t.stop();
+          setStream(null);
+          setIsRecording(false);
+        }
+      };
+
       recorder.onstop = async () => {
         for (const t of openedStream.getTracks()) t.stop();
         setStream(null);
         setIsRecording(false);
+        clearTimers();
+
+        if (runtimeErrorRef.current) {
+          chunksRef.current = [];
+          setRawBlob(null);
+          setAudioBlob(null);
+          return;
+        }
 
         const raw = new Blob(chunksRef.current, { type: recorder.mimeType });
         setRawBlob(raw);

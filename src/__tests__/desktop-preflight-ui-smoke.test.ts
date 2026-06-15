@@ -187,6 +187,17 @@ describe("desktop preflight and UI smoke", () => {
     );
   });
 
+  it("keeps recorder runtime failures from silently producing partial audio", () => {
+    const recorderHook = readProjectFile("src/hooks/use-recorder.ts");
+
+    expect(recorderHook).toContain("recorder.onerror");
+    expect(recorderHook).toContain("getRecorderRuntimeErrorMessage");
+    expect(recorderHook).toContain("runtimeErrorRef.current");
+    expect(recorderHook).toContain("setRawBlob(null)");
+    expect(recorderHook).toContain("setAudioBlob(null)");
+    expect(recorderHook).toContain("录音过程中");
+  });
+
   it("keeps recording and benchmark replay on the shared audio player hook", () => {
     const replayPages = [
       "src/app/drill/prosody/page.tsx",
