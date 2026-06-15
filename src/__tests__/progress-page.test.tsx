@@ -1,11 +1,26 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import ProgressPage from "@/app/progress/page";
 
+const benchmarkRecording = {
+  id: "bench-1",
+  createdAt: 1_718_000_000_000,
+  source: "prosody" as const,
+  title: "Stress baseline",
+  text: "I think so.",
+  score: 82,
+  targetLabel: "/th/",
+};
+
 const mocks = vi.hoisted(() => ({
+  clearBenchmarkRecordings: vi.fn(),
+  deleteBenchmarkRecording: vi.fn(),
+  getBenchmarkAudioBlob: vi.fn(),
   languageId: "en-US",
-  listBenchmarkRecordings: vi.fn(() => []),
+  listBenchmarkRecordings: vi.fn<() => Array<typeof benchmarkRecording>>(
+    () => [],
+  ),
   loadMasteryProfile: vi.fn(() => ({
     version: 1,
     updatedAt: 1_718_000_000_000,
@@ -24,6 +39,7 @@ const mocks = vi.hoisted(() => ({
     },
     sessions: [],
   })),
+  playBlob: vi.fn(),
 }));
 
 vi.mock("next/link", () => ({
@@ -48,16 +64,34 @@ vi.mock("@/hooks/use-api-keys", () => ({
 
 vi.mock("@/hooks/use-audio-player", () => ({
   useAudioPlayer: () => ({
-    playBlob: vi.fn(),
+    playBlob: mocks.playBlob,
   }),
 }));
 
 vi.mock("@/lib/benchmark-archive", () => ({
-  clearBenchmarkRecordings: vi.fn(),
-  deleteBenchmarkRecording: vi.fn(),
-  getBenchmarkAudioBlob: vi.fn(),
+  clearBenchmarkRecordings: mocks.clearBenchmarkRecordings,
+  deleteBenchmarkRecording: mocks.deleteBenchmarkRecording,
+  getBenchmarkAudioBlob: mocks.getBenchmarkAudioBlob,
   listBenchmarkRecordings: mocks.listBenchmarkRecordings,
-  summarizeBenchmarkGroups: () => [],
+  summarizeBenchmarkGroups: (items: typeof benchmarkRecording[]) =>
+    items.length === 0
+      ? []
+      : [
+          {
+            key: "prosody:/th/:i think so",
+            source: "prosody",
+            targetLabel: "/th/",
+            text: "I think so.",
+            title: "Stress baseline",
+            recordings: items,
+            trend: {
+              count: items.length,
+              latestScore: items[0].score,
+              bestScore: items[0].score,
+              deltaFromFirst: 0,
+            },
+          },
+        ],
   summarizeBenchmarkTrend: () => ({
     count: 0,
     latestScore: 0,
@@ -72,8 +106,14 @@ vi.mock("@/lib/mastery-profile", () => ({
 describe("ProgressPage language boundary", () => {
   beforeEach(() => {
     mocks.languageId = "en-US";
-    mocks.listBenchmarkRecordings.mockClear();
+    mocks.clearBenchmarkRecordings.mockReset().mockResolvedValue(undefined);
+    mocks.deleteBenchmarkRecording.mockReset().mockResolvedValue(undefined);
+    mocks.getBenchmarkAudioBlob.mockReset().mockResolvedValue(
+      new Blob([new Uint8Array([1, 2, 3])], { type: "audio/webm" }),
+    );
+    mocks.listBenchmarkRecordings.mockReset().mockReturnValue([]);
     mocks.loadMasteryProfile.mockClear();
+    mocks.playBlob.mockClear();
   });
 
   it("shows the formal progress archive for English", async () => {
@@ -107,5 +147,45 @@ describe("ProgressPage language boundary", () => {
     expect(screen.queryByText("阶段变化")).not.toBeInTheDocument();
     expect(mocks.listBenchmarkRecordings).not.toHaveBeenCalled();
     expect(mocks.loadMasteryProfile).not.toHaveBeenCalled();
+  });
+
+  it("shows a visible warning when benchmark audio is missing", async () => {
+    mocks.listBenchmarkRecordings.mockReturnValue([benchmarkRecording]);
+    mocks.getBenchmarkAudioBlob.mockResolvedValueOnce(null);
+
+    render(<ProgressPage />);
+
+    fireEvent.click(
+      screen.getByRole("button", { name: /播放 benchmark 录音/ }),
+    );
+
+    const alert = await screen.findByRole("alert");
+
+    expect(alert).toHaveAttribute(
+      "data-smoke",
+      "progress-benchmark-archive-status",
+    );
+    expect(alert).toHaveTextContent("本机音频数据缺失");
+    expect(alert).toHaveTextContent("可以删除该记录后重新录制");
+    expect(mocks.playBlob).not.toHaveBeenCalled();
+  });
+
+  it("shows a visible error when benchmark deletion fails", async () => {
+    mocks.listBenchmarkRecordings.mockReturnValue([benchmarkRecording]);
+    mocks.deleteBenchmarkRecording.mockRejectedValueOnce(
+      new Error("IndexedDB unavailable"),
+    );
+    vi.spyOn(window, "confirm").mockReturnValueOnce(true);
+
+    render(<ProgressPage />);
+
+    fireEvent.click(
+      screen.getByRole("button", { name: /删除 benchmark 录音/ }),
+    );
+
+    const alert = await screen.findByRole("alert");
+
+    expect(alert).toHaveTextContent("删除这条 benchmark 录音失败");
+    expect(alert).toHaveTextContent("本机 IndexedDB 数据库不可用");
   });
 });

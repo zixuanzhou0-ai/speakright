@@ -32,12 +32,42 @@ import { loadMasteryProfile } from "@/lib/mastery-profile";
 import { TRAINING_PACKS } from "@/lib/training-packs";
 import type { MasteryProfile } from "@/types/training";
 
+type ProgressArchiveStatus = {
+  tone: "success" | "warning" | "error";
+  message: string;
+};
+
+function getProgressArchiveErrorMessage(
+  error: unknown,
+  fallback: string,
+): string {
+  const message = error instanceof Error ? error.message.trim() : "";
+  if (message && /[\u4e00-\u9fff]/.test(message)) return message;
+  const lowerMessage = message.toLowerCase();
+
+  if (/indexeddb|database|\bidb\b/.test(lowerMessage)) {
+    return `${fallback}：本机 IndexedDB 数据库不可用，请关闭其它 SpeakRight 窗口后重试，必要时重启应用。`;
+  }
+
+  if (/quota|space|full|storage/.test(lowerMessage)) {
+    return `${fallback}：本机存储空间可能不足，请清理磁盘空间或应用缓存后重试。`;
+  }
+
+  if (/permission|denied|blocked|access/.test(lowerMessage)) {
+    return `${fallback}：系统阻止了本机录音数据访问，请检查应用权限或安全软件设置后重试。`;
+  }
+
+  return `${fallback}：本机 benchmark 归档操作没有完成，请重启应用后重试。`;
+}
+
 export default function ProgressPage() {
   const { languageId } = useLanguageConfig();
   const languageProfile = getLanguageProfile(languageId);
   const canShowFormalProgress = canRecordFormalMastery(languageId);
   const [recordings, setRecordings] = useState<BenchmarkRecordingMeta[]>([]);
   const [profile, setProfile] = useState<MasteryProfile | null>(null);
+  const [archiveStatus, setArchiveStatus] =
+    useState<ProgressArchiveStatus | null>(null);
   const playback = useAudioPlayer();
   const benchmarkGroups = useMemo(
     () => (canShowFormalProgress ? summarizeBenchmarkGroups(recordings) : []),
@@ -77,10 +107,28 @@ export default function ProgressPage() {
     : 0;
   const recentSessions = profile?.sessions.slice(0, 6) ?? [];
 
-  const playRecording = async (id: string) => {
-    const blob = await getBenchmarkAudioBlob(id);
-    if (!blob) return;
-    playback.playBlob(blob);
+  const playRecording = async (item: BenchmarkRecordingMeta) => {
+    setArchiveStatus(null);
+    try {
+      const blob = await getBenchmarkAudioBlob(item.id);
+      if (!blob) {
+        setArchiveStatus({
+          tone: "warning",
+          message:
+            "无法播放这条 benchmark 录音：本机音频数据缺失或已被系统清理，列表记录仍保留。可以删除该记录后重新录制。",
+        });
+        return;
+      }
+      playback.playBlob(blob);
+    } catch (error) {
+      setArchiveStatus({
+        tone: "error",
+        message: getProgressArchiveErrorMessage(
+          error,
+          "无法播放这条 benchmark 录音",
+        ),
+      });
+    }
   };
 
   if (!canShowFormalProgress) {
@@ -139,16 +187,46 @@ export default function ProgressPage() {
 
   const handleDeleteRecording = async (id: string) => {
     if (!window.confirm("删除这条本机录音记录？")) return;
-    await deleteBenchmarkRecording(id);
-    refreshRecordings();
+    setArchiveStatus(null);
+    try {
+      await deleteBenchmarkRecording(id);
+      refreshRecordings();
+      setArchiveStatus({
+        tone: "success",
+        message: "已删除这条本机 benchmark 录音记录。",
+      });
+    } catch (error) {
+      setArchiveStatus({
+        tone: "error",
+        message: getProgressArchiveErrorMessage(
+          error,
+          "删除这条 benchmark 录音失败",
+        ),
+      });
+    }
   };
 
   const handleClearRecordings = async () => {
     if (!window.confirm("清空全部本机 benchmark 录音？此操作不能撤销。")) {
       return;
     }
-    await clearBenchmarkRecordings();
-    refreshRecordings();
+    setArchiveStatus(null);
+    try {
+      await clearBenchmarkRecordings();
+      refreshRecordings();
+      setArchiveStatus({
+        tone: "success",
+        message: "已清空全部本机 benchmark 录音记录。",
+      });
+    } catch (error) {
+      setArchiveStatus({
+        tone: "error",
+        message: getProgressArchiveErrorMessage(
+          error,
+          "清空 benchmark 录音失败",
+        ),
+      });
+    }
   };
 
   return (
@@ -232,6 +310,22 @@ export default function ProgressPage() {
             </p>
           </div>
 
+          {archiveStatus && (
+            <p
+              className={
+                archiveStatus.tone === "success"
+                  ? "mb-4 rounded-lg border border-primary/25 bg-primary/5 p-3 text-sm text-foreground break-words [overflow-wrap:anywhere]"
+                  : archiveStatus.tone === "warning"
+                    ? "mb-4 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-900 break-words [overflow-wrap:anywhere] dark:text-amber-200"
+                    : "mb-4 rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive break-words [overflow-wrap:anywhere]"
+              }
+              data-smoke="progress-benchmark-archive-status"
+              role={archiveStatus.tone === "success" ? "status" : "alert"}
+            >
+              {archiveStatus.message}
+            </p>
+          )}
+
           {recordings.length === 0 ? (
             <div className="rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground">
               暂无
@@ -282,7 +376,8 @@ export default function ProgressPage() {
                             type="button"
                             variant="outline"
                             size="icon"
-                            onClick={() => playRecording(item.id)}
+                            aria-label={`播放 benchmark 录音：${group.title}`}
+                            onClick={() => playRecording(item)}
                             className="cursor-pointer"
                           >
                             <Play className="h-4 w-4" />
@@ -291,6 +386,7 @@ export default function ProgressPage() {
                             type="button"
                             variant="outline"
                             size="icon"
+                            aria-label={`删除 benchmark 录音：${group.title}`}
                             onClick={() => handleDeleteRecording(item.id)}
                             className="cursor-pointer text-destructive hover:text-destructive"
                           >

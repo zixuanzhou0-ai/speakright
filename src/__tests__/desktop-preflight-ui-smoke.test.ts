@@ -320,6 +320,16 @@ describe("desktop preflight and UI smoke", () => {
       expect(source, pagePath).toContain("playBlob");
       expect(source, pagePath).not.toContain("new Audio(");
     }
+
+    const progressPage = readProjectFile("src/app/progress/page.tsx");
+    expect(progressPage).toContain(
+      'data-smoke="progress-benchmark-archive-status"',
+    );
+    expect(progressPage).toContain("本机音频数据缺失");
+    expect(progressPage).toContain("getProgressArchiveErrorMessage");
+    expect(progressPage).toContain('role={archiveStatus.tone === "success" ? "status" : "alert"}');
+    expect(progressPage).toContain("aria-label={`播放 benchmark 录音");
+    expect(progressPage).toContain("aria-label={`删除 benchmark 录音");
   });
 
   it("keeps benchmark archive save failures visible without blocking scoring", () => {

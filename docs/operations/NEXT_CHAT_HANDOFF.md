@@ -184,6 +184,10 @@ git status --short --branch
 - Recording replay and benchmark playback now use `useAudioPlayer.playBlob`
   instead of raw `new Audio(...)`, so repeated replay clicks stop the previous
   blob and object URL cleanup stays centralized.
+- Progress archive benchmark playback now shows a Chinese inline warning if the
+  metadata exists but the local IndexedDB audio blob is missing, and delete/clear
+  failures show inline archive-status errors instead of failing silently. The
+  icon-only play/delete buttons have accessible labels.
 - Prosody, scenario, and spontaneous transfer now show a Chinese warning if
   benchmark audio cannot be saved to local IndexedDB/quota storage after scoring
   succeeds. The scored result stays visible, but spontaneous transfer no longer
