@@ -71,4 +71,34 @@ describe("local-save warning wiring", () => {
       expect(source).toContain(page.marker);
     }
   });
+
+  it("wires assessment report persistence failures into visible warnings without blocking reports", () => {
+    const warning = readProjectFile("src/lib/local-save-warning.ts");
+    const assessmentPage = readProjectFile("src/app/assessment/page.tsx");
+    const passagePage = readProjectFile("src/app/assessment/passage/page.tsx");
+
+    expect(warning).toContain("本机历史报告或复测基线未保存");
+    expect(warning).toContain("本机历史诊断报告没有删除成功");
+
+    expect(assessmentPage).toContain("LOCAL_ASSESSMENT_SAVE_WARNING");
+    expect(assessmentPage).toContain(
+      "function saveReport(report: DiagnosisReport, languageId: string): boolean",
+    );
+    expect(assessmentPage).toContain("const reportSaved = saveReport");
+    expect(assessmentPage).toContain("setSavedReport(report)");
+    expect(assessmentPage).toContain(
+      'data-smoke="assessment-local-save-warning"',
+    );
+
+    expect(passagePage).toContain("LOCAL_ASSESSMENT_SAVE_WARNING");
+    expect(passagePage).toContain(
+      "function saveReport(report: DiagnosisReport, languageId: string): boolean",
+    );
+    expect(passagePage).toContain("const reportSaved = saveReport");
+    expect(passagePage).toContain("compareCoverageReportToHistory(report, [])");
+    expect(passagePage).toContain("setBenchmarkComparison(comparison)");
+    expect(passagePage).toContain(
+      'data-smoke="assessment-passage-local-save-warning"',
+    );
+  });
 });

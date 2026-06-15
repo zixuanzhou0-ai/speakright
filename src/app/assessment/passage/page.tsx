@@ -39,6 +39,10 @@ import {
 } from "@/lib/coverage-passage";
 import { buildCoveragePassageDiagnosisReport } from "@/lib/diagnosis-engine";
 import { getLanguageProfile } from "@/lib/language-profiles";
+import {
+  LOCAL_ASSESSMENT_DELETE_WARNING,
+  LOCAL_ASSESSMENT_SAVE_WARNING,
+} from "@/lib/local-save-warning";
 import { canRecordFormalMastery } from "@/lib/mastery-language-policy";
 import { getTrainingPack } from "@/lib/training-packs";
 import type {
@@ -80,8 +84,14 @@ type PassagePhase =
   | { type: "report"; result: DiagnosisReport }
   | { type: "error"; message: string; recoverTo?: ReadablePassagePhase };
 
-function saveReport(report: DiagnosisReport, languageId: string) {
-  localStorage.setItem(storageKeyFor(languageId), JSON.stringify(report));
+function saveReport(report: DiagnosisReport, languageId: string): boolean {
+  if (typeof window === "undefined") return true;
+  try {
+    localStorage.setItem(storageKeyFor(languageId), JSON.stringify(report));
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function loadSavedCoverageReport(languageId: string): DiagnosisReport | null {
@@ -144,6 +154,7 @@ export default function CoveragePassageAssessmentPage() {
   const [savedReportWarning, setSavedReportWarning] = useState<string | null>(
     () => getSavedCoverageReportWarning(languageId),
   );
+  const [localSaveWarning, setLocalSaveWarning] = useState<string | null>(null);
   const [phase, setPhase] = useState<PassagePhase>({ type: "intro" });
   const [benchmarkComparison, setBenchmarkComparison] =
     useState<CoverageBenchmarkComparison | null>(null);
@@ -160,6 +171,7 @@ export default function CoveragePassageAssessmentPage() {
   useEffect(() => {
     setSavedReport(loadSavedCoverageReport(languageId));
     setSavedReportWarning(getSavedCoverageReportWarning(languageId));
+    setLocalSaveWarning(null);
     setPhase({ type: "intro" });
   }, [languageId]);
 
@@ -167,16 +179,27 @@ export default function CoveragePassageAssessmentPage() {
     const report = buildCoveragePassageDiagnosisReport({
       recordings: recordingsRef.current,
     });
-    saveReport(report, languageId);
-    setBenchmarkComparison(saveCoverageBenchmark(report));
+    const reportSaved = saveReport(report, languageId);
+    let benchmarkSaved = true;
+    let comparison = compareCoverageReportToHistory(report, []);
+    try {
+      comparison = saveCoverageBenchmark(report);
+    } catch {
+      benchmarkSaved = false;
+    }
+    setBenchmarkComparison(comparison);
     setSavedReport(report);
     setSavedReportWarning(null);
+    setLocalSaveWarning(
+      reportSaved && benchmarkSaved ? null : LOCAL_ASSESSMENT_SAVE_WARNING,
+    );
     setPhase({ type: "report", result: report });
   }, [languageId]);
 
   const handleStart = () => {
     recordingsRef.current = [];
     usedProbeIdsRef.current = [];
+    setLocalSaveWarning(null);
     recorder.reset();
     recordingQuality.reset();
     azure.reset();
@@ -272,7 +295,12 @@ export default function CoveragePassageAssessmentPage() {
   ]);
 
   const handleRetake = () => {
-    localStorage.removeItem(storageKeyFor(languageId));
+    try {
+      localStorage.removeItem(storageKeyFor(languageId));
+      setLocalSaveWarning(null);
+    } catch {
+      setLocalSaveWarning(LOCAL_ASSESSMENT_DELETE_WARNING);
+    }
     setSavedReport(null);
     setSavedReportWarning(null);
     recordingsRef.current = [];
@@ -309,7 +337,8 @@ export default function CoveragePassageAssessmentPage() {
               {languageProfile.shortLabel}全音覆盖诊断
             </h1>
             <p className="mt-1 break-words text-sm text-muted-foreground [overflow-wrap:anywhere]">
-              当前语言仍为 experimental，不加载英语全音覆盖文章或英语训练包证据。
+              当前语言仍为
+              experimental，不加载英语全音覆盖文章或英语训练包证据。
             </p>
           </div>
         </div>
@@ -382,6 +411,16 @@ export default function CoveragePassageAssessmentPage() {
         </div>
       )}
 
+      {localSaveWarning && (
+        <div
+          className="mb-4 break-words rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950 [overflow-wrap:anywhere] dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-100"
+          data-smoke="assessment-passage-local-save-warning"
+          role="alert"
+        >
+          {localSaveWarning}
+        </div>
+      )}
+
       <div className="flex-1">
         <AnimatePresence mode="wait">
           {phase.type === "intro" && (
@@ -445,9 +484,17 @@ export default function CoveragePassageAssessmentPage() {
                     {savedReport && (
                       <Button
                         onClick={() => {
-                          setBenchmarkComparison(
-                            compareCoverageReportToHistory(savedReport),
-                          );
+                          try {
+                            setBenchmarkComparison(
+                              compareCoverageReportToHistory(savedReport),
+                            );
+                            setLocalSaveWarning(null);
+                          } catch {
+                            setBenchmarkComparison(
+                              compareCoverageReportToHistory(savedReport, []),
+                            );
+                            setLocalSaveWarning(LOCAL_ASSESSMENT_SAVE_WARNING);
+                          }
                           setPhase({ type: "report", result: savedReport });
                         }}
                         variant="outline"

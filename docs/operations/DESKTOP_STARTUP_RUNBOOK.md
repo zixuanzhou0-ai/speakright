@@ -90,7 +90,10 @@ reminder that it does not start localhost or the Next dev server.
   surfaces should do the same for mastery/profile writes: pack-runner,
   perception, prosody, scenario transfer, and spontaneous transfer may keep the
   completed result visible, but must show a Chinese warning if local mastery,
-  review queue, or transfer evidence cannot be saved.
+  review queue, or transfer evidence cannot be saved. Quick diagnosis and
+  full-passage diagnosis should keep the generated report visible if report
+  history or the coverage retest baseline cannot be saved, and retake/delete
+  failures should show a Chinese warning instead of a raw storage exception.
 - English: open phoneme list, then five phoneme detail pages; play target sound,
   example word, record, replay the recording, and score once.
 - Spanish, French, and Russian: switch each language, open the sound-unit list,

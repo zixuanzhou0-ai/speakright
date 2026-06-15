@@ -172,6 +172,10 @@ git status --short --branch
   prosody, scenario transfer, and spontaneous transfer keep the completed result
   visible but show a Chinese `role="alert"` if local mastery, review queue, or
   transfer evidence could not be saved.
+- Quick diagnosis and full-passage diagnosis now also treat local report history
+  and coverage benchmark saves as best-effort: the generated report stays
+  visible, and blocked localStorage writes or retake/delete failures show a
+  Chinese `role="alert"` instead of interrupting the flow.
 - Settings language availability now distinguishes bundled language-pack
   `检查中` from true `缺失或不可读`. Spanish/French/Russian users should not see a
   false missing-pack state while the local manifest is still loading; unreadable
@@ -428,6 +432,9 @@ Current gate summary:
   non-English full-score guard against `完美` / `已掌握` overclaims.
 - Focused advanced-training boundary tests passed: `2` files and `7` tests,
   including direct English pack-route blocking for experimental languages.
+- Focused local-save warning tests passed: `1` file and `4` tests, covering
+  local score/practice warnings, advanced mastery/profile warnings, and
+  quick/full-passage diagnosis report or coverage-baseline save warnings.
 - Focused progress-archive boundary tests passed: `3` files and `13` tests,
   including the direct `/progress` experimental blocker and updated Release
   smoke route coverage.
@@ -472,8 +479,8 @@ Current gate summary:
 - Focused phoneme detail presentation tests passed: `2` files and `9` tests,
   covering non-English full text visibility, Russian long Cyrillic rule text,
   and task-accurate A/B playback labels.
-- Full tests passed: `106` files and `604` tests.
-- Typecheck, lint (`364` files checked), and static desktop frontend build
+- Full tests passed: `111` files and `619` tests.
+- Typecheck, lint (`370` files checked), and static desktop frontend build
   passed.
 - Release EXE build passed and rebuilt EXE, MSI, and NSIS artifacts.
 - Release EXE preflight passed; no localhost startup is part of the release
@@ -494,7 +501,7 @@ Current gate summary:
   intro card plus start/passage actions instead of only checking the page
   container.
 - Release EXE launch passed from the static Tauri bundle, and the test process
-  was closed after verification.
+  was closed after verification; the latest launch PID was `55856`.
 - No ElevenLabs generation or TTS spend is part of this validation path.
 
 For tomorrow's manual test session, start with:
