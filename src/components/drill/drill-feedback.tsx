@@ -130,7 +130,10 @@ export function DrillFeedback({
         )}
 
         {/* Action buttons */}
-        <div className="flex gap-3">
+        <div
+          className="flex max-w-full flex-wrap justify-center gap-3"
+          data-smoke="drill-feedback-actions"
+        >
           {passed && (
             <Button onClick={onNext} className="gap-2 cursor-pointer">
               下一个
@@ -162,13 +165,16 @@ export function DrillFeedback({
 
           {mustDecide && (
             <div className="flex flex-col items-center gap-3">
-              <p className="text-sm text-muted-foreground">
+              <p className="max-w-full break-words text-center text-sm text-muted-foreground [overflow-wrap:anywhere]">
                 已尝试 {maxAttempts} 次，先慢速拆解再继续：
               </p>
-              <div className="max-w-md rounded-lg border border-red-200 bg-red-50 p-3 text-center text-sm text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-400">
+              <div className="max-w-md break-words rounded-lg border border-red-200 bg-red-50 p-3 text-center text-sm text-red-700 [overflow-wrap:anywhere] dark:border-red-900 dark:bg-red-950/30 dark:text-red-400">
                 先只模仿目标音的口型，再读单词前半段，最后读完整内容。慢一点，目标音素过线比整词分更重要。
               </div>
-              <div className="flex gap-2">
+              <div
+                className="flex max-w-full flex-wrap justify-center gap-2"
+                data-smoke="drill-feedback-decision-actions"
+              >
                 <Button
                   onClick={onPlayReference}
                   variant="outline"

@@ -71,6 +71,9 @@ E:\SpeakRightDesktopRepo\src-tauri\target\release\speakright.exe
   scripts, including `test`, `typecheck`, `lint`, `desktop:preflight`,
   `desktop:launch-release`, dry-run audio audits, and the public release gate.
   Routine validation scripts are checked so they do not call audio generation.
+- Drill feedback action buttons now wrap and stay centered after three failed
+  attempts, so the `再听一遍` / `跳过此词` controls do not force horizontal
+  overflow in narrow windows.
 - Installation docs now include a source-build Release EXE path and first-launch
   expectations for no API keys, no network, no microphone permission, and
   missing bundled local audio. The runbook mirrors those degraded-state checks
