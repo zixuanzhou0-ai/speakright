@@ -117,8 +117,9 @@ credential store where supported; learning data stays local to the app.
 
 No cloud backend is required for this release.
 If local storage is full or blocked, pronunciation scoring should still show the
-current result. The phoneme-detail practice card will show a Chinese warning if
-the local score trend or practice history for that attempt could not be saved.
+current result. Phoneme detail, free practice, and drill practice surfaces show a
+Chinese warning if the local score trend, practice history, or transfer evidence
+for that attempt could not be saved.
 
 ## First Launch Expectations
 

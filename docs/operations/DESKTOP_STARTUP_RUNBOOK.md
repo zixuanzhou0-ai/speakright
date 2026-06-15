@@ -84,8 +84,9 @@ reminder that it does not start localhost or the Next dev server.
   messages, and never replace missing local sound-unit audio with browser TTS,
   proxy rule audio, teaching-video audio, or an unrelated sample.
 - Local storage failures: if score trend or practice-history persistence is
-  blocked by quota/permissions, phoneme detail scoring should still show the
-  current result and display a Chinese warning that local history was not saved.
+  blocked by quota/permissions, phoneme detail, free practice, and drill scoring
+  should still show the current result and display a Chinese warning that local
+  history or transfer evidence was not saved.
 - English: open phoneme list, then five phoneme detail pages; play target sound,
   example word, record, replay the recording, and score once.
 - Spanish, French, and Russian: switch each language, open the sound-unit list,

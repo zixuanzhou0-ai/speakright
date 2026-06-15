@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useReducer, useRef } from "react";
+import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { computeDrillSummary } from "@/lib/drill-utils";
 import { addScore } from "@/lib/score-history";
 import { getPassScore } from "@/lib/training-score";
@@ -248,6 +248,7 @@ export interface UseDrillSessionResult {
   // Azure passthrough
   isAssessing: boolean;
   assessError: string | null;
+  localSaveError: string | null;
   // Actions
   start: (config: DrillSessionConfig, items: DrillItem[]) => void;
   finishPhonemeLesson: () => void;
@@ -273,11 +274,13 @@ export function useDrillSession(
   const recorder = useRecorder();
   const azure = useAzureAssessment();
   const assessingRef = useRef(false);
+  const [localSaveError, setLocalSaveError] = useState<string | null>(null);
 
   const start = useCallback(
     (config: DrillSessionConfig, items: DrillItem[]) => {
       recorder.reset();
       azure.reset();
+      setLocalSaveError(null);
       dispatch({ type: "START", items, config });
     },
     [recorder, azure],
@@ -294,6 +297,7 @@ export function useDrillSession(
   const startRecording = useCallback(() => {
     recorder.reset();
     azure.reset();
+    setLocalSaveError(null);
     dispatch({ type: "START_RECORDING" });
     recorder.startRecording();
   }, [recorder, azure]);
@@ -321,10 +325,17 @@ export function useDrillSession(
         allowFallback: (options.scoreHistoryPrefix ?? "en-US") === "en-US",
       });
       // Save score to history
-      addScore(
+      const scoreSaved = addScore(
         `${options.scoreHistoryPrefix ?? "en-US"}:${item.phoneme}:${item.text}`,
         target.targetScore,
       );
+      if (!scoreSaved) {
+        setLocalSaveError(
+          "本次评分已完成，但本机训练趋势记录未保存。可能是本机存储空间不足或系统限制了本地存储；你可以继续训练，稍后在设置页导出/重置本机数据后重试。",
+        );
+      } else {
+        setLocalSaveError(null);
+      }
       dispatch({
         type: "ASSESS_SUCCESS",
         score: {
@@ -378,24 +389,28 @@ export function useDrillSession(
   const nextItem = useCallback(() => {
     recorder.reset();
     azure.reset();
+    setLocalSaveError(null);
     dispatch({ type: "NEXT_ITEM" });
   }, [recorder, azure]);
 
   const retryItem = useCallback(() => {
     recorder.reset();
     azure.reset();
+    setLocalSaveError(null);
     dispatch({ type: "RETRY_ITEM" });
   }, [recorder, azure]);
 
   const skipItem = useCallback(() => {
     recorder.reset();
     azure.reset();
+    setLocalSaveError(null);
     dispatch({ type: "SKIP_ITEM" });
   }, [recorder, azure]);
 
   const resetAll = useCallback(() => {
     recorder.reset();
     azure.reset();
+    setLocalSaveError(null);
     dispatch({ type: "RESET" });
   }, [recorder, azure]);
 
@@ -413,6 +428,7 @@ export function useDrillSession(
     recorderError: recorder.error,
     isAssessing: azure.isLoading,
     assessError: azure.error,
+    localSaveError,
     start,
     finishPhonemeLesson,
     finishTeaching,

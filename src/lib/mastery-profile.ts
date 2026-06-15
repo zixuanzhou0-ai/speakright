@@ -131,21 +131,26 @@ export function getMasteryProfileStorageWarning(): string | null {
   return null;
 }
 
-export function saveMasteryProfile(profile: MasteryProfile): void {
-  if (typeof window === "undefined") return;
+export function saveMasteryProfile(profile: MasteryProfile): boolean {
+  if (typeof window === "undefined") return true;
   const nextProfile = {
     ...profile,
     version: 2 as const,
     updatedAt: Date.now(),
   };
-  localStorage.setItem(MASTERY_STORAGE_KEY, JSON.stringify(nextProfile));
-  localStorage.setItem(
-    TRAINING_SESSIONS_STORAGE_KEY,
-    JSON.stringify(nextProfile.sessions),
-  );
-  window.dispatchEvent(
-    new StorageEvent("storage", { key: MASTERY_STORAGE_KEY }),
-  );
+  try {
+    localStorage.setItem(MASTERY_STORAGE_KEY, JSON.stringify(nextProfile));
+    localStorage.setItem(
+      TRAINING_SESSIONS_STORAGE_KEY,
+      JSON.stringify(nextProfile.sessions),
+    );
+    window.dispatchEvent(
+      new StorageEvent("storage", { key: MASTERY_STORAGE_KEY }),
+    );
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export function isReviewDue(mastery?: PackMastery, now = Date.now()): boolean {

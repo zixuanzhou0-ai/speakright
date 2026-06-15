@@ -50,6 +50,7 @@ export default function SentencesPage() {
   const [transferSummary, setTransferSummary] =
     useState<FreePracticeTransferSummary | null>(null);
   const [profile, setProfile] = useState<MasteryProfile | null>(null);
+  const [localSaveError, setLocalSaveError] = useState<string | null>(null);
 
   const isWordMode = !isSentence(sentence);
   const trimmedText = sentence.trim();
@@ -158,6 +159,7 @@ export default function SentencesPage() {
     wordAudio.clearError();
     playback.stop();
     setTransferSummary(null);
+    setLocalSaveError(null);
     recordingQuality.reset();
     autoAssessTriggered.current = false;
   }, [
@@ -181,6 +183,7 @@ export default function SentencesPage() {
     wordAudio.clearError();
     playback.stop();
     setHasPlayedWord(false);
+    setLocalSaveError(null);
   }, [trimmedText, tts, wordAudio, playback]);
 
   useEffect(() => {
@@ -208,6 +211,7 @@ export default function SentencesPage() {
     azure.reset();
     setSelectedWord(null);
     setTransferSummary(null);
+    setLocalSaveError(null);
     recordingQuality.reset();
     recorder.startRecording();
   }, [llm, azure, recorder, recordingQuality]);
@@ -230,9 +234,11 @@ export default function SentencesPage() {
     );
 
     if (result) {
+      setLocalSaveError(null);
       const text = sentence.trim();
       const histKey = `${languageId}:${text.slice(0, 50)}:${text.length}`;
-      addScore(histKey, result.pronunciationScore);
+      const scoreSaved = addScore(histKey, result.pronunciationScore);
+      let masterySaved = true;
 
       if (canUseMasteryTransfer) {
         const profile = loadMasteryProfile();
@@ -259,7 +265,7 @@ export default function SentencesPage() {
             transfer,
             reliability,
           );
-          saveMasteryProfile(recorded.profile);
+          masterySaved = saveMasteryProfile(recorded.profile);
           setProfile(recorded.profile);
           setTransferSummary(recorded.summary);
         } else {
@@ -267,6 +273,11 @@ export default function SentencesPage() {
         }
       } else {
         setTransferSummary(null);
+      }
+      if (!scoreSaved || !masterySaved) {
+        setLocalSaveError(
+          "本次评分已完成，但本机趋势图、练习记录或迁移证据未保存。可能是本机存储空间不足或系统限制了本地存储；你可以继续练习，稍后在设置页导出/重置本机数据后重试。",
+        );
       }
       llm.requestFeedback(
         text,
@@ -336,6 +347,7 @@ export default function SentencesPage() {
     recorder.reset();
     azure.reset();
     llm.reset();
+    setLocalSaveError(null);
     setSelectedWord(null);
     setTransferSummary(null);
     recordingQuality.reset();
@@ -437,6 +449,7 @@ export default function SentencesPage() {
             onReplay={handlePlayRecording}
             isAssessing={azure.isLoading}
             assessError={azure.error}
+            localSaveError={localSaveError}
             result={azure.result}
             onClear={handleClear}
             onAssess={handleAssess}

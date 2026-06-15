@@ -28,6 +28,7 @@ interface SentenceRecordingCardProps {
   // Assessment
   isAssessing: boolean;
   assessError: string | null;
+  localSaveError?: string | null;
   result: AzureAssessmentResult | null;
   onClear: () => void;
   onAssess: () => void;
@@ -49,6 +50,7 @@ export function SentenceRecordingCard({
   onReplay,
   isAssessing,
   assessError,
+  localSaveError,
   result,
   onClear,
   onAssess,
@@ -124,6 +126,15 @@ export function SentenceRecordingCard({
         {assessError && (
           <p role="alert" className="text-sm text-red-500">
             {assessError}
+          </p>
+        )}
+        {localSaveError && (
+          <p
+            role="alert"
+            className="text-center text-sm text-amber-600 dark:text-amber-400"
+            data-smoke="free-practice-local-save-error"
+          >
+            {localSaveError}
           </p>
         )}
       </div>

@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   createEmptyMasteryProfile,
   evaluateSessionMastery,
@@ -8,6 +8,7 @@ import {
   MASTERY_PROFILE_STORAGE_WARNING,
   MASTERY_STORAGE_KEY,
   recordTrainingSession,
+  saveMasteryProfile,
 } from "@/lib/mastery-profile";
 import { CORRUPT_LOCAL_DATA_KEY } from "@/lib/local-data-migrations";
 import type { TrainingSessionSummary } from "@/types/training";
@@ -69,6 +70,24 @@ function session(overrides: Partial<TrainingSessionSummary> = {}) {
 describe("mastery profile", () => {
   beforeEach(() => {
     localStorage.clear();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    localStorage.clear();
+  });
+
+  it("returns true when the mastery profile is saved locally", () => {
+    expect(saveMasteryProfile(createEmptyMasteryProfile())).toBe(true);
+    expect(localStorage.getItem(MASTERY_STORAGE_KEY)).toContain('"version":2');
+  });
+
+  it("returns false instead of throwing when mastery profile storage is blocked", () => {
+    vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+      throw new DOMException("quota exceeded", "QuotaExceededError");
+    });
+
+    expect(saveMasteryProfile(createEmptyMasteryProfile())).toBe(false);
   });
 
   it("warns and falls back to an empty profile when current storage is corrupt", () => {
