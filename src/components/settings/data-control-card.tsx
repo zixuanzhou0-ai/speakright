@@ -258,6 +258,17 @@ export function DataControlCard() {
             </div>
           </div>
 
+          {summary.corruptItems > 0 && (
+            <div
+              className="break-words rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-950 [overflow-wrap:anywhere] dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-100"
+              data-smoke="data-control-corrupt-data-warning"
+              role="alert"
+            >
+              已隔离 {summary.corruptItems} 项损坏的本机数据。建议先导出学习数据或诊断包留底；
+              如果相关页面仍异常，请使用“重置本机数据”。默认不会删除 API keys。
+            </div>
+          )}
+
           <div className="rounded-lg bg-muted/35 p-4 text-sm text-muted-foreground">
             录音评分会发送音频与参考文本到 Azure
             Speech；标准示范会把练习文本发送到 ElevenLabs；AI

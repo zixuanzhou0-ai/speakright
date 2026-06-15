@@ -164,6 +164,9 @@ describe("desktop preflight and UI smoke", () => {
     expect(script).toContain("usage-history-target");
     expect(script).toContain("pronunciation-test-row");
     expect(script).toContain("data-control-api-key-toggle-row");
+    expect(script).toContain("data-control-corrupt-data-warning");
+    expect(script).toContain("speakright_corrupt_data_v1");
+    expect(script).toContain("默认不会删除 API keys");
     expect(script).toContain("settings reset-data dialog toggle row");
     expect(script).toContain("azure-config-actions");
     expect(script).toContain("tts-config-actions");
@@ -278,6 +281,9 @@ describe("desktop preflight and UI smoke", () => {
       'data-smoke="data-control-api-key-toggle-row"',
     );
     expect(dataControlCard).toContain(
+      'data-smoke="data-control-corrupt-data-warning"',
+    );
+    expect(dataControlCard).toContain(
       "flex flex-col gap-3 rounded-lg border bg-muted/25 p-3 sm:flex-row sm:items-center sm:justify-between",
     );
     expect(dataControlCard).toContain(
@@ -287,6 +293,9 @@ describe("desktop preflight and UI smoke", () => {
     expect(dataControlCard).toContain("导出学习数据失败");
     expect(dataControlCard).toContain("删除 API keys 失败");
     expect(dataControlCard).toContain("本机安全存储或设置存储不可用");
+    expect(dataControlCard).toContain("已隔离 {summary.corruptItems}");
+    expect(dataControlCard).toContain("导出学习数据或诊断包");
+    expect(dataControlCard).toContain("默认不会删除 API keys");
     expect(dataControlCard).toContain("overflow-wrap:anywhere");
     expect(dataControlCard).toContain("toast.error(message)");
     expect(dataControlCard).toContain("toast.success(message)");

@@ -320,6 +320,37 @@ describe("settings key hydration", () => {
     });
   });
 
+  it("shows actionable data privacy guidance for quarantined corrupt local data", async () => {
+    const { DataControlCard } = await import(
+      "@/components/settings/data-control-card"
+    );
+    localStorage.setItem(
+      "speakright_corrupt_data_v1",
+      JSON.stringify([
+        {
+          key: "speakright_score_history",
+          raw: "{broken score history",
+          reason: "Malformed JSON",
+          detectedAt: new Date().toISOString(),
+          schemaVersion: 2,
+        },
+      ]),
+    );
+
+    render(<DataControlCard />);
+
+    const alert = screen.getByRole("alert");
+
+    expect(alert).toHaveAttribute(
+      "data-smoke",
+      "data-control-corrupt-data-warning",
+    );
+    expect(alert).toHaveTextContent("已隔离 1 项损坏的本机数据");
+    expect(alert).toHaveTextContent("导出学习数据或诊断包");
+    expect(alert).toHaveTextContent("重置本机数据");
+    expect(alert).toHaveTextContent("默认不会删除 API keys");
+  });
+
   it("keeps data privacy delete failures visible inline", async () => {
     const { DataControlCard } = await import(
       "@/components/settings/data-control-card"

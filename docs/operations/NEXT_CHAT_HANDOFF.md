@@ -146,6 +146,10 @@ git status --short --branch
   results visible inline. Storage/keychain/IndexedDB/quota/permission failures
   are converted to Chinese recovery messages with `role="alert"` instead of
   relying only on a short toast.
+- Settings data/privacy center also shows quarantined corrupt local data as a
+  visible Chinese `role="alert"` with guidance to export learning data or a
+  diagnostics bundle before using `重置本机数据`; the alert notes that API keys
+  are not deleted by default.
 - Settings language availability now distinguishes bundled language-pack
   `检查中` from true `缺失或不可读`. Spanish/French/Russian users should not see a
   false missing-pack state while the local manifest is still loading; unreadable
@@ -417,6 +421,9 @@ Current gate summary:
   failures, visible Progress warning rendering, and Release smoke coverage for
   corrupt mastery/coverage localStorage on `/progress`, `/drill/evidence`, and
   `/assessment/passage`.
+- Focused Settings quarantined-data tests passed: `2` files and `23` tests,
+  covering the data/privacy center corrupt-data alert plus Release smoke checks
+  for text, role, wrapping, and no-overflow behavior.
 - Open-source handoff/readiness plus IPA audit export drift tests passed.
 - Static language-pack manifest IPA drift tests passed for the applied French
   and Russian reviewed findings.
@@ -440,7 +447,7 @@ Current gate summary:
 - Focused phoneme detail presentation tests passed: `2` files and `9` tests,
   covering non-English full text visibility, Russian long Cyrillic rule text,
   and task-accurate A/B playback labels.
-- Full tests passed: `106` files and `602` tests.
+- Full tests passed: `106` files and `603` tests.
 - Typecheck, lint (`364` files checked), and static desktop frontend build
   passed.
 - Release EXE build passed and rebuilt EXE, MSI, and NSIS artifacts.

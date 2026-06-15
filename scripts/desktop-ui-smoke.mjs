@@ -648,6 +648,18 @@ async function seedSettingsSmokeData(cdp) {
     }
   };
   localStorage.setItem("speakright_usage", JSON.stringify(usage));
+  localStorage.setItem(
+    "speakright_corrupt_data_v1",
+    JSON.stringify([
+      {
+        key: "speakright_score_history",
+        raw: "{broken score history",
+        reason: "Malformed JSON",
+        detectedAt: new Date().toISOString(),
+        schemaVersion: 2
+      }
+    ])
+  );
   return { ok: true };
 })()
 `,
@@ -858,6 +870,7 @@ async function assertSettings(cdp) {
       '[data-smoke="azure-config-actions"], [data-smoke="tts-config-actions"], [data-smoke="llm-config-actions"]'
     ),
   ];
+  const corruptWarning = document.querySelector('[data-smoke="data-control-corrupt-data-warning"]');
   const llmProviderChips = [...document.querySelectorAll('[data-smoke="llm-provider-chip"]')];
   const llmProviderLabels = llmProviderChips.map((chip) => chip.innerText.trim());
   const childrenDoNotOverlap = (element) => {
@@ -915,6 +928,12 @@ async function assertSettings(cdp) {
       pronunciationRows.length > 0 &&
       pronunciationRowsWrap &&
       settingsActionRowsWrap &&
+      Boolean(corruptWarning) &&
+      corruptWarning.getAttribute("role") === "alert" &&
+      wraps(corruptWarning) &&
+      bodyText.includes("已隔离 1 项损坏的本机数据") &&
+      bodyText.includes("重置本机数据") &&
+      bodyText.includes("默认不会删除 API keys") &&
       llmProvidersWrap &&
       bodyText.includes("实验") &&
       !bodyText.includes("Merriam-Webster") &&
@@ -927,6 +946,7 @@ async function assertSettings(cdp) {
     pronunciationRowsWrap,
     settingsActionRowCount: settingsActionRows.length,
     settingsActionRowsWrap,
+    hasCorruptWarning: Boolean(corruptWarning),
     llmProviderLabels,
     llmProvidersWrap,
     bodyText: bodyText.slice(0, 1200)
