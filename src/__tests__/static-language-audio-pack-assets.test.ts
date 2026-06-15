@@ -90,6 +90,8 @@ describe("static multilingual language audio packs", () => {
     expect(normalizeAudioPackText("cafe\u0301")).toBe("café");
     expect(normalizeAudioPackText("да́")).toBe("да");
     expect(normalizeAudioPackText("Les   amis")).toBe("les amis");
+    expect(normalizeAudioPackText("Нож тупой.")).toBe("нож тупой");
+    expect(normalizeAudioPackText("Bonjour !")).toBe("bonjour");
   });
 
   it("covers every non-English diagnostic word with static local audio", () => {

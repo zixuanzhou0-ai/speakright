@@ -40,4 +40,29 @@ describe("French pronunciation content", () => {
       expect(unit?.soundUnitType, slug).toBe("prosody");
     }
   });
+
+  it("keeps French rule sentence hints tied to connected-speech realization", () => {
+    const deck = LANGUAGE_LEARNING_DECKS["fr-FR"];
+    const bySlug = (slug: string) =>
+      deck.sentenceDeck.find((item) => item.targetUnitSlugs.includes(slug));
+    const byText = (text: string) =>
+      deck.sentenceDeck.find((item) => item.text === text);
+
+    expect(bySlug("fr-liaison")?.ipaHint).toBe("/lezami aʁiv a paʁi/");
+    expect(bySlug("fr-enchainement")?.ipaHint).toBe("/ilabit avɛkɛl/");
+    expect(bySlug("fr-elision")?.ipaHint).toBe("/lami aʁiv a ɥit œʁ/");
+    expect(byText("Trop grand, trop lent, trop fort.")?.ipaHint).toBe(
+      "/tʁo gʁɑ̃ tʁo lɑ̃ tʁo fɔʁ/",
+    );
+    expect(bySlug("fr-schwa")?.ipaHint).toContain("ə");
+
+    for (const item of [
+      bySlug("fr-liaison"),
+      bySlug("fr-enchainement"),
+      bySlug("fr-elision"),
+      byText("Trop grand, trop lent, trop fort."),
+    ]) {
+      expect(item?.ipaHint, item?.text).toMatch(/^\/.+\/$/);
+    }
+  });
 });

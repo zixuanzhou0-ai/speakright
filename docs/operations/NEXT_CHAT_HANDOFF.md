@@ -53,6 +53,13 @@ E:\SpeakRightDesktopRepo\src-tauri\target\release\speakright.exe
   at `docs/operations/non-english-ipa-reviewed-findings.json`. It records which
   GPT Research/high-risk rows were applied, which broad variants were accepted,
   and which rows remain `needs-review`.
+- French rule sentence hints now show connected-speech IPA for liaison,
+  enchaînement, elision, and final-consonant silence; Russian final-devoicing
+  sentence practice now uses `Нож тупой` so the target boundary is a clear
+  voiceless-consonant context rather than `Друг ждёт`.
+- `audio:parity:dry-run` now reports Russian `918` normalized lookup items with
+  `0` missing because terminal punctuation is normalized before local-pack
+  lookup; the bundled Russian manifest/file total remains `460 x 2`.
 - Language-pack audio manifests now keep their IPA metadata aligned with the
   sourced reviewed findings for applied French connected-speech rows and Russian
   connected-speech voicing rows. The Russian `поезд идёт` manifest entry remains

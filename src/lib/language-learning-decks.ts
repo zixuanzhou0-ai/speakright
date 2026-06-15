@@ -460,7 +460,7 @@ export const LANGUAGE_LEARNING_DECKS: Record<DeckLanguageId, LanguageLearningDec
       },
       {
         text: "Les amis arrivent à Paris.",
-        ipaHint: "/z‿a ʁ/",
+        ipaHint: "/lezami aʁiv a paʁi/",
         targetUnitSlugs: ["fr-liaison", "fr-r"],
         focus: "连诵和法语 r",
       },
@@ -478,7 +478,7 @@ export const LANGUAGE_LEARNING_DECKS: Record<DeckLanguageId, LanguageLearningDec
       },
       {
         text: "Il habite avec elle.",
-        ipaHint: "enchaînement",
+        ipaHint: "/ilabit avɛkɛl/",
         targetUnitSlugs: ["fr-enchainement"],
         focus: "词尾辅音和连音",
       },
@@ -490,7 +490,7 @@ export const LANGUAGE_LEARNING_DECKS: Record<DeckLanguageId, LanguageLearningDec
       },
       {
         text: "L’ami arrive à huit heures.",
-        ipaHint: "elision + /ɥ/",
+        ipaHint: "/lami aʁiv a ɥit œʁ/",
         targetUnitSlugs: ["fr-elision", "fr-glide-hui", "fr-enchainement"],
         focus: "省音、enchaînement 和 /ɥ/",
       },
@@ -526,7 +526,7 @@ export const LANGUAGE_LEARNING_DECKS: Record<DeckLanguageId, LanguageLearningDec
       },
       {
         text: "Trop grand, trop lent, trop fort.",
-        ipaHint: "final silence",
+        ipaHint: "/tʁo gʁɑ̃ tʁo lɑ̃ tʁo fɔʁ/",
         targetUnitSlugs: ["fr-final-consonant-silence", "fr-an", "fr-r"],
         focus: "词尾静音和法语 r",
       },
@@ -635,8 +635,8 @@ export const LANGUAGE_LEARNING_DECKS: Record<DeckLanguageId, LanguageLearningDec
       { text: "Центр улицы рядом.", stressText: "Центр у́лицы ря́дом.", ipaHint: "/ts/", targetUnitSlugs: ["ru-ts"], focus: "ц /ts/" },
       { text: "Мой поезд идёт на юг.", stressText: "Мой по́езд идёт на юг.", ipaHint: "/j/", targetUnitSlugs: ["ru-j", "ru-iotated-vowels"], focus: "й 和 iotated vowels" },
       { text: "Москва сегодня холодная.", stressText: "Москва́ сего́дня хо́лодная.", ipaHint: "/ɐ ə/", targetUnitSlugs: ["ru-unstressed-o-a", "ru-unstressed-e-ya"], focus: "非重读元音弱化" },
-      { text: "Друг ждёт у гаража.", stressText: "Друг ждёт у гаража́.", ipaHint: "final devoicing", targetUnitSlugs: ["ru-final-devoicing", "ru-sh-zh"], focus: "词尾清化和 ж/ш" },
-      { text: "Сделать быстро трудно.", stressText: "Сде́лать бы́стро тру́дно.", ipaHint: "voicing assimilation", targetUnitSlugs: ["ru-voicing-assimilation", "ru-soft-t-d"], focus: "清浊同化" },
+      { text: "Нож тупой.", stressText: "Нож тупо́й.", ipaHint: "/noʂ tʊˈpoj/", targetUnitSlugs: ["ru-final-devoicing", "ru-sh-zh"], focus: "ж 在清辅音 /t/ 前清化，同时听 ж/ш 的厚音色" },
+      { text: "Сделать быстро трудно.", stressText: "Сде́лать бы́стро тру́дно.", ipaHint: "/ˈzdʲelətʲ ˈbɨstrə/", targetUnitSlugs: ["ru-voicing-assimilation", "ru-soft-t-d"], focus: "清浊同化" },
       { text: "Текст простой, но группа большая.", stressText: "Текст просто́й, но гру́ппа больша́я.", ipaHint: "clusters", targetUnitSlugs: ["ru-clusters"], focus: "辅音丛不加元音" },
     ],
   },

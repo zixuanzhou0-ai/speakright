@@ -151,8 +151,9 @@ before the local RC audit: `94be1d4`.
 - Build shape: Tauri static bundle, not `localhost`.
 - Bundled asset check after the latest audio expansion: English `1464/1464`,
   Spanish `880/880`, French `1090/1090`, Russian `920/920`, videos `224/224`.
-- Multilingual audio parity after generation: Spanish `440 x 2`, French
-  `545 x 2`, Russian `460 x 2`, total missing `0`.
+- Multilingual audio parity validates normalized lookup items with total missing
+  `0`: Spanish `880`, French `1090`, Russian `918`. Bundled Russian files
+  remain `460 x 2` because punctuation variants can share one local clip.
 - Secondary voices selected for the experimental packs: Spanish `Lydia`, French
   `Rachel`, Russian `Sergey`; the original primary voices remain bundled.
 - Azure live validation: `220/220` sampled pronunciation assessments passed.

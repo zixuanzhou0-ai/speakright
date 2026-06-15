@@ -449,7 +449,9 @@ release notes and installation guide keep the unsigned warning visible.
     `narrowViewport=ok`, `lowHeightViewport=ok`, and
     `releaseServedFromDevServer=false`.
   - `npm.cmd run audio:parity:dry-run`: Spanish `880`, French `1090`, Russian
-    `920`, total missing `0`, no ElevenLabs calls.
+    `918` normalized lookup items, total missing `0`, no ElevenLabs calls.
+    Bundled Russian files remain `460 x 2`; punctuation variants can share one
+    local clip.
   - Latest recorded `npm.cmd run audio:loudness:dry-run`: reference video mean `-14.7 dB`,
     word floor `-21.6 dB`; representative English, Spanish, French, Russian
     A/B word samples, plus IPA chart normal/slow word samples, passed after

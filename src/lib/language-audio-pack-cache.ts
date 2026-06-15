@@ -30,6 +30,8 @@ export function normalizeAudioPackText(text: string): string {
     .replace(/\s*'\s*/g, "'")
     .replace(/\s+/g, " ")
     .trim()
+    .replace(/[.!?。！？]+$/g, "")
+    .trim()
     .toLocaleLowerCase();
 }
 

@@ -143,8 +143,10 @@ README/docs-only changes run the lightweight Docs Check workflow.
   language-pack audio `1090/1090`, Russian language-pack audio `920/920`, local
   videos `224/224`.
 - Multilingual audio-density expansion target: 24 practice items per Spanish,
-  French, and Russian sound unit. The latest dry-run after generation reports
-  Spanish `440 x 2`, French `545 x 2`, Russian `460 x 2`, total missing `0`.
+  French, and Russian sound unit. Current parity dry-run validates normalized
+  lookup items with total missing `0`: Spanish `880`, French `1090`, Russian
+  `918`. Bundled Russian files remain `460 x 2` because punctuation variants can
+  share one local clip.
 - Secondary voices selected for the experimental language packs: Spanish
   `Lydia`, French `Rachel`, Russian `Sergey`; the original primary voices
   remain Spanish `Marco Cruz`, French `Clément`, Russian `Valeria`.

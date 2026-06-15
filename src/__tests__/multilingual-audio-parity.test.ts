@@ -126,7 +126,7 @@ describe("multilingual audio parity contract", () => {
     expect(report.totals.requiredItems).toBe(
       75 * MULTILINGUAL_AUDIO_PARITY_TARGET_PER_UNIT,
     );
-    expect(report.totals.existingAudioItems).toBe(2890);
+    expect(report.totals.existingAudioItems).toBe(2888);
     expect(report.totals.missingAudioItems).toBe(0);
     expect(report.totals.estimatedNewCharacters).toBe(0);
   });

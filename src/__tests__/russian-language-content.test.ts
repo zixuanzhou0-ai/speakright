@@ -35,6 +35,41 @@ describe("Russian pronunciation content", () => {
     expect(finalDevoicing?.description).not.toContain("在词尾不保持浊音");
   });
 
+  it("keeps Russian rule sentence hints faithful to cross-word realization", () => {
+    const deck = LANGUAGE_LEARNING_DECKS["ru-RU"];
+    const finalDevoicingItems = deck.sentenceDeck.filter((item) =>
+      item.targetUnitSlugs.includes("ru-final-devoicing"),
+    );
+    const assimilationItem = deck.sentenceDeck.find(
+      (item) => item.text === "Сделать быстро трудно.",
+    );
+    const reductionItem = deck.sentenceDeck.find((item) =>
+      item.targetUnitSlugs.includes("ru-unstressed-o-a"),
+    );
+    const hardSoftItem = deck.sentenceDeck.find((item) =>
+      item.targetUnitSlugs.includes("ru-hard-soft"),
+    );
+    const clusterItem = deck.sentenceDeck.find((item) =>
+      item.targetUnitSlugs.includes("ru-clusters"),
+    );
+
+    expect(finalDevoicingItems.map((item) => item.text)).not.toContain(
+      "Друг ждёт у гаража.",
+    );
+    expect(finalDevoicingItems[0]).toMatchObject({
+      text: "Нож тупой.",
+      stressText: "Нож тупо́й.",
+      ipaHint: "/noʂ tʊˈpoj/",
+    });
+    expect(finalDevoicingItems[0]?.focus).toContain("清辅音");
+    expect(assimilationItem?.ipaHint).toBe("/ˈzdʲelətʲ ˈbɨstrə/");
+    expect(assimilationItem?.focus).toContain("清浊同化");
+    expect(reductionItem?.stressText).toContain("Москва́");
+    expect(reductionItem?.ipaHint).toContain("ɐ");
+    expect(hardSoftItem?.focus).toContain("硬软辅音");
+    expect(clusterItem?.focus).toContain("辅音丛");
+  });
+
   it("expands Russian diagnostic, contrast, and sentence decks", () => {
     const deck = LANGUAGE_LEARNING_DECKS["ru-RU"];
 
