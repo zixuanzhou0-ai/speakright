@@ -179,9 +179,13 @@ export default function CoveragePassageAssessmentPage() {
       languageProfile.azureLocale,
     );
     if (!result) {
+      const assessmentError =
+        azure.getLastError() ??
+        azure.error ??
+        "评估失败：请检查 Azure Speech API 密钥、区域、网络或代理后重试。";
       setPhase({
         type: "error",
-        message: azure.error || "评估失败，请检查 Azure 配置或网络后重试。",
+        message: assessmentError,
         recoverTo: currentPhase,
       });
       return;
@@ -480,7 +484,13 @@ export default function CoveragePassageAssessmentPage() {
                     compact
                   />
                   {recorder.error && (
-                    <p className="text-sm text-destructive">{recorder.error}</p>
+                    <p
+                      className="max-w-md text-center text-sm text-destructive break-words [overflow-wrap:anywhere]"
+                      data-smoke="assessment-passage-recorder-error"
+                      role="alert"
+                    >
+                      {recorder.error}
+                    </p>
                   )}
                   {recorder.autoStopped && (
                     <p className="text-xs text-muted-foreground">
@@ -564,8 +574,12 @@ export default function CoveragePassageAssessmentPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               className="mx-auto max-w-lg rounded-xl border border-red-200 bg-red-50 p-6 text-center dark:border-red-900 dark:bg-red-950/30"
+              data-smoke="assessment-passage-error"
+              role="alert"
             >
-              <p className="text-red-700 dark:text-red-400">{phase.message}</p>
+              <p className="text-red-700 break-words [overflow-wrap:anywhere] dark:text-red-400">
+                {phase.message}
+              </p>
               <div className="mt-3 flex justify-center gap-2">
                 {phase.recoverTo && (
                   <Button

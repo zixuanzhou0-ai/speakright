@@ -139,6 +139,10 @@ git status --short --branch
   errors and Azure scoring errors inline with `role="alert"`, so missing
   microphone permission, missing Azure keys, network failure, or quota failure
   does not look like a frozen assessment step.
+- Full-passage diagnosis now follows the same failure standard: recorder errors
+  render inline with `role="alert"`, and Azure scoring failures use the latest
+  hook error immediately so missing keys or network/provider failures do not
+  collapse into a stale generic `评估失败` message.
 - Prosody and scenario transfer pages now render standard-demo TTS failures
   inline, and their recording/assessment error panels are `role="alert"`.
   Spontaneous transfer now also shows `recorder.error` instead of only its own

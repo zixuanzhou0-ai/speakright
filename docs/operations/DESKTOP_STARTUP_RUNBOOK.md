@@ -76,7 +76,9 @@ npm run desktop:launch-release
   then three detail pages; play target sound, example word, video, record,
   replay the recording, and score once.
 - Drill, free practice, and diagnosis: check that missing/low evidence never
-  presents a confident perfect diagnosis for experimental languages.
+  presents a confident perfect diagnosis for experimental languages. In both
+  quick diagnosis and full-passage diagnosis, microphone and Azure failures
+  should appear inline in Chinese with a clear recovery path.
 
 If the release executable is missing or you intentionally need fresh artifacts,
 build and launch it in one step:

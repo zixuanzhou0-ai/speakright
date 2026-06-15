@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { assessPronunciation } from "@/lib/api-client";
 import { getAzureConfig } from "@/lib/api-keys";
 import { trackAzureUsage } from "@/lib/usage-tracker";
@@ -16,6 +16,7 @@ interface UseAzureAssessmentReturn {
   result: AzureAssessmentResult | null;
   isLoading: boolean;
   error: string | null;
+  getLastError: () => string | null;
   reset: () => void;
   restore: (saved: AzureAssessmentResult) => void;
 }
@@ -24,6 +25,12 @@ export function useAzureAssessment(): UseAzureAssessmentReturn {
   const [result, setResult] = useState<AzureAssessmentResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const errorRef = useRef<string | null>(null);
+
+  const setAssessmentError = useCallback((message: string | null) => {
+    errorRef.current = message;
+    setError(message);
+  }, []);
 
   const assess = useCallback(async (
     audioBlob: Blob,
@@ -32,13 +39,13 @@ export function useAzureAssessment(): UseAzureAssessmentReturn {
   ) => {
     const config = getAzureConfig();
     if (!config) {
-      setError(
+      setAssessmentError(
         "请先到设置页配置 Azure Speech API 密钥和区域；配置后回到本页重新评分。",
       );
       return null;
     }
 
-    setError(null);
+    setAssessmentError(null);
     setResult(null);
     setIsLoading(true);
 
@@ -67,22 +74,24 @@ export function useAzureAssessment(): UseAzureAssessmentReturn {
     } catch (e) {
       console.error("[Azure Assessment]", e);
       const msg = e instanceof Error ? e.message : "发音评估失败";
-      setError(msg);
+      setAssessmentError(msg);
       return null;
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [setAssessmentError]);
 
   const reset = useCallback(() => {
     setResult(null);
-    setError(null);
-  }, []);
+    setAssessmentError(null);
+  }, [setAssessmentError]);
 
   const restore = useCallback((saved: AzureAssessmentResult) => {
     setResult(saved);
-    setError(null);
-  }, []);
+    setAssessmentError(null);
+  }, [setAssessmentError]);
 
-  return { assess, result, isLoading, error, reset, restore };
+  const getLastError = useCallback(() => errorRef.current, []);
+
+  return { assess, result, isLoading, error, getLastError, reset, restore };
 }

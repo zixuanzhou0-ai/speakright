@@ -203,6 +203,8 @@ describe("desktop preflight and UI smoke", () => {
 
   it("keeps quick assessment recording and scoring failures visible inline", () => {
     const assessmentPage = readProjectFile("src/app/assessment/page.tsx");
+    const passagePage = readProjectFile("src/app/assessment/passage/page.tsx");
+    const azureHook = readProjectFile("src/hooks/use-azure-assessment.ts");
     const recorderAlerts =
       assessmentPage.match(/data-smoke="assessment-recorder-error"/g) ?? [];
     const azureAlerts =
@@ -216,6 +218,20 @@ describe("desktop preflight and UI smoke", () => {
     expect(assessmentPage).not.toContain(
       'message: azure.error || "评估失败"',
     );
+
+    expect(passagePage).toContain(
+      'data-smoke="assessment-passage-recorder-error"',
+    );
+    expect(passagePage).toContain('data-smoke="assessment-passage-error"');
+    expect(passagePage).toContain("azure.getLastError()");
+    expect(passagePage).toContain("Azure Speech API 密钥、区域、网络或代理");
+    expect(passagePage).toContain('role="alert"');
+    expect(passagePage).not.toContain(
+      'message: azure.error || "评估失败"',
+    );
+
+    expect(azureHook).toContain("getLastError");
+    expect(azureHook).toContain("errorRef.current");
   });
 
   it("keeps recorder runtime failures from silently producing partial audio", () => {
