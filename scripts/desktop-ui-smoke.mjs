@@ -685,6 +685,43 @@ async function seedProgressBenchmarkSmokeData(cdp) {
     }
   ];
   localStorage.setItem("speakright_benchmark_recordings_v1", JSON.stringify(items));
+  localStorage.setItem(
+    "speakright_mastery_profile_v2",
+    JSON.stringify({
+      version: 2,
+      updatedAt: Date.now(),
+      packs: {
+        "s-th": {
+          packId: "s-th",
+          status: "stable",
+          masteryState: "integrated",
+          levelProgress: {},
+          bestTargetScore: 88,
+          perceptionBestRate: 0.9,
+          completedSessions: 1,
+          failureStreak: 0,
+          lastPracticedAt: Date.now()
+        }
+      },
+      phonemes: {},
+      errorPatterns: {},
+      sessions: [
+        {
+          id: "smoke-progress-session",
+          packId: "s-th",
+          startedAt: Date.now() - 120000,
+          completedAt: Date.now() - 60000,
+          perceptionCorrect: 4,
+          perceptionTotal: 5,
+          targetScores: [78, 82, 86],
+          wordScores: [80],
+          sentenceScores: [84],
+          mastered: false,
+          masteryStateAfter: "integrated"
+        }
+      ]
+    })
+  );
   return { ok: true };
 })()
 `,
@@ -703,6 +740,7 @@ async function assertEnglishProgressArchive(cdp) {
     `
 (() => {
   const rows = [...document.querySelectorAll('[data-smoke="progress-benchmark-row"]')];
+  const recentRows = [...document.querySelectorAll('[data-smoke="progress-recent-session-row"]')];
   const childrenDoNotOverlap = (element) => {
     const children = [...element.children].filter((child) => {
       const rect = child.getBoundingClientRect();
@@ -737,16 +775,27 @@ async function assertEnglishProgressArchive(cdp) {
     ...document.querySelectorAll('[data-smoke="progress-benchmark-text"]'),
     ...document.querySelectorAll('[data-smoke="progress-benchmark-date"]'),
   ].filter((element) => element.innerText.trim().length > 0);
+  const recentTextNodes = [
+    ...document.querySelectorAll('[data-smoke="progress-recent-session-title"]'),
+    ...document.querySelectorAll('[data-smoke="progress-recent-session-meta"]'),
+  ].filter((element) => element.innerText.trim().length > 0);
   return {
     ok:
       rows.length > 0 &&
+      recentRows.length > 0 &&
       rows.every((row) => row.scrollWidth <= row.clientWidth + 2) &&
+      recentRows.every((row) => row.scrollWidth <= row.clientWidth + 2) &&
       rows.every(childrenDoNotOverlap) &&
+      recentRows.every(childrenDoNotOverlap) &&
       benchmarkTextNodes.every(wraps) &&
+      recentTextNodes.every(wraps) &&
       document.body.innerText.includes("Stress baseline with a deliberately long benchmark title"),
     rowCount: rows.length,
+    recentRowCount: recentRows.length,
     rowsDoNotOverlap: rows.every(childrenDoNotOverlap),
+    recentRowsDoNotOverlap: recentRows.every(childrenDoNotOverlap),
     benchmarkTextWraps: benchmarkTextNodes.every(wraps),
+    recentTextWraps: recentTextNodes.every(wraps),
     bodyText: (document.body?.innerText ?? "").slice(0, 1000)
   };
 })()

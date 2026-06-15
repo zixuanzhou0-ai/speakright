@@ -88,6 +88,9 @@ describe("desktop preflight and UI smoke", () => {
     expect(script).toContain("/progress");
     expect(script).toContain("assertEnglishProgressArchive");
     expect(script).toContain("progress-benchmark-row");
+    expect(script).toContain("progress-recent-session-row");
+    expect(script).toContain("progress-recent-session-title");
+    expect(script).toContain("speakright_mastery_profile_v2");
     expect(script).toContain("speakright_benchmark_recordings_v1");
     expect(script).toContain("progress missing benchmark audio warning");
     expect(script).toContain("direct: true");
@@ -404,6 +407,13 @@ describe("desktop preflight and UI smoke", () => {
     expect(progressPage).toContain('data-smoke="progress-benchmark-meta"');
     expect(progressPage).toContain('data-smoke="progress-benchmark-text"');
     expect(progressPage).toContain('data-smoke="progress-benchmark-date"');
+    expect(progressPage).toContain('data-smoke="progress-recent-session-row"');
+    expect(progressPage).toContain(
+      'data-smoke="progress-recent-session-title"',
+    );
+    expect(progressPage).toContain(
+      'data-smoke="progress-recent-session-meta"',
+    );
     expect(progressPage).toContain("flex flex-col gap-3");
     expect(progressPage).toContain("sm:flex-row sm:items-center sm:justify-between");
     expect(progressPage).toContain("本机音频数据缺失");

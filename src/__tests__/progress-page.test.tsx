@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import ProgressPage from "@/app/progress/page";
+import type { MasteryProfile } from "@/types/training";
 
 const benchmarkRecording = {
   id: "bench-1",
@@ -21,22 +22,24 @@ const mocks = vi.hoisted(() => ({
   listBenchmarkRecordings: vi.fn<() => Array<typeof benchmarkRecording>>(
     () => [],
   ),
-  loadMasteryProfile: vi.fn(() => ({
-    version: 1,
+  loadMasteryProfile: vi.fn<() => MasteryProfile>(() => ({
+    version: 2,
     updatedAt: 1_718_000_000_000,
     packs: {
       "s-th": {
         packId: "s-th",
         status: "mastered",
         masteryState: "transferred",
-        lastScore: 92,
-        bestScore: 94,
-        attempts: 3,
-        passedAttempts: 3,
-        failedAttempts: 0,
+        levelProgress: {},
+        bestTargetScore: 94,
+        perceptionBestRate: 0.9,
+        completedSessions: 3,
+        failureStreak: 0,
         lastPracticedAt: 1_718_000_000_000,
       },
     },
+    phonemes: {},
+    errorPatterns: {},
     sessions: [],
   })),
   playBlob: vi.fn(),
@@ -181,6 +184,62 @@ describe("ProgressPage language boundary", () => {
     expect(row).toHaveClass("sm:flex-row");
     expect(row?.textContent).toContain("82");
     expect(screen.getByText("Stress baseline")).toBeInTheDocument();
+    expect(document.body.innerHTML).not.toContain("truncate");
+    expect(document.body.innerHTML).not.toContain("line-clamp");
+  });
+
+  it("keeps recent training session rows wrap-ready", () => {
+    mocks.loadMasteryProfile.mockReturnValueOnce({
+      version: 2,
+      updatedAt: 1_718_000_000_000,
+      packs: {
+        "s-th": {
+          packId: "s-th",
+          status: "stable",
+          masteryState: "integrated",
+          levelProgress: {},
+          bestTargetScore: 88,
+          perceptionBestRate: 0.9,
+          completedSessions: 1,
+          failureStreak: 0,
+        },
+      },
+      phonemes: {},
+      errorPatterns: {},
+      sessions: [
+        {
+          id: "session-1",
+          packId: "s-th",
+          startedAt: 1_718_000_000_000,
+          completedAt: 1_718_000_060_000,
+          perceptionCorrect: 4,
+          perceptionTotal: 5,
+          targetScores: [78, 82, 86],
+          wordScores: [80],
+          sentenceScores: [84],
+          mastered: false,
+          masteryStateAfter: "integrated",
+        },
+      ],
+    });
+
+    render(<ProgressPage />);
+
+    const row = document.querySelector(
+      '[data-smoke="progress-recent-session-row"]',
+    );
+    const title = document.querySelector(
+      '[data-smoke="progress-recent-session-title"]',
+    );
+    const meta = document.querySelector(
+      '[data-smoke="progress-recent-session-meta"]',
+    );
+
+    expect(row).toHaveClass("rounded-lg");
+    expect(title).toHaveClass("break-words");
+    expect(meta).toHaveClass("break-words");
+    expect(screen.getByText("integrated")).toBeInTheDocument();
+    expect(screen.getByText(/目标音平均/)).toBeInTheDocument();
     expect(document.body.innerHTML).not.toContain("truncate");
     expect(document.body.innerHTML).not.toContain("line-clamp");
   });

@@ -432,18 +432,29 @@ export default function ProgressPage() {
                   (item) => item.id === session.packId,
                 );
                 return (
-                  <div key={session.id} className="rounded-lg border p-3">
-                    <div className="flex items-center justify-between gap-3">
-                      <p className="text-sm font-semibold">
+                  <div
+                    key={session.id}
+                    className="rounded-lg border p-3"
+                    data-smoke="progress-recent-session-row"
+                  >
+                    <div className="flex flex-col items-center gap-2 sm:flex-row sm:items-start sm:justify-between">
+                      <p
+                        className="min-w-0 break-words text-center text-sm font-semibold [overflow-wrap:anywhere] sm:text-left"
+                        data-smoke="progress-recent-session-title"
+                      >
                         {pack?.title ?? session.packId}
                       </p>
                       <Badge
                         variant={session.mastered ? "default" : "secondary"}
+                        className="max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]"
                       >
                         {session.masteryStateAfter ?? "learning"}
                       </Badge>
                     </div>
-                    <p className="mt-2 text-xs text-muted-foreground">
+                    <p
+                      className="mt-2 break-words text-center text-xs text-muted-foreground [overflow-wrap:anywhere] sm:text-left"
+                      data-smoke="progress-recent-session-meta"
+                    >
                       目标音平均{" "}
                       {session.targetScores.length > 0
                         ? Math.round(

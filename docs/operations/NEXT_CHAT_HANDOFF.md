@@ -175,6 +175,10 @@ git status --short --branch
   narrow screens. Release EXE smoke seeds English benchmark metadata locally,
   checks those rows in main/narrow/low-height passes, and confirms missing local
   benchmark audio shows a Chinese warning without generating audio.
+- Progress recent-session rows now wrap pack title, stage badge, target-score
+  average, and completion time. Release EXE smoke seeds an English mastery
+  profile locally so these rows are checked in main/narrow/low-height passes
+  without touching experimental-language mastery.
 - Quick diagnosis word and paragraph recording cards now show recorder startup
   errors and Azure scoring errors inline with `role="alert"`, so missing
   microphone permission, missing Azure keys, network failure, or quota failure
