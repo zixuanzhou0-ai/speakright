@@ -29,7 +29,7 @@ claimed as complete.
 | Non-English IPA audit exports are reproducible, distinguish full IPA rows from deck focus hints, keep sourced review decisions machine-checkable, and keep bundled language-pack IPA metadata aligned | `src/lib/non-english-ipa-audit.ts`, `scripts/export-non-english-ipa-audit-input.mjs`, `docs/operations/non-english-ipa-audit-input.json`, `docs/operations/non-english-ipa-reviewed-findings.json`, `docs/operations/IPA_DISPLAY_AUDIT_STRATEGY.md`, `public/audio/language-packs/fr-FR/manifest.json`, `public/audio/language-packs/ru-RU/manifest.json`, `src/__tests__/non-english-ipa-audit.test.ts`, `src/__tests__/non-english-ipa-reviewed-findings.test.ts`, `src/__tests__/static-language-audio-pack-assets.test.ts`, `npm.cmd run ipa:audit:export`; the current tracked export contains `1736` rows and marks `34` `deck-focus-hint` rows so compact practice cues are not mistaken for complete sentence IPA, the test compares the tracked JSON against the current source-built output to catch stale audit exports, high-risk French connected-speech rows reject stale word-boundary IPA, Spanish audit `currentIpa` rows stay phoneme-first for `/b d g/` while explicit allophone unit labels may keep `[β ð ɣ]`, the static language-pack asset test locks applied French/Russian manifest IPA metadata against stale word-boundary or isolated-devoicing strings, and the reviewed-findings ledger locks applied `update`, accepted `variant-accepted`, and unchanged `needs-review` rows such as Russian `поезд идёт` against accidental drift |
 | Repeated or noisy non-English practice text is constrained | `src/lib/language-keyword-expansions.ts`, `src/__tests__/language-learning-decks.test.ts`, `src/__tests__/spanish-sound-examples.test.ts` |
 | Non-English diagnosis avoids trusted perfect scores when evidence is thin, mismatched, omitted, or inserted | `src/lib/diagnosis-engine.ts`, `src/lib/assessment-evidence-engine.ts`, `src/types/diagnosis.ts`, `src/__tests__/diagnosis-engine.test.ts`, `src/__tests__/assessment-evidence-engine.test.ts`, `scripts/desktop-ui-smoke.mjs` |
-| Recording startup, mid-session recorder interruptions, and first-run microphone readiness failures show actionable Chinese messages and do not leave drill or diagnosis users stuck without visible feedback | `src/hooks/use-recorder.ts`, `src/components/drill/drill-recording.tsx`, `src/components/drill/desktop-readiness-card.tsx`, `src/lib/desktop-readiness.ts`, `src/app/drill/word/page.tsx`, `src/app/drill/sentence/page.tsx`, `src/app/drill/spontaneous/page.tsx`, `src/app/drill/contrast/page.tsx`, `src/app/drill/pack/[packId]/pack-runner-client.tsx`, `src/components/sentences/sentence-recording-card.tsx`, `src/app/phonemes/[phoneme]/phoneme-detail-page.tsx`, `src/app/assessment/page.tsx`, `src/app/assessment/passage/page.tsx`, `src/__tests__/use-recorder.test.tsx`, `src/__tests__/drill-recording.test.tsx`, `src/__tests__/desktop-readiness.test.ts`, `src/__tests__/desktop-readiness-card.test.tsx`, `src/__tests__/desktop-preflight-ui-smoke.test.ts`; denied permission, missing microphone, busy device, unsupported recorder runtime, unsupported microphone access, mid-recording permission/device/busy interruptions, low input signal, too-short readiness samples, and generic startup failures map to separate Chinese messages, recorder initialization failure stops any opened stream, runtime recorder errors stop the stream and discard untrusted partial audio, word/sentence/spontaneous/contrast/pack-runner drill cards plus quick and full-passage diagnosis pages render recorder failures inline with `role="alert"`, and the first-run readiness card shows an inline Chinese microphone hint instead of only a short status label |
+| Recording startup, mid-session recorder interruptions, first-run microphone readiness failures, and blocked recording-quality checks show actionable Chinese messages and do not leave drill or diagnosis users stuck without visible feedback | `src/hooks/use-recorder.ts`, `src/components/drill/drill-recording.tsx`, `src/components/drill/desktop-readiness-card.tsx`, `src/components/audio/recording-quality-panel.tsx`, `src/lib/desktop-readiness.ts`, `src/app/drill/word/page.tsx`, `src/app/drill/sentence/page.tsx`, `src/app/drill/spontaneous/page.tsx`, `src/app/drill/contrast/page.tsx`, `src/app/drill/pack/[packId]/pack-runner-client.tsx`, `src/components/sentences/sentence-recording-card.tsx`, `src/app/phonemes/[phoneme]/phoneme-detail-page.tsx`, `src/app/assessment/page.tsx`, `src/app/assessment/passage/page.tsx`, `src/__tests__/use-recorder.test.tsx`, `src/__tests__/drill-recording.test.tsx`, `src/__tests__/desktop-readiness.test.ts`, `src/__tests__/desktop-readiness-card.test.tsx`, `src/__tests__/recording-quality-panel.test.tsx`, `src/__tests__/desktop-preflight-ui-smoke.test.ts`; denied permission, missing microphone, busy device, unsupported recorder runtime, unsupported microphone access, mid-recording permission/device/busy interruptions, low input signal, too-short readiness samples, and generic startup failures map to separate Chinese messages, recorder initialization failure stops any opened stream, runtime recorder errors stop the stream and discard untrusted partial audio, word/sentence/spontaneous/contrast/pack-runner drill cards plus quick and full-passage diagnosis pages render recorder failures inline with `role="alert"`, the first-run readiness card shows an inline Chinese microphone hint instead of only a short status label, and the shared recording-quality panel now exposes blocker outcomes such as too-short/silent/decode-failed recordings as `role="alert"` while submit-ready quality feedback remains `role="status"` |
 | Recording waveform rendering failures do not make a successful recording look frozen or unusable | `src/components/audio/waveform-display.tsx`, `src/__tests__/waveform-display.test.tsx`, `src/__tests__/desktop-preflight-ui-smoke.test.ts`; live recording waveform setup handles missing or failing `AudioContext`/`webkitAudioContext` with a Chinese `role="status"` message that recording still continues, saved-recording waveform loading catches WaveSurfer/load failures with a Chinese status that the recording is still preserved for replay, re-recording, or scoring, and the static smoke guard locks the warning text plus `waveform-display-warning` hook |
 | Azure Speech failures show actionable Chinese messages instead of raw provider/network errors | `src/lib/api-client.ts`, `src/hooks/use-azure-assessment.ts`, `src/app/phonemes/[phoneme]/phoneme-detail-page.tsx`, `src/app/assessment/page.tsx`, `src/app/assessment/passage/page.tsx`, `src/app/sentences/page.tsx`, `src/app/drill/prosody/page.tsx`, `src/app/drill/scenarios/page.tsx`, `src/app/drill/spontaneous/page.tsx`, `src/app/drill/contrast/page.tsx`, `src/app/drill/pack/[packId]/pack-runner-client.tsx`, `src/hooks/use-drill-session.ts`, `src/__tests__/api-client-azure.test.ts`, `src/__tests__/use-azure-assessment.test.tsx`, `src/__tests__/use-drill-session.test.tsx`, `src/__tests__/contrast-drill-page.test.tsx`, `src/__tests__/desktop-preflight-ui-smoke.test.ts`; Azure connection tests, pronunciation assessment, and transcription now map no-speech recordings, key/region auth mismatch, missing local Azure config, unreachable network/proxy, timeout, quota/rate-limit, temporary service failure, and empty transcription responses to Chinese messages before they reach UI; quick diagnosis word/paragraph stages plus full-passage diagnosis, prosody, scenario, spontaneous transfer, contrast, pack-runner, and word/sentence drill session recording pages render Azure failures inline, contrast A/B scoring exposes a `重新评分` action that retries the same recording after provider/config recovery instead of forcing an immediate re-record, pack-runner normal and remediation scoring buttons switch to `重新评分` / `重新评分这一步` when an assessment error is visible, the shared assessment hook exposes the latest failure reason synchronously so full-passage diagnosis and word/sentence drill scoring do not fall back to stale generic errors, and paragraph-stage failures keep the user on the current card rather than replacing the screen with a generic fallback |
 | AI coach feedback stays tied to the selected language, target text, IPA/evidence boundaries, and conservative non-English status; desktop LLM provider selection does not allow arbitrary endpoints or paid live calls during routine validation; LLM failures show actionable Chinese messages instead of silently finishing | `src/lib/llm-prompt.ts`, `src/lib/language-feedback-rules.ts`, `src/lib/language-source-alignment.ts`, `src/lib/llm-providers.ts`, `src/lib/api-client.ts`, `src/hooks/use-llm-feedback.ts`, `src/components/settings/llm-config-card.tsx`, `src-tauri/tauri.conf.json`, `docs/api-reference.md`, `src/__tests__/llm-prompt.test.ts`, `src/__tests__/language-feedback-rules.test.ts`, `src/__tests__/language-source-alignment.test.ts`, `src/__tests__/llm-desktop-policy.test.ts`, `src/__tests__/llm-config-card.test.tsx`, `src/__tests__/llm-feedback-parser.test.ts`, `src/__tests__/use-llm-feedback.test.tsx`, `src/__tests__/desktop-preflight-ui-smoke.test.ts`; prompts include the target text, current `languageId`, Azure JSON evidence, language-specific coaching rules, explicit non-English experimental evidence limits, and a ban on claiming mastery from a single recording; non-English full-score feedback must say only `本次录音没有发现明显问题`, must not say `完美` or `已掌握`, and must keep a light retest or practice suggestion; Russian final-devoicing coach guidance and source summaries distinguish pause/voiceless-consonant devoicing from connected speech before voiced consonants, sonorants, or vowels; MiniMax and Xiaomi MiMo remain manual-config providers until exact official OpenAI-compatible endpoint/model information is confirmed; Settings connection tests and feedback streams map auth, invalid provider/model/base URL, network/proxy, timeout, quota/rate-limit, service failure, and desktop policy-block errors to Chinese messages, and `useLlmFeedback` renders SSE error chunks instead of ignoring them |
@@ -68,7 +68,7 @@ rerun during this playback/UI RC pass.
 
 ## Latest Local Command Results
 
-Latest local focused pass for waveform degraded-state recovery and the full RC gate:
+Latest local focused pass for recording-quality alert semantics and the full RC gate:
 
 ```text
 git status --short --branch
@@ -76,35 +76,34 @@ git status --short --branch
   If normal `git push` is unavailable, use the documented GitHub API fallback
   and verify the local-vs-remote tree SHA before treating content as pushed
 
-npx.cmd biome check --fix src/components/audio/waveform-display.tsx src/__tests__/waveform-display.test.tsx src/__tests__/desktop-preflight-ui-smoke.test.ts docs/operations/RC_EVIDENCE_AUDIT.md docs/operations/DESKTOP_STARTUP_RUNBOOK.md docs/operations/NEXT_CHAT_HANDOFF.md
+npx.cmd biome check --fix src/components/audio/recording-quality-panel.tsx src/__tests__/recording-quality-panel.test.tsx src/__tests__/desktop-preflight-ui-smoke.test.ts docs/operations/RC_EVIDENCE_AUDIT.md docs/operations/DESKTOP_STARTUP_RUNBOOK.md docs/operations/NEXT_CHAT_HANDOFF.md
   passed; no fixes needed after the final docs update
 
-npm.cmd run test -- src/__tests__/waveform-display.test.tsx src/__tests__/desktop-preflight-ui-smoke.test.ts
-  2 files / 18 tests passed; live waveform fallback, saved recording waveform
-  failure status, warning cleanup, and static Release smoke source guard are
-  locked
+npm.cmd run test -- src/__tests__/recording-quality-panel.test.tsx src/__tests__/desktop-preflight-ui-smoke.test.ts src/__tests__/open-source-readiness.test.ts
+  3 files / 28 tests passed; blocker quality failures render as alerts,
+  submit-ready quality feedback renders as status, and static Release smoke
+  source/open-source guards are locked
 
 npm.cmd run test
-  115 files / 638 tests passed
+  116 files / 642 tests passed
 
 npm.cmd run typecheck
   passed
 
 npm.cmd run lint
-  passed; 376 files checked
+  passed; 377 files checked
 
 npm.cmd run build:desktop-frontend
   passed; 144 static pages generated
 
 npm.cmd run desktop:build
-  first attempt exceeded the 10-minute tool timeout after artifacts had started
-  updating; the command was rerun with a longer timeout and passed, rebuilding
-  the Release EXE, MSI, and NSIS artifacts after the waveform display change
+  passed; rebuilt the Release EXE, MSI, and NSIS artifacts after the
+  recording-quality panel change
 
 npm.cmd run desktop:preflight
   passed; Release EXE exists, no running speakright.exe, no localhost startup;
   during verification it correctly reported the expected dirty worktree from this
-  waveform degraded-state recovery fix
+  recording-quality alert semantics fix
 
 npm.cmd run desktop:ui-smoke
   passed; Release EXE runtime, centered target text, no target-text ellipsis,
@@ -140,7 +139,7 @@ npm.cmd run desktop:ui-smoke
 
 npm.cmd run desktop:launch-release
   passed; command printed `SpeakRight release desktop app launch requested`,
-  the Release EXE path, `PID: 20748`, and the no-localhost reminder; the Release
+  the Release EXE path, `PID: 56688`, and the no-localhost reminder; the Release
   EXE opened from `src-tauri\target\release\speakright.exe` and was verified as
   a running `speakright.exe` process
 
@@ -160,7 +159,7 @@ npm.cmd run desktop:launch-release
 ## Limits
 
 - `audio:parity:dry-run` and `audio:loudness:dry-run` were not rerun during the
-  waveform degraded-state recovery pass; the latest recorded audio
+  recording-quality alert semantics pass; the latest recorded audio
   dry-runs remain the previous playback-layer audits.
 - `es-ES`, `fr-FR`, and `ru-RU` are experimental and must not be described as
   formally mastered.

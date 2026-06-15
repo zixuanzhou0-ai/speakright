@@ -48,6 +48,8 @@ export function RecordingQualityPanel({
         !report.canSubmit && "border-destructive/35 bg-destructive/5",
         compact && "p-2",
       )}
+      data-smoke="recording-quality-panel"
+      role={report.canSubmit ? "status" : "alert"}
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2">

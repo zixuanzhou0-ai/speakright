@@ -394,6 +394,19 @@ describe("desktop preflight and UI smoke", () => {
     expect(waveformDisplay).toContain('ws.on("error"');
   });
 
+  it("keeps blocking recording-quality failures exposed as alerts", () => {
+    const qualityPanel = readProjectFile(
+      "src/components/audio/recording-quality-panel.tsx",
+    );
+
+    expect(qualityPanel).toContain('data-smoke="recording-quality-panel"');
+    expect(qualityPanel).toContain(
+      'role={report.canSubmit ? "status" : "alert"}',
+    );
+    expect(qualityPanel).toContain("建议重录");
+    expect(qualityPanel).toContain("录音质量");
+  });
+
   it("keeps advanced drill provider failures visible inline", () => {
     const drillPage = readProjectFile("src/app/drill/page.tsx");
     const drillReportStorage = readProjectFile(
