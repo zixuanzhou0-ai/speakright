@@ -21,7 +21,10 @@ import { useRecorder } from "@/hooks/use-recorder";
 import { useRecordingQuality } from "@/hooks/use-recording-quality";
 import { assessPronunciation, transcribeSpeech } from "@/lib/api-client";
 import { getAzureConfig } from "@/lib/api-keys";
-import { saveBenchmarkRecording } from "@/lib/benchmark-archive";
+import {
+  getBenchmarkArchiveSaveErrorMessage,
+  saveBenchmarkRecording,
+} from "@/lib/benchmark-archive";
 import {
   analyzeFreePracticeTransfer,
   type FreePracticeTransferSummary,
@@ -65,6 +68,7 @@ export default function SpontaneousPage() {
     null,
   );
   const [error, setError] = useState<string | null>(null);
+  const [archiveWarning, setArchiveWarning] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const recorder = useRecorder({ maxDurationMs: 60_000 });
   const replayAudio = useAudioPlayer();
@@ -107,6 +111,7 @@ export default function SpontaneousPage() {
     setTranscript("");
     setSummary(null);
     setError(null);
+    setArchiveWarning(null);
   };
 
   const startRecording = async () => {
@@ -118,11 +123,13 @@ export default function SpontaneousPage() {
     const config = getAzureConfig();
     if (!config) {
       setError("请先到设置页配置 Azure Speech API 密钥和区域；配置后回到本页重新评分。");
+      setArchiveWarning(null);
       return;
     }
     if (!recorder.audioBlob || !quality.report?.canSubmit) return;
 
     setError(null);
+    setArchiveWarning(null);
     setIsProcessing(true);
     try {
       const nextTranscript = await transcribeSpeech(
@@ -170,14 +177,23 @@ export default function SpontaneousPage() {
       } else {
         setSummary(transferSummary);
       }
-      await saveBenchmarkRecording(recorder.audioBlob, {
-        source: "spontaneous",
-        title: prompt.title,
-        text: nextTranscript,
-        score: result.pronunciationScore,
-        targetLabel:
-          targetPacks.map((pack) => pack.id).join(", ") || "spontaneous",
-      });
+      try {
+        await saveBenchmarkRecording(recorder.audioBlob, {
+          source: "spontaneous",
+          title: prompt.title,
+          text: nextTranscript,
+          score: result.pronunciationScore,
+          targetLabel:
+            targetPacks.map((pack) => pack.id).join(", ") || "spontaneous",
+        });
+        setArchiveWarning(null);
+      } catch (archiveError) {
+        console.warn(
+          "[Benchmark archive] failed to save spontaneous audio",
+          archiveError,
+        );
+        setArchiveWarning(getBenchmarkArchiveSaveErrorMessage(archiveError));
+      }
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "即兴表达分析失败");
     } finally {
@@ -306,6 +322,15 @@ export default function SpontaneousPage() {
                 {recorder.error ?? error}
               </p>
             )}
+            {archiveWarning && (
+              <p
+                role="alert"
+                data-smoke="spontaneous-benchmark-archive-warning"
+                className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-200"
+              >
+                {archiveWarning}
+              </p>
+            )}
           </section>
 
           {(transcript || summary) && (
@@ -351,7 +376,9 @@ export default function SpontaneousPage() {
                 </div>
               ) : (
                 <p className="mt-4 text-sm text-muted-foreground">
-                  这次即兴内容没有命中当前弱点词；录音已作为 benchmark 保存。
+                  {archiveWarning
+                    ? "这次即兴内容没有命中当前弱点词；本次评分已完成，但 benchmark 录音未保存。"
+                    : "这次即兴内容没有命中当前弱点词；录音已作为 benchmark 保存。"}
                 </p>
               )}
               <Button

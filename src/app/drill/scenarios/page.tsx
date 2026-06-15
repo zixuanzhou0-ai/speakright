@@ -23,7 +23,10 @@ import { useAzureAssessment } from "@/hooks/use-azure-assessment";
 import { useRecorder } from "@/hooks/use-recorder";
 import { useRecordingQuality } from "@/hooks/use-recording-quality";
 import { useTtsAligned } from "@/hooks/use-tts-aligned";
-import { saveBenchmarkRecording } from "@/lib/benchmark-archive";
+import {
+  getBenchmarkArchiveSaveErrorMessage,
+  saveBenchmarkRecording,
+} from "@/lib/benchmark-archive";
 import {
   analyzeFreePracticeTransfer,
   type FreePracticeTransferSummary,
@@ -52,6 +55,7 @@ export default function ScenariosPage() {
   const [summary, setSummary] = useState<FreePracticeTransferSummary | null>(
     null,
   );
+  const [archiveWarning, setArchiveWarning] = useState<string | null>(null);
   const recorder = useRecorder({ maxDurationMs: 45_000 });
   const assessment = useAzureAssessment();
   const tts = useTtsAligned();
@@ -81,10 +85,12 @@ export default function ScenariosPage() {
     assessment.reset();
     quality.reset();
     setSummary(null);
+    setArchiveWarning(null);
   };
 
   const startRecording = async () => {
     setSummary(null);
+    setArchiveWarning(null);
     assessment.reset();
     quality.reset();
     await recorder.startRecording();
@@ -135,8 +141,10 @@ export default function ScenariosPage() {
         score: result.pronunciationScore,
         targetLabel: plan.targetPackIds.join(", "),
       });
+      setArchiveWarning(null);
     } catch (error) {
       console.warn("[Benchmark archive] failed to save scenario", error);
+      setArchiveWarning(getBenchmarkArchiveSaveErrorMessage(error));
     }
   };
 
@@ -311,6 +319,15 @@ export default function ScenariosPage() {
                 className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300"
               >
                 {recorder.error ?? assessment.error}
+              </p>
+            )}
+            {archiveWarning && (
+              <p
+                role="alert"
+                data-smoke="scenario-benchmark-archive-warning"
+                className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-200"
+              >
+                {archiveWarning}
               </p>
             )}
           </section>

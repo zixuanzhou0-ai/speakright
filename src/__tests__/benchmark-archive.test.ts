@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   benchmarkGroupKey,
   encodeBenchmarkAudioBlob,
+  getBenchmarkArchiveSaveErrorMessage,
   summarizeBenchmarkGroups,
   summarizeBenchmarkTrend,
 } from "@/lib/benchmark-archive";
@@ -121,5 +122,16 @@ describe("benchmark archive", () => {
       bytes: 3,
       dataBase64: "YWJj",
     });
+  });
+
+  it("maps benchmark save failures to user-facing Chinese warnings", () => {
+    expect(getBenchmarkArchiveSaveErrorMessage(new Error("disk failed"))).toBe(
+      "本次评分已完成，但练习录音没有保存到本机 benchmark 归档。请检查系统存储权限或剩余空间后，下次重新录音保存。",
+    );
+    expect(
+      getBenchmarkArchiveSaveErrorMessage(
+        new DOMException("", "QuotaExceededError"),
+      ),
+    ).toContain("本机存储空间不足");
   });
 });

@@ -29,6 +29,17 @@ const DB_NAME = "speakright-benchmark-audio";
 const STORE_NAME = "recordings";
 const DB_VERSION = 1;
 
+export function getBenchmarkArchiveSaveErrorMessage(error: unknown): string {
+  if (
+    error instanceof DOMException &&
+    (error.name === "QuotaExceededError" || error.name === "UnknownError")
+  ) {
+    return "本次评分已完成，但本机存储空间不足或 IndexedDB 被系统限制，录音没有保存到 benchmark 归档。可以在设置页清理缓存或稍后重试。";
+  }
+
+  return "本次评分已完成，但练习录音没有保存到本机 benchmark 归档。请检查系统存储权限或剩余空间后，下次重新录音保存。";
+}
+
 function readMeta(): BenchmarkRecordingMeta[] {
   if (typeof window === "undefined") return [];
   try {

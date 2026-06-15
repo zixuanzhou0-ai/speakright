@@ -172,6 +172,10 @@ git status --short --branch
 - Recording replay and benchmark playback now use `useAudioPlayer.playBlob`
   instead of raw `new Audio(...)`, so repeated replay clicks stop the previous
   blob and object URL cleanup stays centralized.
+- Prosody, scenario, and spontaneous transfer now show a Chinese warning if
+  benchmark audio cannot be saved to local IndexedDB/quota storage after scoring
+  succeeds. The scored result stays visible, but spontaneous transfer no longer
+  claims the recording was saved when archive persistence failed.
 - Bundled English and Spanish/French/Russian A/B word audio uses peak-safe Web
   Audio `GainNode` playback gain for louder, closer-to-video local playback
   without regenerating MP3s, calling ElevenLabs, or allowing obvious clipping.

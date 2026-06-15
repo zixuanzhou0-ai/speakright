@@ -274,4 +274,42 @@ describe("desktop preflight and UI smoke", () => {
       expect(source, pagePath).not.toContain("new Audio(");
     }
   });
+
+  it("keeps benchmark archive save failures visible without blocking scoring", () => {
+    const benchmarkArchive = readProjectFile("src/lib/benchmark-archive.ts");
+    const prosodyPage = readProjectFile("src/app/drill/prosody/page.tsx");
+    const scenariosPage = readProjectFile("src/app/drill/scenarios/page.tsx");
+    const spontaneousPage = readProjectFile("src/app/drill/spontaneous/page.tsx");
+
+    expect(benchmarkArchive).toContain("getBenchmarkArchiveSaveErrorMessage");
+    expect(benchmarkArchive).toContain("本次评分已完成");
+    expect(benchmarkArchive).toContain("本机存储空间不足");
+
+    for (const [pagePath, source, smokeId] of [
+      [
+        "src/app/drill/prosody/page.tsx",
+        prosodyPage,
+        'data-smoke="prosody-benchmark-archive-warning"',
+      ],
+      [
+        "src/app/drill/scenarios/page.tsx",
+        scenariosPage,
+        'data-smoke="scenario-benchmark-archive-warning"',
+      ],
+      [
+        "src/app/drill/spontaneous/page.tsx",
+        spontaneousPage,
+        'data-smoke="spontaneous-benchmark-archive-warning"',
+      ],
+    ] as const) {
+      expect(source, pagePath).toContain(smokeId);
+      expect(source, pagePath).toContain("getBenchmarkArchiveSaveErrorMessage");
+      expect(source, pagePath).toContain("archiveWarning");
+      expect(source, pagePath).toContain('role="alert"');
+    }
+
+    expect(spontaneousPage).toContain("benchmark 录音未保存");
+    expect(spontaneousPage).toContain("录音已作为 benchmark 保存。");
+    expect(spontaneousPage).toContain("? \"这次即兴内容没有命中当前弱点词");
+  });
 });
