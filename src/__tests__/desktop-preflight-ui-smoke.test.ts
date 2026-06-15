@@ -111,6 +111,8 @@ describe("desktop preflight and UI smoke", () => {
     expect(script).toContain("scoringTileAudioPolicy=ok");
     expect(script).toContain("usage-history-target");
     expect(script).toContain("pronunciation-test-row");
+    expect(script).toContain("data-control-api-key-toggle-row");
+    expect(script).toContain("settings reset-data dialog toggle row");
     expect(script).toContain("azure-config-actions");
     expect(script).toContain("tts-config-actions");
     expect(script).toContain("llm-config-actions");
@@ -219,6 +221,12 @@ describe("desktop preflight and UI smoke", () => {
     expect(dataControlCard).toContain('data-smoke="data-control-status"');
     expect(dataControlCard).toContain(
       'data-smoke="data-control-dialog-status"',
+    );
+    expect(dataControlCard).toContain(
+      'data-smoke="data-control-api-key-toggle-row"',
+    );
+    expect(dataControlCard).toContain(
+      "flex flex-col gap-3 rounded-lg border bg-muted/25 p-3 sm:flex-row sm:items-center sm:justify-between",
     );
     expect(dataControlCard).toContain(
       'role={status.tone === "error" ? "alert" : "status"}',

@@ -164,6 +164,9 @@ git status --short --branch
   wrap-ready layout. Their connection status text keeps long Chinese
   provider/network messages visible, and Release EXE smoke checks the rows for
   wrapping plus child-control overlap.
+- Settings data/privacy reset-all-data dialog now keeps the `同时删除 API keys`
+  explanation readable beside or above the switch. Release EXE smoke opens the
+  dialog and checks the toggle row for readable text and child-control overlap.
 - Quick diagnosis word and paragraph recording cards now show recorder startup
   errors and Azure scoring errors inline with `role="alert"`, so missing
   microphone permission, missing Azure keys, network failure, or quota failure

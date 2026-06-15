@@ -772,6 +772,119 @@ async function assertSettings(cdp) {
   if (!result?.ok) {
     throw new Error(`Settings UI smoke failed: ${result?.bodyText ?? ""}`);
   }
+
+  const openedResetDialog = await evaluate(
+    cdp,
+    `
+(() => {
+  const resetButton = [...document.querySelectorAll("button")].find(
+    (button) => button.innerText.trim() === "重置本机数据"
+  );
+  if (!resetButton) {
+    return {
+      ok: false,
+      reason: "missing-reset-button",
+      bodyText: (document.body?.innerText ?? "").slice(0, 800)
+    };
+  }
+  resetButton.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window }));
+  return { ok: true };
+})()
+`,
+  );
+  if (!openedResetDialog?.ok) {
+    throw new Error(
+      `Settings data-control reset dialog could not open: ${JSON.stringify(
+        openedResetDialog,
+      )}`,
+    );
+  }
+
+  const resetDialogResult = await waitForCondition(
+    cdp,
+    `
+(() => {
+  const row = document.querySelector('[data-smoke="data-control-api-key-toggle-row"]');
+  const childrenDoNotOverlap = (element) => {
+    const children = [...element.children].filter((child) => {
+      const rect = child.getBoundingClientRect();
+      return rect.width > 0 && rect.height > 0;
+    });
+    return children.every((child, index) => {
+      const rect = child.getBoundingClientRect();
+      return children.every((other, otherIndex) => {
+        if (index >= otherIndex) return true;
+        const otherRect = other.getBoundingClientRect();
+        return (
+          rect.right <= otherRect.left ||
+          otherRect.right <= rect.left ||
+          rect.bottom <= otherRect.top ||
+          otherRect.bottom <= rect.top
+        );
+      });
+    });
+  };
+  const label = row?.querySelector("div");
+  const labelWraps = label ? (() => {
+    const style = window.getComputedStyle(label);
+    return (
+      style.textOverflow !== "ellipsis" &&
+      style.whiteSpace !== "nowrap" &&
+      style.webkitLineClamp !== "1" &&
+      label.scrollWidth <= label.clientWidth + 2
+    );
+  })() : false;
+  return {
+    ok:
+      Boolean(row) &&
+      row.scrollWidth <= row.clientWidth + 2 &&
+      childrenDoNotOverlap(row) &&
+      labelWraps,
+    rowExists: Boolean(row),
+    rowScrollWidth: row?.scrollWidth ?? 0,
+    rowClientWidth: row?.clientWidth ?? 0,
+    labelWraps,
+    bodyText: (document.body?.innerText ?? "").slice(0, 800)
+  };
+})()
+`,
+    "settings reset-data dialog toggle row",
+  );
+  if (!resetDialogResult?.ok) {
+    throw new Error(
+      `Settings data-control reset dialog smoke failed: ${JSON.stringify(
+        resetDialogResult,
+      )}`,
+    );
+  }
+
+  await evaluate(
+    cdp,
+    `
+(() => {
+  const cancelButton = [...document.querySelectorAll("button")].find(
+    (button) => button.innerText.trim() === "取消"
+  );
+  cancelButton?.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window }));
+  return { ok: true };
+})()
+`,
+  );
+  await waitForCondition(
+    cdp,
+    `
+(() => ({
+  ok:
+    !document.querySelector('[data-smoke="data-control-api-key-toggle-row"]') &&
+    ![...document.querySelectorAll('[role="dialog"]')].some((dialog) =>
+      dialog.innerText.includes("重置本机数据？")
+    ),
+  bodyText: (document.body?.innerText ?? "").slice(0, 500)
+}))()
+`,
+    "settings reset-data dialog to close",
+  );
+  await delay(250);
 }
 
 async function assertDetail(cdp, language) {

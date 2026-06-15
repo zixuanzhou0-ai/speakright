@@ -363,8 +363,11 @@ export function DataControlCard() {
             </div>
           )}
           {confirmAction === "all-data" && (
-            <div className="flex items-center justify-between gap-4 rounded-lg border bg-muted/25 p-3">
-              <div>
+            <div
+              className="flex flex-col gap-3 rounded-lg border bg-muted/25 p-3 sm:flex-row sm:items-center sm:justify-between"
+              data-smoke="data-control-api-key-toggle-row"
+            >
+              <div className="min-w-0 break-words [overflow-wrap:anywhere]">
                 <p className="text-sm font-medium">同时删除 API keys</p>
                 <p className="text-xs text-muted-foreground">
                   关闭时会保留 Azure、ElevenLabs、LLM 和词典密钥，便于重置后继续使用。
@@ -374,6 +377,7 @@ export function DataControlCard() {
                 checked={resetIncludesApiKeys}
                 onCheckedChange={setResetIncludesApiKeys}
                 aria-label="同时删除 API keys"
+                className="shrink-0"
               />
             </div>
           )}
