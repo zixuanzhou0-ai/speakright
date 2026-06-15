@@ -8,15 +8,26 @@ import {
 } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const mocks = vi.hoisted(() => ({
-  fetchElevenLabsUsage: vi.fn(async () => ({
-    characterCount: 120,
-    characterLimit: 10_000,
-    nextResetUnix: Math.floor(Date.now() / 1000) + 86_400,
-  })),
-  secureStore: new Map<string, unknown>(),
-  store: new Map<string, unknown>(),
-}));
+const mocks = vi.hoisted(() => {
+  const secureStore = new Map<string, unknown>();
+  const store = new Map<string, unknown>();
+
+  return {
+    fetchElevenLabsUsage: vi.fn(async () => ({
+      characterCount: 120,
+      characterLimit: 10_000,
+      nextResetUnix: Math.floor(Date.now() / 1000) + 86_400,
+    })),
+    secureStore,
+    secureStoreDelete: vi.fn(async (key: string) => {
+      secureStore.delete(key);
+    }),
+    store,
+    storeDelete: vi.fn(async (key: string) => {
+      store.delete(key);
+    }),
+  };
+});
 
 vi.mock("@/lib/tauri-runtime", () => ({
   isTauriEnvironment: () => true,
@@ -29,9 +40,7 @@ vi.mock("@/lib/secure-store", () => ({
   secureStoreSet: vi.fn(async (key: string, value: unknown) => {
     mocks.secureStore.set(key, value);
   }),
-  secureStoreDelete: vi.fn(async (key: string) => {
-    mocks.secureStore.delete(key);
-  }),
+  secureStoreDelete: mocks.secureStoreDelete,
 }));
 
 vi.mock("@/lib/tauri-store", () => ({
@@ -39,9 +48,7 @@ vi.mock("@/lib/tauri-store", () => ({
   storeSet: vi.fn(async (key: string, value: unknown) => {
     mocks.store.set(key, value);
   }),
-  storeDelete: vi.fn(async (key: string) => {
-    mocks.store.delete(key);
-  }),
+  storeDelete: mocks.storeDelete,
 }));
 
 vi.mock("@/lib/api-client", () => ({
@@ -63,6 +70,12 @@ describe("settings key hydration", () => {
     localStorage.clear();
     mocks.secureStore.clear();
     mocks.store.clear();
+    mocks.secureStoreDelete.mockImplementation(async (key: string) => {
+      mocks.secureStore.delete(key);
+    });
+    mocks.storeDelete.mockImplementation(async (key: string) => {
+      mocks.store.delete(key);
+    });
   });
 
   afterEach(() => {
@@ -305,5 +318,30 @@ describe("settings key hydration", () => {
     await waitFor(() => {
       expect(screen.getByText("2/3")).toBeInTheDocument();
     });
+  });
+
+  it("keeps data privacy delete failures visible inline", async () => {
+    const { DataControlCard } = await import(
+      "@/components/settings/data-control-card"
+    );
+    mocks.secureStoreDelete.mockRejectedValueOnce(
+      new Error("keychain delete failed"),
+    );
+
+    render(<DataControlCard />);
+
+    fireEvent.click(screen.getByRole("button", { name: "删除 API keys" }));
+    const confirmButtons = screen.getAllByRole("button", {
+      name: "删除 API keys",
+    });
+    fireEvent.click(confirmButtons[confirmButtons.length - 1]);
+
+    const alert = await screen.findByRole("alert");
+
+    expect(alert).toHaveTextContent("删除 API keys 失败");
+    expect(alert).toHaveTextContent("本机安全存储或设置存储不可用");
+    expect(
+      document.querySelector('[data-smoke="data-control-status"]'),
+    ).not.toBeNull();
   });
 });

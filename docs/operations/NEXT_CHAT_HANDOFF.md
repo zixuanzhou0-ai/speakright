@@ -117,6 +117,10 @@ git status --short --branch
 - Settings usage monitor now shows an explicit first-run ElevenLabs empty state:
   sentence/phrase demos need an API Key, while local word audio and built-in
   language-pack audio can still be used.
+- Settings data/privacy center now keeps export, diagnostics, delete, and reset
+  results visible inline. Storage/keychain/IndexedDB/quota/permission failures
+  are converted to Chinese recovery messages with `role="alert"` instead of
+  relying only on a short toast.
 - Spanish `词重音` and `音节节奏`, and French `词尾静音`, had duplicate examples
   reduced. Continue auditing all Spanish/French/Russian units for repeated text.
 - Spanish video buttons were shortened and allowed to wrap so they do not crowd

@@ -39,6 +39,10 @@ type ConfirmAction =
   | "benchmark-audio"
   | "all-data"
   | null;
+type DataControlStatus = {
+  tone: "success" | "error";
+  message: string;
+};
 
 const COPY: Record<
   Exclude<ConfirmAction, null>,
@@ -70,11 +74,53 @@ const COPY: Record<
   },
 };
 
+function containsChineseText(message: string): boolean {
+  return /[\u4e00-\u9fff]/.test(message);
+}
+
+function getDataControlErrorMessage(
+  error: unknown,
+  fallback: string,
+): string {
+  const rawMessage = error instanceof Error ? error.message.trim() : "";
+
+  if (rawMessage && containsChineseText(rawMessage)) {
+    return rawMessage;
+  }
+
+  const lowerMessage = rawMessage.toLowerCase();
+
+  if (/keychain|secure|credential|settings store|tauri store/.test(lowerMessage)) {
+    return `${fallback}：本机安全存储或设置存储不可用，请重启应用后重试。`;
+  }
+
+  if (/indexeddb|database|\bidb\b/.test(lowerMessage)) {
+    return `${fallback}：本机 IndexedDB 数据库不可用，请关闭其它 SpeakRight 窗口后重试，必要时重启应用。`;
+  }
+
+  if (/quota|space|full|storage/.test(lowerMessage)) {
+    return `${fallback}：本机存储空间可能不足，请清理磁盘空间或应用缓存后重试。`;
+  }
+
+  if (/permission|denied|blocked|access/.test(lowerMessage)) {
+    return `${fallback}：没有足够权限写入或删除本机数据，请检查文件下载权限或系统安全设置后重试。`;
+  }
+
+  return `${fallback}：本机操作没有完成，请重试；若仍失败，请查看桌面运行日志或截图反馈。`;
+}
+
+function getDataControlStatusClassName(tone: DataControlStatus["tone"]): string {
+  return tone === "error"
+    ? "rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive break-words [overflow-wrap:anywhere]"
+    : "rounded-lg border border-primary/25 bg-primary/5 p-3 text-sm text-foreground break-words [overflow-wrap:anywhere]";
+}
+
 export function DataControlCard() {
   const [confirmAction, setConfirmAction] = useState<ConfirmAction>(null);
   const [summaryVersion, setSummaryVersion] = useState(0);
   const [busy, setBusy] = useState(false);
   const [resetIncludesApiKeys, setResetIncludesApiKeys] = useState(false);
+  const [status, setStatus] = useState<DataControlStatus | null>(null);
   const [summary, setSummary] = useState(() => getLocalDataSummary());
   const copy = confirmAction ? COPY[confirmAction] : null;
 
@@ -91,14 +137,23 @@ export function DataControlCard() {
     setConfirmAction(null);
     setResetIncludesApiKeys(false);
   };
+  const openDialog = (action: Exclude<ConfirmAction, null>) => {
+    setStatus(null);
+    setConfirmAction(action);
+  };
 
   const handleExport = async () => {
     setBusy(true);
+    setStatus(null);
     try {
       await downloadLocalDataExport();
-      toast.success("本地学习数据已导出");
+      const message = "本地学习数据已导出，导出文件不包含 API keys。";
+      setStatus({ tone: "success", message });
+      toast.success(message);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "导出失败");
+      const message = getDataControlErrorMessage(error, "导出学习数据失败");
+      setStatus({ tone: "error", message });
+      toast.error(message);
     } finally {
       setBusy(false);
     }
@@ -106,11 +161,16 @@ export function DataControlCard() {
 
   const handleDiagnosticsExport = async () => {
     setBusy(true);
+    setStatus(null);
     try {
       await downloadDesktopSupportBundle();
-      toast.success("桌面诊断包已导出");
+      const message = "桌面诊断包已导出，诊断包不包含 API keys 或原始录音。";
+      setStatus({ tone: "success", message });
+      toast.success(message);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "诊断包导出失败");
+      const message = getDataControlErrorMessage(error, "诊断包导出失败");
+      setStatus({ tone: "error", message });
+      toast.error(message);
     } finally {
       setBusy(false);
     }
@@ -119,28 +179,40 @@ export function DataControlCard() {
   const handleConfirm = async () => {
     if (!confirmAction) return;
     setBusy(true);
+    setStatus(null);
     try {
+      let message = "";
       if (confirmAction === "learning") {
         await deleteLearningData();
-        toast.success("学习数据已删除");
+        message = "学习数据已删除，API keys 已保留。";
       } else if (confirmAction === "api-keys") {
         await deleteApiKeys();
-        toast.success("API keys 已删除");
+        message = "API keys 已删除。";
       } else if (confirmAction === "all-data") {
         await deleteAllLocalData({ includeApiKeys: resetIncludesApiKeys });
-        toast.success(
-          resetIncludesApiKeys
-            ? "本机数据和 API keys 已重置"
-            : "本机数据已重置，API keys 已保留",
-        );
+        message = resetIncludesApiKeys
+          ? "本机数据和 API keys 已重置。"
+          : "本机数据已重置，API keys 已保留。";
       } else {
         await deleteBenchmarkAudioData();
-        toast.success("Benchmark 音频已清空");
+        message = "Benchmark 音频已清空。";
       }
+      setStatus({ tone: "success", message });
+      toast.success(message);
       closeDialog();
       refresh();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "操作失败");
+      const fallback =
+        confirmAction === "learning"
+          ? "删除学习数据失败"
+          : confirmAction === "api-keys"
+            ? "删除 API keys 失败"
+            : confirmAction === "all-data"
+              ? "重置本机数据失败"
+              : "清空 benchmark 音频失败";
+      const message = getDataControlErrorMessage(error, fallback);
+      setStatus({ tone: "error", message });
+      toast.error(message);
     } finally {
       setBusy(false);
     }
@@ -194,6 +266,17 @@ export function DataControlCard() {
             诊断包只包含版本信息、数据摘要和桌面运行日志尾部，不包含 API keys 或原始录音。
           </div>
 
+          {status && (
+            <div
+              aria-live={status.tone === "error" ? "assertive" : "polite"}
+              className={getDataControlStatusClassName(status.tone)}
+              data-smoke="data-control-status"
+              role={status.tone === "error" ? "alert" : "status"}
+            >
+              {status.message}
+            </div>
+          )}
+
           <div className="flex flex-wrap gap-2">
             <Button
               type="button"
@@ -217,7 +300,7 @@ export function DataControlCard() {
             <Button
               type="button"
               variant="outline"
-              onClick={() => setConfirmAction("all-data")}
+              onClick={() => openDialog("all-data")}
               disabled={busy}
               className="gap-2"
             >
@@ -227,7 +310,7 @@ export function DataControlCard() {
             <Button
               type="button"
               variant="outline"
-              onClick={() => setConfirmAction("learning")}
+              onClick={() => openDialog("learning")}
               disabled={busy}
               className="gap-2"
             >
@@ -237,7 +320,7 @@ export function DataControlCard() {
             <Button
               type="button"
               variant="outline"
-              onClick={() => setConfirmAction("benchmark-audio")}
+              onClick={() => openDialog("benchmark-audio")}
               disabled={busy}
               className="gap-2"
             >
@@ -247,7 +330,7 @@ export function DataControlCard() {
             <Button
               type="button"
               variant="destructive"
-              onClick={() => setConfirmAction("api-keys")}
+              onClick={() => openDialog("api-keys")}
               disabled={busy}
               className="gap-2"
             >
@@ -269,6 +352,16 @@ export function DataControlCard() {
             <DialogTitle>{copy?.title}</DialogTitle>
             <DialogDescription>{copy?.description}</DialogDescription>
           </DialogHeader>
+          {status?.tone === "error" && (
+            <div
+              aria-live="assertive"
+              className={getDataControlStatusClassName("error")}
+              data-smoke="data-control-dialog-status"
+              role="alert"
+            >
+              {status.message}
+            </div>
+          )}
           {confirmAction === "all-data" && (
             <div className="flex items-center justify-between gap-4 rounded-lg border bg-muted/25 p-3">
               <div>

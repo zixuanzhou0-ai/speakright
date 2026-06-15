@@ -170,6 +170,27 @@ describe("desktop preflight and UI smoke", () => {
     expect(llmCard).toContain("break-words");
   });
 
+  it("keeps Settings data-control operation results visible inline", () => {
+    const dataControlCard = readProjectFile(
+      "src/components/settings/data-control-card.tsx",
+    );
+
+    expect(dataControlCard).toContain('data-smoke="data-control-status"');
+    expect(dataControlCard).toContain(
+      'data-smoke="data-control-dialog-status"',
+    );
+    expect(dataControlCard).toContain(
+      'role={status.tone === "error" ? "alert" : "status"}',
+    );
+    expect(dataControlCard).toContain("getDataControlErrorMessage");
+    expect(dataControlCard).toContain("导出学习数据失败");
+    expect(dataControlCard).toContain("删除 API keys 失败");
+    expect(dataControlCard).toContain("本机安全存储或设置存储不可用");
+    expect(dataControlCard).toContain("overflow-wrap:anywhere");
+    expect(dataControlCard).toContain("toast.error(message)");
+    expect(dataControlCard).toContain("toast.success(message)");
+  });
+
   it("keeps quick assessment recording and scoring failures visible inline", () => {
     const assessmentPage = readProjectFile("src/app/assessment/page.tsx");
     const recorderAlerts =

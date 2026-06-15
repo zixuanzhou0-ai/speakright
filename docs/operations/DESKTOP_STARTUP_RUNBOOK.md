@@ -64,7 +64,9 @@ npm run desktop:launch-release
 5. Begin manual QA with this order:
 
 - Settings: confirm language switch, Azure, ElevenLabs, LLM, data/privacy, and
-  release info are visible.
+  release info are visible; data/privacy export, diagnostics, delete, and reset
+  operations should keep success or failure visible inline in Chinese rather
+  than relying only on a short toast.
 - English: open phoneme list, then five phoneme detail pages; play target sound,
   example word, record, replay the recording, and score once.
 - Spanish, French, and Russian: switch each language, open the sound-unit list,
