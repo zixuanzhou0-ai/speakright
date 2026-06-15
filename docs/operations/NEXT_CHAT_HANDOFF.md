@@ -167,6 +167,9 @@ git status --short --branch
   restarting a course, moving items/levels, retrying, and starting normal or
   remediation recording, so stale reference-audio/TTS errors do not linger into
   the scoring card.
+- Pack-runner normal scoring and remediation scoring buttons now switch to
+  `重新评分` / `重新评分这一步` when an Azure assessment error is visible, making
+  same-recording retry explicit.
 - Recorder runtime interruptions are no longer treated as usable recordings.
   If `MediaRecorder.onerror` fires after recording starts, the hook stops the
   stream, discards any partial audio, and shows a Chinese recovery message about

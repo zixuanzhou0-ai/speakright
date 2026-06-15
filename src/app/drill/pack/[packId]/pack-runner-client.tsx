@@ -1730,6 +1730,10 @@ function RecordingStep({
   const itemText = item.displayText ?? item.text;
   const itemDensity = getPracticeTextDensity(itemText);
   const ipaDensity = getPracticeTextDensity(item.ipa ?? "", "phrase");
+  const scoreButtonLabel = assessmentError ? "重新评分" : "提交评分";
+  const remediationScoreButtonLabel = assessmentError
+    ? "重新评分这一步"
+    : "给这一步评分";
 
   return (
     <motion.div
@@ -1802,10 +1806,15 @@ function RecordingStep({
             <Button
               onClick={onSubmit}
               disabled={scoreDisabled}
+              data-smoke="pack-runner-submit-score"
               className="gap-2 cursor-pointer"
             >
-              <Mic className="h-4 w-4" />
-              提交评分
+              {assessmentError ? (
+                <RotateCcw className="h-4 w-4" />
+              ) : (
+                <Mic className="h-4 w-4" />
+              )}
+              {scoreButtonLabel}
             </Button>
           )}
           {isAssessing && (
@@ -1941,10 +1950,15 @@ function RecordingStep({
                         onClick={() => onSubmitRemediationStep(remediation)}
                         disabled={scoreDisabled}
                         size="sm"
+                        data-smoke="pack-runner-remediation-submit-score"
                         className="mt-2 gap-2 cursor-pointer"
                       >
-                        <Mic className="h-4 w-4" />
-                        给这一步评分
+                        {assessmentError ? (
+                          <RotateCcw className="h-4 w-4" />
+                        ) : (
+                          <Mic className="h-4 w-4" />
+                        )}
+                        {remediationScoreButtonLabel}
                       </Button>
                     )}
                   {isAssessing && (

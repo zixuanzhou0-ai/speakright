@@ -318,6 +318,13 @@ describe("desktop preflight and UI smoke", () => {
       'data-smoke="pack-runner-reference-audio-error"',
     );
     expect(packRunner).toContain('data-smoke="pack-runner-assessment-error"');
+    expect(packRunner).toContain('data-smoke="pack-runner-submit-score"');
+    expect(packRunner).toContain(
+      'data-smoke="pack-runner-remediation-submit-score"',
+    );
+    expect(packRunner).toContain('assessmentError ? "重新评分" : "提交评分"');
+    expect(packRunner).toContain("remediationScoreButtonLabel");
+    expect(packRunner).toContain("重新评分这一步");
     expect(packRunner).toContain("referenceError={wordAudio.error ?? tts.error}");
     expect(packRunner).toContain(
       "assessmentError={recorder.error ?? azure.error}",
