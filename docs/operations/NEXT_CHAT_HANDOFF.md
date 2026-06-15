@@ -405,6 +405,11 @@ git status --short --branch
   separated. Word and sentence drill recording cards render `recorderError`
   inline, so a failed microphone start is visible to the learner instead of
   leaving the drill card in a quiet idle state.
+- Recording waveform rendering now fails soft. If live waveform setup cannot
+  create a Web Audio context, or if the saved recording waveform cannot load,
+  the shared `WaveformDisplay` shows a Chinese `waveform-display-warning`
+  status while keeping the recording usable for replay, re-recording, or
+  scoring.
 - First-run microphone readiness failures now show actionable Chinese hints in
   the readiness checklist. Unsupported microphone checking, denied permission,
   low input signal, and too-short samples no longer rely on English exceptions
@@ -498,6 +503,9 @@ Current gate summary:
 - Focused recorder-startup tests passed: `2` files and `11` tests, covering
   actionable microphone error messages, stream cleanup after recorder
   initialization failure, and visible drill-card errors.
+- Focused waveform degraded-state tests passed: `1` file and `3` tests,
+  covering live waveform fallback, warning cleanup after recording stops, and
+  saved recording waveform load failure.
 - Focused desktop-readiness microphone tests passed: `2` files and `8` tests,
   covering low-signal/too-short Chinese errors plus unsupported and denied
   microphone-check checklist hints.
@@ -515,10 +523,12 @@ Current gate summary:
 - Focused phoneme detail presentation tests passed: `2` files and `9` tests,
   covering non-English full text visibility, Russian long Cyrillic rule text,
   and task-accurate A/B playback labels.
-- Full tests passed: `114` files and `634` tests.
-- Typecheck, lint (`375` files checked), and static desktop frontend build
+- Full tests passed: `115` files and `638` tests.
+- Typecheck, lint (`376` files checked), and static desktop frontend build
   passed.
-- Release EXE build passed and rebuilt EXE, MSI, and NSIS artifacts.
+- Release EXE build passed and rebuilt EXE, MSI, and NSIS artifacts after one
+  first attempt exceeded the 10-minute tool timeout; the rerun completed
+  successfully with a longer timeout.
 - Release EXE preflight passed; no localhost startup is part of the release
   path. During the pre-commit verification run it correctly reported the
   expected dirty worktree from this local fix.
@@ -537,7 +547,7 @@ Current gate summary:
   intro card plus start/passage actions instead of only checking the page
   container.
 - Release EXE launch passed from the static Tauri bundle, and the test process
-  was closed after verification; the latest launch PID was `61496`.
+  was closed after verification; the latest launch PID was `20748`.
 - No ElevenLabs generation or TTS spend is part of this validation path.
 
 For tomorrow's manual test session, start with:

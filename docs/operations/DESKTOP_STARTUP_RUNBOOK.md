@@ -83,8 +83,10 @@ reminder that it does not start localhost or the Next dev server.
   missing-key setup states in Settings, keep bundled local audio usable without
   network access where assets exist, show Chinese provider/network errors for
   online scoring/TTS/fallback failures, show inline Chinese microphone recovery
-  messages, and never replace missing local sound-unit audio with browser TTS,
-  proxy rule audio, teaching-video audio, or an unrelated sample.
+  messages, show a Chinese non-blocking status if the waveform renderer cannot
+  display a live or saved recording shape, and never replace missing local
+  sound-unit audio with browser TTS, proxy rule audio, teaching-video audio, or
+  an unrelated sample.
 - Startup data checks: if local learning-data migration or quarantine cannot
   read/write local storage, the app should still continue startup, keep API key
   hydration running, and show a Chinese warning telling the learner to use
@@ -462,6 +464,9 @@ release notes and installation guide keep the unsigned warning visible.
   - Focused drill diagnosis-report storage tests: `2` files and `18` tests
     passed, covering corrupted/blocked saved report reads and static Release
     smoke coverage for the `/drill` recovery alert.
+  - Focused waveform degraded-state tests: `1` file and `3` tests passed,
+    covering live waveform fallback, warning cleanup after recording stops, and
+    saved recording waveform load failure.
   - Focused exact scoring-audio tests: `6` files and `57` tests passed,
     including left/right header-clip parity, Spanish/French/Russian exact alias
     inventory, unclickable unverified tiles, and header/scoring short playback.
@@ -483,11 +488,12 @@ release notes and installation guide keep the unsigned warning visible.
   - Latest settled-main validation results are centralized in
     `docs/operations/RC_EVIDENCE_AUDIT.md` to avoid stale counts across
     multiple handoff documents.
-  - `npm.cmd run test` passed with `114` files and `634` tests;
-    `npm.cmd run typecheck`, `npm.cmd run lint` (`375` files checked), and
+  - `npm.cmd run test` passed with `115` files and `638` tests;
+    `npm.cmd run typecheck`, `npm.cmd run lint` (`376` files checked), and
     `npm.cmd run build:desktop-frontend` passed in the latest settled-main
     gate.
-  - `npm.cmd run desktop:build`: passed; rebuilt Release EXE, MSI, and NSIS.
+  - `npm.cmd run desktop:build`: passed; rebuilt Release EXE, MSI, and NSIS
+    after a longer-timeout rerun.
   - `npm.cmd run desktop:preflight`: passed.
   - `npm.cmd run desktop:ui-smoke`: passed from Release EXE with centered target
     text assertions, scoring-breakdown visibility/readability checks in normal,

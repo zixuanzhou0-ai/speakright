@@ -378,6 +378,22 @@ describe("desktop preflight and UI smoke", () => {
     expect(recorderHook).toContain("录音过程中");
   });
 
+  it("keeps waveform rendering failures visible without blocking recording", () => {
+    const waveformDisplay = readProjectFile(
+      "src/components/audio/waveform-display.tsx",
+    );
+
+    expect(waveformDisplay).toContain("LIVE_WAVEFORM_WARNING");
+    expect(waveformDisplay).toContain("SAVED_WAVEFORM_WARNING");
+    expect(waveformDisplay).toContain("录音波形暂时不可用");
+    expect(waveformDisplay).toContain("录音仍会继续");
+    expect(waveformDisplay).toContain("录音已保留");
+    expect(waveformDisplay).toContain('data-smoke="waveform-display-warning"');
+    expect(waveformDisplay).toContain('role="status"');
+    expect(waveformDisplay).toContain("getAudioContextConstructor");
+    expect(waveformDisplay).toContain('ws.on("error"');
+  });
+
   it("keeps advanced drill provider failures visible inline", () => {
     const drillPage = readProjectFile("src/app/drill/page.tsx");
     const drillReportStorage = readProjectFile(
