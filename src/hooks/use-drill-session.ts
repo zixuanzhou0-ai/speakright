@@ -338,7 +338,10 @@ export function useDrillSession(
     } else {
       dispatch({
         type: "ASSESS_ERROR",
-        message: azure.error || "评分失败，请重试",
+        message:
+          azure.getLastError() ??
+          azure.error ??
+          "评分失败：请检查 Azure Speech API 密钥、区域、网络或代理后重试。",
       });
     }
   }, [

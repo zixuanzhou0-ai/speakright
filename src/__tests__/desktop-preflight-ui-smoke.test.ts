@@ -250,6 +250,7 @@ describe("desktop preflight and UI smoke", () => {
     const scenariosPage = readProjectFile("src/app/drill/scenarios/page.tsx");
     const spontaneousPage = readProjectFile("src/app/drill/spontaneous/page.tsx");
     const azureHook = readProjectFile("src/hooks/use-azure-assessment.ts");
+    const drillSessionHook = readProjectFile("src/hooks/use-drill-session.ts");
 
     expect(prosodyPage).toContain('data-smoke="prosody-demo-audio-error"');
     expect(prosodyPage).toContain('data-smoke="prosody-assessment-error"');
@@ -272,6 +273,12 @@ describe("desktop preflight and UI smoke", () => {
 
     expect(azureHook).toContain("Azure Speech API 密钥和区域");
     expect(azureHook).toContain("回到本页重新评分");
+
+    expect(drillSessionHook).toContain("azure.getLastError()");
+    expect(drillSessionHook).toContain(
+      "评分失败：请检查 Azure Speech API 密钥、区域、网络或代理后重试。",
+    );
+    expect(drillSessionHook).not.toContain('azure.error || "评分失败，请重试"');
   });
 
   it("keeps contrast, perception, and pack-runner failures visible inline", () => {

@@ -77,8 +77,9 @@ npm run desktop:launch-release
   replay the recording, and score once.
 - Drill, free practice, and diagnosis: check that missing/low evidence never
   presents a confident perfect diagnosis for experimental languages. In both
-  quick diagnosis and full-passage diagnosis, microphone and Azure failures
-  should appear inline in Chinese with a clear recovery path.
+  word/sentence drill sessions, quick diagnosis, and full-passage diagnosis,
+  microphone and Azure failures should appear inline in Chinese with a clear
+  recovery path.
 - Progress archive: if a benchmark list record remains but the local audio blob
   is missing, playback should show an inline Chinese warning instead of doing
   nothing; delete/clear failures should also stay visible inline.
