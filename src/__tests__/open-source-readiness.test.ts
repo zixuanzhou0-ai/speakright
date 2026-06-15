@@ -71,6 +71,7 @@ describe("open-source readiness files", () => {
       ".env.example",
       ".github/ISSUE_TEMPLATE/bug_report.md",
       ".github/ISSUE_TEMPLATE/ipa_audit.md",
+      ".github/ISSUE_TEMPLATE/audio_provider_request.md",
       ".github/ISSUE_TEMPLATE/feature_request.md",
       ".github/pull_request_template.md",
     ]) {
@@ -102,10 +103,12 @@ describe("open-source readiness files", () => {
     expect(contributing).toContain("SUPPORT.md");
     expect(contributing).toContain("Release EXE");
     expect(contributing).toContain("Do not generate ElevenLabs audio");
+    expect(contributing).toContain("audio/provider issue template");
     expect(contributing).toContain("Spanish, French, and Russian are experimental");
     expect(support).toContain("Release EXE");
     expect(support).toContain("SECURITY.md");
     expect(support).toContain("needs-review");
+    expect(support).toContain("audio/provider issue template");
     expect(support).toContain("Do not ask contributors to generate ElevenLabs audio");
     expect(security).toContain("Windows artifacts are currently unsigned");
   });
@@ -114,6 +117,7 @@ describe("open-source readiness files", () => {
     const bugReport = read(".github/ISSUE_TEMPLATE/bug_report.md");
     const featureRequest = read(".github/ISSUE_TEMPLATE/feature_request.md");
     const ipaAudit = read(".github/ISSUE_TEMPLATE/ipa_audit.md");
+    const audioProvider = read(".github/ISSUE_TEMPLATE/audio_provider_request.md");
     const pullRequest = read(".github/pull_request_template.md");
 
     expect(bugReport).toContain("Release EXE");
@@ -130,6 +134,14 @@ describe("open-source readiness files", () => {
     expect(ipaAudit).toContain("deck-focus-hint");
     expect(ipaAudit).toContain("needs-review");
     expect(ipaAudit).toContain("CODE_OF_CONDUCT.md");
+    expect(audioProvider).toContain("Missing bundled local audio");
+    expect(audioProvider).toContain("wrong source");
+    expect(audioProvider).toContain("Loudness or clipping mismatch");
+    expect(audioProvider).toContain("paid provider");
+    expect(audioProvider).toContain("Release EXE or installer");
+    expect(audioProvider).toContain("Do not attach API keys");
+    expect(audioProvider).toContain("without explicit maintainer approval");
+    expect(audioProvider).toContain("Spanish, French, and Russian remain experimental");
     expect(pullRequest).toContain("I did not use localhost/dev server");
     expect(pullRequest).toContain("I did not generate ElevenLabs audio");
     expect(pullRequest).toContain("Spanish, French, and Russian remain experimental");

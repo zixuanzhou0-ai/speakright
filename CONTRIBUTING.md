@@ -17,6 +17,10 @@ Do not use the older browser workspace for desktop release work.
 Use `SUPPORT.md` when you are unsure whether a report belongs in a public issue,
 an IPA audit issue, or a private security report.
 
+Use the audio/provider issue template for missing bundled audio, wrong
+clickable audio sources, loudness mismatches, or requests that would spend
+ElevenLabs or another paid-provider quota.
+
 ## Development Setup
 
 ```bat

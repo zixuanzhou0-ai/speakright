@@ -142,7 +142,7 @@ before the local RC audit: `94be1d4`.
   policy.
 - Public-release blocker: Windows EXE/MSI/NSIS artifacts are still unsigned.
 
-For the 2026-06-14 internal-test pass, use the installed app or Release EXE
+For the 2026-06-15 internal-test pass, use the installed app or Release EXE
 first. Only rebuild if the executable is missing, stale after code changes, or
 manual QA finds a bug that needs a code fix.
 

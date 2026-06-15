@@ -22,6 +22,9 @@ Use GitHub issues for:
 - Release EXE bugs that do not expose private data.
 - UI layout, text wrapping, audio playback, or scoring behavior that can be
   described without attaching private recordings.
+- Missing bundled audio, wrong clickable audio sources, loudness mismatches, or
+  paid-provider/quota requests that can be described without private data; use
+  the audio/provider issue template.
 - Feature requests that preserve the experimental-language boundary for
   Spanish, French, and Russian.
 - Sourced IPA or pronunciation audit reports that include the required evidence
@@ -62,6 +65,10 @@ French, and Russian:
 - Treat `deck-focus-hint` rows as practice focus cues, not full sentence IPA.
 
 ## Audio And Paid Provider Boundary
+
+Use the audio/provider issue template for missing local audio, audio that plays
+the wrong source, loudness or clipping mismatches, and requests that would spend
+ElevenLabs or another provider quota.
 
 Routine support should not require paid provider calls. Do not ask contributors to generate ElevenLabs audio or spend TTS credits unless a maintainer explicitly approves that exact generation pass.
 

@@ -1,6 +1,6 @@
 # Next Chat Handoff
 
-Date: 2026-06-14
+Date: 2026-06-15
 
 This file exists so the next Codex chat can continue without relying on the long
 conversation history.
@@ -36,13 +36,16 @@ E:\SpeakRightDesktopRepo\src-tauri\target\release\speakright.exe
   issue templates, PR template, and `.env.example`. The MIT license covers source
   code and source documentation; bundled media assets are explicitly documented
   as a separate rights boundary.
+- The public issue templates now include a dedicated audio/provider request
+  path for missing bundled audio, wrong clickable audio sources, loudness
+  mismatches, and quota-impacting provider requests.
 - The public conduct policy keeps accent, learner-recording, IPA, and
   experimental-language discussion respectful and evidence-first; vulnerabilities,
   leaked credentials, private recordings, and private learning-data exports are
   routed to `SECURITY.md`, not public issues.
 - `SUPPORT.md` now routes Release EXE bugs, IPA audit disputes, private
-  security/privacy reports, and paid-provider/audio-generation requests to the
-  right public or private channel.
+  security/privacy reports, audio/provider requests, and paid-provider/audio
+  generation requests to the right public or private channel.
 - Open-source readiness tests now include a tracked-text-file guard for obvious
   real private-key/API-token formats; failures report only path, line, and
   pattern name, not the matched secret text.

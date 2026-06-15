@@ -66,8 +66,8 @@ For the current Release Candidate evidence matrix, see
   redistributing packaged builds.
 - Contribution rules are in `CONTRIBUTING.md`.
 - Community behavior expectations are in `CODE_OF_CONDUCT.md`.
-- Support routing for issues, IPA audits, private reports, and paid-provider
-  boundaries is in `SUPPORT.md`.
+- Support routing for Release EXE bugs, IPA audits, audio/provider requests,
+  private reports, and paid-provider boundaries is in `SUPPORT.md`.
 - Security reporting and secret-handling guidance are in `SECURITY.md`.
 - `.env.example` is documentation only; do not commit real API keys, recordings,
   learning-data exports, tokens, or private user data.
@@ -128,8 +128,8 @@ README/docs-only changes run the lightweight Docs Check workflow.
 
 - The current Windows artifacts are for controlled testing unless code signing
   is complete.
-- Last controlled-test verification: 2026-06-13, after the RC audio playback,
-  multilingual layout, evidence, and Release EXE smoke tightening pass.
+- Last controlled-test verification: 2026-06-15, after the open-source
+  audio/provider support-routing pass and full Release EXE gate.
 - Previous release-validation baseline: `94be1d4`
   (`chore: tighten desktop release validation`).
 - Latest release-hardening pass added non-English low-evidence diagnosis gates,
@@ -158,7 +158,7 @@ README/docs-only changes run the lightweight Docs Check workflow.
 - Non-English pronunciation scoring remains experimental; `evidenceMastery`
   stays disabled for `es-ES`, `fr-FR`, and `ru-RU` until provider probes and
   language-specific evidence gates are finished.
-- Latest local RC handoff on 2026-06-14 tightened non-English practice-card
+- Recent local RC handoff updates tightened non-English practice-card
   readability, one-shot sound-unit speakers across detail and list cards,
   exact scoring-breakdown sound-unit audio,
   local A/B word-audio gain, and formal mastery/progress-archive gating. Long
