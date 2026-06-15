@@ -56,4 +56,30 @@ describe("mastery language policy", () => {
     expect(source).toContain("!canRecordHvptMastery");
     expect(source).toContain("saveMasteryProfile(nextProfile)");
   });
+
+  it("keeps formal evidence archives behind the English-only policy", () => {
+    const evidencePage = readFileSync(
+      join(process.cwd(), "src/app/drill/evidence/page.tsx"),
+      "utf8",
+    );
+    const coveragePassagePage = readFileSync(
+      join(process.cwd(), "src/app/assessment/passage/page.tsx"),
+      "utf8",
+    );
+
+    expect(evidencePage).toContain("canRecordFormalMastery(languageId)");
+    expect(evidencePage).toContain("const canShowFormalEvidence =");
+    expect(evidencePage).toContain("if (!canShowFormalEvidence)");
+    expect(evidencePage).toContain("setProfile(null)");
+    expect(evidencePage).toContain("evidence-experimental-blocker");
+    expect(evidencePage).toContain("不读取或显示正式英语 mastery");
+
+    expect(coveragePassagePage).toContain("canRecordFormalMastery(languageId)");
+    expect(coveragePassagePage).toContain("const canUseCoveragePassage =");
+    expect(coveragePassagePage).toContain("if (!canUseCoveragePassage)");
+    expect(coveragePassagePage).toContain(
+      "assessment-passage-experimental-blocker",
+    );
+    expect(coveragePassagePage).toContain("不加载英语全音覆盖文章");
+  });
 });

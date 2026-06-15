@@ -194,6 +194,12 @@ git status --short --branch
   `/drill/sentence`, and `/drill/contrast` in English context during main,
   narrow, and low-height passes and checks the initial config cards plus
   horizontal overflow.
+- Full-passage diagnosis and training evidence are now protected as English
+  advanced/formal-evidence surfaces. Direct `/assessment/passage` and
+  `/drill/evidence` access under Spanish/French/Russian shows experimental
+  blockers instead of loading English coverage passages, English training-pack
+  evidence, or formal mastery archives; English direct routes keep page hooks
+  and wrap-ready headers for Release smoke.
 - Quick diagnosis word and paragraph recording cards now show recorder startup
   errors and Azure scoring errors inline with `role="alert"`, so missing
   microphone permission, missing Azure keys, network failure, or quota failure
@@ -391,9 +397,10 @@ Current gate summary:
 - Focused perception-drill action-row tests passed: `2` files and `14` tests,
   covering inline ABX audio errors, wrap-ready result actions, and Release smoke
   route coverage for the experimental-language blocker path.
-- Focused core-drill-route smoke tests passed: `1` file and `13` tests,
-  covering word/sentence/contrast smoke hooks, wrap-ready page headers, and the
-  new English core drill route smoke assertions.
+- Focused advanced direct-route blocker tests passed: `2` files and `19` tests,
+  covering word/sentence/contrast smoke hooks, full-passage/evidence direct
+  hooks, wrap-ready page headers, and experimental-language blockers for English
+  coverage/evidence surfaces.
 - Open-source handoff/readiness plus IPA audit export drift tests passed.
 - Static language-pack manifest IPA drift tests passed for the applied French
   and Russian reviewed findings.
@@ -417,7 +424,7 @@ Current gate summary:
 - Focused phoneme detail presentation tests passed: `2` files and `9` tests,
   covering non-English full text visibility, Russian long Cyrillic rule text,
   and task-accurate A/B playback labels.
-- Full tests passed: `106` files and `596` tests.
+- Full tests passed: `106` files and `598` tests.
 - Typecheck, lint (`364` files checked), and static desktop frontend build
   passed.
 - Release EXE build passed and rebuilt EXE, MSI, and NSIS artifacts.
@@ -426,12 +433,13 @@ Current gate summary:
   expected dirty worktree from this local fix.
 - Release EXE UI smoke passed with `scoringTileAudioPolicy=ok`,
   `englishTransferRoutes=ok`, `englishCoreDrillRoutes=ok`,
-  `practiceAudioLabels=ok`, `freePracticeSmoke=ok`, `assessmentSmoke=ok`,
-  `narrowViewport=ok`, `lowHeightViewport=ok`, and
+  `advancedDirectRoutes=ok`, `practiceAudioLabels=ok`, `freePracticeSmoke=ok`,
+  `assessmentSmoke=ok`, `narrowViewport=ok`, `lowHeightViewport=ok`, and
   `releaseServedFromDevServer=false`; the smoke script now includes `/progress`
   and `/drill/perception` in the main, narrow-window, and low-height route
   passes, checks English `/drill/word`, `/drill/sentence`, `/drill/contrast`,
-  `/drill/scenarios`, and `/drill/spontaneous` pages in main/narrow/low-height
+  `/assessment/passage`, `/drill/evidence`, `/drill/scenarios`, and
+  `/drill/spontaneous` pages in main/narrow/low-height
   passes, `/sentences` waits for the actual
   free-practice page plus input/recording cards, and `/assessment` waits for the
   intro card plus start/passage actions instead of only checking the page

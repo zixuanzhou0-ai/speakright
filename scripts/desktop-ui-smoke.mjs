@@ -1592,12 +1592,142 @@ async function assertEnglishCoreDrillRoutes(cdp) {
   }
 }
 
+async function assertAdvancedDirectRoutes(cdp) {
+  await clickLanguage(cdp, "en-US");
+  const englishRoutes = [
+    {
+      path: "/assessment/passage",
+      selector: '[data-smoke="assessment-passage-page"]',
+      pageSmoke: "assessment-passage-page",
+      requiredSmokes: [
+        "assessment-passage-intro-card",
+        "assessment-passage-text-card",
+        "assessment-passage-start-button",
+      ],
+    },
+    {
+      path: "/drill/evidence",
+      selector: '[data-smoke="evidence-page"]',
+      pageSmoke: "evidence-page",
+      requiredSmokes: ["evidence-summary-stats"],
+    },
+  ];
+
+  for (const route of englishRoutes) {
+    await navigate(cdp, route.path, route.selector, { direct: true });
+    const result = await evaluate(
+      cdp,
+      `
+(() => {
+  const page = document.querySelector('[data-smoke="${route.pageSmoke}"]');
+  const requiredSmokes = ${JSON.stringify(route.requiredSmokes)};
+  const requiredReady = requiredSmokes.every((smoke) =>
+    Boolean(document.querySelector(\`[data-smoke="\${smoke}"]\`))
+  );
+  const bodyText = document.body?.innerText ?? "";
+  const readableText = [...document.querySelectorAll("h1,h2,h3,p,textarea")].every((element) => {
+    const rect = element.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) return true;
+    const style = window.getComputedStyle(element);
+    return (
+      style.textOverflow !== "ellipsis" &&
+      style.whiteSpace !== "nowrap" &&
+      style.webkitLineClamp !== "1"
+    );
+  });
+  return {
+    ok:
+      Boolean(page) &&
+      requiredReady &&
+      bodyText.trim().length > 20 &&
+      readableText &&
+      document.documentElement.scrollWidth <= window.innerWidth + 24,
+    hasPage: Boolean(page),
+    requiredReady,
+    readableText,
+    scrollWidth: document.documentElement.scrollWidth,
+    innerWidth: window.innerWidth,
+    bodyText: bodyText.slice(0, 800)
+  };
+})()
+`,
+    );
+    if (!result?.ok) {
+      throw new Error(
+        `Advanced direct route smoke failed for ${route.path}: ${JSON.stringify(
+          result,
+        )}`,
+      );
+    }
+  }
+
+  await clickLanguage(cdp, "fr-FR");
+  const experimentalRoutes = [
+    {
+      path: "/assessment/passage",
+      selector: '[data-smoke="assessment-passage-experimental-blocker"]',
+      blockerSmoke: "assessment-passage-experimental-blocker",
+    },
+    {
+      path: "/drill/evidence",
+      selector: '[data-smoke="evidence-experimental-blocker"]',
+      blockerSmoke: "evidence-experimental-blocker",
+    },
+  ];
+
+  for (const route of experimentalRoutes) {
+    await navigate(cdp, route.path, route.selector, { direct: true });
+    const result = await evaluate(
+      cdp,
+      `
+(() => {
+  const blocker = document.querySelector('[data-smoke="${route.blockerSmoke}"]');
+  const bodyText = document.body?.innerText ?? "";
+  const readableText = [...document.querySelectorAll("h1,h2,p")].every((element) => {
+    const rect = element.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) return true;
+    const style = window.getComputedStyle(element);
+    return (
+      style.textOverflow !== "ellipsis" &&
+      style.whiteSpace !== "nowrap" &&
+      style.webkitLineClamp !== "1"
+    );
+  });
+  return {
+    ok:
+      Boolean(blocker) &&
+      bodyText.includes("experimental") &&
+      bodyText.includes("mastery") &&
+      !bodyText.includes("训练证据库\\n汇总训练中的错题") &&
+      !bodyText.includes("完整朗读稿") &&
+      readableText &&
+      document.documentElement.scrollWidth <= window.innerWidth + 24,
+    hasBlocker: Boolean(blocker),
+    readableText,
+    scrollWidth: document.documentElement.scrollWidth,
+    innerWidth: window.innerWidth,
+    bodyText: bodyText.slice(0, 800)
+  };
+})()
+`,
+    );
+    if (!result?.ok) {
+      throw new Error(
+        `Experimental advanced route blocker smoke failed for ${route.path}: ${JSON.stringify(
+          result,
+        )}`,
+      );
+    }
+  }
+}
+
 async function assertNarrowViewportRoutes(cdp) {
   await setViewport(cdp, 760, 720);
   try {
     await assertSettings(cdp);
     await assertEnglishTransferRoutes(cdp);
     await assertEnglishCoreDrillRoutes(cdp);
+    await assertAdvancedDirectRoutes(cdp);
     await clickLanguage(cdp, "fr-FR");
     await navigate(
       cdp,
@@ -1793,6 +1923,7 @@ async function assertLowHeightViewportRoutes(cdp) {
 
     await assertEnglishTransferRoutes(cdp);
     await assertEnglishCoreDrillRoutes(cdp);
+    await assertAdvancedDirectRoutes(cdp);
     await clickLanguage(cdp, "ru-RU");
     await navigate(
       cdp,
@@ -2063,6 +2194,7 @@ async function smoke() {
     await assertEnglishProgressArchive(cdp);
     await assertEnglishTransferRoutes(cdp);
     await assertEnglishCoreDrillRoutes(cdp);
+    await assertAdvancedDirectRoutes(cdp);
     await clickLanguage(cdp, "fr-FR");
     await assertMainRoutes(cdp);
     await assertNarrowViewportRoutes(cdp);
@@ -2077,10 +2209,11 @@ async function smoke() {
         `details=${details
           .map((item) => `${item.languageId}:${item.slug}`)
           .join(",")}`,
-        "routes=/drill,/drill/word,/drill/sentence,/drill/contrast,/drill/prosody,/drill/perception,/sentences,/assessment,/progress",
+        "routes=/drill,/drill/word,/drill/sentence,/drill/contrast,/drill/prosody,/drill/perception,/drill/evidence,/sentences,/assessment,/assessment/passage,/progress",
         "scoringTileAudioPolicy=ok",
         "englishTransferRoutes=ok",
         "englishCoreDrillRoutes=ok",
+        "advancedDirectRoutes=ok",
         "practiceAudioLabels=ok",
         "freePracticeSmoke=ok",
         "assessmentSmoke=ok",

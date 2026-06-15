@@ -7,6 +7,7 @@ import {
   ClipboardList,
   Loader2,
   RotateCcw,
+  ShieldCheck,
   Target,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
@@ -38,6 +39,7 @@ import {
 } from "@/lib/coverage-passage";
 import { buildCoveragePassageDiagnosisReport } from "@/lib/diagnosis-engine";
 import { getLanguageProfile } from "@/lib/language-profiles";
+import { canRecordFormalMastery } from "@/lib/mastery-language-policy";
 import { getTrainingPack } from "@/lib/training-packs";
 import type {
   CoveragePassageRecording,
@@ -119,6 +121,7 @@ function getPromptForPhase(
 export default function CoveragePassageAssessmentPage() {
   const { languageId } = useLanguageConfig();
   const languageProfile = getLanguageProfile(languageId);
+  const canUseCoveragePassage = canRecordFormalMastery(languageId);
   const [savedReport, setSavedReport] = useState<DiagnosisReport | null>(() =>
     loadSavedCoverageReport(languageId),
   );
@@ -265,25 +268,80 @@ export default function CoveragePassageAssessmentPage() {
     setPhase(phase.recoverTo);
   };
 
+  if (!canUseCoveragePassage) {
+    return (
+      <div
+        className="h-full overflow-y-auto px-6 py-4 scrollbar-thin"
+        data-smoke="assessment-passage-experimental-blocker"
+      >
+        <div className="mb-5 flex flex-wrap items-start gap-3">
+          <Link
+            href="/assessment"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            aria-label="返回发音诊断"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Link>
+          <div className="min-w-0 flex-1">
+            <h1 className="break-words text-2xl font-bold [overflow-wrap:anywhere]">
+              {languageProfile.shortLabel}全音覆盖诊断
+            </h1>
+            <p className="mt-1 break-words text-sm text-muted-foreground [overflow-wrap:anywhere]">
+              当前语言仍为 experimental，不加载英语全音覆盖文章或英语训练包证据。
+            </p>
+          </div>
+        </div>
+
+        <div className="mx-auto flex min-h-[calc(100vh-12rem)] w-full max-w-2xl flex-col justify-center">
+          <div className="rounded-xl border bg-card p-6 text-center shadow-sm">
+            <ShieldCheck className="mx-auto h-10 w-10 text-primary" />
+            <h2 className="mt-3 break-words text-2xl font-bold [overflow-wrap:anywhere]">
+              {languageProfile.shortLabel}暂不开放英语覆盖文章诊断
+            </h2>
+            <p className="mt-2 break-words text-sm text-muted-foreground [overflow-wrap:anywhere]">
+              西语、法语、俄语目前只使用各自的快速诊断和练习反馈；这里不会把英语覆盖文章、
+              英语训练包或正式 mastery 证据混入当前语言。
+            </p>
+            <div className="mt-5 flex flex-wrap justify-center gap-2">
+              <Link href="/assessment">
+                <Button className="cursor-pointer">返回当前语言诊断</Button>
+              </Link>
+              <Link href="/settings">
+                <Button variant="outline" className="cursor-pointer">
+                  切换语言
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const prompt = getPromptForPhase(phase);
   const progress = phaseProgress(phase);
   const passageText = getCoveragePassageText();
 
   return (
-    <div className="flex h-full flex-col overflow-y-auto px-6 py-4 scrollbar-thin">
-      <div className="mb-4 flex shrink-0 items-start justify-between gap-4">
-        <div>
-          <div className="mb-2 flex items-center gap-2">
+    <div
+      className="flex h-full flex-col overflow-y-auto px-6 py-4 scrollbar-thin"
+      data-smoke="assessment-passage-page"
+    >
+      <div className="mb-4 flex shrink-0 flex-wrap items-start justify-between gap-4">
+        <div className="min-w-0 flex-1">
+          <div className="mb-2 flex flex-wrap items-start gap-2">
             <Link
               href="/assessment"
-              className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
               aria-label="返回快速诊断"
             >
               <ArrowLeft className="h-4 w-4" />
             </Link>
-            <h1 className="text-2xl font-bold">全音覆盖朗读诊断</h1>
+            <h1 className="min-w-0 break-words text-2xl font-bold [overflow-wrap:anywhere]">
+              全音覆盖朗读诊断
+            </h1>
           </div>
-          <p className="text-sm text-muted-foreground">
+          <p className="break-words text-sm text-muted-foreground [overflow-wrap:anywhere]">
             用一篇自然短文覆盖核心音素、词尾、弱读、连读和句子重音，适合做更深的阶段性体检。
           </p>
         </div>
@@ -297,6 +355,7 @@ export default function CoveragePassageAssessmentPage() {
           {phase.type === "intro" && (
             <motion.div
               key="intro"
+              data-smoke="assessment-passage-intro-card"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
@@ -307,11 +366,11 @@ export default function CoveragePassageAssessmentPage() {
                   <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
                     <BookOpenCheck className="h-6 w-6" />
                   </div>
-                  <div>
-                    <h2 className="text-lg font-bold">
+                  <div className="min-w-0">
+                    <h2 className="break-words text-lg font-bold [overflow-wrap:anywhere]">
                       {COVERAGE_PASSAGE.title}
                     </h2>
-                    <p className="mt-1 text-sm text-muted-foreground">
+                    <p className="mt-1 break-words text-sm text-muted-foreground [overflow-wrap:anywhere]">
                       {COVERAGE_PASSAGE.subtitle}
                     </p>
                   </div>
@@ -342,7 +401,12 @@ export default function CoveragePassageAssessmentPage() {
                   </div>
 
                   <div className="flex flex-wrap gap-3">
-                    <Button onClick={handleStart} size="lg" className="gap-2">
+                    <Button
+                      onClick={handleStart}
+                      size="lg"
+                      className="gap-2"
+                      data-smoke="assessment-passage-start-button"
+                    >
                       开始全音诊断
                       <ArrowRight className="h-4 w-4" />
                     </Button>
@@ -366,11 +430,14 @@ export default function CoveragePassageAssessmentPage() {
                 </div>
               </div>
 
-              <div className="rounded-xl border bg-card p-6 shadow-sm">
+              <div
+                className="rounded-xl border bg-card p-6 shadow-sm"
+                data-smoke="assessment-passage-text-card"
+              >
                 <h2 className="mb-3 text-sm font-semibold text-muted-foreground">
                   完整朗读稿
                 </h2>
-                <p className="whitespace-pre-line text-sm leading-7">
+                <p className="whitespace-pre-line break-words text-sm leading-7 [overflow-wrap:anywhere]">
                   {passageText}
                 </p>
               </div>

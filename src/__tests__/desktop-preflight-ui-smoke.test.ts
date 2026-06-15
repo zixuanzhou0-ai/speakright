@@ -92,6 +92,11 @@ describe("desktop preflight and UI smoke", () => {
     expect(script).toContain("englishTransferRoutes=ok");
     expect(script).toContain("scenario-prompt-card");
     expect(script).toContain("spontaneous-recording-card");
+    expect(script).toContain("/drill/evidence");
+    expect(script).toContain("evidence-page");
+    expect(script).toContain("evidence-experimental-blocker");
+    expect(script).toContain("assertAdvancedDirectRoutes");
+    expect(script).toContain("advancedDirectRoutes=ok");
     expect(script).toContain("/sentences");
     expect(script).toContain('selector: \'[data-smoke="sentences-page"]\'');
     expect(script).toContain("sentenceHooksReady");
@@ -102,6 +107,10 @@ describe("desktop preflight and UI smoke", () => {
     expect(script).toContain("assessment-intro-card");
     expect(script).toContain("assessment-start-button");
     expect(script).toContain("assessment-passage-link");
+    expect(script).toContain("/assessment/passage");
+    expect(script).toContain("assessment-passage-page");
+    expect(script).toContain("assessment-passage-intro-card");
+    expect(script).toContain("assessment-passage-experimental-blocker");
     expect(script).toContain("/progress");
     expect(script).toContain("assertEnglishProgressArchive");
     expect(script).toContain("progress-benchmark-row");
@@ -113,7 +122,7 @@ describe("desktop preflight and UI smoke", () => {
     expect(script).toContain("direct: true");
     expect(script).toContain("progress-experimental-blocker");
     expect(script).toContain(
-      "routes=/drill,/drill/word,/drill/sentence,/drill/contrast,/drill/prosody,/drill/perception,/sentences,/assessment,/progress",
+      "routes=/drill,/drill/word,/drill/sentence,/drill/contrast,/drill/prosody,/drill/perception,/drill/evidence,/sentences,/assessment,/assessment/passage,/progress",
     );
     expect(script).toContain("releaseServedFromDevServer=false");
     expect(script).toContain("data-smoke=\"language-option\"");
@@ -290,6 +299,21 @@ describe("desktop preflight and UI smoke", () => {
     expect(passagePage).toContain(
       'data-smoke="assessment-passage-recorder-error"',
     );
+    expect(passagePage).toContain('data-smoke="assessment-passage-page"');
+    expect(passagePage).toContain(
+      'data-smoke="assessment-passage-intro-card"',
+    );
+    expect(passagePage).toContain(
+      'data-smoke="assessment-passage-text-card"',
+    );
+    expect(passagePage).toContain(
+      'data-smoke="assessment-passage-start-button"',
+    );
+    expect(passagePage).toContain(
+      'data-smoke="assessment-passage-experimental-blocker"',
+    );
+    expect(passagePage).toContain("canRecordFormalMastery(languageId)");
+    expect(passagePage).toContain("英语全音覆盖文章");
     expect(passagePage).toContain('data-smoke="assessment-passage-error"');
     expect(passagePage).toContain("azure.getLastError()");
     expect(passagePage).toContain("Azure Speech API 密钥、区域、网络或代理");
@@ -441,6 +465,36 @@ describe("desktop preflight and UI smoke", () => {
     expect(packRunner).toContain("wordAudio.clearError()");
     expect(packRunner).toContain("tts.reset()");
     expect(packRunner).toContain('role="alert"');
+  });
+
+  it("keeps direct evidence and coverage-passage routes smokeable", () => {
+    const evidencePage = readProjectFile("src/app/drill/evidence/page.tsx");
+    const passagePage = readProjectFile("src/app/assessment/passage/page.tsx");
+
+    expect(evidencePage).toContain('data-smoke="evidence-page"');
+    expect(evidencePage).toContain('data-smoke="evidence-summary-stats"');
+    expect(evidencePage).toContain('data-smoke="evidence-empty-state"');
+    expect(evidencePage).toContain(
+      'data-smoke="evidence-experimental-blocker"',
+    );
+    expect(evidencePage).toContain("flex flex-wrap items-start gap-3");
+    expect(evidencePage).toContain("min-w-0 flex-1");
+
+    expect(passagePage).toContain('data-smoke="assessment-passage-page"');
+    expect(passagePage).toContain(
+      'data-smoke="assessment-passage-intro-card"',
+    );
+    expect(passagePage).toContain(
+      'data-smoke="assessment-passage-text-card"',
+    );
+    expect(passagePage).toContain(
+      'data-smoke="assessment-passage-start-button"',
+    );
+    expect(passagePage).toContain(
+      'data-smoke="assessment-passage-experimental-blocker"',
+    );
+    expect(passagePage).toContain("flex shrink-0 flex-wrap");
+    expect(passagePage).toContain("min-w-0 flex-1");
   });
 
   it("keeps recording and benchmark replay on the shared audio player hook", () => {
