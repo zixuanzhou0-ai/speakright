@@ -1219,6 +1219,11 @@ async function assertScoringTileAudioPolicy(cdp) {
 async function assertMainRoutes(cdp) {
   const routes = [
     { path: "/drill", selector: '[data-smoke="drill-page"]' },
+    {
+      path: "/drill/prosody",
+      selector: '[data-smoke="prosody-page"]',
+      direct: true,
+    },
     { path: "/sentences", selector: '[data-smoke="sentences-page"]' },
     { path: "/assessment", selector: '[data-smoke="assessment-page"]' },
     {
@@ -1247,16 +1252,22 @@ async function assertMainRoutes(cdp) {
       Boolean(document.querySelector('[data-smoke="assessment-intro-card"]')) &&
       Boolean(document.querySelector('[data-smoke="assessment-start-button"]')) &&
       Boolean(document.querySelector('[data-smoke="assessment-passage-link"]')));
+  const prosodyHooksReady =
+    routePath !== "/drill/prosody" ||
+    (Boolean(document.querySelector('[data-smoke="prosody-page"]')) &&
+      Boolean(document.querySelector('[data-smoke="prosody-exercise-header"]')));
   return {
     ok:
       bodyText.trim().length > 20 &&
       sentenceHooksReady &&
       assessmentHooksReady &&
+      prosodyHooksReady &&
       !bodyText.includes("Merriam-Webster") &&
       !bodyText.includes("多语言发音包") &&
       !bodyText.includes("无法访问此页面"),
     sentenceHooksReady,
     assessmentHooksReady,
+    prosodyHooksReady,
     bodyText: bodyText.slice(0, 800)
   };
 })()
@@ -1352,6 +1363,11 @@ async function assertNarrowViewportRoutes(cdp) {
 
     for (const route of [
       { path: "/drill", selector: '[data-smoke="drill-page"]' },
+      {
+        path: "/drill/prosody",
+        selector: '[data-smoke="prosody-page"]',
+        direct: true,
+      },
       { path: "/sentences", selector: '[data-smoke="sentences-page"]' },
       { path: "/assessment", selector: '[data-smoke="assessment-page"]' },
       {
@@ -1378,6 +1394,10 @@ async function assertNarrowViewportRoutes(cdp) {
       Boolean(document.querySelector('[data-smoke="assessment-intro-card"]')) &&
       Boolean(document.querySelector('[data-smoke="assessment-start-button"]')) &&
       Boolean(document.querySelector('[data-smoke="assessment-passage-link"]')));
+  const prosodyHooksReady =
+    routePath !== "/drill/prosody" ||
+    (Boolean(document.querySelector('[data-smoke="prosody-page"]')) &&
+      Boolean(document.querySelector('[data-smoke="prosody-exercise-header"]')));
   const visibleButtons = [...document.querySelectorAll("button,a")].filter((element) => {
     const rect = element.getBoundingClientRect();
     return rect.width > 0 && rect.height > 0;
@@ -1391,10 +1411,12 @@ async function assertNarrowViewportRoutes(cdp) {
       bodyText.trim().length > 20 &&
       sentenceHooksReady &&
       assessmentHooksReady &&
+      prosodyHooksReady &&
       buttonTextReadable &&
       document.documentElement.scrollWidth <= window.innerWidth + 24,
     sentenceHooksReady,
     assessmentHooksReady,
+    prosodyHooksReady,
     buttonTextReadable,
     scrollWidth: document.documentElement.scrollWidth,
     innerWidth: window.innerWidth,
@@ -1523,6 +1545,11 @@ async function assertLowHeightViewportRoutes(cdp) {
 
     for (const route of [
       { path: "/drill", selector: '[data-smoke="drill-page"]' },
+      {
+        path: "/drill/prosody",
+        selector: '[data-smoke="prosody-page"]',
+        direct: true,
+      },
       { path: "/sentences", selector: '[data-smoke="sentences-page"]' },
       { path: "/assessment", selector: '[data-smoke="assessment-page"]' },
       {
@@ -1549,6 +1576,10 @@ async function assertLowHeightViewportRoutes(cdp) {
       Boolean(document.querySelector('[data-smoke="assessment-intro-card"]')) &&
       Boolean(document.querySelector('[data-smoke="assessment-start-button"]')) &&
       Boolean(document.querySelector('[data-smoke="assessment-passage-link"]')));
+  const prosodyHooksReady =
+    routePath !== "/drill/prosody" ||
+    (Boolean(document.querySelector('[data-smoke="prosody-page"]')) &&
+      Boolean(document.querySelector('[data-smoke="prosody-exercise-header"]')));
   const visibleInteractive = [...document.querySelectorAll("button,a")].filter((element) => {
     const rect = element.getBoundingClientRect();
     return rect.width > 0 && rect.height > 0;
@@ -1563,10 +1594,12 @@ async function assertLowHeightViewportRoutes(cdp) {
       bodyText.trim().length > 20 &&
       sentenceHooksReady &&
       assessmentHooksReady &&
+      prosodyHooksReady &&
       interactiveTextReadable &&
       document.documentElement.scrollWidth <= window.innerWidth + 24,
     sentenceHooksReady,
     assessmentHooksReady,
+    prosodyHooksReady,
     interactiveTextReadable,
     scrollWidth: document.documentElement.scrollWidth,
     innerWidth: window.innerWidth,
@@ -1696,7 +1729,7 @@ async function smoke() {
         `details=${details
           .map((item) => `${item.languageId}:${item.slug}`)
           .join(",")}`,
-        "routes=/drill,/sentences,/assessment,/progress",
+        "routes=/drill,/drill/prosody,/sentences,/assessment,/progress",
         "scoringTileAudioPolicy=ok",
         "practiceAudioLabels=ok",
         "freePracticeSmoke=ok",

@@ -121,7 +121,10 @@ export default function ProsodyPage() {
     !!recorder.audioBlob && (quality.isAnalyzing || !quality.report?.canSubmit);
 
   return (
-    <div className="h-full overflow-y-auto px-6 py-4 scrollbar-thin">
+    <div
+      className="h-full overflow-y-auto px-6 py-4 scrollbar-thin"
+      data-smoke="prosody-page"
+    >
       <div className="mb-5 flex items-center gap-3">
         <Link
           href="/drill"
@@ -170,10 +173,15 @@ export default function ProsodyPage() {
 
         <main className="space-y-5">
           <section className="rounded-xl border bg-card p-5 shadow-sm">
-            <div className="mb-4 flex items-center justify-between gap-3">
-              <div>
-                <h2 className="text-xl font-bold">{exercise.title}</h2>
-                <p className="mt-1 text-sm text-muted-foreground">
+            <div
+              className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
+              data-smoke="prosody-exercise-header"
+            >
+              <div className="min-w-0 text-center sm:text-left">
+                <h2 className="break-words text-xl font-bold [overflow-wrap:anywhere]">
+                  {exercise.title}
+                </h2>
+                <p className="mt-1 break-words text-sm text-muted-foreground [overflow-wrap:anywhere]">
                   通过线：韵律 {exercise.pass.minProsody} · 流利度{" "}
                   {exercise.pass.minFluency} · 准确度{" "}
                   {exercise.pass.minAccuracy}
@@ -186,7 +194,7 @@ export default function ProsodyPage() {
                   tts.speak(exercise.text, { speed: 0.82, languageId })
                 }
                 disabled={tts.isLoading}
-                className="gap-2 cursor-pointer"
+                className="w-full gap-2 cursor-pointer sm:w-auto"
               >
                 {tts.isLoading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -300,7 +308,7 @@ export default function ProsodyPage() {
 
           {analysis && (
             <section className="rounded-xl border bg-card p-5 shadow-sm">
-              <div className="mb-4 flex items-center justify-between gap-3">
+              <div className="mb-4 flex flex-wrap items-center justify-center gap-3 sm:justify-between">
                 <div className="flex items-center gap-2">
                   {analysis.passed ? (
                     <CheckCircle2 className="h-5 w-5 text-primary" />

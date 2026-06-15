@@ -167,6 +167,10 @@ git status --short --branch
 - Settings data/privacy reset-all-data dialog now keeps the `同时删除 API keys`
   explanation readable beside or above the switch. Release EXE smoke opens the
   dialog and checks the toggle row for readable text and child-control overlap.
+- Prosody drill exercise headers now stack on narrow screens: the exercise
+  title/pass-line stays readable and the `听示范` button no longer competes for
+  the same row. Release EXE smoke covers `/drill/prosody` in main, narrow, and
+  low-height route passes.
 - Quick diagnosis word and paragraph recording cards now show recorder startup
   errors and Azure scoring errors inline with `role="alert"`, so missing
   microphone permission, missing Azure keys, network failure, or quota failure

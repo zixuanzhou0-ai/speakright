@@ -72,6 +72,9 @@ describe("desktop preflight and UI smoke", () => {
     expect(script).toContain("/phonemes/fr-i");
     expect(script).toContain("/phonemes/ru-a");
     expect(script).toContain("/drill");
+    expect(script).toContain("/drill/prosody");
+    expect(script).toContain("prosodyHooksReady");
+    expect(script).toContain("prosody-exercise-header");
     expect(script).toContain("/sentences");
     expect(script).toContain('selector: \'[data-smoke="sentences-page"]\'');
     expect(script).toContain("sentenceHooksReady");
@@ -85,7 +88,9 @@ describe("desktop preflight and UI smoke", () => {
     expect(script).toContain("/progress");
     expect(script).toContain("direct: true");
     expect(script).toContain("progress-experimental-blocker");
-    expect(script).toContain("routes=/drill,/sentences,/assessment,/progress");
+    expect(script).toContain(
+      "routes=/drill,/drill/prosody,/sentences,/assessment,/progress",
+    );
     expect(script).toContain("releaseServedFromDevServer=false");
     expect(script).toContain("data-smoke=\"language-option\"");
     expect(script).toContain("textIsCentered");
@@ -293,6 +298,11 @@ describe("desktop preflight and UI smoke", () => {
 
     expect(prosodyPage).toContain('data-smoke="prosody-demo-audio-error"');
     expect(prosodyPage).toContain('data-smoke="prosody-assessment-error"');
+    expect(prosodyPage).toContain('data-smoke="prosody-page"');
+    expect(prosodyPage).toContain('data-smoke="prosody-exercise-header"');
+    expect(prosodyPage).toContain(
+      "flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between",
+    );
     expect(prosodyPage).toContain("{tts.error}");
     expect(prosodyPage).toContain("{recorder.error ?? assessment.error}");
     expect(prosodyPage).toContain('role="alert"');
