@@ -23,8 +23,11 @@ describe("desktop preflight and UI smoke", () => {
     expect(packageJson.scripts["validate:desktop"]).toContain(
       "desktop:preflight:build",
     );
-    expect(packageJson.scripts["validate:desktop"].indexOf("desktop:preflight"))
-      .toBeLessThan(packageJson.scripts["validate:desktop"].indexOf("desktop:build"));
+    expect(
+      packageJson.scripts["validate:desktop"].indexOf("desktop:preflight"),
+    ).toBeLessThan(
+      packageJson.scripts["validate:desktop"].indexOf("desktop:build"),
+    );
   });
 
   it("fails preflight with a clear prompt when speakright.exe is running", () => {
@@ -59,8 +62,11 @@ describe("desktop preflight and UI smoke", () => {
     expect(packageJson.scripts["validate:desktop"]).toContain(
       "desktop:ui-smoke",
     );
-    expect(packageJson.scripts["validate:desktop"].indexOf("desktop:artifact-smoke"))
-      .toBeLessThan(packageJson.scripts["validate:desktop"].indexOf("desktop:ui-smoke"));
+    expect(
+      packageJson.scripts["validate:desktop"].indexOf("desktop:artifact-smoke"),
+    ).toBeLessThan(
+      packageJson.scripts["validate:desktop"].indexOf("desktop:ui-smoke"),
+    );
   });
 
   it("opens key release routes without recording or ElevenLabs generation", () => {
@@ -105,7 +111,7 @@ describe("desktop preflight and UI smoke", () => {
     expect(script).toContain("assertCorruptLocalDataWarnings");
     expect(script).toContain("corruptLocalDataWarnings=ok");
     expect(script).toContain("/sentences");
-    expect(script).toContain('selector: \'[data-smoke="sentences-page"]\'');
+    expect(script).toContain("selector: '[data-smoke=\"sentences-page\"]'");
     expect(script).toContain("sentenceHooksReady");
     expect(script).toContain("sentence-input-card");
     expect(script).toContain("sentence-recording-card");
@@ -139,9 +145,9 @@ describe("desktop preflight and UI smoke", () => {
       "routes=/drill,/drill/word,/drill/sentence,/drill/contrast,/drill/prosody,/drill/perception,/drill/evidence,/drill/pack/ee-ih,/sentences,/assessment,/assessment/passage,/progress",
     );
     expect(script).toContain("releaseServedFromDevServer=false");
-    expect(script).toContain("data-smoke=\"language-option\"");
+    expect(script).toContain('data-smoke="language-option"');
     expect(script).toContain("textIsCentered");
-    expect(script).toContain("textAlign === \"center\"");
+    expect(script).toContain('textAlign === "center"');
     expect(script).toContain("assertNarrowViewportRoutes");
     expect(script).toContain("narrowViewport=ok");
     expect(script).toContain("assertLowHeightViewportRoutes");
@@ -203,7 +209,7 @@ describe("desktop preflight and UI smoke", () => {
     expect(script).toContain("videoSelectorReady");
     expect(script).toContain("videoSelectorCount");
     expect(script).toContain("headerAudioReady");
-    expect(script).toContain(".includes(\"发音\")");
+    expect(script).toContain('.includes("发音")');
     expect(script).not.toContain("MediaRecorder");
     expect(script).not.toContain("elevenlabs");
     expect(script).not.toContain("generate-word-audio");
@@ -248,9 +254,7 @@ describe("desktop preflight and UI smoke", () => {
     expect(pronunciationCard).toContain("flex flex-wrap items-center gap-3");
     expect(azureCard).toContain('data-smoke="azure-config-actions"');
     expect(azureCard).toContain("flex flex-wrap items-center gap-3");
-    expect(elevenLabsCard).toContain(
-      'data-smoke="tts-config-actions"',
-    );
+    expect(elevenLabsCard).toContain('data-smoke="tts-config-actions"');
     expect(elevenLabsCard).toContain("flex flex-wrap items-center gap-3");
     expect(languageAvailabilityCard).toContain(
       "data-smoke={`language-availability-",
@@ -272,6 +276,7 @@ describe("desktop preflight and UI smoke", () => {
     const dataControlCard = readProjectFile(
       "src/components/settings/data-control-card.tsx",
     );
+    const dataRegistry = readProjectFile("src/lib/data-registry.ts");
 
     expect(dataControlCard).toContain('data-smoke="data-control-status"');
     expect(dataControlCard).toContain(
@@ -282,6 +287,9 @@ describe("desktop preflight and UI smoke", () => {
     );
     expect(dataControlCard).toContain(
       'data-smoke="data-control-corrupt-data-warning"',
+    );
+    expect(dataControlCard).toContain(
+      'data-smoke="data-control-summary-warning"',
     );
     expect(dataControlCard).toContain(
       "flex flex-col gap-3 rounded-lg border bg-muted/25 p-3 sm:flex-row sm:items-center sm:justify-between",
@@ -295,6 +303,8 @@ describe("desktop preflight and UI smoke", () => {
     expect(dataControlCard).toContain("本机安全存储或设置存储不可用");
     expect(dataControlCard).toContain("已隔离 {summary.corruptItems}");
     expect(dataControlCard).toContain("导出学习数据或诊断包");
+    expect(dataControlCard).toContain("LOCAL_DATA_SUMMARY_UNAVAILABLE_MESSAGE");
+    expect(dataRegistry).toContain("本机数据摘要暂时无法读取");
     expect(dataControlCard).toContain("默认不会删除 API keys");
     expect(dataControlCard).toContain("overflow-wrap:anywhere");
     expect(dataControlCard).toContain("toast.error(message)");
@@ -315,20 +325,14 @@ describe("desktop preflight and UI smoke", () => {
     expect(assessmentPage).toContain('role="alert"');
     expect(assessmentPage).toContain("{recorder.error}");
     expect(assessmentPage).toContain("{azure.error}");
-    expect(assessmentPage).not.toContain(
-      'message: azure.error || "评估失败"',
-    );
+    expect(assessmentPage).not.toContain('message: azure.error || "评估失败"');
 
     expect(passagePage).toContain(
       'data-smoke="assessment-passage-recorder-error"',
     );
     expect(passagePage).toContain('data-smoke="assessment-passage-page"');
-    expect(passagePage).toContain(
-      'data-smoke="assessment-passage-intro-card"',
-    );
-    expect(passagePage).toContain(
-      'data-smoke="assessment-passage-text-card"',
-    );
+    expect(passagePage).toContain('data-smoke="assessment-passage-intro-card"');
+    expect(passagePage).toContain('data-smoke="assessment-passage-text-card"');
     expect(passagePage).toContain(
       'data-smoke="assessment-passage-start-button"',
     );
@@ -346,9 +350,7 @@ describe("desktop preflight and UI smoke", () => {
     expect(passagePage).toContain("azure.getLastError()");
     expect(passagePage).toContain("Azure Speech API 密钥、区域、网络或代理");
     expect(passagePage).toContain('role="alert"');
-    expect(passagePage).not.toContain(
-      'message: azure.error || "评估失败"',
-    );
+    expect(passagePage).not.toContain('message: azure.error || "评估失败"');
 
     expect(azureHook).toContain("getLastError");
     expect(azureHook).toContain("errorRef.current");
@@ -370,7 +372,9 @@ describe("desktop preflight and UI smoke", () => {
     const wordPage = readProjectFile("src/app/drill/word/page.tsx");
     const sentencePage = readProjectFile("src/app/drill/sentence/page.tsx");
     const scenariosPage = readProjectFile("src/app/drill/scenarios/page.tsx");
-    const spontaneousPage = readProjectFile("src/app/drill/spontaneous/page.tsx");
+    const spontaneousPage = readProjectFile(
+      "src/app/drill/spontaneous/page.tsx",
+    );
     const azureHook = readProjectFile("src/hooks/use-azure-assessment.ts");
     const drillSessionHook = readProjectFile("src/hooks/use-drill-session.ts");
 
@@ -410,9 +414,7 @@ describe("desktop preflight and UI smoke", () => {
       'data-smoke="spontaneous-processing-error"',
     );
     expect(spontaneousPage).toContain('data-smoke="spontaneous-page"');
-    expect(spontaneousPage).toContain(
-      'data-smoke="spontaneous-prompt-card"',
-    );
+    expect(spontaneousPage).toContain('data-smoke="spontaneous-prompt-card"');
     expect(spontaneousPage).toContain(
       'data-smoke="spontaneous-recording-card"',
     );
@@ -488,7 +490,9 @@ describe("desktop preflight and UI smoke", () => {
     expect(packRunner).toContain('assessmentError ? "重新评分" : "提交评分"');
     expect(packRunner).toContain("remediationScoreButtonLabel");
     expect(packRunner).toContain("重新评分这一步");
-    expect(packRunner).toContain("referenceError={wordAudio.error ?? tts.error}");
+    expect(packRunner).toContain(
+      "referenceError={wordAudio.error ?? tts.error}",
+    );
     expect(packRunner).toContain(
       "assessmentError={recorder.error ?? azure.error}",
     );
@@ -520,12 +524,8 @@ describe("desktop preflight and UI smoke", () => {
     expect(passagePage).toContain(
       'data-smoke="assessment-passage-storage-warning"',
     );
-    expect(passagePage).toContain(
-      'data-smoke="assessment-passage-intro-card"',
-    );
-    expect(passagePage).toContain(
-      'data-smoke="assessment-passage-text-card"',
-    );
+    expect(passagePage).toContain('data-smoke="assessment-passage-intro-card"');
+    expect(passagePage).toContain('data-smoke="assessment-passage-text-card"');
     expect(passagePage).toContain(
       'data-smoke="assessment-passage-start-button"',
     );
@@ -564,14 +564,16 @@ describe("desktop preflight and UI smoke", () => {
     expect(progressPage).toContain(
       'data-smoke="progress-recent-session-title"',
     );
-    expect(progressPage).toContain(
-      'data-smoke="progress-recent-session-meta"',
-    );
+    expect(progressPage).toContain('data-smoke="progress-recent-session-meta"');
     expect(progressPage).toContain("flex flex-col gap-3");
-    expect(progressPage).toContain("sm:flex-row sm:items-center sm:justify-between");
+    expect(progressPage).toContain(
+      "sm:flex-row sm:items-center sm:justify-between",
+    );
     expect(progressPage).toContain("本机音频数据缺失");
     expect(progressPage).toContain("getProgressArchiveErrorMessage");
-    expect(progressPage).toContain('role={archiveStatus.tone === "success" ? "status" : "alert"}');
+    expect(progressPage).toContain(
+      'role={archiveStatus.tone === "success" ? "status" : "alert"}',
+    );
     expect(progressPage).toContain("aria-label={`播放 benchmark 录音");
     expect(progressPage).toContain("aria-label={`删除 benchmark 录音");
   });
@@ -580,7 +582,9 @@ describe("desktop preflight and UI smoke", () => {
     const benchmarkArchive = readProjectFile("src/lib/benchmark-archive.ts");
     const prosodyPage = readProjectFile("src/app/drill/prosody/page.tsx");
     const scenariosPage = readProjectFile("src/app/drill/scenarios/page.tsx");
-    const spontaneousPage = readProjectFile("src/app/drill/spontaneous/page.tsx");
+    const spontaneousPage = readProjectFile(
+      "src/app/drill/spontaneous/page.tsx",
+    );
 
     expect(benchmarkArchive).toContain("getBenchmarkArchiveSaveErrorMessage");
     expect(benchmarkArchive).toContain("本次评分已完成");
@@ -611,6 +615,6 @@ describe("desktop preflight and UI smoke", () => {
 
     expect(spontaneousPage).toContain("benchmark 录音未保存");
     expect(spontaneousPage).toContain("录音已作为 benchmark 保存。");
-    expect(spontaneousPage).toContain("? \"这次即兴内容没有命中当前弱点词");
+    expect(spontaneousPage).toContain('? "这次即兴内容没有命中当前弱点词');
   });
 });

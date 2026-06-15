@@ -155,6 +155,9 @@ git status --short --branch
   results visible inline. Storage/keychain/IndexedDB/quota/permission failures
   are converted to Chinese recovery messages with `role="alert"` instead of
   relying only on a short toast.
+- Settings data/privacy center also fails soft when the local data summary
+  cannot be read. It shows a Chinese `data-control-summary-warning` and keeps
+  the diagnostic export plus `重置本机数据` controls visible.
 - Settings data/privacy center also shows quarantined corrupt local data as a
   visible Chinese `role="alert"` with guidance to export learning data or a
   diagnostics bundle before using `重置本机数据`; the alert notes that API keys
@@ -459,6 +462,9 @@ Current gate summary:
 - Focused Settings quarantined-data tests passed: `2` files and `23` tests,
   covering the data/privacy center corrupt-data alert plus Release smoke checks
   for text, role, wrapping, and no-overflow behavior.
+- Focused Settings data-summary recovery tests passed: `3` files and `36`
+  tests, covering degraded local-data summary reads, a visible Settings warning,
+  preserved diagnostic export/reset controls, and static Release smoke coverage.
 - Focused desktop diagnostics privacy tests passed: `2` files and `22` tests,
   covering schema v2 support bundles, redacted local log paths, and
   quarantined-data summaries that exclude raw values.
@@ -485,7 +491,7 @@ Current gate summary:
 - Focused phoneme detail presentation tests passed: `2` files and `9` tests,
   covering non-English full text visibility, Russian long Cyrillic rule text,
   and task-accurate A/B playback labels.
-- Full tests passed: `111` files and `621` tests.
+- Full tests passed: `111` files and `623` tests.
 - Typecheck, lint (`370` files checked), and static desktop frontend build
   passed.
 - Release EXE build passed and rebuilt EXE, MSI, and NSIS artifacts.
@@ -507,7 +513,7 @@ Current gate summary:
   intro card plus start/passage actions instead of only checking the page
   container.
 - Release EXE launch passed from the static Tauri bundle, and the test process
-  was closed after verification; the latest launch PID was `25372`.
+  was closed after verification; the latest launch PID was `59828`.
 - No ElevenLabs generation or TTS spend is part of this validation path.
 
 For tomorrow's manual test session, start with:

@@ -21,7 +21,7 @@ claimed as complete.
 | Spanish/French/Russian local dual-voice audio has zero missing required items and dry-run makes no ElevenLabs calls | `scripts/multilingual-audio-parity-report.mjs`, `src/__tests__/multilingual-audio-parity.test.ts`, `src/__tests__/static-language-audio-pack-assets.test.ts`, `npm.cmd run audio:parity:dry-run` |
 | Local A/B word audio, IPA chart normal/slow word audio, and bundled language-pack read-along playback are louder and closer to video playback without regenerating TTS or allowing obvious clipping | `src/hooks/use-word-pronunciation.ts`, `src/hooks/use-audio-player.ts`, `src/hooks/use-tts-aligned.ts`, `src/lib/audio-normalization.ts`, `src/lib/audio-playback-policy.ts`, `src/components/phoneme/phoneme-card.tsx`, `src/components/phoneme/phoneme-study-card.tsx`, `scripts/audio-loudness-audit.mjs`, `src/__tests__/audio-normalization.test.ts`, `src/__tests__/use-word-pronunciation.test.tsx`, `src/__tests__/use-audio-player.test.tsx`, `src/__tests__/use-tts-aligned.test.tsx`, `src/__tests__/phoneme-card.test.tsx`, `src/__tests__/phoneme-study-card.test.tsx`, `npm.cmd run audio:loudness:dry-run`; the cached normalization helper, active playback hook, and read-along local-pack path preserve language-pack fallback gain before peak-safe limiting where applicable, very quiet decoded local word clips can reach up to `12x` peak-safe gain when peaks permit it, IPA chart normal/slow word playback uses a shared boost, bundled read-along replay keeps its gain, and representative A/B plus chart-word samples are compared against teaching-video loudness without ElevenLabs calls |
 | Standard-demo TTS, local detail/free-practice word audio gaps, and online dictionary fallback failures show actionable Chinese messages without generating audio during validation | `src/lib/api-client.ts`, `src/hooks/use-tts.ts`, `src/hooks/use-tts-aligned.ts`, `src/hooks/use-word-pronunciation.ts`, `src/components/phoneme/phoneme-study-card.tsx`, `src/components/sentences/sentence-input-card.tsx`, `src/components/settings/elevenlabs-config-card.tsx`, `src/components/settings/usage-monitor.tsx`, `src/app/drill/prosody/page.tsx`, `src/app/drill/scenarios/page.tsx`, `src/app/drill/contrast/page.tsx`, `src/app/drill/perception/page.tsx`, `src/app/drill/pack/[packId]/pack-runner-client.tsx`, `src/__tests__/api-client-audio.test.ts`, `src/__tests__/desktop-preflight-ui-smoke.test.ts`, `src/__tests__/drill-pack-runner.test.tsx`, `src/__tests__/perception-drill-page.test.tsx`, `src/__tests__/phoneme-study-card.test.tsx`, `src/__tests__/settings-key-hydration.test.tsx`, `src/__tests__/use-tts-aligned.test.tsx`, `src/__tests__/use-word-pronunciation.test.tsx`; ElevenLabs connection tests, usage checks, voice queries, TTS, aligned TTS, non-English local-pack gaps, and English online dictionary fallback map invalid keys, unavailable voice/model, network/proxy failures, timeout, quota/rate-limit, service failure, empty/too-long text, missing local detail/free-practice word audio, and missing dictionary entries to Chinese messages; detail-page, free-practice word speakers, prosody demos, scenario demos, contrast word demos, perception playback, and pack-runner reference/perception playback render the failure inline instead of silently clearing the loading state, perception ABX clears stale pronunciation errors when moving to the next question or restarting a session, pack-runner clears stale reference-audio errors when starting/restarting a course, moving levels/items, or beginning recording/remediation, stale online dictionary fallback failures cannot overwrite a newer word playback request, while bundled local word and language-pack audio remain the first-choice path and validation still makes no TTS generation calls |
-| Settings connection-test failures, first-run usage empty states, language availability, and data-control export/delete/reset failures preserve actionable Chinese reasons and avoid raw English exceptions or nowrap overflow | `src/components/settings/azure-config-card.tsx`, `src/components/settings/elevenlabs-config-card.tsx`, `src/components/settings/llm-config-card.tsx`, `src/components/settings/pronunciation-config-card.tsx`, `src/components/settings/usage-monitor.tsx`, `src/components/settings/connection-status.tsx`, `src/components/settings/user-facing-error.ts`, `src/components/settings/language-availability-card.tsx`, `src/components/settings/data-control-card.tsx`, `src/lib/desktop-diagnostics.ts`, `src/__tests__/desktop-preflight-ui-smoke.test.ts`, `src/__tests__/settings-connection-errors.test.tsx`, `src/__tests__/settings-key-hydration.test.tsx`, `src/__tests__/desktop-diagnostics.test.ts`, `src/__tests__/release-security.test.ts`, `src/__tests__/language-availability-card.test.tsx`; Azure, ElevenLabs, AI coach, and Youdao test buttons keep Chinese provider/client messages when available, replace raw English fetch errors with Chinese network/proxy guidance, explain that bundled local practice audio is unaffected by online dictionary test failure, the ElevenLabs usage card explains on first run that sentence/phrase standard demos need a key while local word and built-in language-pack audio can still be used, the language availability card shows `检查中` while local language-pack manifests are loading and `缺失或不可读` with reinstall/Release EXE feedback guidance if they cannot be read, data/privacy center export/delete/reset operations keep success or failure visible inline with `role="status"` / `role="alert"`, quarantined corrupt local data shows a Settings `role="alert"` with guidance to export learning data or a diagnostics bundle before resetting local data, the desktop diagnostics bundle includes key/reason/timestamp/schema/raw length for quarantined data while excluding raw quarantined values, the reset-all-data dialog keeps its API-key toggle explanation readable without overlapping the switch, API config action rows wrap in narrow Settings layouts, and long status text remains wrap-ready |
+| Settings connection-test failures, first-run usage empty states, language availability, and data-control export/delete/reset failures preserve actionable Chinese reasons and avoid raw English exceptions or nowrap overflow | `src/components/settings/azure-config-card.tsx`, `src/components/settings/elevenlabs-config-card.tsx`, `src/components/settings/llm-config-card.tsx`, `src/components/settings/pronunciation-config-card.tsx`, `src/components/settings/usage-monitor.tsx`, `src/components/settings/connection-status.tsx`, `src/components/settings/user-facing-error.ts`, `src/components/settings/language-availability-card.tsx`, `src/components/settings/data-control-card.tsx`, `src/lib/data-registry.ts`, `src/lib/desktop-diagnostics.ts`, `src/__tests__/desktop-preflight-ui-smoke.test.ts`, `src/__tests__/settings-connection-errors.test.tsx`, `src/__tests__/settings-key-hydration.test.tsx`, `src/__tests__/data-registry.test.ts`, `src/__tests__/desktop-diagnostics.test.ts`, `src/__tests__/release-security.test.ts`, `src/__tests__/language-availability-card.test.tsx`; Azure, ElevenLabs, AI coach, and Youdao test buttons keep Chinese provider/client messages when available, replace raw English fetch errors with Chinese network/proxy guidance, explain that bundled local practice audio is unaffected by online dictionary test failure, the ElevenLabs usage card explains on first run that sentence/phrase standard demos need a key while local word and built-in language-pack audio can still be used, the language availability card shows `检查中` while local language-pack manifests are loading and `缺失或不可读` with reinstall/Release EXE feedback guidance if they cannot be read, data/privacy center export/delete/reset operations keep success or failure visible inline with `role="status"` / `role="alert"`, data-summary storage read failures show a Chinese `data-control-summary-warning` while keeping diagnostic export and reset controls visible, quarantined corrupt local data shows a Settings `role="alert"` with guidance to export learning data or a diagnostics bundle before resetting local data, the desktop diagnostics bundle includes key/reason/timestamp/schema/raw length for quarantined data while excluding raw quarantined values, the reset-all-data dialog keeps its API-key toggle explanation readable without overlapping the switch, API config action rows wrap in narrow Settings layouts, and long status text remains wrap-ready |
 | Local score trend, practice-history, and mastery-transfer persistence failures are visible without blocking the completed scoring result | `src/lib/score-history.ts`, `src/lib/practice-tracker.ts`, `src/lib/mastery-profile.ts`, `src/app/phonemes/[phoneme]/phoneme-detail-page.tsx`, `src/app/sentences/page.tsx`, `src/hooks/use-drill-session.ts`, `src/app/drill/word/page.tsx`, `src/app/drill/sentence/page.tsx`, `src/components/sentences/sentence-recording-card.tsx`, `src/__tests__/score-history.test.ts`, `src/__tests__/practice-tracker.test.ts`, `src/__tests__/mastery-profile.test.ts`, `src/__tests__/phoneme-detail-page.test.tsx`, `src/__tests__/sentence-recording-card.test.tsx`, `src/__tests__/use-drill-session.test.tsx`, `src/__tests__/local-save-warnings.test.ts`; score-history, practice-history, and mastery-profile writes return explicit success/failure instead of silently swallowing localStorage quota or permission failures, and phoneme detail, free-practice, plus word/sentence drill scoring keep the assessment result and feedback flow moving while showing a Chinese `role="alert"` that the local trend/history or transfer evidence was not saved |
 | Advanced drill mastery/profile persistence failures are visible without claiming saved progress | `src/lib/local-save-warning.ts`, `src/app/drill/pack/[packId]/pack-runner-client.tsx`, `src/app/drill/perception/page.tsx`, `src/app/drill/prosody/page.tsx`, `src/app/drill/scenarios/page.tsx`, `src/app/drill/spontaneous/page.tsx`, `src/__tests__/local-save-warnings.test.ts`; English advanced training pack completion, HVPT perception completion, prosody training, scenario transfer, and spontaneous transfer keep the completed scoring/training result visible, but if the local mastery profile or review/transfer evidence cannot be written, each page renders a Chinese `role="alert"` (`pack-runner-local-save-warning`, `perception-local-save-warning`, `prosody-local-save-warning`, `scenario-local-save-warning`, or `spontaneous-local-save-warning`) instead of silently implying that progress or review queues were saved |
 | Diagnosis report and coverage baseline persistence failures are visible without blocking generated reports | `src/lib/local-save-warning.ts`, `src/app/assessment/page.tsx`, `src/app/assessment/passage/page.tsx`, `src/__tests__/local-save-warnings.test.ts`; quick diagnosis and full-passage diagnosis treat local report history and coverage benchmark writes as best-effort. If localStorage quota or permission blocks saving, the generated report still displays and the page renders a Chinese `role="alert"` (`assessment-local-save-warning` or `assessment-passage-local-save-warning`) explaining that local history or the retest baseline was not saved. Retake/delete failures also keep the user on a usable flow with a Chinese warning instead of throwing a raw storage exception |
@@ -67,24 +67,22 @@ rerun during this playback/UI RC pass.
 
 ## Latest Local Command Results
 
-Latest local focused pass for startup local-data migration failure handling and the full RC gate:
+Latest local focused pass for Settings data-summary storage recovery and the full RC gate:
 
 ```text
 git status --short --branch
   ## main...origin/main
-  If normal `git push` is unavailable, use the documented GitHub API fallback
-  and verify the local-vs-remote tree SHA before treating content as pushed
 
-npx.cmd biome check --fix src/components/layout/key-hydrator.tsx src/__tests__/key-hydrator.test.tsx
-  passed; no fixes needed
+npx.cmd biome check --fix src/lib/data-registry.ts src/components/settings/data-control-card.tsx src/__tests__/data-registry.test.ts src/__tests__/settings-key-hydration.test.tsx src/__tests__/desktop-preflight-ui-smoke.test.ts docs/operations/RC_EVIDENCE_AUDIT.md docs/operations/DESKTOP_STARTUP_RUNBOOK.md docs/operations/NEXT_CHAT_HANDOFF.md
+  passed; no fixes needed after the final docs update
 
-npm.cmd run test -- src/__tests__/key-hydrator.test.tsx
-  1 file / 4 tests passed; startup API-key/storage failure labels, corrupt
-  local-data quarantine warning, and migration-failure soft-start behavior are
-  locked
+npm.cmd run test -- src/__tests__/data-registry.test.ts src/__tests__/settings-key-hydration.test.tsx src/__tests__/desktop-preflight-ui-smoke.test.ts
+  3 files / 36 tests passed; degraded local-data summary reads, the Settings
+  data-summary warning, preserved diagnostic export/reset controls, and static
+  Release smoke coverage are locked
 
 npm.cmd run test
-  111 files / 621 tests passed
+  111 files / 623 tests passed
 
 npm.cmd run typecheck
   passed
@@ -96,13 +94,13 @@ npm.cmd run build:desktop-frontend
   passed; 144 static pages generated
 
 npm.cmd run desktop:build
-  passed; rebuilt the Release EXE, MSI, and NSIS artifacts after the
-  startup KeyHydrator frontend change
+  passed; rebuilt the Release EXE, MSI, and NSIS artifacts after the Settings
+  data/privacy frontend change
 
 npm.cmd run desktop:preflight
   passed; Release EXE exists, no running speakright.exe, no localhost startup;
   during verification it correctly reported the expected dirty worktree from this
-  startup migration failure handling fix
+  Settings data-summary recovery fix
 
 npm.cmd run desktop:ui-smoke
   passed; Release EXE runtime, centered target text, no target-text ellipsis,
@@ -134,7 +132,7 @@ npm.cmd run desktop:ui-smoke
 
 npm.cmd run desktop:launch-release
   passed; command printed `SpeakRight release desktop app launch requested`,
-  the Release EXE path, `PID: 25372`, and the no-localhost reminder; the Release
+  the Release EXE path, `PID: 59828`, and the no-localhost reminder; the Release
   EXE opened from `src-tauri\target\release\speakright.exe` and was verified as
   a running `speakright.exe` process
 
@@ -154,7 +152,7 @@ npm.cmd run desktop:launch-release
 ## Limits
 
 - `audio:parity:dry-run` and `audio:loudness:dry-run` were not rerun during the
-  startup migration failure handling pass; the latest recorded audio
+  Settings data-summary recovery pass; the latest recorded audio
   dry-runs remain the previous playback-layer audits.
 - `es-ES`, `fr-FR`, and `ru-RU` are experimental and must not be described as
   formally mastered.

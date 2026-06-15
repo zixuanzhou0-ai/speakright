@@ -10,15 +10,15 @@ import {
   clearBenchmarkRecordings,
   exportBenchmarkRecordings,
 } from "@/lib/benchmark-archive";
+import { DESKTOP_MIC_CHECK_KEY } from "@/lib/desktop-readiness";
+import { clearAllLanguageAudioPacks } from "@/lib/language-audio-pack-cache";
 import {
-  clearCorruptLocalData,
   CORRUPT_LOCAL_DATA_KEY,
+  clearCorruptLocalData,
   getLocalDataSchemaStatus,
   LOCAL_DATA_MIGRATED_AT_KEY,
   LOCAL_DATA_SCHEMA_VERSION_KEY,
 } from "@/lib/local-data-migrations";
-import { DESKTOP_MIC_CHECK_KEY } from "@/lib/desktop-readiness";
-import { clearAllLanguageAudioPacks } from "@/lib/language-audio-pack-cache";
 import { storeGet } from "@/lib/tauri-store";
 import { clearTtsCache } from "@/lib/tts-cache";
 
@@ -79,6 +79,7 @@ export interface LocalDataSummary {
   apiKeySlots: number;
   dataSchemaVersion: number;
   corruptItems: number;
+  storageUnavailable?: boolean;
 }
 
 export interface DeleteAllLocalDataOptions {
@@ -148,6 +149,20 @@ async function removePersistentKeys(keys: readonly string[]): Promise<void> {
   await Promise.all(keys.map((key) => clearItem(key)));
 }
 
+export const LOCAL_DATA_SUMMARY_UNAVAILABLE_MESSAGE =
+  "本机数据摘要暂时无法读取。你仍可以导出诊断包或尝试重置本机数据；如果刚刚打开应用，请重启后再试。";
+
+function safeApiKeySummary() {
+  try {
+    return getApiKeySummary();
+  } catch {
+    return {
+      configured: 0,
+      totalSlots: API_KEY_STORAGE_KEYS.length,
+    };
+  }
+}
+
 export async function buildLocalDataExport(): Promise<LocalDataExport> {
   const cacheKeys = prefixedLocalStorageKeys(CACHE_STORAGE_PREFIXES);
   return {
@@ -179,19 +194,32 @@ export async function buildLocalDataExport(): Promise<LocalDataExport> {
 }
 
 export function getLocalDataSummary(): LocalDataSummary {
-  const cacheKeys = [
-    ...CACHE_STORAGE_KEYS,
-    ...prefixedLocalStorageKeys(CACHE_STORAGE_PREFIXES),
-  ];
-  const apiKeys = getApiKeySummary();
-  return {
-    learningKeys: Object.keys(collectKeys(LEARNING_STORAGE_KEYS)).length,
-    cacheKeys: Object.keys(collectKeys(cacheKeys)).length,
-    configuredApiKeys: apiKeys.configured,
-    apiKeySlots: apiKeys.totalSlots,
-    dataSchemaVersion: getLocalDataSchemaStatus().storedVersion,
-    corruptItems: getLocalDataSchemaStatus().corruptItems,
-  };
+  const apiKeys = safeApiKeySummary();
+  try {
+    const cacheKeys = [
+      ...CACHE_STORAGE_KEYS,
+      ...prefixedLocalStorageKeys(CACHE_STORAGE_PREFIXES),
+    ];
+    const dataSchema = getLocalDataSchemaStatus();
+    return {
+      learningKeys: Object.keys(collectKeys(LEARNING_STORAGE_KEYS)).length,
+      cacheKeys: Object.keys(collectKeys(cacheKeys)).length,
+      configuredApiKeys: apiKeys.configured,
+      apiKeySlots: apiKeys.totalSlots,
+      dataSchemaVersion: dataSchema.storedVersion,
+      corruptItems: dataSchema.corruptItems,
+    };
+  } catch {
+    return {
+      learningKeys: 0,
+      cacheKeys: 0,
+      configuredApiKeys: apiKeys.configured,
+      apiKeySlots: apiKeys.totalSlots,
+      dataSchemaVersion: 0,
+      corruptItems: 0,
+      storageUnavailable: true,
+    };
+  }
 }
 
 export async function downloadLocalDataExport(): Promise<void> {

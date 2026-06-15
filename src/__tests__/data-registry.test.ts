@@ -183,6 +183,35 @@ describe("data registry", () => {
     expect(summary.apiKeySlots).toBe(3);
   });
 
+  it("returns a degraded local data summary when storage reads are blocked", async () => {
+    const { getLocalDataSummary, LOCAL_DATA_SUMMARY_UNAVAILABLE_MESSAGE } =
+      await import("@/lib/data-registry");
+    const getItemSpy = vi
+      .spyOn(Storage.prototype, "getItem")
+      .mockImplementation(() => {
+        throw new Error("storage blocked");
+      });
+
+    try {
+      const summary = getLocalDataSummary();
+
+      expect(summary).toMatchObject({
+        learningKeys: 0,
+        cacheKeys: 0,
+        configuredApiKeys: 0,
+        apiKeySlots: 3,
+        dataSchemaVersion: 0,
+        corruptItems: 0,
+        storageUnavailable: true,
+      });
+      expect(LOCAL_DATA_SUMMARY_UNAVAILABLE_MESSAGE).toContain(
+        "本机数据摘要暂时无法读取",
+      );
+    } finally {
+      getItemSpy.mockRestore();
+    }
+  });
+
   it("deletes learning data and caches while preserving app settings and keys", async () => {
     const { deleteLearningData } = await import("@/lib/data-registry");
     localStorage.setItem("speakright_mastery_profile_v2", "{}");

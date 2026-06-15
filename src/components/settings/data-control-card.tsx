@@ -22,6 +22,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
+import { subscribeToStorage } from "@/lib/api-keys";
 import {
   deleteAllLocalData,
   deleteApiKeys,
@@ -29,9 +30,9 @@ import {
   deleteLearningData,
   downloadLocalDataExport,
   getLocalDataSummary,
+  LOCAL_DATA_SUMMARY_UNAVAILABLE_MESSAGE,
 } from "@/lib/data-registry";
 import { downloadDesktopSupportBundle } from "@/lib/desktop-diagnostics";
-import { subscribeToStorage } from "@/lib/api-keys";
 
 type ConfirmAction =
   | "learning"
@@ -78,10 +79,7 @@ function containsChineseText(message: string): boolean {
   return /[\u4e00-\u9fff]/.test(message);
 }
 
-function getDataControlErrorMessage(
-  error: unknown,
-  fallback: string,
-): string {
+function getDataControlErrorMessage(error: unknown, fallback: string): string {
   const rawMessage = error instanceof Error ? error.message.trim() : "";
 
   if (rawMessage && containsChineseText(rawMessage)) {
@@ -90,7 +88,9 @@ function getDataControlErrorMessage(
 
   const lowerMessage = rawMessage.toLowerCase();
 
-  if (/keychain|secure|credential|settings store|tauri store/.test(lowerMessage)) {
+  if (
+    /keychain|secure|credential|settings store|tauri store/.test(lowerMessage)
+  ) {
     return `${fallback}：本机安全存储或设置存储不可用，请重启应用后重试。`;
   }
 
@@ -109,7 +109,9 @@ function getDataControlErrorMessage(
   return `${fallback}：本机操作没有完成，请重试；若仍失败，请查看桌面运行日志或截图反馈。`;
 }
 
-function getDataControlStatusClassName(tone: DataControlStatus["tone"]): string {
+function getDataControlStatusClassName(
+  tone: DataControlStatus["tone"],
+): string {
   return tone === "error"
     ? "rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive break-words [overflow-wrap:anywhere]"
     : "rounded-lg border border-primary/25 bg-primary/5 p-3 text-sm text-foreground break-words [overflow-wrap:anywhere]";
@@ -264,8 +266,19 @@ export function DataControlCard() {
               data-smoke="data-control-corrupt-data-warning"
               role="alert"
             >
-              已隔离 {summary.corruptItems} 项损坏的本机数据。建议先导出学习数据或诊断包留底；
+              已隔离 {summary.corruptItems}{" "}
+              项损坏的本机数据。建议先导出学习数据或诊断包留底；
               如果相关页面仍异常，请使用“重置本机数据”。默认不会删除 API keys。
+            </div>
+          )}
+
+          {summary.storageUnavailable && (
+            <div
+              className="break-words rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-950 [overflow-wrap:anywhere] dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-100"
+              data-smoke="data-control-summary-warning"
+              role="alert"
+            >
+              {LOCAL_DATA_SUMMARY_UNAVAILABLE_MESSAGE}
             </div>
           )}
 
@@ -273,8 +286,10 @@ export function DataControlCard() {
             录音评分会发送音频与参考文本到 Azure
             Speech；标准示范会把练习文本发送到 ElevenLabs；AI
             教练会把文本、分数和错误摘要发送到你配置的 LLM provider。
-            原始训练录音默认不长期保存，benchmark 录音只保存在本机并会随学习数据导出。
-            诊断包只包含版本信息、数据摘要和桌面运行日志尾部，不包含 API keys 或原始录音。
+            原始训练录音默认不长期保存，benchmark
+            录音只保存在本机并会随学习数据导出。
+            诊断包只包含版本信息、数据摘要和桌面运行日志尾部，不包含 API keys
+            或原始录音。
           </div>
 
           {status && (
@@ -381,7 +396,8 @@ export function DataControlCard() {
               <div className="min-w-0 break-words [overflow-wrap:anywhere]">
                 <p className="text-sm font-medium">同时删除 API keys</p>
                 <p className="text-xs text-muted-foreground">
-                  关闭时会保留 Azure、ElevenLabs、LLM 和词典密钥，便于重置后继续使用。
+                  关闭时会保留 Azure、ElevenLabs、LLM
+                  和词典密钥，便于重置后继续使用。
                 </p>
               </div>
               <Switch

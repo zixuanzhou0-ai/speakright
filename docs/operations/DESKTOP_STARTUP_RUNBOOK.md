@@ -73,10 +73,12 @@ reminder that it does not start localhost or the Next dev server.
 - Settings: confirm language switch, Azure, ElevenLabs, LLM, data/privacy, and
   release info are visible; data/privacy export, diagnostics, delete, and reset
   operations should keep success or failure visible inline in Chinese rather
-  than relying only on a short toast. For Spanish/French/Russian, the language
-  availability card should show local-pack `检查中` while it reads bundled
-  resources, then either the bundled item count or a Chinese `缺失或不可读`
-  reinstall/Release EXE feedback hint.
+  than relying only on a short toast. If the local data summary cannot be read,
+  the data/privacy card should still show a Chinese warning while keeping the
+  diagnostic export and reset controls visible. For Spanish/French/Russian, the
+  language availability card should show local-pack `检查中` while it reads
+  bundled resources, then either the bundled item count or a Chinese
+  `缺失或不可读` reinstall/Release EXE feedback hint.
 - First launch and degraded states: the app should open with no API keys, show
   missing-key setup states in Settings, keep bundled local audio usable without
   network access where assets exist, show Chinese provider/network errors for
@@ -90,7 +92,9 @@ reminder that it does not start localhost or the Next dev server.
 - Local storage failures: if score trend or practice-history persistence is
   blocked by quota/permissions, phoneme detail, free practice, and drill scoring
   should still show the current result and display a Chinese warning that local
-  history or transfer evidence was not saved. Advanced English training
+  history or transfer evidence was not saved. Settings data/privacy should fail
+  soft if summary reads are blocked, preserving the export diagnostics and reset
+  paths instead of crashing the settings page. Advanced English training
   surfaces should do the same for mastery/profile writes: pack-runner,
   perception, prosody, scenario transfer, and spontaneous transfer may keep the
   completed result visible, but must show a Chinese warning if local mastery,
