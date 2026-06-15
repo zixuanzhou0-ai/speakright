@@ -150,6 +150,9 @@ git status --short --branch
   visible Chinese `role="alert"` with guidance to export learning data or a
   diagnostics bundle before using `重置本机数据`; the alert notes that API keys
   are not deleted by default.
+- Desktop diagnostics bundles are now schema v2 and include a privacy-safe
+  quarantined-data summary (`key`, `reason`, `detectedAt`, `schemaVersion`,
+  `rawCharacters`) while still excluding raw quarantined local data values.
 - Settings language availability now distinguishes bundled language-pack
   `检查中` from true `缺失或不可读`. Spanish/French/Russian users should not see a
   false missing-pack state while the local manifest is still loading; unreadable
@@ -424,6 +427,9 @@ Current gate summary:
 - Focused Settings quarantined-data tests passed: `2` files and `23` tests,
   covering the data/privacy center corrupt-data alert plus Release smoke checks
   for text, role, wrapping, and no-overflow behavior.
+- Focused desktop diagnostics privacy tests passed: `2` files and `22` tests,
+  covering schema v2 support bundles, redacted local log paths, and
+  quarantined-data summaries that exclude raw values.
 - Open-source handoff/readiness plus IPA audit export drift tests passed.
 - Static language-pack manifest IPA drift tests passed for the applied French
   and Russian reviewed findings.
@@ -447,7 +453,7 @@ Current gate summary:
 - Focused phoneme detail presentation tests passed: `2` files and `9` tests,
   covering non-English full text visibility, Russian long Cyrillic rule text,
   and task-accurate A/B playback labels.
-- Full tests passed: `106` files and `603` tests.
+- Full tests passed: `106` files and `604` tests.
 - Typecheck, lint (`364` files checked), and static desktop frontend build
   passed.
 - Release EXE build passed and rebuilt EXE, MSI, and NSIS artifacts.

@@ -226,6 +226,10 @@ describe("release security configuration", () => {
       join(projectRoot, "src-tauri/src/lib.rs"),
       "utf8",
     );
+    const desktopDiagnostics = readFileSync(
+      join(projectRoot, "src/lib/desktop-diagnostics.ts"),
+      "utf8",
+    );
 
     expect(rustEntry).toContain("tauri_plugin_log::Builder::new()");
     expect(rustEntry).toContain("TargetKind::LogDir");
@@ -239,6 +243,11 @@ describe("release security configuration", () => {
 
     const rustLogCalls = rustEntry.match(/log::\w+!\([^)]+\)/g) ?? [];
     expect(rustLogCalls.join("\n")).not.toMatch(/\b(key|value)\b/);
+
+    expect(desktopDiagnostics).toContain("readCorruptLocalData");
+    expect(desktopDiagnostics).toContain("rawCharacters");
+    expect(desktopDiagnostics).toContain("Raw quarantined local data values");
+    expect(desktopDiagnostics).not.toContain("raw:");
   });
 
   it("keeps blob permission scoped to media and avoids unsafe eval", () => {

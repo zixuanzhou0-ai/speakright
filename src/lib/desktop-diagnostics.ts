@@ -2,6 +2,7 @@
 
 import { invoke } from "@tauri-apps/api/core";
 import { getLocalDataSummary, type LocalDataSummary } from "@/lib/data-registry";
+import { readCorruptLocalData } from "@/lib/local-data-migrations";
 import { DESKTOP_RELEASE_INFO } from "@/lib/release-info";
 import { isTauriEnvironment } from "@/lib/tauri-runtime";
 
@@ -15,12 +16,21 @@ export interface DesktopRuntimeDiagnostics {
   };
 }
 
+export interface DesktopCorruptLocalDataSummary {
+  key: string;
+  reason: string;
+  detectedAt: string;
+  schemaVersion: number;
+  rawCharacters: number;
+}
+
 export interface DesktopSupportBundle {
-  schemaVersion: 1;
+  schemaVersion: 2;
   exportedAt: string;
   product: "SpeakRight Desktop";
   release: typeof DESKTOP_RELEASE_INFO;
   dataSummary: LocalDataSummary;
+  corruptLocalData: DesktopCorruptLocalDataSummary[];
   runtime: DesktopRuntimeDiagnostics;
   excluded: string[];
 }
@@ -49,6 +59,16 @@ function sanitizeDesktopRuntimeDiagnostics(
   };
 }
 
+function summarizeCorruptLocalData(): DesktopCorruptLocalDataSummary[] {
+  return readCorruptLocalData().map((item) => ({
+    key: item.key,
+    reason: item.reason,
+    detectedAt: item.detectedAt,
+    schemaVersion: item.schemaVersion,
+    rawCharacters: item.raw.length,
+  }));
+}
+
 export async function getDesktopRuntimeDiagnostics(): Promise<DesktopRuntimeDiagnostics> {
   if (!isTauriEnvironment()) {
     return {
@@ -67,16 +87,18 @@ export async function getDesktopRuntimeDiagnostics(): Promise<DesktopRuntimeDiag
 export async function buildDesktopSupportBundle(): Promise<DesktopSupportBundle> {
   const runtime = await getDesktopRuntimeDiagnostics();
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     exportedAt: new Date().toISOString(),
     product: "SpeakRight Desktop",
     release: DESKTOP_RELEASE_INFO,
     dataSummary: getLocalDataSummary(),
+    corruptLocalData: summarizeCorruptLocalData(),
     runtime: sanitizeDesktopRuntimeDiagnostics(runtime),
     excluded: [
       "API keys",
       "Local user profile path",
       "Full learning history",
+      "Raw quarantined local data values",
       "Benchmark audio blobs",
       "ElevenLabs TTS audio cache",
     ],
