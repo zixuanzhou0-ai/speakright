@@ -1,6 +1,6 @@
 # Next Chat Handoff
 
-Date: 2026-06-15
+Date: 2026-06-16
 
 This file exists so the next Codex chat can continue without relying on the long
 conversation history.
@@ -71,6 +71,10 @@ E:\SpeakRightDesktopRepo\src-tauri\target\release\speakright.exe
   scripts, including `test`, `typecheck`, `lint`, `desktop:preflight`,
   `desktop:launch-release`, dry-run audio audits, and the public release gate.
   Routine validation scripts are checked so they do not call audio generation.
+- `desktop:launch-release` has its own Release-process guard. On Windows it
+  refuses to open a second `speakright.exe`, prints the running PID list, waits
+  for the OS spawn event, and prints the launched PID; it still never starts
+  localhost or the Next dev server.
 - Drill feedback action buttons now wrap and stay centered after three failed
   attempts, so the `再听一遍` / `跳过此词` controls do not force horizontal
   overflow in narrow windows.
@@ -116,6 +120,10 @@ git status --short --branch
 
 ## Latest Local Fixes To Preserve
 
+- The Release launch script is now self-contained: even if a maintainer skips
+  `desktop:preflight`, `desktop:launch-release` refuses stale duplicate
+  `speakright.exe` processes, reports PIDs, and confirms the spawned Release
+  process ID.
 - Non-English practice cards now prioritize the text the user must read.
   Words, phrases, and sentences should be visible in full instead of using
   ellipsis.

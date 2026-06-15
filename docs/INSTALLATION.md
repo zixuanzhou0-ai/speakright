@@ -189,7 +189,7 @@ before the local RC audit: `94be1d4`.
   policy.
 - Public-release blocker: Windows EXE/MSI/NSIS artifacts are still unsigned.
 
-For the 2026-06-15 internal-test pass, use the installed app or Release EXE
+For the 2026-06-16 internal-test pass, use the installed app or Release EXE
 first. Only rebuild if the executable is missing, stale after code changes, or
 manual QA finds a bug that needs a code fix.
 
@@ -218,6 +218,9 @@ npm run desktop:launch-release
 If `desktop:preflight` reports that `speakright.exe` is already running, close
 the app window first. The preflight command is intentionally non-destructive and
 does not stop the process for you.
+`desktop:launch-release` has the same non-destructive duplicate-process guard:
+it refuses to open another Release EXE, prints the running PID list, and leaves
+the existing SpeakRight window untouched.
 
 ## Troubleshooting
 

@@ -1,6 +1,6 @@
 # Desktop Startup Runbook
 
-Last verified: 2026-06-15
+Last verified: 2026-06-16
 
 This repository is the current SpeakRight Desktop workspace:
 
@@ -58,6 +58,11 @@ cd /d E:\SpeakRightDesktopRepo
 npm run desktop:launch-release
 ```
 
+If `desktop:launch-release` reports that `speakright.exe` is already running,
+use the existing SpeakRight window or close it before launching another Release
+EXE. The command prints the running process IDs so the operator can identify the
+stale app process without falling back to a localhost browser tab.
+
 4. Use the app window that opens from Tauri. Do not use a browser tab pointed at
    `localhost`.
 
@@ -112,6 +117,9 @@ cannot overwrite it during `npm run desktop:build` or `npm run validate:desktop`
 stop; they do not automatically close the user's app window. If needed, close
 the window from the taskbar or stop the `speakright` process before starting the
 build.
+`desktop:launch-release` also refuses to open a second Release EXE when
+`speakright.exe` is already running; it reports the running PID list and leaves
+the existing app process untouched.
 
 Expected process after startup:
 

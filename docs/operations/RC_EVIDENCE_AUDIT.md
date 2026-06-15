@@ -1,6 +1,6 @@
 # SpeakRight Desktop RC Evidence Audit
 
-Date: 2026-06-15
+Date: 2026-06-16
 
 This audit records the evidence used for the Release Candidate quality gate.
 It is intentionally evidence-first: if an item is not covered by a file,
@@ -11,7 +11,7 @@ claimed as complete.
 
 | RC requirement | Evidence source |
 | --- | --- |
-| Current workspace is `E:\SpeakRightDesktopRepo`; release testing uses the Release EXE, not localhost; public install docs explain download, source build, first launch, and degraded no-key/no-network/no-microphone/missing-local-audio states | `README.md`, `docs/INSTALLATION.md`, `docs/operations/DESKTOP_STARTUP_RUNBOOK.md`, `scripts/desktop-preflight.mjs`, `scripts/desktop-ui-smoke.mjs`, `src/__tests__/open-source-readiness.test.ts`, `npm.cmd run desktop:preflight`, `npm.cmd run desktop:ui-smoke` |
+| Current workspace is `E:\SpeakRightDesktopRepo`; release testing uses the Release EXE, not localhost; public install docs explain download, source build, first launch, and degraded no-key/no-network/no-microphone/missing-local-audio states | `README.md`, `docs/INSTALLATION.md`, `docs/operations/DESKTOP_STARTUP_RUNBOOK.md`, `scripts/desktop-preflight.mjs`, `scripts/desktop-launch-release.mjs`, `scripts/desktop-ui-smoke.mjs`, `src/__tests__/open-source-readiness.test.ts`, `npm.cmd run desktop:preflight`, `npm.cmd run desktop:launch-release`, `npm.cmd run desktop:ui-smoke`; `desktop:launch-release` refuses duplicate `speakright.exe` Release processes, reports running PIDs, waits for the OS spawn event, and prints the launched PID without starting localhost |
 | English is the stable baseline; Spanish, French, and Russian remain experimental | `README.md`, `docs/INSTALLATION.md`, `docs/operations/NEXT_CHAT_HANDOFF.md`, `src/app/drill/page.tsx`, `src/lib/mastery-language-policy.ts`, `src/__tests__/mastery-language-policy.test.ts` |
 | Non-English practice can score and provide feedback but cannot load English advanced training packs, write formal mastery/evidenceMastery, display diagnosis issues as formal mastery stages, or show/read English progress archives | `src/lib/mastery-language-policy.ts`, `src/components/assessment/assessment-report.tsx`, `src/app/sentences/page.tsx`, `src/app/progress/page.tsx`, `src/app/assessment/passage/page.tsx`, `src/app/drill/evidence/page.tsx`, `src/app/drill/pack/[packId]/pack-runner-client.tsx`, `src/app/drill/perception/page.tsx`, `src/app/drill/prosody/page.tsx`, `src/app/drill/scenarios/page.tsx`, `src/app/drill/spontaneous/page.tsx`, `src/__tests__/assessment-report.test.tsx`, `src/__tests__/drill-pack-runner.test.tsx`, `src/__tests__/progress-page.test.tsx`, `src/__tests__/mastery-language-policy.test.ts`, `src/__tests__/mastery-profile.test.ts`; direct English pack-runner routes show `pack-runner-experimental-blocker` for Spanish/French/Russian instead of loading English pack content; direct `/progress` access shows `progress-experimental-blocker` for Spanish/French/Russian instead of English mastery archive metrics, and the blocker path does not call the formal mastery profile or benchmark archive loaders; direct `/drill/evidence` access shows `evidence-experimental-blocker` for Spanish/French/Russian and does not read the formal mastery profile; direct `/assessment/passage` access shows `assessment-passage-experimental-blocker` for Spanish/French/Russian instead of loading the English coverage passage or English training-pack evidence; diagnosis issue cards keep formal mastery badges for English but show `experimental 练习观察` plus the experimental blocker for Spanish/French/Russian instead of `阶段` / `下一层` / `阶段分` badges |
 | Words, phrases, sentences, IPA, and examples are centered, wrap in full, avoid ellipsis/truncation, and use accurate playback labels | `src/lib/practice-text-presentation.ts`, `src/components/phoneme/phoneme-study-card.tsx`, `src/components/drill/drill-feedback.tsx`, `src/app/assessment/passage/page.tsx`, `src/app/drill/evidence/page.tsx`, `src/app/drill/pack/[packId]/pack-runner-client.tsx`, `src/app/drill/word/page.tsx`, `src/app/drill/sentence/page.tsx`, `src/app/drill/contrast/page.tsx`, `src/app/drill/prosody/page.tsx`, `src/app/drill/perception/page.tsx`, `src/app/drill/scenarios/page.tsx`, `src/app/drill/spontaneous/page.tsx`, `src/app/progress/page.tsx`, `src/components/assessment/assessment-report.tsx`, `src/components/layout/sidebar-phoneme-list.tsx`, `src/components/audio/read-along-text.tsx`, `src/components/sentences/sentence-input-card.tsx`, `src/components/scoring/word-highlight.tsx`, `src/components/settings/language-config-card.tsx`, `src/components/settings/usage-monitor.tsx`, `src/__tests__/practice-text-presentation.test.ts`, `src/__tests__/phoneme-study-card.test.tsx`, `src/__tests__/drill-feedback.test.tsx`, `src/__tests__/assessment-report.test.tsx`, `src/__tests__/sentence-input-card.test.tsx`, `src/__tests__/progress-page.test.tsx`, `src/__tests__/sidebar-phoneme-list.test.tsx`, `src/__tests__/desktop-preflight-ui-smoke.test.ts`, `scripts/desktop-ui-smoke.mjs`; non-English detail A/B playback buttons label rule sentences as rule/sentence playback instead of saying word playback, long Cyrillic rule text remains centered/wrap-ready/untruncated, failed drill feedback actions wrap instead of forcing a narrow-window horizontal row, diagnosis-report prescription CTAs wrap long pack titles instead of clipping them, the free-practice input/listen row wraps while keeping the text input readable, English word/sentence/contrast drill page headers and initial config cards wrap in narrow Release windows, full-passage diagnosis, training-evidence, and training-pack direct-route headers/intro/blocker text wrap in Release routes, the prosody drill exercise title/pass-line/demo button stack cleanly on narrow screens, perception focused-review and completion action rows wrap instead of forcing a single narrow-window button row, English scenario/spontaneous transfer page headers wrap without pushing the back button out of narrow layouts, Progress benchmark rows stack score/date above replay/delete controls on narrow screens, and Progress recent-session rows wrap pack titles plus stage/date metadata instead of forcing a single line |
@@ -63,7 +63,7 @@ rerun during this playback/UI RC pass.
 
 ## Latest Local Command Results
 
-Latest local focused pass for Settings quarantined-data guidance and smoke coverage:
+Latest local focused pass for Release launch guardrails and the full RC gate:
 
 ```text
 git status --short --branch
@@ -71,25 +71,13 @@ git status --short --branch
   If normal `git push` is unavailable, use the documented GitHub API fallback
   and verify the local-vs-remote tree SHA before treating content as pushed
 
-node --check scripts/desktop-ui-smoke.mjs
+node --check scripts/desktop-launch-release.mjs
   passed
 
-npm.cmd run test -- src/__tests__/settings-key-hydration.test.tsx src/__tests__/desktop-preflight-ui-smoke.test.ts
-  2 files / 23 tests passed; Settings data/privacy center shows an actionable
-  Chinese alert for quarantined corrupt local data and Release smoke checks the
-  alert text, role, wrapping, and no-overflow behavior
-
-npm.cmd run test -- src/__tests__/desktop-diagnostics.test.ts src/__tests__/release-security.test.ts
-  2 files / 22 tests passed; diagnostics bundle schema v2 includes a
-  privacy-safe quarantined-data summary with key/reason/timestamp/schema/raw
-  character count and excludes raw quarantined values
-
-npm.cmd run test -- src/__tests__/mastery-profile.test.ts src/__tests__/progress-page.test.tsx src/__tests__/desktop-preflight-ui-smoke.test.ts
-  3 files / 30 tests passed; corrupt current, legacy, and startup-quarantined
-  mastery storage falls back to an empty profile with Chinese recovery warnings,
-  Progress renders the warning visibly, and Release smoke coverage includes
-  corrupt mastery/coverage localStorage warnings on `/progress`, `/drill/evidence`, and
-  `/assessment/passage`
+npm.cmd run test -- src/__tests__/desktop-artifact-smoke.test.ts
+  1 file / 9 tests passed; the static launch-release contract now locks the
+  duplicate `speakright.exe` guard, running PID output, spawn/error handlers,
+  launched PID output, and no-localhost boundary
 
 npm.cmd run test
   106 files / 604 tests passed
@@ -103,13 +91,10 @@ npm.cmd run lint
 npm.cmd run build:desktop-frontend
   passed; 144 static pages generated
 
-npm.cmd run desktop:build
-  passed; rebuilt Release EXE, MSI, and NSIS artifacts
-
 npm.cmd run desktop:preflight
   passed; Release EXE exists, no running speakright.exe, no localhost startup;
-  during verification it correctly reported the expected dirty worktree from
-  this local fix
+  during verification it correctly reported the expected dirty worktree from this
+  local launch-script/docs/test fix
 
 npm.cmd run desktop:ui-smoke
   passed; Release EXE runtime, centered target text, no target-text ellipsis,
@@ -140,9 +125,17 @@ npm.cmd run desktop:ui-smoke
   releaseServedFromDevServer=false
 
 npm.cmd run desktop:launch-release
-  passed; Release EXE opened from the static Tauri bundle and the verification
-  process was closed afterward; no residual `speakright.exe` remained after
-  cleanup
+  passed; Release EXE opened from
+  `src-tauri\target\release\speakright.exe` and was verified as a running
+  `speakright.exe` process
+
+node scripts/desktop-launch-release.mjs
+  failed as expected while the Release EXE was already open, with the message
+  `speakright.exe is already running` and `Running PIDs: ...`
+
+process cleanup
+  the verification Release EXE process was closed afterward; no residual
+  `speakright.exe` remained after cleanup
 ```
 
 For tomorrow, start from:
@@ -155,8 +148,10 @@ npm.cmd run desktop:launch-release
 
 ## Limits
 
+- `desktop:build` was not rerun during this launch-script/docs/test-only pass;
+  no application frontend or Tauri runtime source changed.
 - `audio:parity:dry-run` and `audio:loudness:dry-run` were not rerun during the
-  Settings action-row pass; the latest recorded audio dry-runs remain the
+  launch-script guardrail pass; the latest recorded audio dry-runs remain the
   previous playback-layer audits.
 - `es-ES`, `fr-FR`, and `ru-RU` are experimental and must not be described as
   formally mastered.

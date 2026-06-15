@@ -118,10 +118,12 @@ input under `docs/operations/non-english-ipa-audit-input.json`, including
 
 `desktop:preflight` checks the active workspace, release executable, and running
 `speakright.exe` process before release-style testing. It never closes the app
-for you; close SpeakRight manually before building. `desktop:ui-smoke` launches
-the Release EXE, opens Settings, English, Spanish, French, Russian, drill, free
-practice, and diagnosis routes, and confirms the runtime is not served from
-`localhost`.
+for you; close SpeakRight manually before building. `desktop:launch-release`
+also refuses to open a second `speakright.exe`, reports the running process IDs,
+and only confirms launch after the Release EXE spawn event. `desktop:ui-smoke`
+launches the Release EXE, opens Settings, English, Spanish, French, Russian,
+drill, free practice, and diagnosis routes, and confirms the runtime is not
+served from `localhost`.
 
 GitHub Actions are split by change type: source, public asset, script,
 `src-tauri`, or package changes still run the full Windows desktop build, while
@@ -131,8 +133,8 @@ README/docs-only changes run the lightweight Docs Check workflow.
 
 - The current Windows artifacts are for controlled testing unless code signing
   is complete.
-- Last controlled-test verification: 2026-06-15, after the open-source
-  audio/provider support-routing pass and full Release EXE gate.
+- Last controlled-test verification: 2026-06-16, after the Release launch
+  guardrail pass and full Release EXE gate.
 - Previous release-validation baseline: `94be1d4`
   (`chore: tighten desktop release validation`).
 - Latest release-hardening pass added non-English low-evidence diagnosis gates,
@@ -154,6 +156,8 @@ README/docs-only changes run the lightweight Docs Check workflow.
   `docs/operations/RC_EVIDENCE_AUDIT.md`. The current RC gate covers full tests,
   typecheck, lint, static desktop frontend build, Release EXE preflight,
   Release EXE UI smoke, and Release EXE launch from the static Tauri bundle.
+  `desktop:launch-release` now also refuses duplicate running `speakright.exe`
+  processes before opening a new Release EXE.
 - Verified Azure live sample: `220/220` pronunciation-assessment calls passed.
 - ElevenLabs usage during normal validation remains `0` generated characters.
   The one-time multilingual secondary-voice generation was approved separately
