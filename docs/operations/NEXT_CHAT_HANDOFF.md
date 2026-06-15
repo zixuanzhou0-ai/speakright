@@ -121,6 +121,10 @@ git status --short --branch
   results visible inline. Storage/keychain/IndexedDB/quota/permission failures
   are converted to Chinese recovery messages with `role="alert"` instead of
   relying only on a short toast.
+- Settings language availability now distinguishes bundled language-pack
+  `检查中` from true `缺失或不可读`. Spanish/French/Russian users should not see a
+  false missing-pack state while the local manifest is still loading; unreadable
+  local resources give a Chinese reinstall/Release EXE feedback hint.
 - Spanish `词重音` and `音节节奏`, and French `词尾静音`, had duplicate examples
   reduced. Continue auditing all Spanish/French/Russian units for repeated text.
 - Spanish video buttons were shortened and allowed to wrap so they do not crowd

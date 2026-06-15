@@ -8,6 +8,7 @@ import {
   Database,
   KeyRound,
   Languages,
+  LoaderCircle,
   Volume2,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -42,17 +43,37 @@ interface AvailabilityRow {
   status: string;
   detail: string;
   ready: boolean;
+  statusKind: "ready" | "pending" | "warning";
   icon: typeof KeyRound;
 }
+
+type StaticPackState =
+  | {
+      languageId: ElevenLabsPackLanguageId | null;
+      status: "idle" | "loading" | "missing";
+      summary: null;
+    }
+  | {
+      languageId: ElevenLabsPackLanguageId;
+      status: "ready";
+      summary: StaticLanguageAudioPackSummary;
+    };
 
 function hasSecret(value?: string): boolean {
   return typeof value === "string" && value.trim().length > 0;
 }
 
 function recommendation(rows: AvailabilityRow[]): string {
+  const missingScoring = rows.find(
+    (row) => row.id === "azure" && row.statusKind === "warning",
+  );
+  if (missingScoring) return "下一步：配置 Azure Speech 评分密钥。";
+
+  const pending = rows.find((row) => row.statusKind === "pending");
+  if (pending) return "正在检查内置发音资源；检查完成前不需要安装额外语言包。";
+
   const missing = rows.find((row) => !row.ready);
   if (!missing) return "可以直接开始今日训练。";
-  if (missing.id === "azure") return "下一步：配置 Azure Speech 评分密钥。";
   if (missing.id === "tts") {
     return "下一步：配置 ElevenLabs；内置资源之外的长句示范需要 TTS。";
   }
@@ -68,22 +89,64 @@ export function LanguageAvailabilityCard() {
   const elevenLabsConfig = useElevenLabsConfig();
   const llmConfig = useLlmConfig();
   const profile = getLanguageProfile(languageConfig.languageId);
-  const [staticPack, setStaticPack] =
-    useState<StaticLanguageAudioPackSummary | null>(null);
+  const [staticPackState, setStaticPackState] = useState<StaticPackState>({
+    languageId: null,
+    status: "idle",
+    summary: null,
+  });
   const packLanguageId = isElevenLabsPackLanguageId(languageConfig.languageId)
     ? (languageConfig.languageId as ElevenLabsPackLanguageId)
     : null;
+  const effectiveStaticPack =
+    packLanguageId && staticPackState.languageId === packLanguageId
+      ? staticPackState
+      : packLanguageId
+        ? ({
+            languageId: packLanguageId,
+            status: "loading",
+            summary: null,
+          } satisfies StaticPackState)
+        : ({
+            languageId: null,
+            status: "idle",
+            summary: null,
+          } satisfies StaticPackState);
 
   useEffect(() => {
     let cancelled = false;
-    setStaticPack(null);
 
-    if (!packLanguageId) return;
+    if (!packLanguageId) {
+      setStaticPackState({ languageId: null, status: "idle", summary: null });
+      return;
+    }
 
-    void getStaticLanguageAudioPackSummary(packLanguageId).then((staticSummary) => {
-      if (cancelled) return;
-      setStaticPack(staticSummary);
+    setStaticPackState({
+      languageId: packLanguageId,
+      status: "loading",
+      summary: null,
     });
+
+    void getStaticLanguageAudioPackSummary(packLanguageId)
+      .then((staticSummary) => {
+        if (cancelled) return;
+        setStaticPackState(
+          staticSummary
+            ? {
+                languageId: packLanguageId,
+                status: "ready",
+                summary: staticSummary,
+              }
+            : { languageId: packLanguageId, status: "missing", summary: null },
+        );
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setStaticPackState({
+          languageId: packLanguageId,
+          status: "missing",
+          summary: null,
+        });
+      });
 
     return () => {
       cancelled = true;
@@ -94,7 +157,9 @@ export function LanguageAvailabilityCard() {
     const azureReady = isAzureConfigReady(azureConfig);
     const ttsConfigured = hasSecret(elevenLabsConfig?.apiKey);
     const localPackReady =
-      languageConfig.languageId === "en-US" || Boolean(staticPack);
+      languageConfig.languageId === "en-US" ||
+      effectiveStaticPack.status === "ready";
+    const packIsLoading = effectiveStaticPack.status === "loading";
     const llmReady = hasSecret(llmConfig?.apiKey);
 
     return [
@@ -104,6 +169,7 @@ export function LanguageAvailabilityCard() {
         status: azureReady ? "已配置" : "未配置",
         detail: "负责录音评分、音素/词级反馈和诊断证据。",
         ready: azureReady,
+        statusKind: azureReady ? "ready" : "warning",
         icon: KeyRound,
       },
       {
@@ -113,9 +179,19 @@ export function LanguageAvailabilityCard() {
           ? "ElevenLabs 已配置"
           : localPackReady
             ? "内置资源可用"
-            : "未配置",
-        detail: "负责长句示范；短词/短语优先使用桌面端内置资源。",
+            : packIsLoading
+              ? "检查内置资源"
+              : "未配置",
+        detail: packIsLoading
+          ? "正在确认短词/短语内置资源；长句示范仍需要 ElevenLabs。"
+          : "负责长句示范；短词/短语优先使用桌面端内置资源。",
         ready: ttsConfigured || localPackReady,
+        statusKind:
+          ttsConfigured || localPackReady
+            ? "ready"
+            : packIsLoading
+              ? "pending"
+              : "warning",
         icon: Cloud,
       },
       {
@@ -124,11 +200,24 @@ export function LanguageAvailabilityCard() {
         status:
           languageConfig.languageId === "en-US"
             ? "英语内置"
-            : staticPack
-              ? `内置 ${staticPack.itemCount} 条`
-              : "缺失",
-        detail: "负责单词/短语复读，随桌面端发布，不需要用户安装。",
+            : effectiveStaticPack.status === "ready"
+              ? `内置 ${effectiveStaticPack.summary.itemCount} 条`
+              : effectiveStaticPack.status === "loading"
+                ? "检查中"
+                : "缺失或不可读",
+        detail:
+          languageConfig.languageId === "en-US" ||
+          effectiveStaticPack.status === "ready"
+            ? "负责单词/短语复读，随桌面端发布，不需要用户安装。"
+            : effectiveStaticPack.status === "loading"
+              ? "正在读取随应用打包的本地发音资源清单。"
+              : "没有读到本地发音资源清单，请重新安装最新版桌面端或反馈 Release EXE 问题。",
         ready: localPackReady,
+        statusKind: localPackReady
+          ? "ready"
+          : packIsLoading
+            ? "pending"
+            : "warning",
         icon: Database,
       },
       {
@@ -137,15 +226,16 @@ export function LanguageAvailabilityCard() {
         status: llmReady ? "已配置" : "未配置",
         detail: "负责中文教练反馈；没有它也能完成录音评分。",
         ready: llmReady,
+        statusKind: llmReady ? "ready" : "warning",
         icon: Bot,
       },
     ];
   }, [
     azureConfig,
     elevenLabsConfig,
+    effectiveStaticPack,
     languageConfig.languageId,
     llmConfig,
-    staticPack,
   ]);
 
   return (
@@ -175,16 +265,21 @@ export function LanguageAvailabilityCard() {
               <div
                 key={row.id}
                 className="rounded-lg border bg-background px-3 py-3"
+                data-smoke={`language-availability-${row.id}`}
               >
                 <div className="flex items-center gap-2">
                   <Icon className="h-4 w-4 text-primary" />
-                  <span className="font-medium">{row.label}</span>
+                  <span className="font-medium break-words [overflow-wrap:anywhere]">
+                    {row.label}
+                  </span>
                   <Badge
                     variant={row.ready ? "default" : "outline"}
-                    className="ml-auto gap-1"
+                    className="ml-auto h-auto min-h-5 shrink whitespace-normal text-center break-words [overflow-wrap:anywhere]"
                   >
                     {row.ready ? (
                       <CheckCircle2 className="h-3 w-3" />
+                    ) : row.statusKind === "pending" ? (
+                      <LoaderCircle className="h-3 w-3 animate-spin" />
                     ) : (
                       <AlertTriangle className="h-3 w-3" />
                     )}

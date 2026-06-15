@@ -150,6 +150,9 @@ describe("desktop preflight and UI smoke", () => {
     const pronunciationCard = readProjectFile(
       "src/components/settings/pronunciation-config-card.tsx",
     );
+    const languageAvailabilityCard = readProjectFile(
+      "src/components/settings/language-availability-card.tsx",
+    );
     const llmCard = readProjectFile(
       "src/components/settings/llm-config-card.tsx",
     );
@@ -165,6 +168,13 @@ describe("desktop preflight and UI smoke", () => {
     expect(usageMonitor).not.toContain("truncate");
     expect(pronunciationCard).toContain('data-smoke="pronunciation-test-row"');
     expect(pronunciationCard).toContain("flex flex-wrap items-center gap-3");
+    expect(languageAvailabilityCard).toContain(
+      "data-smoke={`language-availability-",
+    );
+    expect(languageAvailabilityCard).toContain("检查中");
+    expect(languageAvailabilityCard).toContain("缺失或不可读");
+    expect(languageAvailabilityCard).toContain("重新安装最新版桌面端");
+    expect(languageAvailabilityCard).toContain("overflow-wrap:anywhere");
     expect(llmCard).toContain('data-smoke="llm-provider-chip"');
     expect(llmCard).toContain('data-smoke="llm-manual-provider-note"');
     expect(llmCard).toContain("break-words");
