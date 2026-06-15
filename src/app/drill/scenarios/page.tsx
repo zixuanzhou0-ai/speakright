@@ -262,6 +262,15 @@ export default function ScenariosPage() {
                 听示范
               </Button>
             </div>
+            {tts.error && (
+              <p
+                role="alert"
+                data-smoke="scenario-demo-audio-error"
+                className="mt-3 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300"
+              >
+                {tts.error}
+              </p>
+            )}
           </section>
 
           <section className="rounded-xl border bg-card p-5 shadow-sm">
@@ -296,7 +305,11 @@ export default function ScenariosPage() {
               />
             </div>
             {(recorder.error || assessment.error) && (
-              <p className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300">
+              <p
+                role="alert"
+                data-smoke="scenario-assessment-error"
+                className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300"
+              >
                 {recorder.error ?? assessment.error}
               </p>
             )}

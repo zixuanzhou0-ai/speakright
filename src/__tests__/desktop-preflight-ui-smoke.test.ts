@@ -198,6 +198,35 @@ describe("desktop preflight and UI smoke", () => {
     expect(recorderHook).toContain("录音过程中");
   });
 
+  it("keeps advanced drill provider failures visible inline", () => {
+    const prosodyPage = readProjectFile("src/app/drill/prosody/page.tsx");
+    const scenariosPage = readProjectFile("src/app/drill/scenarios/page.tsx");
+    const spontaneousPage = readProjectFile("src/app/drill/spontaneous/page.tsx");
+    const azureHook = readProjectFile("src/hooks/use-azure-assessment.ts");
+
+    expect(prosodyPage).toContain('data-smoke="prosody-demo-audio-error"');
+    expect(prosodyPage).toContain('data-smoke="prosody-assessment-error"');
+    expect(prosodyPage).toContain("{tts.error}");
+    expect(prosodyPage).toContain("{recorder.error ?? assessment.error}");
+    expect(prosodyPage).toContain('role="alert"');
+
+    expect(scenariosPage).toContain('data-smoke="scenario-demo-audio-error"');
+    expect(scenariosPage).toContain('data-smoke="scenario-assessment-error"');
+    expect(scenariosPage).toContain("{tts.error}");
+    expect(scenariosPage).toContain("{recorder.error ?? assessment.error}");
+    expect(scenariosPage).toContain('role="alert"');
+
+    expect(spontaneousPage).toContain(
+      'data-smoke="spontaneous-processing-error"',
+    );
+    expect(spontaneousPage).toContain("{recorder.error ?? error}");
+    expect(spontaneousPage).toContain("Azure Speech API 密钥和区域");
+    expect(spontaneousPage).toContain('role="alert"');
+
+    expect(azureHook).toContain("Azure Speech API 密钥和区域");
+    expect(azureHook).toContain("回到本页重新评分");
+  });
+
   it("keeps recording and benchmark replay on the shared audio player hook", () => {
     const replayPages = [
       "src/app/drill/prosody/page.tsx",

@@ -32,7 +32,9 @@ export function useAzureAssessment(): UseAzureAssessmentReturn {
   ) => {
     const config = getAzureConfig();
     if (!config) {
-      setError("请先在设置页面配置 Azure Speech API 密钥");
+      setError(
+        "请先到设置页配置 Azure Speech API 密钥和区域；配置后回到本页重新评分。",
+      );
       return null;
     }
 

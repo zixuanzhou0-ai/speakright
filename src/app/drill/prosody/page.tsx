@@ -188,6 +188,15 @@ export default function ProsodyPage() {
                 听示范
               </Button>
             </div>
+            {tts.error && (
+              <p
+                role="alert"
+                data-smoke="prosody-demo-audio-error"
+                className="mt-3 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300"
+              >
+                {tts.error}
+              </p>
+            )}
 
             <div className="rounded-xl border bg-background p-5">
               <p
@@ -262,7 +271,11 @@ export default function ProsodyPage() {
               />
             </div>
             {(recorder.error || assessment.error) && (
-              <p className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300">
+              <p
+                role="alert"
+                data-smoke="prosody-assessment-error"
+                className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300"
+              >
                 {recorder.error ?? assessment.error}
               </p>
             )}

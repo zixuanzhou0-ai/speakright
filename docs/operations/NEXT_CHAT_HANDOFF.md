@@ -131,6 +131,10 @@ git status --short --branch
   errors and Azure scoring errors inline with `role="alert"`, so missing
   microphone permission, missing Azure keys, network failure, or quota failure
   does not look like a frozen assessment step.
+- Prosody and scenario transfer pages now render standard-demo TTS failures
+  inline, and their recording/assessment error panels are `role="alert"`.
+  Spontaneous transfer now also shows `recorder.error` instead of only its own
+  transcription/scoring error state, so microphone failure is not invisible.
 - Recorder runtime interruptions are no longer treated as usable recordings.
   If `MediaRecorder.onerror` fires after recording starts, the hook stops the
   stream, discards any partial audio, and shows a Chinese recovery message about

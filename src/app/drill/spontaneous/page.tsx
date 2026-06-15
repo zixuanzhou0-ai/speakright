@@ -117,7 +117,7 @@ export default function SpontaneousPage() {
   const submit = async () => {
     const config = getAzureConfig();
     if (!config) {
-      setError("请先在设置页面配置 Azure Speech API 密钥");
+      setError("请先到设置页配置 Azure Speech API 密钥和区域；配置后回到本页重新评分。");
       return;
     }
     if (!recorder.audioBlob || !quality.report?.canSubmit) return;
@@ -297,9 +297,13 @@ export default function SpontaneousPage() {
                 </p>
               )}
             </div>
-            {error && (
-              <p className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300">
-                {error}
+            {(recorder.error || error) && (
+              <p
+                role="alert"
+                data-smoke="spontaneous-processing-error"
+                className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300"
+              >
+                {recorder.error ?? error}
               </p>
             )}
           </section>
