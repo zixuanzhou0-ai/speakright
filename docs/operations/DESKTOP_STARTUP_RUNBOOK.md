@@ -1,6 +1,6 @@
 # Desktop Startup Runbook
 
-Last verified: 2026-06-14
+Last verified: 2026-06-15
 
 This repository is the current SpeakRight Desktop workspace:
 
@@ -70,6 +70,12 @@ npm run desktop:launch-release
   availability card should show local-pack `检查中` while it reads bundled
   resources, then either the bundled item count or a Chinese `缺失或不可读`
   reinstall/Release EXE feedback hint.
+- First launch and degraded states: the app should open with no API keys, show
+  missing-key setup states in Settings, keep bundled local audio usable without
+  network access where assets exist, show Chinese provider/network errors for
+  online scoring/TTS/fallback failures, show inline Chinese microphone recovery
+  messages, and never replace missing local sound-unit audio with browser TTS,
+  proxy rule audio, teaching-video audio, or an unrelated sample.
 - English: open phoneme list, then five phoneme detail pages; play target sound,
   example word, record, replay the recording, and score once.
 - Spanish, French, and Russian: switch each language, open the sound-unit list,

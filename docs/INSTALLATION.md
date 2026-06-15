@@ -28,6 +28,28 @@ SpeakRight_1.0.1_x64_en-US.msi
 3. Launch SpeakRight.
 4. Open **Settings** and configure API keys.
 
+## Build From Source
+
+Use this path when you are testing a source checkout instead of a downloaded
+installer. Run it from the current desktop repository only:
+
+```bat
+cd /d E:\SpeakRightDesktopRepo
+npm ci
+npm run desktop:build
+npm run desktop:preflight
+npm run desktop:launch-release
+```
+
+The Release EXE should open from:
+
+```text
+E:\SpeakRightDesktopRepo\src-tauri\target\release\speakright.exe
+```
+
+Do not use a browser `localhost` tab as release acceptance. `npm run
+desktop:dev` is for code debugging only.
+
 ## Required Configuration
 
 SpeakRight can open without API keys, but scoring and AI feedback require external services.
@@ -94,6 +116,30 @@ credential store where supported; learning data stays local to the app.
 - training sessions and review queue
 
 No cloud backend is required for this release.
+
+## First Launch Expectations
+
+The desktop app should open even when no API keys have been configured yet.
+Settings should show the missing-key state instead of blocking startup.
+
+If the network is unavailable, local pages and bundled audio should still load
+where the desktop bundle includes the relevant assets. Azure scoring, AI coach
+feedback, online dictionary fallback, and non-bundled TTS should show
+actionable Chinese network/provider messages rather than raw English exceptions
+or silent loading states.
+
+If microphone permission is denied, the microphone is missing, or another app is
+using the device, recording controls should show an inline Chinese recovery
+message and should not leave the learner stuck in a recording/scoring state.
+
+If bundled local audio is missing or unreadable, Settings should show the
+language-pack `缺失或不可读` state with a reinstall or Release EXE feedback hint.
+Practice pages should avoid pretending that browser TTS, teaching-video audio,
+proxy rule audio, or unrelated samples are exact local sound-unit audio.
+
+Installation verification should not generate ElevenLabs audio or spend TTS
+credits. Use the dry-run audio audits when you need to inspect bundled audio
+coverage.
 
 ## Current Internal-Test Status
 

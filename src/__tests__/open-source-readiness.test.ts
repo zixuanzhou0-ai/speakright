@@ -189,6 +189,39 @@ describe("open-source readiness files", () => {
     expect(handoffDocs).not.toContain("PID was `70112`");
   });
 
+  it("keeps install docs explicit about source builds and first-launch failure states", () => {
+    const readme = read("README.md");
+    const installation = read("docs/INSTALLATION.md");
+    const runbook = read("docs/operations/DESKTOP_STARTUP_RUNBOOK.md");
+    const docs = [installation, runbook].join("\n");
+
+    expect(readme).toContain("source builds");
+    expect(readme).toContain("docs/INSTALLATION.md");
+    expect(installation).toContain("Build From Source");
+    expect(installation).toContain("cd /d E:\\SpeakRightDesktopRepo");
+    expect(installation).toContain("npm ci");
+    expect(installation).toContain("npm run desktop:build");
+    expect(installation).toContain("npm run desktop:preflight");
+    expect(installation).toContain("npm run desktop:launch-release");
+    expect(installation).toContain(
+      "E:\\SpeakRightDesktopRepo\\src-tauri\\target\\release\\speakright.exe",
+    );
+    expect(installation).toContain("Do not use a browser `localhost` tab");
+    expect(installation).toContain("desktop:dev` is for code debugging only");
+
+    expect(docs).toContain("First Launch Expectations");
+    expect(docs).toContain("open even when no API keys");
+    expect(docs).toContain("network is unavailable");
+    expect(docs).toContain("actionable Chinese network/provider messages");
+    expect(docs).toContain("microphone permission is denied");
+    expect(docs).toContain("recording controls should show an inline Chinese recovery");
+    expect(docs).toContain("缺失或不可读");
+    expect(docs).toContain("browser TTS");
+    expect(docs).toContain("teaching-video audio");
+    expect(docs).toContain("proxy rule audio");
+    expect(docs).toContain("Installation verification should not generate ElevenLabs audio");
+  });
+
   it("keeps public developer and release npm scripts explicit and zero-generation by default", () => {
     const packageJson = JSON.parse(read("package.json")) as {
       private?: boolean;
