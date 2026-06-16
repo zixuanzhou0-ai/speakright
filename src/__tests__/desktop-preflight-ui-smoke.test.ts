@@ -231,6 +231,7 @@ describe("desktop preflight and UI smoke", () => {
     expect(script).toContain("tts-voice-select");
     expect(script).toContain("tts-model-select");
     expect(script).toContain("ttsSelectsWrap");
+    expect(script).toContain("settingsBadgesWrap");
     expect(script).toContain("childrenDoNotOverlap");
     expect(script).toContain("pronunciationRowsWrap");
     expect(script).toContain("settingsActionRowsWrap");
@@ -348,6 +349,7 @@ describe("desktop preflight and UI smoke", () => {
       "src/components/settings/connection-status.tsx",
     );
     const select = readProjectFile("src/components/ui/select.tsx");
+    const badge = readProjectFile("src/components/ui/badge.tsx");
 
     expect(languageCard).toContain('data-smoke="language-option-missing"');
     expect(languageCard).toContain("overflow-wrap:anywhere");
@@ -445,6 +447,15 @@ describe("desktop preflight and UI smoke", () => {
     expect(select).toContain("[overflow-wrap:anywhere]");
     expect(select).not.toContain("line-clamp");
     expect(select).not.toContain("whitespace-nowrap");
+    expect(badge).toContain("data-slot");
+    expect(badge).toContain("min-h-5");
+    expect(badge).toContain("max-w-full");
+    expect(badge).toContain("text-center");
+    expect(badge).toContain("break-words");
+    expect(badge).toContain("whitespace-normal");
+    expect(badge).toContain("[overflow-wrap:anywhere]");
+    expect(badge).not.toContain("overflow-hidden");
+    expect(badge).not.toContain("whitespace-nowrap");
   });
 
   it("keeps Settings data-control operation results visible inline", () => {

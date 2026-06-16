@@ -853,6 +853,10 @@ async function assertSettings(cdp) {
     `
 (() => {
   const bodyText = document.body?.innerText ?? "";
+  const hasVisibleRect = (element) => {
+    const rect = element.getBoundingClientRect();
+    return rect.width > 0 && rect.height > 0;
+  };
   const wraps = (element) => {
     const style = window.getComputedStyle(element);
     return (
@@ -865,6 +869,7 @@ async function assertSettings(cdp) {
   const languageMissing = [...document.querySelectorAll('[data-smoke="language-option-missing"]')];
   const usageTargets = [...document.querySelectorAll('[data-smoke="usage-history-target"]')];
   const pronunciationRows = [...document.querySelectorAll('[data-smoke="pronunciation-test-row"]')];
+  const settingsBadges = [...document.querySelectorAll('[data-slot="badge"]')].filter(hasVisibleRect);
   const ttsSelects = [
     ...document.querySelectorAll(
       '[data-smoke="tts-voice-select"], [data-smoke="tts-model-select"]'
@@ -905,6 +910,8 @@ async function assertSettings(cdp) {
       childrenDoNotOverlap(element)
       );
     });
+  const settingsBadgesWrap =
+    settingsBadges.length >= 6 && settingsBadges.every(wraps);
   const ttsSelectsWrap =
     ttsSelects.length === 2 &&
     ttsSelects.every((element) => {
@@ -945,6 +952,7 @@ async function assertSettings(cdp) {
       usageTargets.every(wraps) &&
       pronunciationRows.length > 0 &&
       pronunciationRowsWrap &&
+      settingsBadgesWrap &&
       ttsSelectsWrap &&
       settingsActionRowsWrap &&
       Boolean(corruptWarning) &&
@@ -963,6 +971,8 @@ async function assertSettings(cdp) {
     usageTargetCount: usageTargets.length,
     pronunciationRowCount: pronunciationRows.length,
     pronunciationRowsWrap,
+    settingsBadgeCount: settingsBadges.length,
+    settingsBadgesWrap,
     ttsSelectCount: ttsSelects.length,
     ttsSelectsWrap,
     settingsActionRowCount: settingsActionRows.length,

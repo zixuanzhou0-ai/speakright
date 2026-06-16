@@ -118,6 +118,9 @@ E:\SpeakRightDesktopRepo\src-tauri\target\release\speakright.exe
 - ElevenLabs voice/model selects now use wrap-safe trigger/value/item text, and
   Release EXE smoke checks `tts-voice-select` plus `tts-model-select` so long
   model labels do not fall back to one-line clipping in Settings.
+- Shared `Badge` now defaults to a wrap-safe, max-width-bounded label with an
+  explicit `data-slot="badge"` hook; Settings Release EXE smoke checks visible
+  badges at runtime so future status labels do not silently return to nowrap.
 - Advanced pack-runner badges for intro metadata, course-map status, course
   header, level titles, remediation, and debrief next-level labels now also use
   wrap-safe badge classes.
