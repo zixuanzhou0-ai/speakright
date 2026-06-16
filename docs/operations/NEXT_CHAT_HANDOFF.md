@@ -39,6 +39,10 @@ E:\SpeakRightDesktopRepo\src-tauri\target\release\speakright.exe
 - The public issue templates now include a dedicated audio/provider request
   path for missing bundled audio, wrong clickable audio sources, loudness
   mismatches, and quota-impacting provider requests.
+- The PR template now also requires IPA/pronunciation disputes, audio gaps,
+  paid-provider/quota requests, and security/private-data concerns to link to
+  the matching issue or private-report route instead of being buried in release
+  evidence.
 - The public conduct policy keeps accent, learner-recording, IPA, and
   experimental-language discussion respectful and evidence-first; vulnerabilities,
   leaked credentials, private recordings, and private learning-data exports are

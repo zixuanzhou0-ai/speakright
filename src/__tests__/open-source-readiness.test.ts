@@ -220,6 +220,16 @@ describe("open-source readiness files", () => {
     expect(pullRequest).toContain("I did not use localhost/dev server");
     expect(pullRequest).toContain("I did not generate ElevenLabs audio");
     expect(pullRequest).toContain("Spanish, French, and Russian remain experimental");
+    expect(pullRequest).toContain("`IPA or pronunciation audit`");
+    expect(pullRequest).toContain("source evidence");
+    expect(pullRequest).toContain("`Audio gap or provider");
+    expect(pullRequest).toContain("paid-provider/quota request");
+    expect(pullRequest).toContain("private recording");
+    expect(pullRequest).toContain("full diagnostics bundle");
+    expect(pullRequest).toContain("private learning-data export");
+    expect(pullRequest).toContain("unsafe desktop permission");
+    expect(pullRequest).toContain("SECURITY.md");
+    expect(pullRequest).toContain("SUPPORT.md");
     expect(pullRequest).toContain("two independent sources");
     expect(pullRequest).toContain("non-english-ipa-reviewed-findings.json");
     expect(pullRequest).toContain("verdict/status contract");
@@ -286,7 +296,7 @@ describe("open-source readiness files", () => {
       "Latest local full gate",
     );
     expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
-      "121 files / 690 tests passed",
+      "122 files / 694 tests passed",
     );
     expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
       "settings-storage-warning",
@@ -301,7 +311,7 @@ describe("open-source readiness files", () => {
       "match the detail header speaker",
     );
     expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
-      "Biome checked 384 files",
+      "Biome checked 386 files",
     );
     expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
       "ru-RU 918 existing, 0 missing",

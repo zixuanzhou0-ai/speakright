@@ -17,6 +17,15 @@
 - [ ] I did not use localhost/dev server as the release acceptance path.
 - [ ] I did not generate ElevenLabs audio or spend TTS credits.
 - [ ] Spanish, French, and Russian remain experimental.
+- [ ] Any IPA/pronunciation dispute is linked to the `IPA or pronunciation audit`
+      template with source evidence.
+- [ ] Any missing local audio, wrong clickable audio source, loudness mismatch,
+      or paid-provider/quota request is linked to the `Audio gap or provider
+      request` template.
+- [ ] Any API key, token, private recording, full diagnostics bundle, private learning-data export,
+      vulnerability, unsafe desktop permission, or arbitrary file/network access
+      concern is routed through `SECURITY.md` or `SUPPORT.md` instead of public
+      PR evidence.
 - [ ] Any IPA `update` has two independent sources or one primary authority plus
       one dictionary/textbook corroboration.
 - [ ] Any final-corpus IPA change updates
