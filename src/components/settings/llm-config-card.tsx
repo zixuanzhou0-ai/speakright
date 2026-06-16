@@ -29,6 +29,9 @@ import type { ProviderName } from "@/types/llm";
 import { type ConnectionState, ConnectionStatus } from "./connection-status";
 import { getSettingsUserFacingError } from "./user-facing-error";
 
+const WRAP_SAFE_SETTINGS_ACTION_BUTTON_CLASS =
+  "h-auto min-h-8 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]";
+
 export function LlmConfigCard() {
   const [provider, setProvider] = useState<ProviderName>("claude");
   const [apiKey, setApiKey] = useState("");
@@ -338,13 +341,18 @@ export function LlmConfigCard() {
           className="flex flex-wrap items-center gap-3"
           data-smoke="llm-config-actions"
         >
-          <Button onClick={handleSave} disabled={desktopCustomBlocked}>
+          <Button
+            onClick={handleSave}
+            disabled={desktopCustomBlocked}
+            className={WRAP_SAFE_SETTINGS_ACTION_BUTTON_CLASS}
+          >
             保存
           </Button>
           <Button
             variant="outline"
             onClick={handleTest}
             disabled={desktopCustomBlocked}
+            className={WRAP_SAFE_SETTINGS_ACTION_BUTTON_CLASS}
           >
             测试连接
           </Button>

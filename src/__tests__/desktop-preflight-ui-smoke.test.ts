@@ -364,10 +364,26 @@ describe("desktop preflight and UI smoke", () => {
     expect(usageMonitor).not.toContain("truncate");
     expect(pronunciationCard).toContain('data-smoke="pronunciation-test-row"');
     expect(pronunciationCard).toContain("flex flex-wrap items-center gap-3");
+    expect(pronunciationCard).toContain(
+      "WRAP_SAFE_SETTINGS_ACTION_BUTTON_CLASS",
+    );
+    expect(pronunciationCard).toContain(
+      "h-auto min-h-8 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]",
+    );
     expect(azureCard).toContain('data-smoke="azure-config-actions"');
     expect(azureCard).toContain("flex flex-wrap items-center gap-3");
+    expect(azureCard).toContain("WRAP_SAFE_SETTINGS_ACTION_BUTTON_CLASS");
+    expect(azureCard).toContain(
+      "h-auto min-h-8 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]",
+    );
     expect(elevenLabsCard).toContain('data-smoke="tts-config-actions"');
     expect(elevenLabsCard).toContain("flex flex-wrap items-center gap-3");
+    expect(elevenLabsCard).toContain(
+      "WRAP_SAFE_SETTINGS_ACTION_BUTTON_CLASS",
+    );
+    expect(elevenLabsCard).toContain(
+      "h-auto min-h-8 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]",
+    );
     expect(languageAvailabilityCard).toContain(
       "data-smoke={`language-availability-",
     );
@@ -379,6 +395,10 @@ describe("desktop preflight and UI smoke", () => {
     expect(llmCard).toContain('data-smoke="llm-manual-provider-note"');
     expect(llmCard).toContain('data-smoke="llm-config-actions"');
     expect(llmCard).toContain("flex flex-wrap items-center gap-3");
+    expect(llmCard).toContain("WRAP_SAFE_SETTINGS_ACTION_BUTTON_CLASS");
+    expect(llmCard).toContain(
+      "h-auto min-h-8 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]",
+    );
     expect(llmCard).toContain("break-words");
     expect(connectionStatus).toContain(
       'data-smoke="settings-connection-status"',

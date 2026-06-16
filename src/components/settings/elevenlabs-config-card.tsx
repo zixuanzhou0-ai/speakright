@@ -25,6 +25,9 @@ import { setElevenLabsConfig } from "@/lib/api-keys";
 import { type ConnectionState, ConnectionStatus } from "./connection-status";
 import { getSettingsUserFacingError } from "./user-facing-error";
 
+const WRAP_SAFE_SETTINGS_ACTION_BUTTON_CLASS =
+  "h-auto min-h-8 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]";
+
 const ELEVENLABS_VOICES = [
   { voice_id: "RaFzMbMIfqBcIurH6XF9", name: "Eryn" },
   { voice_id: "cR39HTrtXbjvEP4CNYFx", name: "Daphne" },
@@ -182,8 +185,17 @@ export function ElevenLabsConfigCard() {
           className="flex flex-wrap items-center gap-3"
           data-smoke="tts-config-actions"
         >
-          <Button onClick={handleSave}>保存</Button>
-          <Button variant="outline" onClick={handleTest}>
+          <Button
+            onClick={handleSave}
+            className={WRAP_SAFE_SETTINGS_ACTION_BUTTON_CLASS}
+          >
+            保存
+          </Button>
+          <Button
+            variant="outline"
+            onClick={handleTest}
+            className={WRAP_SAFE_SETTINGS_ACTION_BUTTON_CLASS}
+          >
             测试连接
           </Button>
           <ConnectionStatus state={status} message={statusMsg} />

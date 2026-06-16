@@ -22,6 +22,9 @@ import {
 import { type ConnectionState, ConnectionStatus } from "./connection-status";
 import { getSettingsUserFacingError } from "./user-facing-error";
 
+const WRAP_SAFE_SETTINGS_ACTION_BUTTON_CLASS =
+  "h-auto min-h-8 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]";
+
 export function AzureConfigCard() {
   const [key, setKey] = useState("");
   const [region, setRegion] = useState("eastus");
@@ -142,8 +145,17 @@ export function AzureConfigCard() {
           className="flex flex-wrap items-center gap-3"
           data-smoke="azure-config-actions"
         >
-          <Button onClick={handleSave}>保存</Button>
-          <Button variant="outline" onClick={handleTest}>
+          <Button
+            onClick={handleSave}
+            className={WRAP_SAFE_SETTINGS_ACTION_BUTTON_CLASS}
+          >
+            保存
+          </Button>
+          <Button
+            variant="outline"
+            onClick={handleTest}
+            className={WRAP_SAFE_SETTINGS_ACTION_BUTTON_CLASS}
+          >
             测试连接
           </Button>
           <ConnectionStatus state={status} message={statusMsg} />

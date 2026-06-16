@@ -17,6 +17,9 @@ import { getLanguageProfile } from "@/lib/language-profiles";
 import { type ConnectionState, ConnectionStatus } from "./connection-status";
 import { getSettingsUserFacingError } from "./user-facing-error";
 
+const WRAP_SAFE_SETTINGS_ACTION_BUTTON_CLASS =
+  "h-auto min-h-8 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]";
+
 export function PronunciationConfigCard() {
   const [status, setStatus] = useState<ConnectionState>("idle");
   const [statusMsg, setStatusMsg] = useState("");
@@ -101,7 +104,12 @@ export function PronunciationConfigCard() {
           className="flex flex-wrap items-center gap-3"
           data-smoke="pronunciation-test-row"
         >
-          <Button variant="outline" onClick={handleTest} disabled={isTesting}>
+          <Button
+            variant="outline"
+            onClick={handleTest}
+            disabled={isTesting}
+            className={WRAP_SAFE_SETTINGS_ACTION_BUTTON_CLASS}
+          >
             <Volume2 className="mr-1.5 h-4 w-4" />
             测试有道发音
           </Button>
