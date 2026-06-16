@@ -87,6 +87,16 @@ describe("Azure desktop API client", () => {
     });
   });
 
+  it("does not leak unknown English desktop transport errors during connection testing", async () => {
+    mocks.apiFetch.mockRejectedValueOnce(new Error("plugin-http panicked"));
+
+    await expect(testAzure("secret", "eastus")).resolves.toEqual({
+      success: false,
+      error:
+        "Azure Speech 请求失败，请检查 Azure Speech API 密钥、区域、网络或代理后重试。",
+    });
+  });
+
   it("throws a Chinese no-speech message for Azure assessment silence", async () => {
     mocks.apiFetch.mockResolvedValueOnce(
       new Response("No speech detected", { status: 400 }),
@@ -116,6 +126,21 @@ describe("Azure desktop API client", () => {
       ),
     ).rejects.toThrow(
       "无法连接 Azure Speech，请检查网络、代理或 Azure 区域后重试。",
+    );
+  });
+
+  it("does not leak unknown English desktop transport errors during assessment", async () => {
+    mocks.apiFetch.mockRejectedValueOnce(new Error("plugin-http panicked"));
+
+    await expect(
+      assessPronunciation(
+        new Blob(["audio"], { type: "audio/wav" }),
+        "hello",
+        "secret",
+        "eastus",
+      ),
+    ).rejects.toThrow(
+      "Azure Speech 请求失败，请检查 Azure Speech API 密钥、区域、网络或代理后重试。",
     );
   });
 

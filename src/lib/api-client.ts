@@ -85,7 +85,11 @@ function buildAzureNetworkErrorMessage(error: unknown): string {
     return "无法连接 Azure Speech，请检查网络、代理或 Azure 区域后重试。";
   }
 
-  return `Azure Speech 请求失败：${truncateServiceDetail(message) || "未知错误"}`;
+  if (/[\u3400-\u9fff]/.test(message)) {
+    return `Azure Speech 请求失败：${truncateServiceDetail(message)}`;
+  }
+
+  return "Azure Speech 请求失败，请检查 Azure Speech API 密钥、区域、网络或代理后重试。";
 }
 
 function assertAzureSpeechMatch(raw: Record<string, unknown>): void {
