@@ -232,7 +232,13 @@ describe("open-source readiness files", () => {
       "Latest local full gate",
     );
     expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
-      "120 files / 668 tests passed",
+      "121 files / 673 tests passed",
+    );
+    expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
+      "Biome checked 384 files",
+    );
+    expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
+      "ru-RU 918 existing, 0 missing",
     );
     expect(handoffDocs).toContain(
       "Current command-by-command results, including exact test counts, live in",

@@ -89,13 +89,13 @@ npm.cmd run test -- word-card-layout practice-text-presentation
   helpers stay centered, wrapping, density-aware, and untruncated.
 
 npm.cmd run test
-  120 files / 668 tests passed
+  121 files / 673 tests passed
 
 npm.cmd run typecheck
   passed
 
 npm.cmd run lint
-  passed; Biome checked 383 files
+  passed; Biome checked 384 files
 
 npm.cmd run build:desktop-frontend
   passed; 144 static pages generated
@@ -155,10 +155,13 @@ npm.cmd run desktop:launch-release
 
 ## Limits
 
-- `desktop:build`, `audio:parity:dry-run`, and `audio:loudness:dry-run` are not
-  part of every docs/UI-governance tightening pass. Rerun them when Tauri/Rust,
-  packaged assets, audio coverage, playback gain, or loudness math changes. The
-  latest recorded audio dry-runs remain the previous playback-layer audits.
+- `desktop:build` is not part of every docs/UI-governance tightening pass. Rerun
+  it when Tauri/Rust or packaged installer behavior changes.
+- Latest recorded audio dry-runs: `audio:parity:dry-run` reported
+  `es-ES 880 existing, 0 missing`, `fr-FR 1090 existing, 0 missing`, and
+  `ru-RU 918 existing, 0 missing`; `audio:loudness:dry-run` passed against
+  representative A/B, language-pack, IPA normal/slow, and teaching-video
+  samples. Both made zero ElevenLabs calls.
 - `es-ES`, `fr-FR`, and `ru-RU` are experimental and must not be described as
   formally mastered.
 - The RC gate does not generate new TTS audio.

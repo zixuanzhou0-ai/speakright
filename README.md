@@ -146,7 +146,7 @@ README/docs-only changes run the lightweight Docs Check workflow.
   final local `validate:desktop` pass completed successfully.
 - Verified bundled assets after the multilingual dual-voice expansion: English
   word audio `1464/1464`, Spanish language-pack audio `880/880`, French
-  language-pack audio `1090/1090`, Russian language-pack audio `920/920`, local
+  language-pack audio `1090/1090`, Russian language-pack files `920/920`, local
   videos `224/224`.
 - Multilingual audio-density expansion target: 24 practice items per Spanish,
   French, and Russian sound unit. Current parity dry-run validates normalized
