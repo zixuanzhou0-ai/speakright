@@ -329,8 +329,18 @@ describe("desktop preflight and UI smoke", () => {
       'data-smoke="free-practice-transfer-score-badge"',
     );
     expect(sentenceResultsColumn).toContain(
+      'data-smoke="free-practice-transfer-matched-words"',
+    );
+    expect(sentenceResultsColumn).toContain("matchedWordsText");
+    expect(sentenceResultsColumn).not.toContain("matchedWords.slice(0, 6)");
+    expect(sentenceResultsColumn).toContain(
       "h-auto min-h-5 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]",
     );
+    const freePracticeTransfer = readProjectFile(
+      "src/lib/free-practice-transfer.ts",
+    );
+    expect(freePracticeTransfer).toContain("const matchedWords = unique(targetWords);");
+    expect(freePracticeTransfer).not.toContain("unique(targetWords).slice(0, 6)");
     const wordPronunciationHook = readProjectFile(
       "src/hooks/use-word-pronunciation.ts",
     );

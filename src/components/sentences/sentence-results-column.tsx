@@ -154,57 +154,58 @@ function TransferEvidenceCard({
         </Badge>
       </div>
       <div className="grid gap-2">
-        {summary.evidences.map((item) => (
-          <div
-            key={`${item.packId}-${item.levelId}`}
-            className="rounded-lg border bg-background p-3"
-          >
-            <div className="flex flex-wrap items-start justify-center gap-2 text-center">
-              <div className="max-w-full">
-                <p className="break-words text-sm font-semibold [overflow-wrap:anywhere]">
-                  {item.packTitle}
-                </p>
-                <p className="mt-1 break-words text-xs text-muted-foreground [overflow-wrap:anywhere]">
-                  {item.reason}
-                </p>
-              </div>
-              <Badge
-                variant={item.passed ? "default" : "destructive"}
-                className={WRAP_SAFE_BADGE_CLASS}
-                data-smoke="free-practice-transfer-score-badge"
-              >
-                目标音 {item.targetScore}/{item.threshold}
-              </Badge>
-            </div>
-            <div className="mt-2 grid gap-2 md:grid-cols-[0.9fr_1.1fr]">
-              <div className="rounded-md bg-muted/40 p-2">
-                <p className="text-xs font-semibold text-muted-foreground">
-                  命中词
-                </p>
-                <p
-                  className={`${getCenteredReadableTextClassName(
-                    getPracticeTextDensity(
-                      item.matchedWords.slice(0, 6).join(", "),
-                      "phrase",
-                    ),
-                  )} mt-1 font-mono`}
+        {summary.evidences.map((item) => {
+          const matchedWordsText = item.matchedWords.join(", ");
+          return (
+            <div
+              key={`${item.packId}-${item.levelId}`}
+              className="rounded-lg border bg-background p-3"
+            >
+              <div className="flex flex-wrap items-start justify-center gap-2 text-center">
+                <div className="max-w-full">
+                  <p className="break-words text-sm font-semibold [overflow-wrap:anywhere]">
+                    {item.packTitle}
+                  </p>
+                  <p className="mt-1 break-words text-xs text-muted-foreground [overflow-wrap:anywhere]">
+                    {item.reason}
+                  </p>
+                </div>
+                <Badge
+                  variant={item.passed ? "default" : "destructive"}
+                  className={WRAP_SAFE_BADGE_CLASS}
+                  data-smoke="free-practice-transfer-score-badge"
                 >
-                  {item.matchedWords.slice(0, 6).join(", ")}
-                </p>
+                  目标音 {item.targetScore}/{item.threshold}
+                </Badge>
               </div>
-              <div className="rounded-md bg-primary/5 p-2">
-                <p className="text-xs font-semibold text-muted-foreground">
-                  下一次只改
-                </p>
-                <p className="mt-1 break-words text-center text-sm font-medium text-primary [overflow-wrap:anywhere]">
-                  {item.passed
-                    ? "这次能迁移到自己的句子里，下一轮换新句子复测。"
-                    : item.nextCue}
-                </p>
+              <div className="mt-2 grid gap-2 md:grid-cols-[0.9fr_1.1fr]">
+                <div className="rounded-md bg-muted/40 p-2">
+                  <p className="text-xs font-semibold text-muted-foreground">
+                    命中词
+                  </p>
+                  <p
+                    className={`${getCenteredReadableTextClassName(
+                      getPracticeTextDensity(matchedWordsText, "phrase"),
+                    )} mt-1 font-mono`}
+                    data-smoke="free-practice-transfer-matched-words"
+                  >
+                    {matchedWordsText}
+                  </p>
+                </div>
+                <div className="rounded-md bg-primary/5 p-2">
+                  <p className="text-xs font-semibold text-muted-foreground">
+                    下一次只改
+                  </p>
+                  <p className="mt-1 break-words text-center text-sm font-medium text-primary [overflow-wrap:anywhere]">
+                    {item.passed
+                      ? "这次能迁移到自己的句子里，下一轮换新句子复测。"
+                      : item.nextCue}
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

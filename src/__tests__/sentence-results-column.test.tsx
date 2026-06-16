@@ -40,7 +40,16 @@ describe("SentenceResultsColumn transfer evidence layout", () => {
             "极长训练包标题：/s/ 与 /θ/ 自由练习迁移证据需要完整显示不能省略",
           levelId: "sentence-ladder",
           targetPhonemes: ["s", "th"],
-          matchedWords: ["thoughtful", "thanked", "three"],
+          matchedWords: [
+            "thoughtful",
+            "thanked",
+            "three",
+            "think",
+            "mouth",
+            "health",
+            "path",
+            "thick",
+          ],
           targetScore: 86,
           overallScore: 91,
           threshold: 80,
@@ -89,5 +98,14 @@ describe("SentenceResultsColumn transfer evidence layout", () => {
         '[data-smoke="free-practice-transfer-score-badge"]',
       ),
     );
+    const matchedWords = document.querySelector(
+      '[data-smoke="free-practice-transfer-matched-words"]',
+    );
+    expect(matchedWords).not.toBeNull();
+    expect(matchedWords).toHaveTextContent(
+      "thoughtful, thanked, three, think, mouth, health, path, thick",
+    );
+    expect(matchedWords).toHaveClass("text-center");
+    expect(matchedWords).not.toHaveClass("truncate");
   });
 });

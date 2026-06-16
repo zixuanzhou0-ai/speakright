@@ -311,7 +311,7 @@ describe("open-source readiness files", () => {
       "Latest local full gate",
     );
     expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
-      "123 files / 704 tests passed",
+      "123 files / 705 tests passed",
     );
     expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
       "settings-storage-warning",

@@ -313,7 +313,7 @@ export function buildFreePracticeTargetPreview({
           : packTargetWords(packId).filter((word) =>
               textContainsPhrase(textWords, textPhrase, word),
             );
-      const matchedWords = unique(targetWords).slice(0, 6);
+      const matchedWords = unique(targetWords);
       if (matchedWords.length === 0) return null;
 
       return {

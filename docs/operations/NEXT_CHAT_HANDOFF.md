@@ -106,6 +106,9 @@ E:\SpeakRightDesktopRepo\src-tauri\target\release\speakright.exe
 - Free-practice target preview pack badges now wrap long training-pack titles,
   so suggested or matched practice targets do not inherit the base badge nowrap
   behavior.
+- Free-practice transfer evidence now preserves and displays every matched
+  target word in a wrap-safe centered line; `free-practice-transfer.ts` and
+  `SentenceResultsColumn` tests reject the old first-six-word display.
 - The `/drill` landing page now stacks its header actions on narrow windows and
   uses wrap-safe classes for top CTA buttons, status badges, today-plan badges,
   training-memory badges, and training-pack metadata badges.

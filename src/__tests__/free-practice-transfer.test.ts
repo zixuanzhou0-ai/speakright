@@ -79,6 +79,30 @@ describe("free-practice transfer", () => {
     expect(preview.targets[0].matchedWords).toContain("thin");
   });
 
+  it("keeps every matched target word in a free-practice preview", () => {
+    const preview = buildFreePracticeTargetPreview({
+      profile: profile({ errorPatterns: {} }),
+      text: "think three mouth health path thick things thoughtful",
+      mode: "sentence",
+      now: NOW,
+    });
+
+    expect(preview.targets[0]).toMatchObject({
+      packId: "s-th",
+      source: "active-pack",
+    });
+    expect(preview.targets[0].matchedWords).toEqual([
+      "think",
+      "three",
+      "mouth",
+      "health",
+      "things",
+      "path",
+      "thoughtful",
+      "thick",
+    ]);
+  });
+
   it("suggests target words when the free-practice text misses the current goal", () => {
     const preview = buildFreePracticeTargetPreview({
       profile: profile(),
