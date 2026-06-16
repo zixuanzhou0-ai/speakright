@@ -726,6 +726,18 @@ describe("desktop preflight and UI smoke", () => {
     expect(packRunner).toContain('data-smoke="pack-runner-page"');
     expect(packRunner).toContain('data-smoke="pack-runner-intro-card"');
     expect(packRunner).toContain('data-smoke="pack-runner-course-map"');
+    expect(packRunner).toContain("WRAP_SAFE_BADGE_CLASS");
+    expect(packRunner).toContain('data-smoke="pack-runner-intro-phoneme-badge"');
+    expect(packRunner).toContain(
+      'data-smoke="pack-runner-course-map-status-badge"',
+    );
+    expect(packRunner).toContain('data-smoke="pack-runner-level-title-badge"');
+    expect(packRunner).toContain(
+      'data-smoke="pack-runner-debrief-next-level-badge"',
+    );
+    expect(packRunner).toContain(
+      "h-auto min-h-5 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]",
+    );
     expect(packRunner).toContain(
       "h-auto min-h-8 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]",
     );

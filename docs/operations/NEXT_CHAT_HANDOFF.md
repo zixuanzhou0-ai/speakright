@@ -90,6 +90,9 @@ E:\SpeakRightDesktopRepo\src-tauri\target\release\speakright.exe
   behavior.
 - Full-passage diagnosis badges for target packs, feature labels, evidence
   words, and benchmark deltas now use the same wrap-safe badge treatment.
+- Advanced pack-runner badges for intro metadata, course-map status, course
+  header, level titles, remediation, and debrief next-level labels now also use
+  wrap-safe badge classes.
 - Installation docs now include a source-build Release EXE path and first-launch
   expectations for no API keys, no network, no microphone permission, and
   missing bundled local audio. The runbook mirrors those degraded-state checks

@@ -74,6 +74,18 @@ vi.mock("@/hooks/use-tts-aligned", () => ({
   }),
 }));
 
+function expectBadgeWraps(element: Element | null) {
+  expect(element).not.toBeNull();
+  expect(element).toHaveClass("h-auto");
+  expect(element).toHaveClass("min-h-5");
+  expect(element).toHaveClass("max-w-full");
+  expect(element).toHaveClass("whitespace-normal");
+  expect(element).toHaveClass("break-words");
+  expect(element).toHaveClass("text-center");
+  expect(element).toHaveClass("[overflow-wrap:anywhere]");
+  expect(element).not.toHaveClass("whitespace-nowrap");
+}
+
 describe("drill pack runner start flow", () => {
   beforeEach(() => {
     localStorage.clear();
@@ -97,6 +109,14 @@ describe("drill pack runner start flow", () => {
     expect(
       container.querySelector('[data-smoke="pack-runner-course-map"]'),
     ).toBeTruthy();
+    expectBadgeWraps(
+      container.querySelector('[data-smoke="pack-runner-intro-phoneme-badge"]'),
+    );
+    expectBadgeWraps(
+      container.querySelector(
+        '[data-smoke="pack-runner-course-map-status-badge"]',
+      ),
+    );
 
     fireEvent.click(screen.getByRole("button", { name: "从 听辨 ABX 开始" }));
 
@@ -104,6 +124,9 @@ describe("drill pack runner start flow", () => {
     expect(screen.getByRole("heading", { name: "先听准，再说准" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "听辨 ABX" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "X = A" })).toBeInTheDocument();
+    expectBadgeWraps(
+      document.querySelector('[data-smoke="pack-runner-course-header-badge"]'),
+    );
     expect(mocks.wordAudioClearError).toHaveBeenCalled();
     expect(mocks.ttsReset).toHaveBeenCalled();
   });

@@ -110,6 +110,8 @@ import type {
 
 const WRAP_SAFE_ACTION_BUTTON_CLASS =
   "h-auto min-h-8 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]";
+const WRAP_SAFE_BADGE_CLASS =
+  "h-auto min-h-5 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]";
 
 type RunnerPhase =
   | { type: "intro" }
@@ -1138,19 +1140,46 @@ function IntroCard({
     >
       <div className="flex flex-wrap gap-2">
         {pack.targetPhonemes.map((phoneme) => (
-          <Badge key={phoneme} variant="secondary">
+          <Badge
+            key={phoneme}
+            variant="secondary"
+            className={WRAP_SAFE_BADGE_CLASS}
+            data-smoke="pack-runner-intro-phoneme-badge"
+          >
             {phoneme}
           </Badge>
         ))}
-        <Badge variant="outline">{pack.estimatedMinutes} 分钟</Badge>
-        <Badge variant="outline">
+        <Badge
+          variant="outline"
+          className={WRAP_SAFE_BADGE_CLASS}
+          data-smoke="pack-runner-intro-meta-badge"
+        >
+          {pack.estimatedMinutes} 分钟
+        </Badge>
+        <Badge
+          variant="outline"
+          className={WRAP_SAFE_BADGE_CLASS}
+          data-smoke="pack-runner-intro-meta-badge"
+        >
           {pack.course?.levels.length ?? 0} 个关卡
         </Badge>
         {requestedLevel && !redirected && (
-          <Badge variant="default">从 {requestedLevel.title} 开始</Badge>
+          <Badge
+            variant="default"
+            className={WRAP_SAFE_BADGE_CLASS}
+            data-smoke="pack-runner-requested-level-badge"
+          >
+            从 {requestedLevel.title} 开始
+          </Badge>
         )}
         {redirected && (
-          <Badge variant="secondary">先补 {courseMap.startLevelTitle}</Badge>
+          <Badge
+            variant="secondary"
+            className={WRAP_SAFE_BADGE_CLASS}
+            data-smoke="pack-runner-redirected-level-badge"
+          >
+            先补 {courseMap.startLevelTitle}
+          </Badge>
         )}
       </div>
       <h2 className="mt-4 break-words text-xl font-bold [overflow-wrap:anywhere]">
@@ -1212,7 +1241,15 @@ function IntroCard({
               <div key={risk.id} className="rounded-lg bg-muted/40 p-3">
                 <div className="flex items-center justify-between gap-2">
                   <p className="text-sm font-medium">{risk.title}</p>
-                  {risk.active && <Badge variant="destructive">近期出现</Badge>}
+                  {risk.active && (
+                    <Badge
+                      variant="destructive"
+                      className={WRAP_SAFE_BADGE_CLASS}
+                      data-smoke="pack-runner-risk-badge"
+                    >
+                      近期出现
+                    </Badge>
+                  )}
                 </div>
                 <p className="mt-1 text-xs text-muted-foreground">{risk.cue}</p>
               </div>
@@ -1353,6 +1390,8 @@ function CourseMapLevelCard({
                 ? "secondary"
                 : "outline"
           }
+          className={WRAP_SAFE_BADGE_CLASS}
+          data-smoke="pack-runner-course-map-status-badge"
         >
           {courseMapStatusLabel(level.status)}
         </Badge>
@@ -1410,11 +1449,19 @@ function CourseHeader({
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {brief && (
-            <Badge variant="outline">
+            <Badge
+              variant="outline"
+              className={WRAP_SAFE_BADGE_CLASS}
+              data-smoke="pack-runner-course-header-badge"
+            >
               预计剩余 {brief.estimatedMinutes} 分钟
             </Badge>
           )}
-          <Badge variant="secondary">
+          <Badge
+            variant="secondary"
+            className={WRAP_SAFE_BADGE_CLASS}
+            data-smoke="pack-runner-course-header-badge"
+          >
             {pack.masteryRule.targetPassScore}+ 目标音素
           </Badge>
         </div>
@@ -1505,7 +1552,15 @@ function CoachMissionCard({
             <p className="text-xs font-semibold uppercase text-muted-foreground">
               通过条件
             </p>
-            {isFocusedReview && <Badge variant="destructive">专项复练</Badge>}
+            {isFocusedReview && (
+              <Badge
+                variant="destructive"
+                className={WRAP_SAFE_BADGE_CLASS}
+                data-smoke="pack-runner-focused-review-badge"
+              >
+                专项复练
+              </Badge>
+            )}
           </div>
           <p className="mt-1 text-sm font-medium">{passText}</p>
           <p className="mt-2 text-xs text-muted-foreground">
@@ -1556,7 +1611,11 @@ function PerceptionStep({
         <h2 className="text-lg font-bold">先听准，再说准</h2>
         <p className="mt-1 text-sm text-muted-foreground">{item.focusPoint}</p>
         {extraRemaining > 0 && (
-          <Badge variant="destructive" className="mt-3">
+          <Badge
+            variant="destructive"
+            className={`${WRAP_SAFE_BADGE_CLASS} mt-3`}
+            data-smoke="pack-runner-perception-extra-badge"
+          >
             听辨未过，专项复听还剩 {extraRemaining} 题
           </Badge>
         )}
@@ -1651,7 +1710,13 @@ function ArticulationStep({
       animate={{ opacity: 1, y: 0 }}
       className="rounded-xl border bg-card p-6 shadow-sm"
     >
-      <Badge variant="secondary">{level.title}</Badge>
+      <Badge
+        variant="secondary"
+        className={WRAP_SAFE_BADGE_CLASS}
+        data-smoke="pack-runner-level-title-badge"
+      >
+        {level.title}
+      </Badge>
       <h2
         className={`${getCenteredProminentTextClassName(
           itemDensity,
@@ -1780,7 +1845,13 @@ function RecordingStep({
       animate={{ opacity: 1, y: 0 }}
       className="rounded-xl border bg-card p-6 text-center shadow-sm"
     >
-      <Badge variant="secondary">{level.title}</Badge>
+      <Badge
+        variant="secondary"
+        className={WRAP_SAFE_BADGE_CLASS}
+        data-smoke="pack-runner-level-title-badge"
+      >
+        {level.title}
+      </Badge>
       <h2
         className={`${getCenteredProminentTextClassName(
           itemDensity,
@@ -1929,7 +2000,11 @@ function RecordingStep({
                 <p className="break-words font-semibold text-red-700 dark:text-red-400 [overflow-wrap:anywhere]">
                   {remediation.title}
                 </p>
-                <Badge variant="outline">
+                <Badge
+                  variant="outline"
+                  className={WRAP_SAFE_BADGE_CLASS}
+                  data-smoke="pack-runner-remediation-step-badge"
+                >
                   {remediationStepIndex + 1}/{remediation.steps.length}
                 </Badge>
               </div>
@@ -2123,6 +2198,8 @@ function DeepPracticeCoachPanel({ coach }: { coach: DeepPracticeCoach }) {
         </div>
         <Badge
           variant={coach.status === "stuck-prep" ? "destructive" : "secondary"}
+          className={WRAP_SAFE_BADGE_CLASS}
+          data-smoke="pack-runner-deep-practice-badge"
         >
           深度练习
         </Badge>
@@ -2333,7 +2410,11 @@ function CompletedStep({
               </p>
             </div>
             {debrief.nextLevelTitle && (
-              <Badge variant="secondary">
+              <Badge
+                variant="secondary"
+                className={WRAP_SAFE_BADGE_CLASS}
+                data-smoke="pack-runner-debrief-next-level-badge"
+              >
                 下一关：{debrief.nextLevelTitle}
               </Badge>
             )}
