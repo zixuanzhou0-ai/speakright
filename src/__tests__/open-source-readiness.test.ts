@@ -201,8 +201,11 @@ describe("open-source readiness files", () => {
     expect(docs).not.toContain("known uncommitted work");
     expect(docs).not.toContain("ahead of `origin/main` by local commits");
     expect(docs).not.toContain("main...origin/main [ahead 5]");
+    expect(docs).not.toContain("main...origin/main [ahead 17]");
     expect(docs).not.toContain("documented uncommitted release-tightening");
     expect(docs).not.toContain("A settled RC branch should show `main...origin/main`");
+    expect(docs).not.toContain("single-sound audio source-policy pass");
+    expect(docs).not.toContain("audio-policy pass");
     expect(handoff).toContain("GitHub Git Data API push fallback");
     expect(handoff).toContain("local-vs-remote tree SHA comparison");
     expect(docs).toContain("local-vs-remote tree SHA");
@@ -222,7 +225,17 @@ describe("open-source readiness files", () => {
 
     expect(readme).toContain("docs/operations/RC_EVIDENCE_AUDIT.md");
     expect(installation).toContain("docs/operations/RC_EVIDENCE_AUDIT.md");
+    expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
+      "Latest local full gate",
+    );
+    expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
+      "120 files / 668 tests passed",
+    );
+    expect(handoffDocs).toContain(
+      "Current command-by-command results, including exact test counts, live in",
+    );
     expect(handoffDocs).not.toMatch(/89\s+(?:files|test files).*489\s+tests/);
+    expect(handoffDocs).not.toContain("119` files and `666` tests");
     expect(handoffDocs).not.toContain("Biome checked 341 files");
     expect(handoffDocs).not.toContain("PID was `70112`");
   });

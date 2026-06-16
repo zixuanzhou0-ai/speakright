@@ -471,122 +471,24 @@ The latest settled-main command results are centralized in
 `docs/operations/RC_EVIDENCE_AUDIT.md` so README, installation notes, and this
 handoff do not drift apart.
 
-Current gate summary:
+Current gate summary is intentionally compact here:
 
-- Focused AI-coach trust tests passed: `3` files and `20` tests, including the
-  non-English full-score guard against `完美` / `已掌握` overclaims.
-- Focused advanced-training boundary tests passed: `2` files and `7` tests,
-  including direct English pack-route blocking for experimental languages.
-- Focused local-save warning tests passed: `1` file and `4` tests, covering
-  local score/practice warnings, advanced mastery/profile warnings, and
-  quick/full-passage diagnosis report or coverage-baseline save warnings.
-- Focused startup hydrator tests passed: `1` file and `4` tests, covering API
-  key/settings storage failure labels, corrupt local-data quarantine warnings,
-  and local-data migration failure soft-start behavior.
-- Focused theme-provider storage tests passed: `1` file and `2` tests, covering
-  blocked theme reads, blocked theme writes, fallback to `system`, and live
-  theme updates without a crash.
-- Focused drill diagnosis-report storage tests passed: `2` files and `18`
-  tests, covering English diagnosis fallback behavior, corrupted/blocked report
-  reads, the `/drill` recovery alert, and Release smoke coverage for corrupt
-  drill report localStorage.
-- Focused quick diagnosis report storage tests passed: `3` files and `23`
-  tests, covering current report reads, legacy English migration, corrupted or
-  blocked reads, visible `assessment-storage-warning`, and static Release smoke
-  coverage for `/assessment`.
-- Focused progress-archive boundary tests passed: `3` files and `13` tests,
-  including the direct `/progress` experimental blocker and updated Release
-  smoke route coverage.
-- Focused perception-drill action-row tests passed: `2` files and `14` tests,
-  covering inline ABX audio errors, wrap-ready result actions, and Release smoke
-  route coverage for the experimental-language blocker path.
-- Focused advanced direct-route blocker tests passed: `3` files and `22` tests,
-  covering word/sentence/contrast smoke hooks, full-passage/evidence/pack-runner
-  direct hooks, wrap-ready page headers, and experimental-language blockers for
-  English coverage/evidence/pack surfaces.
-- Focused corrupt-local-data warning tests passed across the current quick/drill
-  report and mastery coverage, including `assessment-storage-warning`,
-  `drill-report-storage-warning`, current/legacy/startup-quarantined
-  mastery-profile parse failures, visible Progress warning rendering, and
-  Release smoke coverage for corrupt diagnosis/mastery/coverage localStorage on
-  `/assessment`, `/drill`, `/progress`, `/drill/evidence`, and
-  `/assessment/passage`.
-- Focused Settings quarantined-data tests passed: `2` files and `23` tests,
-  covering the data/privacy center corrupt-data alert plus Release smoke checks
-  for text, role, wrapping, and no-overflow behavior.
-- Focused Settings data-summary recovery tests passed: `3` files and `36`
-  tests, covering degraded local-data summary reads, a visible Settings warning,
-  preserved diagnostic export/reset controls, and static Release smoke coverage.
-- Focused desktop diagnostics privacy tests passed: `2` files and `22` tests,
-  covering schema v2 support bundles, redacted local log paths, and
-  quarantined-data summaries that exclude raw values.
-- Open-source handoff/readiness plus IPA audit export drift tests passed.
-- Static language-pack manifest IPA drift tests passed for the applied French
-  and Russian reviewed findings.
-- Focused recorder-startup tests passed: `2` files and `11` tests, covering
-  actionable microphone error messages, stream cleanup after recorder
-  initialization failure, and visible drill-card errors.
-- Focused waveform degraded-state tests passed: `1` file and `3` tests,
-  covering live waveform fallback, warning cleanup after recording stops, and
-  saved recording waveform load failure.
-- Focused recording-quality panel tests passed: `1` file and `3` tests,
-  covering blocker alerts, submit-ready status feedback, and the empty
-  pre-report state.
-- Focused session-state warning tests passed: `2` files and `20` tests,
-  covering blocked `sessionStorage` read/write/manual helper notifications and
-  static Release smoke hooks for free practice plus phoneme detail warnings.
-- Focused desktop-readiness microphone tests passed: `2` files and `8` tests,
-  covering low-signal/too-short Chinese errors plus unsupported and denied
-  microphone-check checklist hints.
-- Focused Azure failure-message tests passed: `1` file and `10` tests, covering
-  Chinese auth, network, no-speech, NoMatch, and empty-transcription errors.
-- Focused LLM failure-message tests passed: `3` files and `20` tests, covering
-  Chinese Settings connection errors, stream provider/network errors, and
-  visible `useLlmFeedback` error handling for SSE error chunks.
-- Focused audio failure-message tests passed: `3` files and `23` tests,
-  covering Chinese ElevenLabs connection/TTS errors, no-provider standard-demo
-  guidance, and online dictionary fallback failure reasons.
-- Focused Settings connection-status tests passed: `2` files and `8` tests,
-  covering Azure, ElevenLabs, AI coach, Youdao, raw English fetch fallback, and
-  long status wrapping.
-- Focused phoneme detail presentation tests passed: `2` files and `9` tests,
-  covering non-English full text visibility, Russian long Cyrillic rule text,
-  and task-accurate A/B playback labels.
-- Focused free-practice failure guidance tests passed, covering language-aware
-  word-audio labels, sentence TTS error hooks, recorder/Azure alert hooks, and
-  missing LLM config guidance that preserves Azure numeric scores; the static
-  Release smoke self-test now also checks the free-practice failure hooks remain
-  present in the source.
-- Focused single-sound audio policy tests passed: `7` files and `57` tests,
-  covering shared playback policy, detail/list header speakers, scoring tiles,
-  assessment-segment audio, phoneme cards, language-source alignment, and
-  open-source readiness. External URLs in `localSrc` are rejected for
-  header/scoring single-sound playback.
-- Full tests passed: `119` files and `666` tests.
-- Typecheck, lint, and static desktop frontend build passed.
-- The latest single-sound audio source-policy pass did not rebuild desktop
-  artifacts because it did not change Tauri/Rust/package assets, audio coverage,
-  or loudness math; the existing Release EXE was validated through preflight,
-  UI smoke, and launch.
-- Release EXE preflight passed; no localhost startup is part of the release
-  path. During the pre-commit verification run it correctly reported the
-  expected dirty worktree from this local fix.
-- Release EXE UI smoke passed with `scoringTileAudioPolicy=ok`,
-  `englishTransferRoutes=ok`, `englishCoreDrillRoutes=ok`,
-  `advancedDirectRoutes=ok`, `corruptLocalDataWarnings=ok`,
-  `practiceAudioLabels=ok`, `freePracticeSmoke=ok`, `assessmentSmoke=ok`,
-  `narrowViewport=ok`, `lowHeightViewport=ok`, and
-  `releaseServedFromDevServer=false`; the smoke script now includes `/progress`
-  and `/drill/perception` in the main, narrow-window, and low-height route
-  passes, checks English `/drill/word`, `/drill/sentence`, `/drill/contrast`,
-  `/assessment/passage`, `/drill/evidence`, `/drill/pack/ee-ih`,
-  `/drill/scenarios`, and `/drill/spontaneous` pages in main/narrow/low-height
-  passes, `/sentences` waits for the actual
-  free-practice page plus input/recording cards, and `/assessment` waits for the
-  intro card plus start/passage actions instead of only checking the page
-  container.
-- Release EXE launch passed from the static Tauri bundle, and the test process
-  was closed after verification.
+- Current command-by-command results, including exact test counts, live in
+  `docs/operations/RC_EVIDENCE_AUDIT.md`.
+- The routine gate remains `npm.cmd run test`, `npm.cmd run typecheck`,
+  `npm.cmd run lint`, `npm.cmd run build:desktop-frontend`,
+  `npm.cmd run desktop:preflight`, `npm.cmd run desktop:ui-smoke`, and
+  `npm.cmd run desktop:launch-release`.
+- Focused suites cover open-source governance, no-secret scans, source-build
+  docs, IPA audit exports, centered/wrapping target text, failure-state Chinese
+  alerts, experimental-language blockers, audio-source policy, and local-save
+  warnings.
+- Release EXE smoke covers Settings, English, Spanish, French, Russian, drill,
+  free practice, diagnosis, progress, narrow-window layout, low-height layout,
+  scoring tile audio policy, corrupt local-data warnings, and confirms
+  `releaseServedFromDevServer=false`.
+- Release EXE launch opens the static Tauri bundle and the verification process
+  should be closed afterward.
 - No ElevenLabs generation or TTS spend is part of this validation path.
 
 For tomorrow's manual test session, start with:

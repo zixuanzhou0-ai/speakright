@@ -65,42 +65,43 @@ playback-gain audit for representative A/B word audio and IPA chart normal/slow
 word audio versus teaching-video loudness; it also makes zero ElevenLabs calls.
 `desktop:live-validation` remains a provider/resource gate for full controlled
 release checks; the previous Azure live baseline was `220/220`, but it was not
-rerun during this playback/UI RC pass.
+part of this routine Release EXE gate.
 
 ## Latest Local Command Results
 
-Latest local focused pass for single-sound audio source policy and the full RC
-gate:
+Latest local full gate for open-source governance, centered target text, and
+Release EXE validation:
 
 ```text
 git status --short --branch
-  ## main...origin/main [ahead 17]
-  If normal `git push` is unavailable, use the documented GitHub API fallback
-  and verify the local-vs-remote tree SHA before treating content as pushed
+  clean worktree except for the current in-progress doc/test edit when run
+  before commit; local branch may show `main...origin/main [ahead N]` after
+  GitHub API fallback pushes. Verify the GitHub `main` ref and local-vs-remote
+  tree SHA before treating content as unpushed.
 
-npx.cmd biome check --write src/lib/audio-playback-policy.ts src/__tests__/audio-playback-policy.test.ts src/__tests__/phoneme-play-button.test.tsx src/__tests__/phoneme-highlight.test.tsx docs/operations/RC_EVIDENCE_AUDIT.md docs/operations/NEXT_CHAT_HANDOFF.md
-  passed; formatted the touched audio-policy files and evidence docs
+npm.cmd run test -- open-source-readiness
+  1 file / 10 tests passed; public governance files, issue routing, privacy
+  boundaries, zero-generation routine scripts, and Release EXE wording stayed
+  locked.
 
-npm.cmd run test -- audio-playback-policy phoneme-play-button phoneme-highlight assessment-segment-audio phoneme-card language-source-alignment open-source-readiness
-  7 files / 57 tests passed; header/scoring single-sound playback now rejects
-  external URLs in `localSrc` and still allows verified local `/audio/` clips
+npm.cmd run test -- word-card-layout practice-text-presentation
+  2 files / 5 tests passed; the legacy phoneme word card and shared target-text
+  helpers stay centered, wrapping, density-aware, and untruncated.
 
 npm.cmd run test
-  119 files / 666 tests passed
+  120 files / 668 tests passed
 
 npm.cmd run typecheck
   passed
 
 npm.cmd run lint
-  passed
+  passed; Biome checked 383 files
 
 npm.cmd run build:desktop-frontend
   passed; 144 static pages generated
 
 npm.cmd run desktop:preflight
-  passed; Release EXE exists, no running speakright.exe, no localhost startup;
-  during verification it correctly reported the expected dirty worktree from this
-  audio-policy pass
+  passed; Release EXE exists, no running `speakright.exe`, no localhost startup.
 
 npm.cmd run desktop:ui-smoke
   passed; Release EXE runtime, centered target text, no target-text ellipsis,
@@ -137,7 +138,7 @@ npm.cmd run desktop:ui-smoke
 npm.cmd run desktop:launch-release
   passed; command printed `SpeakRight release desktop app launch requested`,
   the Release EXE path, a child process PID, and the no-localhost reminder; the
-  Release EXE opened from `src-tauri\target\release\speakright.exe`
+  Release EXE opened from `src-tauri\target\release\speakright.exe`.
 
 process cleanup
   the verification Release EXE process was closed afterward; no residual
@@ -154,10 +155,10 @@ npm.cmd run desktop:launch-release
 
 ## Limits
 
-- `desktop:build`, `audio:parity:dry-run`, and `audio:loudness:dry-run` were not
-  rerun during the single-sound audio source-policy pass; no Tauri/Rust,
-  packaged-asset, audio-coverage, or loudness math changed. The latest recorded
-  audio dry-runs remain the previous playback-layer audits.
+- `desktop:build`, `audio:parity:dry-run`, and `audio:loudness:dry-run` are not
+  part of every docs/UI-governance tightening pass. Rerun them when Tauri/Rust,
+  packaged assets, audio coverage, playback gain, or loudness math changes. The
+  latest recorded audio dry-runs remain the previous playback-layer audits.
 - `es-ES`, `fr-FR`, and `ru-RU` are experimental and must not be described as
   formally mastered.
 - The RC gate does not generate new TTS audio.
