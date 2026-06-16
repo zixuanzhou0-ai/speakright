@@ -240,10 +240,14 @@ describe("open-source readiness files", () => {
   it("keeps validation result counts centralized in the RC evidence audit", () => {
     const readme = read("README.md");
     const installation = read("docs/INSTALLATION.md");
+    const runbook = read("docs/operations/DESKTOP_STARTUP_RUNBOOK.md");
+    const dualVoiceRunbookSection = runbook.slice(
+      runbook.indexOf("## 2026-06-11 Multilingual Dual-Voice Expansion"),
+    );
     const handoffDocs = [
       readme,
       installation,
-      read("docs/operations/DESKTOP_STARTUP_RUNBOOK.md"),
+      runbook,
       read("docs/operations/NEXT_CHAT_HANDOFF.md"),
     ].join("\n");
 
@@ -303,6 +307,19 @@ describe("open-source readiness files", () => {
     expect(handoffDocs).not.toContain("Biome checked 341 files");
     expect(handoffDocs).not.toContain("378` files checked");
     expect(handoffDocs).toContain("Exact current counts live in");
+    expect(dualVoiceRunbookSection).toContain(
+      "Historical zero-cost dry-run snapshot",
+    );
+    expect(dualVoiceRunbookSection).toContain("Current normalized lookup counts");
+    expect(dualVoiceRunbookSection).not.toContain(
+      "Final zero-cost dry-run results:",
+    );
+    expect(dualVoiceRunbookSection).not.toContain(
+      "`npm.cmd run desktop:live-validation`: English `1464`",
+    );
+    expect(dualVoiceRunbookSection).not.toContain(
+      "`npm.cmd run audio:parity:dry-run`: Spanish `880`",
+    );
     expect(handoffDocs).not.toContain("PID was `70112`");
   });
 

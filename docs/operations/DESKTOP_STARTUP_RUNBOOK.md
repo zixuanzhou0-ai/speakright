@@ -582,11 +582,10 @@ npm.cmd run desktop:launch-release
   - Spanish: `Lydia`
   - French: `Rachel`
   - Russian: `Sergey`
-- Final zero-cost dry-run results:
-  - Spanish: `880` existing audio files, `0` missing.
-  - French: `1090` existing audio files, `0` missing.
-  - Russian: `920` existing audio files, `0` missing.
-  - Total missing: `0`.
+- Historical zero-cost dry-run snapshot: both local voices were present for
+  Spanish, French, and Russian with no missing generated items. Current
+  normalized lookup counts, bundled-file counts, and dry-run output live in
+  `docs/operations/RC_EVIDENCE_AUDIT.md`.
 - Estimated approved one-time generation size: about `10645` characters.
   Routine validation must not regenerate these files.
 - The phoneme detail card now has a compact A/B standard-voice selector. Manual
@@ -595,11 +594,13 @@ npm.cmd run desktop:launch-release
   - `npm.cmd run test`, `npm.cmd run typecheck`, `npm.cmd run lint`, and
     `npm.cmd run build:desktop-frontend` passed. Exact current counts live in
     `docs/operations/RC_EVIDENCE_AUDIT.md`.
-  - `npm.cmd run audio:parity:dry-run`: Spanish `880`, French `1090`, Russian
-    `920`, total missing `0`.
-  - `npm.cmd run desktop:live-validation`: English `1464`, Spanish `880`,
-    French `1090`, Russian `920`, videos `224`, Azure `220/220`, ElevenLabs
-    generated characters `0`.
+  - `npm.cmd run audio:parity:dry-run`: passed for the historical expansion
+    snapshot. Current normalized lookup counts and bundled-file counts live in
+    `docs/operations/RC_EVIDENCE_AUDIT.md`.
+  - `npm.cmd run desktop:live-validation`: passed for bundled audio/video,
+    Azure sample coverage, and zero ElevenLabs generation in that historical
+    snapshot. Current release evidence lives in
+    `docs/operations/RC_EVIDENCE_AUDIT.md`.
   - `npm.cmd run validate:desktop`: passed, including Tauri build, UI smoke,
     release smoke, release report, and installer smoke.
   - `npm.cmd run desktop:release-gate`: failed only because EXE/MSI/NSIS
