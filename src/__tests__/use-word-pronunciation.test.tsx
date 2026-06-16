@@ -107,7 +107,10 @@ vi.mock("howler", () => ({
         mocks.howlSources.push(src);
         mocks.howlVolumes.push(options.volume ?? 1);
         mocks.howlHtml5.push(options.html5 ?? false);
-        if (mocks.failNextLocalAudio && src.startsWith("/audio/words/")) {
+        if (
+          mocks.failNextLocalAudio &&
+          (src.startsWith("/audio/words/") || src.startsWith("blob:"))
+        ) {
           mocks.failNextLocalAudio = false;
           options.onloaderror?.();
         } else {
@@ -315,6 +318,25 @@ describe("useWordPronunciation", () => {
     expect(mocks.howlHtml5).toEqual([true]);
   });
 
+  it("shows desktop cache recovery guidance when a legacy non-English audio cache cannot play", async () => {
+    const audioBlob = new Blob([new Uint8Array([1])], { type: "audio/mpeg" });
+    mocks.failNextLocalAudio = true;
+    mocks.getLanguageAudioPackEntry.mockResolvedValue({ audioBlob });
+    const { result } = renderHook(() => useWordPronunciation());
+
+    await act(async () => {
+      result.current.playWord("bonjour", "blue", "fr-FR");
+    });
+
+    await waitFor(() => {
+      expect(result.current.error).toContain("旧版本地音频缓存可能损坏");
+    });
+    expect(result.current.error).toContain("数据与隐私中心");
+    expect(result.current.error).toContain("重新安装最新版桌面端");
+    expect(result.current.error).not.toContain("重新安装音频包");
+    expect(mocks.fetchPronunciation).not.toHaveBeenCalled();
+  });
+
   it("does not silently fall back to Youdao for missing non-English local audio", async () => {
     const { result } = renderHook(() => useWordPronunciation());
 
@@ -325,6 +347,9 @@ describe("useWordPronunciation", () => {
     await waitFor(() => {
       expect(result.current.error).toContain("暂无");
     });
+    expect(result.current.error).toContain("不会用在线词典或 TTS 冒充");
+    expect(result.current.error).toContain("音频/provider issue");
+    expect(result.current.error).toContain("Release EXE 音频缺口");
     expect(mocks.fetchPronunciation).not.toHaveBeenCalled();
     expect(mocks.fetchSources).toEqual([]);
     expect(mocks.howlSources).toEqual([]);
