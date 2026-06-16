@@ -54,6 +54,10 @@ What happened instead?
 Use Release EXE or installer evidence when reporting user-facing startup behavior.
 A localhost/dev-server tab is not release acceptance.
 
+If SmartScreen, antivirus, or enterprise policy blocked an unsigned artifact,
+paste the exact policy message if it is safe to share. Do not bypass
+managed-device policy just to collect more evidence.
+
 Keep evidence minimal and redacted. Do not attach API keys, bearer tokens, raw
 microphone recordings, private practice text, learning-data exports, or full
 diagnostics bundles to a public issue. Redact local user-profile paths such as
@@ -62,6 +66,7 @@ diagnostics bundles to a public issue. Redact local user-profile paths such as
 ## Checks
 
 - [ ] I used the Release EXE or installer for user-facing startup evidence.
+- [ ] I did not bypass SmartScreen, antivirus, or enterprise policy on a managed device.
 - [ ] I did not include API keys, recordings, diagnostic bundles, or private user data.
 - [ ] This does not require new ElevenLabs generation or paid-provider calls.
 - [ ] Spanish, French, and Russian remain experimental; this report does not claim formal mastery or `evidenceMastery`.

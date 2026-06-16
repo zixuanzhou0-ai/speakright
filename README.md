@@ -24,6 +24,21 @@ not included in this release track.
   English local-audio model.
 - Local articulation assets live under `public/videos/language-assets/`.
 
+## Public Download Status
+
+There is not yet a signed public Windows download. GitHub Release assets,
+workflow-dispatch artifacts, EXE/MSI/NSIS files, and local Release EXE builds
+are controlled-test artifacts unless a release note explicitly says the artifact
+is signed and public.
+
+New users who are not part of a controlled-test pass should build from source or
+wait for a signed Windows release. Do not bypass SmartScreen, antivirus, or
+enterprise policy on a managed device only to try an unsigned artifact; report
+the blocker through the installation/startup issue template instead.
+
+Maintainers should keep Release EXE validation as the acceptance path, but they
+must not describe an unsigned artifact as a stable public download.
+
 ## Development
 
 ```bat

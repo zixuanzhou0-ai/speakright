@@ -284,6 +284,11 @@ npm run validate:public-release
 
 Unsigned artifacts are acceptable for controlled internal testing only when the
 release notes and installation guide keep the unsigned warning visible.
+Do not publish workflow-dispatch artifacts, local Release EXE builds, or
+unsigned GitHub Release assets as a stable public download. If SmartScreen,
+antivirus, or enterprise policy blocks an unsigned artifact, capture the exact
+message for the installation/startup template instead of bypassing managed-device
+policy.
 
 ## 2026-06-10 Handoff Notes
 

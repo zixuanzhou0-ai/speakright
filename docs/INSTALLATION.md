@@ -7,6 +7,10 @@ maintainer or tester in the controlled-test track, use the installer filename
 named by the current release notes and verify it against
 `docs/operations/RC_EVIDENCE_AUDIT.md`.
 
+The filenames below are not a general download recommendation. A controlled-test
+artifact is valid only when the current release notes name it and the evidence
+audit still matches the tree you are evaluating.
+
 This build is not code-signed yet. Use it only for controlled testing until the
 Windows EXE/MSI/NSIS artifacts are signed.
 If you are evaluating the public source repository without joining that
@@ -32,8 +36,10 @@ SpeakRight_1.0.1_x64_en-US.msi
 
 1. Run the installer.
 2. If Windows SmartScreen appears, stop and confirm this is the expected
-   controlled-test build from the project GitHub Release before choosing
-   **More info** and **Run anyway**.
+   controlled-test build from the project GitHub Release before choosing any
+   bypass option on a personal/test machine where policy permits it. Do not
+   bypass antivirus or enterprise policy on managed devices; record the exact
+   blocker in an installation/startup issue instead.
 3. Launch SpeakRight.
 4. Open **Settings** and configure API keys.
 

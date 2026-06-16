@@ -407,6 +407,9 @@ describe("open-source readiness files", () => {
     expect(readme).toContain("Public review, source builds");
     expect(readme).toContain("A signed public Windows release is not complete yet");
     expect(readme).toContain("internal-test or controlled-test builds");
+    expect(readme).toContain("Public Download Status");
+    expect(readme).toContain("There is not yet a signed public Windows download");
+    expect(readme).toContain("must not describe an unsigned artifact as a stable public download");
     expect(readme).toContain("Controlled-test verification records");
     expect(readme).toContain("Release EXE smoke/launch outcome");
     expect(readme).not.toContain("Last controlled-test verification");
@@ -417,6 +420,7 @@ describe("open-source readiness files", () => {
     );
     expect(installation).toContain("controlled-test track");
     expect(installation).toContain("installer filename");
+    expect(installation).toContain("not a general download recommendation");
     expect(installation).toContain("current release notes");
     expect(installation).not.toContain("Download the latest controlled-test installer");
     expect(installation).toContain("prefer **Build From Source** below");
@@ -424,10 +428,13 @@ describe("open-source readiness files", () => {
     expect(installation).toContain("public Windows release");
     expect(installation).toContain("Published GitHub Release assets can lag");
     expect(installation).toContain("docs/operations/RC_EVIDENCE_AUDIT.md");
+    expect(installation).toContain("bypass antivirus or enterprise policy");
     expect(installation).toContain("For controlled internal-test passes");
     expect(installation).toContain("current RC notes");
     expect(installation).not.toContain("For the 2026-06-16 internal-test pass");
     expect(installation).not.toContain("latest local non-English layout fixes");
+    expect(runbook).toContain("Do not publish workflow-dispatch artifacts");
+    expect(runbook).toContain("capture the exact");
     expect(readme).toContain("source builds");
     expect(readme).toContain("docs/INSTALLATION.md");
     expect(installation).toContain("Build From Source");
