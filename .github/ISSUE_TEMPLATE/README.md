@@ -6,7 +6,8 @@ vulnerability, do not open a public issue; follow `SECURITY.md` instead.
 
 | Report type | Use this path |
 | --- | --- |
-| Release EXE bug, UI layout, startup, Settings, scoring, drill, free practice, or assessment behavior | `Bug report` |
+| Download, installer, unsigned Windows artifact, source build, Release EXE launch, or first-launch degraded state | `Installation or startup help` |
+| UI layout, Settings, scoring, drill, free practice, or assessment behavior after the app opens | `Bug report` |
 | Missing bundled audio, wrong clickable audio source, loudness/clipping mismatch, or provider/quota-impacting work | `Audio gap or provider request` |
 | Spanish, French, Russian, or English IPA/pronunciation dispute with sources | `IPA or pronunciation audit` |
 | Product, language-learning, or desktop workflow improvement | `Feature request` |

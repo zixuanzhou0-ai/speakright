@@ -19,6 +19,9 @@ and pronunciation evidence do not end up in the wrong place.
 
 Use GitHub issues for:
 
+- Download, installer, unsigned Windows artifact, source build, Release EXE
+  launch, or first-launch degraded-state problems; use the
+  installation/startup issue template.
 - Release EXE bugs that do not expose private data.
 - UI layout, text wrapping, audio playback, or scoring behavior that can be
   described without attaching private recordings.
@@ -34,6 +37,9 @@ When reporting a user-visible bug, include:
 
 - OS and SpeakRight version or commit.
 - Launch path, ideally Release EXE or installer.
+- For install/startup reports, include the artifact name or path, whether
+  `speakright.exe` was already running, and whether SmartScreen, antivirus, or
+  enterprise policy blocked launch.
 - Language, page, sound unit, word, phrase, or sentence.
 - First-launch or degraded-state context when relevant: API key state, network
   state, microphone permission/device state, and the Settings local-audio state

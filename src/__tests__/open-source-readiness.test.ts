@@ -72,6 +72,7 @@ describe("open-source readiness files", () => {
       "DESKTOP_STARTUP_RUNBOOK.md",
       "NEXT_CHAT_HANDOFF.md",
       ".env.example",
+      ".github/ISSUE_TEMPLATE/installation_startup.md",
       ".github/ISSUE_TEMPLATE/bug_report.md",
       ".github/ISSUE_TEMPLATE/ipa_audit.md",
       ".github/ISSUE_TEMPLATE/audio_provider_request.md",
@@ -108,6 +109,7 @@ describe("open-source readiness files", () => {
     expect(contributing).toContain("Release EXE");
     expect(contributing).toContain("Do not generate ElevenLabs audio");
     expect(contributing).toContain("Triage Routing");
+    expect(contributing).toContain("`Installation or startup help` issue template");
     expect(contributing).toContain("`Bug report` issue template");
     expect(contributing).toContain("`IPA or pronunciation audit` issue template");
     expect(contributing).toContain("`Audio gap or provider request` issue template");
@@ -115,6 +117,8 @@ describe("open-source readiness files", () => {
     expect(contributing).toContain("quota-impacting provider work");
     expect(contributing).toContain("Spanish, French, and Russian are experimental");
     expect(support).toContain("Release EXE");
+    expect(support).toContain("installation/startup issue template");
+    expect(support).toContain("SmartScreen");
     expect(support).toContain("SECURITY.md");
     expect(support).toContain("needs-review");
     expect(support).toContain("audio/provider issue template");
@@ -126,6 +130,9 @@ describe("open-source readiness files", () => {
 
   it("keeps public issue and PR templates aligned with release and privacy boundaries", () => {
     const issueConfig = read(".github/ISSUE_TEMPLATE/config.yml");
+    const installationStartup = read(
+      ".github/ISSUE_TEMPLATE/installation_startup.md",
+    );
     const bugReport = read(".github/ISSUE_TEMPLATE/bug_report.md");
     const featureRequest = read(".github/ISSUE_TEMPLATE/feature_request.md");
     const ipaAudit = read(".github/ISSUE_TEMPLATE/ipa_audit.md");
@@ -137,6 +144,24 @@ describe("open-source readiness files", () => {
     expect(issueConfig).toContain("Support routing guide");
     expect(issueConfig).toContain("SUPPORT.md");
     expect(issueConfig).toContain("Security report");
+    expect(installationStartup).toContain("Installation or startup help");
+    expect(installationStartup).toContain("Downloaded installer or Release EXE");
+    expect(installationStartup).toContain("Built from source");
+    expect(installationStartup).toContain("npm run desktop:build");
+    expect(installationStartup).toContain("speakright.exe");
+    expect(installationStartup).toContain("SmartScreen");
+    expect(installationStartup).toContain("API keys configured");
+    expect(installationStartup).toContain("Network state");
+    expect(installationStartup).toContain("Microphone permission/device");
+    expect(installationStartup).toContain("Settings local-audio state");
+    expect(installationStartup).toContain("缺失或不可读");
+    expect(installationStartup).toContain("Chinese inline error or warning");
+    expect(installationStartup).toContain("localhost/dev-server tab is not");
+    expect(installationStartup).toContain("Keep evidence minimal and redacted");
+    expect(installationStartup).toContain("diagnostics bundles");
+    expect(installationStartup).toContain("C:\\Users\\name");
+    expect(installationStartup).toContain("ElevenLabs");
+    expect(installationStartup).toContain("Spanish, French, and Russian remain experimental");
     expect(bugReport).toContain("Release EXE");
     expect(bugReport).toContain("Spanish, French, or Russian");
     expect(bugReport).toContain("Network state");
@@ -175,6 +200,8 @@ describe("open-source readiness files", () => {
     expect(audioProvider).toContain("without explicit maintainer approval");
     expect(audioProvider).toContain("Spanish, French, and Russian remain experimental");
     expect(issueRouting).toContain("Issue Routing");
+    expect(issueRouting).toContain("Installation or startup help");
+    expect(issueRouting).toContain("unsigned Windows artifact");
     expect(issueRouting).toContain("Bug report");
     expect(issueRouting).toContain("Audio gap or provider request");
     expect(issueRouting).toContain("IPA or pronunciation audit");

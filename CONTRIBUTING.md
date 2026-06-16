@@ -23,7 +23,8 @@ Use the narrowest public or private path for the report:
 
 | Report type | Route |
 | --- | --- |
-| Release EXE startup, Settings, UI layout, scoring, drill, free practice, or diagnosis bug | `Bug report` issue template |
+| Download, installer, unsigned Windows artifact, source build, Release EXE startup, or first-launch degraded-state problem | `Installation or startup help` issue template |
+| Settings, UI layout, scoring, drill, free practice, or diagnosis bug after the app opens | `Bug report` issue template |
 | IPA dispute, pronunciation dispute, or sourced Spanish/French/Russian audit finding | `IPA or pronunciation audit` issue template |
 | Missing bundled audio, wrong clickable audio source, loudness mismatch, or any quota-impacting provider work | `Audio gap or provider request` issue template |
 | API key, token, private recording, private learning-data export, vulnerability, or unsafe desktop permission | `SECURITY.md` private report |
