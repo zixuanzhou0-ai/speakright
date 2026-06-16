@@ -152,7 +152,7 @@ process cleanup
   `speakright.exe` remained after cleanup
 ```
 
-For tomorrow, start from:
+For the next manual test session, start from:
 
 ```bat
 cd /d E:\SpeakRightDesktopRepo
@@ -164,6 +164,10 @@ npm.cmd run desktop:launch-release
 
 - `desktop:build` is not part of every docs/UI-governance tightening pass. Rerun
   it when Tauri/Rust or packaged installer behavior changes.
+- Latest recorded bundled asset validation counted English word audio
+  `1464/1464`, Spanish language-pack audio `880/880`, French language-pack
+  audio `1090/1090`, Russian language-pack files `920/920`, and local videos
+  `224/224`.
 - Latest recorded audio dry-runs: `audio:parity:dry-run` reported
   `es-ES 880 existing, 0 missing`, `fr-FR 1090 existing, 0 missing`, and
   `ru-RU 918 existing, 0 missing`, with `Total missing audio items: 0` and

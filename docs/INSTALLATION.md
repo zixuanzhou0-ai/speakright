@@ -163,11 +163,11 @@ downloaded installer as the latest validated RC.
 
 - Recommended launch path: `npm run desktop:launch-release`.
 - Build shape: Tauri static bundle, not `localhost`.
-- Bundled asset check after the latest audio expansion: English `1464/1464`,
-  Spanish `880/880`, French `1090/1090`, Russian `920/920`, videos `224/224`.
-- Multilingual audio parity validates normalized lookup items with total missing
-  `0`: Spanish `880`, French `1090`, Russian `918`. Bundled Russian files
-  remain `460 x 2` because punctuation variants can share one local clip.
+- Bundled audio/video and multilingual parity counts are validated in
+  `docs/operations/RC_EVIDENCE_AUDIT.md`; keep that audit as the source of truth
+  instead of copying exact asset totals into the installation guide.
+- Multilingual audio parity remains a zero-generation audit for current local
+  coverage across Spanish, French, and Russian.
 - Secondary voices selected for the experimental packs: Spanish `Lydia`, French
   `Rachel`, Russian `Sergey`; the original primary voices remain bundled.
 - Azure live validation: `220/220` sampled pronunciation assessments passed.

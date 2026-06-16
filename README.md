@@ -143,15 +143,12 @@ README/docs-only changes run the lightweight Docs Check workflow.
   blockers live in `docs/operations/RC_EVIDENCE_AUDIT.md`; do not treat an
   older commit SHA or a downloaded installer timestamp as the latest validated
   RC state without checking that audit.
-- Verified bundled assets after the multilingual dual-voice expansion: English
-  word audio `1464/1464`, Spanish language-pack audio `880/880`, French
-  language-pack audio `1090/1090`, Russian language-pack files `920/920`, local
-  videos `224/224`.
+- Bundled audio/video and multilingual parity counts are validated in
+  `docs/operations/RC_EVIDENCE_AUDIT.md`; keep that audit as the source of truth
+  instead of copying exact asset totals into public overview text.
 - Multilingual audio-density expansion target: 24 practice items per Spanish,
-  French, and Russian sound unit. Current parity dry-run validates normalized
-  lookup items with total missing `0`: Spanish `880`, French `1090`, Russian
-  `918`. Bundled Russian files remain `460 x 2` because punctuation variants can
-  share one local clip.
+  French, and Russian sound unit, with zero-generation parity checks for current
+  local coverage.
 - Secondary voices selected for the experimental language packs: Spanish
   `Lydia`, French `Rachel`, Russian `Sergey`; the original primary voices
   remain Spanish `Marco Cruz`, French `Clément`, Russian `Valeria`.

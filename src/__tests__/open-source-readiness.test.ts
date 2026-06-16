@@ -286,9 +286,28 @@ describe("open-source readiness files", () => {
     expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
       'word floor `-21.6 dB`',
     );
+    expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
+      "Latest recorded bundled asset validation counted English word audio",
+    );
+    expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
+      "`1464/1464`, Spanish language-pack audio `880/880`",
+    );
+    expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
+      "Russian language-pack files `920/920`",
+    );
+    expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
+      "local videos",
+    );
     expect(readme).toContain("current release-hardening proof matrix");
     expect(readme).toContain("older commit SHA");
     expect(installation).toContain("Use that audit for the latest command");
+    expect(readme).toContain("source of truth");
+    expect(installation).toContain("source of truth");
+    expect(readme).not.toContain("English word audio `1464/1464`");
+    expect(readme).not.toContain("Russian language-pack files `920/920`");
+    expect(installation).not.toContain("English `1464/1464`");
+    expect(installation).not.toContain("Russian `920/920`");
+    expect(installation).not.toContain("Spanish `880`, French `1090`, Russian `918`");
     expect(readme).not.toContain("Previous release-validation baseline");
     expect(installation).not.toContain("Previous release-validation baseline");
     expect(readme).not.toContain("94be1d4");
@@ -321,6 +340,9 @@ describe("open-source readiness files", () => {
       "`npm.cmd run audio:parity:dry-run`: Spanish `880`",
     );
     expect(handoffDocs).not.toMatch(/\btomorrow(?:'s)?\b/i);
+    expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).not.toMatch(
+      /\btomorrow(?:'s)?\b/i,
+    );
     expect(handoffDocs).not.toContain("PID was `70112`");
   });
 
