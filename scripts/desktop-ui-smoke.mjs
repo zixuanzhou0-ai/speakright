@@ -1571,6 +1571,11 @@ async function assertMainRoutes(cdp) {
     routePath !== "/drill/prosody" ||
     (Boolean(document.querySelector('[data-smoke="prosody-page"]')) &&
       Boolean(document.querySelector('[data-smoke="prosody-exercise-header"]')));
+  const experimentalDrillBoundaryReady =
+    routePath !== "/drill" ||
+    (Boolean(document.querySelector('[data-smoke="drill-experimental-boundary-warning"]')) &&
+      bodyText.includes("不生成正式") &&
+      bodyText.includes("不会用整词分冒充掌握证据"));
   const perceptionHooksReady =
     routePath !== "/drill/perception" ||
     (Boolean(document.querySelector('[data-smoke="perception-page"]')) &&
@@ -1581,6 +1586,7 @@ async function assertMainRoutes(cdp) {
       sentenceHooksReady &&
       assessmentHooksReady &&
       prosodyHooksReady &&
+      experimentalDrillBoundaryReady &&
       perceptionHooksReady &&
       !bodyText.includes("Merriam-Webster") &&
       !bodyText.includes("多语言发音包") &&
@@ -1588,6 +1594,7 @@ async function assertMainRoutes(cdp) {
     sentenceHooksReady,
     assessmentHooksReady,
     prosodyHooksReady,
+    experimentalDrillBoundaryReady,
     perceptionHooksReady,
     bodyText: bodyText.slice(0, 800)
   };

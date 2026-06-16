@@ -286,10 +286,10 @@ export default function DrillPage() {
         >
           <div className="mb-5 flex flex-col gap-3 shrink-0 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
-              <h1 className="text-2xl font-bold">
+              <h1 className="break-words text-2xl font-bold [overflow-wrap:anywhere]">
                 {languageProfile.shortLabel}实验训练
               </h1>
-              <p className="mt-1 text-muted-foreground">
+              <p className="mt-1 break-words text-muted-foreground [overflow-wrap:anywhere]">
                 当前语言为 experimental：可以练习和获取反馈，但不生成正式
                 mastery。
               </p>
@@ -306,9 +306,18 @@ export default function DrillPage() {
             </Link>
           </div>
 
-          <div className="mb-5 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-100">
-            西语、法语、俄语仍处于内测阶段。系统会优先播放内置本地音频； 如果
-            Azure 没有返回可用发音单位证据，就不会用整词分冒充掌握证据。
+          <div
+            className="mb-5 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950 shadow-sm [overflow-wrap:anywhere] dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-100"
+            data-smoke="drill-experimental-boundary-warning"
+            role="status"
+          >
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-start">
+              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+              <p className="min-w-0 break-words">
+                西语、法语、俄语仍处于内测阶段。系统会优先播放内置本地音频；
+                如果 Azure 没有返回可用发音单位证据，就不会用整词分冒充掌握证据。
+              </p>
+            </div>
           </div>
 
           <DrillReportStorageWarning message={reportStorageWarning} />
@@ -326,9 +335,11 @@ export default function DrillPage() {
                     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
                       <mode.icon className="h-5 w-5" />
                     </div>
-                    <h2 className="font-semibold">{mode.title}</h2>
+                    <h2 className="break-words font-semibold [overflow-wrap:anywhere]">
+                      {mode.title}
+                    </h2>
                   </div>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="break-words text-sm text-muted-foreground [overflow-wrap:anywhere]">
                     {mode.description}
                   </p>
                 </motion.div>

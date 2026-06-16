@@ -214,6 +214,9 @@ describe("desktop preflight and UI smoke", () => {
     expect(script).toContain("textIsCentered");
     expect(script).toContain('textAlign === "center"');
     expect(script).toContain("assertNarrowViewportRoutes");
+    expect(script).toContain("experimentalDrillBoundaryReady");
+    expect(script).toContain("drill-experimental-boundary-warning");
+    expect(script).toContain("不会用整词分冒充掌握证据");
     expect(script).toContain("narrowViewport=ok");
     expect(script).toContain("assertLowHeightViewportRoutes");
     expect(script).toContain("lowHeightViewport=ok");
@@ -777,7 +780,13 @@ describe("desktop preflight and UI smoke", () => {
     const drillSessionHook = readProjectFile("src/hooks/use-drill-session.ts");
 
     expect(drillPage).toContain('data-smoke="drill-report-storage-warning"');
+    expect(drillPage).toContain(
+      'data-smoke="drill-experimental-boundary-warning"',
+    );
     expect(drillPage).toContain('role="alert"');
+    expect(drillPage).toContain('role="status"');
+    expect(drillPage).toContain("不生成正式");
+    expect(drillPage).toContain("不会用整词分冒充掌握证据");
     expect(drillPage).toContain("loadDrillReportForLanguage(languageId)");
     expect(drillPage).toContain("WRAP_SAFE_ACTION_BUTTON_CLASS");
     expect(drillPage).toContain("WRAP_SAFE_BADGE_CLASS");

@@ -109,6 +109,10 @@ E:\SpeakRightDesktopRepo\src-tauri\target\release\speakright.exe
 - The `/drill` landing page now stacks its header actions on narrow windows and
   uses wrap-safe classes for top CTA buttons, status badges, today-plan badges,
   training-memory badges, and training-pack metadata badges.
+- The non-English `/drill` landing page now exposes
+  `drill-experimental-boundary-warning` as a visible `role="status"` warning
+  and Release EXE smoke verifies that it says experimental practice does not
+  generate formal mastery or use whole-word scores as fake mastery evidence.
 - Full-passage diagnosis badges for target packs, feature labels, evidence
   words, and benchmark deltas now use the same wrap-safe badge treatment.
 - Quick assessment action buttons and full-passage diagnosis segment text now
