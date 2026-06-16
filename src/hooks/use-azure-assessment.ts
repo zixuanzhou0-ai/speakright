@@ -3,6 +3,7 @@
 import { useCallback, useRef, useState } from "react";
 import { assessPronunciation } from "@/lib/api-client";
 import { getAzureConfig } from "@/lib/api-keys";
+import { normalizeAzureSpeechError } from "@/lib/azure-speech-errors";
 import { trackAzureUsage } from "@/lib/usage-tracker";
 import { isSentence } from "@/lib/utils";
 import type { AzureAssessmentResult } from "@/types/azure";
@@ -73,8 +74,7 @@ export function useAzureAssessment(): UseAzureAssessmentReturn {
       return assessed;
     } catch (e) {
       console.error("[Azure Assessment]", e);
-      const msg = e instanceof Error ? e.message : "发音评估失败";
-      setAssessmentError(msg);
+      setAssessmentError(normalizeAzureSpeechError(e));
       return null;
     } finally {
       setIsLoading(false);

@@ -385,6 +385,7 @@ describe("desktop preflight and UI smoke", () => {
 
     expect(azureHook).toContain("getLastError");
     expect(azureHook).toContain("errorRef.current");
+    expect(azureHook).toContain("normalizeAzureSpeechError");
   });
 
   it("keeps recorder runtime failures from silently producing partial audio", () => {
@@ -515,10 +516,13 @@ describe("desktop preflight and UI smoke", () => {
     expect(spontaneousPage).toContain("min-w-0 flex-1");
     expect(spontaneousPage).toContain("{recorder.error ?? error}");
     expect(spontaneousPage).toContain("Azure Speech API 密钥和区域");
+    expect(spontaneousPage).toContain("normalizeAzureSpeechError");
+    expect(spontaneousPage).not.toContain("caught.message");
     expect(spontaneousPage).toContain('role="alert"');
 
     expect(azureHook).toContain("Azure Speech API 密钥和区域");
     expect(azureHook).toContain("回到本页重新评分");
+    expect(azureHook).toContain("normalizeAzureSpeechError");
 
     expect(drillSessionHook).toContain("azure.getLastError()");
     expect(drillSessionHook).toContain(

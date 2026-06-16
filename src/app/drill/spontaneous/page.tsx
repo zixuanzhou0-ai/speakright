@@ -21,6 +21,7 @@ import { useRecorder } from "@/hooks/use-recorder";
 import { useRecordingQuality } from "@/hooks/use-recording-quality";
 import { assessPronunciation, transcribeSpeech } from "@/lib/api-client";
 import { getAzureConfig } from "@/lib/api-keys";
+import { normalizeAzureSpeechError } from "@/lib/azure-speech-errors";
 import {
   getBenchmarkArchiveSaveErrorMessage,
   saveBenchmarkRecording,
@@ -204,7 +205,7 @@ export default function SpontaneousPage() {
         setArchiveWarning(getBenchmarkArchiveSaveErrorMessage(archiveError));
       }
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "即兴表达分析失败");
+      setError(normalizeAzureSpeechError(caught));
     } finally {
       setIsProcessing(false);
     }

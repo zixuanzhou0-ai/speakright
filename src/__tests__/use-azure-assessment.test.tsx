@@ -89,6 +89,23 @@ describe("useAzureAssessment", () => {
     );
   });
 
+  it("normalizes raw English Azure failures before exposing them", async () => {
+    const { result } = renderHook(() => useAzureAssessment());
+    const audio = new Blob([new Uint8Array(32044)], { type: "audio/wav" });
+    mocks.assessPronunciation.mockRejectedValueOnce(
+      new TypeError("Failed to fetch"),
+    );
+
+    await act(async () => {
+      await result.current.assess(audio, "hello");
+    });
+
+    expect(result.current.getLastError()).toBe(
+      "无法连接 Azure Speech，请检查网络、代理或 Azure 区域后重试。",
+    );
+    expect(result.current.error).not.toContain("Failed to fetch");
+  });
+
   it("exposes the missing-key message before React rerenders the caller", async () => {
     const { result } = renderHook(() => useAzureAssessment());
     const audio = new Blob([new Uint8Array(32044)], { type: "audio/wav" });
