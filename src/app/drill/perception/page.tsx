@@ -43,6 +43,9 @@ import {
   getPracticeTextDensity,
 } from "@/lib/practice-text-presentation";
 
+const WRAP_SAFE_ACTION_BUTTON_CLASS =
+  "h-auto min-h-8 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]";
+
 type PlayingSlot = "A" | "B" | "X" | null;
 
 type PerceptionPhase =
@@ -208,19 +211,26 @@ export default function PerceptionDrillPage() {
             className="rounded-xl border bg-card p-6 text-center shadow-sm"
           >
             <Headphones className="mx-auto h-10 w-10 text-primary" />
-            <h1 className="mt-3 text-2xl font-bold">
+            <h1 className="mt-3 break-words text-2xl font-bold [overflow-wrap:anywhere]">
               {languageProfile.shortLabel}听辨训练开发中
             </h1>
-            <p className="mt-2 text-sm text-muted-foreground">
+            <p className="mt-2 break-words text-sm text-muted-foreground [overflow-wrap:anywhere]">
               当前高变异 ABX 听辨题库仍是英语专属。西语、法语、俄语保持
               experimental，不混入英语听辨材料。
             </p>
             <div className="mt-5 flex flex-wrap justify-center gap-2">
-              <Link href="/drill/contrast">
-                <Button className="cursor-pointer">先做对比训练</Button>
+              <Link href="/drill/contrast" className="max-w-full">
+                <Button
+                  className={`cursor-pointer ${WRAP_SAFE_ACTION_BUTTON_CLASS}`}
+                >
+                  先做对比训练
+                </Button>
               </Link>
-              <Link href="/drill">
-                <Button variant="outline" className="cursor-pointer">
+              <Link href="/drill" className="max-w-full">
+                <Button
+                  variant="outline"
+                  className={`cursor-pointer ${WRAP_SAFE_ACTION_BUTTON_CLASS}`}
+                >
                   返回训练首页
                 </Button>
               </Link>

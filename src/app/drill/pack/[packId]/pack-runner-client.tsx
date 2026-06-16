@@ -108,6 +108,9 @@ import type {
   TrainingSessionSummary,
 } from "@/types/training";
 
+const WRAP_SAFE_ACTION_BUTTON_CLASS =
+  "h-auto min-h-8 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]";
+
 type RunnerPhase =
   | { type: "intro" }
   | { type: "course"; position: CoursePosition }
@@ -365,16 +368,26 @@ export default function TrainingPackPage() {
               mastery。
             </p>
             <div className="mt-5 flex flex-wrap justify-center gap-2">
-              <Link href="/drill/word">
-                <Button className="cursor-pointer">当前语言单词训练</Button>
+              <Link href="/drill/word" className="max-w-full">
+                <Button
+                  className={`cursor-pointer ${WRAP_SAFE_ACTION_BUTTON_CLASS}`}
+                >
+                  当前语言单词训练
+                </Button>
               </Link>
-              <Link href="/drill/contrast">
-                <Button variant="outline" className="cursor-pointer">
+              <Link href="/drill/contrast" className="max-w-full">
+                <Button
+                  variant="outline"
+                  className={`cursor-pointer ${WRAP_SAFE_ACTION_BUTTON_CLASS}`}
+                >
                   当前语言对比训练
                 </Button>
               </Link>
-              <Link href="/drill">
-                <Button variant="outline" className="cursor-pointer">
+              <Link href="/drill" className="max-w-full">
+                <Button
+                  variant="outline"
+                  className={`cursor-pointer ${WRAP_SAFE_ACTION_BUTTON_CLASS}`}
+                >
                   返回训练首页
                 </Button>
               </Link>

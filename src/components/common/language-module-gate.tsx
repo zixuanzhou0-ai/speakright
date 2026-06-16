@@ -15,6 +15,9 @@ interface LanguageModuleGateProps {
   children: ReactNode;
 }
 
+const WRAP_SAFE_ACTION_BUTTON_CLASS =
+  "h-auto min-h-8 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]";
+
 export function LanguageModuleGate({
   moduleName,
   readinessKey,
@@ -34,11 +37,11 @@ export function LanguageModuleGate({
           <div className="rounded-lg bg-yellow-500/10 p-2 text-yellow-600">
             <FlaskConical className="h-5 w-5" />
           </div>
-          <div>
-            <h1 className="text-xl font-semibold">
+          <div className="min-w-0 flex-1">
+            <h1 className="break-words text-xl font-semibold [overflow-wrap:anywhere]">
               {profile.displayName}{moduleName}暂未开放完整训练
             </h1>
-            <p className="mt-2 text-sm text-muted-foreground">
+            <p className="mt-2 break-words text-sm text-muted-foreground [overflow-wrap:anywhere]">
               当前语言已有 {audit.soundUnits} 个{profile.soundUnitLabel}和{" "}
               {audit.keywordTotal} 个示例词；部分模块可预览/可练习，但{" "}
               {audit.missingCapabilities.slice(0, 3).join("、")}还在补齐。
@@ -55,14 +58,19 @@ export function LanguageModuleGate({
         </div>
 
         <div className="mt-5 flex flex-wrap gap-2">
-          <Link href="/phonemes">
-            <Button className="gap-2">
+          <Link href="/phonemes" className="max-w-full">
+            <Button className={`gap-2 ${WRAP_SAFE_ACTION_BUTTON_CLASS}`}>
               先查看可练习的发音单位
               <ArrowRight className="h-4 w-4" />
             </Button>
           </Link>
-          <Link href="/settings">
-            <Button variant="outline">配置语言/音频包</Button>
+          <Link href="/settings" className="max-w-full">
+            <Button
+              variant="outline"
+              className={WRAP_SAFE_ACTION_BUTTON_CLASS}
+            >
+              配置语言/音频包
+            </Button>
           </Link>
         </div>
       </div>

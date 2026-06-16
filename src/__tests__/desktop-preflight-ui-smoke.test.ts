@@ -639,6 +639,12 @@ describe("desktop preflight and UI smoke", () => {
       'data-smoke="perception-experimental-blocker"',
     );
     expect(perceptionPage).toContain(
+      "h-auto min-h-8 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]",
+    );
+    expect(perceptionPage).toContain(
+      "mt-3 break-words text-2xl font-bold [overflow-wrap:anywhere]",
+    );
+    expect(perceptionPage).toContain(
       'data-smoke="perception-focused-review-actions"',
     );
     expect(perceptionPage).toContain(
@@ -658,6 +664,9 @@ describe("desktop preflight and UI smoke", () => {
     expect(packRunner).toContain('data-smoke="pack-runner-page"');
     expect(packRunner).toContain('data-smoke="pack-runner-intro-card"');
     expect(packRunner).toContain('data-smoke="pack-runner-course-map"');
+    expect(packRunner).toContain(
+      "h-auto min-h-8 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]",
+    );
     expect(packRunner).toContain(
       'data-smoke="pack-runner-reference-audio-error"',
     );
@@ -686,6 +695,9 @@ describe("desktop preflight and UI smoke", () => {
   it("keeps direct evidence and coverage-passage routes smokeable", () => {
     const evidencePage = readProjectFile("src/app/drill/evidence/page.tsx");
     const passagePage = readProjectFile("src/app/assessment/passage/page.tsx");
+    const languageModuleGate = readProjectFile(
+      "src/components/common/language-module-gate.tsx",
+    );
 
     expect(evidencePage).toContain('data-smoke="evidence-page"');
     expect(evidencePage).toContain('data-smoke="evidence-summary-stats"');
@@ -695,6 +707,9 @@ describe("desktop preflight and UI smoke", () => {
     expect(evidencePage).toContain('data-smoke="evidence-empty-state"');
     expect(evidencePage).toContain(
       'data-smoke="evidence-experimental-blocker"',
+    );
+    expect(evidencePage).toContain(
+      "h-auto min-h-8 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]",
     );
     expect(evidencePage).toContain("flex flex-wrap items-start gap-3");
     expect(evidencePage).toContain("min-w-0 flex-1");
@@ -711,8 +726,16 @@ describe("desktop preflight and UI smoke", () => {
     expect(passagePage).toContain(
       'data-smoke="assessment-passage-experimental-blocker"',
     );
+    expect(passagePage).toContain(
+      "h-auto min-h-8 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]",
+    );
     expect(passagePage).toContain("flex shrink-0 flex-wrap");
     expect(passagePage).toContain("min-w-0 flex-1");
+
+    expect(languageModuleGate).toContain(
+      "h-auto min-h-8 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]",
+    );
+    expect(languageModuleGate).toContain("min-w-0 flex-1");
   });
 
   it("keeps recording and benchmark replay on the shared audio player hook", () => {

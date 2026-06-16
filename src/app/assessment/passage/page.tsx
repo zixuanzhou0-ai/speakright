@@ -53,6 +53,8 @@ import type {
 const STORAGE_KEY_V2 = "speakright_assessment_result_v2";
 const COVERAGE_REPORT_STORAGE_WARNING =
   "上次全音诊断报告无法读取，已暂时忽略这条本机历史记录。可以重新完成全音诊断，或在设置的数据与隐私中心导出诊断后重置本机学习数据。";
+const WRAP_SAFE_ACTION_BUTTON_CLASS =
+  "h-auto min-h-8 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]";
 
 function storageKeyFor(languageId: string): string {
   return `${STORAGE_KEY_V2}:coverage:${languageId}`;
@@ -354,11 +356,18 @@ export default function CoveragePassageAssessmentPage() {
               英语训练包或正式 mastery 证据混入当前语言。
             </p>
             <div className="mt-5 flex flex-wrap justify-center gap-2">
-              <Link href="/assessment">
-                <Button className="cursor-pointer">返回当前语言诊断</Button>
+              <Link href="/assessment" className="max-w-full">
+                <Button
+                  className={`cursor-pointer ${WRAP_SAFE_ACTION_BUTTON_CLASS}`}
+                >
+                  返回当前语言诊断
+                </Button>
               </Link>
-              <Link href="/settings">
-                <Button variant="outline" className="cursor-pointer">
+              <Link href="/settings" className="max-w-full">
+                <Button
+                  variant="outline"
+                  className={`cursor-pointer ${WRAP_SAFE_ACTION_BUTTON_CLASS}`}
+                >
                   切换语言
                 </Button>
               </Link>

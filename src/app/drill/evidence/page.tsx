@@ -35,6 +35,9 @@ import {
 import { cn } from "@/lib/utils";
 import type { MasteryProfile } from "@/types/training";
 
+const WRAP_SAFE_ACTION_BUTTON_CLASS =
+  "h-auto min-h-8 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]";
+
 function packHref(packId: string, levelId?: string): string {
   return levelId
     ? `/drill/pack/${packId}?level=${encodeURIComponent(levelId)}`
@@ -122,11 +125,18 @@ export default function TrainingEvidencePage() {
               mastery 结果混入当前语言。
             </p>
             <div className="mt-5 flex flex-wrap justify-center gap-2">
-              <Link href="/drill">
-                <Button className="cursor-pointer">返回当前语言训练</Button>
+              <Link href="/drill" className="max-w-full">
+                <Button
+                  className={`cursor-pointer ${WRAP_SAFE_ACTION_BUTTON_CLASS}`}
+                >
+                  返回当前语言训练
+                </Button>
               </Link>
-              <Link href="/settings">
-                <Button variant="outline" className="cursor-pointer">
+              <Link href="/settings" className="max-w-full">
+                <Button
+                  variant="outline"
+                  className={`cursor-pointer ${WRAP_SAFE_ACTION_BUTTON_CLASS}`}
+                >
                   切换语言
                 </Button>
               </Link>
