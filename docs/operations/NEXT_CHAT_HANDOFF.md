@@ -148,6 +148,15 @@ git status --short --branch
 - Free-practice word mode now also renders `wordAudio.error` inline under the
   input/listen controls and clears stale word-audio errors when the learner
   changes text or clears the session.
+- Free-practice word-mode help text is language-aware: English can still say
+  local audio first with Youdao fallback, while Spanish/French/Russian say local
+  language-pack audio first and explicitly warn that missing local entries will
+  not be replaced by online audio pretending to be exact local audio.
+- Free-practice sentence TTS, microphone/recorder, Azure assessment, and missing
+  AI coach LLM configuration failures now render visible Chinese inline alerts.
+  The smoke/test hooks are `free-practice-tts-error`,
+  `free-practice-recorder-error`, and `free-practice-assess-error`; the LLM
+  missing-config message tells learners the Azure numeric score was retained.
 - Settings usage monitor now shows an explicit first-run ElevenLabs empty state:
   sentence/phrase demos need an API Key, while local word audio and built-in
   language-pack audio can still be used.
@@ -539,10 +548,16 @@ Current gate summary:
 - Focused phoneme detail presentation tests passed: `2` files and `9` tests,
   covering non-English full text visibility, Russian long Cyrillic rule text,
   and task-accurate A/B playback labels.
-- Full tests passed: `117` files and `646` tests.
-- Typecheck, lint (`378` files checked), and static desktop frontend build
-  passed.
-- Release EXE build passed and rebuilt EXE, MSI, and NSIS artifacts.
+- Focused free-practice failure guidance tests passed, covering language-aware
+  word-audio labels, sentence TTS error hooks, recorder/Azure alert hooks, and
+  missing LLM config guidance that preserves Azure numeric scores; the static
+  Release smoke self-test now also checks the free-practice failure hooks remain
+  present in the source.
+- Full tests passed: `119` files and `664` tests.
+- Typecheck, lint, and static desktop frontend build passed.
+- The latest free-practice failure guidance pass did not rebuild desktop
+  artifacts because it did not change Tauri/Rust/package assets; the existing
+  Release EXE was validated through preflight, UI smoke, and launch.
 - Release EXE preflight passed; no localhost startup is part of the release
   path. During the pre-commit verification run it correctly reported the
   expected dirty worktree from this local fix.
@@ -561,7 +576,7 @@ Current gate summary:
   intro card plus start/passage actions instead of only checking the page
   container.
 - Release EXE launch passed from the static Tauri bundle, and the test process
-  was closed after verification; the latest launch PID was `54628`.
+  was closed after verification.
 - No ElevenLabs generation or TTS spend is part of this validation path.
 
 For tomorrow's manual test session, start with:

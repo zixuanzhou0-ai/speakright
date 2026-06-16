@@ -201,6 +201,14 @@ describe("desktop preflight and UI smoke", () => {
     expect(
       readProjectFile("src/components/sentences/sentence-input-card.tsx"),
     ).toContain("free-practice-word-audio-error");
+    expect(
+      readProjectFile("src/components/sentences/sentence-input-card.tsx"),
+    ).toContain("free-practice-tts-error");
+    const sentenceRecordingCard = readProjectFile(
+      "src/components/sentences/sentence-recording-card.tsx",
+    );
+    expect(sentenceRecordingCard).toContain("free-practice-recorder-error");
+    expect(sentenceRecordingCard).toContain("free-practice-assess-error");
     const wordPronunciationHook = readProjectFile(
       "src/hooks/use-word-pronunciation.ts",
     );
@@ -277,8 +285,12 @@ describe("desktop preflight and UI smoke", () => {
     expect(llmCard).toContain('data-smoke="llm-config-actions"');
     expect(llmCard).toContain("flex flex-wrap items-center gap-3");
     expect(llmCard).toContain("break-words");
-    expect(connectionStatus).toContain('data-smoke="settings-connection-status"');
-    expect(connectionStatus).toContain('role={state === "error" ? "alert" : "status"}');
+    expect(connectionStatus).toContain(
+      'data-smoke="settings-connection-status"',
+    );
+    expect(connectionStatus).toContain(
+      'role={state === "error" ? "alert" : "status"}',
+    );
     expect(connectionStatus).toContain("aria-live");
     expect(connectionStatus).toContain("basis-48");
     expect(connectionStatus).toContain("overflow-wrap:anywhere");
