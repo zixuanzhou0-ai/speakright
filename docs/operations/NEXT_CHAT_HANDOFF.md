@@ -496,7 +496,7 @@ Current gate summary is intentionally compact here:
   should be closed afterward.
 - No ElevenLabs generation or TTS spend is part of this validation path.
 
-For tomorrow's manual test session, start with:
+For the next manual test session, start with:
 
 ```bat
 cd /d E:\SpeakRightDesktopRepo

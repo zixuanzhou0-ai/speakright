@@ -320,6 +320,7 @@ describe("open-source readiness files", () => {
     expect(dualVoiceRunbookSection).not.toContain(
       "`npm.cmd run audio:parity:dry-run`: Spanish `880`",
     );
+    expect(handoffDocs).not.toMatch(/\btomorrow(?:'s)?\b/i);
     expect(handoffDocs).not.toContain("PID was `70112`");
   });
 

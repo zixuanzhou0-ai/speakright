@@ -331,8 +331,8 @@ release notes and installation guide keep the unsigned warning visible.
 - Azure live pronunciation-assessment sample: `220/220` passed.
 - ElevenLabs usage was checked before and after validation; no TTS smoke was run
   and estimated generated characters used were `0`.
-- Keep using `npm run desktop:launch-release` for tomorrow's manual testing;
-  dev mode remains debug-only.
+- Keep using `npm run desktop:launch-release` for manual testing; dev mode
+  remains debug-only.
 
 ## 2026-06-11 Preflight/UI-Smoke Hardening Result
 
@@ -416,7 +416,7 @@ release notes and installation guide keep the unsigned warning visible.
 - Use `audio:parity:dry-run` for the non-English audio gate; it must remain a
   zero-generation audit.
 
-## 2026-06-14 Tomorrow Test Readiness
+## 2026-06-14 Next Manual Test Readiness
 
 - Release EXE was rebuilt after the RC audio/playback, mastery-gating,
   small-bug smoke tightening, and exact header-clip scoring-audio pass:
@@ -539,7 +539,7 @@ release notes and installation guide keep the unsigned warning visible.
   high-risk phrase rows now use broad connected-speech voicing before voiced,
   sonorant, or vowel-onset words. `поезд идёт` remains `needs-review`, and deck
   focus hints such as `/s sʲ zʲ/` should not be mistaken for full sentence IPA.
-- Tomorrow's manual test should start with:
+- The next manual test should start with:
 
 ```bat
 cd /d E:\SpeakRightDesktopRepo
