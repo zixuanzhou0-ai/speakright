@@ -155,6 +155,24 @@ describe("PhonemePlayButton", () => {
     ).not.toBeInTheDocument();
   });
 
+  it("does not render a header speaker for whole-word local language-pack audio", () => {
+    render(
+      <PhonemePlayButton
+        phonemeAudio={{
+          kind: "local",
+          label: "整词本地音频",
+          source: "local language pack",
+          localSrc: "/audio/language-packs/fr-FR/bonjour-pink-acf26f7271.mp3",
+          languageId: "fr-FR",
+        }}
+      />,
+    );
+
+    expect(
+      screen.queryByRole("button", { name: "播放发音" }),
+    ).not.toBeInTheDocument();
+  });
+
   it("does not render a header speaker when localSrc points to an external URL", () => {
     render(
       <PhonemePlayButton

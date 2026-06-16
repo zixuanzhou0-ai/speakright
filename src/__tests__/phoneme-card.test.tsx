@@ -117,6 +117,33 @@ describe("PhonemeCard header audio", () => {
     expect(player.play).not.toHaveBeenCalled();
   });
 
+  it("does not play whole-word local sources from the IPA symbol", () => {
+    const player = mockPlayer();
+    render(
+      <PhonemeCard
+        player={player}
+        phoneme={phoneme({
+          languageId: "fr-FR",
+          ipa: "/e/",
+          symbol: "fr-e",
+          slug: "fr-e",
+          example: "ete",
+          keywords: [{ word: "ete", ipa: "/ete/" }],
+          phonemeAudio: {
+            kind: "local",
+            label: "Language pack word",
+            source: "local",
+            localSrc: "/audio/language-packs/fr-FR/ete.mp3",
+          },
+        })}
+      />,
+    );
+
+    fireEvent.click(screen.getByText("/e/"));
+
+    expect(player.play).not.toHaveBeenCalled();
+  });
+
   it("uses boosted chart-word playback options when the illustration plays normal or slow word audio", () => {
     const player = mockPlayer();
     render(

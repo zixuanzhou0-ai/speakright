@@ -23,7 +23,7 @@ describe("audio playback policy", () => {
         kind: "local",
         label: "法语本地音频",
         source: "local",
-        localSrc: "/audio/language-packs/fr-FR/accueil-63acf559f5.mp3",
+        localSrc: "/audio/language-assets/fr-FR/header-clips/fr-schwa.m4a",
       },
     });
 
@@ -45,6 +45,29 @@ describe("audio playback policy", () => {
     });
 
     expect(options).toBeUndefined();
+  });
+
+  it("refuses whole-word and language-pack clips as header phoneme audio", () => {
+    for (const localSrc of [
+      "/audio/words/blue/hello.mp3",
+      "/audio/ipa/normal/cat.mp3",
+      "/audio/ipa/slow/cat.mp3",
+      "/audio/language-packs/fr-FR/bonjour-pink-acf26f7271.mp3",
+      "/audio/language-packs/es-ES/hola.mp3",
+    ]) {
+      expect(isPlayableHeaderAudioSrc(localSrc), localSrc).toBe(false);
+      expect(
+        getSoundUnitHeaderPlaybackOptions({
+          phonemeAudio: {
+            kind: "local",
+            label: "整词或语言包音频",
+            source: "local",
+            localSrc,
+          },
+        }),
+        localSrc,
+      ).toBeUndefined();
+    }
   });
 
   it("refuses external URLs for header speakers even when a localSrc field is present", () => {

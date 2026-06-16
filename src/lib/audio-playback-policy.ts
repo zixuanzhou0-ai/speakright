@@ -35,7 +35,14 @@ export function isVideoBackedAudioSrc(src?: string): boolean {
 }
 
 export function isPlayableHeaderAudioSrc(src?: string): boolean {
-  return Boolean(src?.startsWith("/audio/") && !isVideoBackedAudioSrc(src));
+  if (!src || isVideoBackedAudioSrc(src)) return false;
+
+  return (
+    /^\/audio\/ipa\/phoneme\/[^/]+\.mp3$/i.test(src) ||
+    /^\/audio\/language-assets\/(?:es-ES|fr-FR|ru-RU)\/header-clips\/[^/]+\.m4a$/.test(
+      src,
+    )
+  );
 }
 
 export function getSoundUnitHeaderPlaybackOptions({
