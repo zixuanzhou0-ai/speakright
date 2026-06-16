@@ -69,9 +69,7 @@ part of this routine Release EXE gate.
 
 ## Latest Local Command Results
 
-Latest local full gate for open-source governance, centered target text,
-quick-assessment target-label wrapping, detail-header/scoring-tile audio
-metadata, and Release EXE validation:
+Latest local full gate recorded in this audit:
 
 ```text
 git status --short --branch

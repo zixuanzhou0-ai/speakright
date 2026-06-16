@@ -137,8 +137,9 @@ README/docs-only changes run the lightweight Docs Check workflow.
 
 - The current Windows artifacts are for controlled testing unless code signing
   is complete.
-- Last controlled-test verification: 2026-06-16, after the Release launch
-  guardrail pass and full Release EXE gate.
+- Controlled-test verification records for the current main tree live in
+  `docs/operations/RC_EVIDENCE_AUDIT.md`, including the verification date,
+  command outputs, Release EXE smoke/launch outcome, and known blockers.
 - The current release-hardening proof matrix, exact command results, and known
   blockers live in `docs/operations/RC_EVIDENCE_AUDIT.md`; do not treat an
   older commit SHA or a downloaded installer timestamp as the latest validated

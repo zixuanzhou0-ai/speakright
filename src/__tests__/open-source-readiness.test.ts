@@ -260,7 +260,7 @@ describe("open-source readiness files", () => {
       "121 files / 679 tests passed",
     );
     expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
-      "detail-header/scoring-tile audio",
+      "same left/detail sound-unit header clip",
     );
     expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
       "data-audio-kind",
@@ -377,6 +377,10 @@ describe("open-source readiness files", () => {
     expect(readme).toContain("Public review, source builds");
     expect(readme).toContain("A signed public Windows release is not complete yet");
     expect(readme).toContain("internal-test or controlled-test builds");
+    expect(readme).toContain("Controlled-test verification records");
+    expect(readme).toContain("Release EXE smoke/launch outcome");
+    expect(readme).not.toContain("Last controlled-test verification");
+    expect(readme).not.toContain("guardrail pass and full Release EXE gate");
     expect(installation).toContain("Controlled-Test Installer Boundary");
     expect(installation).toContain(
       "Do not treat GitHub Releases as a public signed download page yet",
@@ -390,6 +394,10 @@ describe("open-source readiness files", () => {
     expect(installation).toContain("public Windows release");
     expect(installation).toContain("Published GitHub Release assets can lag");
     expect(installation).toContain("docs/operations/RC_EVIDENCE_AUDIT.md");
+    expect(installation).toContain("For controlled internal-test passes");
+    expect(installation).toContain("current RC notes");
+    expect(installation).not.toContain("For the 2026-06-16 internal-test pass");
+    expect(installation).not.toContain("latest local non-English layout fixes");
     expect(readme).toContain("source builds");
     expect(readme).toContain("docs/INSTALLATION.md");
     expect(installation).toContain("Build From Source");

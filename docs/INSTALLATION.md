@@ -203,9 +203,9 @@ downloaded installer as the latest validated RC.
   policy.
 - Public-release blocker: Windows EXE/MSI/NSIS artifacts are still unsigned.
 
-For the 2026-06-16 internal-test pass, use the installed app or Release EXE
-first. Only rebuild if the executable is missing, stale after code changes, or
-manual QA finds a bug that needs a code fix.
+For controlled internal-test passes, use the installed app or Release EXE first.
+Only rebuild if the executable is missing, stale after code changes, or manual
+QA finds a bug that needs a code fix.
 
 For the next Codex chat, first read:
 
@@ -214,9 +214,9 @@ docs/operations/NEXT_CHAT_HANDOFF.md
 docs/operations/DESKTOP_STARTUP_RUNBOOK.md
 ```
 
-That handoff records the latest local non-English layout fixes, the validation
-commands already run, and any current local worktree caveats. A settled RC
-branch should have no uncommitted file edits before you start new changes.
+That handoff records current RC notes, validation commands, and any local
+worktree caveats. A settled RC branch should have no uncommitted file edits
+before you start new changes.
 If `git status` still reports `main...origin/main [ahead N]` after recent
 GitHub API fallback pushes, verify the GitHub `main` ref and local-vs-remote
 tree SHA before treating the content as unpushed.
