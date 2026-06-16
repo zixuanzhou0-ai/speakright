@@ -181,6 +181,8 @@ describe("desktop preflight and UI smoke", () => {
     expect(script).toContain("smokeAssessmentTiles=1");
     expect(script).toContain("assessment-phoneme-tile-fixture");
     expect(script).toContain("assessment-phoneme-tile");
+    expect(script).toContain("assessment-phoneme-audio-hint");
+    expect(script).toContain("有本地音频的片段可点击");
     expect(script).toContain("data-audio-max-duration-ms");
     expect(script).toContain("tileAudioPolicyReady");
     expect(script).toContain("hasPlayableExactHeaderClip");

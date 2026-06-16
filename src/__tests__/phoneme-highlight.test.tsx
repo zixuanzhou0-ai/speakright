@@ -156,6 +156,11 @@ describe("PhonemeHighlight", () => {
       />,
     );
 
+    expect(screen.getByText("有本地音频的片段可点击")).toHaveAttribute(
+      "data-smoke",
+      "assessment-phoneme-audio-hint",
+    );
+    expect(screen.queryByText("点击可听发音")).not.toBeInTheDocument();
     expect(screen.getAllByText("/n/")).toHaveLength(2);
     expect(screen.queryByText(/m n/)).not.toBeInTheDocument();
 
@@ -343,6 +348,10 @@ describe("PhonemeHighlight", () => {
   it("shows a clear empty-state message when Azure returns no usable phonemes", () => {
     render(<PhonemeHighlight languageId="fr-FR" phonemes={[]} />);
 
+    expect(screen.getByText("暂无本地音频")).toHaveAttribute(
+      "data-smoke",
+      "assessment-phoneme-audio-hint",
+    );
     expect(screen.getByText(/没有返回可用的分段音素标签/)).toBeInTheDocument();
   });
 

@@ -341,12 +341,18 @@ export function PhonemeHighlight({
             {breakdownLabel}
           </p>
           {hasAnyAudio ? (
-            <span className="inline-flex items-center gap-0.5 text-xs text-muted-foreground/60">
+            <span
+              className="inline-flex items-center gap-0.5 text-xs text-muted-foreground/60"
+              data-smoke="assessment-phoneme-audio-hint"
+            >
               <Volume2 className="h-3 w-3" />
-              点击可听发音
+              有本地音频的片段可点击
             </span>
           ) : (
-            <span className="text-xs text-muted-foreground/60">
+            <span
+              className="text-xs text-muted-foreground/60"
+              data-smoke="assessment-phoneme-audio-hint"
+            >
               暂无本地音频
             </span>
           )}

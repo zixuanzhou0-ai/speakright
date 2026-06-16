@@ -1286,6 +1286,7 @@ async function assertScoringTileAudioPolicy(cdp) {
     `
 (() => {
   const fixture = document.querySelector('[data-smoke="assessment-phoneme-tile-fixture"]');
+  const audioHint = document.querySelector('[data-smoke="assessment-phoneme-audio-hint"]');
   const tiles = [...document.querySelectorAll('[data-smoke="assessment-phoneme-tile"]')];
   const hasVisibleRect = (element) => {
     const rect = element.getBoundingClientRect();
@@ -1375,6 +1376,7 @@ async function assertScoringTileAudioPolicy(cdp) {
   });
   const tileAudioPolicyReady =
     Boolean(fixture) &&
+    audioHint?.textContent?.includes("有本地音频的片段可点击") &&
     tiles.length >= 2 &&
     hasPlayableExactHeaderClip &&
     hasLockedUnverifiedTile &&
@@ -1383,6 +1385,7 @@ async function assertScoringTileAudioPolicy(cdp) {
     ok: tileAudioPolicyReady,
     tileCount: tiles.length,
     tileAudioPolicyReady,
+    audioHint: audioHint?.textContent ?? "",
     hasPlayableExactHeaderClip,
     hasLockedUnverifiedTile,
     tilePoliciesAreStrict,
