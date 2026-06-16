@@ -47,6 +47,9 @@ interface AvailabilityRow {
   icon: typeof KeyRound;
 }
 
+const WRAP_SAFE_LANGUAGE_BADGE_CLASS =
+  "h-auto min-h-5 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]";
+
 type StaticPackState =
   | {
       languageId: ElevenLabsPackLanguageId | null;
@@ -241,18 +244,24 @@ export function LanguageAvailabilityCard() {
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="min-w-0 flex-1">
+            <div className="flex min-w-0 flex-wrap items-center gap-2">
               <Languages className="h-4 w-4 text-primary" />
-              <CardTitle className="text-base">当前语言可用性</CardTitle>
+              <CardTitle className="break-words text-base [overflow-wrap:anywhere]">
+                当前语言可用性
+              </CardTitle>
             </div>
-            <CardDescription>
+            <CardDescription className="break-words [overflow-wrap:anywhere]">
               当前：{profile.displayName}。这里把评分、标准示范、单词词典发音和
               AI 教练分开显示，避免把不同服务混在一起。
             </CardDescription>
           </div>
-          <Badge variant={profile.status === "stable" ? "default" : "secondary"}>
+          <Badge
+            variant={profile.status === "stable" ? "default" : "secondary"}
+            className={WRAP_SAFE_LANGUAGE_BADGE_CLASS}
+            data-smoke="language-availability-status-badge"
+          >
             {profile.status === "stable" ? "稳定基线" : "实验板块"}
           </Badge>
         </div>
@@ -267,14 +276,15 @@ export function LanguageAvailabilityCard() {
                 className="rounded-lg border bg-background px-3 py-3"
                 data-smoke={`language-availability-${row.id}`}
               >
-                <div className="flex items-center gap-2">
+                <div className="flex min-w-0 flex-wrap items-center gap-2">
                   <Icon className="h-4 w-4 text-primary" />
                   <span className="font-medium break-words [overflow-wrap:anywhere]">
                     {row.label}
                   </span>
                   <Badge
                     variant={row.ready ? "default" : "outline"}
-                    className="ml-auto h-auto min-h-5 shrink whitespace-normal text-center break-words [overflow-wrap:anywhere]"
+                    className={`ml-auto ${WRAP_SAFE_LANGUAGE_BADGE_CLASS}`}
+                    data-smoke={`language-availability-${row.id}-status-badge`}
                   >
                     {row.ready ? (
                       <CheckCircle2 className="h-3 w-3" />
@@ -286,7 +296,7 @@ export function LanguageAvailabilityCard() {
                     {row.status}
                   </Badge>
                 </div>
-                <p className="mt-1 text-xs text-muted-foreground">
+                <p className="mt-1 break-words text-xs text-muted-foreground [overflow-wrap:anywhere]">
                   {row.detail}
                 </p>
               </div>
@@ -295,7 +305,10 @@ export function LanguageAvailabilityCard() {
         </div>
         <div className="flex items-start gap-2 rounded-lg border border-primary/20 bg-primary/5 px-3 py-2 text-sm">
           <Volume2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-          <p>
+          <p
+            className="break-words [overflow-wrap:anywhere]"
+            data-smoke="language-availability-recommendation"
+          >
             <span className="font-medium">推荐：</span>
             {recommendation(rows)}
           </p>

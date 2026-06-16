@@ -143,8 +143,16 @@ describe("DesktopExternalLink", () => {
     expect(screen.getByText(/正式公开 Windows 发布前/)).toBeInTheDocument();
     expect(screen.getByText(/GitHub Release 页面可能落后/)).toBeInTheDocument();
     expect("installers" in DESKTOP_RELEASE_INFO).toBe(false);
+    expect(
+      document.querySelector('[data-smoke="release-version-badge"]'),
+    ).toHaveClass("whitespace-normal");
+    expect(
+      document.querySelector('[data-smoke="release-channel-badge"]'),
+    ).toHaveClass("whitespace-normal");
 
     const sourceLink = screen.getByRole("link", { name: /源码仓库/ });
+    expect(sourceLink).toHaveClass("whitespace-normal");
+    expect(sourceLink).toHaveAttribute("data-smoke", "release-repository-link");
     const sourceEvent = new MouseEvent("click", {
       bubbles: true,
       cancelable: true,
@@ -159,6 +167,8 @@ describe("DesktopExternalLink", () => {
     });
 
     const releaseLink = screen.getByRole("link", { name: /Release 说明/ });
+    expect(releaseLink).toHaveClass("whitespace-normal");
+    expect(releaseLink).toHaveAttribute("data-smoke", "release-notes-link");
     const releaseEvent = new MouseEvent("click", {
       bubbles: true,
       cancelable: true,

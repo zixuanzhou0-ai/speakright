@@ -329,6 +329,9 @@ describe("desktop preflight and UI smoke", () => {
     const languageAvailabilityCard = readProjectFile(
       "src/components/settings/language-availability-card.tsx",
     );
+    const releaseCard = readProjectFile(
+      "src/components/settings/release-card.tsx",
+    );
     const llmCard = readProjectFile(
       "src/components/settings/llm-config-card.tsx",
     );
@@ -391,6 +394,25 @@ describe("desktop preflight and UI smoke", () => {
     expect(languageAvailabilityCard).toContain("缺失或不可读");
     expect(languageAvailabilityCard).toContain("重新安装最新版桌面端");
     expect(languageAvailabilityCard).toContain("overflow-wrap:anywhere");
+    expect(languageAvailabilityCard).toContain("WRAP_SAFE_LANGUAGE_BADGE_CLASS");
+    expect(languageAvailabilityCard).toContain(
+      'data-smoke="language-availability-status-badge"',
+    );
+    expect(languageAvailabilityCard).toContain(
+      'data-smoke="language-availability-recommendation"',
+    );
+    expect(languageAvailabilityCard).toContain(
+      "h-auto min-h-5 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]",
+    );
+    expect(releaseCard).toContain("WRAP_SAFE_RELEASE_BADGE_CLASS");
+    expect(releaseCard).toContain("WRAP_SAFE_RELEASE_LINK_CLASS");
+    expect(releaseCard).toContain('data-smoke="release-version-badge"');
+    expect(releaseCard).toContain('data-smoke="release-channel-badge"');
+    expect(releaseCard).toContain('data-smoke="release-repository-link"');
+    expect(releaseCard).toContain('data-smoke="release-notes-link"');
+    expect(releaseCard).toContain(
+      "h-auto min-h-7 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]",
+    );
     expect(llmCard).toContain('data-smoke="llm-provider-chip"');
     expect(llmCard).toContain('data-smoke="llm-manual-provider-note"');
     expect(llmCard).toContain('data-smoke="llm-config-actions"');

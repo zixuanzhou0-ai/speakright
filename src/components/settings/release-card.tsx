@@ -22,6 +22,11 @@ import {
 } from "@/components/ui/card";
 import { DESKTOP_RELEASE_INFO } from "@/lib/release-info";
 
+const WRAP_SAFE_RELEASE_BADGE_CLASS =
+  "h-auto min-h-5 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]";
+const WRAP_SAFE_RELEASE_LINK_CLASS =
+  "h-auto min-h-7 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]";
+
 export function ReleaseCard() {
   const release = DESKTOP_RELEASE_INFO;
 
@@ -33,16 +38,30 @@ export function ReleaseCard() {
       data-smoke="release-status"
     >
       <CardHeader>
-        <div className="flex items-center gap-2">
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
           <PackageCheck className="size-5 text-primary" />
-          <CardTitle>桌面端版本与发布</CardTitle>
+          <CardTitle className="break-words [overflow-wrap:anywhere]">
+            桌面端版本与发布
+          </CardTitle>
         </div>
-        <CardDescription>
+        <CardDescription className="break-words [overflow-wrap:anywhere]">
           查看当前已安装版本、更新通道和签名状态。
         </CardDescription>
-        <CardAction className="flex items-center gap-2">
-          <Badge variant="secondary">v{release.currentVersion}</Badge>
-          <Badge variant="outline">{release.channelLabel}</Badge>
+        <CardAction className="flex min-w-0 flex-wrap items-center gap-2">
+          <Badge
+            variant="secondary"
+            className={WRAP_SAFE_RELEASE_BADGE_CLASS}
+            data-smoke="release-version-badge"
+          >
+            v{release.currentVersion}
+          </Badge>
+          <Badge
+            variant="outline"
+            className={WRAP_SAFE_RELEASE_BADGE_CLASS}
+            data-smoke="release-channel-badge"
+          >
+            {release.channelLabel}
+          </Badge>
         </CardAction>
       </CardHeader>
 
@@ -76,22 +95,34 @@ export function ReleaseCard() {
         >
           <div className="flex gap-2">
             <ShieldAlert className="mt-0.5 size-4 shrink-0" />
-            <p>{release.notes.unsigned}</p>
+            <p className="break-words [overflow-wrap:anywhere]">
+              {release.notes.unsigned}
+            </p>
           </div>
         </div>
 
         <div className="flex flex-wrap gap-2 border-t pt-4">
           <DesktopExternalLink
-            className={buttonVariants({ size: "sm", variant: "ghost" })}
+            className={buttonVariants({
+              size: "sm",
+              variant: "ghost",
+              className: WRAP_SAFE_RELEASE_LINK_CLASS,
+            })}
             copyMessage="源码仓库链接已复制，请在浏览器中打开"
+            data-smoke="release-repository-link"
             href={release.repositoryUrl}
           >
             <Code2 className="size-3.5" />
             源码仓库
           </DesktopExternalLink>
           <DesktopExternalLink
-            className={buttonVariants({ size: "sm", variant: "ghost" })}
+            className={buttonVariants({
+              size: "sm",
+              variant: "ghost",
+              className: WRAP_SAFE_RELEASE_LINK_CLASS,
+            })}
             copyMessage="Release 说明链接已复制，请在浏览器中打开"
+            data-smoke="release-notes-link"
             href={release.releaseUrl}
           >
             <PackageCheck className="size-3.5" />
@@ -99,7 +130,7 @@ export function ReleaseCard() {
           </DesktopExternalLink>
         </div>
 
-        <p className="text-xs text-muted-foreground">
+        <p className="break-words text-xs text-muted-foreground [overflow-wrap:anywhere]">
           {release.notes.artifacts} {release.notes.releasePage}{" "}
           {release.notes.checksum}
         </p>
@@ -119,11 +150,13 @@ function ReleaseFact({
 }) {
   return (
     <div className="rounded-lg border bg-background/70 p-3">
-      <div className="mb-1 flex items-center gap-1.5 text-xs text-muted-foreground">
+      <div className="mb-1 flex min-w-0 flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
         {icon}
-        {label}
+        <span className="break-words [overflow-wrap:anywhere]">{label}</span>
       </div>
-      <div className="text-sm font-medium leading-snug">{value}</div>
+      <div className="break-words text-sm font-medium leading-snug [overflow-wrap:anywhere]">
+        {value}
+      </div>
     </div>
   );
 }

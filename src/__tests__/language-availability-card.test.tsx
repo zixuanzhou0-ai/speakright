@@ -37,8 +37,13 @@ describe("language availability card", () => {
 
     expect(screen.getByText("检查中")).toBeInTheDocument();
     expect(screen.getByText("检查内置资源")).toBeInTheDocument();
+    expect(screen.getByText("实验板块")).toHaveClass("whitespace-normal");
+    expect(screen.getByText("检查中")).toHaveClass("whitespace-normal");
     expect(screen.queryByText("缺失或不可读")).not.toBeInTheDocument();
     expect(screen.getByText(/检查完成前不需要安装额外语言包/)).toBeInTheDocument();
+    expect(
+      document.querySelector('[data-smoke="language-availability-recommendation"]'),
+    ).not.toBeNull();
   });
 
   it("surfaces missing local-pack manifests as a Chinese reinstall hint", async () => {
