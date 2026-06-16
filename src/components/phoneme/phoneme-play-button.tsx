@@ -3,6 +3,7 @@
 import { AudioPlayerButton } from "@/components/audio/audio-player";
 import { useAudioPlayer } from "@/hooks/use-audio-player";
 import {
+  getEnglishHeaderPhonemeAudioSrc,
   getSoundUnitHeaderPlaybackOptions,
   isPlayableHeaderAudioSrc,
 } from "@/lib/audio-playback-policy";
@@ -20,11 +21,12 @@ export function PhonemePlayButton({
   onBeforePlay,
 }: PhonemePlayButtonProps) {
   const { play, isPlaying, isLoading, error, clearError } = useAudioPlayer();
+  const chartAudioSrc = getEnglishHeaderPhonemeAudioSrc(chartWord);
   const canPlayLocalHeaderAudio = isPlayableHeaderAudioSrc(
     phonemeAudio?.localSrc,
   );
 
-  if (!chartWord && !canPlayLocalHeaderAudio) return null;
+  if (!chartAudioSrc && !canPlayLocalHeaderAudio) return null;
 
   const playbackOptions = getSoundUnitHeaderPlaybackOptions({
     chartWord,
@@ -32,10 +34,8 @@ export function PhonemePlayButton({
   });
   if (!playbackOptions) return null;
 
-  const audioSrc = chartWord
-    ? `/audio/ipa/phoneme/${chartWord}.mp3`
-    : (phonemeAudio?.localSrc ?? "");
-  const audioKind = chartWord ? "chart" : "sound-unit";
+  const audioSrc = chartAudioSrc ?? phonemeAudio?.localSrc ?? "";
+  const audioKind = chartAudioSrc ? "chart" : "sound-unit";
   const dataAttributes = {
     "data-audio-playable": "true",
     "data-audio-kind": audioKind,

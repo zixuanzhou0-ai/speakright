@@ -1,6 +1,9 @@
 import { getLanguagePhonemes } from "@/lib/language-phonemes";
 import { getAssessmentSegmentAudioInfo } from "@/lib/assessment-segment-audio";
-import { getSoundUnitHeaderPlaybackOptions } from "@/lib/audio-playback-policy";
+import {
+  getEnglishHeaderPhonemeAudioSrc,
+  getSoundUnitHeaderPlaybackOptions,
+} from "@/lib/audio-playback-policy";
 import type { LanguageId } from "@/types/language";
 
 /**
@@ -157,15 +160,16 @@ export function getPhonemeAudioInfo(
   }
 
   const chartWord = azureToChartWord[azureCode.toLowerCase()];
-  return chartWord
-    ? {
-        url: `/audio/ipa/phoneme/${chartWord}.mp3`,
-        kind: "chart",
-        label: toIpa(azureCode),
-        description: "IPA Chart 本地音频",
-        ...getSoundUnitHeaderPlaybackOptions({ chartWord }),
-      }
-    : null;
+  const audioUrl = getEnglishHeaderPhonemeAudioSrc(chartWord);
+  if (!audioUrl) return null;
+
+  return {
+    url: audioUrl,
+    kind: "chart",
+    label: toIpa(azureCode),
+    description: "IPA Chart 本地音频",
+    ...getSoundUnitHeaderPlaybackOptions({ chartWord }),
+  };
 }
 
 /**

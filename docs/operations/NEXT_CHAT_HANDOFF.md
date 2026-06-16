@@ -390,6 +390,10 @@ git status --short --branch
   paths. If a future source mistakenly puts an external URL into `localSrc`,
   the detail/list speaker and scoring tile stay hidden or unclickable instead
   of treating that URL as verified single-sound audio.
+- English chart-word header speakers now also require a simple local filename
+  stem before constructing `/audio/ipa/phoneme/{stem}.mp3`; path fragments,
+  query strings, extensions, spaces, or non-phoneme stems keep the speaker
+  hidden instead of accidentally producing a clickable fake single-sound source.
 - Scoring-breakdown tiles now also reject video-backed audio URLs before
   constructing a `Howl`, so they cannot play a full teaching-video track even if
   an upstream assessment-audio mapping regresses.

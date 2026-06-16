@@ -1,3 +1,4 @@
+import { PHONEMES } from "@/lib/phoneme-data";
 import type { LanguageId } from "@/types/language";
 import type { PhonemeAudioSource } from "@/types/phoneme";
 
@@ -30,6 +31,21 @@ const CHART_WORD_PLAYBACK: Required<Pick<AudioPlaybackOptions, "volume">> = {
 
 export type AssessmentTileAudioKind = "chart" | "sound-unit";
 
+const ENGLISH_CHART_AUDIO_STEMS = new Set(
+  PHONEMES.map((phoneme) => phoneme.chartWord).filter(Boolean),
+);
+
+export function getEnglishHeaderPhonemeAudioSrc(
+  chartWord?: string,
+): string | null {
+  const stem = chartWord?.trim();
+  if (!stem || !/^[a-z0-9-]+$/.test(stem)) return null;
+  if (!ENGLISH_CHART_AUDIO_STEMS.has(stem)) return null;
+
+  const src = `/audio/ipa/phoneme/${stem}.mp3`;
+  return isPlayableHeaderAudioSrc(src) ? src : null;
+}
+
 export function isVideoBackedAudioSrc(src?: string): boolean {
   return Boolean(src && /\.(mp4|m4v|webm)(?:$|\?)/i.test(src));
 }
@@ -52,7 +68,7 @@ export function getSoundUnitHeaderPlaybackOptions({
   chartWord?: string;
   phonemeAudio?: PhonemeAudioSource;
 }): AudioPlaybackOptions | undefined {
-  if (chartWord) {
+  if (getEnglishHeaderPhonemeAudioSrc(chartWord)) {
     return ENGLISH_HEADER_PHONEME_PLAYBACK;
   }
 

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   getAssessmentTilePlaybackOptions,
   getChartWordPlaybackOptions,
+  getEnglishHeaderPhonemeAudioSrc,
   getSoundUnitHeaderPlaybackOptions,
   isPlayableHeaderAudioSrc,
 } from "@/lib/audio-playback-policy";
@@ -45,6 +46,30 @@ describe("audio playback policy", () => {
     });
 
     expect(options).toBeUndefined();
+  });
+
+  it("refuses unsafe English chart-word stems before building phoneme audio paths", () => {
+    expect(getEnglishHeaderPhonemeAudioSrc("cat")).toBe(
+      "/audio/ipa/phoneme/cat.mp3",
+    );
+
+    for (const chartWord of [
+      "normal/cat",
+      "../cat",
+      "cat.mp3",
+      "cat?clip=1",
+      "cat#fragment",
+      "cat word",
+      "fr-schwa",
+      "fr-schwa.m4a",
+      "",
+    ]) {
+      expect(getEnglishHeaderPhonemeAudioSrc(chartWord), chartWord).toBeNull();
+      expect(
+        getSoundUnitHeaderPlaybackOptions({ chartWord }),
+        chartWord,
+      ).toBeUndefined();
+    }
   });
 
   it("refuses whole-word and language-pack clips as header phoneme audio", () => {

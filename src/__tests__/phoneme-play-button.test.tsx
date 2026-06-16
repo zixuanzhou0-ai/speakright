@@ -160,6 +160,14 @@ describe("PhonemePlayButton", () => {
     ).not.toBeInTheDocument();
   });
 
+  it("does not render a header speaker for unsafe English chart-word stems", () => {
+    render(<PhonemePlayButton chartWord="normal/cat" />);
+
+    expect(
+      screen.queryByRole("button", { name: "播放发音" }),
+    ).not.toBeInTheDocument();
+  });
+
   it("does not render fake header speakers for external-only audio references", () => {
     render(
       <PhonemePlayButton
