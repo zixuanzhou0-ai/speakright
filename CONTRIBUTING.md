@@ -77,6 +77,9 @@ Run `npm run desktop:launch-release` for manual QA from the Release EXE.
 Do not generate ElevenLabs audio or spend TTS credits unless the maintainer has
 explicitly approved that exact generation pass. Dry-run audits such as
 `npm run audio:parity:dry-run` and `npm run audio:loudness:dry-run` are safe.
+Before asking for quota-impacting work, include the latest dry-run result or a
+clear reason why dry-run evidence is not applicable, plus the expected
+text/audio scope and approval owner.
 
 If bundled audio is missing, document the gap first. Do not silently replace it
 with browser TTS, video audio, proxy rule audio, or an unrelated sample.

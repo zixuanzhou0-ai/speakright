@@ -22,6 +22,9 @@
 - [ ] Any missing local audio, wrong clickable audio source, loudness mismatch,
       or paid-provider/quota request is linked to the `Audio gap or provider
       request` template.
+- [ ] Any provider-quota work includes a dry-run result or a clear reason why
+      dry-run evidence is not applicable, plus expected text/audio scope and
+      explicit maintainer approval.
 - [ ] Any API key, token, private recording, full diagnostics bundle, private learning-data export,
       vulnerability, unsafe desktop permission, or arbitrary file/network access
       concern is routed through `SECURITY.md` or `SUPPORT.md` instead of public

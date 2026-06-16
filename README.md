@@ -94,6 +94,9 @@ For the current Release Candidate evidence matrix, see
 - Community behavior expectations are in `CODE_OF_CONDUCT.md`.
 - Support routing for Release EXE bugs, IPA audits, audio/provider requests,
   private reports, and paid-provider boundaries is in `SUPPORT.md`.
+- Provider-quota requests should start with a zero-generation dry-run result,
+  expected text/audio scope, and explicit maintainer approval instead of asking
+  contributors to spend ElevenLabs credits.
 - Security reporting and secret-handling guidance are in `SECURITY.md`.
 - `.env.example` is documentation only; do not commit real API keys, recordings,
   learning-data exports, tokens, or private user data.

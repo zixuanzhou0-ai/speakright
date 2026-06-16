@@ -27,7 +27,8 @@ private report, not a public issue.
 Do not ask contributors to generate ElevenLabs audio or spend TTS credits unless
 a maintainer explicitly approves that exact generation pass. Use
 `audio:parity:dry-run` and `audio:loudness:dry-run` for zero-generation audio
-audits.
+audits, and include the dry-run result plus expected text/audio scope before
+requesting any provider-quota work.
 
 Spanish, French, and Russian remain experimental modules. Public issues and pull
 requests must not claim formal mastery or `evidenceMastery` for those languages.

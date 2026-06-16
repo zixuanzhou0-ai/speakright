@@ -128,6 +128,10 @@ E:\SpeakRightDesktopRepo\src-tauri\target\release\speakright.exe
   each language instead of showing only the first three items followed by an
   ellipsis; the static smoke guard rejects `missingPreview` and `…` in that
   component.
+- Audio/provider issue, PR, SUPPORT, CONTRIBUTING, and README guidance now
+  require provider-quota requests to include zero-generation dry-run evidence or
+  a clear not-applicable reason, expected text/audio scope, and explicit
+  maintainer approval before any ElevenLabs or paid-provider work.
 - Release status and language availability cards now wrap version/channel
   badges, release links, build facts, language status badges, detail text, and
   recommendations without losing desktop external-link behavior.

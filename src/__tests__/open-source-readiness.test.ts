@@ -115,6 +115,9 @@ describe("open-source readiness files", () => {
     expect(contributing).toContain("`Audio gap or provider request` issue template");
     expect(contributing).toContain("`SECURITY.md` private report");
     expect(contributing).toContain("quota-impacting provider work");
+    expect(contributing).toContain("latest dry-run result");
+    expect(contributing).toContain("text/audio scope");
+    expect(contributing).toContain("approval owner");
     expect(contributing).toContain("Spanish, French, and Russian are experimental");
     expect(support).toContain("Release EXE");
     expect(support).toContain("installation/startup issue template");
@@ -123,6 +126,9 @@ describe("open-source readiness files", () => {
     expect(support).toContain("needs-review");
     expect(support).toContain("audio/provider issue template");
     expect(support).toContain("Do not ask contributors to generate ElevenLabs audio");
+    expect(support).toContain("Provider-quota requests should include the dry-run result");
+    expect(support).toContain("estimate the text/audio scope");
+    expect(support).toContain("approval before anyone runs");
     expect(support).toContain("Log excerpts only if they are short and redacted");
     expect(support).toContain("Full diagnostics bundles");
     expect(security).toContain("Windows artifacts are currently unsigned");
@@ -193,11 +199,16 @@ describe("open-source readiness files", () => {
     expect(audioProvider).toContain("Network state during the check");
     expect(audioProvider).toContain("UI stayed non-clickable");
     expect(audioProvider).toContain("teaching-video audio");
+    expect(audioProvider).toContain("Latest zero-generation audit run");
+    expect(audioProvider).toContain("Dry-run report path or summary");
+    expect(audioProvider).toContain("Estimated text/character/audio scope");
     expect(audioProvider).toContain("Keep evidence minimal and redacted");
     expect(audioProvider).toContain("bearer tokens");
     expect(audioProvider).toContain("private practice text");
     expect(audioProvider).toContain("C:\\Users\\name");
     expect(audioProvider).toContain("without explicit maintainer approval");
+    expect(audioProvider).toContain("included a dry-run result");
+    expect(audioProvider).toContain("expected text/audio scope");
     expect(audioProvider).toContain("Spanish, French, and Russian remain experimental");
     expect(issueRouting).toContain("Issue Routing");
     expect(issueRouting).toContain("Installation or startup help");
@@ -215,6 +226,7 @@ describe("open-source readiness files", () => {
     expect(issueRouting).toContain("C:\\Users\\name");
     expect(issueRouting).toContain("Full diagnostics bundles");
     expect(issueRouting).toContain("Do not ask contributors to generate ElevenLabs audio");
+    expect(issueRouting).toContain("include the dry-run result plus expected text/audio scope");
     expect(issueRouting).toContain("Spanish, French, and Russian remain experimental");
     expect(issueRouting).toContain("evidenceMastery");
     expect(pullRequest).toContain("I did not use localhost/dev server");
@@ -224,6 +236,9 @@ describe("open-source readiness files", () => {
     expect(pullRequest).toContain("source evidence");
     expect(pullRequest).toContain("`Audio gap or provider");
     expect(pullRequest).toContain("paid-provider/quota request");
+    expect(pullRequest).toContain("Any provider-quota work includes a dry-run result");
+    expect(pullRequest).toContain("expected text/audio scope");
+    expect(pullRequest).toContain("explicit maintainer approval");
     expect(pullRequest).toContain("private recording");
     expect(pullRequest).toContain("full diagnostics bundle");
     expect(pullRequest).toContain("private learning-data export");

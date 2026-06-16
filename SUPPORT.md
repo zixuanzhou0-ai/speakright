@@ -89,3 +89,6 @@ Routine support should not require paid provider calls. Do not ask contributors 
 
 Dry-run audits such as `npm run audio:parity:dry-run` and
 `npm run audio:loudness:dry-run` are safe because they do not generate audio.
+Provider-quota requests should include the dry-run result or explain why the
+dry-run does not apply, estimate the text/audio scope, and name the maintainer
+approval before anyone runs a paid generation or live provider check.

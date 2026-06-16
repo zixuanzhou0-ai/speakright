@@ -46,6 +46,9 @@ Routine support should not require paid provider calls. If this request needs
 ElevenLabs or another paid provider, explain:
 
 - Why bundled local audio or a dry-run audit is insufficient:
+- Latest zero-generation audit run, if relevant:
+  `npm run audio:parity:dry-run` / `npm run audio:loudness:dry-run` / not applicable
+- Dry-run report path or summary, if available:
 - Estimated text/character/audio scope:
 - Whether maintainer approval has already been granted:
 
@@ -55,5 +58,7 @@ ElevenLabs or another paid provider, explain:
       affects user-facing desktop behavior.
 - [ ] I am not asking contributors to generate ElevenLabs audio or spend TTS
       credits without explicit maintainer approval.
+- [ ] If this could spend provider quota, I included a dry-run result or explained
+      why a dry-run is not applicable, plus the expected text/audio scope.
 - [ ] Spanish, French, and Russian remain experimental; this request does not
       claim formal mastery or `evidenceMastery`.
