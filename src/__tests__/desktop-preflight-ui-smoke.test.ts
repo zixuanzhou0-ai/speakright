@@ -365,6 +365,22 @@ describe("desktop preflight and UI smoke", () => {
     expect(assessmentPage).toContain('role="alert"');
     expect(assessmentPage).toContain("{recorder.error}");
     expect(assessmentPage).toContain("{azure.error}");
+    expect(assessmentPage).toContain("{wordAudio.error}");
+    expect(assessmentPage).toContain("{paragraphAudio.error}");
+    expect(
+      assessmentPage.match(
+        /max-w-md break-words text-center text-sm text-destructive \[overflow-wrap:anywhere\]/g,
+      ) ?? [],
+    ).toHaveLength(4);
+    expect(assessmentPage).toContain(
+      "mx-auto max-w-md break-words text-center text-xs text-destructive [overflow-wrap:anywhere]",
+    );
+    expect(assessmentPage).toContain(
+      "mx-auto mt-2 max-w-md break-words text-center text-xs text-destructive [overflow-wrap:anywhere]",
+    );
+    expect(assessmentPage).toContain(
+      "break-words text-red-700 [overflow-wrap:anywhere]",
+    );
     expect(assessmentPage).toContain('data-smoke="assessment-storage-warning"');
     expect(assessmentPage).toContain("loadAssessmentReportForLanguage");
     expect(assessmentReportStorage).toContain("上次快速诊断报告无法读取");

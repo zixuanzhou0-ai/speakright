@@ -540,7 +540,7 @@ export default function AssessmentPage() {
                       )}
                     </motion.button>
                     {wordAudio.error && (
-                      <p className="text-xs text-destructive">
+                      <p className="mx-auto max-w-md break-words text-center text-xs text-destructive [overflow-wrap:anywhere]">
                         {wordAudio.error}
                       </p>
                     )}
@@ -569,7 +569,7 @@ export default function AssessmentPage() {
                       <p
                         role="alert"
                         data-smoke="assessment-recorder-error"
-                        className="max-w-md text-center text-sm text-destructive"
+                        className="max-w-md break-words text-center text-sm text-destructive [overflow-wrap:anywhere]"
                       >
                         {recorder.error}
                       </p>
@@ -578,7 +578,7 @@ export default function AssessmentPage() {
                       <p
                         role="alert"
                         data-smoke="assessment-azure-error"
-                        className="max-w-md text-center text-sm text-destructive"
+                        className="max-w-md break-words text-center text-sm text-destructive [overflow-wrap:anywhere]"
                       >
                         {azure.error}
                       </p>
@@ -658,7 +658,7 @@ export default function AssessmentPage() {
                       {paragraphAudio.isPlaying ? "正在播放" : "听标准示范"}
                     </Button>
                     {paragraphAudio.error && (
-                      <p className="mt-2 text-xs text-destructive">
+                      <p className="mx-auto mt-2 max-w-md break-words text-center text-xs text-destructive [overflow-wrap:anywhere]">
                         {paragraphAudio.error}
                       </p>
                     )}
@@ -688,7 +688,7 @@ export default function AssessmentPage() {
                       <p
                         role="alert"
                         data-smoke="assessment-recorder-error"
-                        className="max-w-md text-center text-sm text-destructive"
+                        className="max-w-md break-words text-center text-sm text-destructive [overflow-wrap:anywhere]"
                       >
                         {recorder.error}
                       </p>
@@ -697,7 +697,7 @@ export default function AssessmentPage() {
                       <p
                         role="alert"
                         data-smoke="assessment-azure-error"
-                        className="max-w-md text-center text-sm text-destructive"
+                        className="max-w-md break-words text-center text-sm text-destructive [overflow-wrap:anywhere]"
                       >
                         {azure.error}
                       </p>
@@ -769,7 +769,7 @@ export default function AssessmentPage() {
                 animate={{ opacity: 1 }}
                 className="max-w-lg mx-auto rounded-xl border border-red-200 bg-red-50 p-6 text-center dark:border-red-900 dark:bg-red-950/30"
               >
-                <p className="text-red-700 dark:text-red-400">
+                <p className="break-words text-red-700 [overflow-wrap:anywhere] dark:text-red-400">
                   {phase.message}
                 </p>
                 <Button
