@@ -221,6 +221,8 @@ describe("open-source readiness files", () => {
     expect(pullRequest).toContain("I did not generate ElevenLabs audio");
     expect(pullRequest).toContain("Spanish, French, and Russian remain experimental");
     expect(pullRequest).toContain("two independent sources");
+    expect(pullRequest).toContain("non-english-ipa-reviewed-findings.json");
+    expect(pullRequest).toContain("verdict/status contract");
     expect(pullRequest).toContain("I did not change `needs-review` IPA rows");
     expect(pullRequest).toContain("I followed `CODE_OF_CONDUCT.md`");
   });

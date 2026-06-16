@@ -148,6 +148,20 @@ as Russian `поезд идёт` stay unchanged until the ledger is updated with
 evidence; Spanish source-unit allophone rows may keep `[β ð ɣ]`, but the final
 audit corpus must remain phoneme-first.
 
+Ledger rows are a status contract, not free-form notes:
+
+- `verdict = update` must use `implementationStatus = applied` or
+  `guarded-final-corpus`, and must list `forbiddenFinalIpa` values so tests can
+  prevent stale learner-facing IPA from returning.
+- `verdict = variant-accepted` must use `implementationStatus =
+  accepted-current`, keep `ipaType = variant`, and explain the UI layer where
+  the current display remains acceptable.
+- `verdict = needs-review` must use `implementationStatus =
+  unchanged-needs-review`, keep the current IPA unchanged, and list
+  `blockedCandidateIpa` values that should not be applied without stronger
+  follow-up evidence.
+- `verdict = ok` must use `implementationStatus = confirmed-current`.
+
 ## GPT Research Prompt
 
 Use this prompt with the exported JSON:

@@ -4,6 +4,13 @@ import { describe, expect, it } from "vitest";
 import { buildNonEnglishIpaAuditRows } from "@/lib/non-english-ipa-audit";
 
 type Verdict = "ok" | "update" | "needs-review" | "variant-accepted";
+type AuditRole = "ipa-transcription" | "deck-focus-hint";
+type IpaType =
+  | "phoneme"
+  | "dictionary"
+  | "training-realization"
+  | "connected-speech"
+  | "variant";
 type ImplementationStatus =
   | "applied"
   | "accepted-current"
@@ -15,13 +22,14 @@ interface ReviewedFinding {
   languageId: string;
   unitSlug: string;
   text: string;
-  auditRole: string;
+  auditRole: AuditRole;
   verdict: Verdict;
-  ipaType: string;
+  ipaType: IpaType;
   implementationStatus: ImplementationStatus;
   expectedCurrentIpa: string;
   forbiddenFinalIpa?: string[];
   blockedCandidateIpa?: string[];
+  notes: string;
   sources: Array<{ name: string; url: string }>;
 }
 
@@ -68,6 +76,18 @@ describe("non-English IPA reviewed findings ledger", () => {
       expect(["ok", "update", "needs-review", "variant-accepted"]).toContain(
         finding.verdict,
       );
+      expect(["ipa-transcription", "deck-focus-hint"]).toContain(
+        finding.auditRole,
+      );
+      expect(
+        [
+          "phoneme",
+          "dictionary",
+          "training-realization",
+          "connected-speech",
+          "variant",
+        ],
+      ).toContain(finding.ipaType);
       expect(
         [
           "applied",
@@ -78,11 +98,54 @@ describe("non-English IPA reviewed findings ledger", () => {
         ],
       ).toContain(finding.implementationStatus);
       expect(finding.expectedCurrentIpa, identity).toMatch(/^\/.+\/$/);
+      expect(finding.notes.trim(), identity).not.toBe("");
       expect(finding.sources.length, identity).toBeGreaterThanOrEqual(2);
+      expect(
+        new Set(finding.sources.map((source) => source.name)).size,
+        identity,
+      ).toBe(finding.sources.length);
 
       for (const source of finding.sources) {
         expect(source.name.trim(), identity).not.toBe("");
         expect(source.url, identity).toMatch(/^https:\/\//);
+      }
+    }
+  });
+
+  it("keeps verdicts and implementation statuses in a reviewable state machine", () => {
+    const reviewed = loadReviewedFindings();
+
+    for (const finding of reviewed.findings) {
+      const label = `${finding.languageId}:${finding.unitSlug}:${finding.text}`;
+
+      for (const forbidden of finding.forbiddenFinalIpa ?? []) {
+        expect(forbidden, label).toMatch(/^\/.+\/$/);
+      }
+
+      for (const blocked of finding.blockedCandidateIpa ?? []) {
+        expect(blocked, label).toMatch(/^\/.+\/$/);
+      }
+
+      switch (finding.verdict) {
+        case "ok":
+          expect(finding.implementationStatus, label).toBe("confirmed-current");
+          break;
+        case "update":
+          expect(["applied", "guarded-final-corpus"], label).toContain(
+            finding.implementationStatus,
+          );
+          expect(finding.forbiddenFinalIpa?.length ?? 0, label).toBeGreaterThan(0);
+          break;
+        case "variant-accepted":
+          expect(finding.implementationStatus, label).toBe("accepted-current");
+          expect(finding.ipaType, label).toBe("variant");
+          break;
+        case "needs-review":
+          expect(finding.implementationStatus, label).toBe("unchanged-needs-review");
+          expect(finding.blockedCandidateIpa?.length ?? 0, label).toBeGreaterThan(
+            0,
+          );
+          break;
       }
     }
   });

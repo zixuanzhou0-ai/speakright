@@ -19,6 +19,9 @@
 - [ ] Spanish, French, and Russian remain experimental.
 - [ ] Any IPA `update` has two independent sources or one primary authority plus
       one dictionary/textbook corroboration.
+- [ ] Any final-corpus IPA change updates
+      `docs/operations/non-english-ipa-reviewed-findings.json` and keeps its
+      verdict/status contract valid.
 - [ ] I did not change `needs-review` IPA rows without stronger follow-up
       evidence.
 - [ ] I did not add API keys, tokens, recordings, private user data, or

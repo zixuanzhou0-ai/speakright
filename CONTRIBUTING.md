@@ -102,6 +102,9 @@ Only apply IPA edits that have reliable source evidence:
   expert review is available.
 - `deck-focus-hint` rows are focus cues, not full sentence IPA, unless a later
   sourced audit explicitly promotes them.
+- If an IPA change touches the final learner-facing corpus, update
+  `docs/operations/non-english-ipa-reviewed-findings.json` in the same PR and
+  keep the ledger verdict/status contract documented in the audit strategy.
 
 ## Community And Privacy
 
