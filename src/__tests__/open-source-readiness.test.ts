@@ -253,7 +253,16 @@ describe("open-source readiness files", () => {
       "Latest local full gate",
     );
     expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
-      "121 files / 678 tests passed",
+      "121 files / 679 tests passed",
+    );
+    expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
+      "detail-header/scoring-tile audio",
+    );
+    expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
+      "data-audio-kind",
+    );
+    expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
+      "match the detail header speaker",
     );
     expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
       "Biome checked 384 files",

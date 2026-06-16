@@ -140,7 +140,9 @@ git status --short --branch
   audio. If no local target audio exists, do not show a speaker icon that jumps
   to an external page. The `PhonemePlayButton` component now enforces this too:
   external-only references and browser-TTS fallback audio render no header
-  speaker.
+  speaker. Verified header speakers also expose `data-audio-*` metadata so
+  Release EXE smoke can compare the detail header clip against right-side
+  scoring tiles.
 - Detail-page practice speakers now render `wordAudio.error` inline under the
   word/phrase/sentence controls. Missing non-English local pack audio and
   English online dictionary fallback failures should be visible to learners
@@ -318,7 +320,10 @@ git status --short --branch
   phoneme tiles now reuse the exact same left/detail sound-unit header clip
   (`phonemeAudio.localSrc`) or stay visible but unclickable. They no longer use
   bundled word examples, rule/prosody clips, proxy media, or video audio as
-  single-phoneme playback sources.
+  single-phoneme playback sources. `desktop:ui-smoke` now verifies at runtime
+  that a playable scoring tile matches the detail header speaker by
+  `data-audio-kind`, `data-audio-src`, `data-audio-max-duration-ms`, and
+  `data-audio-fade-out-ms`.
 - Exact assessment audio aliases are now stored with local language assets.
   Spanish allophone clips stay narrow: `es-bv` maps to `/β/`, `es-d` to `/ð/`,
   and `es-g` to `/ɣ/`; they do not pretend to be plain `/b/ /d/ /g/`.
@@ -485,8 +490,8 @@ Current gate summary is intentionally compact here:
   warnings.
 - Release EXE smoke covers Settings, English, Spanish, French, Russian, drill,
   free practice, diagnosis, progress, narrow-window layout, low-height layout,
-  scoring tile audio policy, corrupt local-data warnings, and confirms
-  `releaseServedFromDevServer=false`.
+  scoring tile audio policy, detail-header/scoring-tile source parity, corrupt
+  local-data warnings, and confirms `releaseServedFromDevServer=false`.
 - Release EXE launch opens the static Tauri bundle and the verification process
   should be closed afterward.
 - No ElevenLabs generation or TTS spend is part of this validation path.
