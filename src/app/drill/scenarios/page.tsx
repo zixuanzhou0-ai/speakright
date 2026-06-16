@@ -289,7 +289,7 @@ export default function ScenariosPage() {
               <p
                 role="alert"
                 data-smoke="scenario-demo-audio-error"
-                className="mt-3 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300"
+                className="mt-3 break-words rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 [overflow-wrap:anywhere] dark:border-red-900 dark:bg-red-950/30 dark:text-red-300"
               >
                 {tts.error}
               </p>
@@ -335,7 +335,7 @@ export default function ScenariosPage() {
               <p
                 role="alert"
                 data-smoke="scenario-assessment-error"
-                className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300"
+                className="mt-4 break-words rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 [overflow-wrap:anywhere] dark:border-red-900 dark:bg-red-950/30 dark:text-red-300"
               >
                 {recorder.error ?? assessment.error}
               </p>
@@ -344,7 +344,7 @@ export default function ScenariosPage() {
               <p
                 role="alert"
                 data-smoke="scenario-benchmark-archive-warning"
-                className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-200"
+                className="mt-4 break-words rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 [overflow-wrap:anywhere] dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-200"
               >
                 {archiveWarning}
               </p>
@@ -353,7 +353,7 @@ export default function ScenariosPage() {
               <p
                 role="alert"
                 data-smoke="scenario-local-save-warning"
-                className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-200"
+                className="mt-4 break-words rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 [overflow-wrap:anywhere] dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-200"
               >
                 {localSaveWarning}
               </p>

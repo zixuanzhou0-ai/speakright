@@ -80,7 +80,8 @@ export function DrillRecording({
         {recorderError && (
           <p
             role="alert"
-            className="max-w-md text-center text-sm text-destructive"
+            data-smoke="drill-recording-recorder-error"
+            className="max-w-md break-words text-center text-sm text-destructive [overflow-wrap:anywhere]"
           >
             {recorderError}
           </p>

@@ -122,7 +122,7 @@ export function SentenceRecordingCard({
           <p
             role="alert"
             data-smoke="free-practice-recorder-error"
-            className="rounded-lg border border-destructive/20 bg-destructive/5 px-3 py-2 text-center text-sm text-destructive"
+            className="break-words rounded-lg border border-destructive/20 bg-destructive/5 px-3 py-2 text-center text-sm text-destructive [overflow-wrap:anywhere]"
           >
             {recorderError}
           </p>
@@ -131,7 +131,7 @@ export function SentenceRecordingCard({
           <p
             role="alert"
             data-smoke="free-practice-assess-error"
-            className="rounded-lg border border-destructive/20 bg-destructive/5 px-3 py-2 text-center text-sm text-destructive"
+            className="break-words rounded-lg border border-destructive/20 bg-destructive/5 px-3 py-2 text-center text-sm text-destructive [overflow-wrap:anywhere]"
           >
             {assessError}
           </p>
@@ -139,7 +139,7 @@ export function SentenceRecordingCard({
         {localSaveError && (
           <p
             role="alert"
-            className="text-center text-sm text-amber-600 dark:text-amber-400"
+            className="break-words text-center text-sm text-amber-600 [overflow-wrap:anywhere] dark:text-amber-400"
             data-smoke="free-practice-local-save-error"
           >
             {localSaveError}

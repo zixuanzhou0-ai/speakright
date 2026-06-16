@@ -8,6 +8,21 @@ function readProjectFile(path: string): string {
   return readFileSync(join(projectRoot, path), "utf8");
 }
 
+function expectSmokeAlertWraps(source: string, smokeId: string) {
+  const marker = `data-smoke="${smokeId}"`;
+  const markerIndex = source.indexOf(marker);
+  expect(markerIndex, `${smokeId} marker`).toBeGreaterThanOrEqual(0);
+
+  const alertSource = source.slice(
+    Math.max(0, markerIndex - 300),
+    markerIndex + 500,
+  );
+  expect(alertSource, `${smokeId} break-words`).toContain("break-words");
+  expect(alertSource, `${smokeId} overflow-wrap`).toContain(
+    "[overflow-wrap:anywhere]",
+  );
+}
+
 describe("desktop preflight and UI smoke", () => {
   it("wires a preflight command before desktop release builds", () => {
     const packageJson = JSON.parse(readProjectFile("package.json")) as {
@@ -209,6 +224,15 @@ describe("desktop preflight and UI smoke", () => {
     );
     expect(sentenceRecordingCard).toContain("free-practice-recorder-error");
     expect(sentenceRecordingCard).toContain("free-practice-assess-error");
+    expectSmokeAlertWraps(
+      sentenceRecordingCard,
+      "free-practice-recorder-error",
+    );
+    expectSmokeAlertWraps(sentenceRecordingCard, "free-practice-assess-error");
+    expectSmokeAlertWraps(
+      sentenceRecordingCard,
+      "free-practice-local-save-error",
+    );
     const wordPronunciationHook = readProjectFile(
       "src/hooks/use-word-pronunciation.ts",
     );
@@ -502,6 +526,10 @@ describe("desktop preflight and UI smoke", () => {
 
     expect(prosodyPage).toContain('data-smoke="prosody-demo-audio-error"');
     expect(prosodyPage).toContain('data-smoke="prosody-assessment-error"');
+    expectSmokeAlertWraps(prosodyPage, "prosody-demo-audio-error");
+    expectSmokeAlertWraps(prosodyPage, "prosody-assessment-error");
+    expectSmokeAlertWraps(prosodyPage, "prosody-benchmark-archive-warning");
+    expectSmokeAlertWraps(prosodyPage, "prosody-local-save-warning");
     expect(prosodyPage).toContain('data-smoke="prosody-page"');
     expect(prosodyPage).toContain('data-smoke="prosody-exercise-header"');
     expect(prosodyPage).toContain(
@@ -523,6 +551,13 @@ describe("desktop preflight and UI smoke", () => {
 
     expect(scenariosPage).toContain('data-smoke="scenario-demo-audio-error"');
     expect(scenariosPage).toContain('data-smoke="scenario-assessment-error"');
+    expectSmokeAlertWraps(scenariosPage, "scenario-demo-audio-error");
+    expectSmokeAlertWraps(scenariosPage, "scenario-assessment-error");
+    expectSmokeAlertWraps(
+      scenariosPage,
+      "scenario-benchmark-archive-warning",
+    );
+    expectSmokeAlertWraps(scenariosPage, "scenario-local-save-warning");
     expect(scenariosPage).toContain('data-smoke="scenario-page"');
     expect(scenariosPage).toContain('data-smoke="scenario-prompt-card"');
     expect(scenariosPage).toContain('data-smoke="scenario-recording-card"');
@@ -535,6 +570,12 @@ describe("desktop preflight and UI smoke", () => {
     expect(spontaneousPage).toContain(
       'data-smoke="spontaneous-processing-error"',
     );
+    expectSmokeAlertWraps(spontaneousPage, "spontaneous-processing-error");
+    expectSmokeAlertWraps(
+      spontaneousPage,
+      "spontaneous-benchmark-archive-warning",
+    );
+    expectSmokeAlertWraps(spontaneousPage, "spontaneous-local-save-warning");
     expect(spontaneousPage).toContain('data-smoke="spontaneous-page"');
     expect(spontaneousPage).toContain('data-smoke="spontaneous-prompt-card"');
     expect(spontaneousPage).toContain(

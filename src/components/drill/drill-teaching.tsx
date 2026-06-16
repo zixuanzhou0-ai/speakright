@@ -81,7 +81,11 @@ export function DrillTeaching({
           {isPlaying ? "正在播放..." : "点击听标准发音"}
         </p>
         {audioError && (
-          <p className="max-w-sm text-center text-xs text-destructive">
+          <p
+            role="alert"
+            data-smoke="drill-teaching-audio-error"
+            className="max-w-sm break-words text-center text-xs text-destructive [overflow-wrap:anywhere]"
+          >
             {audioError}
           </p>
         )}

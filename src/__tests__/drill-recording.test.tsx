@@ -31,7 +31,14 @@ describe("DrillRecording", () => {
   it("shows recorder startup errors inside the drill card", () => {
     renderRecording("未检测到可用麦克风，请连接或启用麦克风后重试。");
 
-    expect(screen.getByRole("alert")).toHaveTextContent("未检测到可用麦克风");
+    const alert = screen.getByRole("alert");
+    expect(alert).toHaveTextContent("未检测到可用麦克风");
+    expect(alert).toHaveAttribute(
+      "data-smoke",
+      "drill-recording-recorder-error",
+    );
+    expect(alert).toHaveClass("break-words");
+    expect(alert).toHaveClass("[overflow-wrap:anywhere]");
   });
 
   it("keeps long drill targets visible while showing the normal idle state", () => {

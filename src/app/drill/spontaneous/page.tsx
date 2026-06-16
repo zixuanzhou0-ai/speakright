@@ -339,7 +339,7 @@ export default function SpontaneousPage() {
               <p
                 role="alert"
                 data-smoke="spontaneous-processing-error"
-                className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300"
+                className="mt-4 break-words rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 [overflow-wrap:anywhere] dark:border-red-900 dark:bg-red-950/30 dark:text-red-300"
               >
                 {recorder.error ?? error}
               </p>
@@ -348,7 +348,7 @@ export default function SpontaneousPage() {
               <p
                 role="alert"
                 data-smoke="spontaneous-benchmark-archive-warning"
-                className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-200"
+                className="mt-4 break-words rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 [overflow-wrap:anywhere] dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-200"
               >
                 {archiveWarning}
               </p>
@@ -357,7 +357,7 @@ export default function SpontaneousPage() {
               <p
                 role="alert"
                 data-smoke="spontaneous-local-save-warning"
-                className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-200"
+                className="mt-4 break-words rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 [overflow-wrap:anywhere] dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-200"
               >
                 {localSaveWarning}
               </p>

@@ -22,7 +22,7 @@ const failedAttempt: DrillAttempt = {
   },
 };
 
-function renderFeedback() {
+function renderFeedback(audioError?: string) {
   return render(
     <DrillFeedback
       item={longItem}
@@ -37,6 +37,7 @@ function renderFeedback() {
       onRetry={vi.fn()}
       onSkip={vi.fn()}
       onPlayReference={vi.fn()}
+      audioError={audioError}
     />,
   );
 }
@@ -67,5 +68,17 @@ describe("DrillFeedback", () => {
 
     expect(screen.getByRole("button", { name: "再听一遍" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "跳过此词" })).toBeInTheDocument();
+  });
+
+  it("keeps long reference-audio errors visible in the feedback card", () => {
+    renderFeedback(
+      "本地标准示范缓存不可用：这是一个很长的文件系统或网络错误提示，需要在窄窗口内完整换行显示。",
+    );
+
+    const alert = screen.getByRole("alert");
+    expect(alert).toHaveAttribute("data-smoke", "drill-feedback-audio-error");
+    expect(alert).toHaveClass("break-words");
+    expect(alert).toHaveClass("[overflow-wrap:anywhere]");
+    expect(alert).toHaveTextContent("本地标准示范缓存不可用");
   });
 });
