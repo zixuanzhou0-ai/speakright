@@ -1079,6 +1079,18 @@ describe("desktop preflight and UI smoke", () => {
       "h-auto min-h-8 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]",
     );
     expect(languageModuleGate).toContain("min-w-0 flex-1");
+    expect(languageModuleGate).toContain(
+      'data-smoke="language-module-missing-capabilities"',
+    );
+    expect(languageModuleGate).toContain(
+      'data-smoke="language-module-known-gaps"',
+    );
+    expect(languageModuleGate).toContain(
+      'audit.missingCapabilities.join("、")',
+    );
+    expect(languageModuleGate).toContain("profile.knownGaps.map");
+    expect(languageModuleGate).not.toContain("missingCapabilities.slice");
+    expect(languageModuleGate).not.toContain("knownGaps.slice");
   });
 
   it("keeps recording and benchmark replay on the shared audio player hook", () => {

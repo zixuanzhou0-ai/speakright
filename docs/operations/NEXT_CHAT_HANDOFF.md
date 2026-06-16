@@ -128,6 +128,9 @@ E:\SpeakRightDesktopRepo\src-tauri\target\release\speakright.exe
   each language instead of showing only the first three items followed by an
   ellipsis; the static smoke guard rejects `missingPreview` and `…` in that
   component.
+- Experimental-language module gates now render the full
+  `missingCapabilities` and `knownGaps` lists instead of only the first three
+  items, so learners see the complete reason a module is still gated.
 - Audio/provider issue, PR, SUPPORT, CONTRIBUTING, and README guidance now
   require provider-quota requests to include zero-generation dry-run evidence or
   a clear not-applicable reason, expected text/audio scope, and explicit

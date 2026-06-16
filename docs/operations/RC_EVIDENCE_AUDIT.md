@@ -74,27 +74,17 @@ Latest local full gate recorded in this audit:
 ```text
 git status --short --branch
   initial gate status before this round's edits was
-  `## main...origin/main [ahead 85]`; the current full gate was run with the
-  contrast-drill full preview list and evidence updates still
-  unstaged, so `desktop:preflight` correctly reported `Git: dirty`. After
-  GitHub API fallback pushes, verify the GitHub `main` ref and local-vs-remote
-  tree SHA before treating content as unpushed.
+  `## main...origin/main [ahead 86]`; the current full gate was run with the
+  experimental-language module-gate full-list rendering fix and evidence
+  updates still unstaged, so `desktop:preflight` correctly reported
+  `Git: dirty`. After GitHub API fallback pushes, verify the GitHub `main` ref
+  and local-vs-remote tree SHA before treating content as unpushed.
 
-npm.cmd run test -- src/__tests__/contrast-drill-page.test.tsx src/__tests__/desktop-preflight-ui-smoke.test.ts
-  2 files / 22 tests passed; the contrast-drill config cards now render every
-  preview word pair in a wrap-safe list, and the static smoke guard rejects the
-  old first-pair-plus-ellipsis pattern.
-
-npm.cmd run test -- src/__tests__/language-content-audit.test.ts src/__tests__/non-english-ipa-audit.test.ts src/__tests__/french-language-content.test.ts
-  3 files / 21 tests passed; French diagnostic targets no longer repeat
-  `petit`, duplicate non-English reading targets are rejected inside a sound
-  unit or deck section, and French/Russian phrase/sentence audit rows must stay
-  slash-delimited IPA rather than rule labels.
-
-npm.cmd run test -- open-source-readiness
-  1 file / 10 tests passed after the evidence count update; public governance
-  files, issue routing, privacy boundaries, zero-generation routine scripts,
-  and Release EXE wording stayed locked.
+npm.cmd run test -- src/__tests__/desktop-preflight-ui-smoke.test.ts
+  1 file / 20 tests passed; the static smoke guard now rejects
+  `missingCapabilities.slice` and `knownGaps.slice` in the shared
+  `LanguageModuleGate`, so gated experimental modules show the complete missing
+  capability and known-gap lists instead of only the first three items.
 
 npm.cmd run test
   123 files / 704 tests passed
@@ -111,8 +101,8 @@ npm.cmd run build:desktop-frontend
 npm.cmd run desktop:build
   passed; reran `build:desktop-frontend`, compiled the Tauri release app, built
   `src-tauri\target\release\speakright.exe`, and generated MSI/NSIS bundles so
-  Release EXE validation used a fresh package after the contrast-drill preview
-  visibility fix and current static app assets.
+  Release EXE validation used a fresh package after the experimental-language
+  module-gate visibility fix and current static app assets.
 
 npm.cmd run desktop:preflight
   passed; Release EXE exists, is not older than `out/`, no running
@@ -120,53 +110,27 @@ npm.cmd run desktop:preflight
   round's changes were intentionally left unstaged until after the gate.
 
 npm.cmd run desktop:ui-smoke
-  passed; Release EXE runtime, centered target text, no target-text ellipsis,
-  no practice-button overlap, expected header-audio visibility/clickability readiness,
-  A/B selector and word-audio button visibility/clickability/label runtime
-  checks, video selector
-  visibility/no-overlap/no-overflow, Settings/usage long-text wrapping,
-  Settings language-capability full-list rendering without ellipsis,
-  Settings ElevenLabs voice/model Select trigger wrapping,
-  Settings visible badge wrapping via `[data-slot="badge"]`,
-  Settings visible text-button wrapping via `[data-slot="button"]`,
-  Settings pronunciation-test and API config action rows no-overlap,
-  scoring-breakdown
-  visibility/readability/no-overflow runtime checks in normal, narrow, and
-  low-height detail windows,
-  `/drill/word`, `/drill/sentence`, `/drill/contrast` English core route
-  coverage, `/assessment/passage`, `/drill/evidence`, and `/drill/pack/ee-ih`
-  English direct route coverage plus experimental-language blockers, `/drill/prosody`,
-  `/drill/perception` experimental blocker route coverage, `/drill/scenarios`
-  and `/drill/spontaneous` English transfer route coverage,
-  seeded English Progress benchmark/recent-session rows, and /progress
-  experimental blocker route coverage in main, narrow-window, and low-height
-  route passes,
-  exact scoring-tile audio policy with a playable header clip and a locked
-  unverified tile, plus a playable scoring tile whose audio metadata matches
-  the detail header speaker,
-  corrupt `/assessment` quick diagnosis report storage warning included in
-  corruptLocalDataWarnings=ok,
-  corrupt `/drill` diagnosis-report storage warning included in
-  corruptLocalDataWarnings=ok,
-  englishTransferRoutes=ok,
-  englishCoreDrillRoutes=ok,
-  advancedDirectRoutes=ok,
-  corruptLocalDataWarnings=ok,
-  scoringTileAudioPolicy=ok,
-  routes output included `/drill/scenarios` and `/drill/spontaneous`,
-  non-English `/drill` boundary warning was visible and smoke-checked,
-  narrowViewport=ok, lowHeightViewport=ok,
-  releaseServedFromDevServer=false
+  passed; Release EXE runtime reported
+  `pid=71780 settings=ok`, detail coverage for English, Spanish, French, and
+  Russian sound units, routes `/drill`, `/drill/word`, `/drill/sentence`,
+  `/drill/contrast`, `/drill/prosody`, `/drill/perception`, `/drill/evidence`,
+  `/drill/pack/ee-ih`, `/drill/scenarios`, `/drill/spontaneous`,
+  `/sentences`, `/assessment`, `/assessment/passage`, and `/progress`, plus
+  `scoringTileAudioPolicy=ok`, `englishTransferRoutes=ok`,
+  `englishCoreDrillRoutes=ok`, `advancedDirectRoutes=ok`,
+  `corruptLocalDataWarnings=ok`, `practiceAudioLabels=ok`,
+  `freePracticeSmoke=ok`, `assessmentSmoke=ok`, `narrowViewport=ok`,
+  `lowHeightViewport=ok`, and `releaseServedFromDevServer=false`.
 
 npm.cmd run desktop:launch-release
   passed; command printed `SpeakRight release desktop app launch requested`,
-  the Release EXE path, a child PID, and the no-localhost reminder; the
-  Release EXE opened from `src-tauri\target\release\speakright.exe`.
+  the Release EXE path, PID `52356`, and the no-localhost reminder; the Release
+  EXE opened from `src-tauri\target\release\speakright.exe`.
 
 process cleanup
-  the verification Release EXE process showed window title `SpeakRight` and
-  `Responding=True`, was closed afterward, and no residual `speakright.exe`
-  remained after cleanup
+  `Get-Process -Id 52356` confirmed `running pid=52356 name=speakright`; the
+  process was stopped afterward, and no residual `speakright.exe` remained
+  after cleanup
 ```
 
 For the next manual test session, start from:

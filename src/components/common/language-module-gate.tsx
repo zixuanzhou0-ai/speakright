@@ -41,16 +41,22 @@ export function LanguageModuleGate({
             <h1 className="break-words text-xl font-semibold [overflow-wrap:anywhere]">
               {profile.displayName}{moduleName}暂未开放完整训练
             </h1>
-            <p className="mt-2 break-words text-sm text-muted-foreground [overflow-wrap:anywhere]">
+            <p
+              className="mt-2 break-words text-sm text-muted-foreground [overflow-wrap:anywhere]"
+              data-smoke="language-module-missing-capabilities"
+            >
               当前语言已有 {audit.soundUnits} 个{profile.soundUnitLabel}和{" "}
               {audit.keywordTotal} 个示例词；部分模块可预览/可练习，但{" "}
-              {audit.missingCapabilities.slice(0, 3).join("、")}还在补齐。
+              {audit.missingCapabilities.join("、")}还在补齐。
             </p>
           </div>
         </div>
 
-        <div className="mt-4 rounded-lg bg-muted/35 p-4 text-sm text-muted-foreground">
-          {profile.knownGaps.slice(0, 3).map((gap) => (
+        <div
+          className="mt-4 break-words rounded-lg bg-muted/35 p-4 text-sm text-muted-foreground [overflow-wrap:anywhere]"
+          data-smoke="language-module-known-gaps"
+        >
+          {profile.knownGaps.map((gap) => (
             <p key={gap} className="mb-1 last:mb-0">
               {gap}
             </p>
