@@ -409,6 +409,33 @@ describe("settings key hydration", () => {
     }
   });
 
+  it("keeps data privacy action buttons wrap-ready in narrow Settings windows", async () => {
+    const { DataControlCard } = await import(
+      "@/components/settings/data-control-card"
+    );
+
+    render(<DataControlCard />);
+
+    const longMainAction = screen.getByRole("button", {
+      name: "清空 benchmark 音频",
+    });
+    expect(longMainAction).toHaveClass("h-auto");
+    expect(longMainAction).toHaveClass("max-w-full");
+    expect(longMainAction).toHaveClass("whitespace-normal");
+    expect(longMainAction).toHaveClass("break-words");
+    expect(longMainAction).toHaveClass("text-center");
+    expect(longMainAction).toHaveClass("[overflow-wrap:anywhere]");
+    expect(longMainAction).not.toHaveClass("whitespace-nowrap");
+
+    fireEvent.click(longMainAction);
+
+    const confirmAction = screen.getByRole("button", { name: "清空音频" });
+    expect(confirmAction).toHaveClass("h-auto");
+    expect(confirmAction).toHaveClass("max-w-full");
+    expect(confirmAction).toHaveClass("whitespace-normal");
+    expect(confirmAction).not.toHaveClass("whitespace-nowrap");
+  });
+
   it("keeps data privacy delete failures visible inline", async () => {
     const { DataControlCard } = await import(
       "@/components/settings/data-control-card"

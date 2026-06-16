@@ -75,6 +75,9 @@ const COPY: Record<
   },
 };
 
+const WRAP_SAFE_ACTION_BUTTON_CLASS =
+  "h-auto min-h-8 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]";
+
 function containsChineseText(message: string): boolean {
   return /[\u4e00-\u9fff]/.test(message);
 }
@@ -308,7 +311,7 @@ export function DataControlCard() {
               type="button"
               onClick={handleExport}
               disabled={busy}
-              className="gap-2"
+              className={`gap-2 ${WRAP_SAFE_ACTION_BUTTON_CLASS}`}
             >
               <Download className="h-4 w-4" />
               导出学习数据
@@ -318,7 +321,7 @@ export function DataControlCard() {
               variant="outline"
               onClick={handleDiagnosticsExport}
               disabled={busy}
-              className="gap-2"
+              className={`gap-2 ${WRAP_SAFE_ACTION_BUTTON_CLASS}`}
             >
               <Bug className="h-4 w-4" />
               导出诊断包
@@ -328,7 +331,7 @@ export function DataControlCard() {
               variant="outline"
               onClick={() => openDialog("all-data")}
               disabled={busy}
-              className="gap-2"
+              className={`gap-2 ${WRAP_SAFE_ACTION_BUTTON_CLASS}`}
             >
               <RotateCcw className="h-4 w-4" />
               重置本机数据
@@ -338,7 +341,7 @@ export function DataControlCard() {
               variant="outline"
               onClick={() => openDialog("learning")}
               disabled={busy}
-              className="gap-2"
+              className={`gap-2 ${WRAP_SAFE_ACTION_BUTTON_CLASS}`}
             >
               <Trash2 className="h-4 w-4" />
               删除学习数据
@@ -348,7 +351,7 @@ export function DataControlCard() {
               variant="outline"
               onClick={() => openDialog("benchmark-audio")}
               disabled={busy}
-              className="gap-2"
+              className={`gap-2 ${WRAP_SAFE_ACTION_BUTTON_CLASS}`}
             >
               <VolumeX className="h-4 w-4" />
               清空 benchmark 音频
@@ -358,7 +361,7 @@ export function DataControlCard() {
               variant="destructive"
               onClick={() => openDialog("api-keys")}
               disabled={busy}
-              className="gap-2"
+              className={`gap-2 ${WRAP_SAFE_ACTION_BUTTON_CLASS}`}
             >
               <KeyRound className="h-4 w-4" />
               删除 API keys
@@ -414,6 +417,7 @@ export function DataControlCard() {
               variant="outline"
               onClick={closeDialog}
               disabled={busy}
+              className={WRAP_SAFE_ACTION_BUTTON_CLASS}
             >
               取消
             </Button>
@@ -422,6 +426,7 @@ export function DataControlCard() {
               variant={confirmAction === "api-keys" ? "destructive" : "default"}
               onClick={handleConfirm}
               disabled={busy}
+              className={WRAP_SAFE_ACTION_BUTTON_CLASS}
             >
               {copy?.button}
             </Button>

@@ -89,7 +89,7 @@ npm.cmd run test -- word-card-layout practice-text-presentation
   helpers stay centered, wrapping, density-aware, and untruncated.
 
 npm.cmd run test
-  121 files / 676 tests passed
+  121 files / 677 tests passed
 
 npm.cmd run typecheck
   passed

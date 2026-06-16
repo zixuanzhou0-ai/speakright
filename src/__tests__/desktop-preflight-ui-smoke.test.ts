@@ -355,6 +355,10 @@ describe("desktop preflight and UI smoke", () => {
     expect(dataControlCard).toContain("本机安全存储或设置存储不可用");
     expect(dataControlCard).toContain("已隔离 {summary.corruptItems}");
     expect(dataControlCard).toContain("导出学习数据或诊断包");
+    expect(dataControlCard).toContain("清空 benchmark 音频");
+    expect(dataControlCard).toContain(
+      "h-auto min-h-8 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]",
+    );
     expect(dataControlCard).toContain("LOCAL_DATA_SUMMARY_UNAVAILABLE_MESSAGE");
     expect(dataRegistry).toContain("本机数据摘要暂时无法读取");
     expect(dataControlCard).toContain("默认不会删除 API keys");
