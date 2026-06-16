@@ -40,6 +40,9 @@ type ProgressArchiveStatus = {
   message: string;
 };
 
+const WRAP_SAFE_ACTION_BUTTON_CLASS =
+  "max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]";
+
 function getProgressArchiveErrorMessage(
   error: unknown,
   fallback: string,
@@ -173,16 +176,26 @@ export default function ProgressPage() {
               mastery 结果混入当前语言。
             </p>
             <div className="mt-5 flex flex-wrap justify-center gap-2">
-              <Link href="/drill">
-                <Button className="cursor-pointer">返回当前语言训练</Button>
+              <Link href="/drill" className="max-w-full">
+                <Button
+                  className={`cursor-pointer ${WRAP_SAFE_ACTION_BUTTON_CLASS}`}
+                >
+                  返回当前语言训练
+                </Button>
               </Link>
-              <Link href="/assessment">
-                <Button variant="outline" className="cursor-pointer">
+              <Link href="/assessment" className="max-w-full">
+                <Button
+                  variant="outline"
+                  className={`cursor-pointer ${WRAP_SAFE_ACTION_BUTTON_CLASS}`}
+                >
                   做当前语言诊断
                 </Button>
               </Link>
-              <Link href="/settings">
-                <Button variant="outline" className="cursor-pointer">
+              <Link href="/settings" className="max-w-full">
+                <Button
+                  variant="outline"
+                  className={`cursor-pointer ${WRAP_SAFE_ACTION_BUTTON_CLASS}`}
+                >
                   检查语言设置
                 </Button>
               </Link>

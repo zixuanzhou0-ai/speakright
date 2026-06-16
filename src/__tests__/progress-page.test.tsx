@@ -149,6 +149,19 @@ describe("ProgressPage language boundary", () => {
     expect(
       screen.getByRole("button", { name: "返回当前语言训练" }),
     ).toBeInTheDocument();
+    for (const buttonName of [
+      "返回当前语言训练",
+      "做当前语言诊断",
+      "检查语言设置",
+    ]) {
+      const button = screen.getByRole("button", { name: buttonName });
+      expect(button).toHaveClass("max-w-full");
+      expect(button).toHaveClass("whitespace-normal");
+      expect(button).toHaveClass("break-words");
+      expect(button).toHaveClass("text-center");
+      expect(button).toHaveClass("[overflow-wrap:anywhere]");
+      expect(button).not.toHaveClass("whitespace-nowrap");
+    }
     expect(screen.queryByText("已掌握包")).not.toBeInTheDocument();
     expect(screen.queryByText("最近训练状态")).not.toBeInTheDocument();
     expect(screen.queryByText("阶段变化")).not.toBeInTheDocument();
