@@ -870,6 +870,8 @@ async function assertSettings(cdp) {
   const usageTargets = [...document.querySelectorAll('[data-smoke="usage-history-target"]')];
   const pronunciationRows = [...document.querySelectorAll('[data-smoke="pronunciation-test-row"]')];
   const settingsBadges = [...document.querySelectorAll('[data-slot="badge"]')].filter(hasVisibleRect);
+  const settingsTextButtons = [...document.querySelectorAll('[data-slot="button"]')]
+    .filter((element) => hasVisibleRect(element) && element.innerText.trim().length > 0);
   const ttsSelects = [
     ...document.querySelectorAll(
       '[data-smoke="tts-voice-select"], [data-smoke="tts-model-select"]'
@@ -912,6 +914,8 @@ async function assertSettings(cdp) {
     });
   const settingsBadgesWrap =
     settingsBadges.length >= 6 && settingsBadges.every(wraps);
+  const settingsTextButtonsWrap =
+    settingsTextButtons.length >= 8 && settingsTextButtons.every(wraps);
   const ttsSelectsWrap =
     ttsSelects.length === 2 &&
     ttsSelects.every((element) => {
@@ -953,6 +957,7 @@ async function assertSettings(cdp) {
       pronunciationRows.length > 0 &&
       pronunciationRowsWrap &&
       settingsBadgesWrap &&
+      settingsTextButtonsWrap &&
       ttsSelectsWrap &&
       settingsActionRowsWrap &&
       Boolean(corruptWarning) &&
@@ -973,6 +978,8 @@ async function assertSettings(cdp) {
     pronunciationRowsWrap,
     settingsBadgeCount: settingsBadges.length,
     settingsBadgesWrap,
+    settingsTextButtonCount: settingsTextButtons.length,
+    settingsTextButtonsWrap,
     ttsSelectCount: ttsSelects.length,
     ttsSelectsWrap,
     settingsActionRowCount: settingsActionRows.length,

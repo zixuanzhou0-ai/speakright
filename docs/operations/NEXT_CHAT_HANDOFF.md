@@ -121,6 +121,9 @@ E:\SpeakRightDesktopRepo\src-tauri\target\release\speakright.exe
 - Shared `Badge` now defaults to a wrap-safe, max-width-bounded label with an
   explicit `data-slot="badge"` hook; Settings Release EXE smoke checks visible
   badges at runtime so future status labels do not silently return to nowrap.
+- Shared `Button` now defaults text buttons to centered, wrap-safe labels with
+  `min-h-*` sizing; fixed square icon variants still use `size-*`. Settings
+  Release EXE smoke checks visible text buttons at runtime.
 - Advanced pack-runner badges for intro metadata, course-map status, course
   header, level titles, remediation, and debrief next-level labels now also use
   wrap-safe badge classes.

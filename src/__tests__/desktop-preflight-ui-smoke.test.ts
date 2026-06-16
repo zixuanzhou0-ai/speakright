@@ -232,6 +232,7 @@ describe("desktop preflight and UI smoke", () => {
     expect(script).toContain("tts-model-select");
     expect(script).toContain("ttsSelectsWrap");
     expect(script).toContain("settingsBadgesWrap");
+    expect(script).toContain("settingsTextButtonsWrap");
     expect(script).toContain("childrenDoNotOverlap");
     expect(script).toContain("pronunciationRowsWrap");
     expect(script).toContain("settingsActionRowsWrap");
@@ -350,6 +351,7 @@ describe("desktop preflight and UI smoke", () => {
     );
     const select = readProjectFile("src/components/ui/select.tsx");
     const badge = readProjectFile("src/components/ui/badge.tsx");
+    const button = readProjectFile("src/components/ui/button.tsx");
 
     expect(languageCard).toContain('data-smoke="language-option-missing"');
     expect(languageCard).toContain("overflow-wrap:anywhere");
@@ -456,6 +458,16 @@ describe("desktop preflight and UI smoke", () => {
     expect(badge).toContain("[overflow-wrap:anywhere]");
     expect(badge).not.toContain("overflow-hidden");
     expect(badge).not.toContain("whitespace-nowrap");
+    expect(button).toContain("data-slot=\"button\"");
+    expect(button).toContain("text-center");
+    expect(button).toContain("break-words");
+    expect(button).toContain("whitespace-normal");
+    expect(button).toContain("[overflow-wrap:anywhere]");
+    expect(button).toContain("min-h-8");
+    expect(button).toContain("min-h-7");
+    expect(button).toContain("min-h-9");
+    expect(button).toContain('icon: "size-8"');
+    expect(button).not.toContain("whitespace-nowrap");
   });
 
   it("keeps Settings data-control operation results visible inline", () => {
