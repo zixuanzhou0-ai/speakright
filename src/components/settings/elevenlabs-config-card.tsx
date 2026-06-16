@@ -112,6 +112,17 @@ export function ElevenLabsConfigCard() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
+        {!apiKey.trim() && (
+          <div
+            className="rounded-lg border border-amber-500/25 bg-amber-500/10 p-3 text-sm text-amber-900 dark:text-amber-200"
+            data-smoke="elevenlabs-missing-key-guidance"
+            role="status"
+          >
+            未配置 ElevenLabs 时，已内置单词和语言包音频仍可播放；自由输入的句子/短语标准示范和逐词高亮需要
+            Key。
+          </div>
+        )}
+
         <div className="space-y-2">
           <Label htmlFor="el-key">API Key</Label>
           <Input

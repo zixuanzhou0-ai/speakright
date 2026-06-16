@@ -73,6 +73,29 @@ describe("settings connection errors", () => {
     ).toBeInTheDocument();
   });
 
+  it("shows first-run missing-key guidance without requiring a failed test click", () => {
+    render(
+      <>
+        <AzureConfigCard />
+        <ElevenLabsConfigCard />
+        <LlmConfigCard />
+      </>,
+    );
+
+    expect(
+      screen.getByText(/未配置 Azure 时可以浏览课程和播放已内置音频/),
+    ).toHaveAttribute("data-smoke", "azure-missing-key-guidance");
+    expect(screen.getByText(/录音评分、诊断和训练达标判定不可用/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/未配置 ElevenLabs 时，已内置单词和语言包音频仍可播放/),
+    ).toHaveAttribute("data-smoke", "elevenlabs-missing-key-guidance");
+    expect(screen.getByText(/自由输入的句子\/短语标准示范/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/未配置 AI 教练 Key 时，Azure 数字评分仍可用/),
+    ).toHaveAttribute("data-smoke", "llm-missing-key-guidance");
+    expect(screen.getByText(/不会卡住评分流程/)).toBeInTheDocument();
+  });
+
   it("does not leak raw English ElevenLabs exceptions into Settings", async () => {
     mocks.testElevenLabs.mockRejectedValueOnce(new Error("Failed to fetch"));
 

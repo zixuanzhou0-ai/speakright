@@ -98,6 +98,17 @@ export function AzureConfigCard() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
+        {!key.trim() && (
+          <div
+            className="rounded-lg border border-amber-500/25 bg-amber-500/10 p-3 text-sm text-amber-900 dark:text-amber-200"
+            data-smoke="azure-missing-key-guidance"
+            role="status"
+          >
+            未配置 Azure 时可以浏览课程和播放已内置音频，但录音评分、诊断和训练达标判定不可用。请先保存 Key 和
+            Region。
+          </div>
+        )}
+
         <div className="space-y-2">
           <Label htmlFor="azure-key">Subscription Key</Label>
           <Input

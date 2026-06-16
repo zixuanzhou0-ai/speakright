@@ -174,6 +174,16 @@ export function LlmConfigCard() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
+        {!apiKey.trim() && (
+          <div
+            className="rounded-lg border border-amber-500/25 bg-amber-500/10 p-3 text-sm text-amber-900 dark:text-amber-200"
+            data-smoke="llm-missing-key-guidance"
+            role="status"
+          >
+            未配置 AI 教练 Key 时，Azure 数字评分仍可用；中文教练反馈会显示配置提示，不会卡住评分流程。
+          </div>
+        )}
+
         {/* Provider chips */}
         <div className="space-y-2">
           <Label>Provider</Label>
