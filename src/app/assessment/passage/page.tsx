@@ -55,6 +55,8 @@ const COVERAGE_REPORT_STORAGE_WARNING =
   "上次全音诊断报告无法读取，已暂时忽略这条本机历史记录。可以重新完成全音诊断，或在设置的数据与隐私中心导出诊断后重置本机学习数据。";
 const WRAP_SAFE_ACTION_BUTTON_CLASS =
   "h-auto min-h-8 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]";
+const WRAP_SAFE_BADGE_CLASS =
+  "h-auto min-h-5 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]";
 
 function storageKeyFor(languageId: string): string {
   return `${STORAGE_KEY_V2}:coverage:${languageId}`;
@@ -405,7 +407,7 @@ export default function CoveragePassageAssessmentPage() {
             用一篇自然短文覆盖核心音素、词尾、弱读、连读和句子重音，适合做更深的阶段性体检。
           </p>
         </div>
-        <Badge variant="secondary" className="shrink-0">
+        <Badge variant="secondary" className={WRAP_SAFE_BADGE_CLASS}>
           {COVERAGE_PASSAGE.estimatedMinutes} 分钟
         </Badge>
       </div>
@@ -465,7 +467,12 @@ export default function CoveragePassageAssessmentPage() {
                       {COVERAGE_TARGET_PACKS.map((packId) => {
                         const pack = getTrainingPack(packId);
                         return (
-                          <Badge key={packId} variant="outline">
+                          <Badge
+                            key={packId}
+                            variant="outline"
+                            className={WRAP_SAFE_BADGE_CLASS}
+                            data-smoke="assessment-passage-target-pack-badge"
+                          >
                             {pack?.title ?? packId}
                           </Badge>
                         );
@@ -566,7 +573,12 @@ export default function CoveragePassageAssessmentPage() {
                   </p>
                   <div className="mt-3 flex flex-wrap gap-1.5">
                     {prompt.targetFeatures.map((feature) => (
-                      <Badge key={feature} variant="secondary">
+                      <Badge
+                        key={feature}
+                        variant="secondary"
+                        className={WRAP_SAFE_BADGE_CLASS}
+                        data-smoke="assessment-passage-feature-badge"
+                      >
                         {FEATURE_LABELS[feature]}
                       </Badge>
                     ))}
@@ -585,6 +597,8 @@ export default function CoveragePassageAssessmentPage() {
                 <div className="mb-4">
                   <Badge
                     variant={phase.type === "probe" ? "destructive" : "outline"}
+                    className={WRAP_SAFE_BADGE_CLASS}
+                    data-smoke="assessment-passage-mode-badge"
                   >
                     {phase.type === "probe" ? "补测" : "朗读"}
                   </Badge>
@@ -601,7 +615,12 @@ export default function CoveragePassageAssessmentPage() {
                   </h3>
                   <div className="flex flex-wrap gap-1.5">
                     {prompt.evidenceWords.map((word) => (
-                      <Badge key={word} variant="outline">
+                      <Badge
+                        key={word}
+                        variant="outline"
+                        className={WRAP_SAFE_BADGE_CLASS}
+                        data-smoke="assessment-passage-evidence-word-badge"
+                      >
                         {word}
                       </Badge>
                     ))}
@@ -813,6 +832,8 @@ function CoverageBenchmarkCard({
                   ? "destructive"
                   : "secondary"
             }
+            className={WRAP_SAFE_BADGE_CLASS}
+            data-smoke="assessment-passage-benchmark-score-badge"
           >
             总分 {comparison.current.overallScore}
             {comparison.previous ? ` (${signed(comparison.overallDelta)})` : ""}
@@ -862,7 +883,12 @@ function CoverageBenchmarkCard({
           </p>
           <div className="mt-2 flex flex-wrap gap-1.5">
             {topDimensionDeltas.map(([key, delta]) => (
-              <Badge key={key} variant={delta < 0 ? "destructive" : "outline"}>
+              <Badge
+                key={key}
+                variant={delta < 0 ? "destructive" : "outline"}
+                className={WRAP_SAFE_BADGE_CLASS}
+                data-smoke="assessment-passage-benchmark-dimension-badge"
+              >
                 {DIMENSION_LABELS[key]} {signed(delta)}
               </Badge>
             ))}

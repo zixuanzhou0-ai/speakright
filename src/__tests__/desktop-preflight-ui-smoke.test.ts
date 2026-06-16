@@ -453,6 +453,18 @@ describe("desktop preflight and UI smoke", () => {
     expect(passagePage).toContain('data-smoke="assessment-passage-intro-card"');
     expect(passagePage).toContain('data-smoke="assessment-passage-text-card"');
     expect(passagePage).toContain(
+      'data-smoke="assessment-passage-target-pack-badge"',
+    );
+    expect(passagePage).toContain(
+      'data-smoke="assessment-passage-feature-badge"',
+    );
+    expect(passagePage).toContain(
+      'data-smoke="assessment-passage-evidence-word-badge"',
+    );
+    expect(passagePage).toContain(
+      "h-auto min-h-5 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]",
+    );
+    expect(passagePage).toContain(
       'data-smoke="assessment-passage-start-button"',
     );
     expect(passagePage).toContain(

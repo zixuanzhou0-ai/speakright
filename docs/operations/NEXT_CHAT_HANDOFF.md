@@ -88,6 +88,8 @@ E:\SpeakRightDesktopRepo\src-tauri\target\release\speakright.exe
 - Free-practice target preview pack badges now wrap long training-pack titles,
   so suggested or matched practice targets do not inherit the base badge nowrap
   behavior.
+- Full-passage diagnosis badges for target packs, feature labels, evidence
+  words, and benchmark deltas now use the same wrap-safe badge treatment.
 - Installation docs now include a source-build Release EXE path and first-launch
   expectations for no API keys, no network, no microphone permission, and
   missing bundled local audio. The runbook mirrors those degraded-state checks
