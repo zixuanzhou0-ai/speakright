@@ -482,7 +482,7 @@ export function PhonemeDetailPage() {
 
           {sessionStorageWarning && (
             <p
-              className="rounded-lg border border-amber-300/60 bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200"
+              className="break-words rounded-lg border border-amber-300/60 bg-amber-50 px-3 py-2 text-sm text-amber-800 [overflow-wrap:anywhere] dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200"
               data-smoke="phoneme-session-storage-warning"
               role="alert"
             >
@@ -518,19 +518,27 @@ export function PhonemeDetailPage() {
               />
 
               {recorder.error && (
-                <p role="alert" className="text-sm text-red-500">
+                <p
+                  role="alert"
+                  className="max-w-full break-words text-center text-sm text-red-500 [overflow-wrap:anywhere]"
+                  data-smoke="phoneme-recorder-error"
+                >
                   {recorder.error}
                 </p>
               )}
               {azure.error && (
-                <p role="alert" className="text-sm text-red-500">
+                <p
+                  role="alert"
+                  className="max-w-full break-words text-center text-sm text-red-500 [overflow-wrap:anywhere]"
+                  data-smoke="phoneme-azure-error"
+                >
                   {azure.error}
                 </p>
               )}
               {localSaveError && (
                 <p
                   role="alert"
-                  className="text-center text-sm text-amber-600 dark:text-amber-400"
+                  className="max-w-full break-words text-center text-sm text-amber-600 [overflow-wrap:anywhere] dark:text-amber-400"
                   data-smoke="local-practice-save-error"
                 >
                   {localSaveError}

@@ -584,6 +584,10 @@ describe("desktop preflight and UI smoke", () => {
     expect(playButton).toContain('data-smoke="phoneme-header-audio-error"');
     expect(phonemeGrid).toContain('data-smoke="phoneme-grid-audio-error"');
     expect(studyCard).toContain('data-smoke="practice-chart-audio-error"');
+    expect(studyCard).toContain('data-smoke="practice-word-audio-error"');
+    expect(studyCard).toContain(
+      "mt-2 break-words text-center text-xs text-destructive [overflow-wrap:anywhere]",
+    );
     expect(phonemeHighlight).toContain(
       'data-smoke="assessment-phoneme-audio-error"',
     );
@@ -622,6 +626,18 @@ describe("desktop preflight and UI smoke", () => {
       'data-smoke="phoneme-session-storage-warning"',
     );
     expect(phonemePage).toContain("handleSessionStorageError");
+    expect(phonemePage).toContain('data-smoke="phoneme-recorder-error"');
+    expect(phonemePage).toContain('data-smoke="phoneme-azure-error"');
+    expect(phonemePage).toContain('data-smoke="local-practice-save-error"');
+    expect(phonemePage).toContain(
+      "break-words rounded-lg border border-amber-300/60",
+    );
+    expect(phonemePage).toContain(
+      "max-w-full break-words text-center text-sm text-red-500 [overflow-wrap:anywhere]",
+    );
+    expect(phonemePage).toContain(
+      "max-w-full break-words text-center text-sm text-amber-600 [overflow-wrap:anywhere]",
+    );
     expect(phonemePage).toContain('role="alert"');
   });
 

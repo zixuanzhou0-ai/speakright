@@ -183,6 +183,8 @@ describe("PhonemeDetailPage local persistence warnings", () => {
     expect(alert).toHaveTextContent("本次评分已完成");
     expect(alert).toHaveTextContent("本机练习记录或趋势图未保存");
     expect(alert).toHaveTextContent("本地存储");
+    expect(alert).toHaveClass("break-words");
+    expect(alert).toHaveClass("[overflow-wrap:anywhere]");
 
     await waitFor(() => {
       expect(mocks.requestFeedback).toHaveBeenCalled();

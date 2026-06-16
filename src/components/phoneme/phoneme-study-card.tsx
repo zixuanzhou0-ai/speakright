@@ -233,7 +233,7 @@ function NonEnglishPracticeTask({
         <p
           role="alert"
           data-smoke="practice-word-audio-error"
-          className="mt-2 text-center text-xs text-destructive"
+          className="mt-2 break-words text-center text-xs text-destructive [overflow-wrap:anywhere]"
         >
           {audioError}
         </p>
@@ -531,7 +531,7 @@ export function PhonemeStudyCard({
                 <p
                   role="alert"
                   data-smoke="practice-word-audio-error"
-                  className="mt-2 text-center text-xs text-destructive"
+                  className="mt-2 break-words text-center text-xs text-destructive [overflow-wrap:anywhere]"
                 >
                   {wordAudioError}
                 </p>
@@ -540,7 +540,7 @@ export function PhonemeStudyCard({
                 <p
                   role="alert"
                   data-smoke="practice-chart-audio-error"
-                  className="mt-2 text-center text-xs text-destructive"
+                  className="mt-2 break-words text-center text-xs text-destructive [overflow-wrap:anywhere]"
                 >
                   {chartAudioError}
                 </p>

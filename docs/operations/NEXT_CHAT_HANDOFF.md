@@ -92,6 +92,9 @@ E:\SpeakRightDesktopRepo\src-tauri\target\release\speakright.exe
 - Free-practice page header, clear-session action, session-storage warning, and
   transfer-evidence status/score badges now use wrap-safe classes so long state
   text does not force horizontal overflow in narrow windows.
+- Phoneme detail session-storage, recorder, Azure, local-save, chart-audio, and
+  word-audio warnings now also use break-word/overflow-wrap classes so long
+  Chinese recovery text stays inside the practice card.
 - Free-practice target preview pack badges now wrap long training-pack titles,
   so suggested or matched practice targets do not inherit the base badge nowrap
   behavior.

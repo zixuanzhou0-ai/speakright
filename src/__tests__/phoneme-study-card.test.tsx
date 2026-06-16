@@ -186,6 +186,8 @@ describe("PhonemeStudyCard non-English reading layout", () => {
     const alert = screen.getByRole("alert");
     expect(alert).toHaveTextContent("暂无「perdon」的本地标准发音。");
     expect(alert).toHaveAttribute("data-smoke", "practice-word-audio-error");
+    expect(alert).toHaveClass("break-words");
+    expect(alert).toHaveClass("[overflow-wrap:anywhere]");
   });
 
   it("shows English dictionary fallback errors below the practice controls", () => {
@@ -210,6 +212,8 @@ describe("PhonemeStudyCard non-English reading layout", () => {
     expect(screen.getByRole("alert")).toHaveTextContent(
       "在线发音兜底失败，请检查网络后重试。",
     );
+    expect(screen.getByRole("alert")).toHaveClass("break-words");
+    expect(screen.getByRole("alert")).toHaveClass("[overflow-wrap:anywhere]");
   });
 
   it("shows chart illustration audio errors below the English practice controls", () => {
@@ -235,6 +239,8 @@ describe("PhonemeStudyCard non-English reading layout", () => {
     const alert = screen.getByRole("alert");
     expect(alert).toHaveAttribute("data-smoke", "practice-chart-audio-error");
     expect(alert).toHaveTextContent("本地音频加载失败");
+    expect(alert).toHaveClass("break-words");
+    expect(alert).toHaveClass("[overflow-wrap:anywhere]");
   });
 
   it("keeps exact local header audio for non-English units with target assets", () => {
