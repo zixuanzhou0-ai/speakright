@@ -5,6 +5,7 @@ import {
   shouldShowSoundUnitHeaderAudio,
 } from "@/lib/language-source-alignment";
 import type { LanguageId } from "@/types/language";
+import type { PhonemeData } from "@/types/phoneme";
 
 function unit(languageId: LanguageId, slug: string) {
   const soundUnit = getLanguagePhonemeBySlug(languageId, slug);
@@ -13,11 +14,64 @@ function unit(languageId: LanguageId, slug: string) {
   return soundUnit;
 }
 
+function adHocEnglishUnit(overrides: Partial<PhonemeData>): PhonemeData {
+  return {
+    ipa: "/x/",
+    symbol: "x",
+    slug: "test-audio-policy",
+    name: "test audio policy",
+    category: "consonant",
+    example: "test",
+    keywords: [{ word: "test", ipa: "/test/" }],
+    difficulty: "easy",
+    ...overrides,
+  };
+}
+
 describe("language source alignment", () => {
   it("keeps English local chart/header audio available", () => {
     expect(shouldShowSoundUnitHeaderAudio("en-US", unit("en-US", "ee"))).toBe(
       true,
     );
+  });
+
+  it("hides English header speakers when fallback localSrc is not a short header clip", () => {
+    expect(
+      shouldShowSoundUnitHeaderAudio(
+        "en-US",
+        adHocEnglishUnit({
+          phonemeAudio: {
+            kind: "local",
+            label: "Video-backed fallback",
+            source: "test",
+            localSrc: "/videos/phonemes/ee.mp4",
+            languageId: "en-US",
+          },
+        }),
+      ),
+    ).toBe(false);
+
+    expect(
+      shouldShowSoundUnitHeaderAudio(
+        "en-US",
+        adHocEnglishUnit({
+          phonemeAudio: {
+            kind: "local",
+            label: "Whole-word fallback",
+            source: "test",
+            localSrc: "/audio/words/blue/test.mp3",
+            languageId: "en-US",
+          },
+        }),
+      ),
+    ).toBe(false);
+
+    expect(
+      shouldShowSoundUnitHeaderAudio(
+        "en-US",
+        adHocEnglishUnit({ chartWord: "cat" }),
+      ),
+    ).toBe(true);
   });
 
   it("keeps exact non-English phoneme header audio available", () => {

@@ -144,6 +144,37 @@ describe("PhonemeCard header audio", () => {
     expect(player.play).not.toHaveBeenCalled();
   });
 
+  it("does not present English fallback whole-word audio as clickable IPA header audio", () => {
+    const player = mockPlayer();
+    render(
+      <PhonemeCard
+        player={player}
+        phoneme={phoneme({
+          ipa: "/x/",
+          symbol: "x",
+          slug: "fallback-word-audio",
+          example: "test",
+          keywords: [{ word: "test", ipa: "/test/" }],
+          phonemeAudio: {
+            kind: "local",
+            label: "Whole-word fallback",
+            source: "local word audio",
+            localSrc: "/audio/words/blue/test.mp3",
+            languageId: "en-US",
+          },
+        })}
+      />,
+    );
+
+    const ipa = screen.getByText("/x/");
+    expect(ipa).toHaveClass("cursor-default");
+    expect(ipa).not.toHaveClass("cursor-pointer");
+
+    fireEvent.click(ipa);
+
+    expect(player.play).not.toHaveBeenCalled();
+  });
+
   it("uses boosted chart-word playback options when the illustration plays normal or slow word audio", () => {
     const player = mockPlayer();
     render(

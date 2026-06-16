@@ -93,7 +93,10 @@ export function shouldShowSoundUnitHeaderAudio(
   phoneme: PhonemeData,
 ): boolean {
   if (languageId === "en-US") {
-    return Boolean(phoneme.chartWord || phoneme.phonemeAudio?.localSrc);
+    return Boolean(
+      phoneme.chartWord ||
+        isPlayableHeaderAudioSrc(phoneme.phonemeAudio?.localSrc),
+    );
   }
 
   if (!isPlayableHeaderAudioSrc(phoneme.phonemeAudio?.localSrc)) return false;
