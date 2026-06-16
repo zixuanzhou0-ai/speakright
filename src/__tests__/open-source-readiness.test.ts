@@ -68,6 +68,9 @@ describe("open-source readiness files", () => {
       "SUPPORT.md",
       "SECURITY.md",
       "THIRD_PARTY_NOTICES.md",
+      "INSTALLATION.md",
+      "DESKTOP_STARTUP_RUNBOOK.md",
+      "NEXT_CHAT_HANDOFF.md",
       ".env.example",
       ".github/ISSUE_TEMPLATE/bug_report.md",
       ".github/ISSUE_TEMPLATE/ipa_audit.md",
@@ -242,9 +245,31 @@ describe("open-source readiness files", () => {
 
   it("keeps install docs explicit about source builds and first-launch failure states", () => {
     const readme = read("README.md");
+    const rootInstallation = read("INSTALLATION.md");
+    const rootRunbook = read("DESKTOP_STARTUP_RUNBOOK.md");
+    const rootHandoff = read("NEXT_CHAT_HANDOFF.md");
     const installation = read("docs/INSTALLATION.md");
     const runbook = read("docs/operations/DESKTOP_STARTUP_RUNBOOK.md");
     const docs = [installation, runbook].join("\n");
+
+    expect(rootInstallation).toContain("docs/INSTALLATION.md");
+    expect(rootInstallation).toContain("npm run desktop:preflight");
+    expect(rootInstallation).toContain("npm run desktop:launch-release");
+    expect(rootInstallation).toContain("localhost");
+    expect(rootInstallation).toContain(
+      "E:\\SpeakRightDesktopRepo\\src-tauri\\target\\release\\speakright.exe",
+    );
+    expect(rootRunbook).toContain(
+      "docs/operations/DESKTOP_STARTUP_RUNBOOK.md",
+    );
+    expect(rootRunbook).toContain("git status --short --branch");
+    expect(rootRunbook).toContain("older `E:\\SpeakRight`");
+    expect(rootRunbook).toContain("localhost");
+    expect(rootHandoff).toContain("docs/operations/NEXT_CHAT_HANDOFF.md");
+    expect(rootHandoff).toContain("docs/operations/RC_EVIDENCE_AUDIT.md");
+    expect(rootHandoff).toContain("Spanish, French, and Russian");
+    expect(rootHandoff).toContain("ElevenLabs");
+    expect(rootHandoff).toContain("Release EXE");
 
     expect(readme).toContain("Public review, source builds");
     expect(readme).toContain("A signed public Windows release is not complete yet");
