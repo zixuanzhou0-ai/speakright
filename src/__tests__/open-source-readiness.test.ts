@@ -257,7 +257,10 @@ describe("open-source readiness files", () => {
       "Latest local full gate",
     );
     expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
-      "121 files / 681 tests passed",
+      "121 files / 682 tests passed",
+    );
+    expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
+      "settings-storage-warning",
     );
     expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
       "same left/detail sound-unit header clip",

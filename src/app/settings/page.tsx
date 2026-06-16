@@ -9,6 +9,7 @@ import { LanguageConfigCard } from "@/components/settings/language-config-card";
 import { LlmConfigCard } from "@/components/settings/llm-config-card";
 import { PronunciationConfigCard } from "@/components/settings/pronunciation-config-card";
 import { ReleaseCard } from "@/components/settings/release-card";
+import { SettingsStorageWarning } from "@/components/settings/settings-storage-warning";
 import { UsageMonitor } from "@/components/settings/usage-monitor";
 
 export default function SettingsPage() {
@@ -23,6 +24,8 @@ export default function SettingsPage() {
           管理桌面端版本、用量监控和 API
           密钥。所有密钥仅保存在本机，不会上传到服务器。
         </p>
+
+        <SettingsStorageWarning />
 
         <div className="mb-6">
           <ReleaseCard />

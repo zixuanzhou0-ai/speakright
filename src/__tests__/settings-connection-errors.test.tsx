@@ -1,10 +1,11 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AzureConfigCard } from "@/components/settings/azure-config-card";
 import { ConnectionStatus } from "@/components/settings/connection-status";
 import { ElevenLabsConfigCard } from "@/components/settings/elevenlabs-config-card";
 import { LlmConfigCard } from "@/components/settings/llm-config-card";
 import { PronunciationConfigCard } from "@/components/settings/pronunciation-config-card";
+import { SettingsStorageWarning } from "@/components/settings/settings-storage-warning";
 
 const mocks = vi.hoisted(() => ({
   fetchPronunciation: vi.fn(),
@@ -34,6 +35,13 @@ vi.mock("@/lib/api-client", () => ({
 }));
 
 vi.mock("@/lib/api-keys", () => ({
+  API_KEY_STORAGE_ERROR_EVENT: "speakright:api-key-storage-error",
+  API_KEY_STORAGE_KEYS: [
+    "speakright_azure_config",
+    "speakright_elevenlabs_config",
+    "speakright_llm_config",
+  ],
+  APP_PREFERENCE_STORAGE_KEYS: ["speakright_coach_mode"],
   setAzureConfig: mocks.setAzureConfig,
   setElevenLabsConfig: mocks.setElevenLabsConfig,
   setLlmConfig: mocks.setLlmConfig,
@@ -94,6 +102,37 @@ describe("settings connection errors", () => {
       screen.getByText(/未配置 AI 教练 Key 时，Azure 数字评分仍可用/),
     ).toHaveAttribute("data-smoke", "llm-missing-key-guidance");
     expect(screen.getByText(/不会卡住评分流程/)).toBeInTheDocument();
+  });
+
+  it("shows a persistent Settings alert when local key storage fails", () => {
+    render(<SettingsStorageWarning />);
+
+    act(() => {
+      window.dispatchEvent(
+        new CustomEvent("speakright:api-key-storage-error", {
+          detail: {
+            key: "speakright_azure_config",
+            operation: "save",
+            message: "keychain unavailable",
+          },
+        }),
+      );
+    });
+
+    expect(screen.getByRole("alert")).toHaveAttribute(
+      "data-smoke",
+      "settings-storage-warning",
+    );
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "API Key 保存失败：本机密钥存储暂时不可用",
+    );
+    expect(screen.getByRole("alert")).not.toHaveTextContent(
+      "keychain unavailable",
+    );
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "刚才的配置可能没有保存成功，请重新保存",
+    );
+    expect(screen.getByRole("alert")).toHaveTextContent("导出诊断包");
   });
 
   it("keeps missing connection-test config visible inline instead of toast-only", () => {
