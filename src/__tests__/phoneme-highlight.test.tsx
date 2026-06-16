@@ -443,6 +443,9 @@ describe("PhonemeHighlight", () => {
     expect(tile).toHaveAttribute("aria-disabled", "true");
     expect(tile).toHaveAttribute("data-audio-kind", "none");
     expect(tile.getAttribute("aria-label")).toBeNull();
+    expect(tile.getAttribute("role")).toBeNull();
+    expect(tile.getAttribute("tabindex")).toBe("-1");
+    expect(tile.getAttribute("title")).toContain("暂无本地音频");
 
     fireEvent.click(tile);
     act(() => {

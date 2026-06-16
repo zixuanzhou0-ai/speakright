@@ -186,6 +186,10 @@ describe("desktop preflight and UI smoke", () => {
     expect(script).toContain("hasPlayableExactHeaderClip");
     expect(script).toContain("hasLockedUnverifiedTile");
     expect(script).toContain("tilePoliciesAreStrict");
+    expect(script).toContain('tile.role === ""');
+    expect(script).toContain('tile.tabIndex === "-1"');
+    expect(script).toContain('tile.role === "button"');
+    expect(script).toContain('tile.tabIndex === "0"');
     expect(script).toContain("scoringTileAudioPolicy=ok");
     expect(script).toContain("usage-history-target");
     expect(script).toContain("pronunciation-test-row");

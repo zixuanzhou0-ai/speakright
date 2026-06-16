@@ -217,85 +217,83 @@ export function PhonemeBlock({
     };
   }, [blockKey]);
 
+  const tile = (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{
+        opacity: 1,
+        x: !isGood ? [0, -2, 2, -2, 0] : 0,
+      }}
+      transition={{
+        delay: index * 0.03,
+        x: { delay: index * 0.03 + 0.1, duration: 0.3 },
+      }}
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.92 }}
+      onClick={handleClick}
+      onKeyDown={handleKeyDown}
+      role={hasAudio ? "button" : undefined}
+      tabIndex={hasAudio ? 0 : -1}
+      aria-disabled={hasAudio ? "false" : "true"}
+      aria-label={hasAudio ? `播放音标 ${displayLabel}` : undefined}
+      title={hasAudio ? undefined : `${score} 分 · ${ph.phoneme} · 暂无本地音频`}
+      data-smoke="assessment-phoneme-tile"
+      data-audio-playable={hasAudio ? "true" : "false"}
+      data-audio-kind={audioInfo?.kind ?? "none"}
+      data-audio-src={audioInfo?.url ?? ""}
+      data-audio-max-duration-ms={audioInfo?.maxDurationMs ?? ""}
+      data-audio-fade-out-ms={audioInfo?.fadeOutMs ?? ""}
+      className={cn(
+        "flex w-14 flex-col items-center rounded-lg p-1.5 transition-colors",
+        hasAudio ? "cursor-pointer" : "cursor-default",
+        isPlaying
+          ? "ring-2 ring-primary bg-primary/25"
+          : isGood
+            ? "bg-primary/15"
+            : "bg-destructive/10",
+      )}
+    >
+      <span
+        className={cn(
+          "font-ipa flex h-5 items-center justify-center text-[15px] font-bold leading-none",
+          isGood ? "text-primary" : "text-destructive",
+        )}
+      >
+        {displayLabel}
+      </span>
+      <span
+        className={cn(
+          "text-xs tabular-nums leading-tight",
+          isGood ? "text-primary" : "text-red-700 dark:text-red-400",
+        )}
+      >
+        {score}
+      </span>
+      <div className="mt-0.5 h-[3px] w-full overflow-hidden rounded-full bg-black/10 dark:bg-white/10">
+        <div
+          className={`h-full rounded-full ${getBarColor(ph.accuracyScore)}`}
+          style={{ width: `${Math.min(score, 100)}%` }}
+        />
+      </div>
+    </motion.div>
+  );
+
+  if (!hasAudio) return tile;
+
   return (
     <Tooltip>
-      <TooltipTrigger>
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{
-            opacity: 1,
-            x: !isGood ? [0, -2, 2, -2, 0] : 0,
-          }}
-          transition={{
-            delay: index * 0.03,
-            x: { delay: index * 0.03 + 0.1, duration: 0.3 },
-          }}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.92 }}
-          onClick={handleClick}
-          onKeyDown={handleKeyDown}
-          role={hasAudio ? "button" : undefined}
-          tabIndex={hasAudio ? 0 : undefined}
-          aria-disabled={hasAudio ? "false" : "true"}
-          aria-label={hasAudio ? `播放音标 ${displayLabel}` : undefined}
-          data-smoke="assessment-phoneme-tile"
-          data-audio-playable={hasAudio ? "true" : "false"}
-          data-audio-kind={audioInfo?.kind ?? "none"}
-          data-audio-src={audioInfo?.url ?? ""}
-          data-audio-max-duration-ms={audioInfo?.maxDurationMs ?? ""}
-          data-audio-fade-out-ms={audioInfo?.fadeOutMs ?? ""}
-          className={cn(
-            "flex w-14 flex-col items-center rounded-lg p-1.5 transition-colors",
-            hasAudio ? "cursor-pointer" : "cursor-default",
-            isPlaying
-              ? "ring-2 ring-primary bg-primary/25"
-              : isGood
-                ? "bg-primary/15"
-                : "bg-destructive/10",
-          )}
-        >
-          <span
-            className={cn(
-              "font-ipa flex h-5 items-center justify-center text-[15px] font-bold leading-none",
-              isGood ? "text-primary" : "text-destructive",
-            )}
-          >
-            {displayLabel}
-          </span>
-          <span
-            className={cn(
-              "text-xs tabular-nums leading-tight",
-              isGood ? "text-primary" : "text-red-700 dark:text-red-400",
-            )}
-          >
-            {score}
-          </span>
-          <div className="mt-0.5 h-[3px] w-full overflow-hidden rounded-full bg-black/10 dark:bg-white/10">
-            <div
-              className={`h-full rounded-full ${getBarColor(ph.accuracyScore)}`}
-              style={{ width: `${Math.min(score, 100)}%` }}
-            />
-          </div>
-        </motion.div>
-      </TooltipTrigger>
+      <TooltipTrigger>{tile}</TooltipTrigger>
       <TooltipContent>
         <span className="tabular-nums">{score} 分</span>
         <span className="ml-1.5 text-xs text-muted-foreground">
           {ph.phoneme}
         </span>
-        {hasAudio && (
-          <span className="ml-1.5 text-xs text-muted-foreground">
-            ·{" "}
-            {audioInfo.kind === "sound-unit"
-              ? "点击播放左侧同一音标标准音"
-              : "点击播放 IPA 标准音"}
-          </span>
-        )}
-        {!hasAudio && (
-          <span className="ml-1.5 text-xs text-muted-foreground">
-            · 暂无本地音频
-          </span>
-        )}
+        <span className="ml-1.5 text-xs text-muted-foreground">
+          ·{" "}
+          {audioInfo.kind === "sound-unit"
+            ? "点击播放左侧同一音标标准音"
+            : "点击播放 IPA 标准音"}
+        </span>
       </TooltipContent>
     </Tooltip>
   );

@@ -1298,6 +1298,8 @@ async function assertScoringTileAudioPolicy(cdp) {
     const playable = tile.getAttribute("data-audio-playable") === "true";
     const ariaDisabled = tile.getAttribute("aria-disabled") === "true";
     const ariaLabel = tile.getAttribute("aria-label") ?? "";
+    const role = tile.getAttribute("role") ?? "";
+    const tabIndex = tile.getAttribute("tabindex") ?? "";
     const kind = tile.getAttribute("data-audio-kind") ?? "none";
     const isHeaderClip =
       /^\\/audio\\/language-assets\\/es-ES\\/header-clips\\/.+\\.m4a$/i.test(audioSrc);
@@ -1307,6 +1309,8 @@ async function assertScoringTileAudioPolicy(cdp) {
       playable,
       ariaDisabled,
       ariaLabel,
+      role,
+      tabIndex,
       kind,
       audioSrc,
       maxDurationMs,
@@ -1335,6 +1339,8 @@ async function assertScoringTileAudioPolicy(cdp) {
       tile.hasVisibleRect &&
       !tile.playable &&
       tile.ariaDisabled &&
+      tile.role === "" &&
+      tile.tabIndex === "-1" &&
       tile.kind === "none" &&
       tile.audioSrc === "" &&
       tile.maxDurationMs === 0 &&
@@ -1346,6 +1352,8 @@ async function assertScoringTileAudioPolicy(cdp) {
     if (!tile.playable) {
       return (
         tile.ariaDisabled &&
+        tile.role === "" &&
+        tile.tabIndex === "-1" &&
         tile.kind === "none" &&
         tile.audioSrc === "" &&
         tile.maxDurationMs === 0 &&
@@ -1355,6 +1363,8 @@ async function assertScoringTileAudioPolicy(cdp) {
     }
     return (
       !tile.ariaDisabled &&
+      tile.role === "button" &&
+      tile.tabIndex === "0" &&
       tile.ariaLabel.includes("播放音标") &&
       tile.kind === "sound-unit" &&
       tile.isHeaderClip &&
@@ -1383,7 +1393,9 @@ async function assertScoringTileAudioPolicy(cdp) {
       fadeOutMs: tile.getAttribute("data-audio-fade-out-ms"),
       playable: tile.getAttribute("data-audio-playable"),
       ariaDisabled: tile.getAttribute("aria-disabled"),
-      ariaLabel: tile.getAttribute("aria-label")
+      ariaLabel: tile.getAttribute("aria-label"),
+      role: tile.getAttribute("role"),
+      tabIndex: tile.getAttribute("tabindex")
     })),
     bodyText: (document.body?.innerText ?? "").slice(0, 800)
   };
