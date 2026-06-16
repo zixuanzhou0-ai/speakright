@@ -294,6 +294,13 @@ describe("desktop preflight and UI smoke", () => {
       'role={isNotConfigured ? "status" : "alert"}',
     );
     expect(usageMonitor).toContain("overflow-wrap:anywhere");
+    expect(usageMonitor).toContain("flex flex-wrap items-center gap-4");
+    expect(usageMonitor).toContain(
+      "flex flex-wrap items-center justify-between gap-2",
+    );
+    expect(usageMonitor).toContain(
+      "h-auto min-h-6 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]",
+    );
     expect(usageMonitor).not.toContain("truncate");
     expect(pronunciationCard).toContain('data-smoke="pronunciation-test-row"');
     expect(pronunciationCard).toContain("flex flex-wrap items-center gap-3");

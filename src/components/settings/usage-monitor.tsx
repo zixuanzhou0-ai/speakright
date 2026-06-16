@@ -89,6 +89,12 @@ const ELEVENLABS_USAGE_NOT_CONFIGURED_MESSAGE =
 const ELEVENLABS_USAGE_QUERY_FAILED_MESSAGE =
   "ElevenLabs 用量查询失败，请检查网络、代理或 API Key 后重试；本地单词音频和已内置语言包音频可继续使用。";
 
+const WRAP_SAFE_USAGE_BUTTON_CLASS =
+  "h-auto min-h-6 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]";
+
+const WRAP_SAFE_DIALOG_BUTTON_CLASS =
+  "h-auto min-h-8 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]";
+
 function ElevenLabsUsageCard() {
   const [data, setData] = useState<ElevenLabsData | null>(null);
   const [loading, setLoading] = useState(false);
@@ -181,15 +187,15 @@ function ElevenLabsUsageCard() {
             {error}
           </p>
         ) : data ? (
-          <div className="flex items-center gap-4">
-            <div className="relative">
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="relative shrink-0">
               <Ring percent={percent} />
               <span className="absolute inset-0 flex items-center justify-center text-xs font-semibold">
                 {percent.toFixed(1)}%
               </span>
             </div>
-            <div className="space-y-1 text-sm">
-              <p>
+            <div className="min-w-0 space-y-1 text-sm">
+              <p className="break-words [overflow-wrap:anywhere]">
                 <span className="font-medium">
                   {data.characterCount.toLocaleString()}
                 </span>
@@ -199,13 +205,17 @@ function ElevenLabsUsageCard() {
                 </span>
               </p>
               {resetDays !== null && (
-                <p className="text-muted-foreground">{resetDays} 天后重置</p>
+                <p className="break-words text-muted-foreground [overflow-wrap:anywhere]">
+                  {resetDays} 天后重置
+                </p>
               )}
-              <p className="text-xs text-muted-foreground">实时（API 查询）</p>
+              <p className="break-words text-xs text-muted-foreground [overflow-wrap:anywhere]">
+                实时（API 查询）
+              </p>
             </div>
           </div>
         ) : loading ? (
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
             <Loader2 className="h-4 w-4 animate-spin" />
             加载中...
           </div>
@@ -248,25 +258,27 @@ function AzureUsageCard() {
         </Button>
       </CardHeader>
       <CardContent className="space-y-3">
-        <div className="flex items-center gap-4">
-          <div className="relative">
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="relative shrink-0">
             <Ring percent={percent} />
             <span className="absolute inset-0 flex items-center justify-center text-xs font-semibold">
               {percent.toFixed(1)}%
             </span>
           </div>
-          <div className="space-y-1 text-sm">
-            <p>
+          <div className="min-w-0 space-y-1 text-sm">
+            <p className="break-words [overflow-wrap:anywhere]">
               <span className="font-medium">{totalHours.toFixed(1)}</span>
               <span className="text-muted-foreground">
                 {" "}
                 / {limitHours.toFixed(0)} 小时
               </span>
             </p>
-            <p className="text-muted-foreground">
+            <p className="break-words text-muted-foreground [overflow-wrap:anywhere]">
               {usage.totalRequests} 次调用
             </p>
-            <p className="text-xs text-muted-foreground">本地估算</p>
+            <p className="break-words text-xs text-muted-foreground [overflow-wrap:anywhere]">
+              本地估算
+            </p>
           </div>
         </div>
 
@@ -297,14 +309,14 @@ function AzureUsageCard() {
           </div>
         )}
 
-        <div className="flex items-center justify-between">
-          <p className="text-[11px] text-muted-foreground">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="min-w-0 flex-1 break-words text-[11px] text-muted-foreground [overflow-wrap:anywhere]">
             实际用量以 Azure 门户为准
           </p>
           <Button
             variant="ghost"
             size="sm"
-            className="h-6 text-xs px-2"
+            className={`px-2 text-xs ${WRAP_SAFE_USAGE_BUTTON_CLASS}`}
             onClick={() => setConfirmOpen(true)}
           >
             重置计数
@@ -318,10 +330,18 @@ function AzureUsageCard() {
                 </DialogDescription>
               </DialogHeader>
               <DialogFooter>
-                <Button variant="outline" onClick={() => setConfirmOpen(false)}>
+                <Button
+                  variant="outline"
+                  onClick={() => setConfirmOpen(false)}
+                  className={WRAP_SAFE_DIALOG_BUTTON_CLASS}
+                >
                   取消
                 </Button>
-                <Button variant="destructive" onClick={handleReset}>
+                <Button
+                  variant="destructive"
+                  onClick={handleReset}
+                  className={WRAP_SAFE_DIALOG_BUTTON_CLASS}
+                >
                   重置
                 </Button>
               </DialogFooter>
@@ -397,11 +417,11 @@ function LlmUsageCard() {
           </div>
         </div>
 
-        <div className="flex justify-end">
+        <div className="flex flex-wrap justify-end gap-2">
           <Button
             variant="ghost"
             size="sm"
-            className="h-6 text-xs px-2"
+            className={`px-2 text-xs ${WRAP_SAFE_USAGE_BUTTON_CLASS}`}
             onClick={() => setConfirmOpen(true)}
           >
             重置计数
@@ -415,10 +435,18 @@ function LlmUsageCard() {
                 </DialogDescription>
               </DialogHeader>
               <DialogFooter>
-                <Button variant="outline" onClick={() => setConfirmOpen(false)}>
+                <Button
+                  variant="outline"
+                  onClick={() => setConfirmOpen(false)}
+                  className={WRAP_SAFE_DIALOG_BUTTON_CLASS}
+                >
                   取消
                 </Button>
-                <Button variant="destructive" onClick={handleReset}>
+                <Button
+                  variant="destructive"
+                  onClick={handleReset}
+                  className={WRAP_SAFE_DIALOG_BUTTON_CLASS}
+                >
                   重置
                 </Button>
               </DialogFooter>

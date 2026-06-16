@@ -183,6 +183,43 @@ describe("settings key hydration", () => {
     expect(screen.queryByText("Failed to fetch")).not.toBeInTheDocument();
   }, 30_000);
 
+  it("keeps usage reset controls wrap-ready in narrow Settings cards", async () => {
+    const { UsageMonitor } = await import(
+      "@/components/settings/usage-monitor"
+    );
+
+    render(<UsageMonitor />);
+
+    const resetButtons = screen.getAllByRole("button", {
+      name: "重置计数",
+    });
+
+    expect(resetButtons).toHaveLength(2);
+    for (const button of resetButtons) {
+      expect(button).toHaveClass("h-auto");
+      expect(button).toHaveClass("min-h-6");
+      expect(button).toHaveClass("max-w-full");
+      expect(button).toHaveClass("whitespace-normal");
+      expect(button).toHaveClass("break-words");
+      expect(button).toHaveClass("text-center");
+      expect(button).toHaveClass("[overflow-wrap:anywhere]");
+      expect(button).not.toHaveClass("whitespace-nowrap");
+    }
+
+    fireEvent.click(resetButtons[0]);
+
+    const cancelButton = screen.getByRole("button", { name: "取消" });
+    const confirmButton = screen.getByRole("button", { name: "重置" });
+
+    for (const button of [cancelButton, confirmButton]) {
+      expect(button).toHaveClass("h-auto");
+      expect(button).toHaveClass("min-h-8");
+      expect(button).toHaveClass("max-w-full");
+      expect(button).toHaveClass("whitespace-normal");
+      expect(button).not.toHaveClass("whitespace-nowrap");
+    }
+  });
+
   it("keeps the word pronunciation label fixed after legacy source hydration", async () => {
     const { SentenceInputCard } = await import(
       "@/components/sentences/sentence-input-card"
