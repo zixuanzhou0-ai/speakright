@@ -1,11 +1,12 @@
 import { describe, expect, it } from "vitest";
+import { spanishPhonemeLayerIpa } from "@/lib/language-keyword-expansions";
+import type { DeckLanguageId } from "@/lib/language-learning-decks";
+import { LANGUAGE_LEARNING_DECKS } from "@/lib/language-learning-decks";
 import {
   getLanguagePhonemeBySlug,
   getLanguagePhonemes,
 } from "@/lib/language-phonemes";
 import { getLanguageResourceSite } from "@/lib/language-resource-sites";
-import { LANGUAGE_LEARNING_DECKS } from "@/lib/language-learning-decks";
-import type { DeckLanguageId } from "@/lib/language-learning-decks";
 
 const DECK_LANGUAGES = Object.keys(LANGUAGE_LEARNING_DECKS) as DeckLanguageId[];
 const PRACTICE_TOKEN_REPEAT_LIMIT = 3;
@@ -108,9 +109,9 @@ describe("language learning decks", () => {
       expect(deck.sentenceDeck.length).toBeGreaterThanOrEqual(
         targets.sentenceDeck,
       );
-      expect(deck.diagnosticPassage.text.trim().split(/\s+/).length).toBeGreaterThan(
-        6,
-      );
+      expect(
+        deck.diagnosticPassage.text.trim().split(/\s+/).length,
+      ).toBeGreaterThan(6);
     }
   });
 
@@ -177,7 +178,9 @@ describe("language learning decks", () => {
   it("keeps final non-English practice options unique within each sound unit", () => {
     for (const languageId of DECK_LANGUAGES) {
       for (const soundUnit of getLanguagePhonemes(languageId)) {
-        const keys = soundUnit.keywords.map((keyword) => displayKey(keyword.word));
+        const keys = soundUnit.keywords.map((keyword) =>
+          displayKey(keyword.word),
+        );
         const duplicateKeys = keys.filter(
           (key, index) => keys.indexOf(key) !== index,
         );
@@ -190,7 +193,10 @@ describe("language learning decks", () => {
   it("keeps non-English practice carousels capped and free of known noisy repeats", () => {
     for (const languageId of DECK_LANGUAGES) {
       for (const soundUnit of getLanguagePhonemes(languageId)) {
-        expect(soundUnit.keywords.length, `${languageId}:${soundUnit.slug}`).toBeLessThanOrEqual(24);
+        expect(
+          soundUnit.keywords.length,
+          `${languageId}:${soundUnit.slug}`,
+        ).toBeLessThanOrEqual(24);
       }
     }
 
@@ -237,6 +243,31 @@ describe("language learning decks", () => {
   });
 
   it("keeps Spanish keyword IPA phoneme-first for b/d/g allophones", () => {
+    const realizationLayerExamples = new Map([
+      ["/ˈbiða/", "/ˈbida/"],
+      ["/beˈβe/", "/beˈbe/"],
+      ["/ˈaɣwa/", "/ˈagwa/"],
+      [
+        "/mi aˈmiɣo ˈdiθe ke ˈtoðo βa βjen/",
+        "/mi aˈmigo ˈdiθe ke ˈtodo ba bjen/",
+      ],
+    ]);
+
+    for (const [realizationIpa, phonemeLayerIpa] of realizationLayerExamples) {
+      expect(spanishPhonemeLayerIpa(realizationIpa)).toBe(phonemeLayerIpa);
+    }
+
+    const spanishDeck = LANGUAGE_LEARNING_DECKS["es-ES"];
+    expect(
+      spanishDeck.diagnosticWords.find((word) => word.text === "vida")?.ipa,
+    ).toBe("/ˈbiða/");
+    expect(
+      spanishDeck.diagnosticWords.find((word) => word.text === "dedo")?.ipa,
+    ).toBe("/ˈdeðo/");
+    expect(
+      spanishDeck.diagnosticWords.find((word) => word.text === "agua")?.ipa,
+    ).toBe("/ˈaɣwa/");
+
     const spanishUnits = getLanguagePhonemes("es-ES");
     const realizationLayerKeywords = spanishUnits.flatMap((soundUnit) =>
       soundUnit.keywords

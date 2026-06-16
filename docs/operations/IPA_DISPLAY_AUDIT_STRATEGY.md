@@ -26,6 +26,10 @@ Spanish `es-ES`:
 - The final learner-facing Spanish keyword IPA is normalized to the phoneme
   layer for `/b d g/`; keyword IPA should not expose `[β ð ɣ]` as the default
   main display.
+- Source sound-unit rows and training decks may keep `[β ð ɣ]` in their raw
+  realization-layer IPA; `expandLanguageKeywordOptions()` applies the final
+  phoneme-layer display normalization before those rows reach the learner-facing
+  keyword carousel and audit export.
 - Spanish `/b/ -> [β]`, `/d/ -> [ð]`, and `/g/ -> [ɣ]` units may still teach the
   allophone realization in labels, descriptions, assessment aliases, and exact
   header clips.
@@ -194,8 +198,9 @@ evidence fields are checked:
 - `needs-review` rows must stay unchanged until a later manual review supplies
   stronger evidence.
 - Spanish `currentIpa` in the exported learner-facing audit corpus should remain
-  phoneme-first for `/b d g/`; `[β ð ɣ]` may appear in explicit allophone unit
-  labels and scoring aliases, but not as leaked default keyword IPA.
+  phoneme-first for `/b d g/`; `[β ð ɣ]` may appear in raw source/training rows,
+  explicit allophone unit labels, and scoring aliases, but not as leaked default
+  keyword IPA.
 
 After applying changes, run:
 
