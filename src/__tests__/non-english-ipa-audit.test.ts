@@ -79,6 +79,30 @@ describe("non-English IPA audit input", () => {
     }
   });
 
+  it("keeps French and Russian phrase or sentence transcription rows as IPA, not rule labels", () => {
+    const rows = buildNonEnglishIpaAuditRows();
+    const forbiddenLabelOnlyIpa =
+      /^(?:clusters|elision|enchaînement|final devoicing|voicing assimilation|silent final C)$/i;
+    const nonIpaTranscriptions = rows
+      .filter(
+        (row) =>
+          (row.languageId === "fr-FR" || row.languageId === "ru-RU") &&
+          row.auditRole === "ipa-transcription" &&
+          row.currentDisplayType !== "word",
+      )
+      .filter(
+        (row) =>
+          !/^\/.+\/$/.test(row.currentIpa) ||
+          forbiddenLabelOnlyIpa.test(row.currentIpa),
+      )
+      .map(
+        (row) =>
+          `${row.languageId}:${row.unitSlug}:${row.text}:${row.currentIpa}`,
+      );
+
+    expect(nonIpaTranscriptions).toEqual([]);
+  });
+
   it("keeps Spanish audit transcriptions phoneme-first while preserving explicit allophone unit labels", () => {
     const rows = buildNonEnglishIpaAuditRows();
     const spanishTranscriptionRows = rows.filter(

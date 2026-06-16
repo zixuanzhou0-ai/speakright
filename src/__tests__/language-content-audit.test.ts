@@ -3,6 +3,7 @@ import {
   auditAllLanguages,
   auditLanguageCoverage,
 } from "@/lib/language-content-audit";
+import { LANGUAGE_LEARNING_DECKS } from "@/lib/language-learning-decks";
 import { getLanguagePhonemes } from "@/lib/language-phonemes";
 import {
   getDefaultPhonemeSlug,
@@ -66,6 +67,73 @@ describe("language content audit", () => {
     );
 
     expect(underfilledUnits).toEqual([]);
+  });
+
+  it("keeps non-English sound-unit practice options free of duplicate reading text", () => {
+    const duplicates = (["es-ES", "fr-FR", "ru-RU"] as const).flatMap(
+      (languageId) =>
+        getLanguagePhonemes(languageId).flatMap((soundUnit) => {
+          const seen = new Set<string>();
+          const repeated = new Set<string>();
+
+          for (const keyword of soundUnit.keywords) {
+            const normalized = keyword.word.trim().toLocaleLowerCase();
+            if (seen.has(normalized)) {
+              repeated.add(keyword.word);
+            }
+            seen.add(normalized);
+          }
+
+          return [...repeated].map(
+            (word) => `${languageId}:${soundUnit.slug}:${word}`,
+          );
+        }),
+    );
+
+    expect(duplicates).toEqual([]);
+  });
+
+  it("keeps non-English training decks free of duplicate reading targets", () => {
+    const duplicates = (["es-ES", "fr-FR", "ru-RU"] as const).flatMap(
+      (languageId) => {
+        const deck = LANGUAGE_LEARNING_DECKS[languageId];
+        const sections = [
+          {
+            name: "diagnosticWords",
+            texts: deck.diagnosticWords.map((item) => item.text),
+          },
+          {
+            name: "contrastDeck",
+            texts: deck.contrastDeck.map(
+              (item) => `${item.left} ~ ${item.right}`,
+            ),
+          },
+          {
+            name: "sentenceDeck",
+            texts: deck.sentenceDeck.map((item) => item.text),
+          },
+        ];
+
+        return sections.flatMap((section) => {
+          const seen = new Set<string>();
+          const repeated = new Set<string>();
+
+          for (const text of section.texts) {
+            const normalized = text.trim().toLocaleLowerCase();
+            if (seen.has(normalized)) {
+              repeated.add(text);
+            }
+            seen.add(normalized);
+          }
+
+          return [...repeated].map(
+            (text) => `${languageId}:${section.name}:${text}`,
+          );
+        });
+      },
+    );
+
+    expect(duplicates).toEqual([]);
   });
 
   it("covers language-critical beta units for Spanish, French, and Russian", () => {

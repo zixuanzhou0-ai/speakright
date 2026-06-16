@@ -61,6 +61,10 @@ E:\SpeakRightDesktopRepo\src-tauri\target\release\speakright.exe
   enchaînement, elision, and final-consonant silence; Russian final-devoicing
   sentence practice now uses `Нож тупой` so the target boundary is a clear
   voiceless-consonant context rather than `Друг ждёт`.
+- French diagnostic coverage no longer repeats `petit` for both schwa and
+  final-consonant silence. Final-consonant silence now uses `trop /tʁo/`, and
+  the content audit rejects duplicate non-English reading targets inside one
+  sound unit or one diagnostic/contrast/sentence deck section.
 - The Russian final-devoicing local asset note is now explicitly marked as a
   proxy anchor and points maintainers to current `Нож тупой /noʂ tʊˈpoj/`
   practice instead of stale `current example друг` wording.

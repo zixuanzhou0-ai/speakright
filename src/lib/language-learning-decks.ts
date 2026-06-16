@@ -322,7 +322,7 @@ export const LANGUAGE_LEARNING_DECKS: Record<DeckLanguageId, LanguageLearningDec
       { text: "fille", ipa: "/fij/", targetUnitSlug: "fr-glide-j" },
       { text: "huit", ipa: "/ɥit/", targetUnitSlug: "fr-glide-hui" },
       { text: "oui", ipa: "/wi/", targetUnitSlug: "fr-glide-w" },
-      { text: "petit", ipa: "/pəti/", targetUnitSlug: "fr-final-consonant-silence" },
+      { text: "trop", ipa: "/tʁo/", targetUnitSlug: "fr-final-consonant-silence" },
       { text: "avec elle", ipa: "/avɛk‿ɛl/", targetUnitSlug: "fr-enchainement" },
       { text: "j’aime", ipa: "/ʒɛm/", targetUnitSlug: "fr-elision" },
     ],
