@@ -47,6 +47,11 @@ import {
 } from "@/lib/transfer-scenarios";
 import type { MasteryProfile } from "@/types/training";
 
+const WRAP_SAFE_ACTION_BUTTON_CLASS =
+  "h-auto min-h-8 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]";
+const WRAP_SAFE_BADGE_CLASS =
+  "h-auto min-h-5 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]";
+
 export default function ScenariosPage() {
   const { languageId } = useLanguageConfig();
   const languageProfile = getLanguageProfile(languageId);
@@ -203,7 +208,13 @@ export default function ScenariosPage() {
                 <p className="break-words font-semibold [overflow-wrap:anywhere]">
                   {scenario.title}
                 </p>
-                <Badge variant="outline">{scenario.kind}</Badge>
+                <Badge
+                  variant="outline"
+                  className={WRAP_SAFE_BADGE_CLASS}
+                  data-smoke="scenario-kind-badge"
+                >
+                  {scenario.kind}
+                </Badge>
               </div>
               <p className="break-words text-xs text-muted-foreground [overflow-wrap:anywhere]">
                 {scenario.goal}
@@ -219,7 +230,9 @@ export default function ScenariosPage() {
           >
             <div className="mb-4 flex items-center gap-2">
               <BriefcaseBusiness className="h-5 w-5 text-primary" />
-              <h2 className="text-xl font-bold">{plan.scenario.title}</h2>
+              <h2 className="break-words text-xl font-bold [overflow-wrap:anywhere]">
+                {plan.scenario.title}
+              </h2>
             </div>
             <div className="rounded-xl border bg-background p-4">
               <p className="text-center text-sm font-semibold">任务</p>
@@ -264,7 +277,7 @@ export default function ScenariosPage() {
                 type="button"
                 variant="outline"
                 onClick={() => setUserText(plan.scenario.sentenceFrame)}
-                className="cursor-pointer"
+                className={`cursor-pointer ${WRAP_SAFE_ACTION_BUTTON_CLASS}`}
               >
                 使用句型框架
               </Button>
@@ -275,7 +288,7 @@ export default function ScenariosPage() {
                   tts.speak(textToRead, { speed: 0.86, languageId })
                 }
                 disabled={tts.isLoading}
-                className="gap-2 cursor-pointer"
+                className={`gap-2 cursor-pointer ${WRAP_SAFE_ACTION_BUTTON_CLASS}`}
               >
                 {tts.isLoading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -388,6 +401,8 @@ export default function ScenariosPage() {
                         </p>
                         <Badge
                           variant={evidence.passed ? "default" : "secondary"}
+                          className={WRAP_SAFE_BADGE_CLASS}
+                          data-smoke="scenario-evidence-score-badge"
                         >
                           {evidence.targetScore}/{evidence.threshold}
                         </Badge>

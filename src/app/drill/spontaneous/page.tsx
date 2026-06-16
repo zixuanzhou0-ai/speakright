@@ -43,6 +43,11 @@ import { buildReviewQueue } from "@/lib/review-queue";
 import { TRAINING_PACKS } from "@/lib/training-packs";
 import type { MasteryProfile } from "@/types/training";
 
+const WRAP_SAFE_ACTION_BUTTON_CLASS =
+  "h-auto min-h-8 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]";
+const WRAP_SAFE_BADGE_CLASS =
+  "h-auto min-h-5 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]";
+
 const PROMPTS = [
   {
     id: "work-update",
@@ -269,7 +274,9 @@ export default function SpontaneousPage() {
           >
             <div className="mb-4 flex items-center gap-2">
               <MessageCircleQuestion className="h-5 w-5 text-primary" />
-              <h2 className="text-xl font-bold">{prompt.title}</h2>
+              <h2 className="break-words text-xl font-bold [overflow-wrap:anywhere]">
+                {prompt.title}
+              </h2>
             </div>
             <p
               className={`${getCenteredReadableTextClassName(
@@ -280,7 +287,13 @@ export default function SpontaneousPage() {
             </p>
             <div className="mt-4 flex flex-wrap justify-center gap-2">
               {targetPacks.length === 0 ? (
-                <Badge variant="outline">没有当前弱点时只保存 benchmark</Badge>
+                <Badge
+                  variant="outline"
+                  className={WRAP_SAFE_BADGE_CLASS}
+                  data-smoke="spontaneous-target-status-badge"
+                >
+                  没有当前弱点时只保存 benchmark
+                </Badge>
               ) : (
                 targetPacks.map((pack) => (
                   <Badge
@@ -301,7 +314,9 @@ export default function SpontaneousPage() {
           >
             <div className="mb-4 flex items-center gap-2">
               <Mic className="h-4 w-4 text-primary" />
-              <h2 className="font-semibold">录一段 20-40 秒即兴回答</h2>
+              <h2 className="break-words font-semibold [overflow-wrap:anywhere]">
+                录一段 20-40 秒即兴回答
+              </h2>
             </div>
             <div className="flex flex-col items-center gap-4">
               <RecordButton
@@ -329,7 +344,7 @@ export default function SpontaneousPage() {
                 assessDisabledReason="录音质量还没通过基础检查"
               />
               {isProcessing && (
-                <p className="flex items-center gap-2 text-sm text-muted-foreground">
+                <p className="flex flex-wrap items-center justify-center gap-2 break-words text-center text-sm text-muted-foreground [overflow-wrap:anywhere]">
                   <Loader2 className="h-4 w-4 animate-spin" />
                   正在转写并做保守评分...
                 </p>
@@ -392,6 +407,8 @@ export default function SpontaneousPage() {
                         </p>
                         <Badge
                           variant={evidence.passed ? "default" : "secondary"}
+                          className={WRAP_SAFE_BADGE_CLASS}
+                          data-smoke="spontaneous-evidence-score-badge"
                         >
                           {evidence.targetScore}/{evidence.threshold}
                         </Badge>
@@ -406,7 +423,7 @@ export default function SpontaneousPage() {
                   ))}
                 </div>
               ) : (
-                <p className="mt-4 text-sm text-muted-foreground">
+                <p className="mt-4 break-words text-sm text-muted-foreground [overflow-wrap:anywhere]">
                   {archiveWarning
                     ? "这次即兴内容没有命中当前弱点词；本次评分已完成，但 benchmark 录音未保存。"
                     : "这次即兴内容没有命中当前弱点词；录音已作为 benchmark 保存。"}
@@ -416,7 +433,7 @@ export default function SpontaneousPage() {
                 type="button"
                 variant="outline"
                 onClick={resetRecording}
-                className="mt-4 gap-2"
+                className={`mt-4 gap-2 ${WRAP_SAFE_ACTION_BUTTON_CLASS}`}
               >
                 <RotateCcw className="h-4 w-4" />
                 换题再试

@@ -1,6 +1,6 @@
 # Next Chat Handoff
 
-Date: 2026-06-16
+Date: 2026-06-17
 
 This file exists so the next Codex chat can continue without relying on the long
 conversation history.
@@ -106,6 +106,9 @@ E:\SpeakRightDesktopRepo\src-tauri\target\release\speakright.exe
 - Quick assessment action buttons and full-passage diagnosis segment text now
   use wrap-safe classes too, including intro/retry/submit buttons, segment
   focus/cue copy, segment titles, and the main passage prompt.
+- Scenario and spontaneous transfer pages now also wrap scenario kind/status
+  badges, score badges, demo/template buttons, processing copy, and retry
+  actions so advanced transfer tasks keep controls visible in narrow windows.
 - Advanced pack-runner badges for intro metadata, course-map status, course
   header, level titles, remediation, and debrief next-level labels now also use
   wrap-safe badge classes.

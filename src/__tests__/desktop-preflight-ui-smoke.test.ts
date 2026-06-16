@@ -764,6 +764,18 @@ describe("desktop preflight and UI smoke", () => {
     expect(scenariosPage).toContain('data-smoke="scenario-recording-card"');
     expect(scenariosPage).toContain("flex flex-wrap items-start gap-3");
     expect(scenariosPage).toContain("min-w-0 flex-1");
+    expect(scenariosPage).toContain("WRAP_SAFE_ACTION_BUTTON_CLASS");
+    expect(scenariosPage).toContain("WRAP_SAFE_BADGE_CLASS");
+    expect(scenariosPage).toContain('data-smoke="scenario-kind-badge"');
+    expect(scenariosPage).toContain(
+      'data-smoke="scenario-evidence-score-badge"',
+    );
+    expect(scenariosPage).toContain(
+      "h-auto min-h-8 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]",
+    );
+    expect(scenariosPage).toContain(
+      "h-auto min-h-5 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]",
+    );
     expect(scenariosPage).toContain("{tts.error}");
     expect(scenariosPage).toContain("{recorder.error ?? assessment.error}");
     expect(scenariosPage).toContain('role="alert"');
@@ -784,6 +796,17 @@ describe("desktop preflight and UI smoke", () => {
     );
     expect(spontaneousPage).toContain("flex flex-wrap items-start gap-3");
     expect(spontaneousPage).toContain("min-w-0 flex-1");
+    expect(spontaneousPage).toContain("WRAP_SAFE_ACTION_BUTTON_CLASS");
+    expect(spontaneousPage).toContain("WRAP_SAFE_BADGE_CLASS");
+    expect(spontaneousPage).toContain(
+      'data-smoke="spontaneous-target-status-badge"',
+    );
+    expect(spontaneousPage).toContain(
+      'data-smoke="spontaneous-evidence-score-badge"',
+    );
+    expect(spontaneousPage).toContain(
+      "flex flex-wrap items-center justify-center gap-2 break-words text-center text-sm text-muted-foreground [overflow-wrap:anywhere]",
+    );
     expect(spontaneousPage).toContain("{recorder.error ?? error}");
     expect(spontaneousPage).toContain("Azure Speech API 密钥和区域");
     expect(spontaneousPage).toContain("normalizeAzureSpeechError");
