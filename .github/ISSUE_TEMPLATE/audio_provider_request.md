@@ -35,8 +35,10 @@ For missing or unreadable local audio, include:
 - Whether the UI stayed non-clickable instead of substituting browser TTS,
   teaching-video audio, proxy audio, or an unrelated word/sample:
 
-Do not attach API keys, raw private recordings, or private learning-data
-exports.
+Keep evidence minimal and redacted. Do not attach API keys, bearer tokens, raw
+private recordings, private practice text, learning-data exports, or full
+diagnostic bundles to a public issue. Redact local user-profile paths such as
+`C:\Users\name` from screenshots and log excerpts.
 
 ## Provider Or Quota Impact
 

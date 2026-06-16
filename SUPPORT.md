@@ -41,6 +41,12 @@ When reporting a user-visible bug, include:
 - Exact steps, expected behavior, and actual behavior.
 - Screenshots only if they do not show API keys, private user data, or private
   recordings.
+- Log excerpts only if they are short and redacted. Remove API keys, bearer
+  tokens, private practice text, raw recording references, learning-data export
+  contents, and local user-profile paths such as `C:\Users\name`.
+- Full diagnostics bundles, raw microphone recordings, and private
+  learning-data exports belong in a private security/support channel, not in a
+  public issue.
 
 ## Private Reports
 

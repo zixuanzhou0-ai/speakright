@@ -119,6 +119,8 @@ describe("open-source readiness files", () => {
     expect(support).toContain("needs-review");
     expect(support).toContain("audio/provider issue template");
     expect(support).toContain("Do not ask contributors to generate ElevenLabs audio");
+    expect(support).toContain("Log excerpts only if they are short and redacted");
+    expect(support).toContain("Full diagnostics bundles");
     expect(security).toContain("Windows artifacts are currently unsigned");
   });
 
@@ -142,7 +144,10 @@ describe("open-source readiness files", () => {
     expect(bugReport).toContain("Microphone permission/device");
     expect(bugReport).toContain("缺失或不可读");
     expect(bugReport).toContain("Chinese inline error or warning");
-    expect(bugReport).toContain("Do not attach API keys");
+    expect(bugReport).toContain("Keep evidence minimal and redacted");
+    expect(bugReport).toContain("bearer tokens");
+    expect(bugReport).toContain("C:\\Users\\name");
+    expect(bugReport).toContain("full diagnostic bundles");
     expect(bugReport).toContain("CODE_OF_CONDUCT.md");
     expect(featureRequest).toContain("Release EXE");
     expect(featureRequest).toContain("experimental-language boundary");
@@ -163,7 +168,10 @@ describe("open-source readiness files", () => {
     expect(audioProvider).toContain("Network state during the check");
     expect(audioProvider).toContain("UI stayed non-clickable");
     expect(audioProvider).toContain("teaching-video audio");
-    expect(audioProvider).toContain("Do not attach API keys");
+    expect(audioProvider).toContain("Keep evidence minimal and redacted");
+    expect(audioProvider).toContain("bearer tokens");
+    expect(audioProvider).toContain("private practice text");
+    expect(audioProvider).toContain("C:\\Users\\name");
     expect(audioProvider).toContain("without explicit maintainer approval");
     expect(audioProvider).toContain("Spanish, French, and Russian remain experimental");
     expect(issueRouting).toContain("Issue Routing");

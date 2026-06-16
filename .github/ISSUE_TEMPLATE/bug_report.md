@@ -49,10 +49,13 @@ What happened instead?
 
 Screenshots, logs, or exact page/unit/word:
 
-Do not attach API keys, raw microphone recordings, or private learning-data
-exports. If the issue affects Spanish, French, or Russian, note that those
-modules are currently experimental and describe the specific misleading or
-broken behavior.
+Keep evidence minimal and redacted. Before posting screenshots or log excerpts,
+remove API keys, bearer tokens, private recordings, learning-data exports,
+private practice text, and local user-profile paths such as `C:\Users\name`.
+Do not attach raw microphone recordings or full diagnostic bundles to a public
+issue. If the issue affects Spanish, French, or Russian, note that those modules
+are currently experimental and describe the specific misleading or broken
+behavior.
 
 Please keep discussion aligned with `CODE_OF_CONDUCT.md`, especially when the
 issue involves accent, region, or learner recordings.
