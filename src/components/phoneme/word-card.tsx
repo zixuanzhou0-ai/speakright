@@ -6,6 +6,11 @@ import { useCallback, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useWordPronunciation } from "@/hooks/use-word-pronunciation";
+import {
+  getCenteredMonoTextClassName,
+  getCenteredReadableTextClassName,
+  getPracticeTextDensity,
+} from "@/lib/practice-text-presentation";
 import { cn } from "@/lib/utils";
 import type { LanguageId } from "@/types/language";
 import type { KeywordEntry } from "@/types/phoneme";
@@ -56,6 +61,7 @@ export function WordCard({
 
   const isActive = wordAudio.isPlaying || wordAudio.isLoading;
   const displayWord = currentWord.stressText ?? currentWord.word;
+  const textDensity = getPracticeTextDensity(displayWord);
 
   return (
     <div className="w-full">
@@ -92,7 +98,8 @@ export function WordCard({
                     animate={{ scale: isActive ? 1.08 : 1 }}
                     transition={springTransition}
                     className={cn(
-                      "text-3xl font-bold rounded-lg px-3 py-0.5 transition-colors duration-200",
+                      "rounded-lg px-3 py-0.5 font-bold transition-colors duration-200",
+                      getCenteredReadableTextClassName(textDensity),
                       isActive && "bg-primary/15 text-primary",
                     )}
                   >
@@ -100,7 +107,8 @@ export function WordCard({
                   </motion.span>
                   <span
                     className={cn(
-                      "font-mono text-base transition-colors duration-200",
+                      "font-mono transition-colors duration-200",
+                      getCenteredMonoTextClassName(textDensity),
                       isActive ? "text-primary/70" : "text-muted-foreground",
                     )}
                   >
