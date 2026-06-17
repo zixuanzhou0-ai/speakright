@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { getAllAssessmentSegmentAudioRegistryEntries } from "@/lib/assessment-segment-audio";
+import { getLanguageAssessmentAudioPolicyRows } from "@/lib/language-assessment-audio-policy";
 import { getLanguagePhonemeBySlug } from "@/lib/language-phonemes";
 import {
   getSoundUnitSourceAlignment,
@@ -91,6 +93,30 @@ describe("language source alignment", () => {
     expect(shouldShowSoundUnitHeaderAudio("ru-RU", unit("ru-RU", "ru-a"))).toBe(
       true,
     );
+  });
+
+  it("keeps every exact assessment clip visible as the same sound-unit header audio", () => {
+    for (const entry of getAllAssessmentSegmentAudioRegistryEntries()) {
+      const soundUnit = unit(entry.languageId, entry.soundUnitSlug);
+      const policyRow = getLanguageAssessmentAudioPolicyRows(entry.languageId).find(
+        (row) => row.slug === entry.soundUnitSlug,
+      );
+
+      expect(
+        shouldShowSoundUnitHeaderAudio(entry.languageId, soundUnit),
+        `${entry.languageId}:${entry.soundUnitSlug}`,
+      ).toBe(true);
+      expect(soundUnit.phonemeAudio?.localSrc, entry.soundUnitSlug).toBe(
+        entry.audioUrl,
+      );
+      expect(policyRow?.shouldBeClickable, entry.soundUnitSlug).toBe(true);
+      expect(policyRow?.registryAudioUrl, entry.soundUnitSlug).toBe(
+        soundUnit.phonemeAudio?.localSrc,
+      );
+      expect(policyRow?.registryMatchesHeaderAudio, entry.soundUnitSlug).toBe(
+        true,
+      );
+    }
   });
 
   it("hides non-English rule/prosody header speakers without exact local target audio", () => {
