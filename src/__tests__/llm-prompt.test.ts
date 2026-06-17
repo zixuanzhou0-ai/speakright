@@ -51,7 +51,11 @@ describe("LLM feedback prompt", () => {
     expect(prompt).toContain("当前语言仍是实验评分链路");
     expect(prompt).toContain("不能强行按英语 SAPI 解释");
     expect(prompt).toContain("papa/papá");
+    expect(prompt).toContain("/p t k/");
+    expect(prompt).toContain("不强送气");
     expect(prompt).not.toContain("stress-timed");
+    expect(prompt).not.toContain("sink / think");
+    expect(prompt).not.toContain("really 的第二个音节");
   });
 
   it("uses French prosody and rule constraints instead of English weak forms", () => {
@@ -67,7 +71,11 @@ describe("LLM feedback prompt", () => {
     expect(prompt).toContain("liaison");
     expect(prompt).toContain("enchaînement");
     expect(prompt).toContain("法语连诵和省音是短语级规则");
+    expect(prompt).toContain("/p t k/");
+    expect(prompt).toContain("少送气");
     expect(prompt).not.toContain("want to →");
+    expect(prompt).not.toContain('"not at all"');
+    expect(prompt).not.toContain("sink vs think");
   });
 
   it("uses Russian stress and palatalization constraints conservatively", () => {
@@ -84,6 +92,8 @@ describe("LLM feedback prompt", () => {
     expect(prompt).toContain("硬/软辅音");
     expect(prompt).toContain("不能用单个整体分数证明");
     expect(prompt).toContain("当前证据不足");
+    expect(prompt).not.toContain("sink / think");
+    expect(prompt).not.toContain("really 的第二个音节");
   });
 
   it("keeps non-English AI coach feedback tied to target text, language, and evidence strength", () => {

@@ -6,7 +6,7 @@ import {
 } from "@/lib/language-feedback-rules";
 
 describe("language feedback rules", () => {
-  it("defines Spanish guidance for vowels, r/rr, approximants, dialect, x, ny, and stress", () => {
+  it("defines Spanish guidance for vowels, plain consonants, r/rr, approximants, dialect, x, ny, and stress", () => {
     const ruleIds = getLanguageFeedbackRules("es-ES").map((rule) => rule.id);
 
     expect(ruleIds).toEqual(
@@ -14,6 +14,8 @@ describe("language feedback rules", () => {
         "spanish-vowel-diphthongization",
         "spanish-r-tap-trill-confusion",
         "spanish-bv-english-v",
+        "spanish-plain-stops-unaspirated",
+        "spanish-common-consonant-anchors",
         "spanish-approximant-too-hard",
         "spanish-theta-s-dialect",
         "spanish-x-too-weak",
@@ -24,13 +26,25 @@ describe("language feedback rules", () => {
     expect(
       matchLanguageFeedbackRules("es-ES", ["es-theta"])[0]?.rule.guidance,
     ).toMatch(/seseo|Castilian/);
+
+    const plainStops = matchLanguageFeedbackRules("es-ES", ["es-p", "es-t"]);
+    expect(plainStops[0]?.rule.guidance).toContain("不强送气");
+    expect(plainStops[0]?.rule.guidance).toContain("牙齿");
+
+    const commonConsonants = matchLanguageFeedbackRules("es-ES", ["es-n"]);
+    expect(commonConsonants[0]?.rule.guidance).toContain("音系");
+    expect(commonConsonants[0]?.rule.practiceCue).toContain("鼻音同化");
   });
 
-  it("defines French guidance for front rounded vowels, nasal vowels, r, and phrase rules", () => {
+  it("defines French guidance for front rounded vowels, nasal vowels, r, common consonants, and phrase rules", () => {
     const matches = matchLanguageFeedbackRules("fr-FR", [
       "fr-y",
       "fr-an",
       "fr-r",
+      "fr-p",
+      "fr-d",
+      "fr-v",
+      "fr-l",
       "fr-schwa",
       "fr-final-consonant-silence",
       "fr-liaison",
@@ -45,6 +59,8 @@ describe("language feedback rules", () => {
         "french-front-rounded-vowel-collapse",
         "french-nasal-vowel-with-n-tail",
         "french-uvular-r-replaced",
+        "french-plain-stops-unaspirated",
+        "french-common-consonant-anchors",
         "french-final-consonant-silence",
         "french-liaison",
         "french-enchainement",
@@ -64,6 +80,12 @@ describe("language feedback rules", () => {
     const schwa = matches.find(
       (match) => match.rule.id === "french-schwa-e-caduc",
     );
+    const plainStops = matches.find(
+      (match) => match.rule.id === "french-plain-stops-unaspirated",
+    );
+    const commonConsonants = matches.find(
+      (match) => match.rule.id === "french-common-consonant-anchors",
+    );
 
     expect(liaison?.matchedSlugs).toEqual(["fr-liaison"]);
     expect(liaison?.rule.guidance).toContain("潜在词尾辅音");
@@ -80,6 +102,14 @@ describe("language feedback rules", () => {
     expect(schwa?.matchedSlugs).toEqual(["fr-schwa"]);
     expect(schwa?.rule.guidance).toContain("e caduc");
     expect(schwa?.rule.guidance).toContain("短语环境");
+
+    expect(plainStops?.matchedSlugs).toEqual(["fr-p", "fr-d"]);
+    expect(plainStops?.rule.guidance).toContain("少送气");
+    expect(plainStops?.rule.guidance).toContain("flap");
+
+    expect(commonConsonants?.matchedSlugs).toEqual(["fr-v", "fr-l"]);
+    expect(commonConsonants?.rule.guidance).toContain("dark L");
+    expect(commonConsonants?.rule.practiceCue).toContain("fou/vous");
   });
 
   it("defines Russian guidance for stress, reduction, palatalization, devoicing, assimilation, clusters, and sh/ch/shch", () => {

@@ -22,6 +22,20 @@ vi.mock("@/lib/tauri-runtime", () => ({
   isTauriEnvironment: mocks.isTauriEnvironment,
 }));
 
+async function drainStream(stream: ReadableStream<Uint8Array>): Promise<string> {
+  const reader = stream.getReader();
+  const decoder = new TextDecoder();
+  let output = "";
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    output += decoder.decode(value);
+  }
+
+  return output;
+}
+
 describe("desktop LLM network policy", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -343,6 +357,68 @@ describe("desktop LLM network policy", () => {
     expect(output).toContain(
       "无法连接 AI 教练服务，请检查网络、代理或 LLM provider 配置后重试。",
     );
+  });
+
+  it("injects English L1 transfer hints only for en-US feedback prompts", async () => {
+    const lowVResult = {
+      words: [
+        {
+          word: "vous",
+          accuracyScore: 52,
+          errorType: "None",
+          phonemes: [{ phoneme: "v", accuracyScore: 40 }],
+          syllables: [],
+        },
+      ],
+    } as unknown as AzureAssessmentResult;
+
+    mocks.apiFetch.mockResolvedValue(
+      new Response("data: [DONE]\n\n", { status: 200 }),
+    );
+
+    await drainStream(
+      streamLlmFeedback(
+        {
+          apiKey: "secret",
+          provider: "gpt",
+          baseUrl: "https://api.openai.com/v1",
+          model: "gpt-5.4-mini",
+        },
+        "vous",
+        lowVResult,
+        "phoneme",
+        undefined,
+        "fr-FR",
+      ),
+    );
+
+    let [, init] = mocks.apiFetch.mock.calls[0];
+    let body = JSON.parse(String(init?.body));
+    expect(body.messages[0].content).toContain("当前练习语言：法语 fr-FR");
+    expect(body.messages[0].content).not.toContain("检测到的母语迁移错误");
+    expect(body.messages[0].content).not.toContain("vest vs west");
+
+    await drainStream(
+      streamLlmFeedback(
+        {
+          apiKey: "secret",
+          provider: "gpt",
+          baseUrl: "https://api.openai.com/v1",
+          model: "gpt-5.4-mini",
+        },
+        "very",
+        lowVResult,
+        "phoneme",
+        undefined,
+        "en-US",
+      ),
+    );
+
+    [, init] = mocks.apiFetch.mock.calls[1];
+    body = JSON.parse(String(init?.body));
+    expect(body.messages[0].content).toContain("当前练习语言：美式英语 en-US");
+    expect(body.messages[0].content).toContain("检测到的母语迁移错误");
+    expect(body.messages[0].content).toContain("vest vs west");
   });
 
   it("translates Anthropic stream events into local feedback SSE chunks", async () => {

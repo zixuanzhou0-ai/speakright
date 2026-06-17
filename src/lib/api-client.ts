@@ -790,14 +790,20 @@ export function streamLlmFeedback(
     });
   }
 
-  // Collect all phoneme scores across words for L1 error detection
-  const allPhonemes = azureResult.words.flatMap((w) =>
-    w.phonemes.map((p) => ({
-      phoneme: p.phoneme,
-      accuracyScore: p.accuracyScore,
-    })),
-  );
-  const l1Context = buildL1ErrorContext(matchL1Errors(allPhonemes));
+  // English L1 patterns are calibrated for en-US Azure SAPI phonemes only.
+  const allPhonemes =
+    languageId === "en-US"
+      ? azureResult.words.flatMap((w) =>
+          w.phonemes.map((p) => ({
+            phoneme: p.phoneme,
+            accuracyScore: p.accuracyScore,
+          })),
+        )
+      : [];
+  const l1Context =
+    languageId === "en-US"
+      ? buildL1ErrorContext(matchL1Errors(allPhonemes))
+      : "";
   const prompt =
     buildFeedbackPrompt(target, azureResult, mode, getCoachMode(), languageId) +
     l1Context;

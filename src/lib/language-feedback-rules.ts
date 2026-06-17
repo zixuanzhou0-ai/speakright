@@ -35,6 +35,26 @@ export const LANGUAGE_FEEDBACK_RULES: LanguageFeedbackRule[] = [
     practiceCue: "boca, vida, uva 逐个读，避免上齿咬下唇。",
   },
   {
+    id: "spanish-plain-stops-unaspirated",
+    languageId: "es-ES",
+    title: "plain /p t k/",
+    triggerSlugs: ["es-p", "es-t", "es-k"],
+    guidance:
+      "西语 /p t k/ 是短促清塞音，词首也不强送气；/t/ 更靠近牙齿，不能套英语 alveolar t 或喷气 p/k。",
+    practiceCue:
+      "pan, taza, casa 分开慢读；手放嘴前检查没有明显喷气，再放进 para ti, casa pequeña。",
+  },
+  {
+    id: "spanish-common-consonant-anchors",
+    languageId: "es-ES",
+    title: "plain consonant anchors",
+    triggerSlugs: ["es-f", "es-m", "es-n", "es-l"],
+    guidance:
+      "西语 /f m n l/ 看起来像英语符号，但目标是西语音系：/f/ 清唇齿摩擦，/m/ 双唇鼻音，/n/ 可随后音变换部位，/l/ 保持清晰前舌音。",
+    practiceCue:
+      "familia, mano, nada, lado 慢读；/n/ 再对比 en casa, un gesto，区分单音锚点和鼻音同化规则。",
+  },
+  {
     id: "spanish-approximant-too-hard",
     languageId: "es-ES",
     title: "intervocalic approximants",
@@ -97,6 +117,26 @@ export const LANGUAGE_FEEDBACK_RULES: LanguageFeedbackRule[] = [
     triggerSlugs: ["fr-r"],
     guidance: "法语 /ʁ/ 在舌根/小舌附近，不卷舌，也不弹舌。",
     practiceCue: "rue, Paris, frère；先轻摩擦，再放进短句。",
+  },
+  {
+    id: "french-plain-stops-unaspirated",
+    languageId: "fr-FR",
+    title: "plain /p b t d k g/",
+    triggerSlugs: ["fr-p", "fr-b", "fr-t", "fr-d", "fr-k", "fr-g"],
+    guidance:
+      "法语 /p t k/ 通常比英语词首更少送气，/b d g/ 要保持清楚声带振动；/t d/ 不要读成美式 flap，也不要加英语式爆破拖尾。",
+    practiceCue:
+      "pas/bas, tout/doux, cou/goût 交替；每组只检查清浊和短促闭塞，不练英语式重音。",
+  },
+  {
+    id: "french-common-consonant-anchors",
+    languageId: "fr-FR",
+    title: "plain consonant anchors",
+    triggerSlugs: ["fr-f", "fr-v", "fr-s", "fr-z", "fr-m", "fr-n", "fr-l"],
+    guidance:
+      "法语 /f v s z m n l/ 是普通辅音锚点，但不能直接照英语习惯读：/v z/ 要保留声带振动，/l/ 保持清晰前舌音，不做英语词尾 dark L。",
+    practiceCue:
+      "fou/vous, sous/zoo, ami/année, la lune 分组慢读；先稳住清浊和清晰 /l/，再放进短语。",
   },
   {
     id: "french-final-consonant-silence",
