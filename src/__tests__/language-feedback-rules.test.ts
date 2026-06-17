@@ -31,8 +31,10 @@ describe("language feedback rules", () => {
       "fr-y",
       "fr-an",
       "fr-r",
+      "fr-schwa",
       "fr-final-consonant-silence",
       "fr-liaison",
+      "fr-enchainement",
       "fr-elision",
       "fr-phrase-final-prominence",
     ]);
@@ -44,12 +46,40 @@ describe("language feedback rules", () => {
         "french-nasal-vowel-with-n-tail",
         "french-uvular-r-replaced",
         "french-final-consonant-silence",
-        "french-liaison-enchainement-elision",
+        "french-liaison",
+        "french-enchainement",
+        "french-elision",
+        "french-schwa-e-caduc",
         "french-phrase-final-prominence",
       ]),
     );
     expect(buildLanguageFeedbackPromptContext("fr-FR")).toContain("nasal");
     expect(buildLanguageFeedbackPromptContext("fr-FR")).toContain("节奏组");
+
+    const liaison = matches.find((match) => match.rule.id === "french-liaison");
+    const enchainement = matches.find(
+      (match) => match.rule.id === "french-enchainement",
+    );
+    const elision = matches.find((match) => match.rule.id === "french-elision");
+    const schwa = matches.find(
+      (match) => match.rule.id === "french-schwa-e-caduc",
+    );
+
+    expect(liaison?.matchedSlugs).toEqual(["fr-liaison"]);
+    expect(liaison?.rule.guidance).toContain("潜在词尾辅音");
+    expect(liaison?.rule.guidance).toContain("合适短语环境");
+    expect(liaison?.rule.guidance).not.toContain("已经发出来的词尾辅音");
+
+    expect(enchainement?.matchedSlugs).toEqual(["fr-enchainement"]);
+    expect(enchainement?.rule.guidance).toContain("已经发出来的词尾辅音");
+    expect(enchainement?.rule.guidance).toContain("不是同一机制");
+
+    expect(elision?.matchedSlugs).toEqual(["fr-elision"]);
+    expect(elision?.rule.guidance).toContain("撇号");
+
+    expect(schwa?.matchedSlugs).toEqual(["fr-schwa"]);
+    expect(schwa?.rule.guidance).toContain("e caduc");
+    expect(schwa?.rule.guidance).toContain("短语环境");
   });
 
   it("defines Russian guidance for stress, reduction, palatalization, devoicing, assimilation, clusters, and sh/ch/shch", () => {

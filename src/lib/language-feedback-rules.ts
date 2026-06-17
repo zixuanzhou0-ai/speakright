@@ -107,12 +107,40 @@ export const LANGUAGE_FEEDBACK_RULES: LanguageFeedbackRule[] = [
     practiceCue: "petit, grand, trop, chaud 读短，不把拼写尾音读出来。",
   },
   {
-    id: "french-liaison-enchainement-elision",
+    id: "french-liaison",
     languageId: "fr-FR",
-    title: "liaison, enchaînement, elision",
-    triggerSlugs: ["fr-liaison", "fr-enchainement", "fr-elision"],
-    guidance: "liaison、enchaînement、elision 是句子层现象，不应按孤立音素判；该连的要连，该省的要省。",
-    practiceCue: "les amis, il arrive, j'aime 分别练连诵、连接和省音。",
+    title: "liaison",
+    triggerSlugs: ["fr-liaison"],
+    guidance:
+      "liaison 是潜在词尾辅音在合适短语环境中出现；不要把每个静音词尾都读出，也不要漏掉必须连的词组。",
+    practiceCue: "les amis, vous avez, petit ami；先找限定词/代词等常见可连环境。",
+  },
+  {
+    id: "french-enchainement",
+    languageId: "fr-FR",
+    title: "enchaînement",
+    triggerSlugs: ["fr-enchainement"],
+    guidance:
+      "enchaînement 是已经发出来的词尾辅音接到下一个元音开头词上，和把静音词尾复活的 liaison 不是同一机制。",
+    practiceCue: "il arrive, elle aime, avec elle；保留原本发音的尾辅音，再顺接到后面的元音。",
+  },
+  {
+    id: "french-elision",
+    languageId: "fr-FR",
+    title: "elision",
+    triggerSlugs: ["fr-elision"],
+    guidance:
+      "elision 是弱元音在元音开头词前省去并写成撇号形式，不能按完整孤立词逐字读。",
+    practiceCue: "j'aime, l'ami, c'est；看到撇号时直接连成一个节奏块。",
+  },
+  {
+    id: "french-schwa-e-caduc",
+    languageId: "fr-FR",
+    title: "schwa / e caduc",
+    triggerSlugs: ["fr-schwa"],
+    guidance:
+      "法语 /ə/ 是 e caduc：有些位置可听见，有些位置弱化或脱落；反馈应看短语环境，不能把它当成永远稳定的孤立元音。",
+    practiceCue: "ce matin, je te le dis, petit cheval；先慢读保留节奏，再练自然省略。",
   },
   {
     id: "french-phrase-final-prominence",

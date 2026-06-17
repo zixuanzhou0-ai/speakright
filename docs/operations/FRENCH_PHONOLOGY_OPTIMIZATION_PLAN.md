@@ -1,188 +1,117 @@
 # French Phonology Optimization Plan
 
-Status: draft implementation plan
+Status: alignment implementation plan
 Language profile: `fr-FR`
 Product status: experimental
 Last updated: 2026-06-17
 
-This plan defines how SpeakRight should tighten French pronunciation content so
-it follows French phonology and French-as-a-foreign-language pronunciation
-training. French cannot be modeled as a flat list of isolated IPA symbols.
+## 结论
 
-## Source Basis
+法语有成熟 IPA 和外语发音教学体系。SpeakRight 不能把法语拆成一张孤立 IPA
+按钮表，因为法语学习的核心不只在单音，还在鼻化元音、前圆唇元音、glide、词尾
+静音、liaison、enchainement、elision、e caduc/schwa 和短语末突出。
 
-Primary model:
+正确答案是：法语要用"库存音位 + 短语规则 + 语流实现 + 韵律"四层模型。很多
+辅音符号看起来和英语相同，例如 `/p t k f v s z m n l/`，但发音位置、送气、
+释放、词尾行为、与元音/短语的关系都不等同于英语。相同 IPA 符号不等于可以直接
+复用英语课程讲法或英语音频。
+
+## 依据
 
 - Fougeron and Smith, "French", `Journal of the International Phonetic
-  Association`, 23(2), 73-76; reprinted in the `Handbook of the International
-  Phonetic Association`, pp. 78-81:
-  <https://doi.org/10.1017/S0025100300004874>
+  Association`, 23(2), 73-76; also reprinted in the IPA Handbook:
+  https://doi.org/10.1017/S0025100300004874
 - `Handbook of the International Phonetic Association`, Cambridge University
-  Press, 1999:
-  <https://www.internationalphoneticassociation.org/content/handbook-ipa>
-- French phonetics/FLE references used as model anchors: Pierre Leon,
-  `Phonetisme et prononciations du francais`; Pierre Fouche, `Traite de
-  prononciation francaise`; PFC project for contemporary French variation.
-- Current app implementation:
+  Press, 1999: https://www.internationalphoneticassociation.org/content/handbook-ipa
+- PFC, `Phonologie du Francais Contemporain`, contemporary variation reference:
+  https://www.projet-pfc.net/
+- FLE/phonetics anchors: Pierre Leon, Pierre Fouche, Bernard Tranel, plus
+  standard descriptions of liaison, enchainement, elision, e caduc and French
+  prosody.
+- 当前实现：
   `src/lib/language-sound-units/french.ts`,
+  `src/lib/language-feedback-rules.ts`,
   `src/lib/local-language-assets.ts`,
-  `src/lib/assessment-segment-audio.ts`,
-  `src/lib/language-source-alignment.ts`.
+  `src/__tests__/language-feedback-rules.test.ts`.
 
-Pedagogical stance:
+## 当前状态判断
 
-- Teach the French sound inventory and the French phrase rhythm separately.
-- Treat liaison, enchainement, elision, schwa behavior, and final consonant
-  silence as phrase/sentence rules, not as clickable single-phoneme tiles.
-- Keep mergers and regional variation visible. Do not punish common French
-  varieties for `/œ̃/` -> `/ɛ̃/` or `/ɑ/` -> `/a/` mergers unless the learner
-  selected a target that requires the distinction.
+当前 `FRENCH_PHONEMES` 是一个可继续打磨的 experimental 法语专属课程锚点层，
+不能宣称 mastery 或完整 coverage。
 
-## Correct French Model
+已覆盖：
 
-French has a mature IPA and phonological description, but the product must use
-several layers:
+- 口元音和鼻化元音：`/i y u e ɛ ø œ ə o ɔ a ɑ̃ ɛ̃ ɔ̃ œ̃/`。
+- 前圆唇重点：`/y ø œ ɥ/`。
+- 小舌 `/ʁ/`，法语 `/ʃ/` 和 `/ʒ/`，`/ɲ/`，glides `/j ɥ w/`。
+- 常见辅音课程锚点 `/p b t d k g f v s z m n l/`。
+- 词尾静音、liaison、enchainement、elision、phrase-final prominence。
+- feedback rules 已拆开 `french-liaison`, `french-enchainement`,
+  `french-elision`, `french-schwa-e-caduc`，避免把不同机制混成一个建议。
 
-| Layer | French target | Product meaning |
+仍不齐或不能宣称完成：
+
+- 常见辅音锚点多数没有 verified short local header clip，scoring tile 应显示
+  分数但不可点击。
+- `/ɑ/` 应先作为 `/a/` 的高级/地区变体处理，不能在默认 `fr-FR` 里强行当必修。
+- `/ŋ/` 主要出现在 loanwords，暂不应作为核心初学单元。
+- `/œ̃/` 需要保留传统/对比说明，同时承认现代许多口音与 `/ɛ̃/` 合并。
+- phrase/sentence IPA 必须继续审计 liaison、enchainement、elision、schwa 和词尾
+  静音，不得靠拼写机械生成。
+
+## 正确拆分模型
+
+| 层 | 法语内容 | 产品处理 |
 | --- | --- | --- |
-| Oral vowels | `/i y u e ɛ ø œ ə o ɔ a/` plus variant `/ɑ/` where taught | Main vowel units and vowel contrasts |
-| Nasal vowels | `/ɑ̃ ɛ̃ ɔ̃ œ̃/`, with `/œ̃/` often merged into `/ɛ̃/` | Dedicated nasal-vowel training and variant notes |
-| Consonants | `/p b t d k g f v s z ʃ ʒ m n ɲ l ʁ/` plus `/ŋ/` in loans | Inventory anchors; common consonants now have standalone course units, exact clips pending |
-| Glides | `/j ɥ w/` | Contrast training, especially `/ɥ/` vs `/w/` |
-| Phrase phonology | liaison, enchainement, elision, schwa, final consonant silence | Phrase/sentence lessons and scoring feedback |
-| Prosody | no English-like lexical stress; prominence is phrase-final/rhythmic-group based | Sentence-level coaching |
+| phoneme | 口元音、鼻化元音、核心辅音、`/ʁ ʃ ʒ ɲ/` | 主课程和诊断标签，可有 exact clip |
+| glide | `/j ɥ w/` | 对比训练，尤其 `/ɥ/` vs `/w/` |
+| variantPhoneme | `/œ̃/`, 可选 `/ɑ/`, loan `/ŋ/` | 显示变体/地区/寄存说明，谨慎评分 |
+| phraseRule | liaison, final consonant silence, elision | 不做单音标 speaker，做短语/句子训练 |
+| connectedSpeech | enchainement, e caduc/schwa 保留或脱落 | phrase/sentence feedback |
+| prosody | rhythm group, phrase-final prominence | 句子级训练，不套英语词重音模型 |
 
-Core content requirements:
+## 修改计划
 
-- `/y/`, `/ø/`, `/œ/`, and `/ɥ/` must be front rounded targets, not English-like
-  `/u/` or `/w/`.
-- Nasal vowels must not add a full final `/n/` or `/ŋ/`.
-- `/ʁ/` is uvular, not English rhotic and not Spanish trill.
-- French `ch` is `/ʃ/`, not `/tʃ/`; French `j` and soft `g` are `/ʒ/`, not `/dʒ/`.
-- Liaison and enchainement must be separated:
-  - Liaison: latent final consonant appears before vowel/h muet in licensed
-    syntactic environments.
-  - Enchainement: already pronounced final consonant resyllabifies into the
-    following vowel.
-- Schwa `/ə/` is unstable and context-dependent. It must be trained as sound
-  plus rule, not just one stable isolated vowel.
-- Final consonants require lexical and phrase context. A mnemonic like C-R-F-L
-  helps learners, but exceptions must be visible.
+1. 数据模型
+   - 法语 sound unit 必须能区分 `phoneme`, `glide`, `variantPhoneme`,
+     `phraseRule`, `connectedSpeech`, `prosody`。
+   - `fr-schwa` 需要双层说明：它既是 `/ə/` 这个教学目标，也是 e caduc 在语流中
+     可保留、弱化或脱落的规则入口。
 
-## Current SpeakRight State
+2. 课程内容
+   - `/y ø œ ɥ/` 放在高优先级，明确"前舌位 + 圆唇"，避免退成 `/u o w/`。
+   - 鼻化元音必须标注"鼻化元音，不加完整 /n/ 或 /ŋ/"。
+   - `/ʁ/` 标注小舌目标，不等于英语 rhotic，也不等于西语 trill。
+   - `ch = /ʃ/`, `j/soft g = /ʒ/`，不得写成英语 affricate `/tʃ dʒ/`。
+   - `fr-final-consonant-silence` 要写"通常静音、liaison 可恢复、词汇例外存在"。
 
-Current `FRENCH_PHONEMES` contains 40 course sound units:
+3. 短语规则
+   - liaison: 潜在词尾辅音只在合适句法/语音环境中出现。
+   - enchainement: 已经发出来的词尾辅音重新切到下一个元音开头词。
+   - elision: 弱元音在元音前省略并常由撇号显示。
+   - schwa/e caduc: 慢速/教学读法可出现，自然语流中依语速、地区和环境变化。
+   - phrase-final prominence: 法语不是英语式每个内容词重读，而是节奏组末尾突出。
 
-- Vowels and nasal vowels: `fr-i`, `fr-y`, `fr-u`, `fr-e`, `fr-e-open`,
-  `fr-eu-close`, `fr-eu-open`, `fr-an`, `fr-in`, `fr-on`, `fr-a`,
-  `fr-schwa`, `fr-o-close`, `fr-o-open`, `fr-un`.
-- Consonants and glides: `fr-r`, `fr-p`, `fr-b`, `fr-t`, `fr-d`, `fr-k`,
-  `fr-g`, `fr-f`, `fr-v`, `fr-s`, `fr-z`, `fr-m`, `fr-n`, `fr-l`,
-  `fr-sh`, `fr-zh`, `fr-ny`, `fr-glide-j`, `fr-glide-hui`, `fr-glide-w`.
-- Phrase/rule units: `fr-liaison`, `fr-final-consonant-silence`,
-  `fr-enchainement`, `fr-elision`.
-- Prosody unit: `fr-phrase-final-prominence`, a sentence/rhythmic-group target
-  for phrase-final prominence rather than English-style lexical stress.
+4. 音频策略
+   - 只有 `/audio/language-assets/fr-FR/header-clips/*.m4a` 中 verified exact
+     clip 才能让 scoring tile 可点击。
+   - liaison、enchainement、elision、final consonant silence、phrase-final
+     prominence 只能用短语/句子示范，不可显示成单音标小喇叭。
+   - 常见辅音无 clip 时继续 score-only。
+   - 不生成 ElevenLabs 法语音频，除非维护者明确确认。
 
-Current exact scoring-tile audio:
+5. 测试
+   - `french-language-content.test.ts`: 锁定核心 inventory、前圆唇、鼻化元音、
+     `/œ̃/` merge note、`/ʃ ʒ/` 非 affricate 说明。
+   - `language-feedback-rules.test.ts`: 锁定 liaison、enchainement、elision、
+     schwa/e caduc 分拆。
+   - `assessment-segment-audio.test.ts`: phrase rule 和未验证辅音保持不可点击。
+   - `non-english-ipa-audit.test.ts`: phrase/sentence 行不得退化成 stale
+     word-boundary IPA。
 
-- Playable exact header clips include the vowel, nasal vowel, `/ʁ ʃ ʒ ɲ j ɥ w/`
-  units listed in `assessment-segment-audio.test.ts`.
-- Phrase/rule units have no exact single-phoneme tile audio and should stay
-  unclickable.
-- Common consonants `/p b t d k g f v s z m n l/` are now standalone course
-  units, but they still have no verified short local header clips.
+## 验收
 
-This is a strong experimental French-specific anchor set, but it is not a
-stable/mastery-ready French phonology module.
-
-## Target Data Model
-
-French needs explicit layer separation:
-
-| `soundUnitLayer` target | Examples | UI/audio rule |
-| --- | --- | --- |
-| `phoneme` | `/i y u e ɛ ø œ o ɔ a p b t d k g f v s z ʃ ʒ m n ɲ l ʁ/` | May have exact speaker when verified |
-| `variantPhoneme` | `/œ̃/`, `/ɑ/`, `/ŋ/` loanword target | Shows variation note and profile scope |
-| `glide` | `/j ɥ w/` | Contrast drills; may be playable when exact |
-| `rule` | liaison, final consonant silence, elision | No single speaker; sentence demo only |
-| `connectedSpeech` | enchainement, schwa deletion/retention | Phrase/sentence scoring and feedback |
-| `prosody` | phrase-final prominence, syllable timing | Sentence-level coaching |
-
-## Required Content Changes
-
-1. Inventory completion
-   - Add standalone French units for `/p b t d k g f v s z m n l/`. Done in
-     source; exact short local header clips remain pending.
-   - Decide whether `/ɑ/` is an optional variant note under `/a/` or a separate
-     advanced regional target.
-   - Keep `/ŋ/` as loanword/reference-only unless a clear training need exists.
-
-2. Vowel and nasal-vowel quality
-   - Keep `/y ø œ ɥ/` as priority targets for Chinese learners.
-   - Keep `/œ̃/` visible as a traditional/contrast unit, but mark the common
-     modern merger with `/ɛ̃/`.
-   - Add minimal-pair or near-pair drills for `/e/` vs `/ɛ/`, `/o/` vs `/ɔ/`,
-     `/ø/` vs `/œ/`, `/ɑ̃/` vs `/ɔ̃/` vs `/ɛ̃/`.
-
-3. Phrase-rule split
-   - Split `fr-liaison` and `fr-enchainement` in copy and tests. The current
-     combined lesson title should not imply the same mechanism.
-   - `fr-final-consonant-silence` should include "normally silent", "liaison can
-     revive it", and "lexical exceptions".
-   - `fr-elision` should stay phrase-level and include apostrophe examples.
-   - `fr-schwa` should be dual-layer: it is a vowel in the inventory and also a
-     deletion/retention rule in connected speech.
-
-4. Prosody
-   - Add a French sentence-rhythm unit: phrase-final accent, not English lexical
-     stress. Done in source as `fr-phrase-final-prominence`; exact sentence-
-     rhythm evidence audio remains pending and unclickable.
-   - Update feedback rules so learners are not asked to stress every content word
-     as in English.
-
-5. Example IPA audit
-   - Re-check phrase and sentence IPA for liaison, enchainement, elision,
-     schwa, and silent final consonants.
-   - Do not hard-edit `needs-review` rows without at least two source-backed
-     confirmations.
-
-## Audio Policy
-
-French audio must follow the existing honest-playback rule:
-
-- Exact clips may be clickable only when the audio is a verified short
-  `/audio/language-assets/fr-FR/header-clips/*.m4a` clip tied to the same sound
-  unit.
-- Rule/prosody units such as liaison, enchainement, elision, final consonant
-  silence, and phrase-final prominence must not expose a single-symbol tile
-  speaker.
-- If a rule has a sentence demo later, label it "短语/句子示范", not "音标发音".
-- Common consonants whose exact local clips are not yet verified should show
-  labels and scores but stay unclickable.
-- Do not generate ElevenLabs audio for French without explicit maintainer
-  approval.
-
-## Test Plan
-
-Add or update tests in these areas:
-
-- `src/__tests__/french-language-content.test.ts`
-  - Inventory includes the required common consonant anchors or marks them as
-    known gaps.
-  - `/œ̃/` merger note remains visible.
-  - `/ʃ/` and `/ʒ/` are not described as affricates.
-- `src/__tests__/language-source-alignment.test.ts`
-  - `fr-liaison`, `fr-enchainement`, `fr-elision`, and
-    `fr-final-consonant-silence` are rule/phrase units and hide header speakers.
-- `src/__tests__/assessment-segment-audio.test.ts`
-  - Phrase symbols such as `‿` and words such as `liaison` remain unclickable.
-  - Exact clips only map to verified header-clip assets.
-- `src/__tests__/language-feedback-rules.test.ts`
-  - French sentence feedback includes liaison, enchainement, elision, schwa, and
-    final consonant silence when evidence is present.
-
-Acceptance gate:
+稳定改动后只用 Release EXE 验收：
 
 ```bat
 npm.cmd run test
@@ -194,21 +123,15 @@ npm.cmd run desktop:ui-smoke
 npm.cmd run desktop:launch-release
 ```
 
-Optional audio-only gates, still dry-run:
+可选音频 dry-run：
 
 ```bat
 npm.cmd run audio:parity:dry-run
 npm.cmd run audio:loudness:dry-run
 ```
 
-## French Completion Goal
+## 法语完成目标
 
-French is ready to move from experimental content toward public beta only when:
-
-- The inventory covers common French consonants, core oral vowels, nasal vowels,
-  glides, and variant notes.
-- Phrase-level rules are modeled separately from single sound units.
-- All clickable speakers use exact local short clips.
-- French feedback does not impose English stress or English rhotic assumptions.
-- Tests lock liaison, enchainement, elision, schwa, final consonant silence, and
-  phrase-final prominence alongside nasal-vowel behavior.
+法语进入 public beta 的条件是：用户能区分单音库存、变体、短语规则和句子韵律；
+AI feedback 不再套英语 stress/rhotic 习惯；所有可点击 speaker 都是同源本地短
+clip；所有规则类 tile 都清楚显示为短语/句子规则，而不是假装成单音标。
