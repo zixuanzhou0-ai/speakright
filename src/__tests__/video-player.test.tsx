@@ -10,12 +10,13 @@ vi.mock("@/components/common/desktop-external-link", () => ({
     href,
     children,
     className,
+    ...props
   }: {
     href: string;
     children: React.ReactNode;
     className?: string;
-  }) => (
-    <a href={href} className={className}>
+  } & React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
+    <a href={href} className={className} {...props}>
       {children}
     </a>
   ),
@@ -118,7 +119,7 @@ describe("VideoPlayer", () => {
     );
   });
 
-  it("keeps external fallback resources visible when no local video is available", () => {
+  it("keeps every external fallback resource visible when no local video is available", () => {
     render(
       <VideoPlayer
         slug="es-lexical-stress"
@@ -129,6 +130,21 @@ describe("VideoPlayer", () => {
             url: "https://example.com/spanish",
             kind: "ipa",
           },
+          {
+            title: "External Spanish articulation chart",
+            url: "https://example.com/articulation",
+            kind: "articulation",
+          },
+          {
+            title: "External Spanish dictionary reference",
+            url: "https://example.com/dictionary",
+            kind: "dictionary",
+          },
+          {
+            title: "External Spanish lecture notes",
+            url: "https://example.com/lecture",
+            kind: "video",
+          },
         ]}
       />,
     );
@@ -137,6 +153,16 @@ describe("VideoPlayer", () => {
     expect(
       screen.getByText("External Spanish pronunciation resource"),
     ).toBeInTheDocument();
+    expect(
+      screen.getByText("External Spanish articulation chart"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("External Spanish dictionary reference"),
+    ).toBeInTheDocument();
+    expect(screen.getByText("External Spanish lecture notes")).toBeInTheDocument();
+    expect(
+      document.querySelectorAll('[data-smoke="video-fallback-resource-card"]'),
+    ).toHaveLength(4);
   });
 
   it("uses local teaching lessons instead of external fallback cards for rule units", () => {

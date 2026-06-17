@@ -354,6 +354,12 @@ describe("desktop preflight and UI smoke", () => {
     expect(drillPhonemeLesson).toContain("phoneme.keywords.map");
     expect(drillPhonemeLesson).not.toContain("phoneme.keywords.slice(0, 6)");
     expect(drillPhonemeLesson).not.toContain("示例单词（点击听发音）");
+    const videoPlayer = readProjectFile(
+      "src/components/phoneme/video-player.tsx",
+    );
+    expect(videoPlayer).toContain("resources.map");
+    expect(videoPlayer).toContain('data-smoke="video-fallback-resource-card"');
+    expect(videoPlayer).not.toContain("resources.slice(0, 3)");
     const wordPronunciationHook = readProjectFile(
       "src/hooks/use-word-pronunciation.ts",
     );

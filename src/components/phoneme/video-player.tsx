@@ -195,8 +195,6 @@ export function VideoPlayer({
       );
     }
 
-    const visibleResources = resources.slice(0, 3);
-
     return (
       <div
         className={`flex w-full flex-col justify-center rounded-lg border border-dashed bg-muted/25 p-3 ${className ?? ""}`}
@@ -205,7 +203,7 @@ export function VideoPlayer({
           <p className="text-sm font-medium text-foreground">
             {sourceAlignment
               ? "暂无精准本地视频"
-              : visibleResources.length > 0
+              : resources.length > 0
                 ? "外部 IPA / 发音教学资源"
                 : "教学视频素材准备中"}
           </p>
@@ -225,14 +223,14 @@ export function VideoPlayer({
           </div>
         )}
 
-        {visibleResources.length > 0 ? (
+        {resources.length > 0 ? (
           <div className="grid gap-1.5">
             {sourceAlignment && (
               <p className="text-[11px] font-medium text-muted-foreground">
                 参考资料
               </p>
             )}
-            {visibleResources.map((resource) => {
+            {resources.map((resource) => {
               const Icon = RESOURCE_ICON[resource.kind];
 
               return (
@@ -240,6 +238,7 @@ export function VideoPlayer({
                   key={`${resource.kind}-${resource.url}`}
                   href={resource.url}
                   className="group flex items-start gap-3 rounded-lg border bg-background/70 px-3 py-2 text-center transition-colors hover:border-primary/50 hover:bg-primary/5"
+                  data-smoke="video-fallback-resource-card"
                 >
                   <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
                     <Icon className="h-4 w-4" />

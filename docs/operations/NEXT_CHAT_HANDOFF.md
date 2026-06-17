@@ -227,6 +227,10 @@ git status --short --branch
   `line-clamp`, and `whitespace-nowrap` regressions.
 - Non-English rule/prosody units use Chinese labels such as `规则训练 · 音节节奏`
   rather than raw English rule names like `syllable timing`.
+- When a sound unit has no precise local teaching video, the fallback reference
+  panel now renders every external teaching resource from `resources`, not only
+  the first three. The card hook is `video-fallback-resource-card`; local
+  teaching lessons still take priority over external fallback cards.
 - Header speaker buttons should appear only when there is real local target
   audio. If no local target audio exists, do not show a speaker icon that jumps
   to an external page. The `PhonemePlayButton` component now enforces this too:

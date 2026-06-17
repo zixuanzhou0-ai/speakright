@@ -22,7 +22,7 @@ claimed as complete.
 | Drill landing review queue and training memory keep actionable tasks visible | `src/app/drill/page.tsx`, `src/lib/review-queue.ts`, `src/lib/training-memory.ts`, `src/__tests__/desktop-preflight-ui-smoke.test.ts`; after `buildReviewQueue` and `buildTrainingMemory` bound their source lists, the drill landing page renders every `drill-review-task-card`, merged `drill-today-item-card`, and `drill-memory-weakness-card`, rather than applying a second `slice(0, 2)` cap to review/today tasks or `activeWeaknesses.slice(0, 3)` to training-memory weaknesses |
 | Progress training history keeps retained sessions visible | `src/app/progress/page.tsx`, `src/lib/mastery-profile.ts`, `src/__tests__/progress-page.test.tsx`, `src/__tests__/desktop-preflight-ui-smoke.test.ts`; after `recordTrainingSession` applies the local storage retention limit to the latest 80 sessions, the Progress page renders every retained `profile.sessions` row and shows `progress-session-count`, rather than applying a second `slice(0, 6)` UI cap |
 | Non-English rule units without local target audio do not show clickable speaker buttons | `src/lib/language-source-alignment.ts`, `src/components/phoneme/phoneme-study-card.tsx`, `src/components/drill/drill-phoneme-lesson.tsx`, `src/components/phoneme/phoneme-card.tsx`, `src/__tests__/phoneme-study-card.test.tsx`, `src/__tests__/language-source-alignment.test.ts`, `scripts/desktop-ui-smoke.mjs` |
-| Proxy or generic videos are not presented as exact teaching videos | `src/lib/language-source-alignment.ts`, `src/lib/language-teaching-videos.ts`, `src/components/phoneme/video-player.tsx`, `src/components/drill/drill-phoneme-lesson.tsx`, `src/__tests__/language-teaching-videos.test.ts`, `src/__tests__/video-player.test.tsx`, `scripts/desktop-ui-smoke.mjs` |
+| Proxy or generic videos are not presented as exact teaching videos | `src/lib/language-source-alignment.ts`, `src/lib/language-teaching-videos.ts`, `src/components/phoneme/video-player.tsx`, `src/components/drill/drill-phoneme-lesson.tsx`, `src/__tests__/language-teaching-videos.test.ts`, `src/__tests__/video-player.test.tsx`, `src/__tests__/desktop-preflight-ui-smoke.test.ts`, `scripts/desktop-ui-smoke.mjs`; local teaching lessons take priority over external fallback cards, and when no precise local video is available the fallback panel renders every `video-fallback-resource-card` from `resources` rather than applying a second `resources.slice(0, 3)` cap |
 | Spanish/French/Russian local dual-voice audio has zero missing required items and dry-run makes no ElevenLabs calls | `scripts/multilingual-audio-parity-report.mjs`, `src/__tests__/multilingual-audio-parity.test.ts`, `src/__tests__/static-language-audio-pack-assets.test.ts`, `npm.cmd run audio:parity:dry-run` |
 | Local A/B word audio, IPA chart normal/slow word audio, and bundled language-pack read-along playback are louder and closer to video playback without regenerating TTS or allowing obvious clipping | `src/hooks/use-word-pronunciation.ts`, `src/hooks/use-audio-player.ts`, `src/hooks/use-tts-aligned.ts`, `src/lib/audio-normalization.ts`, `src/lib/audio-playback-policy.ts`, `src/components/phoneme/phoneme-card.tsx`, `src/components/phoneme/phoneme-study-card.tsx`, `scripts/audio-loudness-audit.mjs`, `src/__tests__/audio-normalization.test.ts`, `src/__tests__/use-word-pronunciation.test.tsx`, `src/__tests__/use-audio-player.test.tsx`, `src/__tests__/use-tts-aligned.test.tsx`, `src/__tests__/phoneme-card.test.tsx`, `src/__tests__/phoneme-study-card.test.tsx`, `npm.cmd run audio:loudness:dry-run`; the cached normalization helper, active playback hook, and read-along local-pack path preserve language-pack fallback gain before peak-safe limiting where applicable, very quiet decoded local word clips can reach up to `12x` peak-safe gain when peaks permit it, IPA chart normal/slow word playback uses a shared boost, bundled read-along replay keeps its gain, and representative A/B plus chart-word samples are compared against teaching-video loudness without ElevenLabs calls |
 | Standard-demo TTS, local detail/free-practice word audio gaps, and online dictionary fallback failures show actionable Chinese messages without generating audio during validation | `src/lib/api-client.ts`, `src/hooks/use-tts.ts`, `src/hooks/use-tts-aligned.ts`, `src/hooks/use-word-pronunciation.ts`, `src/components/phoneme/phoneme-study-card.tsx`, `src/components/sentences/sentence-input-card.tsx`, `src/components/settings/elevenlabs-config-card.tsx`, `src/components/settings/usage-monitor.tsx`, `src/app/drill/prosody/page.tsx`, `src/app/drill/scenarios/page.tsx`, `src/app/drill/contrast/page.tsx`, `src/app/drill/perception/page.tsx`, `src/app/drill/pack/[packId]/pack-runner-client.tsx`, `src/__tests__/api-client-audio.test.ts`, `src/__tests__/desktop-preflight-ui-smoke.test.ts`, `src/__tests__/drill-pack-runner.test.tsx`, `src/__tests__/perception-drill-page.test.tsx`, `src/__tests__/phoneme-study-card.test.tsx`, `src/__tests__/sentence-input-card.test.tsx`, `src/__tests__/settings-key-hydration.test.tsx`, `src/__tests__/use-tts-aligned.test.tsx`, `src/__tests__/use-word-pronunciation.test.tsx`; ElevenLabs connection tests, usage checks, voice queries, TTS, aligned TTS, non-English local-pack gaps, and English online dictionary fallback map invalid keys, unavailable voice/model, network/proxy failures, timeout, quota/rate-limit, service failure, empty/too-long text, missing local detail/free-practice word audio, and missing dictionary entries to Chinese messages; detail-page, free-practice word speakers, free-practice sentence TTS errors (`free-practice-tts-error`), prosody demos, scenario demos, contrast word demos, perception playback, and pack-runner reference/perception playback render the failure inline instead of silently clearing the loading state; experimental-language free-practice word mode also tells learners that missing local language-pack items will not be replaced by online audio pretending to be exact local audio, perception ABX clears stale pronunciation errors when moving to the next question or restarting a session, pack-runner clears stale reference-audio errors when starting/restarting a course, moving levels/items, or beginning recording/remediation, stale online dictionary fallback failures cannot overwrite a newer word playback request, while bundled local word and language-pack audio remain the first-choice path and validation still makes no TTS generation calls |
@@ -79,18 +79,18 @@ Latest local full gate recorded in this audit:
 ```text
 git status --short --branch
   initial gate status before this round's edits was
-  `## main...origin/main [ahead 95]`; the current full gate was run with the
-  drill landing active-weakness full-list rendering fix and evidence updates
+  `## main...origin/main [ahead 96]`; the current full gate was run with the
+  video fallback resource full-list rendering fix and evidence updates
   still unstaged, so `desktop:preflight` correctly reported `Git: dirty`. After
   GitHub API fallback pushes, verify the GitHub `main` ref and local-vs-remote
   tree SHA before treating content as unpushed.
 
-npm.cmd run test -- src/__tests__/desktop-preflight-ui-smoke.test.ts
-  1 file / 20 tests passed; the drill landing page renders every bounded
-  active weakness from `trainingMemory.activeWeaknesses`, exposes
-  `drill-memory-weakness-card`, and the static smoke guard rejects
-  `trainingMemory.activeWeaknesses.slice(0, 3)` while still rejecting the old
-  review/today two-item caps.
+npm.cmd run test -- src/__tests__/video-player.test.tsx src/__tests__/desktop-preflight-ui-smoke.test.ts
+  2 files / 29 tests passed; the video fallback panel renders every external
+  resource card when no precise local video is available, exposes
+  `video-fallback-resource-card`, and the static smoke guard rejects
+  `resources.slice(0, 3)` while preserving local teaching lessons as the
+  priority path.
 
 npm.cmd run test
   125 files / 710 tests passed
@@ -106,7 +106,7 @@ npm.cmd run build:desktop-frontend
 
 npm.cmd run desktop:build
   passed; reran `build:desktop-frontend`, generated 144 static pages, compiled
-  the Tauri release app in 5m 00s, built
+  the Tauri release app in 5m 24s, built
   `src-tauri\target\release\speakright.exe`, and generated fresh MSI/NSIS
   bundles.
 
@@ -117,7 +117,7 @@ npm.cmd run desktop:preflight
 
 npm.cmd run desktop:ui-smoke
   passed; Release EXE runtime reported
-  `pid=74620 settings=ok`, detail coverage for English, Spanish, French, and
+  `pid=53332 settings=ok`, detail coverage for English, Spanish, French, and
   Russian sound units, routes `/drill`, `/drill/word`, `/drill/sentence`,
   `/drill/contrast`, `/drill/prosody`, `/drill/perception`, `/drill/evidence`,
   `/drill/pack/ee-ih`, `/drill/scenarios`, `/drill/spontaneous`,
@@ -130,11 +130,11 @@ npm.cmd run desktop:ui-smoke
 
 npm.cmd run desktop:launch-release
   passed; command printed `SpeakRight release desktop app launch requested`,
-  the Release EXE path, PID `31316`, and the no-localhost reminder; the Release
+  the Release EXE path, PID `67300`, and the no-localhost reminder; the Release
   EXE opened from `src-tauri\target\release\speakright.exe`.
 
 process cleanup
-  `Get-Process -Id 31316` confirmed `running pid=31316 name=speakright`; the
+  `Get-Process -Id 67300` confirmed `running pid=67300 name=speakright`; the
   process was stopped afterward, and no residual `speakright.exe` remained
   after cleanup
 ```
