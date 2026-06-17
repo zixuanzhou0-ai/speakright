@@ -115,6 +115,18 @@ describe("multilingual Azure phoneme map parity", () => {
     ).toBe(64);
     expect(
       getPhonemeAccuracy(
+        result([{ phoneme: "tʲ", accuracyScore: 75 }]),
+        "ru-t-tj",
+      ),
+    ).toBe(75);
+    expect(
+      getPhonemeAccuracy(
+        result([{ phoneme: "d", accuracyScore: 68 }]),
+        "ru-d-dj",
+      ),
+    ).toBe(68);
+    expect(
+      getPhonemeAccuracy(
         result([{ phoneme: "pʲ", accuracyScore: 72 }]),
         "ru-p-pj",
       ),
@@ -149,6 +161,7 @@ describe("multilingual Azure phoneme map parity", () => {
     expect(getPhonemeAudioUrl("k", "es-ES")).toBeNull();
     expect(getPhonemeAudioUrl("p", "fr-FR")).toBeNull();
     expect(getPhonemeAudioUrl("tʲ", "ru-RU")).toBeNull();
+    expect(getPhonemeAudioUrl("dʲ", "ru-RU")).toBeNull();
     expect(getPhonemeAudioUrl("pʲ", "ru-RU")).toBeNull();
     expect(getPhonemeAudioUrl("v", "ru-RU")).toBeNull();
     expect(getPhonemeAudioUrl("ʐ", "ru-RU")).toBeNull();

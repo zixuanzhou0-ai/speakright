@@ -106,6 +106,8 @@ const russianHardSoftExactUnits = [
 ];
 const russianHardSoftUnits = [
   ...russianHardSoftExactUnits,
+  "ru-t-tj",
+  "ru-d-dj",
   "ru-p-pj",
   "ru-b-bj",
   "ru-m-mj",

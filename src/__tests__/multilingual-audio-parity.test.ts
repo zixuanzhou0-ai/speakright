@@ -122,13 +122,13 @@ describe("multilingual audio parity contract", () => {
     expect(report.targetItemsPerUnit).toBe(
       MULTILINGUAL_AUDIO_PARITY_TARGET_PER_UNIT,
     );
-    expect(report.totals.soundUnits).toBe(99);
+    expect(report.totals.soundUnits).toBe(101);
     expect(report.totals.requiredItems).toBe(
-      99 * MULTILINGUAL_AUDIO_PARITY_TARGET_PER_UNIT,
+      101 * MULTILINGUAL_AUDIO_PARITY_TARGET_PER_UNIT,
     );
     expect(report.totals.existingAudioItems).toBe(2888);
-    expect(report.totals.missingAudioItems).toBe(688);
-    expect(report.totals.estimatedNewCharacters).toBe(5832);
+    expect(report.totals.missingAudioItems).toBe(720);
+    expect(report.totals.estimatedNewCharacters).toBe(6200);
 
     const spanishReport = report.languages.find(
       (language) => language.languageId === "es-ES",
@@ -169,7 +169,15 @@ describe("multilingual audio parity contract", () => {
       russianReport?.units
         .filter((unit) => unit.missingAudioTexts.length > 0)
         .map((unit) => unit.slug),
-    ).toEqual(["ru-p-pj", "ru-b-bj", "ru-m-mj", "ru-f-fj", "ru-v-vj"]);
+    ).toEqual([
+      "ru-t-tj",
+      "ru-d-dj",
+      "ru-p-pj",
+      "ru-b-bj",
+      "ru-m-mj",
+      "ru-f-fj",
+      "ru-v-vj",
+    ]);
   });
 
   it("keeps existing language pack manifest entries pointing to real files", () => {

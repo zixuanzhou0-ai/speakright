@@ -82,6 +82,8 @@ export const REQUIRED_RUSSIAN_UNITS = [
   "ru-u",
   "ru-hard-soft",
   "ru-soft-t-d",
+  "ru-t-tj",
+  "ru-d-dj",
   "ru-soft-s-z",
   "ru-soft-n-l-r",
   "ru-soft-labials",

@@ -585,6 +585,20 @@ const RUSSIAN_INVENTORY_BASE: PhonologyInventoryBaseEntry[] = [
     ["Proxy anchor only; exact per-segment soft stop clips are incomplete."],
   ),
   row(
+    "ru-t-tj",
+    "contrast",
+    "Hard/soft coronal stop contrast /t tʲ/.",
+    [...RUSSIAN_CORE_SOURCES, "wiktionary-ru-pronunciation-appendix"],
+    ["No verified exact single-segment /t/ or /tʲ/ short clip is bundled yet."],
+  ),
+  row(
+    "ru-d-dj",
+    "contrast",
+    "Hard/soft voiced coronal stop contrast /d dʲ/.",
+    [...RUSSIAN_CORE_SOURCES, "wiktionary-ru-pronunciation-appendix"],
+    ["No verified exact single-segment /d/ or /dʲ/ short clip is bundled yet."],
+  ),
+  row(
     "ru-soft-s-z",
     "contrast",
     "Hard/soft sibilant contrast /s sʲ z zʲ/.",
@@ -759,7 +773,7 @@ export const LANGUAGE_PHONOLOGY_GAPS: Record<
       label: "complete hard/soft consonant pairs",
       layer: "contrast",
       reason:
-        "Russian hard/soft consonants are systemic. The first standalone labial pair anchors now exist, but the full per-consonant exact audio inventory is still incomplete.",
+        "Russian hard/soft consonants are systemic. The first standalone stop and labial pair anchors now exist, but the full per-consonant exact audio inventory is still incomplete.",
       expectedBeforeStable: true,
       sourceRefs: RUSSIAN_CORE_SOURCES,
     },

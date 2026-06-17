@@ -365,6 +365,8 @@ export const phonemeAssessmentAliases: AssessmentAliasMap = {
     "vʲ",
   ],
   "ru-soft-t-d": ["tʲ", "dʲ"],
+  "ru-t-tj": ["t", "tʲ"],
+  "ru-d-dj": ["d", "dʲ"],
   "ru-soft-s-z": ["sʲ", "zʲ"],
   "ru-soft-n-l-r": ["nʲ", "lʲ", "rʲ"],
   "ru-soft-labials": ["pʲ", "bʲ", "mʲ", "fʲ", "vʲ"],

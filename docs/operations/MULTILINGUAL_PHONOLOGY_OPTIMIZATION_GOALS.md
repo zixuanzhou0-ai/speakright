@@ -53,10 +53,10 @@ local header clips before they can become clickable scoring-tile audio.
 Russian goal: vowels including `/ɨ/`, source-backed hard/soft consonant pairs,
 always-hard and always-soft consonants, mobile stress, vowel reduction, final
 devoicing, regressive voicing assimilation, iotated vowels, soft sign behavior,
-and clusters. The first standalone labial hard/soft pair anchors
-`/p pʲ b bʲ m mʲ f fʲ v vʲ/` now exist as score-only contrast units, but
-Russian still is not a full inventory and the new pair anchors do not have
-verified short local header clips.
+and clusters. The first standalone stop and labial hard/soft pair anchors
+`/t tʲ d dʲ p pʲ b bʲ m mʲ f fʲ v vʲ/` now exist as score-only contrast
+units, but Russian still is not a full inventory and the new pair anchors do
+not have verified short local header clips.
 
 ## Implementation Goals
 

@@ -33,6 +33,8 @@ type ResourceBackedPhoneme = PhonemeData & {
 
 const NON_ENGLISH_LANGUAGES: LanguageId[] = ["es-ES", "fr-FR", "ru-RU"];
 const RUSSIAN_SCORE_ONLY_LOCAL_ASSET_GAPS = [
+  "ru-t-tj",
+  "ru-d-dj",
   "ru-p-pj",
   "ru-b-bj",
   "ru-m-mj",
@@ -204,6 +206,8 @@ describe("non-English phoneme resource parity", () => {
       "ru-soft-s-z",
       "ru-soft-n-l-r",
       "ru-soft-labials",
+      "ru-t-tj",
+      "ru-d-dj",
       "ru-p-pj",
       "ru-b-bj",
       "ru-m-mj",

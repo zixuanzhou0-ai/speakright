@@ -220,6 +220,8 @@ export const LANGUAGE_SOUND_UNIT_GROUPS: Record<
       slugs: [
         "ru-hard-soft",
         "ru-soft-t-d",
+        "ru-t-tj",
+        "ru-d-dj",
         "ru-soft-s-z",
         "ru-soft-n-l-r",
         "ru-soft-labials",

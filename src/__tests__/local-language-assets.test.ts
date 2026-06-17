@@ -14,6 +14,8 @@ function publicDiskPath(publicPath: string): string {
 }
 
 const RUSSIAN_SCORE_ONLY_LOCAL_ASSET_GAPS = [
+  "ru-t-tj",
+  "ru-d-dj",
   "ru-p-pj",
   "ru-b-bj",
   "ru-m-mj",

@@ -524,11 +524,12 @@ git status --short --branch
   before pauses or voiceless consonants, but connected speech before voiced
   consonants, sonorants, or vowels must be treated as connected-speech
   realization rather than isolated word-final devoicing.
-- Russian now exposes the first standalone hard/soft labial pair anchors:
-  `ru-p-pj`, `ru-b-bj`, `ru-m-mj`, `ru-f-fj`, and `ru-v-vj`. They are
-  source-backed score-only contrast units with diagnostic, contrast, and
-  sentence deck coverage; they intentionally have no clickable single-segment
-  audio until verified short local header clips are added.
+- Russian now exposes the first standalone hard/soft stop and labial pair
+  anchors: `ru-t-tj`, `ru-d-dj`, `ru-p-pj`, `ru-b-bj`, `ru-m-mj`, `ru-f-fj`,
+  and `ru-v-vj`. They are source-backed score-only contrast units with
+  diagnostic, contrast, and sentence deck coverage; they intentionally have no
+  clickable single-segment audio until verified short local header clips are
+  added.
 - French and Russian language-pack manifest IPA metadata now matches the same
   applied reviewed findings as the course/audit corpus for `l'homme écoute`,
   `l'école ouvre`, `друг дома`, `город большой`, `нож острый`, `снег идёт`,
@@ -669,13 +670,13 @@ Start with the Release EXE and inspect these areas before adding new features:
   `docs/operations/non-english-ipa-audit-input.json`. A local generated copy may
   also exist at
   `E:/SpeakRightDesktopRepo/src-tauri/target/ipa-audit/non-english-ipa-audit-input.json`.
-  It now contains the final expanded UI corpus with `2312` rows: Spanish `660`,
-  French `911`, Russian `741`. The earlier `988`-row file covered only base
+  It now contains the final expanded UI corpus with `2360` rows: Spanish `660`,
+  French `911`, Russian `789`. The earlier `988`-row file covered only base
   sound-unit arrays.
 - The audit input is now reproducible with `npm.cmd run ipa:audit:export`.
   Rows include `auditRole`: `ipa-transcription` for real IPA rows and
   `deck-focus-hint` for `language-learning-decks` sentence `ipaHint` rows. The
-  current export contains `2312` total rows and marks `36` deck focus
+  current export contains `2360` total rows and marks `36` deck focus
   hints so GPT Research does not mistake compact cues such as `/s sʲ zʲ/` for
   complete sentence IPA. Recent source-synced rows also replaced generic
   `elision + nasal vowels` / `clusters` sentence labels with full IPA for
@@ -694,7 +695,7 @@ Start with the Release EXE and inspect these areas before adding new features:
   realization-layer IPA in learner-facing keyword rows. The code now normalizes
   final Spanish keyword IPA to the phoneme layer while preserving allophone
   teaching labels, assessment aliases, and exact header clips for scoring.
-- Remaining audit work: continue from the new `2312`-row final UI corpus and
+- Remaining audit work: continue from the new `2360`-row final UI corpus and
   ask GPT Research for a full row-level table, especially for French schwa
   style variants and Russian broad-vs-finer accepted variants.
 - Second GPT Research pass was applied for high-confidence rows:

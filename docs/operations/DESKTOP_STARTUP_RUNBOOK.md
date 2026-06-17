@@ -535,7 +535,7 @@ policy.
   `docs/operations/IPA_DISPLAY_AUDIT_STRATEGY.md`. The non-English audit input
   generated from the current source data is tracked at
   `docs/operations/non-english-ipa-audit-input.json` with the final expanded UI
-  corpus: `2312` rows, Spanish `660`, French `911`, Russian `741`. A generated
+  corpus: `2360` rows, Spanish `660`, French `911`, Russian `789`. A generated
   local copy may also exist in `src-tauri/target/ipa-audit/`. Use the prompt in
   that document for GPT Research or expert review before changing IPA strings
   in bulk.

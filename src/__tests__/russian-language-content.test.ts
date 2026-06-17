@@ -24,8 +24,10 @@ describe("Russian pronunciation content", () => {
     expect(audit.russianKeywordsWithoutStress).toEqual([]);
   });
 
-  it("adds standalone Russian hard-soft labial pair anchors without claiming mastery coverage", () => {
+  it("adds standalone Russian hard-soft pair anchors without claiming mastery coverage", () => {
     for (const [slug, expectedIpa] of [
+      ["ru-t-tj", "/t tʲ/"],
+      ["ru-d-dj", "/d dʲ/"],
       ["ru-p-pj", "/p pʲ/"],
       ["ru-b-bj", "/b bʲ/"],
       ["ru-m-mj", "/m mʲ/"],
