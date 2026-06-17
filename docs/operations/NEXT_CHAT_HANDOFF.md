@@ -214,6 +214,10 @@ git status --short --branch
   weakness cards now render every item from their already bounded source lists,
   instead of re-capping the page to the first two review tasks or first three
   active weaknesses.
+- Advanced transfer practice now keeps generated practice targets visible:
+  `/drill/scenarios` renders every `plan.targetWords` badge, and
+  `/drill/prosody` renders every `exercise.weakWords` badge instead of applying
+  extra page-level caps.
 - Diagnosis reports now render every generated issue card from the bounded
   diagnosis-engine issue list instead of showing only the first three; the
   section is labeled `学习处方与补测` rather than `Top 3`. Each issue card also

@@ -46,6 +46,9 @@ import {
   type ProsodyAnalysis,
 } from "@/lib/prosody-training";
 
+const WRAP_SAFE_BADGE_CLASS =
+  "max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]";
+
 export default function ProsodyPage() {
   const { languageId } = useLanguageConfig();
   const languageProfile = getLanguageProfile(languageId);
@@ -243,16 +246,17 @@ export default function ProsodyPage() {
                   <Badge
                     key={word}
                     variant="secondary"
-                    className="max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]"
+                    className={WRAP_SAFE_BADGE_CLASS}
                   >
                     重读 {word}
                   </Badge>
                 ))}
-                {exercise.weakWords.slice(0, 4).map((word) => (
+                {exercise.weakWords.map((word) => (
                   <Badge
                     key={word}
                     variant="outline"
-                    className="max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]"
+                    className={WRAP_SAFE_BADGE_CLASS}
+                    data-smoke="prosody-weak-word-badge"
                   >
                     弱读 {word}
                   </Badge>

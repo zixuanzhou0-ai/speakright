@@ -20,6 +20,7 @@ claimed as complete.
 | Diagnosis reports keep generated issues and evidence visible instead of re-summarizing them in the component | `src/components/assessment/assessment-report.tsx`, `src/__tests__/assessment-report.test.tsx`, `src/__tests__/desktop-preflight-ui-smoke.test.ts`; after the diagnosis engine builds its bounded issue, per-issue evidence, and `rawEvidence` lists, the report renders every generated `assessment-report-issue-card`, every `assessment-report-issue-evidence` row, every generated evidence row with `assessment-report-evidence-row`, and every `errorPatternId` badge, rather than slicing the component view to the first 3 issues, first issue-evidence row, first 8 evidence rows, or first 2 pattern IDs |
 | Training evidence pages keep generated evidence, pattern, and remediation lists complete | `src/app/drill/evidence/page.tsx`, `src/__tests__/training-evidence-page.test.tsx`, `src/__tests__/desktop-preflight-ui-smoke.test.ts`; after `buildTrainingEvidenceBook` builds its sorted evidence book, the page renders every `evidence-card-row`, `evidence-pattern-row`, and `evidence-remediation-row`, rather than slicing the component view to the first 8 evidence cards, 6 patterns, or 6 remediation records |
 | Drill landing review queue and training memory keep actionable tasks visible | `src/app/drill/page.tsx`, `src/lib/review-queue.ts`, `src/lib/training-memory.ts`, `src/__tests__/desktop-preflight-ui-smoke.test.ts`; after `buildReviewQueue` and `buildTrainingMemory` bound their source lists, the drill landing page renders every `drill-review-task-card`, merged `drill-today-item-card`, and `drill-memory-weakness-card`, rather than applying a second `slice(0, 2)` cap to review/today tasks or `activeWeaknesses.slice(0, 3)` to training-memory weaknesses |
+| Advanced transfer pages keep generated practice target lists visible | `src/app/drill/scenarios/page.tsx`, `src/app/drill/prosody/page.tsx`, `src/lib/transfer-scenarios.ts`, `src/lib/prosody-training.ts`, `src/__tests__/desktop-preflight-ui-smoke.test.ts`; scenario practice renders every `scenario-target-word-badge` from `plan.targetWords`, and prosody practice renders every `prosody-weak-word-badge` from `exercise.weakWords`, rather than applying second UI caps with `plan.targetWords.slice(0, 8)` or `exercise.weakWords.slice(0, 4)` |
 | Progress training history keeps retained sessions visible | `src/app/progress/page.tsx`, `src/lib/mastery-profile.ts`, `src/__tests__/progress-page.test.tsx`, `src/__tests__/desktop-preflight-ui-smoke.test.ts`; after `recordTrainingSession` applies the local storage retention limit to the latest 80 sessions, the Progress page renders every retained `profile.sessions` row and shows `progress-session-count`, rather than applying a second `slice(0, 6)` UI cap |
 | Non-English rule units without local target audio do not show clickable speaker buttons | `src/lib/language-source-alignment.ts`, `src/components/phoneme/phoneme-study-card.tsx`, `src/components/drill/drill-phoneme-lesson.tsx`, `src/components/phoneme/phoneme-card.tsx`, `src/__tests__/phoneme-study-card.test.tsx`, `src/__tests__/language-source-alignment.test.ts`, `scripts/desktop-ui-smoke.mjs` |
 | Proxy or generic videos are not presented as exact teaching videos | `src/lib/language-source-alignment.ts`, `src/lib/language-teaching-videos.ts`, `src/components/phoneme/video-player.tsx`, `src/components/drill/drill-phoneme-lesson.tsx`, `src/__tests__/language-teaching-videos.test.ts`, `src/__tests__/video-player.test.tsx`, `src/__tests__/desktop-preflight-ui-smoke.test.ts`, `scripts/desktop-ui-smoke.mjs`; local teaching lessons take priority over external fallback cards, and when no precise local video is available the fallback panel renders every `video-fallback-resource-card` from `resources` rather than applying a second `resources.slice(0, 3)` cap |
@@ -79,18 +80,17 @@ Latest local full gate recorded in this audit:
 ```text
 git status --short --branch
   initial gate status before this round's edits was
-  `## main...origin/main [ahead 96]`; the current full gate was run with the
-  video fallback resource full-list rendering fix and evidence updates
-  still unstaged, so `desktop:preflight` correctly reported `Git: dirty`. After
+  `## main...origin/main [ahead 97]`; the current full gate was run with the
+  advanced transfer target-list full-rendering fix and evidence updates still
+  unstaged, so `desktop:preflight` correctly reported `Git: dirty`. After
   GitHub API fallback pushes, verify the GitHub `main` ref and local-vs-remote
   tree SHA before treating content as unpushed.
 
-npm.cmd run test -- src/__tests__/video-player.test.tsx src/__tests__/desktop-preflight-ui-smoke.test.ts
-  2 files / 29 tests passed; the video fallback panel renders every external
-  resource card when no precise local video is available, exposes
-  `video-fallback-resource-card`, and the static smoke guard rejects
-  `resources.slice(0, 3)` while preserving local teaching lessons as the
-  priority path.
+npm.cmd run test -- src/__tests__/desktop-preflight-ui-smoke.test.ts
+  1 file / 20 tests passed; scenario transfer renders every
+  `plan.targetWords` badge, prosody transfer renders every `exercise.weakWords`
+  badge, and the static smoke guard rejects `plan.targetWords.slice(0, 8)` plus
+  `exercise.weakWords.slice(0, 4)`.
 
 npm.cmd run test
   125 files / 710 tests passed
@@ -106,7 +106,7 @@ npm.cmd run build:desktop-frontend
 
 npm.cmd run desktop:build
   passed; reran `build:desktop-frontend`, generated 144 static pages, compiled
-  the Tauri release app in 5m 24s, built
+  the Tauri release app in 4m 56s, built
   `src-tauri\target\release\speakright.exe`, and generated fresh MSI/NSIS
   bundles.
 
@@ -117,7 +117,7 @@ npm.cmd run desktop:preflight
 
 npm.cmd run desktop:ui-smoke
   passed; Release EXE runtime reported
-  `pid=53332 settings=ok`, detail coverage for English, Spanish, French, and
+  `pid=59652 settings=ok`, detail coverage for English, Spanish, French, and
   Russian sound units, routes `/drill`, `/drill/word`, `/drill/sentence`,
   `/drill/contrast`, `/drill/prosody`, `/drill/perception`, `/drill/evidence`,
   `/drill/pack/ee-ih`, `/drill/scenarios`, `/drill/spontaneous`,
@@ -130,11 +130,11 @@ npm.cmd run desktop:ui-smoke
 
 npm.cmd run desktop:launch-release
   passed; command printed `SpeakRight release desktop app launch requested`,
-  the Release EXE path, PID `67300`, and the no-localhost reminder; the Release
+  the Release EXE path, PID `46348`, and the no-localhost reminder; the Release
   EXE opened from `src-tauri\target\release\speakright.exe`.
 
 process cleanup
-  `Get-Process -Id 67300` confirmed `running pid=67300 name=speakright`; the
+  `Get-Process -Id 46348` confirmed `running pid=46348 name=speakright`; the
   process was stopped afterward, and no residual `speakright.exe` remained
   after cleanup
 ```

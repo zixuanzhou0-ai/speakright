@@ -247,11 +247,12 @@ export default function ScenariosPage() {
                 {plan.coachingFocus}
               </p>
               <div className="mt-3 flex flex-wrap justify-center gap-2">
-                {plan.targetWords.slice(0, 8).map((word) => (
+                {plan.targetWords.map((word) => (
                   <Badge
                     key={word}
                     variant="secondary"
                     className="max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]"
+                    data-smoke="scenario-target-word-badge"
                   >
                     {word}
                   </Badge>

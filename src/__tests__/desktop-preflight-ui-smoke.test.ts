@@ -912,6 +912,9 @@ describe("desktop preflight and UI smoke", () => {
     expectSmokeAlertWraps(prosodyPage, "prosody-local-save-warning");
     expect(prosodyPage).toContain('data-smoke="prosody-page"');
     expect(prosodyPage).toContain('data-smoke="prosody-exercise-header"');
+    expect(prosodyPage).toContain("exercise.weakWords.map");
+    expect(prosodyPage).toContain('data-smoke="prosody-weak-word-badge"');
+    expect(prosodyPage).not.toContain("exercise.weakWords.slice(0, 4)");
     expect(prosodyPage).toContain(
       "flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between",
     );
@@ -945,6 +948,9 @@ describe("desktop preflight and UI smoke", () => {
     expect(scenariosPage).toContain("min-w-0 flex-1");
     expect(scenariosPage).toContain("WRAP_SAFE_ACTION_BUTTON_CLASS");
     expect(scenariosPage).toContain("WRAP_SAFE_BADGE_CLASS");
+    expect(scenariosPage).toContain("plan.targetWords.map");
+    expect(scenariosPage).toContain('data-smoke="scenario-target-word-badge"');
+    expect(scenariosPage).not.toContain("plan.targetWords.slice(0, 8)");
     expect(scenariosPage).toContain('data-smoke="scenario-kind-badge"');
     expect(scenariosPage).toContain(
       'data-smoke="scenario-evidence-score-badge"',
