@@ -1,8 +1,19 @@
 import type { CoachMode } from "@/lib/api-keys";
-import { buildLanguageFeedbackPromptContext } from "@/lib/language-feedback-rules";
+import {
+  buildLanguageFeedbackPromptContext,
+  matchLanguageFeedbackRules,
+} from "@/lib/language-feedback-rules";
+import {
+  getLanguageDeckFeedbackRuleMatches,
+  type DeckLanguageId,
+} from "@/lib/language-learning-decks";
 import { isSentence } from "@/lib/utils";
 import type { LanguageId } from "@/types/language";
 import type { AzureAssessmentResult } from "@/types/azure";
+
+export interface FeedbackPromptOptions {
+  targetUnitSlugs?: string[];
+}
 
 const COACH_PERSONAS: Record<CoachMode, string> = {
   easy: `你是一位友善包容的目标语言发音教练，像一个热情的外国朋友。
@@ -40,6 +51,127 @@ const LANGUAGE_COACH_CONTEXT: Record<LanguageId, string> = {
   "ru-RU": `当前练习语言：俄语 ru-RU。
 你必须按俄语体系解释，不能把英语发音规则套进来。重点关注重音与元音弱化、/ɨ/ vs /i/、硬/软辅音、词尾清化、清浊同化、辅音丛、颤音 /r/、ш/ж/ч/щ/ц。俄语重音、弱化、同化和辅音丛是上下文/序列级目标，不应被单个音素分数直接证明。`,
 };
+
+function asDeckLanguageId(languageId: LanguageId): DeckLanguageId | null {
+  return languageId === "es-ES" ||
+    languageId === "fr-FR" ||
+    languageId === "ru-RU"
+    ? languageId
+    : null;
+}
+
+function normalizePracticeText(text: string): string {
+  return text
+    .trim()
+    .toLocaleLowerCase()
+    .normalize("NFD")
+    .replace(/\p{Mark}/gu, "")
+    .replace(/[’‘]/g, "'")
+    .replace(/[‐‑‒–—]/g, "-")
+    .replace(/[^\p{L}\p{N}'~\-\s]/gu, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function buildTargetedLanguageFeedbackPromptContext(
+  languageId: LanguageId,
+  target: string,
+  options: FeedbackPromptOptions,
+): string {
+  const deckLanguageId = asDeckLanguageId(languageId);
+  if (!deckLanguageId) return "";
+
+  const ruleSummaries = new Map<
+    string,
+    {
+      title: string;
+      matchedSlugs: Set<string>;
+      evidence: Set<string>;
+      guidance: string;
+      practiceCue: string;
+    }
+  >();
+
+  const addRule = ({
+    id,
+    title,
+    matchedSlugs,
+    evidence,
+    guidance,
+    practiceCue,
+  }: {
+    id: string;
+    title: string;
+    matchedSlugs: string[];
+    evidence: string;
+    guidance: string;
+    practiceCue: string;
+  }) => {
+    const existing = ruleSummaries.get(id);
+    if (existing) {
+      for (const slug of matchedSlugs) existing.matchedSlugs.add(slug);
+      existing.evidence.add(evidence);
+      return;
+    }
+
+    ruleSummaries.set(id, {
+      title,
+      matchedSlugs: new Set(matchedSlugs),
+      evidence: new Set([evidence]),
+      guidance,
+      practiceCue,
+    });
+  };
+
+  const explicitSlugs = options.targetUnitSlugs?.filter(Boolean) ?? [];
+  if (explicitSlugs.length > 0) {
+    for (const { rule, matchedSlugs } of matchLanguageFeedbackRules(
+      deckLanguageId,
+      explicitSlugs,
+    )) {
+      addRule({
+        id: rule.id,
+        title: rule.title,
+        matchedSlugs,
+        evidence: `target slugs: ${matchedSlugs.join(", ")}`,
+        guidance: rule.guidance,
+        practiceCue: rule.practiceCue,
+      });
+    }
+  }
+
+  const normalizedTarget = normalizePracticeText(target);
+  for (const entry of getLanguageDeckFeedbackRuleMatches(deckLanguageId)) {
+    if (normalizePracticeText(entry.text) !== normalizedTarget) continue;
+    for (const matchedRule of entry.matchedRules) {
+      const [ruleMatch] = matchLanguageFeedbackRules(
+        deckLanguageId,
+        matchedRule.matchedSlugs,
+      ).filter(({ rule }) => rule.id === matchedRule.id);
+      if (!ruleMatch) continue;
+      addRule({
+        id: ruleMatch.rule.id,
+        title: ruleMatch.rule.title,
+        matchedSlugs: matchedRule.matchedSlugs,
+        evidence: `${entry.entryType}: ${entry.text}`,
+        guidance: ruleMatch.rule.guidance,
+        practiceCue: ruleMatch.rule.practiceCue,
+      });
+    }
+  }
+
+  if (ruleSummaries.size === 0) return "";
+
+  return [
+    "",
+    "## 当前练习材料命中的专项规则",
+    "- 这些规则来自当前目标发音单位或已审计 deck 条目；只有 Azure 结果提供证据时，才能把它们写成诊断结论。",
+    ...Array.from(ruleSummaries.entries()).map(
+      ([id, rule]) =>
+        `- ${id} · ${rule.title} (${Array.from(rule.matchedSlugs).join(", ")}; evidence: ${Array.from(rule.evidence).join(" | ")}): ${rule.guidance} 练习提示：${rule.practiceCue}`,
+    ),
+  ].join("\n");
+}
 
 function buildEvidenceBoundaryContext(languageId: LanguageId): string {
   const nonEnglish =
@@ -298,10 +430,13 @@ export function buildFeedbackPrompt(
   mode: "phoneme" | "sentence" = "phoneme",
   coachMode: CoachMode = "normal",
   languageId: LanguageId = "en-US",
+  options: FeedbackPromptOptions = {},
 ): string {
   const azureJson = JSON.stringify(azureResult, null, 2);
   const sentenceMode = isSentence(target);
   const languageRulesContext = buildLanguageFeedbackPromptContext(languageId);
+  const targetedLanguageRulesContext =
+    buildTargetedLanguageFeedbackPromptContext(languageId, target, options);
   const languageCoachContext = LANGUAGE_COACH_CONTEXT[languageId];
   const evidenceBoundaryContext = buildEvidenceBoundaryContext(languageId);
   const isEnglish = languageId === "en-US";
@@ -341,6 +476,7 @@ ${evidenceBoundaryContext}
 练习模式：${mode}（phoneme = 单词练习，sentence = 句子练习）
 ${mode === "phoneme" ? "注意：用户正在练习单个单词。请只针对当前语言中的发音单位给出指导，包括舌位、口型、气流、声带和中文母语者常见迁移；不要套用其他语言的发音规则。" : ""}
 Azure 发音评估结果：${azureJson}
+${targetedLanguageRulesContext}
 ${languageRulesContext}
 
 ## 评估结果字段说明（你必须完整利用以下所有字段）

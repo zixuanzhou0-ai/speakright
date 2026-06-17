@@ -3,6 +3,7 @@
 import { useCallback, useRef, useState } from "react";
 import { streamLlmFeedback } from "@/lib/api-client";
 import { getLlmConfig } from "@/lib/api-keys";
+import type { FeedbackPromptOptions } from "@/lib/llm-prompt";
 import { trackLlmUsage } from "@/lib/usage-tracker";
 import type { AzureAssessmentResult } from "@/types/azure";
 import type { LanguageId } from "@/types/language";
@@ -117,6 +118,7 @@ interface UseLlmFeedbackReturn {
     azureResult: AzureAssessmentResult,
     mode?: "phoneme" | "sentence",
     languageId?: LanguageId,
+    options?: FeedbackPromptOptions,
   ) => Promise<void>;
   feedback: FeedbackData;
   hasFeedback: boolean;
@@ -159,6 +161,7 @@ export function useLlmFeedback(): UseLlmFeedbackReturn {
       azureResult: AzureAssessmentResult,
       mode: "phoneme" | "sentence" = "phoneme",
       languageId: LanguageId = "en-US",
+      options: FeedbackPromptOptions = {},
     ) => {
       const config = getLlmConfig();
       if (!config) {
@@ -182,6 +185,7 @@ export function useLlmFeedback(): UseLlmFeedbackReturn {
           mode,
           controller.signal,
           languageId,
+          options,
         );
         const reader = stream.getReader();
         if (!reader) throw new Error("No response body");

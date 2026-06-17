@@ -14,7 +14,10 @@ import {
 import { parseAzureResult } from "@/lib/azure-speech";
 import { buildL1ErrorContext, matchL1Errors } from "@/lib/l1-error-patterns";
 import { getDesktopLlmPolicyError } from "@/lib/llm-providers";
-import { buildFeedbackPrompt } from "@/lib/llm-prompt";
+import {
+  buildFeedbackPrompt,
+  type FeedbackPromptOptions,
+} from "@/lib/llm-prompt";
 import { apiFetch } from "@/lib/tauri-http";
 import { isTauriEnvironment } from "@/lib/tauri-runtime";
 import { isSentence } from "@/lib/utils";
@@ -774,6 +777,7 @@ export function streamLlmFeedback(
   mode: "phoneme" | "sentence" = "phoneme",
   signal?: AbortSignal,
   languageId: LanguageId = "en-US",
+  options: FeedbackPromptOptions = {},
 ): ReadableStream<Uint8Array> {
   const encoder = new TextEncoder();
   const blockedReason = getBlockedDesktopLlmReason(config);
@@ -805,7 +809,14 @@ export function streamLlmFeedback(
       ? buildL1ErrorContext(matchL1Errors(allPhonemes))
       : "";
   const prompt =
-    buildFeedbackPrompt(target, azureResult, mode, getCoachMode(), languageId) +
+    buildFeedbackPrompt(
+      target,
+      azureResult,
+      mode,
+      getCoachMode(),
+      languageId,
+      options,
+    ) +
     l1Context;
   return new ReadableStream({
     async start(controller) {
