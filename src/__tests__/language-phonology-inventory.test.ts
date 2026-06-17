@@ -101,6 +101,9 @@ describe("language phonology inventory", () => {
     expect(getPhonologyInventoryEntry("fr-FR", "fr-un")?.layer).toBe(
       "contrast",
     );
+    expect(
+      getPhonologyInventoryEntry("fr-FR", "fr-phrase-final-prominence")?.layer,
+    ).toBe("prosody");
     expect(getPhonologyInventoryEntry("ru-RU", "ru-hard-soft")?.layer).toBe(
       "contrast",
     );
@@ -140,6 +143,7 @@ describe("language phonology inventory", () => {
       ["es-ES", "es-lexical-stress", "rule-only"],
       ["fr-FR", "fr-liaison", "rule-only"],
       ["fr-FR", "fr-final-consonant-silence", "rule-only"],
+      ["fr-FR", "fr-phrase-final-prominence", "rule-only"],
       ["ru-RU", "ru-hard-soft", "proxy-local-reference"],
       ["ru-RU", "ru-final-devoicing", "proxy-local-reference"],
       ["ru-RU", "ru-voicing-assimilation", "proxy-local-reference"],

@@ -57,6 +57,7 @@ describe("language sound unit groups", () => {
       "鼻化元音",
       "辅音与滑音",
       "连读/静音规则",
+      "短语韵律",
     ]);
   });
 

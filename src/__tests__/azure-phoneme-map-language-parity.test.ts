@@ -232,6 +232,7 @@ describe("multilingual Azure phoneme map parity", () => {
       "fr-final-consonant-silence",
       "fr-enchainement",
       "fr-elision",
+      "fr-phrase-final-prominence",
       "ru-stress-reduction",
       "ru-final-devoicing",
       "ru-voicing-assimilation",

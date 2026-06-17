@@ -65,13 +65,17 @@ E:\SpeakRightDesktopRepo\src-tauri\target\release\speakright.exe
   final-consonant silence. Final-consonant silence now uses `trop /tʁo/`, and
   the content audit rejects duplicate non-English reading targets inside one
   sound unit or one diagnostic/contrast/sentence deck section.
+- French now includes `fr-phrase-final-prominence` as an experimental
+  sentence/prosody unit for rhythmic-group final prominence. It is deliberately
+  score/rule guidance only: no Azure single-phoneme alias and no clickable
+  header/scoring tile audio until exact sentence-rhythm evidence exists.
 - The Russian final-devoicing local asset note is now explicitly marked as a
   proxy anchor and points maintainers to current `Нож тупой /noʂ tʊˈpoj/`
   practice instead of stale `current example друг` wording.
 - `audio:parity:dry-run` now reports explicit experimental audio gaps without
   generating audio: Spanish `880` existing / `214` missing, French `1090`
-  existing / `344` missing, Russian `918` existing / `226` missing, total
-  missing `784`, estimated `6774` characters. Do not generate ElevenLabs audio
+  existing / `392` missing, Russian `918` existing / `226` missing, total
+  missing `832`, estimated `7542` characters. Do not generate ElevenLabs audio
   unless the maintainer explicitly confirms after reviewing that dry-run.
 - Language-pack audio manifests now keep their IPA metadata aligned with the
   sourced reviewed findings for applied French connected-speech rows and Russian

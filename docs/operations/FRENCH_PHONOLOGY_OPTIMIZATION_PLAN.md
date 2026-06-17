@@ -71,7 +71,7 @@ Core content requirements:
 
 ## Current SpeakRight State
 
-Current `FRENCH_PHONEMES` contains 39 course sound units:
+Current `FRENCH_PHONEMES` contains 40 course sound units:
 
 - Vowels and nasal vowels: `fr-i`, `fr-y`, `fr-u`, `fr-e`, `fr-e-open`,
   `fr-eu-close`, `fr-eu-open`, `fr-an`, `fr-in`, `fr-on`, `fr-a`,
@@ -81,6 +81,8 @@ Current `FRENCH_PHONEMES` contains 39 course sound units:
   `fr-sh`, `fr-zh`, `fr-ny`, `fr-glide-j`, `fr-glide-hui`, `fr-glide-w`.
 - Phrase/rule units: `fr-liaison`, `fr-final-consonant-silence`,
   `fr-enchainement`, `fr-elision`.
+- Prosody unit: `fr-phrase-final-prominence`, a sentence/rhythmic-group target
+  for phrase-final prominence rather than English-style lexical stress.
 
 Current exact scoring-tile audio:
 
@@ -91,8 +93,8 @@ Current exact scoring-tile audio:
 - Common consonants `/p b t d k g f v s z m n l/` are now standalone course
   units, but they still have no verified short local header clips.
 
-This is a strong experimental French-specific anchor set, but it is not a full
-French phoneme inventory.
+This is a strong experimental French-specific anchor set, but it is not a
+stable/mastery-ready French phonology module.
 
 ## Target Data Model
 
@@ -134,7 +136,8 @@ French needs explicit layer separation:
 
 4. Prosody
    - Add a French sentence-rhythm unit: phrase-final accent, not English lexical
-     stress.
+     stress. Done in source as `fr-phrase-final-prominence`; exact sentence-
+     rhythm evidence audio remains pending and unclickable.
    - Update feedback rules so learners are not asked to stress every content word
      as in English.
 
@@ -151,8 +154,9 @@ French audio must follow the existing honest-playback rule:
 - Exact clips may be clickable only when the audio is a verified short
   `/audio/language-assets/fr-FR/header-clips/*.m4a` clip tied to the same sound
   unit.
-- Rule units such as liaison, enchainement, elision, and final consonant silence
-  must not expose a single-symbol tile speaker.
+- Rule/prosody units such as liaison, enchainement, elision, final consonant
+  silence, and phrase-final prominence must not expose a single-symbol tile
+  speaker.
 - If a rule has a sentence demo later, label it "短语/句子示范", not "音标发音".
 - Common consonants whose exact local clips are not yet verified should show
   labels and scores but stay unclickable.
@@ -207,4 +211,4 @@ French is ready to move from experimental content toward public beta only when:
 - All clickable speakers use exact local short clips.
 - French feedback does not impose English stress or English rhotic assumptions.
 - Tests lock liaison, enchainement, elision, schwa, final consonant silence, and
-  nasal-vowel behavior.
+  phrase-final prominence alongside nasal-vowel behavior.

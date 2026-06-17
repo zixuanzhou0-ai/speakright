@@ -34,6 +34,7 @@ describe("language feedback rules", () => {
       "fr-final-consonant-silence",
       "fr-liaison",
       "fr-elision",
+      "fr-phrase-final-prominence",
     ]);
     const ids = matches.map((match) => match.rule.id);
 
@@ -44,9 +45,11 @@ describe("language feedback rules", () => {
         "french-uvular-r-replaced",
         "french-final-consonant-silence",
         "french-liaison-enchainement-elision",
+        "french-phrase-final-prominence",
       ]),
     );
     expect(buildLanguageFeedbackPromptContext("fr-FR")).toContain("nasal");
+    expect(buildLanguageFeedbackPromptContext("fr-FR")).toContain("节奏组");
   });
 
   it("defines Russian guidance for stress, reduction, palatalization, devoicing, assimilation, clusters, and sh/ch/shch", () => {

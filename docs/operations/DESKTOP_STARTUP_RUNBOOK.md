@@ -208,7 +208,7 @@ the release-readiness or user-testing entrypoint.
   `npm run audio:parity:dry-run`; the target is 24 practice items per sound
   unit with two local voice files per item, and the latest report explicitly
   lists experimental gaps instead of generating audio: Spanish `214` missing,
-  French `344` missing, Russian `226` missing, total `784`, estimated `6774`
+  French `392` missing, Russian `226` missing, total `832`, estimated `7542`
   characters.
 - Multilingual audio packs are not installed from Settings anymore.
 - Local articulation/video assets live under `public/videos/language-assets/`.
@@ -524,8 +524,8 @@ policy.
     `narrowViewport=ok`, `lowHeightViewport=ok`, and
     `releaseServedFromDevServer=false`.
   - `npm.cmd run audio:parity:dry-run`: Spanish `880` existing / `214`
-    missing, French `1090` existing / `344` missing, Russian `918` existing /
-    `226` missing, total missing `784`, estimated `6774` characters, no
+    missing, French `1090` existing / `392` missing, Russian `918` existing /
+    `226` missing, total missing `832`, estimated `7542` characters, no
     ElevenLabs calls.
   - Latest recorded `npm.cmd run audio:loudness:dry-run`: reference video mean `-14.7 dB`,
     word floor `-21.6 dB`; representative English, Spanish, French, Russian
@@ -537,7 +537,7 @@ policy.
   `docs/operations/IPA_DISPLAY_AUDIT_STRATEGY.md`. The non-English audit input
   generated from the current source data is tracked at
   `docs/operations/non-english-ipa-audit-input.json` with the final expanded UI
-  corpus: `2432` rows, Spanish `732`, French `911`, Russian `789`. A generated
+  corpus: `2456` rows, Spanish `732`, French `935`, Russian `789`. A generated
   local copy may also exist in `src-tauri/target/ipa-audit/`. Use the prompt in
   that document for GPT Research or expert review before changing IPA strings
   in bulk.

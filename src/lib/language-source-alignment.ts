@@ -57,6 +57,8 @@ const RULE_SUMMARIES: Record<string, string> = {
     "很多法语词尾辅音在孤立词中不发音，但在派生形式或连读环境中可能重新出现。",
   "fr-schwa":
     "法语 schwa 是否发出受语速、地区和短语结构影响；不要把每个 e 都读成完整元音。",
+  "fr-phrase-final-prominence":
+    "法语突出通常落在节奏组最后一个可发音音节；不要像英语一样给每个内容词加词重音。",
   "ru-iotated-vowels":
     "я/е/ё/ю 在词首、元音后或 ь/ъ 后通常带 /j/；在辅音后主要标记前一个辅音软化。",
   "ru-final-devoicing":

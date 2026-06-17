@@ -74,6 +74,7 @@ export const REQUIRED_FRENCH_UNITS = [
   "fr-liaison",
   "fr-enchainement",
   "fr-elision",
+  "fr-phrase-final-prominence",
 ] as const;
 
 export const REQUIRED_RUSSIAN_UNITS = [

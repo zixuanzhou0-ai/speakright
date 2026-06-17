@@ -105,6 +105,12 @@ describe("language source alignment", () => {
     ).toBe(false);
     expect(
       shouldShowSoundUnitHeaderAudio(
+        "fr-FR",
+        unit("fr-FR", "fr-phrase-final-prominence"),
+      ),
+    ).toBe(false);
+    expect(
+      shouldShowSoundUnitHeaderAudio(
         "ru-RU",
         unit("ru-RU", "ru-final-devoicing"),
       ),
@@ -117,5 +123,16 @@ describe("language source alignment", () => {
     expect(alignment?.ruleSummary).toContain("停顿或清辅音前");
     expect(alignment?.ruleSummary).toContain("浊辅音、响音或元音前");
     expect(alignment?.ruleSummary).not.toContain("这不是拼写错误，而是词尾规则");
+  });
+
+  it("keeps French phrase-final prominence out of English lexical stress logic", () => {
+    const alignment = getSoundUnitSourceAlignment(
+      "fr-FR",
+      "fr-phrase-final-prominence",
+    );
+
+    expect(alignment?.ruleSummary).toContain("节奏组");
+    expect(alignment?.ruleSummary).toContain("不要像英语");
+    expect(alignment?.primaryVideoCoverage).not.toBe("exact");
   });
 });

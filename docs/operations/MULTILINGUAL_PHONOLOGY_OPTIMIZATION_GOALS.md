@@ -49,8 +49,10 @@ audio.
 French goal: oral vowels, nasal vowels, front rounded vowels, glides `/j ɥ w/`,
 uvular `/ʁ/`, common consonants, liaison, enchainement, elision, schwa, final
 consonant silence, and phrase-final prominence. Plain standalone
-`/p b t d k g f v s z m n l/` anchors now exist, but still need verified short
-local header clips before they can become clickable scoring-tile audio.
+`/p b t d k g f v s z m n l/` anchors now exist, and
+`fr-phrase-final-prominence` now exists as a sentence/prosody anchor; these
+still need verified exact local clips or sentence-rhythm evidence before any
+new scoring-tile audio can become clickable.
 
 Russian goal: vowels including `/ɨ/`, source-backed hard/soft consonant pairs,
 always-hard and always-soft consonants, mobile stress, vowel reduction, final

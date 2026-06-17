@@ -41,6 +41,8 @@ French `fr-FR`:
 - Word cards should show dictionary-style pronunciation.
 - Phrase and sentence cards may show connected-speech realization when liaison, enchainement, elision, schwa, or final-consonant behavior changes what the learner should say.
 - Rule units are training rules, not exact single-phoneme audio sources.
+- Phrase-final prominence is a sentence/prosody target, not an English-style
+  lexical-stress target and not a clickable single-phoneme audio source.
 
 2026-06-14 applied audit result:
 
@@ -113,10 +115,10 @@ A generated local copy may also exist at:
 `E:/SpeakRightDesktopRepo/src-tauri/target/ipa-audit/non-english-ipa-audit-input.json`
 
 It now contains the final expanded UI corpus rather than only the base source
-arrays. Current count: 2432 rows.
+arrays. Current count: 2456 rows.
 
 - `es-ES`: 732 rows
-- `fr-FR`: 911 rows
+- `fr-FR`: 935 rows
 - `ru-RU`: 789 rows
 
 The earlier 988-row audit input covered only base sound-unit arrays. The current

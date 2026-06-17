@@ -33,6 +33,7 @@ const SOUND_UNIT_LABELS: Record<string, string> = {
   "fr-liaison": "连诵",
   "fr-enchainement": "连读",
   "fr-elision": "省音",
+  "fr-phrase-final-prominence": "短语末突出",
   "ru-hard-soft": "硬软辅音",
   "ru-soft-t-d": "软 T/D",
   "ru-soft-s-z": "软 S/Z",

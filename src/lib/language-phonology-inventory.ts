@@ -525,6 +525,13 @@ const FRENCH_INVENTORY_BASE: PhonologyInventoryBaseEntry[] = [
     [...FRENCH_CORE_SOURCES, "openipa-fr"],
     ["No exact local single-click elision rule clip exists yet."],
   ),
+  row(
+    "fr-phrase-final-prominence",
+    "prosody",
+    "French prominence is rhythmic-group/phrase-final rather than English-style lexical stress on each content word.",
+    [...FRENCH_CORE_SOURCES, "phonetique-ca"],
+    ["No exact local sentence-rhythm evidence clip exists for clickable scoring tiles yet."],
+  ),
 ];
 
 const RUSSIAN_INVENTORY_BASE: PhonologyInventoryBaseEntry[] = [
@@ -777,10 +784,11 @@ export const LANGUAGE_PHONOLOGY_GAPS: Record<
     },
     {
       id: "fr-phrase-rule-clips",
-      label: "liaison / enchainement / elision / final silence",
+      label:
+        "liaison / enchainement / elision / final silence / phrase-final prominence",
       layer: "connected-speech-rule",
       reason:
-        "Phrase rules are modeled in content, but no exact local rule audio exists for clickable scoring tiles.",
+        "Phrase rules and phrase-final prominence are modeled in content, but no exact local rule/prosody audio exists for clickable scoring tiles.",
       expectedBeforeStable: true,
       sourceRefs: FRENCH_CORE_SOURCES,
     },

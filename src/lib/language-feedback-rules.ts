@@ -115,6 +115,15 @@ export const LANGUAGE_FEEDBACK_RULES: LanguageFeedbackRule[] = [
     practiceCue: "les amis, il arrive, j'aime 分别练连诵、连接和省音。",
   },
   {
+    id: "french-phrase-final-prominence",
+    languageId: "fr-FR",
+    title: "phrase-final prominence",
+    triggerSlugs: ["fr-phrase-final-prominence"],
+    guidance:
+      "法语突出通常在节奏组最后一个可发音音节，不像英语那样给每个内容词单独加重音。",
+    practiceCue: "读 Le musée ferme à six heures. 时让 six heures 收束短语，前面的词保持平稳。",
+  },
+  {
     id: "russian-missing-stress-or-reduction",
     languageId: "ru-RU",
     title: "stress and reduction",

@@ -422,11 +422,19 @@ export const LANGUAGE_LEARNING_DECKS: Record<DeckLanguageId, LanguageLearningDec
       { text: "trop", ipa: "/tʁo/", targetUnitSlug: "fr-final-consonant-silence" },
       { text: "avec elle", ipa: "/avɛk‿ɛl/", targetUnitSlug: "fr-enchainement" },
       { text: "j’aime", ipa: "/ʒɛm/", targetUnitSlug: "fr-elision" },
+      { text: "bonjour", ipa: "/bɔ̃ʒuʁ/", targetUnitSlug: "fr-phrase-final-prominence" },
     ],
     diagnosticPassage: {
       title: "前圆唇元音、鼻化元音和连诵筛查",
       text: "Un étudiant prend un bon café. Les amis parlent dans une petite rue.",
-      targetUnitSlugs: ["fr-y", "fr-an", "fr-in", "fr-on", "fr-liaison"],
+      targetUnitSlugs: [
+        "fr-y",
+        "fr-an",
+        "fr-in",
+        "fr-on",
+        "fr-liaison",
+        "fr-phrase-final-prominence",
+      ],
     },
     contrastDeck: [
       {
@@ -716,6 +724,12 @@ export const LANGUAGE_LEARNING_DECKS: Record<DeckLanguageId, LanguageLearningDec
         ipaHint: "/l/",
         targetUnitSlugs: ["fr-l"],
         focus: "清亮法语 /l/，避免英语 dark L",
+      },
+      {
+        text: "Le musée ferme à six heures.",
+        ipaHint: "/lə myze fɛʁm a sizœʁ/",
+        targetUnitSlugs: ["fr-phrase-final-prominence"],
+        focus: "节奏组末的 heures 稍突出，不逐词套英语重音。",
       },
     ],
   },

@@ -11,7 +11,7 @@ import {
 describe("French pronunciation content", () => {
   it("covers the French IPA-first beta inventory", () => {
     expectRequiredUnits("fr-FR", REQUIRED_FRENCH_UNITS);
-    expect(REQUIRED_FRENCH_UNITS).toHaveLength(39);
+    expect(REQUIRED_FRENCH_UNITS).toHaveLength(40);
   });
 
   it("keeps French units source-backed and learner-facing", () => {
@@ -27,12 +27,13 @@ describe("French pronunciation content", () => {
     expectDeckTargetsResolvable("fr-FR");
   });
 
-  it("treats liaison, enchaînement, elision, and final silence as rule units", () => {
+  it("treats liaison, enchaînement, elision, final silence, and rhythm as rule units", () => {
     const ruleSlugs = [
       "fr-final-consonant-silence",
       "fr-liaison",
       "fr-enchainement",
       "fr-elision",
+      "fr-phrase-final-prominence",
     ];
 
     for (const slug of ruleSlugs) {
@@ -66,6 +67,10 @@ describe("French pronunciation content", () => {
     );
     expect(byText("Le grand homme parle encore.")?.focus).toContain("/t/");
     expect(bySlug("fr-schwa")?.ipaHint).toContain("ə");
+    expect(bySlug("fr-phrase-final-prominence")?.focus).toContain("英语重音");
+    expect(bySlug("fr-phrase-final-prominence")?.ipaHint).toBe(
+      "/lə myze fɛʁm a sizœʁ/",
+    );
 
     for (const item of [
       bySlug("fr-liaison"),
@@ -74,6 +79,7 @@ describe("French pronunciation content", () => {
       byText("Trop grand, trop lent, trop fort."),
       byText("J’aime le bon vin blanc."),
       byText("Le grand homme parle encore."),
+      bySlug("fr-phrase-final-prominence"),
     ]) {
       expect(item?.ipaHint, item?.text).toMatch(/^\/.+\/$/);
     }

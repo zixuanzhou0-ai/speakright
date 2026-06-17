@@ -423,6 +423,12 @@ export const phonemeAssessmentExemptions: Record<string, AssessmentExemption> =
       suggestedEvidence:
         "Use phrase-level examples such as j'aime/l'ami with alignment review.",
     },
+    "fr-phrase-final-prominence": {
+      reason:
+        "French phrase-final prominence is a prosody target across a rhythmic group, not a single segment alias.",
+      suggestedEvidence:
+        "Use sentence-level timing, final-syllable duration, and intonation evidence instead of phoneme score fallback.",
+    },
     "ru-soft-sign": {
       reason:
         "Russian soft sign is an orthographic palatalization marker, not an independent segment.",

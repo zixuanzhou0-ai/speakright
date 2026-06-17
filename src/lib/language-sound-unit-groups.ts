@@ -206,6 +206,13 @@ export const LANGUAGE_SOUND_UNIT_GROUPS: Record<
         "fr-elision",
       ],
     },
+    {
+      id: "phrase-prosody",
+      label: "短语韵律",
+      description: "法语节奏组末尾突出，不按英语给每个内容词加重音。",
+      displayType: "rule",
+      slugs: ["fr-phrase-final-prominence"],
+    },
   ],
   "ru-RU": [
     {

@@ -82,6 +82,7 @@ const frenchConsonantsAndGlides = [
   "fr-glide-hui",
   "fr-glide-w",
 ];
+const frenchProsodyUnits = ["fr-phrase-final-prominence"];
 
 const russianOverviewUnits = [
   "ru-a",
@@ -174,7 +175,7 @@ export const LANGUAGE_TEACHING_VIDEO_ASSETS: LanguageTeachingVideoAsset[] = [
     sourceUrl: "https://www.youtube.com/watch?v=hI2Pso1dDjM",
     videoSrc: "/videos/language-assets/fr-FR/youtube-lessons/hI2Pso1dDjM.mp4",
     durationSeconds: 883,
-    soundUnitSlugs: frenchConsonantsAndGlides,
+    soundUnitSlugs: [...frenchConsonantsAndGlides, ...frenchProsodyUnits],
     focus: "overview",
   },
   {
