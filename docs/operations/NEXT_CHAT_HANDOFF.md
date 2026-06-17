@@ -135,6 +135,9 @@ E:\SpeakRightDesktopRepo\src-tauri\target\release\speakright.exe
 - Scenario and spontaneous transfer pages now also wrap scenario kind/status
   badges, score badges, demo/template buttons, processing copy, and retry
   actions so advanced transfer tasks keep controls visible in narrow windows.
+- Spontaneous transfer now shows every current review/active target pack badge
+  instead of only the first three; `spontaneous-target-pack-badge` and the
+  page-rendering test lock the complete target-pack list.
 - Settings provider action rows now use wrap-safe save/test buttons for Azure,
   ElevenLabs, AI coach, and pronunciation fallback checks, so narrow Settings
   layouts do not inherit one-line button defaults.

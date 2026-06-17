@@ -21,7 +21,7 @@ claimed as complete.
 | Diagnosis reports keep generated issues and evidence visible instead of re-summarizing them in the component | `src/components/assessment/assessment-report.tsx`, `src/__tests__/assessment-report.test.tsx`, `src/__tests__/desktop-preflight-ui-smoke.test.ts`; after the diagnosis engine builds its bounded issue, per-issue evidence, and `rawEvidence` lists, the report renders every generated `assessment-report-issue-card`, every `assessment-report-issue-evidence` row, every generated evidence row with `assessment-report-evidence-row`, and every `errorPatternId` badge, rather than slicing the component view to the first 3 issues, first issue-evidence row, first 8 evidence rows, or first 2 pattern IDs |
 | Training evidence pages keep generated evidence, pattern, and remediation lists complete | `src/app/drill/evidence/page.tsx`, `src/__tests__/training-evidence-page.test.tsx`, `src/__tests__/desktop-preflight-ui-smoke.test.ts`; after `buildTrainingEvidenceBook` builds its sorted evidence book, the page renders every `evidence-card-row`, `evidence-pattern-row`, and `evidence-remediation-row`, rather than slicing the component view to the first 8 evidence cards, 6 patterns, or 6 remediation records |
 | Drill landing review queue and training memory keep actionable tasks visible | `src/app/drill/page.tsx`, `src/lib/review-queue.ts`, `src/lib/training-memory.ts`, `src/__tests__/desktop-preflight-ui-smoke.test.ts`; after `buildReviewQueue` and `buildTrainingMemory` bound their source lists, the drill landing page renders every `drill-review-task-card`, merged `drill-today-item-card`, and `drill-memory-weakness-card`, rather than applying a second `slice(0, 2)` cap to review/today tasks or `activeWeaknesses.slice(0, 3)` to training-memory weaknesses |
-| Advanced transfer pages keep generated practice target lists visible | `src/app/drill/scenarios/page.tsx`, `src/app/drill/prosody/page.tsx`, `src/lib/transfer-scenarios.ts`, `src/lib/prosody-training.ts`, `src/__tests__/desktop-preflight-ui-smoke.test.ts`; scenario practice renders every `scenario-target-word-badge` from `plan.targetWords`, and prosody practice renders every `prosody-weak-word-badge` from `exercise.weakWords`, rather than applying second UI caps with `plan.targetWords.slice(0, 8)` or `exercise.weakWords.slice(0, 4)` |
+| Advanced transfer pages keep generated practice target lists visible | `src/app/drill/scenarios/page.tsx`, `src/app/drill/prosody/page.tsx`, `src/app/drill/spontaneous/page.tsx`, `src/lib/transfer-scenarios.ts`, `src/lib/prosody-training.ts`, `src/__tests__/spontaneous-page.test.tsx`, `src/__tests__/desktop-preflight-ui-smoke.test.ts`; scenario practice renders every `scenario-target-word-badge` from `plan.targetWords`, prosody practice renders every `prosody-weak-word-badge` from `exercise.weakWords`, and spontaneous transfer renders every `spontaneous-target-pack-badge` from the current review/active pack candidates, rather than applying second UI caps with `plan.targetWords.slice(0, 8)`, `exercise.weakWords.slice(0, 4)`, or `targetPacks.slice(0, 3)` |
 | Progress training history keeps retained sessions visible | `src/app/progress/page.tsx`, `src/lib/mastery-profile.ts`, `src/__tests__/progress-page.test.tsx`, `src/__tests__/desktop-preflight-ui-smoke.test.ts`; after `recordTrainingSession` applies the local storage retention limit to the latest 80 sessions, the Progress page renders every retained `profile.sessions` row and shows `progress-session-count`, rather than applying a second `slice(0, 6)` UI cap |
 | Non-English rule units without local target audio do not show clickable speaker buttons | `src/lib/language-source-alignment.ts`, `src/components/phoneme/phoneme-study-card.tsx`, `src/components/drill/drill-phoneme-lesson.tsx`, `src/components/phoneme/phoneme-card.tsx`, `src/__tests__/phoneme-study-card.test.tsx`, `src/__tests__/language-source-alignment.test.ts`, `scripts/desktop-ui-smoke.mjs` |
 | Proxy or generic videos are not presented as exact teaching videos | `src/lib/language-source-alignment.ts`, `src/lib/language-teaching-videos.ts`, `src/components/phoneme/video-player.tsx`, `src/components/drill/drill-phoneme-lesson.tsx`, `src/__tests__/language-teaching-videos.test.ts`, `src/__tests__/video-player.test.tsx`, `src/__tests__/desktop-preflight-ui-smoke.test.ts`, `scripts/desktop-ui-smoke.mjs`; local teaching lessons take priority over external fallback cards, and when no precise local video is available the fallback panel renders every `video-fallback-resource-card` from `resources` rather than applying a second `resources.slice(0, 3)` cap |
@@ -81,35 +81,33 @@ Latest local full gate recorded in this audit:
 ```text
 git status --short --branch
   initial gate status before this round's edits was
-  `## main...origin/main [ahead 99]`; the current full gate was run with the
-  free-practice suggestion-word source-list full-rendering fix and evidence
-  updates still unstaged, so `desktop:preflight` correctly reported
+  `## main...origin/main [ahead 100]`; the current full gate was run with the
+  spontaneous transfer target-pack full-rendering fix and evidence updates
+  still unstaged, so `desktop:preflight` correctly reported
   `Git: dirty`. After
   GitHub API fallback pushes, verify the GitHub `main` ref and local-vs-remote
   tree SHA before treating content as unpushed.
 
-npm.cmd run test -- src/__tests__/free-practice-transfer.test.ts src/__tests__/sentence-input-card.test.tsx src/__tests__/desktop-preflight-ui-smoke.test.ts
-  3 files / 34 tests passed; the preview builder preserves more than four
-  generated suggestion words, free-practice suggestion cards render every
-  `suggestion.words` badge with `free-practice-suggestion-word`, and the static
-  smoke guard rejects source-level `.slice(0, 4)` plus UI-level
-  `suggestion.words.slice(0, 4)`.
+npm.cmd run test -- src/__tests__/spontaneous-page.test.tsx src/__tests__/desktop-preflight-ui-smoke.test.ts
+  2 files / 21 tests passed; spontaneous transfer renders every current
+  review/active target pack badge with `spontaneous-target-pack-badge`, and the
+  static smoke guard rejects the old UI-level `.slice(0, 3)` target-pack cap.
 
 npm.cmd run test
-  125 files / 710 tests passed
+  126 files / 711 tests passed
 
 npm.cmd run typecheck
   passed
 
 npm.cmd run lint
-  passed; Biome checked 389 files.
+  passed; Biome checked 390 files.
 
 npm.cmd run build:desktop-frontend
   passed; 144 static pages generated
 
 npm.cmd run desktop:build
   passed; reran `build:desktop-frontend`, generated 144 static pages, compiled
-  the Tauri release app in 6m 18s, built
+  the Tauri release app in 7m 01s, built
   `src-tauri\target\release\speakright.exe`, and generated fresh MSI/NSIS
   bundles.
 
@@ -120,7 +118,7 @@ npm.cmd run desktop:preflight
 
 npm.cmd run desktop:ui-smoke
   passed; Release EXE runtime reported
-  `pid=71076 settings=ok`, detail coverage for English, Spanish, French, and
+  `pid=19248 settings=ok`, detail coverage for English, Spanish, French, and
   Russian sound units, routes `/drill`, `/drill/word`, `/drill/sentence`,
   `/drill/contrast`, `/drill/prosody`, `/drill/perception`, `/drill/evidence`,
   `/drill/pack/ee-ih`, `/drill/scenarios`, `/drill/spontaneous`,
@@ -133,11 +131,11 @@ npm.cmd run desktop:ui-smoke
 
 npm.cmd run desktop:launch-release
   passed; command printed `SpeakRight release desktop app launch requested`,
-  the Release EXE path, PID `75760`, and the no-localhost reminder; the Release
+  the Release EXE path, PID `47320`, and the no-localhost reminder; the Release
   EXE opened from `src-tauri\target\release\speakright.exe`.
 
 process cleanup
-  `Get-Process -Id 75760` confirmed `running pid=75760 name=speakright`; the
+  `Get-Process -Id 47320` confirmed `running pid=47320 name=speakright`; the
   process was stopped afterward, and no residual `speakright.exe` remained
   after cleanup
 ```

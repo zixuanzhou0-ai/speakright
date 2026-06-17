@@ -100,7 +100,6 @@ export default function SpontaneousPage() {
   const targetPacks = useMemo(() => {
     if (!transferProfile) return [];
     const reviewPackIds = buildReviewQueue(transferProfile)
-      .slice(0, 3)
       .map((item) => item.packId);
     const activePackIds = Object.values(transferProfile.packs)
       .filter((pack) => pack.status !== "mastered")
@@ -108,8 +107,7 @@ export default function SpontaneousPage() {
       .map((pack) => pack.packId);
     return Array.from(new Set([...reviewPackIds, ...activePackIds]))
       .map((packId) => TRAINING_PACKS.find((pack) => pack.id === packId))
-      .filter((pack): pack is (typeof TRAINING_PACKS)[number] => !!pack)
-      .slice(0, 3);
+      .filter((pack): pack is (typeof TRAINING_PACKS)[number] => !!pack);
   }, [transferProfile]);
 
   const resetRecording = () => {
@@ -299,7 +297,8 @@ export default function SpontaneousPage() {
                   <Badge
                     key={pack.id}
                     variant="secondary"
-                    className="max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]"
+                    className={WRAP_SAFE_BADGE_CLASS}
+                    data-smoke="spontaneous-target-pack-badge"
                   >
                     观察 {pack.title}
                   </Badge>

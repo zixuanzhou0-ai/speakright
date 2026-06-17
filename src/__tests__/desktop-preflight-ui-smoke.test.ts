@@ -991,6 +991,11 @@ describe("desktop preflight and UI smoke", () => {
       'data-smoke="spontaneous-target-status-badge"',
     );
     expect(spontaneousPage).toContain(
+      'data-smoke="spontaneous-target-pack-badge"',
+    );
+    expect(spontaneousPage).toContain("targetPacks.map");
+    expect(spontaneousPage).not.toContain(".slice(0, 3)");
+    expect(spontaneousPage).toContain(
       'data-smoke="spontaneous-evidence-score-badge"',
     );
     expect(spontaneousPage).toContain(
