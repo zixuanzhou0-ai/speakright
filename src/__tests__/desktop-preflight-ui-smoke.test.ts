@@ -840,9 +840,14 @@ describe("desktop preflight and UI smoke", () => {
       "const reviewItems = reviewQueue.map(prescriptionFromReviewTask);",
     );
     expect(drillPage).toContain("{reviewQueue.map((task) => {");
+    expect(drillPage).toContain("trainingMemory.activeWeaknesses.map");
     expect(drillPage).toContain('data-smoke="drill-review-task-card"');
     expect(drillPage).toContain('data-smoke="drill-today-item-card"');
+    expect(drillPage).toContain('data-smoke="drill-memory-weakness-card"');
     expect(drillPage).not.toContain("reviewQueue.slice(0, 2)");
+    expect(drillPage).not.toContain(
+      "trainingMemory.activeWeaknesses.slice(0, 3)",
+    );
     expect(drillPage).not.toContain(".slice(0, 2)");
     expect(drillPage).toContain(
       "h-auto min-h-8 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]",

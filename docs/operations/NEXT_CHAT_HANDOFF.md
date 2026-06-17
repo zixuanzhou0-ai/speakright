@@ -210,9 +210,10 @@ git status --short --branch
 - Drill teaching cards now render every bundled keyword/example for the current
   sound unit instead of the first six only, and label the section as `示例文本`
   so phrase, sentence, and rule units are not described as single-word examples.
-- Drill landing review cards and today-prescription cards now render every item
-  from the already bounded review queue / day prescription, instead of
-  re-capping the page to the first two actionable tasks.
+- Drill landing review cards, today-prescription cards, and training-memory
+  weakness cards now render every item from their already bounded source lists,
+  instead of re-capping the page to the first two review tasks or first three
+  active weaknesses.
 - Diagnosis reports now render every generated issue card from the bounded
   diagnosis-engine issue list instead of showing only the first three; the
   section is labeled `学习处方与补测` rather than `Top 3`. Each issue card also

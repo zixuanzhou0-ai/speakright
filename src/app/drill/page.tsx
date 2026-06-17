@@ -648,18 +648,21 @@ export default function DrillPage() {
                   完成一次训练后，这里会显示最近最该处理的发音卡点。
                 </div>
               ) : (
-                trainingMemory.activeWeaknesses.slice(0, 3).map((weakness) => (
+                trainingMemory.activeWeaknesses.map((weakness) => (
                   <Link
                     key={weakness.id}
                     href={packHref(weakness.packId, weakness.levelId)}
                   >
-                    <div className="rounded-lg border bg-background p-3 transition-colors hover:border-primary/50 cursor-pointer">
+                    <div
+                      className="rounded-lg border bg-background p-3 transition-colors hover:border-primary/50 cursor-pointer"
+                      data-smoke="drill-memory-weakness-card"
+                    >
                       <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <p className="text-sm font-semibold">
+                        <div className="min-w-0 flex-1">
+                          <p className="break-words text-sm font-semibold [overflow-wrap:anywhere]">
                             {weakness.title}
                           </p>
-                          <p className="mt-1 text-xs text-muted-foreground">
+                          <p className="mt-1 break-words text-xs text-muted-foreground [overflow-wrap:anywhere]">
                             {weakness.packTitle} · {weakness.reason}
                           </p>
                         </div>
@@ -679,7 +682,7 @@ export default function DrillPage() {
                           <span>最近目标音 {weakness.bestTargetScore}</span>
                         )}
                       </div>
-                      <p className="mt-2 text-xs font-medium text-primary">
+                      <p className="mt-2 break-words text-xs font-medium text-primary [overflow-wrap:anywhere]">
                         下一次只改：{weakness.cue}
                       </p>
                     </div>
