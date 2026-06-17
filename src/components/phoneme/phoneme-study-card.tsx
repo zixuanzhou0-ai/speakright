@@ -19,6 +19,7 @@ import {
   getPhonologyLayerLabel,
   getPhonologyTilePolicyDescription,
 } from "@/lib/language-phonology-inventory";
+import { getLanguageResourceSite } from "@/lib/language-resource-sites";
 import {
   getSoundUnitSourceAlignment,
   shouldShowLocalVideoAsPrimary,
@@ -318,6 +319,9 @@ export function PhonemeStudyCard({
     phoneme.languageId ?? "en-US",
     phoneme.slug,
   );
+  const inventorySourceSummary = inventoryEntry?.sourceRefs
+    .map((ref) => getLanguageResourceSite(ref)?.title ?? ref)
+    .join("、");
 
   return (
     <div className="shrink-0 rounded-xl border bg-card shadow-sm overflow-hidden">
@@ -413,6 +417,8 @@ export function PhonemeStudyCard({
             data-phonology-layer={inventoryEntry.layer}
             data-tile-policy={inventoryEntry.tilePolicy}
             data-audio-status={inventoryEntry.audioStatus}
+            data-source-ref-count={inventoryEntry.sourceRefs.length}
+            data-variant-scope={inventoryEntry.variantScope}
           >
             <div className="flex flex-wrap items-center justify-center gap-1.5">
               <Badge variant="outline" className="text-[10px]">
@@ -433,6 +439,14 @@ export function PhonemeStudyCard({
             <p className="mt-1 break-words text-center text-xs leading-snug text-muted-foreground [overflow-wrap:anywhere]">
               {getPhonologyTilePolicyDescription(inventoryEntry.tilePolicy)}
             </p>
+            <p className="mt-1 break-words text-center text-xs leading-snug text-muted-foreground [overflow-wrap:anywhere]">
+              音系口径：{inventoryEntry.variantScope}
+            </p>
+            {inventorySourceSummary && (
+              <p className="mt-1 break-words text-center text-xs leading-snug text-muted-foreground [overflow-wrap:anywhere]">
+                来源：{inventorySourceSummary}
+              </p>
+            )}
             {inventoryEntry.gaps.length > 0 && (
               <p className="mt-1 break-words text-center text-xs leading-snug text-amber-700 [overflow-wrap:anywhere] dark:text-amber-300">
                 待补：仍有 {inventoryEntry.gaps.length} 项音频/方言/规则证据缺口。

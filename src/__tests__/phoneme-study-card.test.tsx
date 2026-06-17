@@ -290,6 +290,11 @@ describe("PhonemeStudyCard non-English reading layout", () => {
     expect(detail).toHaveAttribute("data-phonology-layer", "prosody");
     expect(detail).toHaveAttribute("data-tile-policy", "clickable-exact-header");
     expect(detail).toHaveAttribute("data-audio-status", "exact-local-header");
+    expect(detail).toHaveAttribute("data-source-ref-count", "3");
+    expect(detail).toHaveAttribute(
+      "data-variant-scope",
+      "E caduc /ə/ is context-sensitive and may be present, reduced, or deleted.",
+    );
     expect(screen.getByText("实验模块")).toBeInTheDocument();
     expect(screen.getByText("韵律/重音")).toBeInTheDocument();
     expect(screen.getByText("精确短音频")).toBeInTheDocument();
@@ -299,6 +304,18 @@ describe("PhonemeStudyCard non-English reading layout", () => {
     expect(
       screen.getByText(/法语 e caduc .*可听见/),
     ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "音系口径：E caduc /ə/ is context-sensitive and may be present, reduced, or deleted.",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/来源：Journal of the IPA: French/),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Handbook of the International Phonetic Association/),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/Phonetique\.ca/)).toBeInTheDocument();
     expect(
       screen.getByText("待补：仍有 1 项音频/方言/规则证据缺口。"),
     ).toBeInTheDocument();
@@ -327,11 +344,23 @@ describe("PhonemeStudyCard non-English reading layout", () => {
     );
     expect(detail).toHaveAttribute("data-tile-policy", "rule-guidance-only");
     expect(detail).toHaveAttribute("data-audio-status", "rule-only");
+    expect(detail).toHaveAttribute("data-source-ref-count", "4");
+    expect(detail).toHaveAttribute(
+      "data-variant-scope",
+      "Latent final consonants surface only in licensed phrase contexts.",
+    );
     expect(screen.getByText("语流规则")).toBeInTheDocument();
     expect(screen.getByText("规则说明")).toBeInTheDocument();
     expect(
       screen.getByText("按规则/短语证据训练，不作单音播放。"),
     ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "音系口径：Latent final consonants surface only in licensed phrase contexts.",
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/来源：Journal of the IPA: French/)).toBeInTheDocument();
+    expect(screen.getByText(/Open IPA French/)).toBeInTheDocument();
     expect(
       screen.queryByRole("button", { name: "播放发音" }),
     ).not.toBeInTheDocument();
