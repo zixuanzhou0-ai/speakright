@@ -329,13 +329,13 @@ describe("open-source readiness files", () => {
       "Biome checked 392 files",
     );
     expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
-      "ru-RU 918 existing, 332 missing",
+      "ru-RU 918 existing, 466 missing",
     );
     expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
-      "Total missing audio items: 938",
+      "Total missing audio items: 1072",
     );
     expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
-      "estimated characters/credits: 8432",
+      "estimated characters/credits: 9772",
     );
     expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
       'reference video mean `-14.7 dB`',

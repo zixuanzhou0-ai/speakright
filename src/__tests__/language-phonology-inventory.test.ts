@@ -250,6 +250,11 @@ describe("language phonology inventory", () => {
     for (const slug of [
       "ru-t-tj",
       "ru-d-dj",
+      "ru-s-sj",
+      "ru-z-zj",
+      "ru-n-nj",
+      "ru-l-lj",
+      "ru-r-rj",
       "ru-p-pj",
       "ru-b-bj",
       "ru-m-mj",

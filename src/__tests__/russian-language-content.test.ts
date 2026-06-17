@@ -28,6 +28,11 @@ describe("Russian pronunciation content", () => {
     for (const [slug, expectedIpa] of [
       ["ru-t-tj", "/t tʲ/"],
       ["ru-d-dj", "/d dʲ/"],
+      ["ru-s-sj", "/s sʲ/"],
+      ["ru-z-zj", "/z zʲ/"],
+      ["ru-n-nj", "/n nʲ/"],
+      ["ru-l-lj", "/l lʲ/"],
+      ["ru-r-rj", "/r rʲ/"],
       ["ru-p-pj", "/p pʲ/"],
       ["ru-b-bj", "/b bʲ/"],
       ["ru-m-mj", "/m mʲ/"],

@@ -74,8 +74,8 @@ E:\SpeakRightDesktopRepo\src-tauri\target\release\speakright.exe
   practice instead of stale `current example друг` wording.
 - `audio:parity:dry-run` now reports explicit experimental audio gaps without
   generating audio: Spanish `880` existing / `214` missing, French `1090`
-  existing / `392` missing, Russian `918` existing / `332` missing, total
-  missing `938`, estimated `8432` characters. Do not generate ElevenLabs audio
+  existing / `392` missing, Russian `918` existing / `466` missing, total
+  missing `1072`, estimated `9772` characters. Do not generate ElevenLabs audio
   unless the maintainer explicitly confirms after reviewing that dry-run.
 - Language-pack audio manifests now keep their IPA metadata aligned with the
   sourced reviewed findings for applied French connected-speech rows and Russian
@@ -530,9 +530,11 @@ git status --short --branch
   before pauses or voiceless consonants, but connected speech before voiced
   consonants, sonorants, or vowels must be treated as connected-speech
   realization rather than isolated word-final devoicing.
-- Russian now exposes the first standalone hard/soft stop, labial, and velar pair
-  anchors: `ru-t-tj`, `ru-d-dj`, `ru-p-pj`, `ru-b-bj`, `ru-m-mj`, `ru-f-fj`,
-  `ru-v-vj`, `ru-k-kj`, `ru-g-gj`, and `ru-x-xj`. They are source-backed score-only contrast units with
+- Russian now exposes the first standalone hard/soft coronal stop, sibilant,
+  sonorant, labial, and velar pair anchors: `ru-t-tj`, `ru-d-dj`,
+  `ru-s-sj`, `ru-z-zj`, `ru-n-nj`, `ru-l-lj`, `ru-r-rj`, `ru-p-pj`,
+  `ru-b-bj`, `ru-m-mj`, `ru-f-fj`, `ru-v-vj`, `ru-k-kj`, `ru-g-gj`,
+  and `ru-x-xj`. They are source-backed score-only contrast units with
   diagnostic, contrast, and sentence deck coverage; they intentionally have no
   clickable single-segment audio until verified short local header clips are
   added.
@@ -676,13 +678,13 @@ Start with the Release EXE and inspect these areas before adding new features:
   `docs/operations/non-english-ipa-audit-input.json`. A local generated copy may
   also exist at
   `E:/SpeakRightDesktopRepo/src-tauri/target/ipa-audit/non-english-ipa-audit-input.json`.
-  It now contains the final expanded UI corpus with `2526` rows: Spanish `732`,
-  French `935`, Russian `859`. The earlier `988`-row file covered only base
+  It now contains the final expanded UI corpus with `2641` rows: Spanish `732`,
+  French `935`, Russian `974`. The earlier `988`-row file covered only base
   sound-unit arrays.
 - The audit input is now reproducible with `npm.cmd run ipa:audit:export`.
   Rows include `auditRole`: `ipa-transcription` for real IPA rows and
   `deck-focus-hint` for `language-learning-decks` sentence `ipaHint` rows. The
-  current export contains `2526` total rows and marks `36` deck focus
+  current export contains `2641` total rows and marks `36` deck focus
   hints so GPT Research does not mistake compact cues such as `/s sʲ zʲ/` for
   complete sentence IPA. Recent source-synced rows also replaced generic
   `elision + nasal vowels` / `clusters` sentence labels with full IPA for
@@ -706,7 +708,7 @@ Start with the Release EXE and inspect these areas before adding new features:
   phoneme anchors, while `[β ð ɣ]` stay on `es-bv`, `es-d`, and `es-g` with the
   existing exact realization clips. Do not map plain stops to the realization
   clips unless exact stop-position header clips are added later.
-- Remaining audit work: continue from the new `2526`-row final UI corpus and
+- Remaining audit work: continue from the new `2641`-row final UI corpus and
   ask GPT Research for a full row-level table, especially for French schwa
   style variants and Russian broad-vs-finer accepted variants.
 - Second GPT Research pass was applied for high-confidence rows:

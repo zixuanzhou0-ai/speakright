@@ -16,7 +16,7 @@ describe("non-English IPA audit input", () => {
       .reduce((total, soundUnit) => total + soundUnit.keywords.length, 0);
 
     expect(rows).toHaveLength(expectedRowCount);
-    expect(rows).toHaveLength(2526);
+    expect(rows).toHaveLength(2641);
   });
 
   it("marks deck sentence IPA hints as focus cues instead of full transcriptions", () => {

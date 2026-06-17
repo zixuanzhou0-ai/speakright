@@ -163,6 +163,36 @@ describe("multilingual Azure phoneme map parity", () => {
     ).toBe(68);
     expect(
       getPhonemeAccuracy(
+        result([{ phoneme: "sʲ", accuracyScore: 74 }]),
+        "ru-s-sj",
+      ),
+    ).toBe(74);
+    expect(
+      getPhonemeAccuracy(
+        result([{ phoneme: "z", accuracyScore: 69 }]),
+        "ru-z-zj",
+      ),
+    ).toBe(69);
+    expect(
+      getPhonemeAccuracy(
+        result([{ phoneme: "nʲ", accuracyScore: 77 }]),
+        "ru-n-nj",
+      ),
+    ).toBe(77);
+    expect(
+      getPhonemeAccuracy(
+        result([{ phoneme: "l", accuracyScore: 78 }]),
+        "ru-l-lj",
+      ),
+    ).toBe(78);
+    expect(
+      getPhonemeAccuracy(
+        result([{ phoneme: "rʲ", accuracyScore: 79 }]),
+        "ru-r-rj",
+      ),
+    ).toBe(79);
+    expect(
+      getPhonemeAccuracy(
         result([{ phoneme: "pʲ", accuracyScore: 72 }]),
         "ru-p-pj",
       ),
@@ -219,6 +249,11 @@ describe("multilingual Azure phoneme map parity", () => {
     expect(getPhonemeAudioUrl("p", "fr-FR")).toBeNull();
     expect(getPhonemeAudioUrl("tʲ", "ru-RU")).toBeNull();
     expect(getPhonemeAudioUrl("dʲ", "ru-RU")).toBeNull();
+    expect(getPhonemeAudioUrl("sʲ", "ru-RU")).toBeNull();
+    expect(getPhonemeAudioUrl("zʲ", "ru-RU")).toBeNull();
+    expect(getPhonemeAudioUrl("nʲ", "ru-RU")).toBeNull();
+    expect(getPhonemeAudioUrl("lʲ", "ru-RU")).toBeNull();
+    expect(getPhonemeAudioUrl("rʲ", "ru-RU")).toBeNull();
     expect(getPhonemeAudioUrl("pʲ", "ru-RU")).toBeNull();
     expect(getPhonemeAudioUrl("v", "ru-RU")).toBeNull();
     expect(getPhonemeAudioUrl("kʲ", "ru-RU")).toBeNull();

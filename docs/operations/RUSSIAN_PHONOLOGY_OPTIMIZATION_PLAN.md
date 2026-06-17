@@ -73,7 +73,7 @@ Core content requirements:
 
 ## Current SpeakRight State
 
-Current `RUSSIAN_PHONEMES` contains 37 course sound units:
+Current `RUSSIAN_PHONEMES` contains 42 course sound units:
 
 - Vowels: `ru-a`, `ru-o`, `ru-i`, `ru-y`, `ru-u`, `ru-e`.
 - Core consonant/special units: `ru-r`, `ru-x`, `ru-sh-zh`, `ru-ts`,
@@ -81,9 +81,10 @@ Current `RUSSIAN_PHONEMES` contains 37 course sound units:
 - Hard/soft and orthographic-rule units: `ru-hard-soft`, `ru-soft-t-d`,
   `ru-soft-s-z`, `ru-soft-n-l-r`, `ru-soft-labials`, `ru-soft-sign`,
   `ru-iotated-vowels`.
-- First standalone hard/soft stop, labial, and velar pair anchors:
-  `ru-t-tj`, `ru-d-dj`, `ru-p-pj`, `ru-b-bj`, `ru-m-mj`, `ru-f-fj`,
-  `ru-v-vj`, `ru-k-kj`, `ru-g-gj`, `ru-x-xj`.
+- First standalone hard/soft coronal stop, sibilant, sonorant, labial, and
+  velar pair anchors: `ru-t-tj`, `ru-d-dj`, `ru-s-sj`, `ru-z-zj`,
+  `ru-n-nj`, `ru-l-lj`, `ru-r-rj`, `ru-p-pj`, `ru-b-bj`, `ru-m-mj`,
+  `ru-f-fj`, `ru-v-vj`, `ru-k-kj`, `ru-g-gj`, `ru-x-xj`.
 - Prosody/rule units: `ru-stress-reduction`, `ru-unstressed-o-a`,
   `ru-unstressed-e-ya`, `ru-final-devoicing`, `ru-voicing-assimilation`,
   `ru-clusters`.
@@ -94,7 +95,8 @@ Current exact scoring-tile audio:
   aliases recorded in `assessment-segment-audio.test.ts`.
 - Many Russian course units are intentionally `isProxyForAssessment` because
   they are contrast/rule groups rather than exact single sounds.
-- The app now exposes the first standalone hard/soft stop, labial, and velar pair
+- The app now exposes the first standalone hard/soft coronal stop, sibilant,
+  sonorant, labial, and velar pair
   anchors as score-only contrast units. It does not yet expose every hard/soft
   consonant pair, and none of the new pair anchors has verified short local
   single-segment audio.
@@ -126,11 +128,12 @@ languages:
    - Mark always-hard and always-soft units separately.
    - Decide which pairs become learner-facing first. Start with high-impact
      pairs already present: `t/d`, `s/z`, `n/l/r`, labials, and velars.
-   - Current implementation note: the first stop, labial, and velar pair anchors
-     `ru-t-tj`, `ru-d-dj`, `ru-p-pj`, `ru-b-bj`, `ru-m-mj`, `ru-f-fj`, and
-     `ru-v-vj`, plus `ru-k-kj`, `ru-g-gj`, and `ru-x-xj`, are now
-     learner-facing score-only contrast units. The full hard/soft pair table
-     and exact single-segment audio remain open.
+   - Current implementation note: the coronal stop, sibilant, sonorant,
+     labial, and velar pair anchors `ru-t-tj`, `ru-d-dj`, `ru-s-sj`,
+     `ru-z-zj`, `ru-n-nj`, `ru-l-lj`, `ru-r-rj`, `ru-p-pj`, `ru-b-bj`,
+     `ru-m-mj`, `ru-f-fj`, `ru-v-vj`, `ru-k-kj`, `ru-g-gj`, and `ru-x-xj`
+     are now learner-facing score-only contrast units. The full hard/soft pair
+     table and exact single-segment audio remain open.
 
 2. Stress-first words
    - Require `stressText` for Russian examples where stress is not visually
@@ -180,13 +183,15 @@ Add or update tests in these areas:
   - Russian examples with reduction include stress text or explicit stress IPA.
   - Hard/soft descriptions say palatalization, not hard consonant plus full `/j/`.
   - Always-hard and always-soft units are labeled correctly.
-  - Standalone stop, labial, and velar pair anchors exist, stay contrast-layer, and
+  - Standalone coronal stop, sibilant, sonorant, labial, and velar pair anchors
+    exist, stay contrast-layer, and
     keep enough examples for training.
 - `src/__tests__/assessment-segment-audio.test.ts`
   - `[ɐ ə ɪ]`, `final devoicing`, `cluster`, and palatalized aliases such as
     `tʲ` remain unclickable unless exact clips are added.
 - `src/__tests__/language-phonology-inventory.test.ts`
-  - New hard/soft stop, labial, and velar pair anchors stay `score-only-unverified`
+  - New hard/soft coronal stop, sibilant, sonorant, labial, and velar pair
+    anchors stay `score-only-unverified`
     until exact local clips exist.
 - `src/__tests__/azure-phoneme-map-language-parity.test.ts`
   - New hard/soft pair aliases score correctly while `getPhonemeAudioUrl`

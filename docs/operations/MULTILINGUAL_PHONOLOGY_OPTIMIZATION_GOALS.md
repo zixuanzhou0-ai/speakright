@@ -9,7 +9,7 @@ Last updated: 2026-06-17
 
 Turn Spanish, French, and Russian from English-template migrations into
 language-specific pronunciation modules. Each module must follow its own
-phonology, separate phonemes from realizations and phrase rules, and keep audio
+phonology, separate phonemes from realizations and phrase rules, and keep
 playback honest.
 
 ## Planning Documents
@@ -27,8 +27,8 @@ playback honest.
    evidenceMastery, or full inventory coverage.
 2. Model every non-English unit as one of: phoneme, allophone/realization,
    contrast, connected-speech rule, or prosody.
-3. A scoring tile is clickable only when it uses the same local short header clip
-   as the left/detail sound unit. Rule, proxy, whole-word, sentence, dictionary,
+3. A scoring tile is clickable only when it uses the same local short header
+   clip as the left/detail sound unit. Rule, proxy, word, sentence, dictionary,
    generated TTS, or video-track material stays unclickable.
 4. No ElevenLabs or paid-provider generation without explicit maintainer
    confirmation after a dry-run estimate.
@@ -40,27 +40,23 @@ playback honest.
 Spanish goal: five stable vowels, tap/trill, Castilian `/θ/`,
 dialect-aware `seseo/yeismo`, `/b d g/` stop-vs-approximant realizations,
 unaspirated `/p t k/`, dental `/t d/`, lexical stress, syllable rhythm,
-diphthongs, and nasal place assimilation. Plain standalone
-`/p t k f m n b d g/` anchors now exist; `/b d g/` stop-position anchors are
-separate from `[β ð ɣ]` realization units, but the plain anchors still need
-verified short local header clips before they can become clickable scoring-tile
-audio.
+diphthongs, and nasal place assimilation. Standalone `/p t k f m n b d g/`
+anchors now exist; `/b d g/` stop anchors are separate from `[β ð ɣ]`, but
+the plain anchors still need verified local clips before becoming clickable.
 
 French goal: oral vowels, nasal vowels, front rounded vowels, glides `/j ɥ w/`,
 uvular `/ʁ/`, common consonants, liaison, enchainement, elision, schwa, final
-consonant silence, and phrase-final prominence. Plain standalone
-`/p b t d k g f v s z m n l/` anchors now exist, and
-`fr-phrase-final-prominence` now exists as a sentence/prosody anchor; these
-still need verified exact local clips or sentence-rhythm evidence before any
-new scoring-tile audio can become clickable.
+consonant silence, and phrase-final prominence. Standalone
+`/p b t d k g f v s z m n l/` anchors and `fr-phrase-final-prominence` now
+exist, but need exact local clips or sentence-rhythm evidence before any new
+scoring-tile audio becomes clickable.
 
-Russian goal: vowels including `/ɨ/`, source-backed hard/soft consonant pairs,
-always-hard and always-soft consonants, mobile stress, vowel reduction, final
-devoicing, regressive voicing assimilation, iotated vowels, soft sign behavior,
-and clusters. The first standalone stop, labial, and velar hard/soft pair
-anchors `/t tʲ d dʲ p pʲ b bʲ m mʲ f fʲ v vʲ k kʲ g gʲ x xʲ/` now exist as
-score-only contrast units, but Russian still is not a full inventory and the
-new pair anchors do not have verified short local header clips.
+Russian goal: vowels including `/ɨ/`, hard/soft consonant pairs, always-hard
+and always-soft consonants, mobile stress, vowel reduction, final devoicing,
+regressive voicing assimilation, iotated vowels, soft sign behavior, and
+clusters. First coronal stop, sibilant, sonorant, labial, and velar hard/soft
+pair anchors now exist as score-only contrast units; Russian is still not a
+full inventory and these anchors have no verified short local clips.
 
 ## Implementation Goals
 
@@ -80,6 +76,6 @@ new pair anchors do not have verified short local header clips.
 
 ## Done
 
-Users can tell which units are exact sounds, contextual realizations, dialect
-variants, and phrase-level rules. The UI never implies that a non-English module
-is production-ready merely because an English-style IPA grid exists.
+Users can tell exact sounds, contextual realizations, dialect variants, and
+phrase-level rules apart. The UI never implies that a non-English module is
+production-ready merely because an English-style IPA grid exists.
