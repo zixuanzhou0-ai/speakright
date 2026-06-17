@@ -316,9 +316,48 @@ describe("PhonemeStudyCard non-English reading layout", () => {
       screen.getByText(/Handbook of the International Phonetic Association/),
     ).toBeInTheDocument();
     expect(screen.getByText(/Phonetique\.ca/)).toBeInTheDocument();
+    const gapDetails = document.querySelector(
+      '[data-smoke="phonology-inventory-gap-details"]',
+    );
+    expect(gapDetails).toHaveAttribute("data-gap-count", "1");
+    expect(gapDetails).toHaveTextContent("待补：");
+    expect(gapDetails).toHaveTextContent(
+      "Sentence-level schwa deletion rules still need fuller coaching coverage.",
+    );
+  });
+
+  it("shows concrete exact-audio gaps for score-only plain consonant units", () => {
+    const spanishP = getLanguagePhonemeBySlug("es-ES", "es-p");
+
+    expect(spanishP).toBeDefined();
+    if (!spanishP) return;
+
+    renderCard({
+      phoneme: spanishP,
+      currentWord: {
+        word: "pan",
+        ipa: "/pan/",
+      },
+    });
+
+    const detail = document.querySelector(
+      '[data-smoke="phonology-inventory-detail"]',
+    );
+    expect(detail).toHaveAttribute("data-phonology-layer", "phoneme");
+    expect(detail).toHaveAttribute("data-tile-policy", "score-only-unverified");
+    expect(detail).toHaveAttribute("data-audio-status", "gap-no-local-clip");
+    expect(screen.getByText("缺少短音频")).toBeInTheDocument();
     expect(
-      screen.getByText("待补：仍有 1 项音频/方言/规则证据缺口。"),
+      screen.getByText("评分 tile 只显示分数，不播放未验证音频。"),
     ).toBeInTheDocument();
+
+    const gapDetails = document.querySelector(
+      '[data-smoke="phonology-inventory-gap-details"]',
+    );
+    expect(gapDetails).toHaveAttribute("data-gap-count", "1");
+    expect(gapDetails).toHaveTextContent(
+      "No verified exact local /p/ header clip exists yet.",
+    );
   });
 
   it("shows inventory rule guidance for phrase-level units instead of implying single-sound playback", () => {
