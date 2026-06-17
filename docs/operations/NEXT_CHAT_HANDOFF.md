@@ -312,7 +312,10 @@ git status --short --branch
 - Progress recent-session rows now wrap pack title, stage badge, target-score
   average, and completion time. Release EXE smoke seeds an English mastery
   profile locally so these rows are checked in main/narrow/low-height passes
-  without touching experimental-language mastery.
+  without touching experimental-language mastery. The Progress page now renders
+  every locally retained training session and shows the retained count instead
+  of applying a second six-row UI cap on top of the mastery-profile storage
+  limit.
 - Perception ABX focused-review and completion action rows now wrap instead of
   forcing all result buttons onto one narrow-window row. Release EXE smoke also
   covers `/drill/perception` in main, narrow, and low-height route passes under

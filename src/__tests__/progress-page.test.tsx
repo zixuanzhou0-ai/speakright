@@ -280,6 +280,48 @@ describe("ProgressPage language boundary", () => {
     expect(document.body.innerHTML).not.toContain("line-clamp");
   });
 
+  it("renders every retained training session instead of only the first six", () => {
+    mocks.loadMasteryProfile.mockReturnValueOnce({
+      version: 2,
+      updatedAt: 1_718_000_000_000,
+      packs: {
+        "s-th": {
+          packId: "s-th",
+          status: "stable",
+          masteryState: "integrated",
+          levelProgress: {},
+          bestTargetScore: 88,
+          perceptionBestRate: 0.9,
+          completedSessions: 7,
+          failureStreak: 0,
+        },
+      },
+      phonemes: {},
+      errorPatterns: {},
+      sessions: Array.from({ length: 7 }, (_, index) => ({
+        id: `session-${index + 1}`,
+        packId: "s-th",
+        startedAt: 1_718_000_000_000 + index * 120_000,
+        completedAt: 1_718_000_060_000 + index * 120_000,
+        perceptionCorrect: 4,
+        perceptionTotal: 5,
+        targetScores: [70 + index],
+        wordScores: [72 + index],
+        sentenceScores: [74 + index],
+        mastered: false,
+        masteryStateAfter: index === 6 ? "retained" : "integrated",
+      })),
+    });
+
+    render(<ProgressPage />);
+
+    expect(
+      document.querySelectorAll('[data-smoke="progress-recent-session-row"]'),
+    ).toHaveLength(7);
+    expect(screen.getByText("本机保留 7 轮")).toBeInTheDocument();
+    expect(screen.getByText("retained")).toBeInTheDocument();
+  });
+
   it("shows a visible error when benchmark deletion fails", async () => {
     mocks.listBenchmarkRecordings.mockReturnValue([benchmarkRecording]);
     mocks.deleteBenchmarkRecording.mockRejectedValueOnce(

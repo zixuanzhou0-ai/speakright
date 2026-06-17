@@ -116,7 +116,7 @@ export default function ProgressPage() {
         (pack) => pack.masteryState === "transferred",
       ).length
     : 0;
-  const recentSessions = profile?.sessions.slice(0, 6) ?? [];
+  const trainingSessions = profile?.sessions ?? [];
 
   const playRecording = async (item: BenchmarkRecordingMeta) => {
     setArchiveStatus(null);
@@ -451,14 +451,25 @@ export default function ProgressPage() {
         </section>
 
         <section className="rounded-xl border bg-card p-5 shadow-sm">
-          <h2 className="text-lg font-bold">最近训练状态</h2>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <h2 className="text-lg font-bold">训练状态历史</h2>
+            <Badge
+              variant="secondary"
+              className="w-fit max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]"
+              data-smoke="progress-session-count"
+            >
+              {trainingSessions.length > 0
+                ? `本机保留 ${trainingSessions.length} 轮`
+                : "暂无本机训练记录"}
+            </Badge>
+          </div>
           <div className="mt-4 space-y-3">
-            {recentSessions.length === 0 ? (
+            {trainingSessions.length === 0 ? (
               <p className="text-sm text-muted-foreground">
                 完成训练包或自由迁移后，这里会显示阶段变化。
               </p>
             ) : (
-              recentSessions.map((session) => {
+              trainingSessions.map((session) => {
                 const pack = TRAINING_PACKS.find(
                   (item) => item.id === session.packId,
                 );

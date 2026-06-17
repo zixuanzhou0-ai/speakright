@@ -19,6 +19,7 @@ claimed as complete.
 | Free-practice transfer evidence keeps matched target words complete | `src/lib/free-practice-transfer.ts`, `src/components/sentences/sentence-results-column.tsx`, `src/__tests__/free-practice-transfer.test.ts`, `src/__tests__/sentence-results-column.test.tsx`, `src/__tests__/desktop-preflight-ui-smoke.test.ts`; free-practice target previews preserve every matched target word inside a selected training target instead of slicing to the first six, and the transfer-evidence card displays the complete centered matched-word line with `free-practice-transfer-matched-words` |
 | Diagnosis reports keep generated evidence visible instead of re-summarizing it in the component | `src/components/assessment/assessment-report.tsx`, `src/__tests__/assessment-report.test.tsx`, `src/__tests__/desktop-preflight-ui-smoke.test.ts`; after the diagnosis engine builds its bounded `rawEvidence` list, the report renders every generated evidence row with `assessment-report-evidence-row` and every `errorPatternId` badge, rather than slicing the component view to the first 8 evidence rows or first 2 pattern IDs |
 | Training evidence pages keep generated evidence, pattern, and remediation lists complete | `src/app/drill/evidence/page.tsx`, `src/__tests__/training-evidence-page.test.tsx`, `src/__tests__/desktop-preflight-ui-smoke.test.ts`; after `buildTrainingEvidenceBook` builds its sorted evidence book, the page renders every `evidence-card-row`, `evidence-pattern-row`, and `evidence-remediation-row`, rather than slicing the component view to the first 8 evidence cards, 6 patterns, or 6 remediation records |
+| Progress training history keeps retained sessions visible | `src/app/progress/page.tsx`, `src/lib/mastery-profile.ts`, `src/__tests__/progress-page.test.tsx`, `src/__tests__/desktop-preflight-ui-smoke.test.ts`; after `recordTrainingSession` applies the local storage retention limit to the latest 80 sessions, the Progress page renders every retained `profile.sessions` row and shows `progress-session-count`, rather than applying a second `slice(0, 6)` UI cap |
 | Non-English rule units without local target audio do not show clickable speaker buttons | `src/lib/language-source-alignment.ts`, `src/components/phoneme/phoneme-study-card.tsx`, `src/components/drill/drill-phoneme-lesson.tsx`, `src/components/phoneme/phoneme-card.tsx`, `src/__tests__/phoneme-study-card.test.tsx`, `src/__tests__/language-source-alignment.test.ts`, `scripts/desktop-ui-smoke.mjs` |
 | Proxy or generic videos are not presented as exact teaching videos | `src/lib/language-source-alignment.ts`, `src/lib/language-teaching-videos.ts`, `src/components/phoneme/video-player.tsx`, `src/components/drill/drill-phoneme-lesson.tsx`, `src/__tests__/language-teaching-videos.test.ts`, `src/__tests__/video-player.test.tsx`, `scripts/desktop-ui-smoke.mjs` |
 | Spanish/French/Russian local dual-voice audio has zero missing required items and dry-run makes no ElevenLabs calls | `scripts/multilingual-audio-parity-report.mjs`, `src/__tests__/multilingual-audio-parity.test.ts`, `src/__tests__/static-language-audio-pack-assets.test.ts`, `npm.cmd run audio:parity:dry-run` |
@@ -77,20 +78,20 @@ Latest local full gate recorded in this audit:
 ```text
 git status --short --branch
   initial gate status before this round's edits was
-  `## main...origin/main [ahead 89]`; the current full gate was run with the
-  training-evidence full-list rendering fix and evidence updates still
+  `## main...origin/main [ahead 90]`; the current full gate was run with the
+  Progress training-history full-list rendering fix and evidence updates still
   unstaged, so `desktop:preflight` correctly reported `Git: dirty`. After
   GitHub API fallback pushes, verify the GitHub `main` ref and local-vs-remote
   tree SHA before treating content as unpushed.
 
-npm.cmd run test -- src/__tests__/training-evidence-page.test.tsx src/__tests__/desktop-preflight-ui-smoke.test.ts
-  2 files / 21 tests passed; the Training Evidence page now renders every
-  generated evidence card, pattern, and remediation row, and the static smoke
-  guard rejects the old first-8-card, first-6-pattern, and first-6-remediation
-  slices.
+npm.cmd run test -- src/__tests__/progress-page.test.tsx src/__tests__/desktop-preflight-ui-smoke.test.ts
+  2 files / 28 tests passed; the Progress page now renders every locally
+  retained training session instead of only the first six, shows
+  `progress-session-count`, and the static smoke guard rejects the old
+  `profile?.sessions.slice(0, 6)` cap.
 
 npm.cmd run test
-  124 files / 707 tests passed
+  124 files / 708 tests passed
 
 npm.cmd run typecheck
   passed
@@ -102,10 +103,10 @@ npm.cmd run build:desktop-frontend
   passed; 144 static pages generated
 
 npm.cmd run desktop:build
-  passed; reran `build:desktop-frontend`, compiled the Tauri release app, built
-  `src-tauri\target\release\speakright.exe`, and generated MSI/NSIS bundles so
-  Release EXE validation used a fresh package after the training-evidence
-  full-list visibility fix and current static app assets.
+  the tool call timed out after 604 seconds while the original npm/Tauri build
+  process continued; the process then exited, `speakright.exe` was updated at
+  2026-06-17 08:43:37, MSI at 08:43:28, and NSIS at 08:47:47, and downstream
+  preflight/UI-smoke/launch checks validated the fresh Release EXE package.
 
 npm.cmd run desktop:preflight
   passed; Release EXE exists, is not older than `out/`, no running
@@ -114,7 +115,7 @@ npm.cmd run desktop:preflight
 
 npm.cmd run desktop:ui-smoke
   passed; Release EXE runtime reported
-  `pid=73880 settings=ok`, detail coverage for English, Spanish, French, and
+  `pid=33068 settings=ok`, detail coverage for English, Spanish, French, and
   Russian sound units, routes `/drill`, `/drill/word`, `/drill/sentence`,
   `/drill/contrast`, `/drill/prosody`, `/drill/perception`, `/drill/evidence`,
   `/drill/pack/ee-ih`, `/drill/scenarios`, `/drill/spontaneous`,
@@ -127,11 +128,11 @@ npm.cmd run desktop:ui-smoke
 
 npm.cmd run desktop:launch-release
   passed; command printed `SpeakRight release desktop app launch requested`,
-  the Release EXE path, PID `61620`, and the no-localhost reminder; the Release
+  the Release EXE path, PID `61412`, and the no-localhost reminder; the Release
   EXE opened from `src-tauri\target\release\speakright.exe`.
 
 process cleanup
-  `Get-Process -Id 61620` confirmed `running pid=61620 name=speakright`; the
+  `Get-Process -Id 61412` confirmed `running pid=61412 name=speakright`; the
   process was stopped afterward, and no residual `speakright.exe` remained
   after cleanup
 ```

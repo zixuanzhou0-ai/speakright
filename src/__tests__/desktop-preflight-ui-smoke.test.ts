@@ -1153,6 +1153,11 @@ describe("desktop preflight and UI smoke", () => {
       'data-smoke="progress-recent-session-title"',
     );
     expect(progressPage).toContain('data-smoke="progress-recent-session-meta"');
+    expect(progressPage).toContain('data-smoke="progress-session-count"');
+    expect(progressPage).toContain(
+      "const trainingSessions = profile?.sessions ?? []",
+    );
+    expect(progressPage).not.toContain("profile?.sessions.slice(0, 6)");
     expect(progressPage).toContain("flex flex-col gap-3");
     expect(progressPage).toContain(
       "sm:flex-row sm:items-center sm:justify-between",
