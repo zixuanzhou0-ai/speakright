@@ -227,7 +227,7 @@ export default function DrillPage() {
     () => buildTrainingMemory(profile, reviewQueue),
     [profile, reviewQueue],
   );
-  const reviewItems = reviewQueue.slice(0, 2).map(prescriptionFromReviewTask);
+  const reviewItems = reviewQueue.map(prescriptionFromReviewTask);
   const todayItems = Array.from(
     new Map(
       [...reviewItems, ...(prescription.days[0]?.items ?? [])].map((item) => [
@@ -235,7 +235,7 @@ export default function DrillPage() {
         item,
       ]),
     ).values(),
-  ).slice(0, 2);
+  );
   const primaryItem = todayItems[0];
   const primaryPack = primaryItem
     ? TRAINING_PACKS.find((pack) => pack.id === primaryItem.packId)
@@ -493,7 +493,7 @@ export default function DrillPage() {
           )}
           {reviewQueue.length > 0 && (
             <div className="mb-4 grid gap-2 md:grid-cols-2">
-              {reviewQueue.slice(0, 2).map((task) => {
+              {reviewQueue.map((task) => {
                 const pack = TRAINING_PACKS.find(
                   (item) => item.id === task.packId,
                 );
@@ -503,9 +503,14 @@ export default function DrillPage() {
                     key={task.id}
                     href={packHref(task.packId, task.levelId)}
                   >
-                    <div className="rounded-lg border border-primary/20 bg-primary/5 p-3 transition-colors hover:border-primary/50 cursor-pointer">
+                    <div
+                      className="rounded-lg border border-primary/20 bg-primary/5 p-3 transition-colors hover:border-primary/50 cursor-pointer"
+                      data-smoke="drill-review-task-card"
+                    >
                       <div className="flex items-center justify-between gap-2">
-                        <p className="text-sm font-semibold">{pack.title}</p>
+                        <p className="min-w-0 flex-1 break-words text-sm font-semibold [overflow-wrap:anywhere]">
+                          {pack.title}
+                        </p>
                         <Badge
                           variant={priorityVariant(task.priority)}
                           className={WRAP_SAFE_BADGE_CLASS}
@@ -514,7 +519,7 @@ export default function DrillPage() {
                           {sourceLabel(task.source)}
                         </Badge>
                       </div>
-                      <p className="mt-1 text-xs text-muted-foreground">
+                      <p className="mt-1 break-words text-xs text-muted-foreground [overflow-wrap:anywhere]">
                         {task.reason}
                       </p>
                     </div>
@@ -535,9 +540,12 @@ export default function DrillPage() {
                     transition={{ delay: index * 0.06 }}
                     whileHover={{ y: -2 }}
                     className="h-full rounded-xl border bg-background p-4 shadow-sm transition-colors hover:border-primary/50 cursor-pointer"
+                    data-smoke="drill-today-item-card"
                   >
                     <div className="flex items-center justify-between gap-3">
-                      <h3 className="font-bold">{pack.title}</h3>
+                      <h3 className="min-w-0 flex-1 break-words font-bold [overflow-wrap:anywhere]">
+                        {pack.title}
+                      </h3>
                       <Badge
                         variant={
                           item.priority === "critical"
@@ -570,15 +578,15 @@ export default function DrillPage() {
                         </Badge>
                       )}
                     </div>
-                    <p className="mt-2 text-sm text-muted-foreground">
+                    <p className="mt-2 break-words text-sm text-muted-foreground [overflow-wrap:anywhere]">
                       {item.reason}
                     </p>
                     {item.learningObjective && (
-                      <p className="mt-2 text-sm text-muted-foreground">
+                      <p className="mt-2 break-words text-sm text-muted-foreground [overflow-wrap:anywhere]">
                         今天只做：{item.learningObjective}
                       </p>
                     )}
-                    <p className="mt-3 text-sm font-medium text-primary">
+                    <p className="mt-3 break-words text-sm font-medium text-primary [overflow-wrap:anywhere]">
                       目标：{pack.focus}
                       {` · 从 ${levelTitle(pack, item.levelId)} 开始`}
                     </p>

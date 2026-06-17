@@ -837,6 +837,14 @@ describe("desktop preflight and UI smoke", () => {
     expect(drillPage).toContain("WRAP_SAFE_ACTION_BUTTON_CLASS");
     expect(drillPage).toContain("WRAP_SAFE_BADGE_CLASS");
     expect(drillPage).toContain(
+      "const reviewItems = reviewQueue.map(prescriptionFromReviewTask);",
+    );
+    expect(drillPage).toContain("{reviewQueue.map((task) => {");
+    expect(drillPage).toContain('data-smoke="drill-review-task-card"');
+    expect(drillPage).toContain('data-smoke="drill-today-item-card"');
+    expect(drillPage).not.toContain("reviewQueue.slice(0, 2)");
+    expect(drillPage).not.toContain(".slice(0, 2)");
+    expect(drillPage).toContain(
       "h-auto min-h-8 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]",
     );
     expect(drillPage).toContain(
