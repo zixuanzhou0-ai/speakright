@@ -40,6 +40,7 @@ Last updated: 2026-06-18
 
 - 元音目标 `/a o i ɨ u e/`，并包含重音/弱化说明。
 - learner-facing `/ɨ/`。
+- source-backed 硬辅音 exact anchors：`/p b t d k g f v s z m n l ʂ ʐ/`。
 - `/r/`、`/x/`、`/ts/`、`/tɕ/`、`/ɕː/`、`/j/`。
 - 常硬/常软目标，如 `/ʂ ʐ ts/`、`/tɕ ɕː j/`。
 - 硬/软系统、软 `/tʲ dʲ/`、软 `/sʲ zʲ/`、软响音、软唇音、软音符号、
@@ -50,7 +51,8 @@ Last updated: 2026-06-18
 
 仍未完成：
 
-- 很多硬软 pair 是 score-only contrast anchor，没有 exact local single-segment clip。
+- 很多硬软 pair 仍是 score-only contrast anchor；硬音 exact clip 不等于软音或 pair
+  lesson 已完成。
 - `[ɐ ə ɪ]` 是弱化实现，不是独立已掌握音素 tile。
 - `/ʐ/` 不能借 `/ʂ/` 音频或规则说明冒充可点击音频。
 - 完整俄语辅音 map 还需要 source-backed pair coverage 和已验证例词。
@@ -60,7 +62,7 @@ Last updated: 2026-06-18
 
 | 层 | 俄语内容 | 产品处理 |
 | --- | --- | --- |
-| phoneme | 重读元音、learner `/ɨ/`、`/r x ts tɕ ɕː j/`、已有 exact 单音锚点 | 课程和诊断标签 |
+| phoneme | 重读元音、learner `/ɨ/`、`/p b t d k g f v s z m n l ʂ ʐ/`、`/r x ts tɕ ɕː j/`、已有 exact 单音锚点 | 课程和诊断标签 |
 | contrast | 硬/软 pair、常硬/常软、软音符号 | pair drill；无 exact clip 时 score-only |
 | allophone/realization | `[ɐ ə ɪ]`、位置性元音质量、清化输出 | 词/短语实现说明 |
 | connected-speech rule | iotated vowels、词尾清化、逆行清浊同化、clusters | 短语/句子反馈 |
@@ -112,4 +114,3 @@ Last updated: 2026-06-18
 
 俄语达到 public experimental 标准时，所有多音节例词可见重音；硬软系统有 source-backed
 map；弱化和同化按环境解释；规则类 tile 不播放假单音频。
-

@@ -71,6 +71,28 @@ describe("Russian pronunciation content", () => {
     }
   });
 
+  it("adds standalone hard Russian fricative, nasal, lateral, and always-hard anchors", () => {
+    for (const [slug, expectedIpa] of [
+      ["ru-f", "/f/"],
+      ["ru-v", "/v/"],
+      ["ru-s", "/s/"],
+      ["ru-z", "/z/"],
+      ["ru-m", "/m/"],
+      ["ru-n", "/n/"],
+      ["ru-l", "/l/"],
+      ["ru-sh", "/ʂ/"],
+      ["ru-zh", "/ʐ/"],
+    ] as const) {
+      const unit = getLanguagePhonemeBySlug("ru-RU", slug);
+
+      expect(unit?.soundUnitType ?? "phoneme", slug).toBe("phoneme");
+      expect(unit?.ipa, slug).toBe(expectedIpa);
+      expect(unit?.description, slug).toContain("硬");
+      expect(unit?.notes?.join(" "), slug).toMatch(/软|清化|对比/);
+      expect(unit?.keywords.length, slug).toBeGreaterThanOrEqual(20);
+    }
+  });
+
   it("explains final devoicing without hiding connected-speech voicing", () => {
     const finalDevoicing = getLanguagePhonemeBySlug(
       "ru-RU",

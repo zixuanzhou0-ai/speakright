@@ -52,7 +52,8 @@ enchaînement、elision、e caduc/schwa、词尾静音和 phrase-final prominenc
 
 俄语 stress-first、hard/soft-first。元音、learner-facing `/ɨ/`、硬/软 pair、
 常硬/常软、`ь`、iotated vowels、弱化、词尾清化、逆行清浊同化和 clusters 必须
-分层。硬软 pair 可以先 score-only，但无 exact clip 时不能播放。
+分层。当前已把 `/p b t d k g f v s z m n l ʂ ʐ/` 的硬音锚点接到 exact local
+header clips；硬软 pair 可以先 score-only，但无 exact pair/soft clip 时不能播放。
 
 ## 实施目标
 
@@ -75,4 +76,3 @@ enchaînement、elision、e caduc/schwa、词尾静音和 phrase-final prominenc
 用户能看清哪些是真实单音、哪些是上下文实现、哪些是对比、哪些是短语规则、哪些是
 韵律；experimental 语言不被包装成已完成产品；所有 speaker 都真实、短、同源、可
 追溯，其余只显示分数或规则说明。
-

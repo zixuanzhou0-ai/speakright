@@ -75,10 +75,19 @@ const VERIFIED_SEGMENTS: Record<Exclude<LanguageId, "en-US">, string[]> = {
     "d",
     "k",
     "g",
+    "f",
+    "v",
+    "s",
+    "z",
+    "m",
+    "n",
+    "l",
     "r",
     "x",
     "ʂ",
     "ʃ",
+    "ʐ",
+    "ʒ",
     "ts",
     "t͡s",
     "tɕ",
@@ -133,6 +142,15 @@ describe("assessment segment audio inventory", () => {
       ["ru-RU", "ɨ", "ru-y"],
       ["ru-RU", "p", "ru-p"],
       ["ru-RU", "g", "ru-g"],
+      ["ru-RU", "f", "ru-f"],
+      ["ru-RU", "v", "ru-v"],
+      ["ru-RU", "s", "ru-s"],
+      ["ru-RU", "z", "ru-z"],
+      ["ru-RU", "m", "ru-m"],
+      ["ru-RU", "n", "ru-n"],
+      ["ru-RU", "l", "ru-l"],
+      ["ru-RU", "ʂ", "ru-sh"],
+      ["ru-RU", "ʐ", "ru-zh"],
       ["ru-RU", "tɕ", "ru-ch"],
       ["ru-RU", "ɕː", "ru-shch"],
     ] as const;
@@ -192,7 +210,6 @@ describe("assessment segment audio inventory", () => {
       ["fr-FR", "liaison"],
       ["ru-RU", "ɐ"],
       ["ru-RU", "ə"],
-      ["ru-RU", "ʐ"],
       ["ru-RU", "tʲ"],
       ["ru-RU", "final devoicing"],
       ["ru-RU", "cluster"],
@@ -207,7 +224,6 @@ describe("assessment segment audio inventory", () => {
     expect(getAssessmentPhonemeLabel("ɱ", "es-ES")).toBe("/ɱ/");
     expect(getAssessmentPhonemeLabel("m", "es-ES")).toBe("/m/");
     expect(getAssessmentPhonemeLabel("n", "es-ES")).toBe("/n/");
-    expect(getAssessmentPhonemeLabel("ʐ", "ru-RU")).toBe("/ʐ/");
     expect(getAssessmentPhonemeLabel("final devoicing", "ru-RU")).toBe(
       "/final devoicing/",
     );

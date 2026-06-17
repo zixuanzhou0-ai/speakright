@@ -346,6 +346,7 @@ describe("PhonemeHighlight", () => {
       ],
       ["播放音标 /ɨ/", "/audio/language-assets/ru-RU/header-clips/ru-y.m4a"],
       ["播放音标 /ʂ/", "/audio/language-assets/ru-RU/header-clips/ru-sh.m4a"],
+      ["播放音标 /ʐ/", "/audio/language-assets/ru-RU/header-clips/ru-zh.m4a"],
     ] as const;
 
     for (const [ariaLabel, source] of expectedSources) {
@@ -362,7 +363,7 @@ describe("PhonemeHighlight", () => {
       );
     }
 
-    for (const label of ["/dʲ/", "/nʲ/", "/ɐ/", "/ʐ/"] as const) {
+    for (const label of ["/dʲ/", "/nʲ/", "/ɐ/"] as const) {
       const tile = screen
         .getByText(label)
         .closest('[data-smoke="assessment-phoneme-tile"]');

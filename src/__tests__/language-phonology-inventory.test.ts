@@ -116,7 +116,23 @@ describe("language phonology inventory", () => {
     expect(getPhonologyInventoryEntry("ru-RU", "ru-hard-soft")?.layer).toBe(
       "contrast",
     );
-    for (const slug of ["ru-p", "ru-b", "ru-t", "ru-d", "ru-k", "ru-g"]) {
+    for (const slug of [
+      "ru-p",
+      "ru-b",
+      "ru-t",
+      "ru-d",
+      "ru-k",
+      "ru-g",
+      "ru-f",
+      "ru-v",
+      "ru-s",
+      "ru-z",
+      "ru-m",
+      "ru-n",
+      "ru-l",
+      "ru-sh",
+      "ru-zh",
+    ]) {
       expect(getPhonologyInventoryEntry("ru-RU", slug)?.layer).toBe("phoneme");
     }
     expect(getPhonologyInventoryEntry("ru-RU", "ru-final-devoicing")?.layer).toBe(
@@ -168,6 +184,7 @@ describe("language phonology inventory", () => {
       ["fr-FR", "fr-final-consonant-silence", "rule-only"],
       ["fr-FR", "fr-phrase-final-prominence", "rule-only"],
       ["ru-RU", "ru-hard-soft", "proxy-local-reference"],
+      ["ru-RU", "ru-sh-zh", "proxy-local-reference"],
       ["ru-RU", "ru-final-devoicing", "proxy-local-reference"],
       ["ru-RU", "ru-voicing-assimilation", "proxy-local-reference"],
     ] as const;
@@ -298,7 +315,7 @@ describe("language phonology inventory", () => {
     }
   });
 
-  it("promotes exact Russian hard stop anchors to clickable same-unit header clips", () => {
+  it("promotes exact Russian hard consonant anchors to clickable same-unit header clips", () => {
     for (const [slug, alias] of [
       ["ru-p", "p"],
       ["ru-b", "b"],
@@ -306,13 +323,22 @@ describe("language phonology inventory", () => {
       ["ru-d", "d"],
       ["ru-k", "k"],
       ["ru-g", "g"],
+      ["ru-f", "f"],
+      ["ru-v", "v"],
+      ["ru-s", "s"],
+      ["ru-z", "z"],
+      ["ru-m", "m"],
+      ["ru-n", "n"],
+      ["ru-l", "l"],
+      ["ru-sh", "ʂ"],
+      ["ru-zh", "ʐ"],
     ] as const) {
       const entry = getPhonologyInventoryEntry("ru-RU", slug);
 
       expect(entry?.layer, slug).toBe("phoneme");
       expect(entry?.audioStatus, slug).toBe("exact-local-header");
       expect(entry?.tilePolicy, slug).toBe("clickable-exact-header");
-      expect(entry?.exactAssessmentAliases, slug).toEqual([alias]);
+      expect(entry?.exactAssessmentAliases, slug).toContain(alias);
       expect(entry?.headerAudioSrc, slug).toBe(
         `/audio/language-assets/ru-RU/header-clips/${slug}.m4a`,
       );

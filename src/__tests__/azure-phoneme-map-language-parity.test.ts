@@ -242,6 +242,12 @@ describe("multilingual Azure phoneme map parity", () => {
     expect(getPhonemeAudioUrl("ɨ", "ru-RU")).toBe(
       "/audio/language-assets/ru-RU/header-clips/ru-y.m4a",
     );
+    expect(getPhonemeAudioUrl("v", "ru-RU")).toBe(
+      "/audio/language-assets/ru-RU/header-clips/ru-v.m4a",
+    );
+    expect(getPhonemeAudioUrl("ʐ", "ru-RU")).toBe(
+      "/audio/language-assets/ru-RU/header-clips/ru-zh.m4a",
+    );
     expect(getPhonemeAudioUrl("k", "es-ES")).toBeNull();
     expect(getPhonemeAudioUrl("b", "es-ES")).toBeNull();
     expect(getPhonemeAudioUrl("d", "es-ES")).toBeNull();
@@ -255,11 +261,9 @@ describe("multilingual Azure phoneme map parity", () => {
     expect(getPhonemeAudioUrl("lʲ", "ru-RU")).toBeNull();
     expect(getPhonemeAudioUrl("rʲ", "ru-RU")).toBeNull();
     expect(getPhonemeAudioUrl("pʲ", "ru-RU")).toBeNull();
-    expect(getPhonemeAudioUrl("v", "ru-RU")).toBeNull();
     expect(getPhonemeAudioUrl("kʲ", "ru-RU")).toBeNull();
     expect(getPhonemeAudioUrl("gʲ", "ru-RU")).toBeNull();
     expect(getPhonemeAudioUrl("xʲ", "ru-RU")).toBeNull();
-    expect(getPhonemeAudioUrl("ʐ", "ru-RU")).toBeNull();
     expect(getPhonemeAudioUrl("ɱ", "es-ES")).toBeNull();
     expect(getPhonemeAudioUrl("final devoicing", "ru-RU")).toBeNull();
     expect(getPhonemeAudioUrl("iy", "en-US")).toBe(

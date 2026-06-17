@@ -358,6 +358,48 @@ export const LOCAL_LANGUAGE_PHONEME_ASSETS: LocalLanguagePhonemeAsset[] = [
     audioIpa: "/g/",
     exactAssessmentAliases: ["g"],
   }),
+  russianSeeingSpeechAsset("ru-f", "ru-f", [
+    "Russian hard ф /f/ exact local asset; soft /fʲ/ remains a separate contrast target.",
+  ], {
+    audioIpa: "/f/",
+    exactAssessmentAliases: ["f"],
+  }),
+  russianSeeingSpeechAsset("ru-v", "ru-v", [
+    "Russian hard в /v/ exact local asset; /v/ assimilation behavior is a separate rule.",
+  ], {
+    audioIpa: "/v/",
+    exactAssessmentAliases: ["v"],
+  }),
+  russianSeeingSpeechAsset("ru-s", "ru-s", [
+    "Russian hard с /s/ exact local asset; soft /sʲ/ remains a separate contrast target.",
+  ], {
+    audioIpa: "/s/",
+    exactAssessmentAliases: ["s"],
+  }),
+  russianSeeingSpeechAsset("ru-z", "ru-z", [
+    "Russian hard з /z/ exact local asset; final devoicing is a separate rule.",
+  ], {
+    audioIpa: "/z/",
+    exactAssessmentAliases: ["z"],
+  }),
+  russianSeeingSpeechAsset("ru-m", "ru-m", [
+    "Russian hard м /m/ exact local asset; soft /mʲ/ remains a separate contrast target.",
+  ], {
+    audioIpa: "/m/",
+    exactAssessmentAliases: ["m"],
+  }),
+  russianSeeingSpeechAsset("ru-n", "ru-n", [
+    "Russian hard н /n/ exact local asset; soft /nʲ/ remains a separate contrast target.",
+  ], {
+    audioIpa: "/n/",
+    exactAssessmentAliases: ["n"],
+  }),
+  russianSeeingSpeechAsset("ru-l", "ru-l", [
+    "Russian hard л /l/ exact local asset; soft /lʲ/ remains a separate contrast target.",
+  ], {
+    audioIpa: "/l/",
+    exactAssessmentAliases: ["l"],
+  }),
   russianSeeingSpeechAsset("ru-r", "ru-r", [
     "Russian trilled р /r/ primary local asset; palatalized trill audio is also available.",
   ], {
@@ -401,10 +443,21 @@ export const LOCAL_LANGUAGE_PHONEME_ASSETS: LocalLanguagePhonemeAsset[] = [
     },
   ),
   russianSeeingSpeechAsset("ru-sh-zh", "ru-sh", [
-    "ш/ж contrast: ш is primary; ж is bundled as a related local asset.",
+    "ш/ж contrast: standalone ш and ж units carry exact tile audio; this grouped contrast stays a teaching proxy.",
+  ], {
+    isProxyForAssessment: true,
+  }),
+  russianSeeingSpeechAsset("ru-sh", "ru-sh", [
+    "Russian always-hard ш /ʂ/ exact local asset; distinct from soft щ /ɕː/.",
   ], {
     audioIpa: "/ʂ/",
     exactAssessmentAliases: ["ʂ", "ʃ", "sh"],
+  }),
+  russianSeeingSpeechAsset("ru-zh", "ru-zh", [
+    "Russian always-hard ж /ʐ/ exact local asset; final devoicing is a separate rule.",
+  ], {
+    audioIpa: "/ʐ/",
+    exactAssessmentAliases: ["ʐ", "ʒ", "zh"],
   }),
   russianSeeingSpeechAsset("ru-ts-ch-shch", "ru-ts", [
     "ц/ч/щ group: ц /ts/ is primary; ч and щ use Commons audio plus /ɕ/ proxy video.",
