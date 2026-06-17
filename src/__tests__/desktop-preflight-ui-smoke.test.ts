@@ -1071,6 +1071,17 @@ describe("desktop preflight and UI smoke", () => {
     expect(evidencePage).toContain(
       'data-smoke="evidence-experimental-blocker"',
     );
+    expect(evidencePage).toContain('data-smoke="evidence-card-row"');
+    expect(evidencePage).toContain('data-smoke="evidence-pattern-row"');
+    expect(evidencePage).toContain('data-smoke="evidence-remediation-row"');
+    expect(evidencePage).toContain("evidenceBook.cards.map");
+    expect(evidencePage).toContain("evidenceBook.patterns.map");
+    expect(evidencePage).toContain("evidenceBook.remediations.map");
+    expect(evidencePage).not.toContain("topCards");
+    expect(evidencePage).not.toContain("topPatterns");
+    expect(evidencePage).not.toContain("remediations = evidenceBook.remediations.slice");
+    expect(evidencePage).not.toContain("evidenceBook.cards.slice(0, 8)");
+    expect(evidencePage).not.toContain("evidenceBook.patterns.slice(0, 6)");
     expect(evidencePage).toContain(
       "h-auto min-h-8 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]",
     );

@@ -97,6 +97,9 @@ E:\SpeakRightDesktopRepo\src-tauri\target\release\speakright.exe
 - Diagnosis reports now render every generated `rawEvidence` row and every
   `errorPatternId` badge instead of showing only the first 8 evidence rows or
   first 2 pattern IDs; `assessment-report-evidence-row` guards the evidence list.
+- Training Evidence now renders every generated evidence card, pattern, and
+  remediation row instead of only the first 8 / 6 / 6 items; the page exposes
+  `evidence-card-row`, `evidence-pattern-row`, and `evidence-remediation-row`.
 - Free-practice input/listen controls now use a wrapping action row with a
   readable textarea minimum width; the word-mode icon button also has the
   explicit `播放单词发音` accessible label.

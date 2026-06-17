@@ -311,7 +311,7 @@ describe("open-source readiness files", () => {
       "Latest local full gate",
     );
     expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
-      "123 files / 706 tests passed",
+      "124 files / 707 tests passed",
     );
     expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
       "settings-storage-warning",
@@ -326,7 +326,7 @@ describe("open-source readiness files", () => {
       "match the detail header speaker",
     );
     expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
-      "Biome checked 387 files",
+      "Biome checked 388 files",
     );
     expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
       "ru-RU 918 existing, 0 missing",

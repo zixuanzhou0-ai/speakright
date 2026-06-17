@@ -86,9 +86,6 @@ export default function TrainingEvidencePage() {
     () => buildTrainingEvidenceBook(canShowFormalEvidence ? profile : null),
     [canShowFormalEvidence, profile],
   );
-  const topCards = evidenceBook.cards.slice(0, 8);
-  const topPatterns = evidenceBook.patterns.slice(0, 6);
-  const remediations = evidenceBook.remediations.slice(0, 6);
 
   if (!canShowFormalEvidence) {
     return (
@@ -225,7 +222,7 @@ export default function TrainingEvidencePage() {
                 title="最该复练的具体词"
                 description="按严重程度、重复次数和最近出现时间排序。"
               />
-              {topCards.map((card, index) => (
+              {evidenceBook.cards.map((card, index) => (
                 <EvidenceCardRow card={card} index={index} key={card.id} />
               ))}
             </section>
@@ -237,10 +234,10 @@ export default function TrainingEvidencePage() {
                   title="反复出现的错因"
                   description="这些不是单个词的问题，而是动作模式。"
                 />
-                {topPatterns.length === 0 ? (
+                {evidenceBook.patterns.length === 0 ? (
                   <SmallEmpty text="还没有形成稳定错因。继续完成训练后会自动聚合。" />
                 ) : (
-                  topPatterns.map((pattern) => (
+                  evidenceBook.patterns.map((pattern) => (
                     <PatternRow pattern={pattern} key={pattern.patternId} />
                   ))
                 )}
@@ -252,10 +249,10 @@ export default function TrainingEvidencePage() {
                   title="补救步骤效果"
                   description="看哪些慢速拆解真的让目标音上涨。"
                 />
-                {remediations.length === 0 ? (
+                {evidenceBook.remediations.length === 0 ? (
                   <SmallEmpty text="还没有补救步骤记录。连续失败后进入拆解会产生记录。" />
                 ) : (
-                  remediations.map((item) => (
+                  evidenceBook.remediations.map((item) => (
                     <RemediationRow item={item} key={item.id} />
                   ))
                 )}
@@ -320,17 +317,20 @@ function EvidenceCardRow({ card, index }: { card: EvidenceCard; index: number })
         transition={{ delay: index * 0.04 }}
         whileHover={{ y: -2 }}
         className="rounded-xl border bg-card p-4 shadow-sm transition-colors hover:border-primary/50 cursor-pointer"
+        data-smoke="evidence-card-row"
       >
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <h3 className="text-lg font-bold">{card.text}</h3>
+              <h3 className="break-words text-lg font-bold [overflow-wrap:anywhere]">
+                {card.text}
+              </h3>
               <Badge variant={severityVariant(card.severity)}>
                 {severityLabel(card.severity)}
               </Badge>
               {card.dueTask && <Badge variant="outline">已进复习队列</Badge>}
             </div>
-            <p className="mt-1 text-sm text-muted-foreground">
+            <p className="mt-1 break-words text-sm text-muted-foreground [overflow-wrap:anywhere]">
               {card.packTitle} · {card.levelTitle}
             </p>
           </div>
@@ -346,13 +346,13 @@ function EvidenceCardRow({ card, index }: { card: EvidenceCard; index: number })
             <p className="text-xs font-semibold uppercase text-muted-foreground">
               证据
             </p>
-            <p className="mt-1 text-sm">
+            <p className="mt-1 break-words text-sm [overflow-wrap:anywhere]">
               出现 {card.attempts} 次 · 目标音 {card.targetPhonemes.join(" / ")}
               {card.scoreGap >= 12
                 ? ` · 整体分高出目标音 ${card.scoreGap} 分`
                 : ""}
             </p>
-            <p className="mt-1 text-xs text-muted-foreground">
+            <p className="mt-1 break-words text-xs text-muted-foreground [overflow-wrap:anywhere]">
               首次 {formatDate(card.firstSeenAt)} · 最近 {formatDate(card.lastSeenAt)}
             </p>
           </div>
@@ -360,9 +360,11 @@ function EvidenceCardRow({ card, index }: { card: EvidenceCard; index: number })
             <p className="text-xs font-semibold uppercase text-muted-foreground">
               下一次只改
             </p>
-            <p className="mt-1 text-sm font-medium text-primary">{card.nextCue}</p>
+            <p className="mt-1 break-words text-sm font-medium text-primary [overflow-wrap:anywhere]">
+              {card.nextCue}
+            </p>
             {card.patternTitles.length > 0 && (
-              <p className="mt-1 text-xs text-muted-foreground">
+              <p className="mt-1 break-words text-xs text-muted-foreground [overflow-wrap:anywhere]">
                 错因：{card.patternTitles.join(" / ")}
               </p>
             )}
@@ -376,11 +378,16 @@ function EvidenceCardRow({ card, index }: { card: EvidenceCard; index: number })
 function PatternRow({ pattern }: { pattern: PatternEvidence }) {
   return (
     <Link href={packHref(pattern.packId, pattern.levelId)}>
-      <div className="rounded-xl border bg-card p-4 shadow-sm transition-colors hover:border-primary/50 cursor-pointer">
+      <div
+        className="rounded-xl border bg-card p-4 shadow-sm transition-colors hover:border-primary/50 cursor-pointer"
+        data-smoke="evidence-pattern-row"
+      >
         <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="font-semibold">{pattern.title}</p>
-            <p className="mt-1 text-xs text-muted-foreground">
+          <div className="min-w-0">
+            <p className="break-words font-semibold [overflow-wrap:anywhere]">
+              {pattern.title}
+            </p>
+            <p className="mt-1 break-words text-xs text-muted-foreground [overflow-wrap:anywhere]">
               {pattern.packTitle} · 出现 {pattern.seenCount} 次 · 卡住 {pattern.stuckCount} 次
             </p>
           </div>
@@ -388,8 +395,10 @@ function PatternRow({ pattern }: { pattern: PatternEvidence }) {
             {severityLabel(pattern.severity)}
           </Badge>
         </div>
-        <p className="mt-3 text-sm text-muted-foreground">{pattern.explanation}</p>
-        <p className="mt-2 text-sm font-medium text-primary">
+        <p className="mt-3 break-words text-sm text-muted-foreground [overflow-wrap:anywhere]">
+          {pattern.explanation}
+        </p>
+        <p className="mt-2 break-words text-sm font-medium text-primary [overflow-wrap:anywhere]">
           下一次只改：{pattern.cue}
         </p>
       </div>
@@ -400,11 +409,16 @@ function PatternRow({ pattern }: { pattern: PatternEvidence }) {
 function RemediationRow({ item }: { item: RemediationEvidence }) {
   const passRate = Math.round((item.passedCount / Math.max(1, item.attempts)) * 100);
   return (
-    <div className="rounded-xl border bg-card p-4 shadow-sm">
+    <div
+      className="rounded-xl border bg-card p-4 shadow-sm"
+      data-smoke="evidence-remediation-row"
+    >
       <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="font-semibold">{item.text}</p>
-          <p className="mt-1 text-xs text-muted-foreground">
+        <div className="min-w-0">
+          <p className="break-words font-semibold [overflow-wrap:anywhere]">
+            {item.text}
+          </p>
+          <p className="mt-1 break-words text-xs text-muted-foreground [overflow-wrap:anywhere]">
             {item.packTitle} · {item.pathId}
           </p>
         </div>
@@ -421,7 +435,7 @@ function RemediationRow({ item }: { item: RemediationEvidence }) {
           danger={!item.latestPassed}
         />
       </div>
-      <p className="mt-2 text-xs text-muted-foreground">
+      <p className="mt-2 break-words text-xs text-muted-foreground [overflow-wrap:anywhere]">
         尝试 {item.attempts} 次 · 失败 {item.failedCount} 次 · 最近 {formatDate(item.lastSeenAt)}
       </p>
     </div>
