@@ -340,6 +340,7 @@ export function PhonemeDetailPage() {
         result,
         "phoneme",
         languageId,
+        { targetUnitSlugs: phoneme ? [phoneme.slug] : [] },
       );
     }
   }, [
@@ -391,6 +392,7 @@ export function PhonemeDetailPage() {
       azure.result,
       "phoneme",
       languageId,
+      { targetUnitSlugs: [phoneme.slug] },
     );
   }, [
     azure.result,

@@ -117,6 +117,55 @@ describe("LLM feedback prompt", () => {
     );
   });
 
+  it("adds targeted Spanish deck rules when the practice text matches audited evidence", () => {
+    const prompt = buildFeedbackPrompt(
+      "Un gato duerme en un banco.",
+      SAMPLE_RESULT,
+      "sentence",
+      "normal",
+      "es-ES",
+    );
+
+    expect(prompt).toContain("当前练习材料命中的专项规则");
+    expect(prompt).toContain("spanish-nasal-place-assimilation");
+    expect(prompt).toContain("sentence: Un gato duerme en un banco.");
+    expect(prompt).toContain("es-nasal-place");
+    expect(prompt).toContain("只有 Azure 结果提供证据时");
+  });
+
+  it("adds targeted French phrase rules from audited sentence evidence", () => {
+    const prompt = buildFeedbackPrompt(
+      "L’ami arrive à huit heures.",
+      SAMPLE_RESULT,
+      "sentence",
+      "normal",
+      "fr-FR",
+    );
+
+    expect(prompt).toContain("当前练习材料命中的专项规则");
+    expect(prompt).toContain("french-elision");
+    expect(prompt).toContain("french-enchainement");
+    expect(prompt).toContain("french-glide-contrast");
+    expect(prompt).toContain("fr-glide-hui");
+  });
+
+  it("adds targeted Russian rule evidence from explicit sound-unit slugs", () => {
+    const prompt = buildFeedbackPrompt(
+      "Russian rule-unit probe",
+      SAMPLE_RESULT,
+      "sentence",
+      "normal",
+      "ru-RU",
+      { targetUnitSlugs: ["ru-voicing-assimilation", "ru-clusters"] },
+    );
+
+    expect(prompt).toContain("当前练习材料命中的专项规则");
+    expect(prompt).toContain("russian-voicing-assimilation");
+    expect(prompt).toContain("russian-cluster-epenthesis");
+    expect(prompt).toContain("target slugs: ru-voicing-assimilation");
+    expect(prompt).toContain("target slugs: ru-clusters");
+  });
+
   it("does not let perfect-score instructions overclaim non-English mastery", () => {
     const spanishPrompt = buildFeedbackPrompt(
       "canción",
