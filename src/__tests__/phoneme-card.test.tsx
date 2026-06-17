@@ -2,6 +2,7 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { PhonemeCard } from "@/components/phoneme/phoneme-card";
 import type { UseAudioPlayerReturn } from "@/hooks/use-audio-player";
+import { getLanguagePhonemeBySlug } from "@/lib/language-phonemes";
 import type { PhonemeData } from "@/types/phoneme";
 
 afterEach(() => {
@@ -333,5 +334,43 @@ describe("PhonemeCard header audio", () => {
     expect(player.play).toHaveBeenCalledWith("/audio/ipa/normal/cat.mp3", {
       volume: 1.6,
     });
+  });
+
+  it("shows experimental phonology inventory badges for non-English realization units", () => {
+    const player = mockPlayer();
+    const spanishBv = getLanguagePhonemeBySlug("es-ES", "es-bv");
+    expect(spanishBv).toBeDefined();
+    if (!spanishBv) return;
+
+    render(<PhonemeCard player={player} phoneme={spanishBv} />);
+
+    const badges = document.querySelector(
+      '[data-smoke="phonology-inventory-card-badges"]',
+    );
+    expect(badges).toHaveAttribute("data-phonology-layer", "allophone");
+    expect(badges).toHaveAttribute("data-tile-policy", "clickable-exact-header");
+    expect(screen.getByText("实验")).toBeInTheDocument();
+    expect(screen.getByText("实现音")).toBeInTheDocument();
+    expect(screen.getByText("精确短音频")).toBeInTheDocument();
+  });
+
+  it("shows rule inventory badges without implying playable single-sound audio", () => {
+    const player = mockPlayer();
+    const spanishStress = getLanguagePhonemeBySlug("es-ES", "es-lexical-stress");
+    expect(spanishStress).toBeDefined();
+    if (!spanishStress) return;
+
+    render(<PhonemeCard player={player} phoneme={spanishStress} />);
+
+    const badges = document.querySelector(
+      '[data-smoke="phonology-inventory-card-badges"]',
+    );
+    expect(badges).toHaveAttribute("data-phonology-layer", "prosody");
+    expect(badges).toHaveAttribute("data-tile-policy", "rule-guidance-only");
+    expect(screen.getByText("韵律/重音")).toBeInTheDocument();
+    expect(screen.getByText("规则说明")).toBeInTheDocument();
+    expect(
+      document.querySelector('[data-smoke="phoneme-card-header-audio-button"]'),
+    ).not.toBeInTheDocument();
   });
 });

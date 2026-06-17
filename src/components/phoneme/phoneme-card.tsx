@@ -15,6 +15,11 @@ import {
   getSoundUnitHeaderPlaybackOptions,
   isKnownEnglishChartAudioStem,
 } from "@/lib/audio-playback-policy";
+import {
+  getPhonologyInventoryEntry,
+  getPhonologyLayerLabel,
+  getPhonologyTilePolicyLabel,
+} from "@/lib/language-phonology-inventory";
 import { shouldShowSoundUnitHeaderAudio } from "@/lib/language-source-alignment";
 import { getSoundUnitCardLabel } from "@/lib/language-sound-unit-groups";
 import {
@@ -59,6 +64,10 @@ export function PhonemeCard({ phoneme, player }: PhonemeCardProps) {
   const image = phoneme.chartImage;
   const unitLabel = getSoundUnitCardLabel(phoneme);
   const languageId = phoneme.languageId ?? "en-US";
+  const inventoryEntry =
+    languageId !== "en-US"
+      ? getPhonologyInventoryEntry(languageId, phoneme.slug)
+      : undefined;
   const canPlayHeaderAudio = shouldShowSoundUnitHeaderAudio(
     languageId,
     phoneme,
@@ -159,6 +168,24 @@ export function PhonemeCard({ phoneme, player }: PhonemeCardProps) {
             <p className="mt-1 break-words text-sm leading-snug text-muted-foreground [overflow-wrap:anywhere]">
               {phoneme.description}
             </p>
+          )}
+          {inventoryEntry && (
+            <div
+              className="mt-2 flex flex-wrap items-center justify-center gap-1.5"
+              data-smoke="phonology-inventory-card-badges"
+              data-phonology-layer={inventoryEntry.layer}
+              data-tile-policy={inventoryEntry.tilePolicy}
+            >
+              <Badge variant="outline" className="text-[10px]">
+                实验
+              </Badge>
+              <Badge variant="secondary" className="text-[10px]">
+                {getPhonologyLayerLabel(inventoryEntry.layer)}
+              </Badge>
+              <Badge variant="outline" className="text-[10px]">
+                {getPhonologyTilePolicyLabel(inventoryEntry.tilePolicy)}
+              </Badge>
+            </div>
           )}
         </div>
 

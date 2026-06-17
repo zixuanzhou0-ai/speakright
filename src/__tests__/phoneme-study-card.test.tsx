@@ -270,6 +270,73 @@ describe("PhonemeStudyCard non-English reading layout", () => {
     expect(button).toHaveAttribute("data-audio-fade-out-ms", "60");
   });
 
+  it("shows source-backed inventory details for exact non-English sound units", () => {
+    const frenchSchwa = getLanguagePhonemeBySlug("fr-FR", "fr-schwa");
+
+    expect(frenchSchwa).toBeDefined();
+    if (!frenchSchwa) return;
+
+    renderCard({
+      phoneme: frenchSchwa,
+      currentWord: {
+        word: "ce matin",
+        ipa: "/sə matɛ̃/",
+      },
+    });
+
+    const detail = document.querySelector(
+      '[data-smoke="phonology-inventory-detail"]',
+    );
+    expect(detail).toHaveAttribute("data-phonology-layer", "prosody");
+    expect(detail).toHaveAttribute("data-tile-policy", "clickable-exact-header");
+    expect(detail).toHaveAttribute("data-audio-status", "exact-local-header");
+    expect(screen.getByText("实验模块")).toBeInTheDocument();
+    expect(screen.getByText("韵律/重音")).toBeInTheDocument();
+    expect(screen.getByText("精确短音频")).toBeInTheDocument();
+    expect(
+      screen.getByText("评分 tile 可播放同源本地短音频。"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/法语 e caduc .*可听见/),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("待补：仍有 1 项音频/方言/规则证据缺口。"),
+    ).toBeInTheDocument();
+  });
+
+  it("shows inventory rule guidance for phrase-level units instead of implying single-sound playback", () => {
+    const frenchLiaison = getLanguagePhonemeBySlug("fr-FR", "fr-liaison");
+
+    expect(frenchLiaison).toBeDefined();
+    if (!frenchLiaison) return;
+
+    renderCard({
+      phoneme: frenchLiaison,
+      currentWord: {
+        word: "les amis",
+        ipa: "/lezami/",
+      },
+    });
+
+    const detail = document.querySelector(
+      '[data-smoke="phonology-inventory-detail"]',
+    );
+    expect(detail).toHaveAttribute(
+      "data-phonology-layer",
+      "connected-speech-rule",
+    );
+    expect(detail).toHaveAttribute("data-tile-policy", "rule-guidance-only");
+    expect(detail).toHaveAttribute("data-audio-status", "rule-only");
+    expect(screen.getByText("语流规则")).toBeInTheDocument();
+    expect(screen.getByText("规则说明")).toBeInTheDocument();
+    expect(
+      screen.getByText("按规则/短语证据训练，不作单音播放。"),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "播放发音" }),
+    ).not.toBeInTheDocument();
+  });
+
   it("passes boosted chart-word playback options from the English detail illustration", () => {
     const onPlayChartAudio = vi.fn();
     render(

@@ -6,23 +6,30 @@ import Image from "next/image";
 import { useState } from "react";
 import { PhonemePlayButton } from "@/components/phoneme/phoneme-play-button";
 import { VideoPlayer } from "@/components/phoneme/video-player";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   type AudioPlaybackOptions,
   getChartWordPlaybackOptions,
 } from "@/lib/audio-playback-policy";
-import { getSpanishSoundVideoSet } from "@/lib/spanish-sounds-of-speech-videos";
 import { getExactTeachingVideosForSoundUnit } from "@/lib/language-teaching-videos";
 import {
+  getPhonologyAudioStatusLabel,
+  getPhonologyInventoryEntry,
+  getPhonologyLayerLabel,
+  getPhonologyTilePolicyDescription,
+} from "@/lib/language-phonology-inventory";
+import {
   getSoundUnitSourceAlignment,
-  shouldShowSoundUnitHeaderAudio,
   shouldShowLocalVideoAsPrimary,
+  shouldShowSoundUnitHeaderAudio,
 } from "@/lib/language-source-alignment";
 import {
   getCenteredMonoTextClassName,
   getCenteredReadableTextClassName,
   getPracticeTextPresentation,
 } from "@/lib/practice-text-presentation";
+import { getSpanishSoundVideoSet } from "@/lib/spanish-sounds-of-speech-videos";
 import type { LanguageProfile } from "@/types/language";
 import type { KeywordEntry, PhonemeData } from "@/types/phoneme";
 
@@ -299,6 +306,10 @@ export function PhonemeStudyCard({
     phoneme.languageId ?? "en-US",
     phoneme.slug,
   );
+  const inventoryEntry =
+    languageProfile.id !== "en-US"
+      ? getPhonologyInventoryEntry(languageProfile.id, phoneme.slug)
+      : undefined;
   const sourceAlignment = getSoundUnitSourceAlignment(
     phoneme.languageId ?? "en-US",
     phoneme.slug,
@@ -394,6 +405,41 @@ export function PhonemeStudyCard({
             </motion.button>
           )}
         </div>
+
+        {inventoryEntry && (
+          <div
+            className="mt-3 rounded-lg border bg-muted/20 px-3 py-2"
+            data-smoke="phonology-inventory-detail"
+            data-phonology-layer={inventoryEntry.layer}
+            data-tile-policy={inventoryEntry.tilePolicy}
+            data-audio-status={inventoryEntry.audioStatus}
+          >
+            <div className="flex flex-wrap items-center justify-center gap-1.5">
+              <Badge variant="outline" className="text-[10px]">
+                实验模块
+              </Badge>
+              <Badge variant="secondary" className="text-[10px]">
+                {getPhonologyLayerLabel(inventoryEntry.layer)}
+              </Badge>
+              <Badge variant="outline" className="text-[10px]">
+                {getPhonologyAudioStatusLabel(inventoryEntry.audioStatus)}
+              </Badge>
+            </div>
+            {phoneme.description && (
+              <p className="mt-1.5 break-words text-center text-xs leading-snug text-muted-foreground [overflow-wrap:anywhere]">
+                {phoneme.description}
+              </p>
+            )}
+            <p className="mt-1 break-words text-center text-xs leading-snug text-muted-foreground [overflow-wrap:anywhere]">
+              {getPhonologyTilePolicyDescription(inventoryEntry.tilePolicy)}
+            </p>
+            {inventoryEntry.gaps.length > 0 && (
+              <p className="mt-1 break-words text-center text-xs leading-snug text-amber-700 [overflow-wrap:anywhere] dark:text-amber-300">
+                待补：仍有 {inventoryEntry.gaps.length} 项音频/方言/规则证据缺口。
+              </p>
+            )}
+          </div>
+        )}
 
         {/* Word navigation */}
         {currentWord ? (

@@ -43,6 +43,7 @@ export interface LanguagePhonologyInventoryEntry
   audioStatus: PhonologyInventoryAudioStatus;
   tilePolicy: PhonologyInventoryTilePolicy;
   exactAssessmentAliases: string[];
+  gaps: string[];
   headerAudioSrc?: string;
 }
 
@@ -54,6 +55,34 @@ export interface LanguagePhonologyGap {
   expectedBeforeStable: boolean;
   sourceRefs: string[];
 }
+
+const LAYER_LABELS: Record<PhonologyInventoryLayer, string> = {
+  phoneme: "音素",
+  allophone: "实现音",
+  contrast: "对比/变体",
+  "connected-speech-rule": "语流规则",
+  prosody: "韵律/重音",
+  cluster: "辅音丛",
+};
+
+const AUDIO_STATUS_LABELS: Record<PhonologyInventoryAudioStatus, string> = {
+  "exact-local-header": "精确短音频",
+  "proxy-local-reference": "代理参考",
+  "rule-only": "规则说明",
+  "gap-no-local-clip": "缺少短音频",
+};
+
+const TILE_POLICY_SHORT_LABELS: Record<PhonologyInventoryTilePolicy, string> = {
+  "clickable-exact-header": "精确短音频",
+  "score-only-unverified": "音频未验证",
+  "rule-guidance-only": "规则说明",
+};
+
+const TILE_POLICY_DESCRIPTIONS: Record<PhonologyInventoryTilePolicy, string> = {
+  "clickable-exact-header": "评分 tile 可播放同源本地短音频。",
+  "score-only-unverified": "评分 tile 只显示分数，不播放未验证音频。",
+  "rule-guidance-only": "按规则/短语证据训练，不作单音播放。",
+};
 
 const SHARED_SOURCES = ["ipa-handbook"];
 const SPANISH_CORE_SOURCES = [
@@ -691,4 +720,28 @@ export function getLanguagePhonologyGaps(
   languageId: NonEnglishLanguageId,
 ): LanguagePhonologyGap[] {
   return LANGUAGE_PHONOLOGY_GAPS[languageId];
+}
+
+export function getPhonologyLayerLabel(
+  layer: PhonologyInventoryLayer,
+): string {
+  return LAYER_LABELS[layer];
+}
+
+export function getPhonologyAudioStatusLabel(
+  audioStatus: PhonologyInventoryAudioStatus,
+): string {
+  return AUDIO_STATUS_LABELS[audioStatus];
+}
+
+export function getPhonologyTilePolicyLabel(
+  tilePolicy: PhonologyInventoryTilePolicy,
+): string {
+  return TILE_POLICY_SHORT_LABELS[tilePolicy];
+}
+
+export function getPhonologyTilePolicyDescription(
+  tilePolicy: PhonologyInventoryTilePolicy,
+): string {
+  return TILE_POLICY_DESCRIPTIONS[tilePolicy];
 }
