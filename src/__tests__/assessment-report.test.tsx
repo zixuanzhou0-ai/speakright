@@ -198,4 +198,37 @@ describe("AssessmentReport mastery display", () => {
       "break-words",
     );
   });
+
+  it("renders every generated evidence row and error pattern badge", () => {
+    const result = reportFor("en-US");
+    result.rawEvidence = Array.from({ length: 10 }, (_, index) => ({
+      text: `evidence word ${index + 1}`,
+      score: 80 - index,
+      detail: `第 ${index + 1} 条诊断证据需要完整显示`,
+      source: "word",
+    }));
+    result.issues[0] = {
+      ...result.issues[0],
+      errorPatternIds: [
+        "first-pattern",
+        "second-pattern",
+        "third-pattern-must-stay-visible",
+      ],
+    };
+
+    render(<AssessmentReport result={result} onRetake={vi.fn()} />);
+
+    const evidenceRows = document.querySelectorAll(
+      '[data-smoke="assessment-report-evidence-row"]',
+    );
+    expect(evidenceRows).toHaveLength(10);
+    expect(screen.getByText("evidence word 9")).toBeInTheDocument();
+    expect(screen.getByText("evidence word 10")).toBeInTheDocument();
+    expect(screen.getByText("第 10 条诊断证据需要完整显示")).toHaveClass(
+      "break-words",
+    );
+    expect(
+      screen.getByText("third-pattern-must-stay-visible"),
+    ).toBeInTheDocument();
+  });
 });

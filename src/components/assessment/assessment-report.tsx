@@ -310,14 +310,17 @@ export function AssessmentReport({ result, onRetake }: AssessmentReportProps) {
             诊断证据
           </h2>
           <div className="grid gap-2 md:grid-cols-2">
-            {result.rawEvidence.slice(0, 8).map((entry) => (
+            {result.rawEvidence.map((entry) => (
               <div
                 key={`${entry.source}-${entry.text}-${entry.detail}-${entry.score}`}
                 className="flex items-start justify-between gap-3 rounded-lg bg-muted/40 px-3 py-2"
+                data-smoke="assessment-report-evidence-row"
               >
-                <div>
-                  <p className="text-sm font-medium">{entry.text}</p>
-                  <p className="text-xs text-muted-foreground">
+                <div className="min-w-0">
+                  <p className="break-words text-sm font-medium [overflow-wrap:anywhere]">
+                    {entry.text}
+                  </p>
+                  <p className="break-words text-xs text-muted-foreground [overflow-wrap:anywhere]">
                     {entry.detail}
                   </p>
                 </div>
@@ -521,7 +524,7 @@ function IssueCard({
             证据 {issue.evidenceStrength}
           </Badge>
         )}
-        {issue.errorPatternIds?.slice(0, 2).map((patternId) => (
+        {issue.errorPatternIds?.map((patternId) => (
           <Badge
             key={patternId}
             variant="secondary"

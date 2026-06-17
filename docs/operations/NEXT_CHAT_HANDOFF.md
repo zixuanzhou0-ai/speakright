@@ -94,6 +94,9 @@ E:\SpeakRightDesktopRepo\src-tauri\target\release\speakright.exe
   grid, so long multilingual phrases do not crowd the score column.
 - Diagnosis-report action buttons now wrap as well; long prescription CTA titles
   such as `开始：...` keep `whitespace-normal`, `break-words`, and centered text.
+- Diagnosis reports now render every generated `rawEvidence` row and every
+  `errorPatternId` badge instead of showing only the first 8 evidence rows or
+  first 2 pattern IDs; `assessment-report-evidence-row` guards the evidence list.
 - Free-practice input/listen controls now use a wrapping action row with a
   readable textarea minimum width; the word-mode icon button also has the
   explicit `播放单词发音` accessible label.

@@ -573,6 +573,9 @@ describe("desktop preflight and UI smoke", () => {
     const assessmentReportStorage = readProjectFile(
       "src/lib/assessment-report-storage.ts",
     );
+    const assessmentReport = readProjectFile(
+      "src/components/assessment/assessment-report.tsx",
+    );
     const passagePage = readProjectFile("src/app/assessment/passage/page.tsx");
     const azureHook = readProjectFile("src/hooks/use-azure-assessment.ts");
     const recorderAlerts =
@@ -617,6 +620,13 @@ describe("desktop preflight and UI smoke", () => {
     expect(assessmentPage).toContain('data-smoke="assessment-storage-warning"');
     expect(assessmentPage).toContain("loadAssessmentReportForLanguage");
     expect(assessmentReportStorage).toContain("上次快速诊断报告无法读取");
+    expect(assessmentReport).toContain(
+      'data-smoke="assessment-report-evidence-row"',
+    );
+    expect(assessmentReport).toContain("result.rawEvidence.map");
+    expect(assessmentReport).toContain("issue.errorPatternIds?.map");
+    expect(assessmentReport).not.toContain("rawEvidence.slice(0, 8)");
+    expect(assessmentReport).not.toContain("errorPatternIds?.slice(0, 2)");
     expect(assessmentPage).not.toContain('message: azure.error || "评估失败"');
 
     expect(passagePage).toContain(
