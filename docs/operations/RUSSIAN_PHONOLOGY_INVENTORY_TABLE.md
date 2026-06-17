@@ -1,0 +1,73 @@
+# Russian Phonology Inventory Table
+
+Generated from `src/lib/language-phonology-inventory.ts`. Do not edit the table by hand; run `npm.cmd run phonology:inventory:export` after changing language sound units, source refs, audio status, tile policy, or gaps.
+
+Language profile: `ru-RU`
+Product status: experimental
+
+## Current Stable-Before-Release Gaps
+
+- complete hard/soft consonant pairs: Russian hard/soft consonants are systemic. Standalone coronal stop, sibilant, sonorant, labial, and velar pair anchors now exist, but the full per-consonant exact audio inventory is still incomplete. Source refs: jipa-russian, ipa-handbook.
+- reduction / devoicing / assimilation / clusters: The rule units are useful, but exact phrase-level evidence and tile playback remain incomplete. Source refs: jipa-russian, ipa-handbook.
+
+## Inventory
+
+| slug | IPA | layer | variant scope | source refs | audio status | tile policy | gaps |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| ru-a | /a/ | phoneme | Russian /a/ with stress-sensitive quality. | jipa-russian, ipa-handbook, seeing-speech-ru | exact-local-header | clickable-exact-header | none |
+| ru-o | /o/ | phoneme | Stressed /o/; unstressed о belongs to reduction rules. | jipa-russian, ipa-handbook, seeing-speech-ru | exact-local-header | clickable-exact-header | none |
+| ru-i | /i/ | phoneme | Front /i/ often paired with consonant palatalization. | jipa-russian, ipa-handbook, seeing-speech-ru | exact-local-header | clickable-exact-header | none |
+| ru-y | /ɨ/ | phoneme | Learner-facing /ɨ/ target for ы. | jipa-russian, ipa-handbook, seeing-speech-ru | exact-local-header | clickable-exact-header | none |
+| ru-u | /u/ | phoneme | Russian /u/ with stress-sensitive reduction. | jipa-russian, ipa-handbook, seeing-speech-ru | exact-local-header | clickable-exact-header | none |
+| ru-p | /p/ | phoneme | Hard Russian /p/ stop anchor; soft /pʲ/ remains a separate contrast target. | jipa-russian, ipa-handbook, seeing-speech-ru | exact-local-header | clickable-exact-header | none |
+| ru-b | /b/ | phoneme | Hard Russian /b/ stop anchor; final devoicing and soft /bʲ/ are trained separately. | jipa-russian, ipa-handbook, seeing-speech-ru | exact-local-header | clickable-exact-header | none |
+| ru-t | /t/ | phoneme | Hard Russian /t/ stop anchor; soft /tʲ/ remains a separate contrast target. | jipa-russian, ipa-handbook, seeing-speech-ru | exact-local-header | clickable-exact-header | none |
+| ru-d | /d/ | phoneme | Hard Russian /d/ stop anchor; final devoicing and soft /dʲ/ are trained separately. | jipa-russian, ipa-handbook, seeing-speech-ru | exact-local-header | clickable-exact-header | none |
+| ru-k | /k/ | phoneme | Hard Russian /k/ stop anchor; soft /kʲ/ and cluster behavior are trained separately. | jipa-russian, ipa-handbook, seeing-speech-ru | exact-local-header | clickable-exact-header | none |
+| ru-g | /g/ | phoneme | Hard Russian /g/ stop anchor; final devoicing and soft /gʲ/ are trained separately. | jipa-russian, ipa-handbook, seeing-speech-ru | exact-local-header | clickable-exact-header | none |
+| ru-f | /f/ | phoneme | Hard Russian /f/ fricative anchor; soft /fʲ/ remains a separate contrast target. | jipa-russian, ipa-handbook, seeing-speech-ru | exact-local-header | clickable-exact-header | none |
+| ru-v | /v/ | phoneme | Hard Russian /v/ fricative anchor; /v/ assimilation behavior stays in the rule layer. | jipa-russian, ipa-handbook, seeing-speech-ru | exact-local-header | clickable-exact-header | none |
+| ru-s | /s/ | phoneme | Hard Russian /s/ fricative anchor; soft /sʲ/ remains a separate contrast target. | jipa-russian, ipa-handbook, seeing-speech-ru | exact-local-header | clickable-exact-header | none |
+| ru-z | /z/ | phoneme | Hard Russian /z/ fricative anchor; final devoicing and soft /zʲ/ are trained separately. | jipa-russian, ipa-handbook, seeing-speech-ru | exact-local-header | clickable-exact-header | none |
+| ru-m | /m/ | phoneme | Hard Russian /m/ nasal anchor; soft /mʲ/ remains a separate contrast target. | jipa-russian, ipa-handbook, seeing-speech-ru | exact-local-header | clickable-exact-header | none |
+| ru-n | /n/ | phoneme | Hard Russian /n/ nasal anchor; soft /nʲ/ remains a separate contrast target. | jipa-russian, ipa-handbook, seeing-speech-ru | exact-local-header | clickable-exact-header | none |
+| ru-l | /l/ | phoneme | Hard Russian /l/ lateral anchor; soft /lʲ/ remains a separate contrast target. | jipa-russian, ipa-handbook, seeing-speech-ru | exact-local-header | clickable-exact-header | none |
+| ru-hard-soft | /C ~ Cʲ/ | contrast | Systemic hard/soft consonant contrast, not one added /j/ sound. | jipa-russian, ipa-handbook, wiktionary-ru-pronunciation-appendix | proxy-local-reference | score-only-unverified | Grouped proxy video only; per-consonant hard/soft exact clips are incomplete. |
+| ru-r | /r/ | phoneme | Russian trill /r/ with hard and soft variants. | jipa-russian, ipa-handbook, seeing-speech-ru | exact-local-header | clickable-exact-header | none |
+| ru-x | /x/ | phoneme | Velar fricative /x/. | jipa-russian, ipa-handbook, seeing-speech-ru | exact-local-header | clickable-exact-header | none |
+| ru-sh-zh | /ʂ ʐ/ | contrast | Always-hard retroflex-like /ʂ ʐ/ contrast. | jipa-russian, ipa-handbook, seeing-speech-ru | proxy-local-reference | score-only-unverified | The grouped contrast stays unclickable; standalone /ʂ/ and /ʐ/ units carry exact tile audio. |
+| ru-sh | /ʂ/ | phoneme | Always-hard retroflex-like fricative /ʂ/. | jipa-russian, ipa-handbook, seeing-speech-ru | exact-local-header | clickable-exact-header | none |
+| ru-zh | /ʐ/ | phoneme | Always-hard voiced retroflex-like fricative /ʐ/. | jipa-russian, ipa-handbook, seeing-speech-ru | exact-local-header | clickable-exact-header | none |
+| ru-ts-ch-shch | /ts tɕ ɕː/ | contrast | Affricate/fricative set /ts tɕ ɕː/ grouped for learning. | jipa-russian, ipa-handbook, seeing-speech-ru | proxy-local-reference | score-only-unverified | Grouped unit is a proxy; individual /ts/, /tɕ/, /ɕː/ units carry exact tile audio. |
+| ru-stress-reduction | /ˈ + ə ɐ/ | prosody | Mobile stress changes vowel quality; score at word/phrase level. | jipa-russian, ipa-handbook, easypronunciation-ru-trainer | proxy-local-reference | rule-guidance-only | No exact single-click stress-reduction lesson audio exists yet. |
+| ru-clusters | /CC(C)/ | connected-speech-rule | Russian consonant clusters should not gain inserted vowels. | jipa-russian, ipa-handbook, wiktionary-ru-pronunciation-appendix | proxy-local-reference | rule-guidance-only | No exact single-click cluster lesson audio exists yet. |
+| ru-e | /e/ | phoneme | Stressed /e/ with spelling-dependent palatalization context. | jipa-russian, ipa-handbook, seeing-speech-ru | exact-local-header | clickable-exact-header | none |
+| ru-soft-t-d | /t tʲ d dʲ/ | contrast | Hard/soft coronal stop contrast /t tʲ d dʲ/. | jipa-russian, ipa-handbook, wiktionary-ru-pronunciation-appendix | proxy-local-reference | score-only-unverified | Proxy anchor only; exact per-segment soft stop clips are incomplete. |
+| ru-t-tj | /t tʲ/ | contrast | Hard/soft coronal stop contrast /t tʲ/. | jipa-russian, ipa-handbook, wiktionary-ru-pronunciation-appendix | gap-no-local-clip | score-only-unverified | No verified exact single-segment /t/ or /tʲ/ short clip is bundled yet. |
+| ru-d-dj | /d dʲ/ | contrast | Hard/soft voiced coronal stop contrast /d dʲ/. | jipa-russian, ipa-handbook, wiktionary-ru-pronunciation-appendix | gap-no-local-clip | score-only-unverified | No verified exact single-segment /d/ or /dʲ/ short clip is bundled yet. |
+| ru-soft-s-z | /s sʲ z zʲ/ | contrast | Hard/soft sibilant contrast /s sʲ z zʲ/. | jipa-russian, ipa-handbook, wiktionary-ru-pronunciation-appendix | proxy-local-reference | score-only-unverified | Standalone hard /s z/ clips now exist; exact soft-fricative and pair-lesson clips are still incomplete. |
+| ru-soft-n-l-r | /n nʲ l lʲ r rʲ/ | contrast | Hard/soft sonorant contrast /n nʲ l lʲ r rʲ/. | jipa-russian, ipa-handbook, wiktionary-ru-pronunciation-appendix | proxy-local-reference | score-only-unverified | Standalone hard /n l r/ clips now exist; exact soft-sonorant and pair-lesson clips are still incomplete. |
+| ru-s-sj | /s sʲ/ | contrast | Hard/soft voiceless sibilant contrast /s sʲ/. | jipa-russian, ipa-handbook, wiktionary-ru-pronunciation-appendix | gap-no-local-clip | score-only-unverified | Hard /s/ now has a standalone exact clip; soft /sʲ/ and pair-lesson clips are still missing. |
+| ru-z-zj | /z zʲ/ | contrast | Hard/soft voiced sibilant contrast /z zʲ/. | jipa-russian, ipa-handbook, wiktionary-ru-pronunciation-appendix | gap-no-local-clip | score-only-unverified | Hard /z/ now has a standalone exact clip; soft /zʲ/ and pair-lesson clips are still missing. |
+| ru-n-nj | /n nʲ/ | contrast | Hard/soft nasal contrast /n nʲ/. | jipa-russian, ipa-handbook, wiktionary-ru-pronunciation-appendix | gap-no-local-clip | score-only-unverified | Hard /n/ now has a standalone exact clip; soft /nʲ/ and pair-lesson clips are still missing. |
+| ru-l-lj | /l lʲ/ | contrast | Hard/soft lateral contrast /l lʲ/. | jipa-russian, ipa-handbook, wiktionary-ru-pronunciation-appendix | gap-no-local-clip | score-only-unverified | Hard /l/ now has a standalone exact clip; soft /lʲ/ and pair-lesson clips are still missing. |
+| ru-r-rj | /r rʲ/ | contrast | Hard/soft rhotic contrast /r rʲ/. | jipa-russian, ipa-handbook, wiktionary-ru-pronunciation-appendix | gap-no-local-clip | score-only-unverified | No verified exact single-segment /r/ or /rʲ/ short clip is bundled yet. |
+| ru-soft-labials | /pʲ bʲ mʲ fʲ vʲ/ | contrast | Soft labial contrast /pʲ bʲ mʲ fʲ vʲ/. | jipa-russian, ipa-handbook, wiktionary-ru-pronunciation-appendix | proxy-local-reference | score-only-unverified | Proxy anchor only; exact per-segment soft labial clips are incomplete. |
+| ru-p-pj | /p pʲ/ | contrast | Hard/soft labial stop contrast /p pʲ/. | jipa-russian, ipa-handbook, wiktionary-ru-pronunciation-appendix | gap-no-local-clip | score-only-unverified | No verified exact single-segment /p/ or /pʲ/ short clip is bundled yet. |
+| ru-b-bj | /b bʲ/ | contrast | Hard/soft voiced labial stop contrast /b bʲ/. | jipa-russian, ipa-handbook, wiktionary-ru-pronunciation-appendix | gap-no-local-clip | score-only-unverified | No verified exact single-segment /b/ or /bʲ/ short clip is bundled yet. |
+| ru-m-mj | /m mʲ/ | contrast | Hard/soft labial nasal contrast /m mʲ/. | jipa-russian, ipa-handbook, wiktionary-ru-pronunciation-appendix | gap-no-local-clip | score-only-unverified | Hard /m/ now has a standalone exact clip; soft /mʲ/ and pair-lesson clips are still missing. |
+| ru-f-fj | /f fʲ/ | contrast | Hard/soft labiodental fricative contrast /f fʲ/. | jipa-russian, ipa-handbook, wiktionary-ru-pronunciation-appendix | gap-no-local-clip | score-only-unverified | Hard /f/ now has a standalone exact clip; soft /fʲ/ and pair-lesson clips are still missing. |
+| ru-v-vj | /v vʲ/ | contrast | Hard/soft voiced labiodental fricative contrast /v vʲ/. | jipa-russian, ipa-handbook, wiktionary-ru-pronunciation-appendix | gap-no-local-clip | score-only-unverified | Hard /v/ now has a standalone exact clip; soft /vʲ/ and pair-lesson clips are still missing. |
+| ru-k-kj | /k kʲ/ | contrast | Hard/soft velar stop contrast /k kʲ/. | jipa-russian, ipa-handbook, wiktionary-ru-pronunciation-appendix | gap-no-local-clip | score-only-unverified | No verified exact single-segment /k/ or /kʲ/ short clip is bundled yet. |
+| ru-g-gj | /g gʲ/ | contrast | Hard/soft voiced velar stop contrast /g gʲ/. | jipa-russian, ipa-handbook, wiktionary-ru-pronunciation-appendix | gap-no-local-clip | score-only-unverified | No verified exact single-segment /g/ or /gʲ/ short clip is bundled yet. |
+| ru-x-xj | /x xʲ/ | contrast | Hard/soft velar fricative contrast /x xʲ/. | jipa-russian, ipa-handbook, wiktionary-ru-pronunciation-appendix | gap-no-local-clip | score-only-unverified | No verified exact single-segment /x/ or /xʲ/ short clip is bundled yet. |
+| ru-soft-sign | /ʲ/ | contrast | Soft sign marks palatalization and is not an independent vowel or /j/. | jipa-russian, ipa-handbook, wiktionary-ru-pronunciation-appendix | proxy-local-reference | score-only-unverified | Proxy /j/ articulatory reference stays unclickable for assessment tiles. |
+| ru-ts | /ts/ | phoneme | Always-hard affricate /ts/. | jipa-russian, ipa-handbook, seeing-speech-ru | exact-local-header | clickable-exact-header | none |
+| ru-ch | /tɕ/ | phoneme | Always-soft affricate /tɕ/. | jipa-russian, ipa-handbook, seeing-speech-ru | exact-local-header | clickable-exact-header | none |
+| ru-shch | /ɕː/ | phoneme | Long soft fricative /ɕː/. | jipa-russian, ipa-handbook, seeing-speech-ru | exact-local-header | clickable-exact-header | none |
+| ru-j | /j/ | phoneme | Short /j/ glide; separate from palatalization [ʲ]. | jipa-russian, ipa-handbook, seeing-speech-ru | exact-local-header | clickable-exact-header | none |
+| ru-iotated-vowels | /ja je jo ju/ | connected-speech-rule | я/е/ё/ю mark /j/ onset or preceding-consonant palatalization depending on position. | jipa-russian, ipa-handbook, wiktionary-ru-pronunciation-appendix | proxy-local-reference | rule-guidance-only | Rule unit uses proxy material only; exact tile audio stays disabled. |
+| ru-unstressed-o-a | /ɐ ə/ | prosody | Unstressed о/а reduce toward [ɐ]/[ə] depending on stress distance and context. | jipa-russian, ipa-handbook, easypronunciation-ru-trainer | proxy-local-reference | rule-guidance-only | Current reduction clips are references, not full exact rule lessons. |
+| ru-unstressed-e-ya | /ɪ ə/ | prosody | Unstressed е/я reduce toward [ɪ]/[ə] with palatalization context. | jipa-russian, ipa-handbook, easypronunciation-ru-trainer | proxy-local-reference | rule-guidance-only | Current reduction clips are references, not full exact rule lessons. |
+| ru-final-devoicing | final devoicing | connected-speech-rule | Word-final voiced obstruents devoice before pause or voiceless consonants, but resurface in some linked contexts. | jipa-russian, ipa-handbook, wiktionary-ru-pronunciation-appendix | proxy-local-reference | rule-guidance-only | Proxy clip remains unclickable; rule needs phrase-level audio evidence. |
+| ru-voicing-assimilation | voicing assimilation | connected-speech-rule | Regressive voicing assimilation across adjacent obstruents, with /v/ behavior needing careful treatment. | jipa-russian, ipa-handbook, wiktionary-ru-pronunciation-appendix | proxy-local-reference | rule-guidance-only | Proxy clip remains unclickable; /v/ caveat still needs richer coaching. |

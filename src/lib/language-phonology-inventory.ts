@@ -93,6 +93,12 @@ const TILE_POLICY_DESCRIPTIONS: Record<PhonologyInventoryTilePolicy, string> = {
   "rule-guidance-only": "按规则/短语证据训练，不作单音播放。",
 };
 
+const INVENTORY_DOCUMENT_LABELS: Record<NonEnglishLanguageId, string> = {
+  "es-ES": "Spanish",
+  "fr-FR": "French",
+  "ru-RU": "Russian",
+};
+
 const SHARED_SOURCES = ["ipa-handbook"];
 const SPANISH_CORE_SOURCES = [
   "rae-ngle-phonology",
@@ -1152,4 +1158,33 @@ export function formatLanguagePhonologyInventoryMarkdownTable(
   );
 
   return [header, separator, ...rows.map((row) => `| ${row} |`)].join("\n");
+}
+
+export function formatLanguagePhonologyInventoryMarkdownDocument(
+  languageId: NonEnglishLanguageId,
+): string {
+  const languageLabel = INVENTORY_DOCUMENT_LABELS[languageId];
+  const gaps = getLanguagePhonologyGaps(languageId);
+  const table = formatLanguagePhonologyInventoryMarkdownTable(languageId);
+
+  return [
+    `# ${languageLabel} Phonology Inventory Table`,
+    "",
+    "Generated from `src/lib/language-phonology-inventory.ts`. Do not edit the table by hand; run `npm.cmd run phonology:inventory:export` after changing language sound units, source refs, audio status, tile policy, or gaps.",
+    "",
+    `Language profile: \`${languageId}\``,
+    "Product status: experimental",
+    "",
+    "## Current Stable-Before-Release Gaps",
+    "",
+    ...gaps.map(
+      (gap) =>
+        `- ${gap.label}: ${gap.reason} Source refs: ${gap.sourceRefs.join(", ")}.`,
+    ),
+    "",
+    "## Inventory",
+    "",
+    table,
+    "",
+  ].join("\n");
 }

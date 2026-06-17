@@ -39,7 +39,8 @@ Last updated: 2026-06-18
 `slug`、`IPA`、`layer`、`variant scope`、`source refs`、`audio status`、
 `tile policy`、`gaps`。对应测试在
 `src/__tests__/language-phonology-inventory.test.ts`，用于防止文档口径、课程单位、
-音频策略和 source refs 漂移。
+音频策略和 source refs 漂移。生成后的人工审阅入口是
+[`RUSSIAN_PHONOLOGY_INVENTORY_TABLE.md`](./RUSSIAN_PHONOLOGY_INVENTORY_TABLE.md)。
 
 ## 当前产品状态
 
