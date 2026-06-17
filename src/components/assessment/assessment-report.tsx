@@ -178,7 +178,7 @@ export function AssessmentReport({ result, onRetake }: AssessmentReportProps) {
               )}
             </div>
             <div className="flex flex-wrap gap-2">
-              {result.issues.slice(0, 3).map((issue) => (
+              {result.issues.map((issue) => (
                 <Badge
                   key={issue.id}
                   className={WRAP_SAFE_BADGE_CLASS}
@@ -213,11 +213,11 @@ export function AssessmentReport({ result, onRetake }: AssessmentReportProps) {
           <div className="flex items-center gap-2">
             <Target className="h-4 w-4 text-primary" />
             <h2 className="text-sm font-semibold text-muted-foreground">
-              Top 3 学习处方与补测
+              学习处方与补测
             </h2>
           </div>
           <div className="grid gap-3 md:grid-cols-3">
-            {result.issues.slice(0, 3).map((issue) => {
+            {result.issues.map((issue) => {
               const prescriptionItem = prescriptionItems.find((item) =>
                 issue.recommendedPackIds.includes(item.packId),
               );
@@ -469,6 +469,7 @@ function IssueCard({
           ? "border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-950/20"
           : "bg-card",
       )}
+      data-smoke="assessment-report-issue-card"
     >
       <div className="mb-2 flex items-start justify-between gap-2">
         <h3 className="min-w-0 break-words text-sm font-bold [overflow-wrap:anywhere]">

@@ -199,6 +199,38 @@ describe("AssessmentReport mastery display", () => {
     );
   });
 
+  it("renders every generated diagnosis issue instead of only the first three", () => {
+    const result = reportFor("en-US");
+    result.issues = Array.from({ length: 5 }, (_, index) => ({
+      ...result.issues[0],
+      id: `issue-${index + 1}`,
+      title: `Generated diagnosis issue ${index + 1}`,
+      severity: index === 0 ? "critical" : "major",
+      evidence: [
+        {
+          text: `evidence target ${index + 1}`,
+          score: 60 + index,
+          detail: `第 ${index + 1} 个诊断问题的证据需要完整显示`,
+        },
+      ],
+    }));
+
+    render(<AssessmentReport result={result} onRetake={vi.fn()} />);
+
+    expect(screen.getByText("学习处方与补测")).toBeInTheDocument();
+    expect(screen.queryByText("Top 3 学习处方与补测")).not.toBeInTheDocument();
+    expect(
+      document.querySelectorAll('[data-smoke="assessment-report-issue-card"]'),
+    ).toHaveLength(5);
+
+    for (const issue of result.issues) {
+      expect(screen.getAllByText(issue.title).length).toBeGreaterThanOrEqual(2);
+    }
+    expect(
+      screen.getByText("第 5 个诊断问题的证据需要完整显示", { exact: false }),
+    ).toBeInTheDocument();
+  });
+
   it("renders every generated evidence row and error pattern badge", () => {
     const result = reportFor("en-US");
     result.rawEvidence = Array.from({ length: 10 }, (_, index) => ({
