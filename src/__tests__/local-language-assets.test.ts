@@ -6,19 +6,33 @@ import {
   getLocalLanguagePhonemeAsset,
 } from "@/lib/local-language-assets";
 import { getLanguagePhonemes } from "@/lib/language-phonemes";
+import { getPhonologyInventoryEntry } from "@/lib/language-phonology-inventory";
 import { RUSSIAN_PHONEMES } from "@/lib/language-sound-units/russian";
 
 function publicDiskPath(publicPath: string): string {
   return join(process.cwd(), "public", publicPath.replace(/^\//, ""));
 }
 
+const RUSSIAN_SCORE_ONLY_LOCAL_ASSET_GAPS = [
+  "ru-p-pj",
+  "ru-b-bj",
+  "ru-m-mj",
+  "ru-f-fj",
+  "ru-v-vj",
+];
+
 describe("local language assets", () => {
-  it("maps every Russian sound unit slug to local primary media", () => {
+  it("maps every Russian sound unit slug to local primary media or an explicit score-only gap", () => {
     const unmappedRussianSlugs = RUSSIAN_PHONEMES.map(
       (soundUnit) => soundUnit.slug,
     ).filter((slug) => !getLocalLanguagePhonemeAsset("ru-RU", slug));
 
-    expect(unmappedRussianSlugs).toEqual([]);
+    expect(unmappedRussianSlugs).toEqual(RUSSIAN_SCORE_ONLY_LOCAL_ASSET_GAPS);
+    for (const slug of unmappedRussianSlugs) {
+      expect(getPhonologyInventoryEntry("ru-RU", slug)?.tilePolicy).toBe(
+        "score-only-unverified",
+      );
+    }
   });
 
   it("keeps every local Russian primary video and audio file on disk", () => {
@@ -47,7 +61,9 @@ describe("local language assets", () => {
           : [`ru-RU:${soundUnit.slug}`],
     );
 
-    expect(unresolvedRussianUnits).toEqual([]);
+    expect(unresolvedRussianUnits).toEqual(
+      RUSSIAN_SCORE_ONLY_LOCAL_ASSET_GAPS.map((slug) => `ru-RU:${slug}`),
+    );
   });
 
   it("preserves attribution and proxy notes for Russian local assets", () => {
@@ -55,7 +71,9 @@ describe("local language assets", () => {
       (asset) => asset.languageId === "ru-RU",
     );
 
-    expect(russianAssets).toHaveLength(RUSSIAN_PHONEMES.length);
+    expect(russianAssets).toHaveLength(
+      RUSSIAN_PHONEMES.length - RUSSIAN_SCORE_ONLY_LOCAL_ASSET_GAPS.length,
+    );
     for (const asset of russianAssets) {
       expect(asset.source).toContain("Seeing Speech");
       expect(asset.sourceUrl).toMatch(/^https:\/\/www\.seeingspeech\.ac\.uk/);

@@ -73,7 +73,7 @@ Core content requirements:
 
 ## Current SpeakRight State
 
-Current `RUSSIAN_PHONEMES` contains 27 course sound units:
+Current `RUSSIAN_PHONEMES` contains 32 course sound units:
 
 - Vowels: `ru-a`, `ru-o`, `ru-i`, `ru-y`, `ru-u`, `ru-e`.
 - Core consonant/special units: `ru-r`, `ru-x`, `ru-sh-zh`, `ru-ts`,
@@ -81,6 +81,8 @@ Current `RUSSIAN_PHONEMES` contains 27 course sound units:
 - Hard/soft and orthographic-rule units: `ru-hard-soft`, `ru-soft-t-d`,
   `ru-soft-s-z`, `ru-soft-n-l-r`, `ru-soft-labials`, `ru-soft-sign`,
   `ru-iotated-vowels`.
+- First standalone hard/soft labial pair anchors: `ru-p-pj`, `ru-b-bj`,
+  `ru-m-mj`, `ru-f-fj`, `ru-v-vj`.
 - Prosody/rule units: `ru-stress-reduction`, `ru-unstressed-o-a`,
   `ru-unstressed-e-ya`, `ru-final-devoicing`, `ru-voicing-assimilation`,
   `ru-clusters`.
@@ -91,8 +93,10 @@ Current exact scoring-tile audio:
   aliases recorded in `assessment-segment-audio.test.ts`.
 - Many Russian course units are intentionally `isProxyForAssessment` because
   they are contrast/rule groups rather than exact single sounds.
-- The app does not yet expose every hard/soft consonant pair as standalone exact
-  units with verified short local audio.
+- The app now exposes the first standalone hard/soft labial pair anchors as
+  score-only contrast units. It does not yet expose every hard/soft consonant
+  pair, and none of the new pair anchors has verified short local single-segment
+  audio.
 
 This is the right experimental direction, but it is not a full Russian inventory
 or mastery system.
@@ -121,6 +125,10 @@ languages:
    - Mark always-hard and always-soft units separately.
    - Decide which pairs become learner-facing first. Start with high-impact
      pairs already present: `t/d`, `s/z`, `n/l/r`, labials.
+   - Current implementation note: the first labial pair anchors
+     `ru-p-pj`, `ru-b-bj`, `ru-m-mj`, `ru-f-fj`, and `ru-v-vj` are now
+     learner-facing score-only contrast units. The full hard/soft pair table and
+     exact single-segment audio remain open.
 
 2. Stress-first words
    - Require `stressText` for Russian examples where stress is not visually
@@ -170,9 +178,17 @@ Add or update tests in these areas:
   - Russian examples with reduction include stress text or explicit stress IPA.
   - Hard/soft descriptions say palatalization, not hard consonant plus full `/j/`.
   - Always-hard and always-soft units are labeled correctly.
+  - Standalone labial pair anchors exist, stay contrast-layer, and keep enough
+    examples for training.
 - `src/__tests__/assessment-segment-audio.test.ts`
   - `[ɐ ə ɪ]`, `final devoicing`, `cluster`, and palatalized aliases such as
     `tʲ` remain unclickable unless exact clips are added.
+- `src/__tests__/language-phonology-inventory.test.ts`
+  - New hard/soft labial pair anchors stay `score-only-unverified` until exact
+    local clips exist.
+- `src/__tests__/azure-phoneme-map-language-parity.test.ts`
+  - New hard/soft labial pair aliases score correctly while `getPhonemeAudioUrl`
+    remains `null`.
 - `src/__tests__/language-source-alignment.test.ts`
   - Rule/proxy Russian units do not show exact header speakers.
   - `ru-final-devoicing` remains connected-speech aware.

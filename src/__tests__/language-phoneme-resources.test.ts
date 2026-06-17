@@ -12,6 +12,7 @@ import {
   getLanguagePhonemes,
   hasLocalPhonemeAssets,
 } from "@/lib/language-phonemes";
+import { getPhonologyInventoryEntry } from "@/lib/language-phonology-inventory";
 import { RUSSIAN_PHONEMES } from "@/lib/language-sound-units/russian";
 import type { LanguageId } from "@/types/language";
 import type { PhonemeData } from "@/types/phoneme";
@@ -31,6 +32,13 @@ type ResourceBackedPhoneme = PhonemeData & {
 };
 
 const NON_ENGLISH_LANGUAGES: LanguageId[] = ["es-ES", "fr-FR", "ru-RU"];
+const RUSSIAN_SCORE_ONLY_LOCAL_ASSET_GAPS = [
+  "ru-p-pj",
+  "ru-b-bj",
+  "ru-m-mj",
+  "ru-f-fj",
+  "ru-v-vj",
+];
 
 function baseEnglishPhoneme(overrides: Partial<PhonemeData> = {}): PhonemeData {
   return {
@@ -113,12 +121,17 @@ describe("non-English phoneme resource parity", () => {
     expect(missingOrEmptyFiles).toEqual([]);
   });
 
-  it("maps every current Russian sound unit to bundled local media", () => {
+  it("maps every current Russian sound unit to bundled local media or an explicit score-only gap", () => {
     const unmappedRussianSlugs = RUSSIAN_PHONEMES.map(
       (soundUnit) => soundUnit.slug,
     ).filter((slug) => !getLocalLanguagePhonemeAsset("ru-RU", slug));
 
-    expect(unmappedRussianSlugs).toEqual([]);
+    expect(unmappedRussianSlugs).toEqual(RUSSIAN_SCORE_ONLY_LOCAL_ASSET_GAPS);
+    for (const slug of unmappedRussianSlugs) {
+      expect(getPhonologyInventoryEntry("ru-RU", slug)?.tilePolicy).toBe(
+        "score-only-unverified",
+      );
+    }
   });
 
   it("promotes bundled media units to local ready video/audio", () => {
@@ -191,6 +204,11 @@ describe("non-English phoneme resource parity", () => {
       "ru-soft-s-z",
       "ru-soft-n-l-r",
       "ru-soft-labials",
+      "ru-p-pj",
+      "ru-b-bj",
+      "ru-m-mj",
+      "ru-f-fj",
+      "ru-v-vj",
       "ru-stress-reduction",
       "ru-unstressed-o-a",
       "ru-unstressed-e-ya",
@@ -274,7 +292,9 @@ describe("non-English phoneme resource parity", () => {
       (asset) => asset.languageId === "ru-RU",
     );
 
-    expect(russianAssets).toHaveLength(RUSSIAN_PHONEMES.length);
+    expect(russianAssets).toHaveLength(
+      RUSSIAN_PHONEMES.length - RUSSIAN_SCORE_ONLY_LOCAL_ASSET_GAPS.length,
+    );
     for (const asset of russianAssets) {
       expect(asset.source).toContain("Seeing Speech");
       expect(asset.sourceUrl).toMatch(/^https:\/\/www\.seeingspeech\.ac\.uk/);

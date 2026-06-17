@@ -113,6 +113,18 @@ describe("multilingual Azure phoneme map parity", () => {
         "ru-ch",
       ),
     ).toBe(64);
+    expect(
+      getPhonemeAccuracy(
+        result([{ phoneme: "pʲ", accuracyScore: 72 }]),
+        "ru-p-pj",
+      ),
+    ).toBe(72);
+    expect(
+      getPhonemeAccuracy(
+        result([{ phoneme: "v", accuracyScore: 70 }]),
+        "ru-v-vj",
+      ),
+    ).toBe(70);
   });
 
   it("resolves multilingual assessment phonemes to local playback assets", () => {
@@ -137,6 +149,8 @@ describe("multilingual Azure phoneme map parity", () => {
     expect(getPhonemeAudioUrl("k", "es-ES")).toBeNull();
     expect(getPhonemeAudioUrl("p", "fr-FR")).toBeNull();
     expect(getPhonemeAudioUrl("tʲ", "ru-RU")).toBeNull();
+    expect(getPhonemeAudioUrl("pʲ", "ru-RU")).toBeNull();
+    expect(getPhonemeAudioUrl("v", "ru-RU")).toBeNull();
     expect(getPhonemeAudioUrl("ʐ", "ru-RU")).toBeNull();
     expect(getPhonemeAudioUrl("ɱ", "es-ES")).toBeNull();
     expect(getPhonemeAudioUrl("final devoicing", "ru-RU")).toBeNull();

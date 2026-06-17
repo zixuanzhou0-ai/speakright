@@ -24,6 +24,24 @@ describe("Russian pronunciation content", () => {
     expect(audit.russianKeywordsWithoutStress).toEqual([]);
   });
 
+  it("adds standalone Russian hard-soft labial pair anchors without claiming mastery coverage", () => {
+    for (const [slug, expectedIpa] of [
+      ["ru-p-pj", "/p pʲ/"],
+      ["ru-b-bj", "/b bʲ/"],
+      ["ru-m-mj", "/m mʲ/"],
+      ["ru-f-fj", "/f fʲ/"],
+      ["ru-v-vj", "/v vʲ/"],
+    ] as const) {
+      const unit = getLanguagePhonemeBySlug("ru-RU", slug);
+
+      expect(unit?.soundUnitType, slug).toBe("contrast");
+      expect(unit?.ipa, slug).toBe(expectedIpa);
+      expect(unit?.description, slug).toContain("硬");
+      expect(unit?.description, slug).toContain("软");
+      expect(unit?.keywords.length, slug).toBeGreaterThanOrEqual(20);
+    }
+  });
+
   it("explains final devoicing without hiding connected-speech voicing", () => {
     const finalDevoicing = getLanguagePhonemeBySlug(
       "ru-RU",

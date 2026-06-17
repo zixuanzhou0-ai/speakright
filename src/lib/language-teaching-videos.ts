@@ -96,13 +96,21 @@ const russianOverviewUnits = [
   "ru-shch",
   "ru-j",
 ];
-const russianHardSoftUnits = [
+const russianHardSoftExactUnits = [
   "ru-hard-soft",
   "ru-soft-t-d",
   "ru-soft-s-z",
   "ru-soft-n-l-r",
   "ru-soft-labials",
   "ru-soft-sign",
+];
+const russianHardSoftUnits = [
+  ...russianHardSoftExactUnits,
+  "ru-p-pj",
+  "ru-b-bj",
+  "ru-m-mj",
+  "ru-f-fj",
+  "ru-v-vj",
   "ru-iotated-vowels",
 ];
 
@@ -231,9 +239,7 @@ export const LANGUAGE_TEACHING_VIDEO_ASSETS: LanguageTeachingVideoAsset[] = [
     videoSrc: "/videos/language-assets/ru-RU/youtube-lessons/YrOFy4u7cyM.mp4",
     durationSeconds: 553,
     soundUnitSlugs: russianHardSoftUnits,
-    exactSoundUnitSlugs: russianHardSoftUnits.filter(
-      (slug) => slug !== "ru-iotated-vowels",
-    ),
+    exactSoundUnitSlugs: russianHardSoftExactUnits,
     focus: "contrast",
   },
   {

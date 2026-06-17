@@ -128,6 +128,11 @@ const SOUND_SPECIFIC_SOURCE_REFS: Record<string, string[]> = {
   "fr-on": ["lawless-french-ipa", "phonetique-ca"],
   "fr-liaison": ["openipa-fr", "lawless-french-ipa"],
   "ru-hard-soft": ["wiktionary-ru-pronunciation-appendix"],
+  "ru-p-pj": ["wiktionary-ru-pronunciation-appendix", "jipa-russian", "ipa-handbook"],
+  "ru-b-bj": ["wiktionary-ru-pronunciation-appendix", "jipa-russian", "ipa-handbook"],
+  "ru-m-mj": ["wiktionary-ru-pronunciation-appendix", "jipa-russian", "ipa-handbook"],
+  "ru-f-fj": ["wiktionary-ru-pronunciation-appendix", "jipa-russian", "ipa-handbook"],
+  "ru-v-vj": ["wiktionary-ru-pronunciation-appendix", "jipa-russian", "ipa-handbook"],
   "ru-stress-reduction": [
     "easypronunciation-ru-trainer",
     "wiktionary-ru-pronunciation-appendix",

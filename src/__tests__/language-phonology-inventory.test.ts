@@ -215,4 +215,17 @@ describe("language phonology inventory", () => {
       expect(entry?.headerAudioSrc, slug).toBeUndefined();
     }
   });
+
+  it("keeps newly added Russian hard-soft labial pairs score-only until exact clips exist", () => {
+    for (const slug of ["ru-p-pj", "ru-b-bj", "ru-m-mj", "ru-f-fj", "ru-v-vj"]) {
+      const entry = getPhonologyInventoryEntry("ru-RU", slug);
+
+      expect(entry?.layer, slug).toBe("contrast");
+      expect(entry?.audioStatus, slug).toBe("gap-no-local-clip");
+      expect(entry?.tilePolicy, slug).toBe("score-only-unverified");
+      expect(getAssessmentAliasesForSlug(slug).length, slug).toBeGreaterThan(0);
+      expect(entry?.exactAssessmentAliases, slug).toEqual([]);
+      expect(entry?.headerAudioSrc, slug).toBeUndefined();
+    }
+  });
 });
