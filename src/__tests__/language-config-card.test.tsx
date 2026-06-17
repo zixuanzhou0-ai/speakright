@@ -31,7 +31,10 @@ describe("language config card", () => {
     expect(
       screen.getByText(/西语、法语、俄语仍为 experimental 实验板块/),
     ).toBeInTheDocument();
+    expect(screen.getByText(/部分练习音频随桌面端内置/)).toBeInTheDocument();
+    expect(screen.getByText(/exact 短音频缺口会在下方标出/)).toBeInTheDocument();
     expect(screen.queryByText(/开放 beta/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/单词\/短语音频已随桌面端内置/)).not.toBeInTheDocument();
 
     for (const languageId of ["es-ES", "fr-FR", "ru-RU"] as const) {
       const profile = LANGUAGE_PROFILES[languageId];
@@ -54,19 +57,19 @@ describe("language config card", () => {
     }
 
     expect(
-      screen.getByText(/音系待补：\/p t k f m n b d g\//),
+      screen.getByText(/音系\/短音频待补：\/p t k f m n b d g\//),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/音系待补：\/p b t d k g f v s z m n l\//),
+      screen.getByText(/音系\/短音频待补：\/p b t d k g f v s z m n l\//),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/音系待补：complete hard\/soft consonant pairs/),
+      screen.getByText(/音系\/短音频待补：complete hard\/soft consonant pairs/),
     ).toBeInTheDocument();
 
     const englishOption = document.querySelector(
       '[data-smoke="language-option"][data-language-id="en-US"]',
     );
     expect(englishOption).not.toBeNull();
-    expect(englishOption?.textContent).not.toContain("音系待补");
+    expect(englishOption?.textContent).not.toContain("音系/短音频待补");
   });
 });
