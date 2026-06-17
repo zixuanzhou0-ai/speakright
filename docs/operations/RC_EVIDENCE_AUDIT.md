@@ -17,7 +17,7 @@ claimed as complete.
 | Non-English practice can score and provide feedback but cannot load English advanced training packs, write formal mastery/evidenceMastery, display diagnosis issues as formal mastery stages, or show/read English progress archives | `src/lib/mastery-language-policy.ts`, `src/components/assessment/assessment-report.tsx`, `src/app/sentences/page.tsx`, `src/app/progress/page.tsx`, `src/app/assessment/passage/page.tsx`, `src/app/drill/page.tsx`, `src/app/drill/evidence/page.tsx`, `src/app/drill/pack/[packId]/pack-runner-client.tsx`, `src/app/drill/perception/page.tsx`, `src/app/drill/prosody/page.tsx`, `src/app/drill/scenarios/page.tsx`, `src/app/drill/spontaneous/page.tsx`, `src/__tests__/assessment-report.test.tsx`, `src/__tests__/desktop-preflight-ui-smoke.test.ts`, `src/__tests__/drill-pack-runner.test.tsx`, `src/__tests__/progress-page.test.tsx`, `src/__tests__/mastery-language-policy.test.ts`, `src/__tests__/mastery-profile.test.ts`; direct English pack-runner routes show `pack-runner-experimental-blocker` for Spanish/French/Russian instead of loading English pack content; direct `/progress` access shows `progress-experimental-blocker` for Spanish/French/Russian instead of English mastery archive metrics, and the blocker path does not call the formal mastery profile or benchmark archive loaders; direct `/drill/evidence` access shows `evidence-experimental-blocker` for Spanish/French/Russian and does not read the formal mastery profile; direct `/assessment/passage` access shows `assessment-passage-experimental-blocker` for Spanish/French/Russian instead of loading the English coverage passage or English training-pack evidence; non-English `/drill` shows a visible `drill-experimental-boundary-warning` with `role="status"` that says experimental practice does not generate formal mastery and will not use whole-word scores as fake mastery evidence; diagnosis issue cards keep formal mastery badges for English but show `experimental 练习观察` plus the experimental blocker for Spanish/French/Russian instead of `阶段` / `下一层` / `阶段分` badges |
 | Words, phrases, sentences, IPA, and examples are centered, wrap in full, avoid ellipsis/truncation, and use accurate playback labels | `src/lib/practice-text-presentation.ts`, `src/components/phoneme/phoneme-study-card.tsx`, `src/components/drill/drill-phoneme-lesson.tsx`, `src/components/drill/drill-feedback.tsx`, `src/components/drill/drill-summary.tsx`, `src/app/assessment/page.tsx`, `src/app/assessment/passage/page.tsx`, `src/app/drill/page.tsx`, `src/app/drill/evidence/page.tsx`, `src/app/drill/pack/[packId]/pack-runner-client.tsx`, `src/app/drill/word/page.tsx`, `src/app/drill/sentence/page.tsx`, `src/app/drill/contrast/page.tsx`, `src/app/drill/prosody/page.tsx`, `src/app/drill/perception/page.tsx`, `src/app/drill/scenarios/page.tsx`, `src/app/drill/spontaneous/page.tsx`, `src/app/progress/page.tsx`, `src/app/sentences/page.tsx`, `src/components/assessment/assessment-report.tsx`, `src/components/layout/sidebar-phoneme-list.tsx`, `src/components/audio/read-along-text.tsx`, `src/components/sentences/sentence-input-card.tsx`, `src/components/sentences/sentence-results-column.tsx`, `src/components/scoring/word-highlight.tsx`, `src/components/settings/language-config-card.tsx`, `src/components/settings/usage-monitor.tsx`, `src/components/ui/badge.tsx`, `src/components/ui/button.tsx`, `src/__tests__/practice-text-presentation.test.ts`, `src/__tests__/phoneme-study-card.test.tsx`, `src/__tests__/drill-phoneme-lesson.test.tsx`, `src/__tests__/drill-feedback.test.tsx`, `src/__tests__/drill-summary.test.tsx`, `src/__tests__/assessment-report.test.tsx`, `src/__tests__/contrast-drill-page.test.tsx`, `src/__tests__/sentence-input-card.test.tsx`, `src/__tests__/sentence-results-column.test.tsx`, `src/__tests__/progress-page.test.tsx`, `src/__tests__/sidebar-phoneme-list.test.tsx`, `src/__tests__/drill-pack-runner.test.tsx`, `src/__tests__/desktop-preflight-ui-smoke.test.ts`, `scripts/desktop-ui-smoke.mjs`; non-English detail A/B playback buttons label rule sentences as rule/sentence playback instead of saying word playback, phoneme detail session/recorder/Azure/local-save warnings and practice audio alerts wrap long Chinese recovery text without forcing horizontal overflow, long Cyrillic rule text remains centered/wrap-ready/untruncated, drill teaching cards render every bundled keyword/example and label the list as `示例文本` instead of hiding examples after the first six or calling phrase/sentence/rule examples single words, contrast-drill set cards show every preview word pair in a wrap-safe list instead of only the first pair plus an ellipsis, failed drill feedback actions wrap instead of forcing a narrow-window horizontal row, drill completion weak-item rows wrap long text/IPA and keep the score separated, quick assessment intro/paragraph/confirmation/retry buttons, target labels, and purpose text are wrap-safe inside the diagnosis flow, the shared Badge component now defaults to `data-slot="badge"`, `max-w-full`, `whitespace-normal`, `break-words`, and no `overflow-hidden`/`whitespace-nowrap`, the shared Button component now defaults text buttons to `text-center`, `whitespace-normal`, `break-words`, and `min-h-*` sizing while preserving fixed `size-*` icon variants, full-passage diagnosis intro/recording/error buttons, segment focus/cue text, titles, prompts, and pack/feature/evidence/benchmark badges wrap instead of inheriting nowrap/overflow defaults, advanced drill landing headers/CTA buttons/status badges/training-pack badges wrap in narrow Release windows instead of inheriting nowrap defaults, non-English drill landing headers/cards and the experimental boundary warning use break-word/overflow-wrap treatment, advanced pack-runner intro/course-map/header/level/debrief badges wrap dynamic level and pack labels instead of inheriting badge nowrap/overflow defaults, diagnosis-report issue badges, evidence labels, and prescription text wrap instead of inheriting one-line badge truncation, diagnosis-report prescription CTAs wrap long pack titles instead of clipping them, the free-practice header/clear action/session warning and input/listen row wrap while keeping the text input readable, free-practice target-preview and transfer-evidence badges wrap long training-pack titles and score labels instead of inheriting badge nowrap/overflow defaults, English word/sentence/contrast drill page headers and initial config cards wrap in narrow Release windows, full-passage diagnosis, training-evidence, and training-pack direct-route headers/intro/blocker text wrap in Release routes, the prosody drill exercise title/pass-line/demo button stack cleanly on narrow screens, perception focused-review and completion action rows wrap instead of forcing a single narrow-window button row, English scenario/spontaneous transfer page headers, scenario kind/score badges, scenario TTS/template buttons, spontaneous target/score badges, spontaneous processing text, and spontaneous retry actions wrap without pushing controls out of narrow layouts, Progress experimental-language blocker CTA buttons wrap instead of inheriting one-line button text, Progress benchmark rows stack score/date above replay/delete controls on narrow screens, and Progress recent-session rows wrap pack titles plus stage/date metadata instead of forcing a single line |
 | Free-practice transfer evidence keeps matched target words complete | `src/lib/free-practice-transfer.ts`, `src/components/sentences/sentence-results-column.tsx`, `src/__tests__/free-practice-transfer.test.ts`, `src/__tests__/sentence-results-column.test.tsx`, `src/__tests__/desktop-preflight-ui-smoke.test.ts`; free-practice target previews preserve every matched target word inside a selected training target instead of slicing to the first six, and the transfer-evidence card displays the complete centered matched-word line with `free-practice-transfer-matched-words` |
-| Free-practice suggestions keep suggested target words complete | `src/components/sentences/sentence-input-card.tsx`, `src/__tests__/sentence-input-card.test.tsx`, `src/__tests__/desktop-preflight-ui-smoke.test.ts`; when the current sentence has not hit a target, the suggestion card renders every `suggestion.words` badge with `free-practice-suggestion-word` and the static smoke guard rejects the old `suggestion.words.slice(0, 4)` cap |
+| Free-practice suggestions keep suggested target words complete | `src/lib/free-practice-transfer.ts`, `src/components/sentences/sentence-input-card.tsx`, `src/__tests__/free-practice-transfer.test.ts`, `src/__tests__/sentence-input-card.test.tsx`, `src/__tests__/desktop-preflight-ui-smoke.test.ts`; when the current sentence has not hit a target, the preview builder preserves every generated suggestion word instead of slicing the source list to four, the suggestion card renders every `suggestion.words` badge with `free-practice-suggestion-word`, and the static smoke guard rejects both source-level `.slice(0, 4)` and UI-level `suggestion.words.slice(0, 4)` caps |
 | Diagnosis reports keep generated issues and evidence visible instead of re-summarizing them in the component | `src/components/assessment/assessment-report.tsx`, `src/__tests__/assessment-report.test.tsx`, `src/__tests__/desktop-preflight-ui-smoke.test.ts`; after the diagnosis engine builds its bounded issue, per-issue evidence, and `rawEvidence` lists, the report renders every generated `assessment-report-issue-card`, every `assessment-report-issue-evidence` row, every generated evidence row with `assessment-report-evidence-row`, and every `errorPatternId` badge, rather than slicing the component view to the first 3 issues, first issue-evidence row, first 8 evidence rows, or first 2 pattern IDs |
 | Training evidence pages keep generated evidence, pattern, and remediation lists complete | `src/app/drill/evidence/page.tsx`, `src/__tests__/training-evidence-page.test.tsx`, `src/__tests__/desktop-preflight-ui-smoke.test.ts`; after `buildTrainingEvidenceBook` builds its sorted evidence book, the page renders every `evidence-card-row`, `evidence-pattern-row`, and `evidence-remediation-row`, rather than slicing the component view to the first 8 evidence cards, 6 patterns, or 6 remediation records |
 | Drill landing review queue and training memory keep actionable tasks visible | `src/app/drill/page.tsx`, `src/lib/review-queue.ts`, `src/lib/training-memory.ts`, `src/__tests__/desktop-preflight-ui-smoke.test.ts`; after `buildReviewQueue` and `buildTrainingMemory` bound their source lists, the drill landing page renders every `drill-review-task-card`, merged `drill-today-item-card`, and `drill-memory-weakness-card`, rather than applying a second `slice(0, 2)` cap to review/today tasks or `activeWeaknesses.slice(0, 3)` to training-memory weaknesses |
@@ -81,16 +81,19 @@ Latest local full gate recorded in this audit:
 ```text
 git status --short --branch
   initial gate status before this round's edits was
-  `## main...origin/main [ahead 98]`; the current full gate was run with the
-  free-practice suggestion-word full-rendering fix and evidence updates still
-  unstaged, so `desktop:preflight` correctly reported `Git: dirty`. After
+  `## main...origin/main [ahead 99]`; the current full gate was run with the
+  free-practice suggestion-word source-list full-rendering fix and evidence
+  updates still unstaged, so `desktop:preflight` correctly reported
+  `Git: dirty`. After
   GitHub API fallback pushes, verify the GitHub `main` ref and local-vs-remote
   tree SHA before treating content as unpushed.
 
-npm.cmd run test -- src/__tests__/sentence-input-card.test.tsx src/__tests__/desktop-preflight-ui-smoke.test.ts
-  2 files / 26 tests passed; free-practice suggestion cards render every
+npm.cmd run test -- src/__tests__/free-practice-transfer.test.ts src/__tests__/sentence-input-card.test.tsx src/__tests__/desktop-preflight-ui-smoke.test.ts
+  3 files / 34 tests passed; the preview builder preserves more than four
+  generated suggestion words, free-practice suggestion cards render every
   `suggestion.words` badge with `free-practice-suggestion-word`, and the static
-  smoke guard rejects `suggestion.words.slice(0, 4)`.
+  smoke guard rejects source-level `.slice(0, 4)` plus UI-level
+  `suggestion.words.slice(0, 4)`.
 
 npm.cmd run test
   125 files / 710 tests passed
@@ -99,16 +102,14 @@ npm.cmd run typecheck
   passed
 
 npm.cmd run lint
-  passed; Biome checked 389 files. The first lint attempt caught an index-based
-  React key in the new suggestion-word map; the final implementation keeps the
-  stable word key and passes Biome.
+  passed; Biome checked 389 files.
 
 npm.cmd run build:desktop-frontend
   passed; 144 static pages generated
 
 npm.cmd run desktop:build
   passed; reran `build:desktop-frontend`, generated 144 static pages, compiled
-  the Tauri release app in 4m 56s, built
+  the Tauri release app in 6m 18s, built
   `src-tauri\target\release\speakright.exe`, and generated fresh MSI/NSIS
   bundles.
 
@@ -119,7 +120,7 @@ npm.cmd run desktop:preflight
 
 npm.cmd run desktop:ui-smoke
   passed; Release EXE runtime reported
-  `pid=55708 settings=ok`, detail coverage for English, Spanish, French, and
+  `pid=71076 settings=ok`, detail coverage for English, Spanish, French, and
   Russian sound units, routes `/drill`, `/drill/word`, `/drill/sentence`,
   `/drill/contrast`, `/drill/prosody`, `/drill/perception`, `/drill/evidence`,
   `/drill/pack/ee-ih`, `/drill/scenarios`, `/drill/spontaneous`,
@@ -132,11 +133,11 @@ npm.cmd run desktop:ui-smoke
 
 npm.cmd run desktop:launch-release
   passed; command printed `SpeakRight release desktop app launch requested`,
-  the Release EXE path, PID `46240`, and the no-localhost reminder; the Release
+  the Release EXE path, PID `75760`, and the no-localhost reminder; the Release
   EXE opened from `src-tauri\target\release\speakright.exe`.
 
 process cleanup
-  `Get-Process -Id 46240` confirmed `running pid=46240 name=speakright`; the
+  `Get-Process -Id 75760` confirmed `running pid=75760 name=speakright`; the
   process was stopped afterward, and no residual `speakright.exe` remained
   after cleanup
 ```

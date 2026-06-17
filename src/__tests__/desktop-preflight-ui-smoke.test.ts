@@ -344,6 +344,7 @@ describe("desktop preflight and UI smoke", () => {
     );
     expect(freePracticeTransfer).toContain("const matchedWords = unique(targetWords);");
     expect(freePracticeTransfer).not.toContain("unique(targetWords).slice(0, 6)");
+    expect(freePracticeTransfer).not.toContain(".slice(0, 4)");
     const drillPhonemeLesson = readProjectFile(
       "src/components/drill/drill-phoneme-lesson.tsx",
     );

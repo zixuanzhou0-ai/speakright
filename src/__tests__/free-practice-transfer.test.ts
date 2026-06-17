@@ -115,7 +115,10 @@ describe("free-practice transfer", () => {
     expect(preview.suggestions[0]).toMatchObject({
       packId: "s-th",
     });
-    expect(preview.suggestions[0].words.length).toBeGreaterThan(0);
+    expect(preview.suggestions[0].words.length).toBeGreaterThan(4);
+    expect(preview.suggestions[0].words).toEqual(
+      expect.arrayContaining(["think", "three", "mouth", "health", "path"]),
+    );
   });
 
   it("does not create transfer evidence when the text misses preview targets", () => {

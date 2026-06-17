@@ -346,9 +346,7 @@ export function buildFreePracticeTargetPreview({
       const words = unique([
         ...normalizeWords(task?.itemText ?? ""),
         ...packTargetWords(packId),
-      ])
-        .filter((word) => word.length >= 3)
-        .slice(0, 4);
+      ]).filter((word) => word.length >= 3);
       return {
         packId,
         packTitle: pack.title,

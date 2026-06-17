@@ -116,8 +116,10 @@ E:\SpeakRightDesktopRepo\src-tauri\target\release\speakright.exe
   target word in a wrap-safe centered line; `free-practice-transfer.ts` and
   `SentenceResultsColumn` tests reject the old first-six-word display.
 - Free-practice suggestion cards now render every suggested target word instead
-  of only the first four; `free-practice-suggestion-word` and static smoke tests
-  reject the old suggestion-word UI cap.
+  of only the first four, and the preview builder now preserves the full
+  generated suggestion-word list instead of cutting it off before UI rendering;
+  `free-practice-suggestion-word` and static smoke tests reject the old
+  source/UI suggestion-word caps.
 - The `/drill` landing page now stacks its header actions on narrow windows and
   uses wrap-safe classes for top CTA buttons, status badges, today-plan badges,
   training-memory badges, and training-pack metadata badges.
