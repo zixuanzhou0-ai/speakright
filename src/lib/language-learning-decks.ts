@@ -1,4 +1,5 @@
-﻿import type { LanguageId } from "@/types/language";
+﻿import { matchLanguageFeedbackRules } from "@/lib/language-feedback-rules";
+import type { LanguageId } from "@/types/language";
 
 export type DeckLanguageId = Exclude<LanguageId, "en-US">;
 
@@ -37,6 +38,26 @@ export interface LanguageLearningDeck {
   };
   contrastDeck: LanguageContrastItem[];
   sentenceDeck: LanguageSentenceItem[];
+}
+
+export type LanguageDeckFeedbackEntryType =
+  | "diagnostic-word"
+  | "diagnostic-passage"
+  | "contrast"
+  | "sentence";
+
+export interface LanguageDeckFeedbackRuleSummary {
+  id: string;
+  title: string;
+  matchedSlugs: string[];
+}
+
+export interface LanguageDeckFeedbackRuleMatch {
+  languageId: DeckLanguageId;
+  entryType: LanguageDeckFeedbackEntryType;
+  text: string;
+  targetUnitSlugs: string[];
+  matchedRules: LanguageDeckFeedbackRuleSummary[];
 }
 
 export const LANGUAGE_LEARNING_DECKS: Record<DeckLanguageId, LanguageLearningDeck> = {
@@ -914,4 +935,56 @@ export function getLanguageLearningDeck(
   languageId: DeckLanguageId,
 ): LanguageLearningDeck {
   return LANGUAGE_LEARNING_DECKS[languageId];
+}
+
+function summarizeFeedbackRules(
+  languageId: DeckLanguageId,
+  targetUnitSlugs: string[],
+): LanguageDeckFeedbackRuleSummary[] {
+  return matchLanguageFeedbackRules(languageId, targetUnitSlugs).map(
+    ({ rule, matchedSlugs }) => ({
+      id: rule.id,
+      title: rule.title,
+      matchedSlugs,
+    }),
+  );
+}
+
+export function getLanguageDeckFeedbackRuleMatches(
+  languageId: DeckLanguageId,
+): LanguageDeckFeedbackRuleMatch[] {
+  const deck = getLanguageLearningDeck(languageId);
+  const entries: Omit<LanguageDeckFeedbackRuleMatch, "matchedRules">[] = [
+    ...deck.diagnosticWords.map((word) => ({
+      languageId,
+      entryType: "diagnostic-word" as const,
+      text: word.text,
+      targetUnitSlugs: [word.targetUnitSlug],
+    })),
+    {
+      languageId,
+      entryType: "diagnostic-passage" as const,
+      text: deck.diagnosticPassage.text,
+      targetUnitSlugs: deck.diagnosticPassage.targetUnitSlugs,
+    },
+    ...deck.contrastDeck.map((item) => ({
+      languageId,
+      entryType: "contrast" as const,
+      text: `${item.left} ~ ${item.right}`,
+      targetUnitSlugs: [item.targetUnitSlug],
+    })),
+    ...deck.sentenceDeck.map((sentence) => ({
+      languageId,
+      entryType: "sentence" as const,
+      text: sentence.text,
+      targetUnitSlugs: sentence.targetUnitSlugs,
+    })),
+  ];
+
+  return entries
+    .map((entry) => ({
+      ...entry,
+      matchedRules: summarizeFeedbackRules(languageId, entry.targetUnitSlugs),
+    }))
+    .filter((entry) => entry.matchedRules.length > 0);
 }

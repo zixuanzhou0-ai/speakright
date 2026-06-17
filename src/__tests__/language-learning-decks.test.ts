@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { spanishPhonemeLayerIpa } from "@/lib/language-keyword-expansions";
 import type { DeckLanguageId } from "@/lib/language-learning-decks";
-import { LANGUAGE_LEARNING_DECKS } from "@/lib/language-learning-decks";
+import {
+  getLanguageDeckFeedbackRuleMatches,
+  LANGUAGE_LEARNING_DECKS,
+} from "@/lib/language-learning-decks";
 import {
   getLanguagePhonemeBySlug,
   getLanguagePhonemes,
@@ -166,6 +169,98 @@ describe("language learning decks", () => {
       for (const slug of targetSlugs) {
         expect(getLanguagePhonemeBySlug(languageId, slug)).toBeDefined();
       }
+    }
+  });
+
+  it("keeps language-specific feedback rules reachable from real deck evidence", () => {
+    const expectedEvidence: {
+      languageId: DeckLanguageId;
+      entryType: string;
+      text: string;
+      ruleId: string;
+      matchedSlugs: string[];
+    }[] = [
+      {
+        languageId: "es-ES",
+        entryType: "sentence",
+        text: "Un gato duerme en un banco.",
+        ruleId: "spanish-nasal-place-assimilation",
+        matchedSlugs: ["es-nasal-place"],
+      },
+      {
+        languageId: "es-ES",
+        entryType: "sentence",
+        text: "Bueno, cuatro amigos juegan afuera.",
+        ruleId: "spanish-diphthong-glides",
+        matchedSlugs: ["es-diphthongs-w"],
+      },
+      {
+        languageId: "fr-FR",
+        entryType: "contrast",
+        text: "huit ~ oui",
+        ruleId: "french-glide-contrast",
+        matchedSlugs: ["fr-glide-hui"],
+      },
+      {
+        languageId: "fr-FR",
+        entryType: "sentence",
+        text: "L’ami arrive à huit heures.",
+        ruleId: "french-elision",
+        matchedSlugs: ["fr-elision"],
+      },
+      {
+        languageId: "fr-FR",
+        entryType: "sentence",
+        text: "L’ami arrive à huit heures.",
+        ruleId: "french-enchainement",
+        matchedSlugs: ["fr-enchainement"],
+      },
+      {
+        languageId: "ru-RU",
+        entryType: "sentence",
+        text: "Я люблю русский язык.",
+        ruleId: "russian-iotated-vowel-context",
+        matchedSlugs: ["ru-iotated-vowels"],
+      },
+      {
+        languageId: "ru-RU",
+        entryType: "sentence",
+        text: "Нож тупой.",
+        ruleId: "russian-final-devoicing",
+        matchedSlugs: ["ru-final-devoicing"],
+      },
+      {
+        languageId: "ru-RU",
+        entryType: "sentence",
+        text: "Встреча завтра утром.",
+        ruleId: "russian-voicing-assimilation",
+        matchedSlugs: ["ru-voicing-assimilation"],
+      },
+      {
+        languageId: "ru-RU",
+        entryType: "contrast",
+        text: "шить ~ жить",
+        ruleId: "russian-sh-zh-ch-shch-confusion",
+        matchedSlugs: ["ru-sh-zh"],
+      },
+    ];
+
+    for (const expected of expectedEvidence) {
+      const entry = getLanguageDeckFeedbackRuleMatches(
+        expected.languageId,
+      ).find(
+        (candidate) =>
+          candidate.entryType === expected.entryType &&
+          candidate.text === expected.text,
+      );
+      const rule = entry?.matchedRules.find(
+        (candidate) => candidate.id === expected.ruleId,
+      );
+
+      expect(entry, `${expected.languageId}:${expected.text}`).toBeDefined();
+      expect(rule?.matchedSlugs, expected.ruleId).toEqual(
+        expected.matchedSlugs,
+      );
     }
   });
 
