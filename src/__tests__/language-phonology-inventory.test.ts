@@ -5,8 +5,10 @@ import { getLanguagePhonemes } from "@/lib/language-phonemes";
 import {
   getLanguagePhonologyGaps,
   getLanguagePhonologyInventory,
+  getLanguagePhonologyInventoryTableRows,
   getPhonologyInventoryEntry,
   getVisibleLanguagePhonologyGaps,
+  formatLanguagePhonologyInventoryMarkdownTable,
   type NonEnglishLanguageId,
   type PhonologyInventoryLayer,
 } from "@/lib/language-phonology-inventory";
@@ -147,6 +149,48 @@ describe("language phonology inventory", () => {
     for (const languageId of LANGUAGE_IDS) {
       for (const entry of getLanguagePhonologyInventory(languageId)) {
         expect(ALLOWED_GOAL_LAYERS.has(entry.layer), entry.slug).toBe(true);
+      }
+    }
+  });
+
+  it("exports maintainable source-backed inventory table rows for each language", () => {
+    for (const languageId of LANGUAGE_IDS) {
+      const inventory = getLanguagePhonologyInventory(languageId);
+      const rows = getLanguagePhonologyInventoryTableRows(languageId);
+
+      expect(rows).toHaveLength(inventory.length);
+
+      for (const row of rows) {
+        expect(row.slug).toBeTruthy();
+        expect(row.ipa).toBeTruthy();
+        expect(ALLOWED_GOAL_LAYERS.has(row.layer), row.slug).toBe(true);
+        expect(row.variantScope, row.slug).toBeTruthy();
+        expect(row.sourceRefs.split(", ").length, row.slug).toBeGreaterThanOrEqual(
+          2,
+        );
+        expect(row.audioStatus, row.slug).toMatch(
+          /^(exact-local-header|proxy-local-reference|rule-only|gap-no-local-clip)$/,
+        );
+        expect(row.tilePolicy, row.slug).toMatch(
+          /^(clickable-exact-header|score-only-unverified|rule-guidance-only)$/,
+        );
+        expect(row.gaps, row.slug).toBeTruthy();
+      }
+    }
+  });
+
+  it("formats inventory tables with the required open-source audit columns", () => {
+    for (const languageId of LANGUAGE_IDS) {
+      const table = formatLanguagePhonologyInventoryMarkdownTable(languageId);
+      const inventory = getLanguagePhonologyInventory(languageId);
+
+      expect(table).toContain(
+        "| slug | IPA | layer | variant scope | source refs | audio status | tile policy | gaps |",
+      );
+      expect(table.split("\n")).toHaveLength(inventory.length + 2);
+
+      for (const entry of inventory) {
+        expect(table, entry.slug).toContain(`| ${entry.slug} |`);
       }
     }
   });

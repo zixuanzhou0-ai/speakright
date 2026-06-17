@@ -33,6 +33,16 @@ Last updated: 2026-06-18
   `src/lib/language-phoneme-resources.ts`,
   `src/lib/assessment-segment-audio.ts`。
 
+## Source-backed Inventory Table
+
+西语 inventory 表的权威入口在 `src/lib/language-phonology-inventory.ts`：
+`getLanguagePhonologyInventoryTableRows("es-ES")` 和
+`formatLanguagePhonologyInventoryMarkdownTable("es-ES")`。每一行必须包含
+`slug`、`IPA`、`layer`、`variant scope`、`source refs`、`audio status`、
+`tile policy`、`gaps`。对应测试在
+`src/__tests__/language-phonology-inventory.test.ts`，用于防止文档口径、课程单位、
+音频策略和 source refs 漂移。
+
 ## 当前产品状态
 
 当前 `SPANISH_PHONEMES` 是可继续打磨的 experimental 课程锚点层，不能宣称 mastery、
@@ -105,4 +115,3 @@ evidenceMastery 或完整 coverage。
 西语达到 public experimental 标准时，用户能区分稳定音位、上下文实现、方言变体、
 重音和节奏；每个可点击 speaker 都是真实、短、同源、可追溯的本地目标音频，其余只
 能 score-only 或 rule-guidance-only。
-

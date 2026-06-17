@@ -55,6 +55,17 @@ export interface LanguagePhonologyGap {
   sourceRefs: string[];
 }
 
+export interface LanguagePhonologyInventoryTableRow {
+  slug: string;
+  ipa: string;
+  layer: PhonologyInventoryLayer;
+  variantScope: string;
+  sourceRefs: string;
+  audioStatus: PhonologyInventoryAudioStatus;
+  tilePolicy: PhonologyInventoryTilePolicy;
+  gaps: string;
+}
+
 const LAYER_LABELS: Record<PhonologyInventoryLayer, string> = {
   phoneme: "音素",
   allophone: "实现音",
@@ -1098,4 +1109,47 @@ export function getPhonologyTilePolicyDescription(
   tilePolicy: PhonologyInventoryTilePolicy,
 ): string {
   return TILE_POLICY_DESCRIPTIONS[tilePolicy];
+}
+
+export function getLanguagePhonologyInventoryTableRows(
+  languageId: NonEnglishLanguageId,
+): LanguagePhonologyInventoryTableRow[] {
+  return getLanguagePhonologyInventory(languageId).map((entry) => ({
+    slug: entry.slug,
+    ipa: entry.ipa,
+    layer: entry.layer,
+    variantScope: entry.variantScope,
+    sourceRefs: entry.sourceRefs.join(", "),
+    audioStatus: entry.audioStatus,
+    tilePolicy: entry.tilePolicy,
+    gaps: entry.gaps.length > 0 ? entry.gaps.join("; ") : "none",
+  }));
+}
+
+function escapeMarkdownTableCell(value: string): string {
+  return value.replace(/\|/g, "\\|").replace(/\r?\n/g, " ");
+}
+
+export function formatLanguagePhonologyInventoryMarkdownTable(
+  languageId: NonEnglishLanguageId,
+): string {
+  const header =
+    "| slug | IPA | layer | variant scope | source refs | audio status | tile policy | gaps |";
+  const separator = "| --- | --- | --- | --- | --- | --- | --- | --- |";
+  const rows = getLanguagePhonologyInventoryTableRows(languageId).map((row) =>
+    [
+      row.slug,
+      row.ipa,
+      row.layer,
+      row.variantScope,
+      row.sourceRefs,
+      row.audioStatus,
+      row.tilePolicy,
+      row.gaps,
+    ]
+      .map((value) => escapeMarkdownTableCell(value))
+      .join(" | "),
+  );
+
+  return [header, separator, ...rows.map((row) => `| ${row} |`)].join("\n");
 }

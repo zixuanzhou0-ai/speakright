@@ -30,6 +30,16 @@ Last updated: 2026-06-18
   `src/lib/language-phonology-inventory.ts`,
   `src/lib/local-language-assets.ts`。
 
+## Source-backed Inventory Table
+
+法语 inventory 表的权威入口在 `src/lib/language-phonology-inventory.ts`：
+`getLanguagePhonologyInventoryTableRows("fr-FR")` 和
+`formatLanguagePhonologyInventoryMarkdownTable("fr-FR")`。每一行必须包含
+`slug`、`IPA`、`layer`、`variant scope`、`source refs`、`audio status`、
+`tile policy`、`gaps`。对应测试在
+`src/__tests__/language-phonology-inventory.test.ts`，用于防止文档口径、课程单位、
+音频策略和 source refs 漂移。
+
 ## 当前产品状态
 
 当前 `FRENCH_PHONEMES` 是 experimental 法语课程方向，不是完整法语发音产品。
@@ -106,4 +116,3 @@ Last updated: 2026-06-18
 法语达到 public experimental 标准时，用户能区分单音库存、对比、短语规则和韵律；
 AI feedback 不套英语 stress/rhotic 假设；所有可点击 speaker 都是 exact same-unit
 local short clip。
-

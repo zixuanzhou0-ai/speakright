@@ -31,6 +31,16 @@ Last updated: 2026-06-18
   `src/lib/local-language-assets.ts`,
   `src/lib/assessment-segment-audio.ts`。
 
+## Source-backed Inventory Table
+
+俄语 inventory 表的权威入口在 `src/lib/language-phonology-inventory.ts`：
+`getLanguagePhonologyInventoryTableRows("ru-RU")` 和
+`formatLanguagePhonologyInventoryMarkdownTable("ru-RU")`。每一行必须包含
+`slug`、`IPA`、`layer`、`variant scope`、`source refs`、`audio status`、
+`tile policy`、`gaps`。对应测试在
+`src/__tests__/language-phonology-inventory.test.ts`，用于防止文档口径、课程单位、
+音频策略和 source refs 漂移。
+
 ## 当前产品状态
 
 当前 `RUSSIAN_PHONEMES` 是 stress-aware experimental 锚点层，方向正确，但不是完整
