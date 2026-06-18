@@ -432,7 +432,7 @@ export function PhonemeStudyCard({
                 {getPhonologyAudioStatusLabel(inventoryEntry.audioStatus)}
               </Badge>
               <Badge variant="outline" className="text-[10px]">
-                tile：{getPhonologyTilePolicyLabel(inventoryEntry.tilePolicy)}
+                拆解：{getPhonologyTilePolicyLabel(inventoryEntry.tilePolicy)}
               </Badge>
             </div>
             {phoneme.description && (

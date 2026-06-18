@@ -190,7 +190,7 @@ function PhonemeCell({
   const policyParts = [
     layerLabel,
     audioStatusLabel ? `音频：${audioStatusLabel}` : undefined,
-    tilePolicyLabel ? `tile：${tilePolicyLabel}` : undefined,
+    tilePolicyLabel ? `拆解：${tilePolicyLabel}` : undefined,
     languageId === "en-US" ? undefined : "experimental 练习观察",
   ].filter(Boolean);
   const policyNote =
@@ -234,7 +234,7 @@ function PhonemeCell({
           {sampleCount > 0 ? ` · ${sampleCount} 个样本` : ""}
           {layerLabel ? ` · ${layerLabel}` : ""}
           {audioStatusLabel ? ` · 音频：${audioStatusLabel}` : ""}
-          {tilePolicyLabel ? ` · tile：${tilePolicyLabel}` : ""}
+          {tilePolicyLabel ? ` · 拆解：${tilePolicyLabel}` : ""}
           {languageId !== "en-US" ? " · experimental 练习观察" : ""} ·
           点击进入学习
         </p>

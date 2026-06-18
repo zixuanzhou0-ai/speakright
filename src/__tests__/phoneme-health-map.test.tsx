@@ -40,7 +40,7 @@ describe("PhonemeHealthMap language policy", () => {
     expect(link).toHaveAccessibleName(/高分/);
     expect(link).toHaveAccessibleName(/实现音/);
     expect(link).toHaveAccessibleName(/音频：精确短音频/);
-    expect(link).toHaveAccessibleName(/tile：精确短音频/);
+    expect(link).toHaveAccessibleName(/拆解：精确短音频/);
     expect(link).toHaveAccessibleName(/experimental 练习观察/);
     expect(link).not.toHaveAccessibleName(/掌握/);
     expect(
@@ -62,7 +62,7 @@ describe("PhonemeHealthMap language policy", () => {
     expect(link).toHaveAccessibleName(/中等/);
     expect(link).toHaveAccessibleName(/音素/);
     expect(link).toHaveAccessibleName(/音频：缺少短音频/);
-    expect(link).toHaveAccessibleName(/tile：音频未验证/);
+    expect(link).toHaveAccessibleName(/拆解：音频未验证/);
     expect(link).not.toHaveAccessibleName(/掌握/);
     expect(
       document.querySelector(
@@ -83,7 +83,7 @@ describe("PhonemeHealthMap language policy", () => {
     expect(link).toHaveAccessibleName(/高分/);
     expect(link).toHaveAccessibleName(/语流规则/);
     expect(link).toHaveAccessibleName(/音频：规则说明/);
-    expect(link).toHaveAccessibleName(/tile：规则说明/);
+    expect(link).toHaveAccessibleName(/拆解：规则说明/);
     expect(link).toHaveAccessibleName(/experimental 练习观察/);
     expect(link).not.toHaveAccessibleName(/掌握/);
     expect(
@@ -105,7 +105,7 @@ describe("PhonemeHealthMap language policy", () => {
     expect(link).toHaveAccessibleName(/高分/);
     expect(link).toHaveAccessibleName(/对比\/变体/);
     expect(link).toHaveAccessibleName(/音频：代理参考/);
-    expect(link).toHaveAccessibleName(/tile：音频未验证/);
+    expect(link).toHaveAccessibleName(/拆解：音频未验证/);
     expect(link).toHaveAccessibleName(/experimental 练习观察/);
     expect(link).not.toHaveAccessibleName(/掌握/);
     expect(

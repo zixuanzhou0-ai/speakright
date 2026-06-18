@@ -298,9 +298,9 @@ describe("PhonemeStudyCard non-English reading layout", () => {
     expect(screen.getByText("实验模块")).toBeInTheDocument();
     expect(screen.getByText("韵律/重音")).toBeInTheDocument();
     expect(screen.getByText("精确短音频")).toBeInTheDocument();
-    expect(screen.getByText("tile：精确短音频")).toBeInTheDocument();
+    expect(screen.getByText("拆解：精确短音频")).toBeInTheDocument();
     expect(
-      screen.getByText("评分 tile 可播放同源本地短音频。"),
+      screen.getByText("评分拆解块可播放同源本地短音频。"),
     ).toBeInTheDocument();
     expect(
       screen.getByText(/法语 e caduc .*可听见/),
@@ -348,9 +348,9 @@ describe("PhonemeStudyCard non-English reading layout", () => {
     expect(detail).toHaveAttribute("data-tile-policy", "score-only-unverified");
     expect(detail).toHaveAttribute("data-audio-status", "gap-no-local-clip");
     expect(screen.getByText("缺少短音频")).toBeInTheDocument();
-    expect(screen.getByText("tile：音频未验证")).toBeInTheDocument();
+    expect(screen.getByText("拆解：音频未验证")).toBeInTheDocument();
     expect(
-      screen.getByText("评分 tile 只显示分数，不播放未验证音频。"),
+      screen.getByText("评分拆解块只显示分数，不播放未验证音频。"),
     ).toBeInTheDocument();
 
     const gapDetails = document.querySelector(
@@ -392,7 +392,7 @@ describe("PhonemeStudyCard non-English reading layout", () => {
     );
     expect(screen.getByText("语流规则")).toBeInTheDocument();
     expect(screen.getByText("规则说明")).toBeInTheDocument();
-    expect(screen.getByText("tile：规则说明")).toBeInTheDocument();
+    expect(screen.getByText("拆解：规则说明")).toBeInTheDocument();
     expect(
       screen.getByText("按规则/短语证据训练，不作单音播放。"),
     ).toBeInTheDocument();

@@ -88,8 +88,8 @@ const TILE_POLICY_SHORT_LABELS: Record<PhonologyInventoryTilePolicy, string> = {
 };
 
 const TILE_POLICY_DESCRIPTIONS: Record<PhonologyInventoryTilePolicy, string> = {
-  "clickable-exact-header": "评分 tile 可播放同源本地短音频。",
-  "score-only-unverified": "评分 tile 只显示分数，不播放未验证音频。",
+  "clickable-exact-header": "评分拆解块可播放同源本地短音频。",
+  "score-only-unverified": "评分拆解块只显示分数，不播放未验证音频。",
   "rule-guidance-only": "按规则/短语证据训练，不作单音播放。",
 };
 
