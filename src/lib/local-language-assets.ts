@@ -181,7 +181,7 @@ export const LOCAL_LANGUAGE_PHONEME_ASSETS: LocalLanguagePhonemeAsset[] = [
   }),
   spanishAnimationAsset("es-y-ll", "yot-sound", {
     audioIpa: "/ʝ/",
-    exactAssessmentAliases: ["ʝ", "ʎ", "y", "ll"],
+    exactAssessmentAliases: ["ʝ"],
   }),
   spanishAnimationAsset("es-l", "l-sound", {
     audioIpa: "/l/",

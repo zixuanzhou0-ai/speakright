@@ -39,6 +39,11 @@ iotated vowels 和 clusters 放到词/短语/句子环境中处理。
 Gramota 俄语正音词典入口线索和 IPA Handbook。结论：俄语有成熟 IPA 描写和正音体系；
 产品不能把俄语拆成英语辅音表。俄语必须先处理重音、弱化和硬软，再谈单音播放。
 
+2026-06-18 实时复核再次确认：Yanushevskaya/Buncic 的 Russian IPA illustration 和
+俄语正音传统都把重音、元音弱化、硬/软辅音、词尾清化、逆行清浊同化放在核心位置。
+因此俄语的产品拆分必须 stress-first、hard/soft-first；硬音 exact clip 不能代表软音、
+弱化输出或同化规则。
+
 - Yanushevskaya and Buncic, "Russian", `Journal of the International Phonetic
   Association`, 45(2), 221-228:
   https://doi.org/10.1017/S0025100314000395

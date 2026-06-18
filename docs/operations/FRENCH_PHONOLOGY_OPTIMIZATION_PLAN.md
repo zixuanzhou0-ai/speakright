@@ -37,6 +37,11 @@ enchaînement、elision、e caduc/schwa 和节奏组末突出。
 法语不缺成熟音标体系；真正的产品难点是不能把法语拆成孤立英语式 tile。法语的可懂度
 高度依赖短语级连接、词尾静音、e caduc/schwa 和节奏组。
 
+2026-06-18 实时复核再次确认：Fougeron/Smith 的 French IPA illustration 支持口元音、
+鼻化元音、前圆唇元音、小舌 `/ʁ/` 和 glides 作为库存/对比层；PFC/IPFC 路线把
+liaison、schwa/e caduc 和真实口语变体放在短语/语体层。因此法语 speaker 策略必须
+继续把规则类单位与单音 exact clip 分开。
+
 - Fougeron and Smith, "French", `Journal of the International Phonetic
   Association`, 23(2), 73-76:
   https://doi.org/10.1017/S0025100300004874
