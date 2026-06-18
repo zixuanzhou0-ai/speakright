@@ -678,18 +678,28 @@ Start with the Release EXE and inspect these areas before adding new features:
   `docs/operations/non-english-ipa-audit-input.json`. A local generated copy may
   also exist at
   `E:/SpeakRightDesktopRepo/src-tauri/target/ipa-audit/non-english-ipa-audit-input.json`.
-  It now contains the final expanded UI corpus with `2641` rows: Spanish `732`,
-  French `935`, Russian `974`. The earlier `988`-row file covered only base
+  It now contains the final expanded UI corpus with `2974` rows: Spanish `732`,
+  French `935`, Russian `1307`. The earlier `988`-row file covered only base
   sound-unit arrays.
 - The audit input is now reproducible with `npm.cmd run ipa:audit:export`.
   Rows include `auditRole`: `ipa-transcription` for real IPA rows and
   `deck-focus-hint` for `language-learning-decks` sentence `ipaHint` rows. The
-  current export contains `2641` total rows and marks `36` deck focus
+  current export contains `2974` total rows and marks `45` deck focus
   hints so GPT Research does not mistake compact cues such as `/s sʲ zʲ/` for
   complete sentence IPA. Recent source-synced rows also replaced generic
   `elision + nasal vowels` / `clusters` sentence labels with full IPA for
   `J’aime le bon vin blanc.`, `Здравствуйте, студент.`, and
   `Текст простой, но группа большая.`.
+- The visible four-language phoneme-practice IPA audit is separate and is
+  reproducible with `npm.cmd run ipa:practice:audit:export`. It uses
+  `getLanguagePhonemePracticeGroups()` so hidden rule cards do not re-enter the
+  practice audit. Latest local temp export contains `2814` rows:
+  `ipa-transcription 2782` and `deck-focus-hint 32`.
+- Latest conservative IPA cleanup normalized visible Spanish ordinary practice
+  rows back to phoneme-first `/n/` instead of nasal-place realizations like
+  `[ŋ]`, while leaving the hidden `es-nasal-place` rule layer intact. Russian
+  hard/soft contrast phrase rows now include visible stress in `stressText` and
+  IPA where they are real IPA rows rather than deck focus hints.
 - The reviewed-findings ledger is now checked by
   `src/__tests__/non-english-ipa-reviewed-findings.test.ts`. It locks the
   high-risk Spanish source-leak guardrails, French connected-speech updates,
@@ -708,7 +718,7 @@ Start with the Release EXE and inspect these areas before adding new features:
   phoneme anchors, while `[β ð ɣ]` stay on `es-bv`, `es-d`, and `es-g` with the
   existing exact realization clips. Do not map plain stops to the realization
   clips unless exact stop-position header clips are added later.
-- Remaining audit work: continue from the new `2641`-row final UI corpus and
+- Remaining audit work: continue from the new `2974`-row final UI corpus and
   ask GPT Research for a full row-level table, especially for French schwa
   style variants and Russian broad-vs-finer accepted variants.
 - Second GPT Research pass was applied for high-confidence rows:

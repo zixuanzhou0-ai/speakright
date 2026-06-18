@@ -41,6 +41,7 @@
     "audio:parity:secondary:dry-run": "node scripts/multilingual-audio-secondary-voice-generate.mjs --dry-run",
     "audio:parity:generate-secondary": "node scripts/multilingual-audio-secondary-voice-generate.mjs --confirm --max-items 1600 --max-estimated-credits 40000",
     "ipa:audit:export": "node scripts/export-non-english-ipa-audit-input.mjs",
+    "ipa:practice:audit:export": "node scripts/export-phoneme-practice-ipa-audit-input.mjs",
     "phonology:inventory:export": "node scripts/export-phonology-inventory-tables.mjs",
     "phonology:inventory:check": "node scripts/export-phonology-inventory-tables.mjs --check",
     "phonology:audio-policy:export": "node scripts/export-assessment-audio-policy-tables.mjs",
