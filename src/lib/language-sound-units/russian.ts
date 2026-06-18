@@ -781,7 +781,7 @@ export const RUSSIAN_PHONEMES: PhonemeData[] = [
     ipa: "/CC(C)/",
     name: "consonant clusters",
     category: "prosody",
-    soundUnitType: "prosody",
+    soundUnitType: "connected-speech-rule",
     example: "встреча",
     keywords: [
       { word: "встреча", ipa: "/ˈfstrʲetɕə/" },
@@ -1699,7 +1699,7 @@ export const RUSSIAN_PHONEMES: PhonemeData[] = [
     ipa: "/ja je jo ju/",
     name: "iotated vowels я/е/ё/ю",
     category: "prosody",
-    soundUnitType: "prosody",
+    soundUnitType: "connected-speech-rule",
     example: "я",
     keywords: [
       { word: "я", ipa: "/ja/" },
@@ -1801,7 +1801,7 @@ export const RUSSIAN_PHONEMES: PhonemeData[] = [
     ipa: "final devoicing",
     name: "word-final devoicing",
     category: "prosody",
-    soundUnitType: "prosody",
+    soundUnitType: "connected-speech-rule",
     example: "друг",
     keywords: [
       { word: "друг", ipa: "/druk/" },
@@ -1835,7 +1835,7 @@ export const RUSSIAN_PHONEMES: PhonemeData[] = [
     ipa: "voicing assimilation",
     name: "consonant voicing assimilation",
     category: "prosody",
-    soundUnitType: "prosody",
+    soundUnitType: "connected-speech-rule",
     example: "встреча",
     keywords: [
       { word: "встреча", ipa: "/ˈfstrʲetɕə/", stressText: "встре́ча" },

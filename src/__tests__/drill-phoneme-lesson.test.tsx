@@ -18,7 +18,7 @@ const phraseUnit: PhonemeData = {
   slug: "fr-enchainement",
   name: "French enchaînement",
   category: "prosody",
-  soundUnitType: "prosody",
+  soundUnitType: "connected-speech-rule",
   example: "il arrive",
   difficulty: "medium",
   description: "前一个词尾辅音接到下一个元音开头词上。",

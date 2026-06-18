@@ -689,7 +689,7 @@ export const FRENCH_PHONEMES: PhonemeData[] = [
     ipa: "/‿/",
     name: "liaison and enchaînement",
     category: "prosody",
-    soundUnitType: "prosody",
+    soundUnitType: "connected-speech-rule",
     example: "les amis",
     keywords: [
       { word: "les amis", ipa: "/lezami/" },
@@ -1083,7 +1083,7 @@ export const FRENCH_PHONEMES: PhonemeData[] = [
     ipa: "silent final C",
     name: "silent final consonants",
     category: "prosody",
-    soundUnitType: "prosody",
+    soundUnitType: "connected-speech-rule",
     example: "petit",
     keywords: [
       { word: "petit", ipa: "/pəti/" },
@@ -1125,7 +1125,7 @@ export const FRENCH_PHONEMES: PhonemeData[] = [
     ipa: "enchaînement",
     name: "enchaînement",
     category: "prosody",
-    soundUnitType: "prosody",
+    soundUnitType: "connected-speech-rule",
     example: "il arrive",
     keywords: [
       { word: "il arrive", ipa: "/ilaʁiv/" },
@@ -1160,7 +1160,7 @@ export const FRENCH_PHONEMES: PhonemeData[] = [
     ipa: "elision",
     name: "elision",
     category: "prosody",
-    soundUnitType: "prosody",
+    soundUnitType: "connected-speech-rule",
     example: "j'aime",
     keywords: [
       { word: "J'aime le bon vin blanc.", ipa: "/ʒɛm lə bɔ̃ vɛ̃ blɑ̃/" },

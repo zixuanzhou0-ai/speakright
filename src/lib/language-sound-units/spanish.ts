@@ -443,7 +443,7 @@ export const SPANISH_PHONEMES: PhonemeData[] = [
     ipa: "/b/ -> [β]",
     name: "Spanish b/v approximant realization",
     category: "consonant",
-    soundUnitType: "contrast",
+    soundUnitType: "allophone",
     example: "vida",
     keywords: [
       { word: "vida", ipa: "/ˈbiða/" },
@@ -463,6 +463,7 @@ export const SPANISH_PHONEMES: PhonemeData[] = [
     ipa: "/d/ -> [ð]",
     name: "Spanish d approximant realization",
     category: "consonant",
+    soundUnitType: "allophone",
     example: "dedo",
     keywords: [
       { word: "dedo", ipa: "/ˈdeðo/" },
@@ -482,6 +483,7 @@ export const SPANISH_PHONEMES: PhonemeData[] = [
     ipa: "/g/ -> [ɣ]",
     name: "Spanish g approximant realization",
     category: "consonant",
+    soundUnitType: "allophone",
     example: "gato",
     keywords: [
       { word: "gato", ipa: "/ˈgato/" },
@@ -737,7 +739,7 @@ export const SPANISH_PHONEMES: PhonemeData[] = [
     ipa: "/m n ɲ ŋ/",
     name: "nasal place assimilation",
     category: "consonant",
-    soundUnitType: "contrast",
+    soundUnitType: "connected-speech-rule",
     example: "un gato",
     keywords: [
       { word: "un beso", ipa: "/um ˈbeso/" },

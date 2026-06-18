@@ -127,16 +127,31 @@ describe("language phonology inventory", () => {
     expect(getPhonologyInventoryEntry("es-ES", "es-bv")?.layer).toBe(
       "allophone",
     );
+    expect(getPhonologyInventoryEntry("es-ES", "es-bv")?.soundUnitType).toBe(
+      "allophone",
+    );
     expect(getPhonologyInventoryEntry("es-ES", "es-d")?.layer).toBe(
+      "allophone",
+    );
+    expect(getPhonologyInventoryEntry("es-ES", "es-d")?.soundUnitType).toBe(
       "allophone",
     );
     expect(getPhonologyInventoryEntry("es-ES", "es-g")?.layer).toBe(
       "allophone",
     );
+    expect(getPhonologyInventoryEntry("es-ES", "es-g")?.soundUnitType).toBe(
+      "allophone",
+    );
+    expect(
+      getPhonologyInventoryEntry("es-ES", "es-nasal-place")?.soundUnitType,
+    ).toBe("connected-speech-rule");
     expect(getPhonologyInventoryEntry("es-ES", "es-lexical-stress")?.layer).toBe(
       "prosody",
     );
     expect(getPhonologyInventoryEntry("fr-FR", "fr-liaison")?.layer).toBe(
+      "connected-speech-rule",
+    );
+    expect(getPhonologyInventoryEntry("fr-FR", "fr-liaison")?.soundUnitType).toBe(
       "connected-speech-rule",
     );
     expect(getPhonologyInventoryEntry("fr-FR", "fr-un")?.layer).toBe(
@@ -170,7 +185,13 @@ describe("language phonology inventory", () => {
     expect(getPhonologyInventoryEntry("ru-RU", "ru-final-devoicing")?.layer).toBe(
       "connected-speech-rule",
     );
+    expect(
+      getPhonologyInventoryEntry("ru-RU", "ru-final-devoicing")?.soundUnitType,
+    ).toBe("connected-speech-rule");
     expect(getPhonologyInventoryEntry("ru-RU", "ru-clusters")?.layer).toBe(
+      "connected-speech-rule",
+    );
+    expect(getPhonologyInventoryEntry("ru-RU", "ru-clusters")?.soundUnitType).toBe(
       "connected-speech-rule",
     );
   });

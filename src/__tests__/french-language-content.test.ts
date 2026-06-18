@@ -28,19 +28,24 @@ describe("French pronunciation content", () => {
   });
 
   it("treats liaison, enchaînement, elision, final silence, and rhythm as rule units", () => {
-    const ruleSlugs = [
+    const connectedSpeechRuleSlugs = [
       "fr-final-consonant-silence",
       "fr-liaison",
       "fr-enchainement",
       "fr-elision",
-      "fr-phrase-final-prominence",
     ];
 
-    for (const slug of ruleSlugs) {
+    for (const slug of connectedSpeechRuleSlugs) {
       expect(REQUIRED_FRENCH_UNITS).toContain(slug);
       const unit = getLanguagePhonemeBySlug("fr-FR", slug);
-      expect(unit?.soundUnitType, slug).toBe("prosody");
+      expect(unit?.soundUnitType, slug).toBe("connected-speech-rule");
     }
+
+    const rhythm = getLanguagePhonemeBySlug(
+      "fr-FR",
+      "fr-phrase-final-prominence",
+    );
+    expect(rhythm?.soundUnitType).toBe("prosody");
   });
 
   it("keeps French rule sentence hints tied to connected-speech realization", () => {

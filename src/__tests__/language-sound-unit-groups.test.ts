@@ -90,7 +90,18 @@ describe("language sound unit groups", () => {
   });
 
   it("keeps non-English units inside the approved product type model", () => {
+    const approvedTypes = new Set([
+      "phoneme",
+      "allophone",
+      "contrast",
+      "connected-speech-rule",
+      "prosody",
+    ]);
+
     for (const languageId of ["es-ES", "fr-FR", "ru-RU"] as const) {
+      const invalidTypes = getLanguagePhonemes(languageId)
+        .filter((unit) => !approvedTypes.has(unit.soundUnitType ?? "phoneme"))
+        .map((unit) => `${unit.slug}:${unit.soundUnitType}`);
       const deprecatedTypes = getLanguagePhonemes(languageId)
         .filter(
           (unit) =>
@@ -99,8 +110,27 @@ describe("language sound unit groups", () => {
         )
         .map((unit) => unit.slug);
 
+      expect(invalidTypes).toEqual([]);
       expect(deprecatedTypes).toEqual([]);
     }
+
+    expect(
+      getLanguagePhonemes("es-ES").find((unit) => unit.slug === "es-bv")
+        ?.soundUnitType,
+    ).toBe("allophone");
+    expect(
+      getLanguagePhonemes("es-ES").find((unit) => unit.slug === "es-nasal-place")
+        ?.soundUnitType,
+    ).toBe("connected-speech-rule");
+    expect(
+      getLanguagePhonemes("fr-FR").find((unit) => unit.slug === "fr-liaison")
+        ?.soundUnitType,
+    ).toBe("connected-speech-rule");
+    expect(
+      getLanguagePhonemes("ru-RU").find(
+        (unit) => unit.slug === "ru-final-devoicing",
+      )?.soundUnitType,
+    ).toBe("connected-speech-rule");
 
     const russianClusters = getLanguagePhonemes("ru-RU").find(
       (unit) => unit.slug === "ru-clusters",
@@ -111,21 +141,25 @@ describe("language sound unit groups", () => {
       throw new Error("Expected Russian cluster rule unit to exist.");
     }
     expect(russianClusters?.category).toBe("prosody");
-    expect(russianClusters?.soundUnitType).toBe("prosody");
+    expect(russianClusters?.soundUnitType).toBe("connected-speech-rule");
     expect(isRuleLikeSoundUnit(russianClusters)).toBe(true);
   });
 
   it("labels non-English cards by sound unit type instead of vowel/consonant fallback", () => {
-    const units = getLanguagePhonemes("fr-FR");
-    const liaison = units.find((unit) => unit.slug === "fr-liaison");
-    const nasalVowel = units.find((unit) => unit.slug === "fr-an");
+    const frenchUnits = getLanguagePhonemes("fr-FR");
+    const spanishUnits = getLanguagePhonemes("es-ES");
+    const liaison = frenchUnits.find((unit) => unit.slug === "fr-liaison");
+    const nasalVowel = frenchUnits.find((unit) => unit.slug === "fr-an");
+    const approximant = spanishUnits.find((unit) => unit.slug === "es-bv");
 
     expect(liaison).toBeDefined();
     expect(nasalVowel).toBeDefined();
-    if (!liaison || !nasalVowel) {
+    expect(approximant).toBeDefined();
+    if (!liaison || !nasalVowel || !approximant) {
       throw new Error("Expected French test fixtures to exist.");
     }
     expect(getSoundUnitCardLabel(liaison)).toBe("规则");
     expect(getSoundUnitCardLabel(nasalVowel)).toBe("音素");
+    expect(getSoundUnitCardLabel(approximant)).toBe("实现");
   });
 });

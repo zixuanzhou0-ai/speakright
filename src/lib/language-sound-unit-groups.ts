@@ -316,7 +316,9 @@ const DISPLAY_TYPE_LABELS: Record<SoundUnitDisplayType, string> = {
 
 const SOUND_UNIT_TYPE_LABELS: Record<SoundUnitType, string> = {
   phoneme: "音素",
+  allophone: "实现",
   contrast: "对比",
+  "connected-speech-rule": "规则",
   prosody: "规则",
 };
 
@@ -363,6 +365,7 @@ export function getSoundUnitCardLabel(phoneme: PhonemeData): string {
 
 export function isRuleLikeSoundUnit(phoneme: PhonemeData): boolean {
   return (
+    phoneme.soundUnitType === "connected-speech-rule" ||
     phoneme.soundUnitType === "prosody" ||
     phoneme.category === "prosody"
   );

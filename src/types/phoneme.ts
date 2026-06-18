@@ -2,7 +2,12 @@ import type { LanguageId } from "@/types/language";
 
 export type PhonemeCategory = "vowel" | "consonant" | "prosody";
 export type Difficulty = "high" | "medium" | "easy";
-export type SoundUnitType = "phoneme" | "contrast" | "prosody";
+export type SoundUnitType =
+  | "phoneme"
+  | "allophone"
+  | "contrast"
+  | "connected-speech-rule"
+  | "prosody";
 export type PhonemeTeachingResourceKind =
   | "video"
   | "ipa"
