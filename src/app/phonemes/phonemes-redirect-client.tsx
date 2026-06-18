@@ -3,14 +3,14 @@
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useLanguageConfig } from "@/hooks/use-api-keys";
-import { getDefaultPhonemeSlug } from "@/lib/language-profiles";
+import { getDefaultPhonemePracticeSlug } from "@/lib/language-sound-unit-groups";
 
 export function PhonemesRedirectClient() {
   const router = useRouter();
   const { languageId } = useLanguageConfig();
 
   useEffect(() => {
-    router.replace(`/phonemes/${getDefaultPhonemeSlug(languageId)}`);
+    router.replace(`/phonemes/${getDefaultPhonemePracticeSlug(languageId)}`);
   }, [languageId, router]);
 
   return (

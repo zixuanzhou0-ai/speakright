@@ -10,10 +10,12 @@ const mocks = vi.hoisted(() => ({
   markWordPracticedForLanguage: vi.fn(),
   routerReplace: vi.fn(),
   reset: vi.fn(),
+  languageId: "en-US" as "en-US" | "es-ES" | "fr-FR" | "ru-RU",
+  phonemeSlug: "ee",
 }));
 
 vi.mock("next/navigation", () => ({
-  useParams: () => ({ phoneme: "ee" }),
+  useParams: () => ({ phoneme: mocks.phonemeSlug }),
   useRouter: () => ({ replace: mocks.routerReplace }),
 }));
 
@@ -50,7 +52,7 @@ vi.mock("@/components/scoring/score-summary", () => ({
 }));
 
 vi.mock("@/hooks/use-api-keys", () => ({
-  useLanguageConfig: () => ({ languageId: "en-US" }),
+  useLanguageConfig: () => ({ languageId: mocks.languageId }),
 }));
 
 vi.mock("@/hooks/use-audio-player", () => ({
@@ -162,6 +164,8 @@ describe("PhonemeDetailPage local persistence warnings", () => {
     mocks.requestFeedback.mockResolvedValue(undefined);
     mocks.addScore.mockReturnValue(true);
     mocks.markWordPracticedForLanguage.mockReturnValue(true);
+    mocks.languageId = "en-US";
+    mocks.phonemeSlug = "ee";
   });
 
   afterEach(() => {
@@ -200,5 +204,25 @@ describe("PhonemeDetailPage local persistence warnings", () => {
       expect(mocks.requestFeedback).toHaveBeenCalled();
     });
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  });
+
+  it("blocks direct access to non-English rule units from the phoneme practice page", () => {
+    mocks.languageId = "fr-FR";
+    mocks.phonemeSlug = "fr-liaison";
+
+    render(<PhonemeDetailPage />);
+
+    const blocked = screen.getByText("这不是单音标练习").closest("div");
+    expect(blocked).toBeInTheDocument();
+    expect(
+      document.querySelector('[data-smoke="phoneme-rule-route-blocked"]'),
+    ).toHaveAttribute("data-sound-unit", "fr-liaison");
+    expect(screen.getByText(/该内容属于规则\/短语训练/)).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "返回当前语言音标练习" }),
+    ).toHaveAttribute("href", "/phonemes/fr-i");
+    expect(screen.queryByTestId("phoneme-study-card")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "录音" })).not.toBeInTheDocument();
+    expect(screen.queryByTestId("phoneme-highlight")).not.toBeInTheDocument();
   });
 });

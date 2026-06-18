@@ -1,8 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
   LANGUAGE_SOUND_UNIT_GROUPS,
+  getDefaultPhonemePracticeSlug,
+  getLanguagePhonemePracticeGroups,
   getLanguageSoundUnitGroups,
   getSoundUnitCardLabel,
+  isVisibleInPhonemePractice,
   isRuleLikeSoundUnit,
 } from "@/lib/language-sound-unit-groups";
 import { getLanguagePhonemes } from "@/lib/language-phonemes";
@@ -31,10 +34,15 @@ describe("language sound unit groups", () => {
 
   it("keeps English grouped as vowels and consonants only", () => {
     const groups = getLanguageSoundUnitGroups("en-US");
+    const practiceGroups = getLanguagePhonemePracticeGroups("en-US");
 
     expect(groups.map((group) => group.label)).toEqual(["元音", "辅音"]);
     expect(groups.every((group) => group.displayType === "phoneme")).toBe(true);
     expect(groups.flatMap((group) => group.units)).toHaveLength(40);
+    expect(practiceGroups.map((group) => group.label)).toEqual(["元音", "辅音"]);
+    expect(practiceGroups.flatMap((group) => group.units).map((unit) => unit.slug)).toEqual(
+      groups.flatMap((group) => group.units).map((unit) => unit.slug),
+    );
   });
 
   it("uses language-specific Spanish group labels", () => {
@@ -71,6 +79,73 @@ describe("language sound unit groups", () => {
       "重音与弱化",
       "拼写到发音规则",
     ]);
+  });
+
+  it("keeps non-English phoneme practice lists limited to single-sound trainable units", () => {
+    const hiddenByLanguage = {
+      "es-ES": ["es-nasal-place", "es-lexical-stress", "es-syllable-rhythm"],
+      "fr-FR": [
+        "fr-final-consonant-silence",
+        "fr-liaison",
+        "fr-enchainement",
+        "fr-elision",
+        "fr-phrase-final-prominence",
+      ],
+      "ru-RU": [
+        "ru-hard-soft",
+        "ru-soft-t-d",
+        "ru-soft-s-z",
+        "ru-soft-n-l-r",
+        "ru-soft-labials",
+        "ru-soft-sign",
+        "ru-stress-reduction",
+        "ru-unstressed-o-a",
+        "ru-unstressed-e-ya",
+        "ru-iotated-vowels",
+        "ru-final-devoicing",
+        "ru-voicing-assimilation",
+        "ru-clusters",
+      ],
+    } as const;
+
+    const retainedByLanguage = {
+      "es-ES": ["es-bv", "es-d", "es-g", "es-diphthongs-j", "es-diphthongs-w"],
+      "fr-FR": ["fr-schwa", "fr-an", "fr-glide-hui"],
+      "ru-RU": ["ru-t-tj", "ru-d-dj", "ru-r-rj", "ru-ts-ch-shch", "ru-j"],
+    } as const;
+
+    for (const languageId of ["es-ES", "fr-FR", "ru-RU"] as const) {
+      const practiceSlugs = getLanguagePhonemePracticeGroups(languageId)
+        .flatMap((group) => group.units)
+        .map((unit) => unit.slug);
+
+      for (const slug of hiddenByLanguage[languageId]) {
+        const unit = getLanguagePhonemes(languageId).find(
+          (candidate) => candidate.slug === slug,
+        );
+        expect(unit, slug).toBeDefined();
+        if (!unit) continue;
+        expect(practiceSlugs).not.toContain(slug);
+        expect(isVisibleInPhonemePractice(languageId, unit)).toBe(false);
+      }
+
+      for (const slug of retainedByLanguage[languageId]) {
+        const unit = getLanguagePhonemes(languageId).find(
+          (candidate) => candidate.slug === slug,
+        );
+        expect(unit, slug).toBeDefined();
+        if (!unit) continue;
+        expect(practiceSlugs).toContain(slug);
+        expect(isVisibleInPhonemePractice(languageId, unit)).toBe(true);
+      }
+    }
+  });
+
+  it("uses the first visible single-sound unit as each language phoneme practice default", () => {
+    expect(getDefaultPhonemePracticeSlug("en-US")).toBe("ee");
+    expect(getDefaultPhonemePracticeSlug("es-ES")).toBe("es-a");
+    expect(getDefaultPhonemePracticeSlug("fr-FR")).toBe("fr-i");
+    expect(getDefaultPhonemePracticeSlug("ru-RU")).toBe("ru-a");
   });
 
   it("does not put non-English rule-like units in ordinary phoneme groups", () => {

@@ -43,19 +43,10 @@ const languageChecks = [
   },
   {
     languageId: "es-ES",
-    slug: "es-lexical-stress",
-    route: "/phonemes/es-lexical-stress",
-    label: "西班牙语词重音",
-    expectHeaderAudio: false,
-    expectPracticeAudioLabelIncludes: "示范",
-  },
-  {
-    languageId: "es-ES",
-    slug: "es-syllable-rhythm",
-    route: "/phonemes/es-syllable-rhythm",
-    label: "西班牙语音节节奏",
-    expectHeaderAudio: false,
-    expectPracticeAudioLabelIncludes: "示范",
+    slug: "es-diphthongs-j",
+    route: "/phonemes/es-diphthongs-j",
+    label: "西班牙语双元音滑音",
+    expectHeaderAudio: true,
   },
   {
     languageId: "fr-FR",
@@ -72,38 +63,6 @@ const languageChecks = [
     expectHeaderAudio: true,
   },
   {
-    languageId: "fr-FR",
-    slug: "fr-liaison",
-    route: "/phonemes/fr-liaison",
-    label: "法语 liaison",
-    expectHeaderAudio: false,
-    expectPracticeAudioLabelIncludes: "示范",
-  },
-  {
-    languageId: "fr-FR",
-    slug: "fr-enchainement",
-    route: "/phonemes/fr-enchainement",
-    label: "法语 enchainement",
-    expectHeaderAudio: false,
-    expectPracticeAudioLabelIncludes: "示范",
-  },
-  {
-    languageId: "fr-FR",
-    slug: "fr-elision",
-    route: "/phonemes/fr-elision",
-    label: "法语 elision",
-    expectHeaderAudio: false,
-    expectPracticeAudioLabelIncludes: "示范",
-  },
-  {
-    languageId: "fr-FR",
-    slug: "fr-final-consonant-silence",
-    route: "/phonemes/fr-final-consonant-silence",
-    label: "法语词尾静音",
-    expectHeaderAudio: false,
-    expectPracticeAudioLabelIncludes: "示范",
-  },
-  {
     languageId: "ru-RU",
     slug: "ru-a",
     route: "/phonemes/ru-a",
@@ -112,59 +71,77 @@ const languageChecks = [
   },
   {
     languageId: "ru-RU",
+    slug: "ru-t-tj",
+    route: "/phonemes/ru-t-tj",
+    label: "俄语硬软 T",
+    expectHeaderAudio: false,
+    expectPracticeAudioLabelIncludes: "示范",
+  },
+];
+
+const hiddenRuleRouteChecks = [
+  {
+    languageId: "es-ES",
+    slug: "es-lexical-stress",
+    route: "/phonemes/es-lexical-stress",
+  },
+  {
+    languageId: "fr-FR",
+    slug: "fr-liaison",
+    route: "/phonemes/fr-liaison",
+  },
+  {
+    languageId: "ru-RU",
     slug: "ru-stress-reduction",
     route: "/phonemes/ru-stress-reduction",
-    label: "俄语重音弱化",
-    expectHeaderAudio: false,
-    expectPracticeAudioLabelIncludes: "示范",
+  },
+];
+
+const phonemePracticeSidebarChecks = [
+  {
+    languageId: "es-ES",
+    route: "/phonemes/es-a",
+    presentText: ["纯元音", "双元音/滑音"],
+    absentText: ["重音与节奏", "鼻音位置", "词重音", "音节节奏"],
+    absentRoutes: [
+      "/phonemes/es-nasal-place",
+      "/phonemes/es-lexical-stress",
+      "/phonemes/es-syllable-rhythm",
+    ],
+  },
+  {
+    languageId: "fr-FR",
+    route: "/phonemes/fr-i",
+    presentText: ["口腔元音", "鼻化元音", "辅音与滑音", "弱读 /ə/"],
+    absentText: ["连读/静音规则", "短语韵律", "连诵", "词尾静音"],
+    absentRoutes: [
+      "/phonemes/fr-final-consonant-silence",
+      "/phonemes/fr-liaison",
+      "/phonemes/fr-enchainement",
+      "/phonemes/fr-elision",
+      "/phonemes/fr-phrase-final-prominence",
+    ],
   },
   {
     languageId: "ru-RU",
-    slug: "ru-unstressed-o-a",
-    route: "/phonemes/ru-unstressed-o-a",
-    label: "俄语非重读 O/A",
-    expectHeaderAudio: false,
-    expectPracticeAudioLabelIncludes: "示范",
-  },
-  {
-    languageId: "ru-RU",
-    slug: "ru-unstressed-e-ya",
-    route: "/phonemes/ru-unstressed-e-ya",
-    label: "俄语非重读 E/Я",
-    expectHeaderAudio: false,
-    expectPracticeAudioLabelIncludes: "示范",
-  },
-  {
-    languageId: "ru-RU",
-    slug: "ru-iotated-vowels",
-    route: "/phonemes/ru-iotated-vowels",
-    label: "俄语带 /j/ 元音",
-    expectHeaderAudio: false,
-    expectPracticeAudioLabelIncludes: "示范",
-  },
-  {
-    languageId: "ru-RU",
-    slug: "ru-final-devoicing",
-    route: "/phonemes/ru-final-devoicing",
-    label: "俄语词尾清化",
-    expectHeaderAudio: false,
-    expectPracticeAudioLabelIncludes: "示范",
-  },
-  {
-    languageId: "ru-RU",
-    slug: "ru-voicing-assimilation",
-    route: "/phonemes/ru-voicing-assimilation",
-    label: "俄语清浊同化",
-    expectHeaderAudio: false,
-    expectPracticeAudioLabelIncludes: "示范",
-  },
-  {
-    languageId: "ru-RU",
-    slug: "ru-clusters",
-    route: "/phonemes/ru-clusters",
-    label: "俄语辅音丛",
-    expectHeaderAudio: false,
-    expectPracticeAudioLabelIncludes: "示范",
+    route: "/phonemes/ru-a",
+    presentText: ["元音", "硬软辅音", "核心辅音", "T/Tь"],
+    absentText: ["重音与弱化", "拼写到发音规则", "重音弱化", "词尾清化"],
+    absentRoutes: [
+      "/phonemes/ru-hard-soft",
+      "/phonemes/ru-soft-t-d",
+      "/phonemes/ru-soft-s-z",
+      "/phonemes/ru-soft-n-l-r",
+      "/phonemes/ru-soft-labials",
+      "/phonemes/ru-soft-sign",
+      "/phonemes/ru-stress-reduction",
+      "/phonemes/ru-unstressed-o-a",
+      "/phonemes/ru-unstressed-e-ya",
+      "/phonemes/ru-iotated-vowels",
+      "/phonemes/ru-final-devoicing",
+      "/phonemes/ru-voicing-assimilation",
+      "/phonemes/ru-clusters",
+    ],
   },
 ];
 
@@ -1317,6 +1294,91 @@ async function assertDetail(cdp, language) {
   return { languageId: language.languageId, slug: language.slug };
 }
 
+async function assertHiddenRuleRouteBlocked(cdp, check) {
+  await clickLanguage(cdp, check.languageId);
+  await navigate(
+    cdp,
+    check.route,
+    '[data-smoke="phoneme-rule-route-blocked"]',
+    { direct: true },
+  );
+  const result = await evaluate(
+    cdp,
+    `
+(() => {
+  const blocked = document.querySelector('[data-smoke="phoneme-rule-route-blocked"]');
+  const bodyText = document.body?.innerText ?? "";
+  return {
+    ok:
+      blocked?.getAttribute("data-language-id") === ${JSON.stringify(check.languageId)} &&
+      blocked?.getAttribute("data-sound-unit") === ${JSON.stringify(check.slug)} &&
+      bodyText.includes("该内容属于规则/短语训练") &&
+      bodyText.includes("不属于单音标练习") &&
+      bodyText.includes("返回当前语言音标练习") &&
+      !document.querySelector('[data-smoke="phoneme-detail-page"]') &&
+      !document.querySelector('[data-smoke="sound-unit-header-audio"]') &&
+      !document.querySelector('[data-smoke="assessment-breakdown-placeholder"]'),
+    bodyText: bodyText.slice(0, 1000),
+    hasDetailPage: Boolean(document.querySelector('[data-smoke="phoneme-detail-page"]')),
+    hasHeaderAudio: Boolean(document.querySelector('[data-smoke="sound-unit-header-audio"]')),
+    hasBreakdown: Boolean(document.querySelector('[data-smoke="assessment-breakdown-placeholder"]'))
+  };
+})()
+`,
+  );
+  if (!result?.ok) {
+    throw new Error(
+      `${check.languageId} hidden rule route was not blocked: ${JSON.stringify(
+        result,
+      )}`,
+    );
+  }
+  return { languageId: check.languageId, slug: check.slug };
+}
+
+async function assertPhonemePracticeSidebarPurity(cdp, check) {
+  await clickLanguage(cdp, check.languageId);
+  await navigate(cdp, check.route, '[data-smoke="phoneme-detail-page"]');
+  await expandPhonemeGroups(cdp);
+  const result = await evaluate(
+    cdp,
+    `
+(() => {
+  const bodyText = document.body?.innerText ?? "";
+  const links = [...document.querySelectorAll("a[href]")].map((anchor) => {
+    try {
+      return new URL(anchor.href, window.location.href).pathname;
+    } catch {
+      return anchor.getAttribute("href") ?? "";
+    }
+  });
+  const presentText = ${JSON.stringify(check.presentText)};
+  const absentText = ${JSON.stringify(check.absentText)};
+  const absentRoutes = ${JSON.stringify(check.absentRoutes)};
+  const missingText = presentText.filter((text) => !bodyText.includes(text));
+  const leakedText = absentText.filter((text) => bodyText.includes(text));
+  const leakedRoutes = absentRoutes.filter((route) => links.includes(route));
+  return {
+    ok: missingText.length === 0 && leakedText.length === 0 && leakedRoutes.length === 0,
+    missingText,
+    leakedText,
+    leakedRoutes,
+    links: links.filter((link) => link.startsWith("/phonemes/")).slice(0, 80),
+    bodyText: bodyText.slice(0, 1500)
+  };
+})()
+`,
+  );
+  if (!result?.ok) {
+    throw new Error(
+      `${check.languageId} phoneme practice sidebar purity failed: ${JSON.stringify(
+        result,
+      )}`,
+    );
+  }
+  return { languageId: check.languageId };
+}
+
 async function assertScoringTileAudioPolicy(cdp) {
   await clickLanguage(cdp, "es-ES");
   await forceNavigate(cdp, "/phonemes/es-a?smokeAssessmentTiles=1");
@@ -2148,7 +2210,7 @@ async function assertNarrowViewportRoutes(cdp) {
     await clickLanguage(cdp, "fr-FR");
     await navigate(
       cdp,
-      "/phonemes/fr-liaison",
+      "/phonemes/fr-schwa",
       '[data-smoke="phoneme-detail-page"]',
     );
 
@@ -2344,7 +2406,7 @@ async function assertLowHeightViewportRoutes(cdp) {
     await clickLanguage(cdp, "ru-RU");
     await navigate(
       cdp,
-      "/phonemes/ru-clusters",
+      "/phonemes/ru-t-tj",
       '[data-smoke="phoneme-detail-page"]',
     );
 
@@ -2607,6 +2669,14 @@ async function smoke() {
     for (const language of languageChecks) {
       details.push(await assertDetail(cdp, language));
     }
+    const hiddenRuleRoutes = [];
+    for (const check of hiddenRuleRouteChecks) {
+      hiddenRuleRoutes.push(await assertHiddenRuleRouteBlocked(cdp, check));
+    }
+    const sidebarPurity = [];
+    for (const check of phonemePracticeSidebarChecks) {
+      sidebarPurity.push(await assertPhonemePracticeSidebarPurity(cdp, check));
+    }
     await assertScoringTileAudioPolicy(cdp);
     await assertEnglishProgressArchive(cdp);
     await assertEnglishTransferRoutes(cdp);
@@ -2627,6 +2697,12 @@ async function smoke() {
         `details=${details
           .map((item) => `${item.languageId}:${item.slug}`)
           .join(",")}`,
+        `hiddenRuleRoutes=ok(${hiddenRuleRoutes
+          .map((item) => `${item.languageId}:${item.slug}`)
+          .join(",")})`,
+        `phonemePracticeSidebar=ok(${sidebarPurity
+          .map((item) => item.languageId)
+          .join(",")})`,
         `routes=${smokeSummaryRoutes.join(",")}`,
         "scoringTileAudioPolicy=ok",
         "englishTransferRoutes=ok",

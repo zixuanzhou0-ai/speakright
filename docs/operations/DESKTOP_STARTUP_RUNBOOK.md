@@ -124,9 +124,13 @@ Release EXE.
   selected-word, score, or AI-feedback state may not restore after navigation.
 - English: open phoneme list, then five phoneme detail pages; play target sound,
   example word, record, replay the recording, and score once.
-- Spanish, French, and Russian: switch each language, open the sound-unit list,
-  then three detail pages; play target sound, example word, video, record,
-  replay the recording, and score once.
+- Spanish, French, and Russian: switch each language, open the phoneme practice
+  list, then three visible single-sound/detail pages; play target sound,
+  example word, video, record, replay the recording, and score once. Rule,
+  stress, reduction, silence, liaison, enchainement, and phrase-prosody units
+  should not appear as phoneme-practice cards; if directly opened from an old
+  URL, they should show a Chinese explanation that the content belongs to
+  rule/phrase training rather than single-phoneme practice.
 - Drill, free practice, and diagnosis: check that missing/low evidence never
   presents a confident perfect diagnosis for experimental languages. In both
   word/sentence drill sessions, quick diagnosis, and full-passage diagnosis,

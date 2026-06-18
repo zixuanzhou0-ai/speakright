@@ -10,7 +10,7 @@ import {
   getPhonologyLayerLabel,
 } from "@/lib/language-phonology-inventory";
 import {
-  getLanguageSoundUnitGroups,
+  getLanguagePhonemePracticeGroups,
   getSoundUnitDisplayTypeLabel,
 } from "@/lib/language-sound-unit-groups";
 import { getLanguageProfile } from "@/lib/language-profiles";
@@ -200,7 +200,7 @@ function PhonemeGroup({
 export function SidebarPhonemeList({ currentSlug }: SidebarPhonemeListProps) {
   const { languageId } = useLanguageConfig();
   const profile = getLanguageProfile(languageId);
-  const groups = getLanguageSoundUnitGroups(languageId).filter(
+  const groups = getLanguagePhonemePracticeGroups(languageId).filter(
     (group) => group.units.length > 0,
   );
   const currentGroupId = groups.find((group) =>

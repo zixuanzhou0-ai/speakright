@@ -36,7 +36,7 @@ describe("PhonemeGrid language grouping", () => {
     expect(screen.getByRole("heading", { name: "辅音" })).toBeInTheDocument();
   });
 
-  it("renders Spanish-specific sound unit groups", () => {
+  it("renders Spanish phoneme-practice groups without stress or rhythm rule cards", () => {
     render(<PhonemeGrid phonemes={getLanguagePhonemes("es-ES")} />);
 
     for (const label of [
@@ -44,37 +44,49 @@ describe("PhonemeGrid language grouping", () => {
       "核心辅音",
       "对比/变体",
       "双元音/滑音",
-      "重音与节奏",
     ]) {
       expect(screen.getByRole("heading", { name: label })).toBeInTheDocument();
     }
+    expect(
+      screen.queryByRole("heading", { name: "重音与节奏" }),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText("词重音")).not.toBeInTheDocument();
+    expect(screen.queryByText("音节节奏")).not.toBeInTheDocument();
   });
 
-  it("renders French-specific sound unit groups", () => {
+  it("renders French phoneme-practice groups without connected-speech rule cards", () => {
     render(<PhonemeGrid phonemes={getLanguagePhonemes("fr-FR")} />);
 
-    for (const label of [
-      "口腔元音",
-      "鼻化元音",
-      "辅音与滑音",
-      "连读/静音规则",
-    ]) {
+    for (const label of ["口腔元音", "鼻化元音", "辅音与滑音"]) {
       expect(screen.getByRole("heading", { name: label })).toBeInTheDocument();
     }
+    expect(
+      screen.queryByRole("heading", { name: "连读/静音规则" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { name: "短语韵律" }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByText("/ə/")).toBeInTheDocument();
+    expect(screen.queryByText("连诵")).not.toBeInTheDocument();
+    expect(screen.queryByText("词尾静音")).not.toBeInTheDocument();
   });
 
-  it("renders Russian-specific sound unit groups", () => {
+  it("renders Russian phoneme-practice groups without aggregate rule cards", () => {
     render(<PhonemeGrid phonemes={getLanguagePhonemes("ru-RU")} />);
 
-    for (const label of [
-      "元音",
-      "硬软辅音",
-      "核心辅音",
-      "重音与弱化",
-      "拼写到发音规则",
-    ]) {
+    for (const label of ["元音", "硬软辅音", "核心辅音"]) {
       expect(screen.getByRole("heading", { name: label })).toBeInTheDocument();
     }
+    expect(
+      screen.queryByRole("heading", { name: "重音与弱化" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { name: "拼写到发音规则" }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByText("/t tʲ/")).toBeInTheDocument();
+    expect(screen.getAllByText("硬软辅音")).toHaveLength(1);
+    expect(screen.queryByText("重音弱化")).not.toBeInTheDocument();
+    expect(screen.queryByText("词尾清化")).not.toBeInTheDocument();
   });
 
   it("shows shared local audio playback failures above the grid", () => {

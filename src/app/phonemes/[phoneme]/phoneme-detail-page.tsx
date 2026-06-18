@@ -28,12 +28,16 @@ import {
   collectDetailAssessmentPhonemes,
   collectDetailAssessmentSyllables,
 } from "@/lib/detail-assessment-breakdown";
-import { getLanguagePhonemeBySlug } from "@/lib/language-phonemes";
 import {
-  getDefaultPhonemeSlug,
-  getLanguageProfile,
-} from "@/lib/language-profiles";
-import { isRuleLikeSoundUnit } from "@/lib/language-sound-unit-groups";
+  getAnyLanguagePhonemeBySlug,
+  getLanguagePhonemeBySlug,
+} from "@/lib/language-phonemes";
+import { getLanguageProfile } from "@/lib/language-profiles";
+import {
+  getDefaultPhonemePracticeSlug,
+  isRuleLikeSoundUnit,
+  isVisibleInPhonemePractice,
+} from "@/lib/language-sound-unit-groups";
 import {
   getPracticedWordsForLanguage,
   markWordPracticedForLanguage,
@@ -69,7 +73,20 @@ export function PhonemeDetailPage() {
   const router = useRouter();
   const { languageId } = useLanguageConfig();
   const languageProfile = getLanguageProfile(languageId);
-  const phoneme = getLanguagePhonemeBySlug(languageId, params.phoneme);
+  const selectedLanguagePhoneme = getLanguagePhonemeBySlug(
+    languageId,
+    params.phoneme,
+  );
+  const requestedPhoneme =
+    selectedLanguagePhoneme ?? getAnyLanguagePhonemeBySlug(params.phoneme);
+  const requestedLanguageId = requestedPhoneme?.languageId ?? languageId;
+  const isRequestedHiddenPracticeRule =
+    requestedPhoneme &&
+    requestedLanguageId !== "en-US" &&
+    !isVisibleInPhonemePractice(requestedLanguageId, requestedPhoneme);
+  const phoneme = isRequestedHiddenPracticeRule
+    ? requestedPhoneme
+    : selectedLanguagePhoneme;
 
   const recorder = useRecorder();
   const azure = useAzureAssessment();
@@ -193,7 +210,7 @@ export function PhonemeDetailPage() {
 
   useEffect(() => {
     if (!phoneme) {
-      router.replace(`/phonemes/${getDefaultPhonemeSlug(languageId)}`);
+      router.replace(`/phonemes/${getDefaultPhonemePracticeSlug(languageId)}`);
     }
   }, [languageId, phoneme, router]);
 
@@ -424,6 +441,37 @@ export function PhonemeDetailPage() {
             返回{unitLabel}列表
           </Button>
         </Link>
+      </div>
+    );
+  }
+
+  const hiddenPracticeRuleLanguageId = phoneme.languageId ?? languageId;
+  const isHiddenPracticeRule =
+    hiddenPracticeRuleLanguageId !== "en-US" &&
+    !isVisibleInPhonemePractice(hiddenPracticeRuleLanguageId, phoneme);
+
+  if (isHiddenPracticeRule) {
+    return (
+      <div
+        className="flex h-full items-center justify-center px-6 py-8"
+        data-smoke="phoneme-rule-route-blocked"
+        data-language-id={hiddenPracticeRuleLanguageId}
+        data-sound-unit={phoneme.slug}
+      >
+        <div className="max-w-xl rounded-xl border bg-card px-6 py-5 text-center shadow-sm">
+          <p className="text-lg font-semibold">这不是单音标练习</p>
+          <p className="mt-2 break-words text-sm leading-6 text-muted-foreground [overflow-wrap:anywhere]">
+            该内容属于规则/短语训练，不属于单音标练习。连读、静音、重音、
+            弱化和短语韵律会保留在句子训练、AI 反馈或后续规则训练中，不会作为单个音标播放或晋级。
+          </p>
+          <Link
+            href={`/phonemes/${getDefaultPhonemePracticeSlug(
+              hiddenPracticeRuleLanguageId,
+            )}`}
+          >
+            <Button className="mt-4">返回当前语言音标练习</Button>
+          </Link>
+        </div>
       </div>
     );
   }

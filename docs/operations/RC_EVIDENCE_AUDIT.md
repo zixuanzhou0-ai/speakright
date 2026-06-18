@@ -7,6 +7,20 @@ It is intentionally evidence-first: if an item is not covered by a file,
 automated test, release-window smoke, or validation command, it should not be
 claimed as complete.
 
+Current boundary note (2026-06-18): non-English phoneme practice now only shows
+single-sound or independently trainable sound units. Spanish stress/rhythm,
+French liaison/enchainement/elision/final-silence/phrase-prosody, and Russian
+stress/reduction/devoicing/assimilation/cluster rule units remain available to
+course, sentence, and feedback logic, but are hidden from phoneme-practice
+cards/sidebar. Direct old `/phonemes/*` rule URLs show a Chinese explanation
+instead of a speaker, recording area, or phoneme-breakdown UI. This is covered
+by `src/__tests__/language-sound-unit-groups.test.ts`,
+`src/__tests__/phoneme-grid-groups.test.tsx`,
+`src/__tests__/sidebar-phoneme-list.test.tsx`,
+`src/__tests__/phoneme-detail-page.test.tsx`, and
+`scripts/desktop-ui-smoke.mjs` (`hiddenRuleRoutes=ok`,
+`phonemePracticeSidebar=ok`).
+
 ## Evidence Matrix
 
 | RC requirement | Evidence source |

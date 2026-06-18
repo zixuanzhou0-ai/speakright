@@ -134,8 +134,15 @@ describe("desktop preflight and UI smoke", () => {
     expect(script).toContain("/settings");
     expect(script).toContain("/phonemes/ee");
     expect(script).toContain("/phonemes/es-a");
+    expect(script).toContain("/phonemes/es-diphthongs-j");
     expect(script).toContain("/phonemes/fr-i");
+    expect(script).toContain("/phonemes/fr-schwa");
     expect(script).toContain("/phonemes/ru-a");
+    expect(script).toContain("/phonemes/ru-t-tj");
+    expect(script).toContain("assertHiddenRuleRouteBlocked");
+    expect(script).toContain("hiddenRuleRoutes=ok");
+    expect(script).toContain("assertPhonemePracticeSidebarPurity");
+    expect(script).toContain("phonemePracticeSidebar=ok");
     expect(script).toContain("/drill");
     expect(script).toContain("/drill/word");
     expect(script).toContain("/drill/sentence");

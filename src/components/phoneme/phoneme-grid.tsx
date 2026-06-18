@@ -1,7 +1,7 @@
 "use client";
 
 import { useAudioPlayer } from "@/hooks/use-audio-player";
-import { getLanguageSoundUnitGroups } from "@/lib/language-sound-unit-groups";
+import { getLanguagePhonemePracticeGroups } from "@/lib/language-sound-unit-groups";
 import type { PhonemeData } from "@/types/phoneme";
 import { PhonemeCard } from "./phoneme-card";
 
@@ -13,7 +13,7 @@ export function PhonemeGrid({ phonemes }: PhonemeGridProps) {
   const player = useAudioPlayer();
   const languageId = phonemes[0]?.languageId ?? "en-US";
   const visibleSlugs = new Set(phonemes.map((phoneme) => phoneme.slug));
-  const groups = getLanguageSoundUnitGroups(languageId)
+  const groups = getLanguagePhonemePracticeGroups(languageId)
     .map((group) => ({
       ...group,
       units: group.units.filter((unit) => visibleSlugs.has(unit.slug)),

@@ -35,45 +35,37 @@ describe("SidebarPhonemeList layout", () => {
     expect(englishExample).toHaveClass("break-words");
   });
 
-  it("uses a wrapping two-line layout for long French rule units", () => {
-    renderWithLanguage("fr-FR", "fr-final-consonant-silence");
+  it("hides French rule units from phoneme practice while keeping schwa visible", () => {
+    renderWithLanguage("fr-FR", "fr-schwa");
 
-    const ruleLabel = screen.getByText("词尾静音");
-    const frenchItem = ruleLabel.closest("a");
-    const layerBadge = frenchItem?.querySelector(
-      '[data-smoke="sidebar-phonology-layer"]',
-    );
-
-    expect(frenchItem).toHaveClass("grid");
-    expect(frenchItem).not.toHaveClass("whitespace-nowrap");
-    expect(ruleLabel).toHaveClass("break-words");
-    expect(layerBadge).toHaveAttribute(
-      "data-phonology-layer",
-      "connected-speech-rule",
-    );
-    expect(layerBadge).toHaveTextContent("语流规则");
+    expect(screen.queryByText("词尾静音")).not.toBeInTheDocument();
+    expect(screen.queryByText("连诵")).not.toBeInTheDocument();
+    expect(screen.queryByText("连读")).not.toBeInTheDocument();
+    expect(screen.queryByText("省音")).not.toBeInTheDocument();
+    expect(screen.queryByText("短语末突出")).not.toBeInTheDocument();
+    expect(screen.getByText("弱读 /ə/")).toBeInTheDocument();
   });
 
-  it("uses a wrapping two-line layout for Spanish rhythm units", () => {
-    renderWithLanguage("es-ES", "es-syllable-rhythm");
+  it("hides Spanish stress and rhythm rule units from phoneme practice", () => {
+    renderWithLanguage("es-ES", "es-diphthongs-j");
 
-    const rhythmLabel = screen.getByText("音节节奏");
-    const spanishItem = rhythmLabel.closest("a");
-
-    expect(spanishItem).toHaveClass("grid");
-    expect(spanishItem).not.toHaveClass("whitespace-nowrap");
-    expect(rhythmLabel).toHaveClass("break-words");
+    expect(screen.queryByText("鼻音位置")).not.toBeInTheDocument();
+    expect(screen.queryByText("词重音")).not.toBeInTheDocument();
+    expect(screen.queryByText("音节节奏")).not.toBeInTheDocument();
+    expect(screen.getByText("双元音 /j/")).toBeInTheDocument();
+    expect(screen.getByText("双元音 /w/")).toBeInTheDocument();
   });
 
-  it("uses a wrapping two-line layout for Russian rule units", () => {
-    renderWithLanguage("ru-RU", "ru-voicing-assimilation");
+  it("hides Russian aggregate rule units from phoneme practice", () => {
+    renderWithLanguage("ru-RU", "ru-t-tj");
 
-    const ruleLabel = screen.getByText("清浊同化");
-    const russianItem = ruleLabel.closest("a");
-
-    expect(russianItem).toHaveClass("grid");
-    expect(russianItem).not.toHaveClass("whitespace-nowrap");
-    expect(ruleLabel).toHaveClass("break-words");
+    expect(screen.queryByText("重音弱化")).not.toBeInTheDocument();
+    expect(screen.queryByText("非重读 O/A")).not.toBeInTheDocument();
+    expect(screen.queryByText("带 /j/ 元音")).not.toBeInTheDocument();
+    expect(screen.queryByText("词尾清化")).not.toBeInTheDocument();
+    expect(screen.queryByText("清浊同化")).not.toBeInTheDocument();
+    expect(screen.queryByText("辅音丛")).not.toBeInTheDocument();
+    expect(screen.getByText("T/Tь")).toBeInTheDocument();
   });
 
   it("labels Spanish realization units as allophones in the sidebar", () => {
@@ -88,15 +80,16 @@ describe("SidebarPhonemeList layout", () => {
     expect(layerBadge).toHaveAttribute("data-phonology-layer", "allophone");
   });
 
-  it("labels Russian hard-soft units as contrasts instead of standalone phonemes", () => {
-    renderWithLanguage("ru-RU", "ru-hard-soft");
+  it("labels visible Russian hard-soft pair units as contrasts", () => {
+    renderWithLanguage("ru-RU", "ru-t-tj");
 
-    const item = screen.getByText("硬软辅音").closest("a");
+    const item = screen.getByText("T/Tь").closest("a");
     expect(item).toBeTruthy();
     if (!item) return;
 
     const layerBadge = within(item).getByText("对比/变体");
     expect(layerBadge).toHaveAttribute("data-smoke", "sidebar-phonology-layer");
     expect(layerBadge).toHaveAttribute("data-phonology-layer", "contrast");
+    expect(screen.queryByText("软音符号")).not.toBeInTheDocument();
   });
 });
