@@ -413,6 +413,33 @@ describe("language phonology inventory", () => {
     }
   });
 
+  it("documents Russian hard-soft pair gaps as missing soft or pair clips, not missing hard anchors", () => {
+    for (const [slug, hardIpa, softIpa] of [
+      ["ru-t-tj", "/t/", "/tʲ/"],
+      ["ru-d-dj", "/d/", "/dʲ/"],
+      ["ru-s-sj", "/s/", "/sʲ/"],
+      ["ru-z-zj", "/z/", "/zʲ/"],
+      ["ru-n-nj", "/n/", "/nʲ/"],
+      ["ru-l-lj", "/l/", "/lʲ/"],
+      ["ru-r-rj", "/r/", "/rʲ/"],
+      ["ru-p-pj", "/p/", "/pʲ/"],
+      ["ru-b-bj", "/b/", "/bʲ/"],
+      ["ru-m-mj", "/m/", "/mʲ/"],
+      ["ru-f-fj", "/f/", "/fʲ/"],
+      ["ru-v-vj", "/v/", "/vʲ/"],
+      ["ru-k-kj", "/k/", "/kʲ/"],
+      ["ru-g-gj", "/g/", "/gʲ/"],
+      ["ru-x-xj", "/x/", "/xʲ/"],
+    ] as const) {
+      const entry = getPhonologyInventoryEntry("ru-RU", slug);
+      const gapText = entry?.gaps.join(" ") ?? "";
+
+      expect(gapText, slug).toContain(`Hard ${hardIpa} now has a standalone exact clip`);
+      expect(gapText, slug).toContain(`soft ${softIpa} and pair-lesson clips are still missing`);
+      expect(gapText, slug).not.toContain(`No verified exact single-segment ${hardIpa}`);
+    }
+  });
+
   it("promotes exact Russian hard consonant anchors to clickable same-unit header clips", () => {
     for (const [slug, alias] of [
       ["ru-p", "p"],
