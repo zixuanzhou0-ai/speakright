@@ -348,10 +348,12 @@ describe("PhonemeCard header audio", () => {
       '[data-smoke="phonology-inventory-card-badges"]',
     );
     expect(badges).toHaveAttribute("data-phonology-layer", "allophone");
+    expect(badges).toHaveAttribute("data-audio-status", "exact-local-header");
     expect(badges).toHaveAttribute("data-tile-policy", "clickable-exact-header");
     expect(screen.getByText("实验")).toBeInTheDocument();
     expect(screen.getByText("实现音")).toBeInTheDocument();
-    expect(screen.getByText("精确短音频")).toBeInTheDocument();
+    expect(screen.getByText("音频：精确短音频")).toBeInTheDocument();
+    expect(screen.getByText("拆解：精确短音频")).toBeInTheDocument();
   });
 
   it("shows rule inventory badges without implying playable single-sound audio", () => {
@@ -366,9 +368,33 @@ describe("PhonemeCard header audio", () => {
       '[data-smoke="phonology-inventory-card-badges"]',
     );
     expect(badges).toHaveAttribute("data-phonology-layer", "prosody");
+    expect(badges).toHaveAttribute("data-audio-status", "rule-only");
     expect(badges).toHaveAttribute("data-tile-policy", "rule-guidance-only");
     expect(screen.getByText("韵律/重音")).toBeInTheDocument();
-    expect(screen.getByText("规则说明")).toBeInTheDocument();
+    expect(screen.getByText("音频：规则说明")).toBeInTheDocument();
+    expect(screen.getByText("拆解：规则说明")).toBeInTheDocument();
+    expect(
+      document.querySelector('[data-smoke="phoneme-card-header-audio-button"]'),
+    ).not.toBeInTheDocument();
+  });
+
+  it("labels real sound units with missing exact clips as score-only audio gaps", () => {
+    const player = mockPlayer();
+    const spanishP = getLanguagePhonemeBySlug("es-ES", "es-p");
+    expect(spanishP).toBeDefined();
+    if (!spanishP) return;
+
+    render(<PhonemeCard player={player} phoneme={spanishP} />);
+
+    const badges = document.querySelector(
+      '[data-smoke="phonology-inventory-card-badges"]',
+    );
+    expect(badges).toHaveAttribute("data-phonology-layer", "phoneme");
+    expect(badges).toHaveAttribute("data-audio-status", "gap-no-local-clip");
+    expect(badges).toHaveAttribute("data-tile-policy", "score-only-unverified");
+    expect(screen.getAllByText("音素").length).toBeGreaterThan(0);
+    expect(screen.getByText("音频：缺少短音频")).toBeInTheDocument();
+    expect(screen.getByText("拆解：音频未验证")).toBeInTheDocument();
     expect(
       document.querySelector('[data-smoke="phoneme-card-header-audio-button"]'),
     ).not.toBeInTheDocument();

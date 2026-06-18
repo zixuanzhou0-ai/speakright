@@ -17,6 +17,7 @@ import {
 } from "@/lib/audio-playback-policy";
 import {
   getPhonologyInventoryEntry,
+  getPhonologyAudioStatusLabel,
   getPhonologyLayerLabel,
   getPhonologyTilePolicyLabel,
 } from "@/lib/language-phonology-inventory";
@@ -174,6 +175,7 @@ export function PhonemeCard({ phoneme, player }: PhonemeCardProps) {
               className="mt-2 flex flex-wrap items-center justify-center gap-1.5"
               data-smoke="phonology-inventory-card-badges"
               data-phonology-layer={inventoryEntry.layer}
+              data-audio-status={inventoryEntry.audioStatus}
               data-tile-policy={inventoryEntry.tilePolicy}
             >
               <Badge variant="outline" className="text-[10px]">
@@ -183,7 +185,10 @@ export function PhonemeCard({ phoneme, player }: PhonemeCardProps) {
                 {getPhonologyLayerLabel(inventoryEntry.layer)}
               </Badge>
               <Badge variant="outline" className="text-[10px]">
-                {getPhonologyTilePolicyLabel(inventoryEntry.tilePolicy)}
+                音频：{getPhonologyAudioStatusLabel(inventoryEntry.audioStatus)}
+              </Badge>
+              <Badge variant="outline" className="text-[10px]">
+                拆解：{getPhonologyTilePolicyLabel(inventoryEntry.tilePolicy)}
               </Badge>
             </div>
           )}
