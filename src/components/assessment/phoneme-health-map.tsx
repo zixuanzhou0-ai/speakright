@@ -8,9 +8,13 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import {
+  getPhonologyAudioStatusLabel,
   getPhonologyInventoryEntry,
   getPhonologyLayerLabel,
+  getPhonologyTilePolicyLabel,
+  type PhonologyInventoryAudioStatus,
   type PhonologyInventoryLayer,
+  type PhonologyInventoryTilePolicy,
 } from "@/lib/language-phonology-inventory";
 import { getLanguagePhonemes } from "@/lib/language-phonemes";
 import { PHONEMES } from "@/lib/phoneme-data";
@@ -81,6 +85,8 @@ export function PhonemeHealthMap({
                 sampleCount={normalized.sampleCount}
                 delay={i * 0.03}
                 layer={inventoryEntry?.layer}
+                audioStatus={inventoryEntry?.audioStatus}
+                tilePolicy={inventoryEntry?.tilePolicy}
               />
             );
           })}
@@ -108,6 +114,8 @@ export function PhonemeHealthMap({
                 sampleCount={normalized.sampleCount}
                 delay={(vowels.length + i) * 0.03}
                 layer={inventoryEntry?.layer}
+                audioStatus={inventoryEntry?.audioStatus}
+                tilePolicy={inventoryEntry?.tilePolicy}
               />
             );
           })}
@@ -136,6 +144,8 @@ export function PhonemeHealthMap({
                   sampleCount={normalized.sampleCount}
                   delay={(vowels.length + consonants.length + i) * 0.03}
                   layer={inventoryEntry?.layer}
+                  audioStatus={inventoryEntry?.audioStatus}
+                  tilePolicy={inventoryEntry?.tilePolicy}
                 />
               );
             })}
@@ -155,6 +165,8 @@ function PhonemeCell({
   sampleCount,
   delay,
   layer,
+  audioStatus,
+  tilePolicy,
 }: {
   languageId: LanguageId;
   ipa: string;
@@ -164,11 +176,25 @@ function PhonemeCell({
   sampleCount: number;
   delay: number;
   layer?: PhonologyInventoryLayer;
+  audioStatus?: PhonologyInventoryAudioStatus;
+  tilePolicy?: PhonologyInventoryTilePolicy;
 }) {
   const label = getLabel(score, languageId);
   const layerLabel = layer ? getPhonologyLayerLabel(layer) : undefined;
-  const experimentalNote =
-    languageId === "en-US" ? "" : " · experimental 练习观察";
+  const audioStatusLabel = audioStatus
+    ? getPhonologyAudioStatusLabel(audioStatus)
+    : undefined;
+  const tilePolicyLabel = tilePolicy
+    ? getPhonologyTilePolicyLabel(tilePolicy)
+    : undefined;
+  const policyParts = [
+    layerLabel,
+    audioStatusLabel ? `音频：${audioStatusLabel}` : undefined,
+    tilePolicyLabel ? `tile：${tilePolicyLabel}` : undefined,
+    languageId === "en-US" ? undefined : "experimental 练习观察",
+  ].filter(Boolean);
+  const policyNote =
+    policyParts.length > 0 ? ` · ${policyParts.join(" · ")}` : "";
 
   return (
     <Tooltip>
@@ -176,9 +202,7 @@ function PhonemeCell({
         render={
           <Link
             href={`/phonemes/${slug}`}
-            aria-label={`${ipa} ${name} — ${label}${
-              layerLabel ? ` · ${layerLabel}` : ""
-            }${experimentalNote}`}
+            aria-label={`${ipa} ${name} — ${label}${policyNote}`}
           />
         }
       >
@@ -192,6 +216,8 @@ function PhonemeCell({
           data-smoke="phoneme-health-cell"
           data-language-id={languageId}
           data-phonology-layer={layer ?? ""}
+          data-audio-status={audioStatus ?? ""}
+          data-tile-policy={tilePolicy ?? ""}
         >
           <span className="font-mono text-sm font-bold">{ipa}</span>
           <span className="text-[10px] tabular-nums">
@@ -207,6 +233,8 @@ function PhonemeCell({
           {label} {score > 0 ? `(${score}分)` : ""}
           {sampleCount > 0 ? ` · ${sampleCount} 个样本` : ""}
           {layerLabel ? ` · ${layerLabel}` : ""}
+          {audioStatusLabel ? ` · 音频：${audioStatusLabel}` : ""}
+          {tilePolicyLabel ? ` · tile：${tilePolicyLabel}` : ""}
           {languageId !== "en-US" ? " · experimental 练习观察" : ""} ·
           点击进入学习
         </p>

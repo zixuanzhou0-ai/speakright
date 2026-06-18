@@ -39,11 +39,34 @@ describe("PhonemeHealthMap language policy", () => {
     const link = linkForSlug("es-bv");
     expect(link).toHaveAccessibleName(/高分/);
     expect(link).toHaveAccessibleName(/实现音/);
+    expect(link).toHaveAccessibleName(/音频：精确短音频/);
+    expect(link).toHaveAccessibleName(/tile：精确短音频/);
     expect(link).toHaveAccessibleName(/experimental 练习观察/);
     expect(link).not.toHaveAccessibleName(/掌握/);
     expect(
       document.querySelector(
-        '[data-smoke="phoneme-health-cell"][data-phonology-layer="allophone"]',
+        '[data-smoke="phoneme-health-cell"][data-phonology-layer="allophone"][data-audio-status="exact-local-header"][data-tile-policy="clickable-exact-header"]',
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("marks Spanish units without exact clips as score-only observations", () => {
+    render(
+      <PhonemeHealthMap
+        languageId="es-ES"
+        scores={{ "es-p": { score: 76, sampleCount: 1 } }}
+      />,
+    );
+
+    const link = linkForSlug("es-p");
+    expect(link).toHaveAccessibleName(/中等/);
+    expect(link).toHaveAccessibleName(/音素/);
+    expect(link).toHaveAccessibleName(/音频：缺少短音频/);
+    expect(link).toHaveAccessibleName(/tile：音频未验证/);
+    expect(link).not.toHaveAccessibleName(/掌握/);
+    expect(
+      document.querySelector(
+        '[data-smoke="phoneme-health-cell"][data-phonology-layer="phoneme"][data-audio-status="gap-no-local-clip"][data-tile-policy="score-only-unverified"]',
       ),
     ).toBeInTheDocument();
   });
@@ -59,11 +82,13 @@ describe("PhonemeHealthMap language policy", () => {
     const link = linkForSlug("fr-liaison");
     expect(link).toHaveAccessibleName(/高分/);
     expect(link).toHaveAccessibleName(/语流规则/);
+    expect(link).toHaveAccessibleName(/音频：规则说明/);
+    expect(link).toHaveAccessibleName(/tile：规则说明/);
     expect(link).toHaveAccessibleName(/experimental 练习观察/);
     expect(link).not.toHaveAccessibleName(/掌握/);
     expect(
       document.querySelector(
-        '[data-smoke="phoneme-health-cell"][data-phonology-layer="connected-speech-rule"]',
+        '[data-smoke="phoneme-health-cell"][data-phonology-layer="connected-speech-rule"][data-audio-status="rule-only"][data-tile-policy="rule-guidance-only"]',
       ),
     ).toBeInTheDocument();
   });
@@ -79,11 +104,13 @@ describe("PhonemeHealthMap language policy", () => {
     const link = linkForSlug("ru-hard-soft");
     expect(link).toHaveAccessibleName(/高分/);
     expect(link).toHaveAccessibleName(/对比\/变体/);
+    expect(link).toHaveAccessibleName(/音频：代理参考/);
+    expect(link).toHaveAccessibleName(/tile：音频未验证/);
     expect(link).toHaveAccessibleName(/experimental 练习观察/);
     expect(link).not.toHaveAccessibleName(/掌握/);
     expect(
       document.querySelector(
-        '[data-smoke="phoneme-health-cell"][data-phonology-layer="contrast"]',
+        '[data-smoke="phoneme-health-cell"][data-phonology-layer="contrast"][data-audio-status="proxy-local-reference"][data-tile-policy="score-only-unverified"]',
       ),
     ).toBeInTheDocument();
   });
