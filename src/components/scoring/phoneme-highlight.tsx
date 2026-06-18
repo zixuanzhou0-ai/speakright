@@ -486,7 +486,8 @@ export function PhonemeHighlight({
             className="mb-3 break-words text-center text-[11px] leading-snug text-muted-foreground/70 [overflow-wrap:anywhere]"
             data-smoke="assessment-phoneme-policy-hint"
           >
-            可听 = 同一 sound unit 的精确短音频；未验证/规则只显示分数，不播放替代音频。
+            可听 = 同一 sound unit 的精确短音频；未验证 =
+            真实音素但缺 exact clip；规则 = 短语/韵律训练，不播放替代音频。
           </p>
         )}
         {playbackError && (

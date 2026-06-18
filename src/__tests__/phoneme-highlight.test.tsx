@@ -210,6 +210,10 @@ describe("PhonemeHighlight", () => {
       "data-smoke",
       "assessment-phoneme-policy-hint",
     );
+    expect(
+      screen.getByText(/未验证 =\s*真实音素但缺 exact clip/),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/规则 =\s*短语\/韵律训练/)).toBeInTheDocument();
     expect(screen.queryByText("点击可听发音")).not.toBeInTheDocument();
     expect(screen.getAllByText("/n/")).toHaveLength(2);
     expect(screen.queryByText(/m n/)).not.toBeInTheDocument();
