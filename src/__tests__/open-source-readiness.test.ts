@@ -269,7 +269,9 @@ describe("open-source readiness files", () => {
   it("keeps current handoff docs from claiming stale local dirty state", () => {
     const handoff = read("docs/operations/NEXT_CHAT_HANDOFF.md");
     const evidence = read("docs/operations/RC_EVIDENCE_AUDIT.md");
+    const readme = read("README.md");
     const docs = [
+      readme,
       read("docs/INSTALLATION.md"),
       read("docs/operations/DESKTOP_STARTUP_RUNBOOK.md"),
       handoff,
@@ -284,20 +286,19 @@ describe("open-source readiness files", () => {
     expect(docs).not.toContain("A settled RC branch should show `main...origin/main`");
     expect(docs).not.toContain("single-sound audio source-policy pass");
     expect(docs).not.toContain("audio-policy pass");
-    expect(handoff).toContain("GitHub Git Data API push fallback");
-    expect(handoff).toContain("local-vs-remote tree SHA comparison");
-    expect(docs).toContain("local-vs-remote tree SHA");
+    expect(docs).not.toContain("NEXT_RC_AUDIO_SETTINGS");
+    expect(handoff).toContain("Numeric pronunciation scores must come from Azure Speech");
+    expect(handoff).toContain("LLM feedback is downstream");
     expect(evidence).not.toContain("github.com:443");
     expect(evidence).not.toContain("network timeouts");
+    expect(readme).toMatch(/LLM providers only generate coaching\s+explanations/);
   });
 
   it("keeps validation result counts centralized in the RC evidence audit", () => {
     const readme = read("README.md");
     const installation = read("docs/INSTALLATION.md");
     const runbook = read("docs/operations/DESKTOP_STARTUP_RUNBOOK.md");
-    const dualVoiceRunbookSection = runbook.slice(
-      runbook.indexOf("## 2026-06-11 Multilingual Dual-Voice Expansion"),
-    );
+    const evidence = read("docs/operations/RC_EVIDENCE_AUDIT.md");
     const handoffDocs = [
       readme,
       installation,
@@ -307,54 +308,14 @@ describe("open-source readiness files", () => {
 
     expect(readme).toContain("docs/operations/RC_EVIDENCE_AUDIT.md");
     expect(installation).toContain("docs/operations/RC_EVIDENCE_AUDIT.md");
-    expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
-      "Latest local full gate",
-    );
-    expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
-      "128 files / 728 tests passed",
-    );
-    expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
-      "settings-storage-warning",
-    );
-    expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
-      "same left/detail sound-unit header clip",
-    );
-    expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
-      "data-audio-kind",
-    );
-    expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
-      "match the detail header speaker",
-    );
-    expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
-      "Biome checked 392 files",
-    );
-    expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
-      "ru-RU 918 existing, 466 missing",
-    );
-    expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
-      "Total missing audio items: 1072",
-    );
-    expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
-      "estimated characters/credits: 9772",
-    );
-    expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
-      'reference video mean `-14.7 dB`',
-    );
-    expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
-      'word floor `-21.6 dB`',
-    );
-    expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
-      "Latest recorded bundled asset validation counted English word audio",
-    );
-    expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
-      "`1464/1464`, Spanish language-pack audio `880/880`",
-    );
-    expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
-      "Russian language-pack files `920/920`",
-    );
-    expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).toContain(
-      "local videos",
-    );
+    expect(evidence).toContain("Latest local full gate");
+    expect(evidence).toContain("src/__tests__/azure-scoring-boundary.test.ts");
+    expect(evidence).toContain("Spanish 1094 existing / 0 missing");
+    expect(evidence).toContain("French 1482 existing / 0 missing");
+    expect(evidence).toContain("Russian 1640 existing / 0 missing");
+    expect(evidence).toContain("total missing 0");
+    expect(evidence).toContain("No ElevenLabs calls were made");
+    expect(evidence).toContain("phonemeLeftColumn=ok");
     expect(readme).toContain("current release-hardening proof matrix");
     expect(readme).toContain("older commit SHA");
     expect(installation).toContain("Use that audit for the latest command");
@@ -369,9 +330,6 @@ describe("open-source readiness files", () => {
     expect(installation).not.toContain("Previous release-validation baseline");
     expect(readme).not.toContain("94be1d4");
     expect(installation).not.toContain("94be1d4");
-    expect(handoffDocs).toContain(
-      "Current command-by-command results, including exact test counts, live in",
-    );
     expect(handoffDocs).not.toMatch(/89\s+(?:files|test files).*489\s+tests/);
     expect(handoffDocs).not.toContain("72 test files and 363 tests");
     expect(handoffDocs).not.toContain("74 files and 374 tests");
@@ -382,25 +340,34 @@ describe("open-source readiness files", () => {
     expect(handoffDocs).not.toContain("Biome checked 312 files");
     expect(handoffDocs).not.toContain("Biome checked 341 files");
     expect(handoffDocs).not.toContain("378` files checked");
-    expect(handoffDocs).toContain("Exact current counts live in");
-    expect(dualVoiceRunbookSection).toContain(
-      "Historical zero-cost dry-run snapshot",
-    );
-    expect(dualVoiceRunbookSection).toContain("Current normalized lookup counts");
-    expect(dualVoiceRunbookSection).not.toContain(
-      "Final zero-cost dry-run results:",
-    );
-    expect(dualVoiceRunbookSection).not.toContain(
-      "`npm.cmd run desktop:live-validation`: English `1464`",
-    );
-    expect(dualVoiceRunbookSection).not.toContain(
-      "`npm.cmd run audio:parity:dry-run`: Spanish `880`",
-    );
+    expect(handoffDocs).toContain("Current Verification Notes");
+    expect(handoffDocs).toContain("Spanish `1094` existing / `0` missing");
+    expect(handoffDocs).toContain("French `1482` existing / `0` missing");
+    expect(handoffDocs).toContain("Russian `1640` existing / `0` missing");
     expect(handoffDocs).not.toMatch(/\btomorrow(?:'s)?\b/i);
-    expect(read("docs/operations/RC_EVIDENCE_AUDIT.md")).not.toMatch(
-      /\btomorrow(?:'s)?\b/i,
-    );
+    expect(evidence).not.toMatch(/\btomorrow(?:'s)?\b/i);
     expect(handoffDocs).not.toContain("PID was `70112`");
+  });
+
+  it("keeps README screenshot assets present", () => {
+    const readme = read("README.md");
+    for (const screenshot of [
+      "settings.png",
+      "english-phoneme-score.png",
+      "free-practice.png",
+      "english-assessment.png",
+      "spanish-phoneme.png",
+      "french-phoneme.png",
+      "russian-phoneme.png",
+    ]) {
+      const markdownPath = `docs/assets/screenshots/${screenshot}`;
+      expect(readme).toContain(markdownPath);
+      expect(existsSync(join(projectRoot, markdownPath)), markdownPath).toBe(
+        true,
+      );
+    }
+    expect(readme).toMatch(/smoke-only demo\s+state/);
+    expect(readme).toContain("real user scores come from Azure");
   });
 
   it("keeps install docs explicit about source builds and first-launch failure states", () => {
@@ -437,8 +404,13 @@ describe("open-source readiness files", () => {
     expect(readme).toContain("Public Download Status");
     expect(readme).toContain("There is not yet a signed public Windows download");
     expect(readme).toContain("must not describe an unsigned artifact as a stable public download");
-    expect(readme).toContain("Controlled-test verification records");
+    expect(readme).toContain("current release-hardening proof matrix");
     expect(readme).toContain("Release EXE smoke/launch outcome");
+    expect(readme).toContain("Screenshots below are captured");
+    expect(readme).toContain("docs/assets/screenshots/settings.png");
+    expect(readme).toContain("Real Scoring Boundary");
+    expect(readme).toContain("Azure Speech Pronunciation Assessment");
+    expect(readme).toContain("LLM layer is downstream only");
     expect(readme).not.toContain("Last controlled-test verification");
     expect(readme).not.toContain("guardrail pass and full Release EXE gate");
     expect(installation).toContain("Controlled-Test Installer Boundary");
@@ -460,7 +432,7 @@ describe("open-source readiness files", () => {
     expect(installation).toContain("current RC notes");
     expect(installation).not.toContain("For the 2026-06-16 internal-test pass");
     expect(installation).not.toContain("latest local non-English layout fixes");
-    expect(runbook).toContain("Do not publish workflow-dispatch artifacts");
+    expect(runbook).toMatch(/Do not\s+publish workflow-dispatch artifacts/i);
     expect(runbook).toContain("capture the exact");
     expect(readme).toContain("source builds");
     expect(readme).toContain("docs/INSTALLATION.md");
@@ -486,7 +458,7 @@ describe("open-source readiness files", () => {
     expect(docs).toContain("browser TTS");
     expect(docs).toContain("teaching-video audio");
     expect(docs).toContain("proxy rule audio");
-    expect(docs).toContain("Installation verification should not generate ElevenLabs audio");
+    expect(docs).toContain("Do not run ElevenLabs TTS smoke or audio generation");
   });
 
   it("keeps public developer and release npm scripts explicit and zero-generation by default", () => {
@@ -548,6 +520,7 @@ describe("open-source readiness files", () => {
     const findings: string[] = [];
 
     for (const path of trackedFiles().filter(shouldScanTrackedFile)) {
+      if (!existsSync(join(projectRoot, path))) continue;
       const text = read(path);
       if (text.includes("\0")) continue;
 

@@ -1,33 +1,49 @@
 # SpeakRight Desktop
 
-SpeakRight Desktop is a Tauri desktop pronunciation-training app for Chinese
-learners. American English (`en-US`) is the stable baseline. Spanish (`es-ES`),
-French (`fr-FR`), and Russian (`ru-RU`) are experimental modules. Japanese is
-not included in this release track.
+SpeakRight Desktop is a Tauri + Next.js pronunciation-training app for Chinese
+learners. It combines local teaching media, microphone recording, real Azure
+Speech pronunciation assessment, and Chinese AI coaching feedback in one desktop
+workflow.
+
+American English (`en-US`) is the stable baseline. Spanish (`es-ES`), French
+(`fr-FR`), and Russian (`ru-RU`) are experimental modules: they expose
+sound-unit practice and free practice, while formal diagnosis, advanced drills,
+progress archives, and mastery/evidence views remain English-only until each
+language has its own release evidence gates.
+
+## Screenshots
+
+Screenshots below are captured from the packaged Release EXE, not a browser
+localhost session. The English score screenshot uses an explicit smoke-only demo
+state to show the post-recording layout; real user scores come from Azure
+Speech Pronunciation Assessment.
+
+| Settings | English sound practice |
+| --- | --- |
+| ![Settings](docs/assets/screenshots/settings.png) | ![English phoneme score](docs/assets/screenshots/english-phoneme-score.png) |
+
+| Free practice | English diagnosis |
+| --- | --- |
+| ![Free practice](docs/assets/screenshots/free-practice.png) | ![English assessment](docs/assets/screenshots/english-assessment.png) |
+
+| Spanish | French | Russian |
+| --- | --- | --- |
+| ![Spanish phoneme](docs/assets/screenshots/spanish-phoneme.png) | ![French phoneme](docs/assets/screenshots/french-phoneme.png) | ![Russian phoneme](docs/assets/screenshots/russian-phoneme.png) |
 
 ## Current Product Boundary
 
-- Desktop-only release track. Do not mix this repository with older browser-app workspaces.
-- The installed app loads the static Tauri bundle, not a localhost dev server.
-- This repository is public source code. `package.json` remains `private: true`
-  to prevent accidental npm publication; releases are desktop artifacts, not an
-  npm package.
+- Desktop-only release track. The installed app loads the static Tauri bundle,
+  not a localhost dev server.
 - Public review, source builds, and controlled Release EXE trials are supported.
   A signed public Windows release is not complete yet; unsigned EXE/MSI/NSIS
   artifacts must remain labeled as internal-test or controlled-test builds.
-- API keys are stored through the desktop secure/local credential layer where
-  supported; they are never committed and are excluded from learning-data
-  exports.
+- The app defaults to a `1280 x 920` launch window with `800px` minimum height.
+- API keys are configured locally in Settings and must never be committed.
 - Spanish, French, and Russian word/phrase audio is bundled under
-  `public/audio/language-packs/`; users do not install these packs separately.
-  Each bundled item now has `blue` and `pink` voice variants, matching the
-  English local-audio model.
-- Local articulation assets live under `public/videos/language-assets/`.
-- Public navigation scope is intentionally conservative: all four languages
-  expose phoneme/sound-unit practice and free practice. Deliberate practice,
-  pronunciation diagnosis, formal progress, and mastery/evidence views are
-  English-only until each non-English language has language-specific evidence
-  gates and release proof. Spanish, French, and Russian remain experimental.
+  `public/audio/language-packs/` with two local voice variants per item.
+- Local articulation media lives under `public/videos/language-assets/`.
+- Bundled media is not automatically relicensed by MIT. See
+  `THIRD_PARTY_NOTICES.md` before redistributing packaged builds.
 
 ## Public Download Status
 
@@ -44,17 +60,90 @@ the blocker through the installation/startup issue template instead.
 Maintainers should keep Release EXE validation as the acceptance path, but they
 must not describe an unsigned artifact as a stable public download.
 
-## Development
+## Language Support
+
+| Language | Status | What is open now |
+| --- | --- | --- |
+| American English `en-US` | Stable baseline | Full phoneme practice, local word demos, free practice, word/sentence/contrast/prosody drills, diagnosis, progress evidence, replay/archive workflows, and AI coach feedback. |
+| Spanish `es-ES` | Experimental | Sound-unit practice, local A/B word and phrase demos, Sounds of Speech articulation media where bundled, free practice, and Azure-scored recordings using `es-ES`. Stress/rhythm and other rule units remain teaching/practice guidance rather than formal mastery. |
+| French `fr-FR` | Experimental | Sound-unit practice, local A/B demos, connected-speech teaching for liaison, enchainement, elision, schwa, final consonant silence, free practice, and Azure-scored recordings using `fr-FR`. Rule units do not masquerade as single-phoneme audio. |
+| Russian `ru-RU` | Experimental | Sound-unit practice, local A/B demos, hard/soft consonant and stress/reduction practice material, free practice, and Azure-scored recordings using `ru-RU`. Stress, reduction, devoicing, assimilation, and cluster rules remain experimental evidence. |
+
+## What The App Does
+
+- Shows a language-specific sound-unit list with local teaching video or a
+  source-backed fallback panel.
+- Plays verified short target clips only when a real local target-sound asset
+  exists.
+- Provides A/B local example audio for practice words, phrases, and sentences.
+- Records learner audio through the desktop app and sends it to Azure Speech
+  Pronunciation Assessment with the selected language locale.
+- Displays Azure-derived score summaries: total score, accuracy, fluency,
+  completeness, and prosody when Azure provides it.
+- Shows word, phoneme, syllable, stress, rhythm, and prosody analysis where the
+  provider evidence is available.
+- Generates Chinese AI coaching feedback from the Azure result, target text,
+  language rules, and source-alignment constraints.
+- Keeps English advanced drills, diagnosis, and progress evidence separate from
+  experimental non-English modules.
+- Handles missing keys, network failures, microphone failures, storage failures,
+  and missing local assets with Chinese inline messages instead of silent
+  no-ops.
+
+## Real Scoring Boundary
+
+SpeakRight does not ask an LLM to invent pronunciation scores. Numeric scores in
+user-facing practice flows come from Azure Speech Pronunciation Assessment, or
+from explicit test/smoke fixtures guarded by query parameters during automated
+Release EXE smoke.
+
+The selected language profile maps directly to Azure locales:
+
+- `en-US` -> `en-US`
+- `es-ES` -> `es-ES`
+- `fr-FR` -> `fr-FR`
+- `ru-RU` -> `ru-RU`
+
+The LLM layer is downstream only. LLM providers only generate coaching
+explanations from Azure evidence; they can explain the Azure result in Chinese,
+suggest practice, and apply language-specific feedback rules, but they must not
+overwrite or fabricate the score numbers. The current release-hardening proof matrix and latest scoring-boundary tests live in
+`docs/operations/RC_EVIDENCE_AUDIT.md`, which is the source of truth for command
+results and Release EXE smoke/launch outcome. Do not treat an older commit SHA,
+download timestamp, or copied summary as the latest validated RC state without
+checking that audit.
+
+## APIs And Providers
+
+- **Azure Speech**: real pronunciation scoring and speech analysis. The app sends
+  the active language locale to Azure for assessment.
+- **ElevenLabs**: optional standard-demo TTS and previously approved bundled
+  local language-pack audio. Routine validation queries usage only and does not
+  generate new audio. Do not generate ElevenLabs audio without explicit
+  maintainer approval.
+- **LLM providers**: OpenAI-compatible providers can be configured for Chinese
+  coaching feedback. They are not the scoring authority.
+- **Youdao pronunciation**: English online dictionary fallback for word
+  pronunciation when local English word audio is unavailable.
+- **Merriam-Webster**: optional English dictionary pronunciation/stress source
+  when the user configures an API key.
+
+## Install And Run
+
+For Windows installer use, source builds, and first-launch expectations, see
+`docs/INSTALLATION.md`.
+
+Source build:
 
 ```bat
 cd /d E:\SpeakRightDesktopRepo
-npm run desktop:dev
+npm ci
+npm run desktop:build
+npm run desktop:preflight
+npm run desktop:launch-release
 ```
 
-The dev build uses the Tauri `devUrl` configured in `src-tauri/tauri.conf.json`.
-Release builds must use the static export in `out/`.
-
-For manual QA and user testing, launch the Release EXE instead of dev mode:
+Manual QA should start from the Release EXE:
 
 ```bat
 cd /d E:\SpeakRightDesktopRepo
@@ -62,53 +151,20 @@ npm run desktop:preflight
 npm run desktop:launch-release
 ```
 
-If the Release EXE is missing or stale:
+Developer mode is for debugging only:
 
 ```bat
-npm run desktop:run-release
+cd /d E:\SpeakRightDesktopRepo
+npm run desktop:dev
 ```
 
-`desktop:preflight` and `desktop:launch-release` also refuse to validate or
-open a Release EXE when the static export in `out/` is newer than the packaged
-executable. After running `npm run build:desktop-frontend` or changing UI code,
-run `npm run desktop:build` before Release EXE smoke or manual QA.
-
 For the daily desktop startup checklist, see
-`docs/operations/DESKTOP_STARTUP_RUNBOOK.md`.
-
-For Windows installer use, source builds, and first-launch expectations, see
-`docs/INSTALLATION.md`.
-
-For the next Codex chat or manual-testing pass, start with
-`docs/operations/NEXT_RC_AUDIO_SETTINGS_GOALS.md`,
-`docs/operations/NEXT_RC_AUDIO_SETTINGS_PROGRESS.md`,
-`docs/operations/NEXT_CHAT_HANDOFF.md`, and the runbook's `Start Next Chat`
-checklist. The first pass should use the Release EXE and cover Settings, the
-full English flow, and Spanish/French/Russian core practice plus the
-non-English boundary pages before adding new work.
-
-For the current Release Candidate evidence matrix, see
-`docs/operations/RC_EVIDENCE_AUDIT.md`.
-
-## Open Source
-
-- Code and source documentation are licensed under the MIT license. See
-  `LICENSE`.
-- Bundled audio, video, image, voice, and third-party educational media assets
-  are not automatically relicensed by MIT. See `THIRD_PARTY_NOTICES.md` before
-  redistributing packaged builds.
-- Contribution rules are in `CONTRIBUTING.md`.
-- Community behavior expectations are in `CODE_OF_CONDUCT.md`.
-- Support routing for Release EXE bugs, IPA audits, audio/provider requests,
-  private reports, and paid-provider boundaries is in `SUPPORT.md`.
-- Provider-quota requests should start with a zero-generation dry-run result,
-  expected text/audio scope, and explicit maintainer approval instead of asking
-  contributors to spend ElevenLabs credits.
-- Security reporting and secret-handling guidance are in `SECURITY.md`.
-- `.env.example` is documentation only; do not commit real API keys, recordings,
-  learning-data exports, tokens, or private user data.
+`docs/operations/DESKTOP_STARTUP_RUNBOOK.md`. For the current Release Candidate
+evidence matrix, see `docs/operations/RC_EVIDENCE_AUDIT.md`.
 
 ## Validation
+
+Run from `E:\SpeakRightDesktopRepo`:
 
 ```bat
 npm run test
@@ -118,138 +174,68 @@ npm run build:desktop-frontend
 npm run desktop:build
 npm run desktop:preflight
 npm run desktop:ui-smoke
-npm run desktop:live-validation
-npm run audio:parity:dry-run
-npm run audio:loudness:dry-run
-npm run ipa:audit:export
-npm run validate:internal-release
+npm run desktop:launch-release
 ```
 
-Use `npm run desktop:build` when you need fresh Windows artifacts. The build
-wrapper defaults `CARGO_BUILD_JOBS=1` on Windows to reduce Rust/LLVM memory
-spikes; set `CARGO_BUILD_JOBS` yourself before running the command if your
-machine or CI runner can safely use more parallelism. Use
-`npm run validate:public-release` only after Windows code signing is configured.
+Supporting zero-generation audits:
 
-The live validation command checks bundled audio/video assets and a high-coverage
-Azure pronunciation-assessment sample. It queries ElevenLabs usage only; it does
-not generate new audio unless an explicit smoke flag is set outside the normal
-release checklist.
+```bat
+npm run audio:parity:dry-run
+npm run phonology:audio-policy:check
+```
 
-`audio:parity:dry-run` checks the Spanish, French, and Russian learning-density
-and dual-voice audio contract without calling ElevenLabs. It writes
-`src-tauri/target/audio-parity/gap-report.json` and verifies that every required
-language-pack item has both `blue` and `pink` local files.
+`desktop:ui-smoke` launches the Release EXE, checks Settings, English full-flow
+routes, Spanish/French/Russian core routes, non-English boundary routes,
+left-column phoneme scoring layout, and confirms the runtime is not served from
+`localhost`.
 
-`audio:loudness:dry-run` uses local ffmpeg analysis to compare representative
-word A/B audio and IPA chart normal/slow word audio against teaching-video
-loudness after playback-layer gain. It writes
-`src-tauri/target/audio-loudness/report.json` and makes zero ElevenLabs calls.
+`audio:parity:dry-run` checks Spanish, French, and Russian local language-pack
+coverage and makes zero ElevenLabs calls. Keep exact counts centralized in
+`docs/operations/RC_EVIDENCE_AUDIT.md` instead of copying them into public
+overview text.
 
-`ipa:audit:export` regenerates the tracked Spanish/French/Russian IPA audit
-input under `docs/operations/non-english-ipa-audit-input.json`, including
-`auditRole` markers that separate full IPA rows from deck focus hints.
+## Repository And Privacy
 
-`desktop:preflight` checks the active workspace, release executable, static
-export freshness, and running `speakright.exe` process before release-style
-testing. It never closes the app for you; close SpeakRight manually before
-building. `desktop:launch-release` also refuses stale static-export packages and
-duplicate `speakright.exe` processes, reports the running process IDs, and prints
-a visible launch request, Release EXE path, child PID, and no-localhost boundary
-before it detaches the app process. `desktop:ui-smoke` launches the Release EXE,
-opens Settings, English full-flow routes, Spanish/French/Russian core routes,
-non-English training/diagnosis boundary routes, and confirms the runtime is not
-served from `localhost`.
+- Source code and source documentation are MIT licensed. See `LICENSE`.
+- `package.json` remains `private: true` to prevent accidental npm publication;
+  releases are desktop artifacts, not an npm package.
+- `.env.example` is documentation only. Do not commit real API keys, recordings,
+  learning-data exports, tokens, or private user data.
+- Do not upload private recordings, full diagnostics bundles, API keys, bearer
+  tokens, or local paths containing user names to public issues.
+- Security reporting and secret-handling guidance are in `SECURITY.md`.
+- Contribution rules are in `CONTRIBUTING.md`; community behavior expectations
+  are in `CODE_OF_CONDUCT.md`; support routing is in `SUPPORT.md`.
 
-GitHub Actions are split by change type: source, public asset, script,
-`src-tauri`, or package changes still run the full Windows desktop build, while
-README/docs-only changes run the lightweight Docs Check workflow.
+## Current Limitations
 
-## Release Notes
+- Windows artifacts are unsigned; public release still requires code signing.
+- Spanish, French, and Russian remain experimental and must not be described as
+  formal mastery or `evidenceMastery`.
+- Some rule, prosody, or composite sound units intentionally do not show speaker
+  buttons until exact local short audio exists.
+- Release validation does not record live learner audio, call Azure live scoring,
+  or generate ElevenLabs TTS in routine smoke.
+- Provider availability, Azure locale behavior, and WebView2 behavior can vary
+  by machine, network, and account quota.
 
-- The current Windows artifacts are for controlled testing unless code signing
-  is complete.
-- Controlled-test verification records for the current main tree live in
-  `docs/operations/RC_EVIDENCE_AUDIT.md`, including the verification date,
-  command outputs, Release EXE smoke/launch outcome, and known blockers.
-- The current release-hardening proof matrix, exact command results, and known
-  blockers live in `docs/operations/RC_EVIDENCE_AUDIT.md`; do not treat an
-  older commit SHA or a downloaded installer timestamp as the latest validated
-  RC state without checking that audit.
-- Bundled audio/video and multilingual parity counts are validated in
-  `docs/operations/RC_EVIDENCE_AUDIT.md`; keep that audit as the source of truth
-  instead of copying exact asset totals into public overview text.
-- Multilingual audio-density expansion target: 24 practice items per Spanish,
-  French, and Russian sound unit, with zero-generation parity checks for current
-  local coverage.
-- Secondary voices selected for the experimental language packs: Spanish
-  `Lydia`, French `Rachel`, Russian `Sergey`; the original primary voices
-  remain Spanish `Marco Cruz`, French `Clément`, Russian `Valeria`.
-- Latest settled-main validation results are centralized in
-  `docs/operations/RC_EVIDENCE_AUDIT.md`. The current RC gate covers full tests,
-  typecheck, lint, static desktop frontend build, Release EXE preflight,
-  Release EXE UI smoke, and Release EXE launch from the static Tauri bundle.
-  `desktop:launch-release` now also refuses duplicate running `speakright.exe`
-  processes before opening a new Release EXE.
-- Verified Azure live sample: `220/220` pronunciation-assessment calls passed.
-- ElevenLabs usage during normal validation remains `0` generated characters.
-  The one-time multilingual secondary-voice generation was approved separately
-  and estimated at about `10645` characters.
-- Public release gate still fails only because EXE/MSI/NSIS artifacts are
-  unsigned.
-- Non-English pronunciation scoring remains experimental; `evidenceMastery`
-  stays disabled for `es-ES`, `fr-FR`, and `ru-RU` until provider probes and
-  language-specific evidence gates are finished.
-- Recent local RC handoff updates tightened non-English practice-card
-  readability, one-shot sound-unit speakers across detail and list cards,
-  exact scoring-breakdown sound-unit audio,
-  local A/B word-audio gain, and formal mastery/progress-archive gating. Long
-  words, phrases, sentences, and IPA are shown in full; rule units use Chinese
-  labels; speaker buttons are hidden when no local target audio exists, and the
-  header speaker component now refuses external-only or browser-TTS fallback
-  audio. This pass is documented in `docs/operations/NEXT_CHAT_HANDOFF.md`.
-- The current RC evidence audit is tracked in
-  `docs/operations/RC_EVIDENCE_AUDIT.md`. It records the proof matrix for
-  Release EXE testing, experimental-language boundaries, non-English audio and
-  video honesty, centered/wrapping target text, and the English-only formal
-  mastery policy.
-- The latest Release EXE smoke enforces centered reading targets in addition to
-  no ellipsis/nowrap, no practice-button overlap, honest clickable header audio,
-  wrapping
-  video selector labels plus selector no-overlap/no-overflow runtime checks,
-  Settings/usage long-text wrapping, Settings pronunciation-test row
-  wrapping/no-overlap runtime checks, A/B voice selector and word-audio button
-  visibility/clickability/label runtime checks, scoring-breakdown
-  visibility/readability/no-overflow runtime checks plus scoring-tile
-  short-audio policy checks, the non-English progress-archive blocker, including
-  narrow-window and low-height detail passes, and
-  `releaseServedFromDevServer=false`.
-- Non-English diagnosis now treats omission/insertion miscues as insufficient
-  evidence for a trusted overall score while preserving practice feedback.
-- AI coach prompts now treat Spanish, French, and Russian full-score recordings
-  conservatively: they can say no obvious issue was found in this recording, but
-  they must not call the result perfect or mastered.
-- Local bundled word and language-pack A/B audio now uses peak-safe Web Audio
-  gain for playback-level loudness matching; very quiet local word clips can use
-  up to `12x` peak-safe gain when decoded peaks permit it. IPA chart normal/slow
-  word audio now gets a shared playback-layer boost as well. Free-practice
-  read-along playback keeps the same boost when it serves a bundled
-  language-pack clip, including replay. Online fallback audio is unchanged and
-  no ElevenLabs generation is part of this validation path.
-- The shared audio-player hook now refuses video-backed sources, so a missed
-  upstream guard cannot make a speaker button play a teaching-video track.
-- Scoring-breakdown phoneme tiles now reuse the exact same left/detail
-  sound-unit header clip (`phonemeAudio.localSrc`) when a verified single-IPA
-  alias exists. Unverified, proxy, rule, prosody, or composite segments stay
-  visible but unclickable; they no longer fall back to word examples, rule
-  audio, proxy media, or teaching-video audio. English chart clicks are capped
-  at `560ms`, and local non-English header/scoring clips are capped at `500ms`
-  through the shared header playback policy.
-- Recording replay and benchmark playback now use the shared audio-player hook,
-  so repeated replay clicks stop the previous blob and cleanup stays centralized.
-- Direct non-English access to drill, diagnosis, advanced pack-runner, and
-  progress/archive routes now shows the shared core-only boundary instead of
-  loading incomplete training or English formal-evidence surfaces. HVPT
-  perception and formal mastery writes remain gated by the English-only formal
-  mastery policy, so Spanish, French, and Russian stay core-practice
-  experimental modules.
+## Credits And Source Notes
+
+SpeakRight depends on careful third-party educational and provider ecosystems:
+
+- Rachel's English materials inform the English teaching-video experience where
+  local English clips are bundled.
+- American IPA Chart / americanipachart.com provides the source family for the
+  English IPA chart audio mirrored in the app.
+- University of Iowa Sounds of Speech Spanish materials are used for bundled
+  Spanish articulation references where exact local assets exist.
+- Seeing Speech / University of Glasgow and related phonetics references inform
+  selected source-ledger decisions and some local articulation media.
+- EasyPronunciation and similar pronunciation resources are used as reference
+  material or source-ledger context where noted; they are not automatically
+  bundled or treated as a redistribution license.
+- Microsoft Fluent Emoji-style IPA images are used for English phoneme cards.
+- Azure Speech, ElevenLabs, Youdao, Merriam-Webster, and user-configured LLM
+  providers power optional online capabilities subject to their own terms.
+
+See `THIRD_PARTY_NOTICES.md` for the full media and provider boundary.
