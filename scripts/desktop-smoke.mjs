@@ -626,7 +626,7 @@ async function captureInteractiveEvidence(debuggingPort) {
     await waitForSelector(cdp, '[data-smoke="desktop-llm-policy"]');
     await waitForSelector(
       cdp,
-      '[data-smoke="release-status"][data-release-channel="internal"][data-signature-status="NotSigned"]',
+      '[data-smoke="release-status"][data-release-channel="controlled-test"][data-signature-status="NotSigned"]',
     );
     await waitForSelector(cdp, '[data-smoke="release-unsigned-warning"]');
 
