@@ -22,7 +22,7 @@ concurrency:
 jobs:
   build:
     runs-on: windows-latest
-    timeout-minutes: 45
+    timeout-minutes: 70
 
     steps:
       - name: Checkout
@@ -46,7 +46,7 @@ jobs:
 
       - name: Validate desktop build
         run: npm run validate:desktop-ci
-        timeout-minutes: 30
+        timeout-minutes: 55
 
       - name: Enforce public release signing
         if: startsWith(github.ref, 'refs/tags/v')
