@@ -1,5 +1,5 @@
 import path from "node:path";
-import { defineConfig } from "vitest/config";
+import { configDefaults, defineConfig } from "vitest/config";
 
 export default defineConfig({
   test: {
@@ -7,6 +7,7 @@ export default defineConfig({
     globals: true,
     setupFiles: ["./src/__tests__/setup.ts"],
     testTimeout: 10_000,
+    exclude: [...configDefaults.exclude, "apps/browser/**"],
   },
   resolve: {
     alias: {

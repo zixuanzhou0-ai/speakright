@@ -470,7 +470,7 @@ describe("open-source readiness files", () => {
     const scripts = packageJson.scripts ?? {};
 
     expect(packageJson.private).toBe(true);
-    expect(packageJson.repository?.url).toContain("speakright-desktop");
+    expect(packageJson.repository?.url).toContain("zixuanzhou0-ai/speakright");
 
     for (const scriptName of [
       "test",
