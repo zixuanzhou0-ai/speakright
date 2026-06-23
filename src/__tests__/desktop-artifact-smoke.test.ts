@@ -229,8 +229,8 @@ describe("desktop artifact smoke wiring", () => {
     expect(workflow).toMatch(
       /cancel-in-progress:\s+\$\{\{\s*!startsWith\(github\.ref,\s*'refs\/tags\/v'\)\s*\}\}/,
     );
-    expect(workflow).toContain("timeout-minutes: 45");
-    expect(workflow).toContain("timeout-minutes: 30");
+    expect(workflow).toContain("timeout-minutes: 70");
+    expect(workflow).toContain("timeout-minutes: 55");
     expect(workflow).toContain("Validate desktop build");
     expect(workflow).toContain("npm run validate:desktop-ci");
   });
