@@ -1,13 +1,31 @@
 import { spawn } from "node:child_process";
+import { createServer } from "node:net";
 
-const port = Number(process.env.PORT || 4173);
-const smokeUrl = `http://127.0.0.1:${port}`;
+const requestedPort = Number(process.env.PORT || 4173);
 
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-async function waitForServer() {
+function isPortAvailable(port) {
+  return new Promise((resolve) => {
+    const probe = createServer()
+      .once("error", () => resolve(false))
+      .once("listening", () => {
+        probe.close(() => resolve(true));
+      })
+      .listen(port, "127.0.0.1");
+  });
+}
+
+async function findAvailablePort(startPort) {
+  for (let port = startPort; port < startPort + 20; port += 1) {
+    if (await isPortAvailable(port)) return port;
+  }
+  throw new Error(`No available static smoke port near ${startPort}`);
+}
+
+async function waitForServer(smokeUrl) {
   const deadline = Date.now() + 15_000;
   while (Date.now() < deadline) {
     try {
@@ -36,6 +54,8 @@ function runNodeScript(script, env = {}) {
   });
 }
 
+const port = await findAvailablePort(requestedPort);
+const smokeUrl = `http://127.0.0.1:${port}`;
 const server = spawn(process.execPath, ["scripts/serve-static.mjs"], {
   cwd: process.cwd(),
   env: { ...process.env, PORT: String(port) },
@@ -43,10 +63,12 @@ const server = spawn(process.execPath, ["scripts/serve-static.mjs"], {
 });
 
 try {
-  await waitForServer();
+  await waitForServer(smokeUrl);
   await runNodeScript("scripts/browser-smoke.mjs", {
     SPEAKRIGHT_BROWSER_SMOKE_URL: smokeUrl,
   });
 } finally {
-  server.kill();
+  if (!server.killed) {
+    server.kill();
+  }
 }

@@ -49,6 +49,9 @@ next-env.d.ts
 # playwright MCP artifacts
 .playwright-mcp/
 
+# generated reports, screenshots, and temporary audit artifacts
+/outputs/
+
 # root-level screenshots (dev debugging artifacts)
 /*.png
 /*.jpg

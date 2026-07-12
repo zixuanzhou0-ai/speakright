@@ -271,3 +271,15 @@ See `THIRD_PARTY_NOTICES.md` and `docs/browser-edition/THIRD_PARTY_NOTICES.md` f
 ## License
 
 MIT.
+
+## 版权、许可与免责声明
+
+版权所有 © 2026 Zixuan Zhou 与 Speak Right 开源贡献者。
+
+Speak Right 是开源软件。除非文件中另有说明，源代码和源码文档基于 MIT License 发布，具体条款以 `LICENSE` 文件为准。第三方服务、素材、品牌与商标归其各自权利人所有，完整边界见 `NOTICE.md` 和 `THIRD_PARTY_NOTICES.md`。
+
+Speak Right 不是官方语言考试、医疗诊断、语音治疗或认证评分工具。数字发音分数来自用户自行配置的 Azure Speech Pronunciation Assessment；AI 教练反馈仅供学习参考。
+
+用户需要自行管理 API Key。请勿将个人 API Key、账号信息、录音或私人数据提交到公开仓库、Issue、截图或文档中。
+
+GitHub 开源页面：https://github.com/zixuanzhou0-ai/speakright

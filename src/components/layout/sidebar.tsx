@@ -11,6 +11,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useLanguageConfig } from "@/hooks/use-api-keys";
 import { cn } from "@/lib/utils";
+import { ProjectFooter } from "./project-footer";
 import { SidebarPhonemeList } from "./sidebar-phoneme-list";
 import { ThemeToggle } from "./theme-toggle";
 
@@ -79,6 +80,8 @@ export function Sidebar() {
 
       {/* Spacer when not on phonemes */}
       {!isPhonemes && <div className="flex-1" />}
+
+      <ProjectFooter />
 
       {/* Bottom bar */}
       <div className="flex h-11 shrink-0 items-center justify-between border-t px-3">
