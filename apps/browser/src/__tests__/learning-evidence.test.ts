@@ -35,7 +35,7 @@ describe("learning evidence v3", () => {
     expect(store.evidence).toHaveLength(1);
     expect(store.evidence[0]).toMatchObject({
       targetUnits: ["s-th"],
-      evidenceStage: "transfer_observed",
+      evidenceStage: "introduced",
       confidence: "low",
       calibrationVersion: "legacy-unvalidated",
       sampleCount: 3,

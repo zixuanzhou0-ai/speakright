@@ -23,11 +23,13 @@ import { useAzureAssessment } from "@/hooks/use-azure-assessment";
 import { useRecorder } from "@/hooks/use-recorder";
 import { useRecordingQuality } from "@/hooks/use-recording-quality";
 import { useTtsAligned } from "@/hooks/use-tts-aligned";
+import { buildAzureAttemptEvidence } from "@/lib/azure-attempt-evidence";
 import {
   getBenchmarkArchiveSaveErrorMessage,
   saveBenchmarkRecording,
 } from "@/lib/benchmark-archive";
 import { getLanguageProfile } from "@/lib/language-profiles";
+import { appendLearningEvidence } from "@/lib/learning-evidence";
 import { LOCAL_MASTERY_SAVE_WARNING } from "@/lib/local-save-warning";
 import { canRecordFormalMastery } from "@/lib/mastery-language-policy";
 import {
@@ -111,7 +113,30 @@ export default function ProsodyPage() {
         buildProsodyTrainingSession(exercise, nextAnalysis),
       );
       const profileSaved = saveMasteryProfile(profile);
-      setLocalSaveWarning(profileSaved ? null : LOCAL_MASTERY_SAVE_WARNING);
+      const createdAt = Date.now();
+      const evidenceSaved = appendLearningEvidence(
+        buildAzureAttemptEvidence({
+          id: `prosody-${exercise.id}-${createdAt}`,
+          sessionId: `prosody-${exercise.id}-${createdAt}`,
+          languageId,
+          taskType: "sentence",
+          targetUnits: ["prosody"],
+          materialIds: [exercise.id],
+          levelId: exercise.id,
+          result,
+          targetScore: Math.round(nextAnalysis.prosodyScore),
+          recordingQuality: {
+            valid: quality.report.canSubmit,
+            score: quality.report.score,
+            reasons: quality.report.issues.map((issue) => issue.detail),
+          },
+          alignmentValid: true,
+          createdAt,
+        }),
+      );
+      setLocalSaveWarning(
+        profileSaved && evidenceSaved ? null : LOCAL_MASTERY_SAVE_WARNING,
+      );
     } else {
       setLocalSaveWarning(null);
     }

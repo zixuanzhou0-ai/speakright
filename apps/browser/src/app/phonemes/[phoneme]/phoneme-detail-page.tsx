@@ -26,6 +26,8 @@ import {
 import { useSyllableStress } from "@/hooks/use-syllable-stress";
 import { useWordPronunciation } from "@/hooks/use-word-pronunciation";
 import { setLanguageConfig } from "@/lib/api-keys";
+import { buildAzureAttemptEvidence } from "@/lib/azure-attempt-evidence";
+import { getPhonemeAccuracy } from "@/lib/azure-phoneme-map";
 import {
   collectDetailAssessmentPhonemes,
   collectDetailAssessmentSyllables,
@@ -40,6 +42,8 @@ import {
   isRuleLikeSoundUnit,
   isVisibleInPhonemePractice,
 } from "@/lib/language-sound-unit-groups";
+import { appendLearningEvidence } from "@/lib/learning-evidence";
+import { canRecordFormalMastery } from "@/lib/mastery-language-policy";
 import {
   getPracticedWordsForLanguage,
   markWordPracticedForLanguage,
@@ -356,6 +360,26 @@ export function PhonemeDetailPage() {
         collectDetailAssessmentPhonemes(result, currentWord?.ipa),
       );
       setSelectedWordSyllables(collectDetailAssessmentSyllables(result));
+      const targetScore = phoneme
+        ? getPhonemeAccuracy(result, phoneme.slug)
+        : null;
+      const evidenceSaved =
+        phoneme && canRecordFormalMastery(languageId)
+          ? appendLearningEvidence(
+              buildAzureAttemptEvidence({
+                id: `phoneme-${phoneme.slug}-${currentWordStr}-${Date.now()}`,
+                sessionId: `phoneme-${phoneme.slug}`,
+                languageId,
+                taskType: "controlled-word",
+                targetUnits: [phoneme.slug],
+                materialIds: [currentWordStr],
+                levelId: phoneme.slug,
+                result,
+                targetScore: targetScore ?? undefined,
+                alignmentValid: targetScore !== null,
+              }),
+            )
+          : true;
       const scoreSaved = addScore(
         scoreHistoryKey(languageId, phoneme?.slug ?? "", currentWordStr),
         result.pronunciationScore,
@@ -371,7 +395,7 @@ export function PhonemeDetailPage() {
           getPracticedWordsForLanguage(languageId, phoneme.slug).length,
         );
       }
-      if (!scoreSaved || !practiceSaved) {
+      if (!scoreSaved || !practiceSaved || !evidenceSaved) {
         setLocalSaveError(
           "本次评分已完成，但本机练习记录或趋势图未保存。可能是本机存储空间不足或系统限制了本地存储；你可以继续练习，稍后清理空间或在设置页导出/重置本机数据后重试。",
         );

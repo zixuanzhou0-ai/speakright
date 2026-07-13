@@ -19,6 +19,7 @@ import { useCoachMode, useLanguageConfig } from "@/hooks/use-api-keys";
 import { useAzureAssessment } from "@/hooks/use-azure-assessment";
 import { useRecorder } from "@/hooks/use-recorder";
 import { useWordPronunciation } from "@/hooks/use-word-pronunciation";
+import { buildAzureAttemptEvidence } from "@/lib/azure-attempt-evidence";
 import { getPhonemeAccuracy } from "@/lib/azure-phoneme-map";
 import { computeDrillSummary, getPassThreshold } from "@/lib/drill-utils";
 import {
@@ -27,6 +28,8 @@ import {
 } from "@/lib/language-learning-decks";
 import { getLanguagePhonemeBySlug } from "@/lib/language-phonemes";
 import { getLanguageProfile } from "@/lib/language-profiles";
+import { appendLearningEvidence } from "@/lib/learning-evidence";
+import { canRecordFormalMastery } from "@/lib/mastery-language-policy";
 import type { MinimalPairSet } from "@/lib/minimal-pairs";
 import { MINIMAL_PAIR_SETS } from "@/lib/minimal-pairs";
 import {
@@ -228,8 +231,26 @@ export default function ContrastDrillPage() {
         processedBlobRef.current = null;
         return;
       }
+      const evidenceSaved = canRecordFormalMastery(languageId)
+        ? appendLearningEvidence(
+            buildAzureAttemptEvidence({
+              id: `contrast-a-${targetWord}-${Date.now()}`,
+              sessionId: `contrast-${selectedSet.id}`,
+              languageId,
+              taskType: "minimal-pair",
+              targetUnits: [targetPhoneme],
+              materialIds: [targetWord],
+              levelId: selectedSet.id,
+              result,
+              targetScore: phonemeScore,
+              alignmentValid: true,
+            }),
+          )
+        : true;
       setPendingScoreA(phonemeScore);
-      setAssessmentError(null);
+      setAssessmentError(
+        evidenceSaved ? null : "评分已完成，但 V3 原始证据未能保存。",
+      );
       processedBlobRef.current = null;
       recorder.reset();
       azure.reset();
@@ -290,10 +311,28 @@ export default function ContrastDrillPage() {
         processedBlobRef.current = null;
         return;
       }
+      const evidenceSaved = canRecordFormalMastery(languageId)
+        ? appendLearningEvidence(
+            buildAzureAttemptEvidence({
+              id: `contrast-b-${targetWord}-${Date.now()}`,
+              sessionId: `contrast-${selectedSet.id}`,
+              languageId,
+              taskType: "minimal-pair",
+              targetUnits: [targetPhoneme],
+              materialIds: [targetWord],
+              levelId: selectedSet.id,
+              result,
+              targetScore: phonemeScore,
+              alignmentValid: true,
+            }),
+          )
+        : true;
       const scoreB = phonemeScore;
       const passed =
         priorScoreA >= currentThreshold && scoreB >= currentThreshold;
-      setAssessmentError(null);
+      setAssessmentError(
+        evidenceSaved ? null : "评分已完成，但 V3 原始证据未能保存。",
+      );
       processedBlobRef.current = null;
       setPhase((prev) =>
         prev.type === "recordB"
@@ -383,7 +422,8 @@ export default function ContrastDrillPage() {
       <div className="mb-4 flex flex-wrap items-start gap-3 shrink-0">
         <Link
           href="/drill"
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full hover:bg-muted transition-colors cursor-pointer"
+          aria-label="返回训练首页"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full hover:bg-muted transition-colors cursor-pointer sm:h-8 sm:w-8"
         >
           <ArrowLeft className="h-4 w-4" />
         </Link>

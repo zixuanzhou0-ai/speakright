@@ -24,6 +24,7 @@ import { useSyllableStress } from "@/hooks/use-syllable-stress";
 import { useTtsAligned } from "@/hooks/use-tts-aligned";
 import { useWordIpa } from "@/hooks/use-word-ipa";
 import { useWordPronunciation } from "@/hooks/use-word-pronunciation";
+import { buildFreePracticeAttemptEvidence } from "@/lib/free-practice-evidence";
 import {
   analyzeFreePracticeTransfer,
   buildFreePracticeTargetPreview,
@@ -31,6 +32,7 @@ import {
   recordFreePracticeTransfer,
 } from "@/lib/free-practice-transfer";
 import { getLanguageProfile } from "@/lib/language-profiles";
+import { appendLearningEvidence } from "@/lib/learning-evidence";
 import { canRecordFormalMastery } from "@/lib/mastery-language-policy";
 import { loadMasteryProfile, saveMasteryProfile } from "@/lib/mastery-profile";
 import { reliabilityFromRecordingQuality } from "@/lib/recording-quality";
@@ -272,6 +274,7 @@ export default function SentencesPage() {
       const histKey = `${languageId}:${text.slice(0, 50)}:${text.length}`;
       const scoreSaved = addScore(histKey, result.pronunciationScore);
       let masterySaved = true;
+      let evidenceSaved = true;
 
       if (canUseMasteryTransfer) {
         const profile = loadMasteryProfile();
@@ -290,13 +293,24 @@ export default function SentencesPage() {
                 transfer.evidences.length >= 2 ? "strong" : "fair",
               note:
                 recordingQuality.report?.issues.length === 0
-                  ? "自由练习命中当前目标且录音质量稳定，可计入迁移证据。"
-                  : "自由练习录音存在质量提示，本次只作为观察，不提升掌握度。",
+                  ? "自由练习命中当前目标且录音质量稳定，可保存为原始观察。"
+                  : "自由练习录音存在质量提示，本次只作为观察，不提升正式证据阶段。",
             },
           );
+          const reliableTransfer = {
+            ...transfer,
+            assessmentReliability: reliability,
+          };
+          evidenceSaved = buildFreePracticeAttemptEvidence({
+            sessionId: `free-${transfer.generatedAt}`,
+            languageId,
+            summary: reliableTransfer,
+          })
+            .map((evidence) => appendLearningEvidence(evidence))
+            .every(Boolean);
           const recorded = recordFreePracticeTransfer(
             profile,
-            transfer,
+            reliableTransfer,
             reliability,
           );
           masterySaved = saveMasteryProfile(recorded.profile);
@@ -308,7 +322,7 @@ export default function SentencesPage() {
       } else {
         setTransferSummary(null);
       }
-      if (!scoreSaved || !masterySaved) {
+      if (!scoreSaved || !masterySaved || !evidenceSaved) {
         setLocalSaveError(
           "本次评分已完成，但本机趋势图、练习记录或迁移证据未保存。可能是本机存储空间不足或系统限制了本地存储；你可以继续练习，稍后在设置页导出/重置本机数据后重试。",
         );

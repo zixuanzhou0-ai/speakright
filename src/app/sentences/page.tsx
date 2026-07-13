@@ -11,6 +11,7 @@ import { useAudioPlayer } from "@/hooks/use-audio-player";
 import { useAzureAssessment } from "@/hooks/use-azure-assessment";
 import type { FeedbackData } from "@/hooks/use-llm-feedback";
 import { useLlmFeedback } from "@/hooks/use-llm-feedback";
+import { useMicrophoneDevice } from "@/hooks/use-microphone-device";
 import { useRecorder } from "@/hooks/use-recorder";
 import { useRecordingQuality } from "@/hooks/use-recording-quality";
 import {
@@ -23,6 +24,7 @@ import { useSyllableStress } from "@/hooks/use-syllable-stress";
 import { useTtsAligned } from "@/hooks/use-tts-aligned";
 import { useWordIpa } from "@/hooks/use-word-ipa";
 import { useWordPronunciation } from "@/hooks/use-word-pronunciation";
+import { buildFreePracticeAttemptEvidence } from "@/lib/free-practice-evidence";
 import {
   analyzeFreePracticeTransfer,
   buildFreePracticeTargetPreview,
@@ -30,6 +32,7 @@ import {
   recordFreePracticeTransfer,
 } from "@/lib/free-practice-transfer";
 import { getLanguageProfile } from "@/lib/language-profiles";
+import { appendLearningEvidence } from "@/lib/learning-evidence";
 import { canRecordFormalMastery } from "@/lib/mastery-language-policy";
 import { loadMasteryProfile, saveMasteryProfile } from "@/lib/mastery-profile";
 import { reliabilityFromRecordingQuality } from "@/lib/recording-quality";
@@ -76,9 +79,13 @@ export default function SentencesPage() {
 
   const tts = useTtsAligned();
   const wordAudio = useWordPronunciation();
+  const microphone = useMicrophoneDevice();
   // Free-practice page allows up to 150-char sentences; bump cap to 60s so
   // paragraph-length input isn't cut off mid-read.
-  const recorder = useRecorder({ maxDurationMs: 60_000 });
+  const recorder = useRecorder({
+    maxDurationMs: 60_000,
+    deviceId: microphone.selectedDeviceId,
+  });
   const recordingQuality = useRecordingQuality(recorder.audioBlob, {
     expectedMode: isWordMode ? "word" : "sentence",
     minDurationMs: isWordMode ? 500 : 800,
@@ -267,6 +274,7 @@ export default function SentencesPage() {
       const histKey = `${languageId}:${text.slice(0, 50)}:${text.length}`;
       const scoreSaved = addScore(histKey, result.pronunciationScore);
       let masterySaved = true;
+      let evidenceSaved = true;
 
       if (canUseMasteryTransfer) {
         const profile = loadMasteryProfile();
@@ -285,13 +293,24 @@ export default function SentencesPage() {
                 transfer.evidences.length >= 2 ? "strong" : "fair",
               note:
                 recordingQuality.report?.issues.length === 0
-                  ? "自由练习命中当前目标且录音质量稳定，可计入迁移证据。"
-                  : "自由练习录音存在质量提示，本次只作为观察，不提升掌握度。",
+                  ? "自由练习命中当前目标且录音质量稳定，可保存为原始观察。"
+                  : "自由练习录音存在质量提示，本次只作为观察，不提升正式证据阶段。",
             },
           );
+          const reliableTransfer = {
+            ...transfer,
+            assessmentReliability: reliability,
+          };
+          evidenceSaved = buildFreePracticeAttemptEvidence({
+            sessionId: `free-${transfer.generatedAt}`,
+            languageId,
+            summary: reliableTransfer,
+          })
+            .map((evidence) => appendLearningEvidence(evidence))
+            .every(Boolean);
           const recorded = recordFreePracticeTransfer(
             profile,
-            transfer,
+            reliableTransfer,
             reliability,
           );
           masterySaved = saveMasteryProfile(recorded.profile);
@@ -303,7 +322,7 @@ export default function SentencesPage() {
       } else {
         setTransferSummary(null);
       }
-      if (!scoreSaved || !masterySaved) {
+      if (!scoreSaved || !masterySaved || !evidenceSaved) {
         setLocalSaveError(
           "本次评分已完成，但本机趋势图、练习记录或迁移证据未保存。可能是本机存储空间不足或系统限制了本地存储；你可以继续练习，稍后在设置页导出/重置本机数据后重试。",
         );
@@ -454,9 +473,29 @@ export default function SentencesPage() {
           </p>
         )}
 
-        <div className="grid grid-cols-1 gap-6 lg:min-h-0 lg:flex-1 lg:grid-cols-[1fr_2fr]">
+        <div
+          className={
+            hasResult
+              ? "grid grid-cols-1 gap-6 lg:min-h-0 lg:flex-1 lg:grid-cols-[1fr_2fr]"
+              : "mx-auto grid w-full max-w-3xl grid-cols-1 gap-4"
+          }
+        >
           {/* Left Column */}
           <div className="flex flex-col gap-3 min-h-0 lg:overflow-y-auto scrollbar-thin">
+            {!hasResult && (
+              <ol
+                className="grid grid-cols-3 gap-2 rounded-xl border bg-primary/5 p-3 text-center text-xs font-medium text-muted-foreground"
+                aria-label="自由练习步骤"
+              >
+                <li className="rounded-lg bg-background px-2 py-2">
+                  1. 输入内容
+                </li>
+                <li className="rounded-lg bg-background px-2 py-2">
+                  2. 听示范
+                </li>
+                <li className="rounded-lg bg-background px-2 py-2">3. 录音</li>
+              </ol>
+            )}
             <SentenceInputCard
               sentence={sentence}
               onSentenceChange={setSentence}
@@ -489,6 +528,11 @@ export default function SentencesPage() {
               maxDurationSeconds={recorder.maxDurationSeconds}
               audioBlob={recorder.audioBlob}
               stream={recorder.stream}
+              microphoneDevices={microphone.devices}
+              selectedMicrophoneDeviceId={microphone.selectedDeviceId}
+              isLoadingMicrophones={microphone.isLoading}
+              onMicrophoneChange={microphone.setSelectedDeviceId}
+              onMicrophoneRefresh={microphone.refresh}
               qualityReport={recordingQuality.report}
               isAnalyzingQuality={recordingQuality.isAnalyzing}
               recorderError={recorder.error}
@@ -506,22 +550,24 @@ export default function SentencesPage() {
           </div>
 
           {/* Right Column */}
-          <div className="flex flex-col gap-3 min-h-0 lg:overflow-y-auto scrollbar-thin lg:pb-4">
-            <SentenceResultsColumn
-              hasResult={hasResult}
-              languageId={languageId}
-              result={azure.result}
-              selectedWord={selectedWord}
-              stressedSyllables={stressedSyllables}
-              onWordClick={handleWordClick}
-              feedback={llm.feedback}
-              isStreaming={llm.isStreaming}
-              hasFeedback={llm.hasFeedback}
-              llmError={llm.error}
-              onRetryFeedback={handleRetryFeedback}
-              transferSummary={transferSummary}
-            />
-          </div>
+          {hasResult && (
+            <div className="flex flex-col gap-3 min-h-0 lg:overflow-y-auto scrollbar-thin lg:pb-4">
+              <SentenceResultsColumn
+                hasResult={hasResult}
+                languageId={languageId}
+                result={azure.result}
+                selectedWord={selectedWord}
+                stressedSyllables={stressedSyllables}
+                onWordClick={handleWordClick}
+                feedback={llm.feedback}
+                isStreaming={llm.isStreaming}
+                hasFeedback={llm.hasFeedback}
+                llmError={llm.error}
+                onRetryFeedback={handleRetryFeedback}
+                transferSummary={transferSummary}
+              />
+            </div>
+          )}
         </div>
       </div>
     </LanguageModuleGate>
