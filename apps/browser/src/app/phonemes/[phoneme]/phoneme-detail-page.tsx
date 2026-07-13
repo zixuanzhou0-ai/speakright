@@ -7,6 +7,7 @@ import { RecordButton } from "@/components/audio/record-button";
 import { RecordingActions } from "@/components/audio/recording-actions";
 import { WaveformDisplay } from "@/components/audio/waveform-display";
 import { FeedbackDisplay } from "@/components/feedback/feedback-display";
+import { PhonemeMobileSelector } from "@/components/phoneme/phoneme-mobile-selector";
 import { PhonemeStudyCard } from "@/components/phoneme/phoneme-study-card";
 import { PhonemeHighlight } from "@/components/scoring/phoneme-highlight";
 import { ScoreSummary } from "@/components/scoring/score-summary";
@@ -513,6 +514,10 @@ export function PhonemeDetailPage() {
       data-language-id={languageId}
       data-sound-unit={phoneme.slug}
     >
+      <PhonemeMobileSelector
+        languageId={languageId}
+        currentSlug={phoneme.slug}
+      />
       {/* Two-column layout */}
       <div className="grid grid-cols-1 gap-5 lg:min-h-0 lg:flex-1 lg:grid-cols-[1fr_2fr]">
         {/* ====== LEFT COLUMN ====== */}

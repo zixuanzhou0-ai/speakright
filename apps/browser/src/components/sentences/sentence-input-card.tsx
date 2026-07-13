@@ -12,6 +12,7 @@ import {
   getCenteredReadableTextClassName,
   getPracticeTextDensity,
 } from "@/lib/practice-text-presentation";
+import { formatTrainingTargetUnit } from "@/lib/training-criteria";
 import type { LanguageId } from "@/types/language";
 
 const MAX_CHARS = 150;
@@ -299,7 +300,7 @@ export function SentenceInputCard({
                     whileTap={{ scale: 0.9 }}
                     transition={{ type: "spring", stiffness: 400, damping: 15 }}
                     onClick={() => onWordAudioPlay(trimmedText)}
-                    className="absolute right-2 bottom-2 flex h-7 w-7 items-center justify-center rounded-full bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary cursor-pointer"
+                    className="absolute right-2 bottom-2 flex h-11 w-11 items-center justify-center rounded-full bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary cursor-pointer sm:h-7 sm:w-7"
                   >
                     <RotateCcw className="h-3.5 w-3.5" />
                   </motion.button>
@@ -331,7 +332,7 @@ export function SentenceInputCard({
                     whileTap={{ scale: 0.9 }}
                     transition={{ type: "spring", stiffness: 400, damping: 15 }}
                     onClick={onTtsReplay}
-                    className="absolute right-2 bottom-2 flex h-7 w-7 items-center justify-center rounded-full bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary cursor-pointer"
+                    className="absolute right-2 bottom-2 flex h-11 w-11 items-center justify-center rounded-full bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary cursor-pointer sm:h-7 sm:w-7"
                   >
                     <RotateCcw className="h-3.5 w-3.5" />
                   </motion.button>
@@ -375,7 +376,10 @@ function TargetPreviewPanel({
                   {target.packTitle}
                 </Badge>
                 <span className="break-words text-center text-xs text-muted-foreground [overflow-wrap:anywhere]">
-                  目标音 {target.targetPhonemes.join(" / ")}
+                  目标音{" "}
+                  {target.targetPhonemes
+                    .map(formatTrainingTargetUnit)
+                    .join(" – ")}
                 </span>
               </div>
               <p className="mt-1 break-words text-center text-xs text-muted-foreground [overflow-wrap:anywhere]">

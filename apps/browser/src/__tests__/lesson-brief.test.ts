@@ -152,7 +152,9 @@ describe("lesson brief", () => {
     expect(brief.startLevelId).toBe("word-ladder");
     expect(brief.reason).toContain("think");
     expect(
-      brief.successCriteria.some((item) => item.includes("目标音素")),
+      brief.successCriteria.some(
+        (item) => item.includes("有效样本") && item.includes("目标音"),
+      ),
     ).toBe(true);
   });
 

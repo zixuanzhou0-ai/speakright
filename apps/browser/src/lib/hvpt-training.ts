@@ -1,6 +1,7 @@
 import type { MasteryProfile, TrainingSessionSummary } from "@/types/training";
 import { buildReviewQueue, buildSessionReviewItems } from "./review-queue";
 import { getTrainingPack } from "./training-packs";
+import { createPackPerceptionTrials } from "./training-perception";
 
 export type HvptSpeaker = "blue" | "pink";
 export type HvptAnswer = "A" | "B";
@@ -33,6 +34,11 @@ export interface HvptTrial {
   xIsA: boolean;
   speakerA: HvptSpeaker;
   speakerB: HvptSpeaker;
+  pairId: string;
+  probePairId: string;
+  audioUriA: string;
+  audioUriB: string;
+  audioUriX: string;
   speakerX: HvptSpeaker;
   context: string;
   difficulty: 1 | 2 | 3 | 4 | 5;
@@ -65,10 +71,11 @@ export const HVPT_CONTRASTS: HvptContrast[] = [
   {
     id: "ee-ih",
     packId: "ee-ih",
-    label: "/i:/ vs /I/",
-    targetA: "/i:/",
-    targetB: "/I/",
-    learnerRisk: "不要只靠长短判断；重点听紧张 /i:/ 和松弛 /I/ 的舌位差。",
+    label: "/iː/ vs /ɪ/",
+    targetA: "/iː/",
+    targetB: "/ɪ/",
+    learnerRisk:
+      "不要只靠时长判断；重点听 /iː/ 较高前、较紧与 /ɪ/ 稍低后、较松的音质差异。",
     passRate: 0.9,
     items: [
       {
@@ -139,10 +146,11 @@ export const HVPT_CONTRASTS: HvptContrast[] = [
   {
     id: "oo-uh",
     packId: "oo-uh",
-    label: "/u:/ vs /U/",
-    targetA: "/u:/",
-    targetB: "/U/",
-    learnerRisk: "/U/ 更短更松，嘴唇不要像 /u:/ 那样收得太圆。",
+    label: "/uː/ vs /ʊ/",
+    targetA: "/uː/",
+    targetB: "/ʊ/",
+    learnerRisk:
+      "/ʊ/ 通常更松、舌位略低前、圆唇较弱；时长只是与 /uː/ 区分的线索之一。",
     passRate: 0.88,
     items: [
       { wordA: "pool", wordB: "pull", context: "final /l/", difficulty: 4 },
@@ -350,23 +358,6 @@ export const HVPT_CONTRASTS: HvptContrast[] = [
   },
 ];
 
-const SPEAKERS: HvptSpeaker[] = ["blue", "pink"];
-
-function shuffle<T>(items: T[], seed = Date.now()): T[] {
-  const next = [...items];
-  let state = seed % 2147483647;
-  for (let i = next.length - 1; i > 0; i--) {
-    state = (state * 48271) % 2147483647;
-    const j = state % (i + 1);
-    [next[i], next[j]] = [next[j], next[i]];
-  }
-  return next;
-}
-
-function speakerFor(index: number, offset: number): HvptSpeaker {
-  return SPEAKERS[(index + offset) % SPEAKERS.length];
-}
-
 export function getHvptContrast(id: string): HvptContrast | undefined {
   return HVPT_CONTRASTS.find((contrast) => contrast.id === id);
 }
@@ -379,29 +370,29 @@ export function buildHvptSession(
   const contrast = getHvptContrast(contrastId);
   if (!contrast) return [];
 
-  const base = shuffle(contrast.items, seed);
-  const trials: HvptTrial[] = [];
-
-  for (let i = 0; i < count; i++) {
-    const item = base[i % base.length];
-    const xIsA = (seed + i * 7) % 2 === 0;
-    trials.push({
-      id: `${contrastId}-${seed}-${i}`,
+  const trials = createPackPerceptionTrials(contrast.packId, seed, count);
+  return trials.map((trial, index) => {
+    const contextItem = contrast.items[index % contrast.items.length];
+    return {
+      id: `${contrastId}-${trial.id}`,
       contrastId,
-      index: i,
-      wordA: item.wordA,
-      wordB: item.wordB,
-      xWord: xIsA ? item.wordA : item.wordB,
-      xIsA,
-      speakerA: speakerFor(i, 0),
-      speakerB: speakerFor(i, 1),
-      speakerX: speakerFor(i, 2),
-      context: item.context,
-      difficulty: item.difficulty,
-    });
-  }
-
-  return trials;
+      index,
+      pairId: trial.pairId,
+      probePairId: trial.probePairId,
+      wordA: trial.referenceA.word,
+      wordB: trial.referenceB.word,
+      xWord: trial.probe.word,
+      xIsA: trial.probeMatches === "A",
+      speakerA: trial.referenceSpeakerId as HvptSpeaker,
+      speakerB: trial.referenceSpeakerId as HvptSpeaker,
+      speakerX: trial.probeSpeakerId as HvptSpeaker,
+      audioUriA: trial.referenceA.uri,
+      audioUriB: trial.referenceB.uri,
+      audioUriX: trial.probe.uri,
+      context: contextItem?.context ?? "cross-speaker contrast",
+      difficulty: contextItem?.difficulty ?? 2,
+    };
+  });
 }
 
 export function summarizeHvptSession(
@@ -432,7 +423,16 @@ export function summarizeHvptSession(
   const total = responses.length;
   const correct = matrix.aAsA + matrix.bAsB;
   const accuracy = total > 0 ? correct / total : 0;
-  const passed = accuracy >= contrast.passRate;
+  const uniquePairCount = new Set(trials.map((trial) => trial.pairId)).size;
+  const crossSpeakerValid = trials.every(
+    (trial) =>
+      trial.speakerA === trial.speakerB &&
+      trial.speakerA !== trial.speakerX &&
+      trial.audioUriA !== trial.audioUriX &&
+      trial.audioUriB !== trial.audioUriX,
+  );
+  const passed =
+    total >= 8 && correct >= 7 && uniquePairCount >= 4 && crossSpeakerValid;
   const biasDirection =
     matrix.aAsB > matrix.bAsA
       ? `更容易把 ${contrast.targetA} 听成 ${contrast.targetB}`
@@ -447,13 +447,13 @@ export function summarizeHvptSession(
     correct,
     accuracy,
     passed,
-    passRate: contrast.passRate,
+    passRate: 7 / 8,
     confusionMatrix: matrix,
     biasDirection,
     focusedReviewTrials,
     nextAction: passed
       ? "听觉边界基本稳定，可以进入发音动作和句子整合。"
-      : "先追加错过的具体对比，不急着录音；听不稳时发音会回到中文默认类别。",
+      : "先追加错过的具体对比，不急着录音；听觉边界不稳定时，产出更容易回到熟悉的发音类别。",
   };
 }
 
@@ -481,8 +481,8 @@ export function buildHvptTrainingSession(
     assessmentReliability: {
       alignment: "good" as const,
       evidenceStrength: "strong" as const,
-      canPromoteMastery: true,
-      note: "听辨题不依赖录音质量，可作为 perception 层证据。",
+      canPromoteMastery: false,
+      note: "旧资料仅用于兼容复习调度；正式阶段由 V3 学习证据决定。",
     },
   }));
   const session: TrainingSessionSummary = {
@@ -514,8 +514,8 @@ export function buildHvptTrainingSession(
     assessmentReliability: {
       alignment: "good",
       evidenceStrength: "strong",
-      canPromoteMastery: true,
-      note: "高变异听辨结果已计入 perception 层。",
+      canPromoteMastery: false,
+      note: "本轮听辨结果不构成掌握结论；正式阶段由 V3 学习证据决定。",
     },
     mastered: false,
   };

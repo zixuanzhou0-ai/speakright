@@ -11,11 +11,15 @@ import {
 } from "lucide-react";
 import { motion } from "motion/react";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useLanguageConfig } from "@/hooks/use-api-keys";
 import { useWordPronunciation } from "@/hooks/use-word-pronunciation";
+import {
+  buildHvptAggregateEvidence,
+  buildHvptAttemptEvidence,
+} from "@/lib/hvpt-evidence";
 import {
   buildHvptSession,
   buildHvptTrainingSession,
@@ -31,6 +35,7 @@ import {
   summarizeHvptSession,
 } from "@/lib/hvpt-training";
 import { getLanguageProfile } from "@/lib/language-profiles";
+import { appendLearningEvidence } from "@/lib/learning-evidence";
 import { LOCAL_MASTERY_SAVE_WARNING } from "@/lib/local-save-warning";
 import { canRecordFormalMastery } from "@/lib/mastery-language-policy";
 import {
@@ -42,6 +47,7 @@ import {
   getCenteredReadableTextClassName,
   getPracticeTextDensity,
 } from "@/lib/practice-text-presentation";
+import { getTrainingPack } from "@/lib/training-packs";
 
 const WRAP_SAFE_ACTION_BUTTON_CLASS =
   "h-auto min-h-8 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]";
@@ -55,7 +61,7 @@ type PerceptionPhase =
   | { type: "focused-review"; trials: HvptTrial[] }
   | { type: "completed"; summary: HvptSummary };
 
-const QUESTIONS_PER_SESSION = 12;
+const QUESTIONS_PER_SESSION = 8;
 
 function speakerLabel(speaker: HvptSpeaker): string {
   return speaker === "blue" ? "Max" : "Nichalia";
@@ -72,6 +78,7 @@ export default function PerceptionDrillPage() {
   const [phase, setPhase] = useState<PerceptionPhase>({ type: "select" });
   const [responses, setResponses] = useState<HvptResponse[]>([]);
   const [trials, setTrials] = useState<HvptTrial[]>([]);
+  const sessionIdRef = useRef(`hvpt-${Date.now()}`);
   const [activeSlot, setActiveSlot] = useState<PlayingSlot>(null);
   const [localSaveWarning, setLocalSaveWarning] = useState<string | null>(null);
   const { languageId } = useLanguageConfig();
@@ -89,6 +96,7 @@ export default function PerceptionDrillPage() {
 
   const startSession = (contrast: HvptContrast, reviewTrials?: HvptTrial[]) => {
     setSelectedContrast(contrast);
+    sessionIdRef.current = `hvpt-${contrast.id}-${Date.now()}`;
     pronunciation.clearError();
     const nextTrials =
       reviewTrials && reviewTrials.length > 0
@@ -111,29 +119,41 @@ export default function PerceptionDrillPage() {
     if (!currentTrial) return;
     pronunciation.clearError();
     setActiveSlot(slot);
-    const word =
+    const asset =
       slot === "A"
-        ? currentTrial.wordA
+        ? { uri: currentTrial.audioUriA, word: currentTrial.wordA }
         : slot === "B"
-          ? currentTrial.wordB
-          : currentTrial.xWord;
-    const speaker =
-      slot === "A"
-        ? currentTrial.speakerA
-        : slot === "B"
-          ? currentTrial.speakerB
-          : currentTrial.speakerX;
-    pronunciation.playWord(word, speaker, languageId);
+          ? { uri: currentTrial.audioUriB, word: currentTrial.wordB }
+          : { uri: currentTrial.audioUriX, word: currentTrial.xWord };
+    pronunciation.playLocalAsset(asset.uri, `${slot}：${asset.word}`);
   };
 
   const answer = (answerValue: HvptAnswer) => {
     if (phase.type !== "playing" || !currentTrial) return;
     const nextResponse = { trialId: currentTrial.id, answer: answerValue };
+    const correct = answerIsCorrect(currentTrial, answerValue);
+    const pack = selectedContrast
+      ? getTrainingPack(selectedContrast.packId)
+      : undefined;
+    const evidenceSaved = appendLearningEvidence(
+      buildHvptAttemptEvidence(
+        {
+          sessionId: sessionIdRef.current,
+          packId: selectedContrast?.packId ?? "unknown",
+          targetUnits: pack?.targetPhonemes ?? [],
+          createdAt: Date.now(),
+        },
+        currentTrial,
+        correct,
+        responses.length + 1,
+      ),
+    );
+    if (!evidenceSaved) setLocalSaveWarning(LOCAL_MASTERY_SAVE_WARNING);
     setResponses((prev) => [...prev, nextResponse]);
     setPhase({
       type: "answered",
       questionIndex: phase.questionIndex,
-      correct: answerIsCorrect(currentTrial, answerValue),
+      correct,
     });
   };
 
@@ -154,19 +174,35 @@ export default function PerceptionDrillPage() {
   const finishWithSummary = (summary: HvptSummary) => {
     pronunciation.clearError();
     setActiveSlot(null);
-    if (
-      !selectedContrast ||
-      typeof window === "undefined" ||
-      !canRecordHvptMastery
-    ) {
+    if (!selectedContrast || typeof window === "undefined") {
       setLocalSaveWarning(null);
+      setPhase({ type: "completed", summary });
+      return;
+    }
+    const pack = getTrainingPack(selectedContrast.packId);
+    const evidenceSaved = appendLearningEvidence(
+      buildHvptAggregateEvidence(
+        {
+          sessionId: sessionIdRef.current,
+          packId: selectedContrast.packId,
+          targetUnits: pack?.targetPhonemes ?? [],
+          createdAt: Date.now(),
+        },
+        trials,
+        summary,
+      ),
+    );
+    if (!canRecordHvptMastery) {
+      setLocalSaveWarning(evidenceSaved ? null : LOCAL_MASTERY_SAVE_WARNING);
       setPhase({ type: "completed", summary });
       return;
     }
     const session = buildHvptTrainingSession(selectedContrast, summary);
     const nextProfile = recordTrainingSession(loadMasteryProfile(), session);
     const profileSaved = saveMasteryProfile(nextProfile);
-    setLocalSaveWarning(profileSaved ? null : LOCAL_MASTERY_SAVE_WARNING);
+    setLocalSaveWarning(
+      profileSaved && evidenceSaved ? null : LOCAL_MASTERY_SAVE_WARNING,
+    );
     setPhase({ type: "completed", summary });
   };
 
@@ -254,7 +290,8 @@ export default function PerceptionDrillPage() {
       <div className="mb-4 flex items-center gap-3 shrink-0">
         <Link
           href="/drill"
-          className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-muted transition-colors cursor-pointer"
+          aria-label="返回训练首页"
+          className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-muted transition-colors cursor-pointer"
         >
           <ArrowLeft className="h-4 w-4" />
         </Link>
@@ -308,9 +345,7 @@ export default function PerceptionDrillPage() {
                 >
                   <div className="mb-2 flex items-center justify-between gap-3">
                     <Headphones className="h-5 w-5 text-primary" />
-                    <Badge variant="outline">
-                      通过线 {Math.round(contrast.passRate * 100)}%
-                    </Badge>
+                    <Badge variant="outline">标准 7/8 · 4 组</Badge>
                   </div>
                   <p className="break-words text-center font-mono text-xl font-bold [overflow-wrap:anywhere]">
                     {contrast.label}
@@ -363,7 +398,7 @@ export default function PerceptionDrillPage() {
                       whileHover={{ scale: 1.04 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={() => playSlot(slot)}
-                      className={`flex flex-col items-center gap-2 rounded-xl border p-4 cursor-pointer ${
+                      className={`flex min-h-24 flex-col items-center gap-2 rounded-xl border p-4 cursor-pointer ${
                         activeSlot === slot && pronunciation.isPlaying
                           ? "border-primary bg-primary/5"
                           : "hover:border-primary/30"
@@ -390,7 +425,7 @@ export default function PerceptionDrillPage() {
                   onClick={() => answer("A")}
                   variant="outline"
                   size="lg"
-                  className="cursor-pointer"
+                  className="min-h-11 cursor-pointer"
                 >
                   X = A
                 </Button>
@@ -398,7 +433,7 @@ export default function PerceptionDrillPage() {
                   onClick={() => answer("B")}
                   variant="outline"
                   size="lg"
-                  className="cursor-pointer"
+                  className="min-h-11 cursor-pointer"
                 >
                   X = B
                 </Button>
@@ -485,10 +520,9 @@ export default function PerceptionDrillPage() {
                       size="sm"
                       variant="outline"
                       onClick={() =>
-                        pronunciation.playWord(
-                          trial.wordA,
-                          trial.speakerA,
-                          languageId,
+                        pronunciation.playLocalAsset(
+                          trial.audioUriA,
+                          `A：${trial.wordA}`,
                         )
                       }
                       className="cursor-pointer"
@@ -500,10 +534,9 @@ export default function PerceptionDrillPage() {
                       size="sm"
                       variant="outline"
                       onClick={() =>
-                        pronunciation.playWord(
-                          trial.wordB,
-                          trial.speakerB,
-                          languageId,
+                        pronunciation.playLocalAsset(
+                          trial.audioUriB,
+                          `B：${trial.wordB}`,
                         )
                       }
                       className="cursor-pointer"

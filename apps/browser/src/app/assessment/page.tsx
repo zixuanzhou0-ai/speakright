@@ -389,6 +389,20 @@ export default function AssessmentPage() {
             ? "你的发音诊断报告和训练处方"
             : `快速诊断 3-4 分钟，找出最该训练的${languageProfile.displayName}发音问题`}
         </p>
+        {languageProfile.status === "experimental" && (
+          <div
+            className="mb-4 flex flex-col gap-2 rounded-xl border border-primary/25 bg-primary/5 p-4 text-sm sm:flex-row sm:items-start"
+            data-smoke="assessment-labs-boundary"
+            role="note"
+          >
+            <Badge variant="secondary" className="w-fit">
+              Labs
+            </Badge>
+            <p className="text-muted-foreground">
+              当前诊断只提供探索性的整体与词级观察；不生成与英语正式体系等价的音素诊断、证据阶段或掌握结论。
+            </p>
+          </div>
+        )}
 
         {localSaveWarning && (
           <div

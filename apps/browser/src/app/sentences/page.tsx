@@ -459,9 +459,29 @@ export default function SentencesPage() {
           </p>
         )}
 
-        <div className="grid grid-cols-1 gap-6 lg:min-h-0 lg:flex-1 lg:grid-cols-[1fr_2fr]">
+        <div
+          className={
+            hasResult
+              ? "grid grid-cols-1 gap-6 lg:min-h-0 lg:flex-1 lg:grid-cols-[1fr_2fr]"
+              : "mx-auto grid w-full max-w-3xl grid-cols-1 gap-4"
+          }
+        >
           {/* Left Column */}
           <div className="flex flex-col gap-3 min-h-0 lg:overflow-y-auto scrollbar-thin">
+            {!hasResult && (
+              <ol
+                className="grid grid-cols-3 gap-2 rounded-xl border bg-primary/5 p-3 text-center text-xs font-medium text-muted-foreground"
+                aria-label="自由练习步骤"
+              >
+                <li className="rounded-lg bg-background px-2 py-2">
+                  1. 输入内容
+                </li>
+                <li className="rounded-lg bg-background px-2 py-2">
+                  2. 听示范
+                </li>
+                <li className="rounded-lg bg-background px-2 py-2">3. 录音</li>
+              </ol>
+            )}
             <SentenceInputCard
               sentence={sentence}
               onSentenceChange={setSentence}
@@ -516,22 +536,24 @@ export default function SentencesPage() {
           </div>
 
           {/* Right Column */}
-          <div className="flex flex-col gap-3 min-h-0 lg:overflow-y-auto scrollbar-thin lg:pb-4">
-            <SentenceResultsColumn
-              hasResult={hasResult}
-              languageId={languageId}
-              result={azure.result}
-              selectedWord={selectedWord}
-              stressedSyllables={stressedSyllables}
-              onWordClick={handleWordClick}
-              feedback={llm.feedback}
-              isStreaming={llm.isStreaming}
-              hasFeedback={llm.hasFeedback}
-              llmError={llm.error}
-              onRetryFeedback={handleRetryFeedback}
-              transferSummary={transferSummary}
-            />
-          </div>
+          {hasResult && (
+            <div className="flex flex-col gap-3 min-h-0 lg:overflow-y-auto scrollbar-thin lg:pb-4">
+              <SentenceResultsColumn
+                hasResult={hasResult}
+                languageId={languageId}
+                result={azure.result}
+                selectedWord={selectedWord}
+                stressedSyllables={stressedSyllables}
+                onWordClick={handleWordClick}
+                feedback={llm.feedback}
+                isStreaming={llm.isStreaming}
+                hasFeedback={llm.hasFeedback}
+                llmError={llm.error}
+                onRetryFeedback={handleRetryFeedback}
+                transferSummary={transferSummary}
+              />
+            </div>
+          )}
         </div>
       </div>
     </LanguageModuleGate>

@@ -77,7 +77,7 @@ export function WordCard({
             size="icon"
             onClick={handlePrev}
             disabled={!hasPrevious}
-            className="h-8 w-8 shrink-0 rounded-full cursor-pointer disabled:opacity-30"
+            className="h-11 w-11 shrink-0 rounded-full cursor-pointer disabled:opacity-30 sm:h-8 sm:w-8"
           >
             <ChevronLeft className="h-5 w-5" />
           </Button>
@@ -193,7 +193,7 @@ export function WordCard({
             variant="outline"
             size="icon"
             onClick={handleNext}
-            className="h-8 w-8 shrink-0 rounded-full cursor-pointer"
+            className="h-11 w-11 shrink-0 rounded-full cursor-pointer sm:h-8 sm:w-8"
           >
             <ChevronRight className="h-5 w-5" />
           </Button>

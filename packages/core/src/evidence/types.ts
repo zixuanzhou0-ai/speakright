@@ -44,12 +44,12 @@ export interface LearningEvidenceV3 {
   targetUnits: string[];
   observations: EvidenceObservation[];
   recordingQuality: {
-    status: "good" | "caution" | "invalid" | "unknown";
+    status: "good" | "caution" | "invalid" | "unknown" | "not-applicable";
     score?: number;
     reasons: string[];
   };
   alignmentQuality: {
-    status: "good" | "caution" | "invalid" | "unknown";
+    status: "good" | "caution" | "invalid" | "unknown" | "not-applicable";
     score?: number;
     reasons: string[];
   };
@@ -65,6 +65,13 @@ export interface LearningEvidenceV3 {
   evidenceStage: EvidenceStage;
   calibrationVersion: string;
   createdAt: number;
+  trace?: {
+    sessionId: string;
+    levelId?: string;
+    materialIds: string[];
+    criterionKind: string;
+    aggregate: boolean;
+  };
 }
 
 export interface LearningEvidenceStoreV3 {

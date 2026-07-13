@@ -1,3 +1,4 @@
+import type { TrainingCriterion } from "@speakright/core/training/criteria";
 import type { DiagnosisIssueType, EvidenceStrength } from "@/types/diagnosis";
 import type { DrillItem } from "@/types/drill";
 
@@ -102,7 +103,7 @@ export interface TrainingLevel {
   kind: TrainingLevelKind;
   goal: string;
   coachCue: string;
-  passRule: LevelPassRule;
+  criterion: TrainingCriterion;
   items: TrainingCourseItem[];
 }
 

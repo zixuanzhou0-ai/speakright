@@ -182,10 +182,19 @@ export function WaveformDisplay({ audioBlob, stream }: WaveformDisplayProps) {
 
   return (
     <div className="w-full space-y-1">
-      <div
-        ref={containerRef}
-        className="min-h-[40px] w-full rounded-md border bg-muted/30"
-      />
+      <button
+        type="button"
+        disabled={!audioBlob}
+        aria-label={audioBlob ? "播放或暂停本次录音" : "录音波形尚未生成"}
+        onClick={() => wsRef.current?.playPause()}
+        className="min-h-11 w-full rounded-md border bg-muted/30 p-0 outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-default"
+      >
+        <span
+          ref={containerRef}
+          className="block min-h-11 w-full"
+          data-playable={audioBlob ? "true" : undefined}
+        />
+      </button>
       {warning && (
         <p
           className="text-center text-xs text-amber-600 dark:text-amber-400"

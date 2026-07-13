@@ -38,9 +38,15 @@ describe("training course v2.5", () => {
         "shadowing",
         "mixed-review",
       ]);
-      expect(
-        pack.course?.levels.find((level) => level.kind === "perception")?.items,
-      ).toHaveLength(8);
+      const perceptionLevel = pack.course?.levels.find(
+        (level) => level.kind === "perception",
+      );
+      expect(perceptionLevel?.items.length).toBeGreaterThanOrEqual(4);
+      expect(perceptionLevel?.criterion).toMatchObject({
+        kind: "perception",
+        minTrials: 8,
+        minUniquePairs: 4,
+      });
       expect(
         pack.course?.levels.find((level) => level.kind === "word")?.items,
       ).toHaveLength(12);

@@ -11,11 +11,15 @@ export function decideEvidencePromotion(
   requestedStage: EvidenceStage,
 ): PromotionDecision {
   const reasons: string[] = [];
-  if (evidence.recordingQuality.status !== "good") {
-    reasons.push("recording-quality-not-good");
-  }
-  if (evidence.alignmentQuality.status !== "good") {
-    reasons.push("target-alignment-not-good");
+  const recordingIsApplicable =
+    evidence.taskType !== "perception" && evidence.taskType !== "articulation";
+  if (recordingIsApplicable) {
+    if (evidence.recordingQuality.status !== "good") {
+      reasons.push("recording-quality-not-good");
+    }
+    if (evidence.alignmentQuality.status !== "good") {
+      reasons.push("target-alignment-not-good");
+    }
   }
   if (evidence.sampleCount < 2) reasons.push("insufficient-samples");
   if (evidence.contextCount < 2 && requestedStage !== "introduced") {

@@ -28,20 +28,20 @@ describe("mastery language policy", () => {
     }
   });
 
-  it("keeps advanced pack-runner mastery writes behind the formal policy", () => {
+  it("keeps guided V3 evidence formal and legacy mastery non-promoting", () => {
     const source = readFileSync(
-      join(
-        process.cwd(),
-        "src/app/drill/pack/[packId]/pack-runner-client.tsx",
-      ),
+      join(process.cwd(), "src/app/drill/pack/[packId]/pack-runner-client.tsx"),
       "utf8",
     );
 
     expect(source).toContain("canRecordFormalMastery(languageId)");
     expect(source).toContain("!canRecordFormalMastery(languageId)");
     expect(source).toContain("pack-runner-experimental-blocker");
-    expect(source).toContain("const mastered = canPromoteMastery &&");
-    expect(source).toContain("if (canPromoteMastery) {");
+    expect(source).toContain(
+      "const completedSummary = { ...summary, mastered: false };",
+    );
+    expect(source).toContain("appendLearningEvidence");
+    expect(source).toContain("buildGuidedTrainingEvidence");
     expect(source).toContain("saveMasteryProfile(profile)");
   });
 

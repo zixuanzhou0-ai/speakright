@@ -38,7 +38,8 @@ export function MicrophoneDeviceSelect({
           type="button"
           variant="ghost"
           size="icon-xs"
-          aria-label="\u5237\u65b0\u9ea6\u514b\u98ce\u5217\u8868"
+          aria-label="刷新麦克风列表"
+          className="min-h-11 min-w-11"
           onClick={onRefresh}
           disabled={disabled || isLoading}
         >
@@ -47,17 +48,21 @@ export function MicrophoneDeviceSelect({
       </div>
       <select
         id="microphone-device"
-        aria-label="\u9ea6\u514b\u98ce"
+        aria-label="麦克风"
         value={selectedDeviceId ?? ""}
         disabled={disabled || devices.length === 0}
         onChange={(event) => onDeviceChange(event.target.value || null)}
-        className="min-h-8 w-full rounded-lg border border-input bg-background px-2 py-1.5 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50"
+        className="min-h-11 w-full rounded-lg border border-input bg-background px-2 py-1.5 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50"
       >
-        <option value="">{"\u6d4f\u89c8\u5668\u9ed8\u8ba4\u9ea6\u514b\u98ce"}</option>
+        <option value="">
+          {"\u6d4f\u89c8\u5668\u9ed8\u8ba4\u9ea6\u514b\u98ce"}
+        </option>
         {devices.map((device) => (
           <option key={device.deviceId} value={device.deviceId}>
             {device.isSystemDefault ? "\u7cfb\u7edf\u9ed8\u8ba4 - " : ""}
-            {device.isCommunicationsDefault ? "\u901a\u8baf\u9ed8\u8ba4 - " : ""}
+            {device.isCommunicationsDefault
+              ? "\u901a\u8baf\u9ed8\u8ba4 - "
+              : ""}
             {displayDeviceLabel(device)}
           </option>
         ))}

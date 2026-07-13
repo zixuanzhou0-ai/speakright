@@ -1,9 +1,11 @@
-import { describe, expect, it } from "vitest";
 import type { LearningEvidenceV3 } from "@speakright/core/evidence/types";
 import { getNextRetentionReviewAt } from "@speakright/core/scheduling/retention";
 import { decideEvidencePromotion } from "@speakright/core/training/evidence-boundary";
+import { describe, expect, it } from "vitest";
 
-function evidence(overrides: Partial<LearningEvidenceV3> = {}): LearningEvidenceV3 {
+function evidence(
+  overrides: Partial<LearningEvidenceV3> = {},
+): LearningEvidenceV3 {
   return {
     id: "evidence-1",
     version: 3,
@@ -47,6 +49,25 @@ describe("shared training evidence boundary", () => {
     expect(decideEvidencePromotion(evidence(), "controlled")).toEqual({
       allowed: true,
       nextStage: "controlled",
+      reasons: [],
+    });
+  });
+
+  it("allows qualified perception evidence when recording checks are not applicable", () => {
+    const decision = decideEvidencePromotion(
+      evidence({
+        taskType: "perception",
+        recordingQuality: { status: "not-applicable", reasons: [] },
+        alignmentQuality: { status: "not-applicable", reasons: [] },
+        sampleCount: 8,
+        contextCount: 4,
+      }),
+      "discriminated",
+    );
+
+    expect(decision).toEqual({
+      allowed: true,
+      nextStage: "discriminated",
       reasons: [],
     });
   });

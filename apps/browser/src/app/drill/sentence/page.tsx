@@ -12,12 +12,12 @@ import { DrillSummaryCard } from "@/components/drill/drill-summary";
 import { DrillTeaching } from "@/components/drill/drill-teaching";
 import { useLanguageConfig } from "@/hooks/use-api-keys";
 import { useDrillSession } from "@/hooks/use-drill-session";
-import { useWordPronunciation } from "@/hooks/use-word-pronunciation";
 import { useTtsAligned } from "@/hooks/use-tts-aligned";
+import { useWordPronunciation } from "@/hooks/use-word-pronunciation";
 import { buildSentenceDrillItems } from "@/lib/drill-utils";
 import {
-  LANGUAGE_LEARNING_DECKS,
   type DeckLanguageId,
+  LANGUAGE_LEARNING_DECKS,
 } from "@/lib/language-learning-decks";
 import { getLanguagePhonemeBySlug } from "@/lib/language-phonemes";
 import { getLanguageProfile } from "@/lib/language-profiles";
@@ -112,7 +112,8 @@ export default function SentenceDrillPage() {
         <div className="mb-4 flex flex-wrap items-start gap-3 shrink-0">
           <Link
             href="/drill"
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full hover:bg-muted transition-colors cursor-pointer"
+            aria-label="返回训练首页"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full hover:bg-muted transition-colors cursor-pointer sm:h-8 sm:w-8"
           >
             <ArrowLeft className="h-4 w-4" />
           </Link>

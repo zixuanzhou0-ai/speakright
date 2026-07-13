@@ -14,6 +14,7 @@
   },
   "scripts": {
     "dev": "next dev --turbopack --port 3000",
+    "prebuild": "node scripts/check-training-audio.mjs",
     "build": "next build",
     "build:static": "next build",
     "serve:static": "node scripts/serve-static.mjs",
@@ -25,6 +26,7 @@
     "test": "vitest run",
     "browser:smoke": "node scripts/browser-smoke.mjs",
     "browser:smoke:static": "node scripts/browser-smoke-static.mjs",
+    "audio:training:check": "node scripts/check-training-audio.mjs",
     "azure:live-log": "node ../../scripts/browser-azure-live-log.mjs",
     "validate": "npm run lint && npm run typecheck && npm run test",
     "validate:browser": "npm run validate && npm run build && npm run browser:smoke:static"

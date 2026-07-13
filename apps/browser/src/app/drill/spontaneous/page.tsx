@@ -99,8 +99,9 @@ export default function SpontaneousPage() {
 
   const targetPacks = useMemo(() => {
     if (!transferProfile) return [];
-    const reviewPackIds = buildReviewQueue(transferProfile)
-      .map((item) => item.packId);
+    const reviewPackIds = buildReviewQueue(transferProfile).map(
+      (item) => item.packId,
+    );
     const activePackIds = Object.values(transferProfile.packs)
       .filter((pack) => pack.status !== "mastered")
       .sort((a, b) => (b.failureStreak ?? 0) - (a.failureStreak ?? 0))
@@ -226,7 +227,8 @@ export default function SpontaneousPage() {
       <div className="mb-5 flex flex-wrap items-start gap-3">
         <Link
           href="/drill"
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full hover:bg-muted transition-colors cursor-pointer"
+          aria-label="返回训练首页"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full hover:bg-muted transition-colors cursor-pointer sm:h-8 sm:w-8"
         >
           <ArrowLeft className="h-4 w-4" />
         </Link>

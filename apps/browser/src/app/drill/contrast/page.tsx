@@ -383,7 +383,8 @@ export default function ContrastDrillPage() {
       <div className="mb-4 flex flex-wrap items-start gap-3 shrink-0">
         <Link
           href="/drill"
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full hover:bg-muted transition-colors cursor-pointer"
+          aria-label="返回训练首页"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full hover:bg-muted transition-colors cursor-pointer sm:h-8 sm:w-8"
         >
           <ArrowLeft className="h-4 w-4" />
         </Link>

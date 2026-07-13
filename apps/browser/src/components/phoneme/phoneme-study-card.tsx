@@ -11,12 +11,12 @@ import {
   type AudioPlaybackOptions,
   getChartWordPlaybackOptions,
 } from "@/lib/audio-playback-policy";
-import { getExactTeachingVideosForSoundUnit } from "@/lib/language-teaching-videos";
 import {
   getSoundUnitSourceAlignment,
   shouldShowLocalVideoAsPrimary,
   shouldShowSoundUnitHeaderAudio,
 } from "@/lib/language-source-alignment";
+import { getExactTeachingVideosForSoundUnit } from "@/lib/language-teaching-videos";
 import {
   getCenteredMonoTextClassName,
   getCenteredReadableTextClassName,
@@ -164,7 +164,8 @@ function NonEnglishPracticeTask({
               onPrevious();
             }}
             disabled={!previousEnabled}
-            className="h-8 w-8 shrink-0 rounded-full cursor-pointer disabled:opacity-30"
+            aria-label="上一个示例词"
+            className="min-h-11 min-w-11 shrink-0 rounded-full cursor-pointer disabled:opacity-30"
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -182,7 +183,7 @@ function NonEnglishPracticeTask({
               aria-label={`使用${voice === "blue" ? "A" : "B"}声线`}
               title={`练习示范 ${voice === "blue" ? "A" : "B"}`}
               onClick={() => onSetSelectedVoice(voice)}
-              className={`h-7 w-7 rounded-full text-[11px] font-semibold transition-colors ${
+              className={`min-h-11 min-w-11 rounded-full text-[11px] font-semibold transition-colors ${
                 selectedVoice === voice
                   ? "bg-primary text-primary-foreground"
                   : "text-muted-foreground hover:bg-background"
@@ -206,7 +207,7 @@ function NonEnglishPracticeTask({
             onPlayWord(currentWord.word, selectedVoice);
           }}
           disabled={wordIsLoading}
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full cursor-pointer text-muted-foreground hover:bg-primary/10 hover:text-primary disabled:opacity-50"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full cursor-pointer text-muted-foreground hover:bg-primary/10 hover:text-primary disabled:opacity-50 sm:h-8 sm:w-8"
         >
           {wordIsLoading ? (
             <Loader2 className="h-5 w-5 animate-spin" />
@@ -223,7 +224,8 @@ function NonEnglishPracticeTask({
               onSetWordDirection(1);
               onNext();
             }}
-            className="h-8 w-8 shrink-0 rounded-full cursor-pointer"
+            aria-label="下一个示例词"
+            className="min-h-11 min-w-11 shrink-0 rounded-full cursor-pointer"
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
@@ -341,7 +343,9 @@ export function PhonemeStudyCard({
               data-smoke="sound-unit-header-audio"
             >
               <PhonemePlayButton
-                chartWord={hasLocalPhonemeAssets ? phoneme.chartWord : undefined}
+                chartWord={
+                  hasLocalPhonemeAssets ? phoneme.chartWord : undefined
+                }
                 phonemeAudio={
                   hasLocalPhonemeAssets ? undefined : phoneme.phonemeAudio
                 }
@@ -428,7 +432,8 @@ export function PhonemeStudyCard({
                       onPrevious();
                     }}
                     disabled={!previousEnabled}
-                    className="h-7 w-7 shrink-0 rounded-full cursor-pointer disabled:opacity-30"
+                    aria-label="上一个示例词"
+                    className="min-h-11 min-w-11 shrink-0 rounded-full cursor-pointer disabled:opacity-30"
                   >
                     <ChevronLeft className="h-4 w-4" />
                   </Button>
@@ -481,7 +486,7 @@ export function PhonemeStudyCard({
                       aria-label={`使用${voice === "blue" ? "A" : "B"}声线`}
                       title={`标准发音 ${voice === "blue" ? "A" : "B"}`}
                       onClick={() => setSelectedVoice(voice)}
-                      className={`h-6 w-6 rounded-full text-[11px] font-semibold transition-colors ${
+                      className={`min-h-11 min-w-11 rounded-full text-[11px] font-semibold transition-colors ${
                         selectedVoice === voice
                           ? "bg-primary text-primary-foreground"
                           : "text-muted-foreground hover:bg-background"
@@ -504,7 +509,7 @@ export function PhonemeStudyCard({
                     onPlayWord(currentWord.word, selectedVoice);
                   }}
                   disabled={wordIsLoading}
-                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full cursor-pointer hover:bg-primary/10 hover:text-primary text-muted-foreground disabled:opacity-50"
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full cursor-pointer hover:bg-primary/10 hover:text-primary text-muted-foreground disabled:opacity-50 sm:h-8 sm:w-8"
                 >
                   {wordIsLoading ? (
                     <Loader2 className="h-5 w-5 animate-spin" />
@@ -521,7 +526,8 @@ export function PhonemeStudyCard({
                       onSetWordDirection(1);
                       onNext();
                     }}
-                    className="h-7 w-7 shrink-0 rounded-full cursor-pointer"
+                    aria-label="下一个示例词"
+                    className="min-h-11 min-w-11 shrink-0 rounded-full cursor-pointer"
                   >
                     <ChevronRight className="h-4 w-4" />
                   </Button>

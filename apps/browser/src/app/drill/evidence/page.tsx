@@ -1,6 +1,5 @@
 "use client";
 
-import type React from "react";
 import {
   AlertTriangle,
   ArrowLeft,
@@ -15,6 +14,7 @@ import {
 } from "lucide-react";
 import { motion } from "motion/react";
 import Link from "next/link";
+import type React from "react";
 import { useEffect, useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -96,7 +96,8 @@ export default function TrainingEvidencePage() {
         <div className="mb-5 flex flex-wrap items-start gap-3">
           <Link
             href="/drill"
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-muted"
+            aria-label="返回训练首页"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-muted sm:h-8 sm:w-8"
           >
             <ArrowLeft className="h-4 w-4" />
           </Link>
@@ -105,8 +106,7 @@ export default function TrainingEvidencePage() {
               {languageProfile.shortLabel}训练证据库
             </h1>
             <p className="mt-1 break-words text-sm text-muted-foreground [overflow-wrap:anywhere]">
-              当前语言仍为 experimental，不读取或显示正式英语 mastery
-              证据库。
+              当前语言仍为 experimental，不读取或显示正式英语 mastery 证据库。
             </p>
           </div>
         </div>
@@ -145,13 +145,17 @@ export default function TrainingEvidencePage() {
   }
 
   return (
-    <div className="h-full overflow-y-auto scrollbar-thin" data-smoke="evidence-page">
+    <div
+      className="h-full overflow-y-auto scrollbar-thin"
+      data-smoke="evidence-page"
+    >
       <div className="mx-auto max-w-6xl px-6 py-4">
         <div className="mb-5 flex flex-wrap items-start justify-between gap-4">
           <div className="flex min-w-0 items-start gap-3">
             <Link
               href="/drill"
-              className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-muted"
+              aria-label="返回训练首页"
+              className="mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-muted sm:h-8 sm:w-8"
             >
               <ArrowLeft className="h-4 w-4" />
             </Link>
@@ -308,7 +312,13 @@ function SectionTitle({
   );
 }
 
-function EvidenceCardRow({ card, index }: { card: EvidenceCard; index: number }) {
+function EvidenceCardRow({
+  card,
+  index,
+}: {
+  card: EvidenceCard;
+  index: number;
+}) {
   return (
     <Link href={packHref(card.packId, card.levelId)}>
       <motion.div
@@ -347,13 +357,14 @@ function EvidenceCardRow({ card, index }: { card: EvidenceCard; index: number })
               证据
             </p>
             <p className="mt-1 break-words text-sm [overflow-wrap:anywhere]">
-              出现 {card.attempts} 次 · 目标音 {card.targetPhonemes.join(" / ")}
+              出现 {card.attempts} 次 · 目标音{" "}
               {card.scoreGap >= 12
                 ? ` · 整体分高出目标音 ${card.scoreGap} 分`
                 : ""}
             </p>
             <p className="mt-1 break-words text-xs text-muted-foreground [overflow-wrap:anywhere]">
-              首次 {formatDate(card.firstSeenAt)} · 最近 {formatDate(card.lastSeenAt)}
+              首次 {formatDate(card.firstSeenAt)} · 最近{" "}
+              {formatDate(card.lastSeenAt)}
             </p>
           </div>
           <div className="rounded-lg bg-primary/5 p-3">
@@ -388,7 +399,8 @@ function PatternRow({ pattern }: { pattern: PatternEvidence }) {
               {pattern.title}
             </p>
             <p className="mt-1 break-words text-xs text-muted-foreground [overflow-wrap:anywhere]">
-              {pattern.packTitle} · 出现 {pattern.seenCount} 次 · 卡住 {pattern.stuckCount} 次
+              {pattern.packTitle} · 出现 {pattern.seenCount} 次 · 卡住{" "}
+              {pattern.stuckCount} 次
             </p>
           </div>
           <Badge variant={severityVariant(pattern.severity)}>
@@ -407,7 +419,9 @@ function PatternRow({ pattern }: { pattern: PatternEvidence }) {
 }
 
 function RemediationRow({ item }: { item: RemediationEvidence }) {
-  const passRate = Math.round((item.passedCount / Math.max(1, item.attempts)) * 100);
+  const passRate = Math.round(
+    (item.passedCount / Math.max(1, item.attempts)) * 100,
+  );
   return (
     <div
       className="rounded-xl border bg-card p-4 shadow-sm"
@@ -436,7 +450,8 @@ function RemediationRow({ item }: { item: RemediationEvidence }) {
         />
       </div>
       <p className="mt-2 break-words text-xs text-muted-foreground [overflow-wrap:anywhere]">
-        尝试 {item.attempts} 次 · 失败 {item.failedCount} 次 · 最近 {formatDate(item.lastSeenAt)}
+        尝试 {item.attempts} 次 · 失败 {item.failedCount} 次 · 最近{" "}
+        {formatDate(item.lastSeenAt)}
       </p>
     </div>
   );

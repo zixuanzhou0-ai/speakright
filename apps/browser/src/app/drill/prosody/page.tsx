@@ -141,7 +141,8 @@ export default function ProsodyPage() {
       <div className="mb-5 flex items-center gap-3">
         <Link
           href="/drill"
-          className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-muted transition-colors cursor-pointer"
+          aria-label="返回训练首页"
+          className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-muted transition-colors cursor-pointer sm:h-8 sm:w-8"
         >
           <ArrowLeft className="h-4 w-4" />
         </Link>
