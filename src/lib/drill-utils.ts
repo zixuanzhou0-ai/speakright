@@ -10,15 +10,10 @@ import { getWordPool } from "./word-pool";
 
 // ── Threshold by coach mode ──
 
-const THRESHOLDS: Record<CoachMode, number> = {
-  easy: 60,
-  normal: 70,
-  hard: 80,
-  strict: 85,
-};
+export const PROVISIONAL_CONTROLLED_PRACTICE_THRESHOLD = 70;
 
-export function getPassThreshold(mode: CoachMode): number {
-  return THRESHOLDS[mode];
+export function getPassThreshold(_mode: CoachMode): number {
+  return PROVISIONAL_CONTROLLED_PRACTICE_THRESHOLD;
 }
 
 // ── Build drill items from word pool ──

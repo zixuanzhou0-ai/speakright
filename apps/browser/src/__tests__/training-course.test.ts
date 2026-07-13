@@ -263,7 +263,7 @@ describe("training course v2.6 quality gates", () => {
       }),
     });
 
-    expect(analysis.targetScore).toBe(96);
+    expect(analysis.targetScore).toBe(0);
     expect(analysis.usedFallback).toBe(true);
     expect(analysis.passed).toBe(false);
     expect(analysis.nextCue).toContain("没有对齐到目标音素");
@@ -359,9 +359,9 @@ describe("training course v2.6 quality gates", () => {
     expect(createCourseStartPosition(course, "missing-level").levelIndex).toBe(
       0,
     );
-    expect(createCourseStartPosition(course, "#shadowing-transfer").levelIndex).toBe(
-      position.levelIndex,
-    );
+    expect(
+      createCourseStartPosition(course, "#shadowing-transfer").levelIndex,
+    ).toBe(position.levelIndex);
   });
 
   it("keeps remediation steps scoreable with natural English text", () => {

@@ -24,11 +24,11 @@ import {
 } from "@/hooks/use-session-state";
 import { useSyllableStress } from "@/hooks/use-syllable-stress";
 import { useWordPronunciation } from "@/hooks/use-word-pronunciation";
+import { setLanguageConfig } from "@/lib/api-keys";
 import {
   collectDetailAssessmentPhonemes,
   collectDetailAssessmentSyllables,
 } from "@/lib/detail-assessment-breakdown";
-import { setLanguageConfig } from "@/lib/api-keys";
 import {
   getAnyLanguagePhonemeBySlug,
   getLanguagePhonemeBySlug,
@@ -219,7 +219,9 @@ export function PhonemeDetailPage() {
 
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
-    setShowSmokeAssessmentTiles(searchParams.get("smokeAssessmentTiles") === "1");
+    setShowSmokeAssessmentTiles(
+      searchParams.get("smokeAssessmentTiles") === "1",
+    );
     setShowSmokeScoreSummary(searchParams.get("smokeScoreSummary") === "1");
   }, []);
 
@@ -483,7 +485,8 @@ export function PhonemeDetailPage() {
           <p className="text-lg font-semibold">这不是单音标练习</p>
           <p className="mt-2 break-words text-sm leading-6 text-muted-foreground [overflow-wrap:anywhere]">
             该内容属于规则/短语训练，不属于单音标练习。连读、静音、重音、
-            弱化和短语韵律会保留在句子训练、AI 反馈或后续规则训练中，不会作为单个音标播放或晋级。
+            弱化和短语韵律会保留在句子训练、AI
+            反馈或后续规则训练中，不会作为单个音标播放或晋级。
           </p>
           <Link
             href={`/phonemes/${getDefaultPhonemePracticeSlug(
@@ -498,7 +501,6 @@ export function PhonemeDetailPage() {
   }
 
   const isWordActive = wordAudio.isPlaying || wordAudio.isLoading;
-  const breakdownLabel = languageId === "en-US" ? "音标拆解" : "发音拆解";
   const showRuleEvidenceNote =
     languageId !== "en-US" && isRuleLikeSoundUnit(phoneme);
   const scoreSummaryResult =
@@ -506,13 +508,13 @@ export function PhonemeDetailPage() {
 
   return (
     <div
-      className="h-full flex flex-col px-6 py-3 overflow-hidden"
+      className="flex min-h-full flex-col overflow-visible px-4 py-3 sm:px-6 lg:h-full lg:overflow-hidden"
       data-smoke="phoneme-detail-page"
       data-language-id={languageId}
       data-sound-unit={phoneme.slug}
     >
       {/* Two-column layout */}
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_2fr] flex-1 min-h-0">
+      <div className="grid grid-cols-1 gap-5 lg:min-h-0 lg:flex-1 lg:grid-cols-[1fr_2fr]">
         {/* ====== LEFT COLUMN ====== */}
         <div
           className="flex flex-col gap-2 min-h-0 lg:overflow-y-auto scrollbar-thin"
@@ -634,7 +636,11 @@ export function PhonemeDetailPage() {
                   showProsody={false}
                   historyKey={
                     azure.result
-                      ? scoreHistoryKey(languageId, phoneme.slug, currentWordStr)
+                      ? scoreHistoryKey(
+                          languageId,
+                          phoneme.slug,
+                          currentWordStr,
+                        )
                       : undefined
                   }
                 />
@@ -657,7 +663,8 @@ export function PhonemeDetailPage() {
                 expectedText={currentWord?.word}
                 expectedIpa={currentWord?.ipa}
               />
-            ) : smokeAssessmentTilePhonemes.length > 0 ? (
+            ) : languageId === "en-US" &&
+              smokeAssessmentTilePhonemes.length > 0 ? (
               <div data-smoke="assessment-phoneme-tile-fixture">
                 <PhonemeHighlight
                   phonemes={smokeAssessmentTilePhonemes}
@@ -672,7 +679,9 @@ export function PhonemeDetailPage() {
                 data-smoke="assessment-breakdown-placeholder"
               >
                 <p className="text-center text-sm text-muted-foreground">
-                  录音并评分后将在此显示{breakdownLabel}
+                  {languageId === "en-US"
+                    ? "录音并评分后将在此显示音标拆解"
+                    : "Labs 仅显示整体与词级观测，不展示未校准的音素细分"}
                 </p>
               </div>
             )}

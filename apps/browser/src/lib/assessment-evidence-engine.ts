@@ -1,9 +1,4 @@
-import {
-  getAssessmentAliasesForSlug,
-  normalizeAssessmentPhoneme,
-  toIpa,
-} from "@/lib/azure-phoneme-map";
-import { getLanguagePhonemes } from "@/lib/language-phonemes";
+import { normalizeAssessmentPhoneme, toIpa } from "@/lib/azure-phoneme-map";
 import type { AzureAssessmentResult, AzureWord } from "@/types/azure";
 import type {
   DiagnosisEvidence,
@@ -217,9 +212,7 @@ function alignmentFromWords(
   const expectedWordCount = Math.max(wordsIn(referenceText).length, 1);
   const observedWordCount = result.words.length;
   const referenceWords = new Set(
-    wordsIn(referenceText)
-      .map(normalizeWordForMatch)
-      .filter(Boolean),
+    wordsIn(referenceText).map(normalizeWordForMatch).filter(Boolean),
   );
   const scoredWords = result.words.filter(validWordForEvidence);
   const wordLevelEvidenceCount = scoredWords.length;
@@ -284,19 +277,8 @@ function slugFromAssessmentCode(
   code: string,
   languageId: LanguageId,
 ): string | null {
-  if (languageId === "en-US") {
-    return AZURE_TO_SLUG[code.toLowerCase()] ?? null;
-  }
-
-  const normalizedCode = normalizeAssessmentPhoneme(code);
-  const matchingSlugs = getLanguagePhonemes(languageId)
-    .map((phoneme) => phoneme.slug)
-    .filter((slug) =>
-      getAssessmentAliasesForSlug(slug).includes(normalizedCode),
-    );
-
-  if (matchingSlugs.length !== 1) return null;
-  return matchingSlugs[0];
+  if (languageId !== "en-US") return null;
+  return AZURE_TO_SLUG[code.toLowerCase()] ?? null;
 }
 
 function ipaForAssessmentCode(code: string, languageId: LanguageId): string {

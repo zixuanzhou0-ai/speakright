@@ -154,7 +154,7 @@ describe("assessment evidence engine", () => {
     expect(summary.wordLevelEvidenceCount).toBe(6);
   });
 
-  it("uses Unicode tokenization for non-English diagnosis text", () => {
+  it("keeps Unicode alignment while withholding unsupported phoneme detail", () => {
     const analysis = analyzeAssessmentEvidence({
       label: "法语短句",
       referenceText: "Été très bon.",
@@ -173,13 +173,11 @@ describe("assessment evidence engine", () => {
 
     expect(analysis.alignment.expectedWordCount).toBe(3);
     expect(analysis.alignment.observedWordCount).toBe(3);
-    expect(analysis.phonemeEvidence["fr-e"].sampleCount).toBe(2);
-    expect(analysis.phonemeEvidence["fr-e-open"].sampleCount).toBe(1);
-    expect(analysis.phonemeEvidence["fr-on"].sampleCount).toBe(1);
-    expect(analysis.phonemeEvidence.eh).toBeUndefined();
+    expect(analysis.tokens).toEqual([]);
+    expect(analysis.phonemeEvidence).toEqual({});
   });
 
-  it("outputs language-specific slugs for Russian evidence instead of English slugs", () => {
+  it("withholds unsupported Russian phoneme slugs", () => {
     const analysis = analyzeAssessmentEvidence({
       label: "俄语补测",
       referenceText: "ты сыр",
@@ -198,8 +196,7 @@ describe("assessment evidence engine", () => {
       ]),
     });
 
-    expect(analysis.phonemeEvidence["ru-y"].sampleCount).toBe(2);
-    expect(analysis.phonemeEvidence.ih).toBeUndefined();
-    expect(analysis.phonemeEvidence.r).toBeUndefined();
+    expect(analysis.tokens).toEqual([]);
+    expect(analysis.phonemeEvidence).toEqual({});
   });
 });

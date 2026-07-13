@@ -144,4 +144,36 @@ describe("useDrillSession", () => {
     expect(result.current.localSaveError).toContain("本次评分已完成");
     expect(result.current.localSaveError).toContain("本机训练趋势记录未保存");
   });
+  it("does not use an overall score when the target phoneme is missing", async () => {
+    mocks.assess.mockResolvedValueOnce({
+      pronunciationScore: 96,
+      accuracyScore: 95,
+      fluencyScore: 94,
+      completenessScore: 100,
+      words: [
+        {
+          word: "think",
+          accuracyScore: 96,
+          errorType: "None",
+          phonemes: [{ phoneme: "ih", accuracyScore: 96 }],
+          syllables: [],
+        },
+      ],
+    });
+
+    const { result } = renderHook(() => useDrillSession());
+
+    act(() => {
+      result.current.start(drillConfig, [drillItem]);
+    });
+    await act(async () => {
+      await result.current.submitRecording();
+    });
+
+    expect(result.current.phase.type).toBe("error");
+    expect(
+      result.current.phase.type === "error" ? result.current.phase.message : "",
+    ).toContain("\u76ee\u6807\u97f3");
+    expect(mocks.addScore).not.toHaveBeenCalled();
+  });
 });

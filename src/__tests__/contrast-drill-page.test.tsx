@@ -17,7 +17,7 @@ const passingAssessment: AzureAssessmentResult = {
       word: "sheep",
       accuracyScore: 88,
       errorType: "None",
-      phonemes: [],
+      phonemes: [{ phoneme: "iy", accuracyScore: 88 }],
       syllables: [],
     },
   ],

@@ -83,7 +83,9 @@ export function SentenceResultsColumn({
           </section>
         )}
 
-        {selectedWord && selectedWord.phonemes.length > 0 ? (
+        {languageId === "en-US" &&
+        selectedWord &&
+        selectedWord.phonemes.length > 0 ? (
           <section className="mt-4 border-t pt-4">
             <h2 className="mb-3 text-center text-sm font-semibold text-muted-foreground">
               <span className="block">音素详情</span>
