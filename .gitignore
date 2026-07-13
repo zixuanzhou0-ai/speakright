@@ -62,3 +62,8 @@ next-env.d.ts
 
 # phoneme teaching videos (Rachel's English, ~230MB)
 /public/videos/phonemes/
+
+# Playwright local reports and failure artifacts
+/playwright-report/
+/test-results/
+/blob-report/
