@@ -5,7 +5,7 @@ Last verified: 2026-06-19
 This repository is the current SpeakRight Desktop workspace:
 
 ```bat
-E:\SpeakRightDesktopRepo
+<repository-root>
 ```
 
 Do not use the older browser workspace or an `apps\desktop` path when testing
@@ -23,7 +23,7 @@ the same runtime shape as the packaged desktop app and does not depend on
    changing code:
 
 ```bat
-cd /d E:\SpeakRightDesktopRepo
+cd /d <repository-root>
 type README.md
 type docs\operations\RC_EVIDENCE_AUDIT.md
 type docs\operations\NEXT_CHAT_HANDOFF.md
@@ -32,7 +32,7 @@ type docs\operations\NEXT_CHAT_HANDOFF.md
 2. Confirm the repository and current worktree state:
 
 ```bat
-cd /d E:\SpeakRightDesktopRepo
+cd /d <repository-root>
 git status --short --branch
 npm run desktop:preflight
 ```
@@ -51,7 +51,7 @@ the work rather than cleaning it for cosmetic reasons.
 3. Start the already-built Release EXE:
 
 ```bat
-cd /d E:\SpeakRightDesktopRepo
+cd /d <repository-root>
 npm run desktop:launch-release
 ```
 
@@ -149,7 +149,7 @@ and ask for confirmation before generating replacement audio.
 Use dev mode only when actively debugging code changes:
 
 ```bat
-cd /d E:\SpeakRightDesktopRepo
+cd /d <repository-root>
 npm run desktop:dev
 ```
 

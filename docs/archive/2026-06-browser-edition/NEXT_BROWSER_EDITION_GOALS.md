@@ -9,7 +9,7 @@ then gives hard boundaries and acceptance gates.
 - Browser Edition code lives under `apps/browser`; local build isolation scans
   show no Tauri imports, desktop secure-store dependency, or desktop port
   dependency in Browser Edition source.
-- Latest local gate passed from `E:\SpeakRight`:
+- Latest local gate passed from `<repository-root>`:
   `npm run validate:browser`.
   This covered Browser Edition lint, typecheck, 113 Vitest files / 639 tests,
   Next production static build with 197 routes, and static smoke for 9 routes
@@ -45,11 +45,11 @@ then gives hard boundaries and acceptance gates.
   migrated `apps/desktop` folder.
 
 ```text
-/goal 继续 SpeakRight Browser Edition 最后一轮收紧：先读取 E:\SpeakRight\docs\browser-edition\README.md、E:\SpeakRight\docs\browser-edition\ARCHITECTURE_AND_SEPARATION.md、E:\SpeakRight\docs\browser-edition\IMPLEMENTATION_PLAN.md、E:\SpeakRight\docs\browser-edition\VALIDATION_AND_RELEASE.md，以及 E:\SpeakRight\docs\operations\NEXT_BROWSER_EDITION_GOALS.md 本文件。当前目标不是继续打磨 Windows 安装包，而是把最新 Windows Desktop 版本的功能同步到一个清晰独立的 Browser Edition，让 Windows、macOS、Linux 用户都能通过浏览器使用开源版 SpeakRight。
+/goal 继续 SpeakRight Browser Edition 最后一轮收紧：先读取 <repository-root>\docs\browser-edition\README.md、<repository-root>\docs\browser-edition\ARCHITECTURE_AND_SEPARATION.md、<repository-root>\docs\browser-edition\IMPLEMENTATION_PLAN.md、<repository-root>\docs\browser-edition\VALIDATION_AND_RELEASE.md，以及 <repository-root>\docs\operations\NEXT_BROWSER_EDITION_GOALS.md 本文件。当前目标不是继续打磨 Windows 安装包，而是把最新 Windows Desktop 版本的功能同步到一个清晰独立的 Browser Edition，让 Windows、macOS、Linux 用户都能通过浏览器使用开源版 SpeakRight。
 
 第一原则：Windows Desktop 和 Browser Edition 必须完全分开。最终公开仓库必须让用户一眼看懂：Windows Desktop 是桌面安装/Release EXE 路线，Browser Edition 是浏览器运行路线。桌面端只能在自己的文件夹里保留 Tauri、Rust、Windows installer、secure store、Release EXE 门禁等代码；浏览器端必须在自己的文件夹里运行，不能直接 import Tauri，不能依赖桌面端端口、桌面端启动器、桌面端 secure store、桌面端 release scripts，也不能把桌面端专属逻辑藏在一堆模糊 helper 里。优先目标结构是 apps/desktop 对应 Windows Desktop，apps/browser 对应 Browser Edition；旧 apps/web 只能作为临时 scaffold 或 legacy seed。迁移完成时，如果 apps/web 还存在，必须在 README 和 docs 里明确说明它不是生产 Browser Edition；如果已经被 apps/browser 取代，就删除或归档旧入口，并更新所有脚本和链接。
 
-第二原则：功能源以最新版 Windows Desktop 为准。先只读核对 E:\SpeakRightDesktopRepo 当前 main 分支、README、docs/INSTALLATION.md、docs/operations/RC_EVIDENCE_AUDIT.md、package.json scripts、src/app 路由、src/components、src/hooks、src/lib、public/audio、public/videos、docs/assets/screenshots。不要假设 E:\SpeakRight 旧 web 版本已经包含最新功能。旧 web 只能提供早期 Next/React 结构和部分素材线索。最新功能、UI、语言边界、Azure 评分边界、LLM 反馈规则、错误消息、release 文案和截图标准都以 E:\SpeakRightDesktopRepo 为准。读取桌面仓库时只读即可；如果需要写入 E:\SpeakRightDesktopRepo，必须先说明原因并确保不破坏当前稳定桌面版。
+第二原则：功能源以最新版 Windows Desktop 为准。先只读核对 <repository-root> 当前 main 分支、README、docs/INSTALLATION.md、docs/archive/2026-06-desktop-release/RC_EVIDENCE_AUDIT.md、package.json scripts、src/app 路由、src/components、src/hooks、src/lib、public/audio、public/videos、docs/assets/screenshots。不要假设 <repository-root> 旧 web 版本已经包含最新功能。旧 web 只能提供早期 Next/React 结构和部分素材线索。最新功能、UI、语言边界、Azure 评分边界、LLM 反馈规则、错误消息、release 文案和截图标准都以 <repository-root> 为准。读取桌面仓库时只读即可；如果需要写入 <repository-root>，必须先说明原因并确保不破坏当前稳定桌面版。
 
 第三原则：Browser Edition 不是 SaaS。不要引入账号系统、云端数据库、托管评分服务或隐藏后端。第一版目标是开源、本地、浏览器可运行：用户 clone 仓库以后能在本地用 npm 命令跑起来，或者在静态导出后通过 localhost/HTTPS 访问。不要宣传 file:// 直接打开，因为麦克风权限通常需要安全上下文。用户自带 Azure Speech、ElevenLabs、LLM、字典等 provider key。浏览器端设置页必须清楚说明 key 的存储方式：默认 session，仅用户明确选择时才持久化到 localStorage/IndexedDB；绝不把 key 写进文件、URL、截图、日志、GitHub issue、测试 fixture 或 release note。
 
@@ -59,7 +59,7 @@ then gives hard boundaries and acceptance gates.
 
 第六原则：同步当前桌面功能，但保持浏览器边界。Browser Edition 至少要覆盖设置页、音标/发音单位列表、音标/发音单位详情、录音、波形/回放、Azure 分数卡、详细拆解、中文 AI 教练、自由练习、英语诊断、英语进阶训练入口和已稳定子路由、进度/历史的本地存储。英语是稳定基线；西班牙语、法语、俄语是实验模块，开放 sound-unit practice、本地 A/B demo、free practice、Azure locale 评分、语言规则反馈，但不能宣称已经具备英语同等的 formal mastery、完整诊断或证据掌握，除非桌面最新 release 已经有对应验证。多语言本地 audio/video 资源要从桌面版资源策略同步，缺少精确短音频时不要显示误导性 speaker button；规则单位、复合发音、重音/弱化/连读类内容要忠实标注为教学/练习指导。
 
-第七原则：架构要干净。创建或整理 apps/browser，不要把 Browser Edition 直接堆在根目录或旧 apps/web 里继续含混。平台代码放在 apps/browser/src/platform，例如 api-keys、speech-assessment、audio-recording、file-runtime。桌面平台代码留在 apps/desktop 或 E:\SpeakRightDesktopRepo 自己的 app 内。纯数据、类型、语言 profile、Azure 结果解析、score utilities、无平台依赖的 UI primitive 可以进入 packages/shared，但 packages/shared 不能 import Tauri，不能在模块加载时读取 window/localStorage/process secrets，也不能变成第二个大杂烩。宁可在过渡期少量重复，也不要让 Browser 和 Desktop 相互 import。
+第七原则：架构要干净。创建或整理 apps/browser，不要把 Browser Edition 直接堆在根目录或旧 apps/web 里继续含混。平台代码放在 apps/browser/src/platform，例如 api-keys、speech-assessment、audio-recording、file-runtime。桌面平台代码留在 apps/desktop 或 <repository-root> 自己的 app 内。纯数据、类型、语言 profile、Azure 结果解析、score utilities、无平台依赖的 UI primitive 可以进入 packages/shared，但 packages/shared 不能 import Tauri，不能在模块加载时读取 window/localStorage/process secrets，也不能变成第二个大杂烩。宁可在过渡期少量重复，也不要让 Browser 和 Desktop 相互 import。
 
 第八原则：静态/浏览器构建要真实可用。Browser Edition 不应依赖 Next API Routes 完成核心功能；旧的 /api/maintenance-start-desktop 这类桌面维护接口必须删除、隔离或留在非 Browser app。build:browser 应能产出浏览器生产构建；如果可以，支持 static export 到 apps/browser/out。所有核心路由必须在 localhost 或 HTTPS server 下可打开。自动 smoke 要验证不是桌面端 3002 runtime，不需要 Tauri global，设置页、英语详情、西语/法语/俄语详情、自由练习、诊断/训练入口都能打开，录音按钮可见，guarded smoke score summary 可渲染，缺 key 时中文错误清楚，媒体 URL 能加载。
 
@@ -69,7 +69,7 @@ then gives hard boundaries and acceptance gates.
 
 第十一原则：清理垃圾文档和过时入口，但必须先查引用。不要一上来删除。先列出 stale docs、旧截图、旧 static export、旧根目录页面、废弃 svg、过时 plan、重复启动脚本、旧 release 文案。用搜索确认没有 README、docs、scripts、tests 引用后再删除或归档。清理时按小 commit 做：结构/脚本、功能迁移、验证、文档、清理分开提交。不要提交 EXE/MSI/NSIS、node_modules、.next、out 临时产物、.runlogs、.codex logs、私钥、录音、真实 API key、用户路径敏感日志。
 
-第十二原则：验收必须完整。至少运行 Browser Edition 的 lint、typecheck、unit tests、build、browser smoke、static smoke（如支持）。真实 Azure live check 至少覆盖 en-US、es-ES、fr-FR、ru-RU 各一次，可以在本地验证日志中记录，不把 key/录音/账号信息公开。若用户明确要求降低手动录音成本，可以用 ElevenLabs `eleven_flash_v2_5` 生成极短 synthetic audio 并交给 Azure Speech 真实评分；必须记录字符预算、模型、locale、分数，并明确说明这是 synthetic-audio provider validation，不冒充人工麦克风 UX。桌面 parity 声明前，再在 E:\SpeakRightDesktopRepo 跑 validate:desktop 或读取最新通过证据，确认没有把未验证的桌面功能写进 Browser Edition 文案。最后跑 markdown 链接检查或手动验证新增链接，做 staged diff 审查和 secret scan。最终 git status 只能包含有意变更。
+第十二原则：验收必须完整。至少运行 Browser Edition 的 lint、typecheck、unit tests、build、browser smoke、static smoke（如支持）。真实 Azure live check 至少覆盖 en-US、es-ES、fr-FR、ru-RU 各一次，可以在本地验证日志中记录，不把 key/录音/账号信息公开。若用户明确要求降低手动录音成本，可以用 ElevenLabs `eleven_flash_v2_5` 生成极短 synthetic audio 并交给 Azure Speech 真实评分；必须记录字符预算、模型、locale、分数，并明确说明这是 synthetic-audio provider validation，不冒充人工麦克风 UX。桌面 parity 声明前，再在 <repository-root> 跑 validate:desktop 或读取最新通过证据，确认没有把未验证的桌面功能写进 Browser Edition 文案。最后跑 markdown 链接检查或手动验证新增链接，做 staged diff 审查和 secret scan。最终 git status 只能包含有意变更。
 
 最终完成标准：一个新用户打开 GitHub 后，不需要问作者就能明白 SpeakRight 有两个清楚版本：Windows Desktop 和 Browser Edition；他能选择 Browser Edition，按照 README 进入 apps/browser，安装依赖，启动 localhost，配置自己的 Azure key，录一段英语或西语/法语/俄语练习，看到真实 Azure 分数和基于该分数的中文反馈；他也能选择 Windows Desktop，知道哪里是安装包/Release EXE 路线，知道 unsigned artifact 的限制。代码层面没有桌面/浏览器互相 import 的混乱；文档层面没有旧 web、desktop、root legacy 入口互相打架；发布层面有当前截图、API 说明、语言功能表、第三方鸣谢、已知限制和清晰验证记录。完成后提交并推送到 GitHub main，提交信息要清楚说明 Browser Edition sync、validation、docs/release cleanup 的范围。
 ```

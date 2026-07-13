@@ -8,12 +8,12 @@ proves it.
 
 ## Evidence Sources
 
-- Goal text: `C:\Users\Administrator\.codex\attachments\58ee9776-cbf3-4cce-9319-256d19720c4e\pasted-text-1.txt`
+- Goal text: `[personal attachment path removed]`
 - Browser Edition plan: `docs/browser-edition/README.md`
 - Architecture and release checklists: `docs/browser-edition/ARCHITECTURE_AND_SEPARATION.md`, `docs/browser-edition/VALIDATION_AND_RELEASE.md`
 - Local validation log: `docs/browser-edition/VALIDATION_LOG.md`
 - Browser app source: `apps/browser`
-- Desktop source of truth inspected read-only: `E:\SpeakRightDesktopRepo` at `aaa5db2 Fix desktop smoke release channel`
+- Desktop source of truth inspected read-only: `<repository-root>` at `aaa5db2 Fix desktop smoke release channel`
 - Current GitHub merge evidence: PR #1 merged to `origin/main` as `8669834c Merge pull request #1 from zixuanzhou0-ai/codex/browser-edition-release-pr`; follow-up scoring validation pushed as `3e900c3 Validate browser Azure scoring release gate`
 
 ## Requirement Audit

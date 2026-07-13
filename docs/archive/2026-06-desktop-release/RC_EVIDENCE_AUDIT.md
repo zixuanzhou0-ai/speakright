@@ -9,7 +9,7 @@ should not be claimed as complete.
 
 ## Current Boundary
 
-- Current workspace: `E:\SpeakRightDesktopRepo`.
+- Current workspace: `<repository-root>`.
 - Release testing uses the packaged Release EXE, not localhost.
 - English `en-US` is the stable baseline.
 - Spanish `es-ES`, French `fr-FR`, and Russian `ru-RU` remain experimental:
@@ -27,8 +27,8 @@ should not be claimed as complete.
 | Requirement | Evidence source |
 | --- | --- |
 | The public README explains the product, screenshots, language scope, API/provider roles, privacy, limitations, and credits | `README.md`, `THIRD_PARTY_NOTICES.md`, `docs/assets/screenshots/*.png` |
-| Current startup instructions point to the Release EXE and no longer depend on obsolete NEXT_RC handoff files | `docs/operations/DESKTOP_STARTUP_RUNBOOK.md`, `docs/operations/NEXT_CHAT_HANDOFF.md` |
-| Signed-public-download status is honest; unsigned EXE/MSI/NSIS artifacts remain controlled-test only | `README.md`, `docs/INSTALLATION.md`, `docs/operations/DESKTOP_STARTUP_RUNBOOK.md`, `.github/ISSUE_TEMPLATE/installation_startup.md` |
+| Current startup instructions point to the Release EXE and no longer depend on obsolete NEXT_RC handoff files | `docs/archive/2026-06-desktop-release/DESKTOP_STARTUP_RUNBOOK.md`, `docs/operations/NEXT_CHAT_HANDOFF.md` |
+| Signed-public-download status is honest; unsigned EXE/MSI/NSIS artifacts remain controlled-test only | `README.md`, `docs/INSTALLATION.md`, `docs/archive/2026-06-desktop-release/DESKTOP_STARTUP_RUNBOOK.md`, `.github/ISSUE_TEMPLATE/installation_startup.md` |
 | Language configuration maps public languages to Azure locales | `src/lib/language-profiles.ts`, `src/__tests__/azure-scoring-boundary.test.ts` |
 | Phoneme detail, free practice, drill, and assessment flows pass `languageProfile.azureLocale` to Azure instead of hard-coding `en-US` | `src/app/phonemes/[phoneme]/phoneme-detail-page.tsx`, `src/app/sentences/page.tsx`, `src/app/assessment/page.tsx`, `src/app/assessment/passage/page.tsx`, `src/app/drill/**`, `src/hooks/use-drill-session.ts`, `src/__tests__/azure-scoring-boundary.test.ts` |
 | LLM feedback is downstream of Azure result JSON and cannot fabricate numeric scores | `src/lib/llm-prompt.ts`, `src/hooks/use-llm-feedback.ts`, `src/__tests__/azure-scoring-boundary.test.ts`, `src/__tests__/llm-prompt.test.ts` |
@@ -40,7 +40,7 @@ should not be claimed as complete.
 
 ## Required RC Commands
 
-Run from `E:\SpeakRightDesktopRepo`:
+Run from `<repository-root>`:
 
 ```bat
 npm.cmd run test

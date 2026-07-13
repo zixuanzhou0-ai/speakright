@@ -5,7 +5,7 @@
 Do not treat GitHub Releases as a public signed download page yet. If you are a
 maintainer or tester in the controlled-test track, use the installer filename
 named by the current release notes and verify it against
-`docs/operations/RC_EVIDENCE_AUDIT.md`.
+`docs/archive/2026-06-desktop-release/RC_EVIDENCE_AUDIT.md`.
 
 The filenames below are not a general download recommendation. A controlled-test
 artifact is valid only when the current release notes name it and the evidence
@@ -17,7 +17,7 @@ If you are evaluating the public source repository without joining that
 controlled-test track, prefer **Build From Source** below or wait for a signed
 public Windows release.
 Published GitHub Release assets can lag behind the current `main` branch; check
-the release notes and `docs/operations/RC_EVIDENCE_AUDIT.md` before treating an
+the release notes and `docs/archive/2026-06-desktop-release/RC_EVIDENCE_AUDIT.md` before treating an
 installer as the latest validated RC.
 
 Controlled-test setup filename currently referenced by the release notes:
@@ -49,7 +49,7 @@ Use this path when you are testing a source checkout instead of a downloaded
 installer. Run it from the current desktop repository only:
 
 ```bat
-cd /d E:\SpeakRightDesktopRepo
+cd /d <repository-root>
 npm ci
 npm run desktop:build
 npm run desktop:preflight
@@ -59,7 +59,7 @@ npm run desktop:launch-release
 The Release EXE should open from:
 
 ```text
-E:\SpeakRightDesktopRepo\src-tauri\target\release\speakright.exe
+<repository-root>\src-tauri\target\release\speakright.exe
 ```
 
 Do not use a browser `localhost` tab as release acceptance. `npm run
@@ -170,14 +170,14 @@ coverage.
 ## Current Internal-Test Status
 
 Current controlled-test track: Release Candidate evidence audit, documented in
-`docs/operations/RC_EVIDENCE_AUDIT.md`. Use that audit for the latest command
+`docs/archive/2026-06-desktop-release/RC_EVIDENCE_AUDIT.md`. Use that audit for the latest command
 results, Release EXE smoke coverage, and known blockers before treating a
 downloaded installer as the latest validated RC.
 
 - Recommended launch path: `npm run desktop:launch-release`.
 - Build shape: Tauri static bundle, not `localhost`.
 - Bundled audio/video and multilingual parity counts are validated in
-  `docs/operations/RC_EVIDENCE_AUDIT.md`; keep that audit as the source of truth
+  `docs/archive/2026-06-desktop-release/RC_EVIDENCE_AUDIT.md`; keep that audit as the source of truth
   instead of copying exact asset totals into the installation guide.
 - Multilingual audio parity remains a zero-generation audit for current local
   coverage across Spanish, French, and Russian.
@@ -201,7 +201,7 @@ downloaded installer as the latest validated RC.
   read-along playback keeps that boost on replay; online fallback audio is
   unchanged and routine validation still does not generate ElevenLabs audio.
 - Latest settled-main validation results are centralized in
-  `docs/operations/RC_EVIDENCE_AUDIT.md`. The current RC gate covers full tests,
+  `docs/archive/2026-06-desktop-release/RC_EVIDENCE_AUDIT.md`. The current RC gate covers full tests,
   typecheck, lint, static desktop frontend build, Release EXE preflight,
   Release EXE UI smoke, and Release EXE launch from the static Tauri bundle.
 - Non-English diagnosis keeps scoring experimental: omission/insertion evidence
@@ -224,7 +224,7 @@ For the next Codex chat, first read:
 
 ```text
 docs/operations/NEXT_CHAT_HANDOFF.md
-docs/operations/DESKTOP_STARTUP_RUNBOOK.md
+docs/archive/2026-06-desktop-release/DESKTOP_STARTUP_RUNBOOK.md
 ```
 
 That handoff records current RC notes, validation commands, and any local
@@ -237,7 +237,7 @@ tree SHA before treating the content as unpushed.
 Recommended developer launch order for release-style testing:
 
 ```bat
-cd /d E:\SpeakRightDesktopRepo
+cd /d <repository-root>
 npm run desktop:preflight
 npm run desktop:launch-release
 ```
@@ -257,8 +257,8 @@ run `npm run desktop:build` first.
 ## Troubleshooting
 
 For developer startup issues, especially `localhost refused`, first check
-`docs/operations/DESKTOP_STARTUP_RUNBOOK.md` and confirm you are using
-`E:\SpeakRightDesktopRepo`. For release-style testing, use
+`docs/archive/2026-06-desktop-release/DESKTOP_STARTUP_RUNBOOK.md` and confirm you are using
+`<repository-root>`. For release-style testing, use
 `npm run desktop:launch-release` or `npm run desktop:run-release`; do not treat a
 browser `localhost` tab as the desktop app.
 

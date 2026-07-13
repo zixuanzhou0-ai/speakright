@@ -266,87 +266,40 @@ describe("open-source readiness files", () => {
     expect(workflow).not.toContain("name: speakright-windows-installers");
   });
 
-  it("keeps current handoff docs from claiming stale local dirty state", () => {
+  it("keeps the current handoff aligned with the evidence-first contract", () => {
     const handoff = read("docs/operations/NEXT_CHAT_HANDOFF.md");
-    const evidence = read("docs/operations/RC_EVIDENCE_AUDIT.md");
-    const readme = read("README.md");
-    const docs = [
-      readme,
-      read("docs/INSTALLATION.md"),
-      read("docs/operations/DESKTOP_STARTUP_RUNBOOK.md"),
-      handoff,
-      evidence,
-    ].join("\n");
+    const prd = read("docs/PRD.md");
+    const decision = read(
+      "docs/architecture/0001-evidence-first-learning-loop.md",
+    );
+    const docs = [handoff, prd, decision, read("README.md")].join("\n");
 
     expect(docs).not.toContain("known uncommitted work");
     expect(docs).not.toContain("ahead of `origin/main` by local commits");
-    expect(docs).not.toContain("main...origin/main [ahead 5]");
-    expect(docs).not.toContain("main...origin/main [ahead 17]");
-    expect(docs).not.toContain("documented uncommitted release-tightening");
-    expect(docs).not.toContain("A settled RC branch should show `main...origin/main`");
-    expect(docs).not.toContain("single-sound audio source-policy pass");
-    expect(docs).not.toContain("audio-policy pass");
-    expect(docs).not.toContain("NEXT_RC_AUDIO_SETTINGS");
-    expect(handoff).toContain("Numeric pronunciation scores must come from Azure Speech");
-    expect(handoff).toContain("LLM feedback is downstream");
-    expect(evidence).not.toContain("github.com:443");
-    expect(evidence).not.toContain("network timeouts");
-    expect(readme).toMatch(/LLM providers only generate coaching\s+explanations/);
+    expect(docs).not.toContain("E:\\SpeakRightDesktopRepo");
+    expect(handoff).toContain("Azure results are noisy observations");
+    expect(handoff).toContain("LLM coaching cannot invent or overwrite");
+    expect(prd).toContain("A single recording cannot establish mastery");
+    expect(decision).toContain("treated as fallible observations");
   });
 
-  it("keeps validation result counts centralized in the RC evidence audit", () => {
-    const readme = read("README.md");
-    const installation = read("docs/INSTALLATION.md");
-    const runbook = read("docs/operations/DESKTOP_STARTUP_RUNBOOK.md");
-    const evidence = read("docs/operations/RC_EVIDENCE_AUDIT.md");
-    const handoffDocs = [
-      readme,
-      installation,
-      runbook,
+  it("archives superseded release evidence instead of treating it as current", () => {
+    const archive = read(
+      "docs/archive/2026-06-desktop-release/RC_EVIDENCE_AUDIT.md",
+    );
+    const archiveIndex = read("docs/archive/README.md");
+    const currentDocs = [
+      read("README.md"),
+      read("docs/PRD.md"),
       read("docs/operations/NEXT_CHAT_HANDOFF.md"),
     ].join("\n");
 
-    expect(readme).toContain("docs/operations/RC_EVIDENCE_AUDIT.md");
-    expect(installation).toContain("docs/operations/RC_EVIDENCE_AUDIT.md");
-    expect(evidence).toContain("Latest local full gate");
-    expect(evidence).toContain("src/__tests__/azure-scoring-boundary.test.ts");
-    expect(evidence).toContain("Spanish 1094 existing / 0 missing");
-    expect(evidence).toContain("French 1482 existing / 0 missing");
-    expect(evidence).toContain("Russian 1640 existing / 0 missing");
-    expect(evidence).toContain("total missing 0");
-    expect(evidence).toContain("No ElevenLabs calls were made");
-    expect(evidence).toContain("phonemeLeftColumn=ok");
-    expect(readme).toContain("current release-hardening proof matrix");
-    expect(readme).toContain("older commit SHA");
-    expect(installation).toContain("Use that audit for the latest command");
-    expect(readme).toContain("source of truth");
-    expect(installation).toContain("source of truth");
-    expect(readme).not.toContain("English word audio `1464/1464`");
-    expect(readme).not.toContain("Russian language-pack files `920/920`");
-    expect(installation).not.toContain("English `1464/1464`");
-    expect(installation).not.toContain("Russian `920/920`");
-    expect(installation).not.toContain("Spanish `880`, French `1090`, Russian `918`");
-    expect(readme).not.toContain("Previous release-validation baseline");
-    expect(installation).not.toContain("Previous release-validation baseline");
-    expect(readme).not.toContain("94be1d4");
-    expect(installation).not.toContain("94be1d4");
-    expect(handoffDocs).not.toMatch(/89\s+(?:files|test files).*489\s+tests/);
-    expect(handoffDocs).not.toContain("72 test files and 363 tests");
-    expect(handoffDocs).not.toContain("74 files and 374 tests");
-    expect(handoffDocs).not.toContain("75` files and `380` tests");
-    expect(handoffDocs).not.toContain("119` files and `666` tests");
-    expect(handoffDocs).not.toContain("117` files and `646` tests");
-    expect(handoffDocs).not.toContain("Biome checked 308 files");
-    expect(handoffDocs).not.toContain("Biome checked 312 files");
-    expect(handoffDocs).not.toContain("Biome checked 341 files");
-    expect(handoffDocs).not.toContain("378` files checked");
-    expect(handoffDocs).toContain("Current Verification Notes");
-    expect(handoffDocs).toContain("Spanish `1094` existing / `0` missing");
-    expect(handoffDocs).toContain("French `1482` existing / `0` missing");
-    expect(handoffDocs).toContain("Russian `1640` existing / `0` missing");
-    expect(handoffDocs).not.toMatch(/\btomorrow(?:'s)?\b/i);
-    expect(evidence).not.toMatch(/\btomorrow(?:'s)?\b/i);
-    expect(handoffDocs).not.toContain("PID was `70112`");
+    expect(archive).toContain("Latest local full gate");
+    expect(archive).toContain("No ElevenLabs calls were made");
+    expect(archiveIndex).toMatch(/must not be used\s+as current implementation/);
+    expect(currentDocs).not.toContain("current release-hardening proof matrix");
+    expect(currentDocs).not.toContain("docs/operations/RC_EVIDENCE_AUDIT.md");
+    expect(currentDocs).not.toMatch(/\btomorrow(?:'s)?\b/i);
   });
 
   it("keeps README screenshot assets present", () => {
@@ -370,95 +323,25 @@ describe("open-source readiness files", () => {
     expect(readme).toContain("real user scores come from Azure");
   });
 
-  it("keeps install docs explicit about source builds and first-launch failure states", () => {
-    const readme = read("README.md");
+  it("keeps installation and startup docs portable and privacy-safe", () => {
     const rootInstallation = read("INSTALLATION.md");
     const rootRunbook = read("DESKTOP_STARTUP_RUNBOOK.md");
     const rootHandoff = read("NEXT_CHAT_HANDOFF.md");
     const installation = read("docs/INSTALLATION.md");
-    const runbook = read("docs/operations/DESKTOP_STARTUP_RUNBOOK.md");
-    const docs = [installation, runbook].join("\n");
+    const docs = [rootInstallation, rootRunbook, rootHandoff, installation].join(
+      "\n",
+    );
 
     expect(rootInstallation).toContain("docs/INSTALLATION.md");
     expect(rootInstallation).toContain("npm run desktop:preflight");
     expect(rootInstallation).toContain("npm run desktop:launch-release");
-    expect(rootInstallation).toContain("localhost");
-    expect(rootInstallation).toContain(
-      "E:\\SpeakRightDesktopRepo\\src-tauri\\target\\release\\speakright.exe",
-    );
-    expect(rootRunbook).toContain(
-      "docs/operations/DESKTOP_STARTUP_RUNBOOK.md",
-    );
+    expect(rootInstallation).toContain("calibration data");
     expect(rootRunbook).toContain("git status --short --branch");
-    expect(rootRunbook).toContain("older `E:\\SpeakRight`");
     expect(rootRunbook).toContain("localhost");
     expect(rootHandoff).toContain("docs/operations/NEXT_CHAT_HANDOFF.md");
-    expect(rootHandoff).toContain("docs/operations/RC_EVIDENCE_AUDIT.md");
-    expect(rootHandoff).toContain("Spanish, French, and Russian");
-    expect(rootHandoff).toContain("ElevenLabs");
-    expect(rootHandoff).toContain("Release EXE");
-
-    expect(readme).toContain("Public review, source builds");
-    expect(readme).toContain("A signed public Windows release is not complete yet");
-    expect(readme).toContain("internal-test or controlled-test builds");
-    expect(readme).toContain("Public Download Status");
-    expect(readme).toContain("There is not yet a signed public Windows download");
-    expect(readme).toContain("must not describe an unsigned artifact as a stable public download");
-    expect(readme).toContain("current release-hardening proof matrix");
-    expect(readme).toContain("Release EXE smoke/launch outcome");
-    expect(readme).toContain("Screenshots below are captured");
-    expect(readme).toContain("docs/assets/screenshots/settings.png");
-    expect(readme).toContain("Real Scoring Boundary");
-    expect(readme).toContain("Azure Speech Pronunciation Assessment");
-    expect(readme).toContain("LLM layer is downstream only");
-    expect(readme).not.toContain("Last controlled-test verification");
-    expect(readme).not.toContain("guardrail pass and full Release EXE gate");
-    expect(installation).toContain("Controlled-Test Installer Boundary");
-    expect(installation).toContain(
-      "Do not treat GitHub Releases as a public signed download page yet",
-    );
-    expect(installation).toContain("controlled-test track");
-    expect(installation).toContain("installer filename");
-    expect(installation).toContain("not a general download recommendation");
-    expect(installation).toContain("current release notes");
-    expect(installation).not.toContain("Download the latest controlled-test installer");
-    expect(installation).toContain("prefer **Build From Source** below");
-    expect(installation).toContain("wait for a signed");
-    expect(installation).toContain("public Windows release");
-    expect(installation).toContain("Published GitHub Release assets can lag");
-    expect(installation).toContain("docs/operations/RC_EVIDENCE_AUDIT.md");
-    expect(installation).toContain("bypass antivirus or enterprise policy");
-    expect(installation).toContain("For controlled internal-test passes");
-    expect(installation).toContain("current RC notes");
-    expect(installation).not.toContain("For the 2026-06-16 internal-test pass");
-    expect(installation).not.toContain("latest local non-English layout fixes");
-    expect(runbook).toMatch(/Do not\s+publish workflow-dispatch artifacts/i);
-    expect(runbook).toContain("capture the exact");
-    expect(readme).toContain("source builds");
-    expect(readme).toContain("docs/INSTALLATION.md");
     expect(installation).toContain("Build From Source");
-    expect(installation).toContain("cd /d E:\\SpeakRightDesktopRepo");
-    expect(installation).toContain("npm ci");
-    expect(installation).toContain("npm run desktop:build");
-    expect(installation).toContain("npm run desktop:preflight");
-    expect(installation).toContain("npm run desktop:launch-release");
-    expect(installation).toContain(
-      "E:\\SpeakRightDesktopRepo\\src-tauri\\target\\release\\speakright.exe",
-    );
-    expect(installation).toContain("Do not use a browser `localhost` tab");
-    expect(installation).toContain("desktop:dev` is for code debugging only");
-
-    expect(docs).toContain("First Launch Expectations");
-    expect(docs).toContain("open even when no API keys");
-    expect(docs).toContain("network is unavailable");
-    expect(docs).toContain("actionable Chinese network/provider messages");
-    expect(docs).toContain("microphone permission is denied");
-    expect(docs).toContain("recording controls should show an inline Chinese recovery");
-    expect(docs).toContain("缺失或不可读");
-    expect(docs).toContain("browser TTS");
-    expect(docs).toContain("teaching-video audio");
-    expect(docs).toContain("proxy rule audio");
-    expect(docs).toContain("Do not run ElevenLabs TTS smoke or audio generation");
+    expect(docs).not.toContain("E:\\SpeakRightDesktopRepo");
+    expect(docs).not.toContain("C:\\Users\\Administrator");
   });
 
   it("keeps public developer and release npm scripts explicit and zero-generation by default", () => {

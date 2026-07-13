@@ -4,7 +4,7 @@ Date: 2026-06-23
 
 ## Passed Locally
 
-From `E:\SpeakRight`:
+From `<repository-root>`:
 
 ```text
 npm run validate:browser
@@ -70,7 +70,7 @@ proof map and the remaining release blockers.
 Release tightening checks were run without clearing Browser Edition
 `localStorage` or `sessionStorage`.
 
-Commands from `E:\SpeakRight\apps\browser`:
+Commands from `<repository-root>\apps\browser`:
 
 ```text
 npm.cmd run test -- --run src/__tests__/browser-api-keys-storage.test.ts src/__tests__/settings-api-key-save.test.tsx src/__tests__/use-recorder.test.tsx
@@ -97,7 +97,7 @@ Observed results:
 
 ## 2026-06-23 Follow-Up SDK And Release Gate Rerun
 
-Commands from `E:\SpeakRight`:
+Commands from `<repository-root>`:
 
 ```text
 npm.cmd run validate:browser
@@ -126,7 +126,7 @@ Observed results:
 
 ## 2026-06-23 Root Lint And Generated Output Exclusion
 
-Commands from `E:\SpeakRight`:
+Commands from `<repository-root>`:
 
 ```text
 npm.cmd run lint
@@ -141,7 +141,7 @@ Observed results:
 
 ## 2026-06-23 Goal Continuation Gate Rerun
 
-Commands from `E:\SpeakRight`:
+Commands from `<repository-root>`:
 
 ```text
 node --check scripts/browser-azure-live-log.mjs
@@ -234,7 +234,7 @@ microphone UX pass.
 ## 2026-06-23 Final Synthetic Gate And Browser Validation
 
 After the low-cost synthetic Azure pass and REST parser fallback, final local
-Browser gates were rerun from `E:\SpeakRight`:
+Browser gates were rerun from `<repository-root>`:
 
 ```text
 npm.cmd --prefix apps/browser run test -- --run src/__tests__/azure-speech.test.ts src/__tests__/azure-scoring-boundary.test.ts src/__tests__/api-client-azure.test.ts

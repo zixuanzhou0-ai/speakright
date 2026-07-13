@@ -1,25 +1,21 @@
 # Installation
 
-The canonical installation guide lives at:
+The canonical guide is `docs/INSTALLATION.md`.
 
-```text
-docs/INSTALLATION.md
-```
-
-Use that guide for controlled-test downloads, source builds, first-launch
-expectations, API key privacy, and unsigned Windows artifact warnings.
-
-Release-style acceptance must launch the desktop Release EXE, not a browser
-`localhost` tab:
+From the repository root, install the locked dependencies and validate the
+frontend before producing a desktop artifact:
 
 ```bat
-cd /d E:\SpeakRightDesktopRepo
+npm ci
+npm run lint
+npm run typecheck
+npm run test
+npm run desktop:build
 npm run desktop:preflight
 npm run desktop:launch-release
 ```
 
-The expected Release EXE path is:
-
-```text
-E:\SpeakRightDesktopRepo\src-tauri\target\release\speakright.exe
-```
+Release-style desktop acceptance uses the built Release EXE. Browser and mobile
+width acceptance uses the Browser Edition static smoke and E2E gates. Do not
+commit API keys, recordings, calibration data, or local user paths. Unsigned
+Windows artifacts remain controlled-test builds, not stable public downloads.

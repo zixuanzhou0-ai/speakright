@@ -10,7 +10,7 @@ All project participation follows `CODE_OF_CONDUCT.md`.
 Use the current desktop repository:
 
 ```bat
-cd /d E:\SpeakRightDesktopRepo
+cd /d <repository-root>
 ```
 
 Do not use the older browser workspace for desktop release work.

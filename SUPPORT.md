@@ -10,7 +10,7 @@ and pronunciation evidence do not end up in the wrong place.
   at `localhost` is not the release app.
 - Check `docs/INSTALLATION.md` for Windows installation and unsigned-artifact
   warnings.
-- Check `docs/operations/DESKTOP_STARTUP_RUNBOOK.md` when the desktop window
+- Check `docs/archive/2026-06-desktop-release/DESKTOP_STARTUP_RUNBOOK.md` when the desktop window
   does not open or an existing `speakright.exe` process blocks a build.
 - Check `docs/operations/IPA_DISPLAY_AUDIT_STRATEGY.md` before proposing
   Spanish, French, or Russian IPA changes.

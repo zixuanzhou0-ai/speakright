@@ -14,7 +14,7 @@ The Browser Edition is not a SaaS product. Users run it locally from source or a
 Browser Edition development:
 
 ```bat
-cd /d E:\SpeakRight
+cd /d <repository-root>
 npm --prefix apps/browser install
 npm run dev:browser
 ```
@@ -28,7 +28,7 @@ http://localhost:3000
 Static Browser Edition:
 
 ```bat
-cd /d E:\SpeakRight
+cd /d <repository-root>
 npm run build:browser
 npm run serve:browser
 ```
@@ -36,7 +36,7 @@ npm run serve:browser
 Windows Desktop development:
 
 ```bat
-cd /d E:\SpeakRight
+cd /d <repository-root>
 npm run desktop:dev
 ```
 
@@ -82,7 +82,7 @@ Browser docs start at [`docs/browser-edition/README.md`](docs/browser-edition/RE
 ## Browser Validation
 
 ```bat
-cd /d E:\SpeakRight
+cd /d <repository-root>
 npm run lint:browser
 npm run typecheck:browser
 npm run test:browser
@@ -93,7 +93,7 @@ npm run browser:smoke:static
 Route-level smoke against an already running server is also available:
 
 ```bat
-cd /d E:\SpeakRight
+cd /d <repository-root>
 npm run browser:smoke
 ```
 
@@ -169,7 +169,7 @@ The selected language profile maps directly to Azure locales:
 - `fr-FR` -> `fr-FR`
 - `ru-RU` -> `ru-RU`
 
-The LLM layer is downstream only. LLM providers only generate coaching explanations from Azure evidence; they can explain the Azure result in Chinese, suggest practice, and apply language-specific feedback rules, but they must not overwrite or fabricate the score numbers. The current release-hardening proof matrix and latest scoring-boundary tests live in `docs/operations/RC_EVIDENCE_AUDIT.md`, which is the source of truth for command results and Release EXE smoke/launch outcome. Do not treat an older commit SHA, download timestamp, or copied summary as the latest validated RC state without checking that audit.
+The LLM layer is downstream only. It explains structured evidence and suggests one verification action, but it must not overwrite numeric observations or turn a single recording into a mastery or substitution claim. The current product contract lives in `docs/PRD.md`; the evidence architecture is recorded in `docs/architecture/0001-evidence-first-learning-loop.md`. The archived 2026-06 release audit is historical evidence, not the current source of truth.
 
 ## APIs And Providers
 
@@ -185,7 +185,7 @@ For Windows installer use, source builds, and first-launch expectations, see `do
 Source build:
 
 ```bat
-cd /d E:\SpeakRight
+cd /d <repository-root>
 npm ci
 npm run desktop:build
 npm run desktop:preflight
@@ -195,7 +195,7 @@ npm run desktop:launch-release
 Manual QA should start from the Release EXE:
 
 ```bat
-cd /d E:\SpeakRight
+cd /d <repository-root>
 npm run desktop:preflight
 npm run desktop:launch-release
 ```
@@ -203,15 +203,15 @@ npm run desktop:launch-release
 Developer mode is for debugging only:
 
 ```bat
-cd /d E:\SpeakRight
+cd /d <repository-root>
 npm run desktop:dev
 ```
 
-For the daily desktop startup checklist, see `docs/operations/DESKTOP_STARTUP_RUNBOOK.md`. For the current Release Candidate evidence matrix, see `docs/operations/RC_EVIDENCE_AUDIT.md`.
+For current development state, rollback information, and release work, see `docs/operations/NEXT_CHAT_HANDOFF.md`. Historical desktop startup and Release Candidate records are retained under `docs/archive/2026-06-desktop-release/`.
 
 ## Desktop Validation
 
-Run from `E:\SpeakRight`:
+Run from `<repository-root>`:
 
 ```bat
 npm run test
@@ -233,7 +233,7 @@ npm run phonology:audio-policy:check
 
 `desktop:ui-smoke` launches the Release EXE, checks Settings, English full-flow routes, Spanish/French/Russian core routes, non-English boundary routes, left-column phoneme scoring layout, and confirms the runtime is not served from `localhost`.
 
-`audio:parity:dry-run` checks Spanish, French, and Russian local language-pack coverage and makes zero ElevenLabs calls. Keep exact counts centralized in `docs/operations/RC_EVIDENCE_AUDIT.md` instead of copying them into public overview text.
+`audio:parity:dry-run` checks Spanish, French, and Russian local language-pack coverage and makes zero ElevenLabs calls. Record new counts in the active validation report; the archived 2026-06 audit remains immutable historical evidence.
 
 ## Repository And Privacy
 

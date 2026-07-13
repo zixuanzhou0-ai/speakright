@@ -5,7 +5,7 @@
 Use `apps/browser`.
 
 ```bat
-cd /d E:\SpeakRight
+cd /d <repository-root>
 npm --prefix apps/browser install
 npm run dev:browser
 ```

@@ -6,7 +6,7 @@ real Browser Edition that matches the latest Windows Desktop product boundary.
 ## Phase 0: Freeze Baselines
 
 1. Record the latest desktop source branch, commit SHA, and status from
-   `E:\SpeakRightDesktopRepo`.
+   `<repository-root>`.
 2. Record this repository status before edits. Do not revert unrelated dirty
    files.
 3. Read:

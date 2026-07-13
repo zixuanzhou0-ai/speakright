@@ -38,6 +38,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+
+# consented, de-identified calibration recordings and reviewer data
+/calibration-data/
 # typescript
 *.tsbuildinfo
 next-env.d.ts

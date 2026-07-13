@@ -82,16 +82,16 @@ describe("desktop artifact smoke wiring", () => {
 
   it("documents release exe startup as the manual QA path", () => {
     const runbook = readFileSync(
-      join(projectRoot, "docs/operations/DESKTOP_STARTUP_RUNBOOK.md"),
+      join(projectRoot, "DESKTOP_STARTUP_RUNBOOK.md"),
       "utf8",
     );
 
     expect(runbook).toContain("npm run desktop:launch-release");
-    expect(runbook).toContain("npm run desktop:run-release");
-    expect(runbook).toContain("Dev Mode Is Debug-Only");
-    expect(runbook).toContain("compiling...");
-    expect(runbook).toContain("validate:internal-release");
-    expect(runbook).toContain("validate:public-release");
+    expect(runbook).toContain("npm run desktop:preflight");
+    expect(runbook).toContain("desktop:dev");
+    expect(runbook).toContain("only for debugging");
+    expect(runbook).toContain("must not");
+    expect(runbook).toContain("localhost");
   });
 
   it("runs artifact smoke after desktop build and before launching the release exe", () => {

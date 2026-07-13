@@ -29,7 +29,7 @@
 
 Windows Desktop remains a separate Tauri app in the repository root / `src` /
 `src-tauri` in this public repo, with the latest settled desktop source also
-tracked in `E:\SpeakRightDesktopRepo`. Windows installer/Release EXE
+tracked in `<repository-root>`. Windows installer/Release EXE
 validation, unsigned artifact warnings, and Tauri permissions belong to the
 desktop release flow.
 
@@ -51,7 +51,7 @@ npm run docs:check-links
 npm run browser:azure-live-log
 ```
 
-See [Validation Log](VALIDATION_LOG.md) for the current local run evidence.
+See [Validation Log](../archive/2026-06-browser-edition/VALIDATION_LOG.md) for the current local run evidence.
 
 Real Azure scoring evidence is recorded in the private ignored validation log:
 `en-US` from the current Browser Edition page, plus `es-ES`, `fr-FR`, and

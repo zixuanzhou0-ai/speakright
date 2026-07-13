@@ -20,20 +20,20 @@ future maintainer explicitly chooses that as a separate product.
 The feature source is the latest settled Windows Desktop app:
 
 ```text
-E:\SpeakRightDesktopRepo
+<repository-root>
 ```
 
 The browser implementation target is this repository, under a clearly separated
 browser app folder:
 
 ```text
-E:\SpeakRight\apps\browser
+<repository-root>\apps\browser
 ```
 
 The existing old web app can be used as a seed:
 
 ```text
-E:\SpeakRight\apps\web
+<repository-root>\apps\web
 ```
 
 Do not treat the old web app as feature-complete. It is a scaffold and asset
@@ -92,21 +92,21 @@ closely as browser constraints allow.
 | Settings | Browser-safe key storage with clear BYOK warnings and no committed credentials. |
 | Media | Bundled/local public assets where legally allowed; missing media must show honest fallback UI. |
 
-## Planned Documents
+## Current and Historical Documents
 
 - [Architecture And Separation](ARCHITECTURE_AND_SEPARATION.md): folder rules,
   allowed imports, platform adapters, storage, provider boundaries.
-- [Implementation Plan](IMPLEMENTATION_PLAN.md): staged migration plan from old
+- [Implementation Plan](../archive/2026-06-browser-edition/IMPLEMENTATION_PLAN.md): staged migration plan from old
   web scaffold to current Browser Edition.
 - [Validation And Release](VALIDATION_AND_RELEASE.md): commands, smoke tests,
   screenshots, GitHub README/release expectations.
-- [Completion Audit](COMPLETION_AUDIT.md): current proof map and remaining
+- [Completion Audit](../archive/2026-06-browser-edition/COMPLETION_AUDIT.md): current proof map and remaining
   blockers for final release.
 - [Release Notes](RELEASE_NOTES.md): Browser Edition release scope,
   validation status, and known limitations.
 - [Third-Party Notices](THIRD_PARTY_NOTICES.md): API providers, bundled asset
   boundaries, and reference-source credits.
-- [Next Browser Edition Goals](../operations/NEXT_BROWSER_EDITION_GOALS.md):
+- [Next Browser Edition Goals](../archive/2026-06-browser-edition/NEXT_BROWSER_EDITION_GOALS.md):
   long-running `/goal` prompt for Codex execution.
 
 ## Recommended Execution Order
