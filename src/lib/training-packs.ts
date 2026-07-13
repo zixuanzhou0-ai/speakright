@@ -54,10 +54,10 @@ export const TRAINING_PACKS: TrainingPack[] = [
   {
     id: "ee-ih",
     title: "区分 sheep / ship",
-    focus: "/iː/ 要拉长绷紧，/ɪ/ 要短促放松",
+    focus: "/iː/ 与 /ɪ/ 主要靠音质和舌位区分，时长只是辅助线索",
     targetPhonemes: ["ee", "ih"],
     contrastPhonemes: ["ee", "ih"],
-    l1Problem: "中文里没有 /ɪ/，很多学习者会把 ship 读得像 sheep。",
+    l1Problem: "普通话通常没有与英语 /ɪ/ 完全对应的独立音位，部分学习者可能把 ship 和 sheep 说得过于接近。",
     mouthCue:
       "/iː/ 嘴角向两边拉、舌位高且紧；/ɪ/ 嘴巴微张、舌头放松，声音立刻收住。",
     perceptionItems: [
@@ -131,7 +131,7 @@ export const TRAINING_PACKS: TrainingPack[] = [
         "The sheep is on the ship.",
         "",
         "ee",
-        "交替拉长 sheep，缩短 ship。",
+        "先稳定区分两个元音的舌位和音质，再比较自然语境中的时长。",
       ),
       item("Please sit in this seat.", "", "ih", "seat 拉长，sit 和 this 放短。"),
       item("I will leave it in the kitchen.", "", "ih", "leave 长，it/in 短。"),
@@ -427,7 +427,7 @@ export const TRAINING_PACKS: TrainingPack[] = [
       item("very", "/ˈveri/", "v", "上齿轻碰下唇，声音持续摩擦。"),
       item("water", "/ˈwɔːtər/", "w", "双唇收圆后快速打开。"),
       item("voice", "/vɔɪs/", "v", "/v/ 有声带震动，不是 /f/。"),
-      item("world", "/wɝːld/", "w", "/w/ 后接卷舌元音，再读 dark L。"),
+      item("world", "/wɝːld/", "w", "/w/ 后接 r 化元音，再读 dark L。"),
     ],
     minimalPairs: [
       {
@@ -474,12 +474,12 @@ export const TRAINING_PACKS: TrainingPack[] = [
   {
     id: "l-r",
     title: "分清 light / right",
-    focus: "/l/ 舌尖要碰齿龈，/r/ 舌头卷起但不碰",
+    focus: "/l/ 舌尖接触齿龈；英语 /ɹ/ 可用舌身聚拢或舌尖上卷，通常不接触上颚",
     targetPhonemes: ["l", "r"],
     contrastPhonemes: ["l", "r"],
     l1Problem: "部分学习者会把 /r/ 读成 /l/，或词尾 dark L 直接吞掉。",
     mouthCue:
-      "/l/ 舌尖碰上齿龈；/r/ 舌尖卷起悬空，嘴唇略收圆，不能碰到上颚。",
+      "/l/ 舌尖碰上齿龈；/ɹ/ 可采用 bunched（舌身聚拢）或 retroflex（舌尖上卷）动作，通常不接触上颚。",
     perceptionItems: [
       {
         wordA: "light",
@@ -721,12 +721,12 @@ export const TRAINING_PACKS: TrainingPack[] = [
   {
     id: "oo-uh",
     title: "分清 pool / pull",
-    focus: "/uː/ 长且圆，/ʊ/ 短且放松",
+    focus: "/uː/ 与 /ʊ/ 的舌位和圆唇程度不同，时长只是辅助线索",
     targetPhonemes: ["oo", "uh"],
     contrastPhonemes: ["oo", "uh"],
     l1Problem: "很多学习者把 look 拉得太长，听起来像 Luke。",
     mouthCue:
-      "/uː/ 嘴唇更圆更突出，声音拉长；/ʊ/ 嘴唇少突出，声音短、松、快。",
+      "/uː/ 通常舌位更高、圆唇更集中；/ʊ/ 舌位略低、圆唇较松。先稳定音质，再处理语境中的时长。",
     perceptionItems: [
       {
         wordA: "pool",

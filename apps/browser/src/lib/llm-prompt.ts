@@ -4,41 +4,41 @@ import {
   matchLanguageFeedbackRules,
 } from "@/lib/language-feedback-rules";
 import {
-  getLanguageDeckFeedbackRuleMatches,
   type DeckLanguageId,
+  getLanguageDeckFeedbackRuleMatches,
 } from "@/lib/language-learning-decks";
 import { isSentence } from "@/lib/utils";
-import type { LanguageId } from "@/types/language";
 import type { AzureAssessmentResult } from "@/types/azure";
+import type { LanguageId } from "@/types/language";
 
 export interface FeedbackPromptOptions {
   targetUnitSlugs?: string[];
 }
 
 const COACH_PERSONAS: Record<CoachMode, string> = {
-  easy: `你是一位友善包容的目标语言发音教练，像一个热情的外国朋友。
+  easy: `你是一位友善、证据优先的目标语言发音教练，目标是帮助学习者表达得更清晰、更稳定。
 你的态度是鼓励为主，只指出真正严重的发音错误（accuracyScore < 60 的音素）。
 如果没有严重错误，就表扬学生说得不错，给 1-2 个小建议即可。
 不需要事无巨细地分析每个音素，轻松愉快的氛围最重要。
 优先改区域只列真正影响沟通的大问题，没有就写"说得很好！继续保持。"`,
 
   normal: `你是一位专业的目标语言发音教练，目标是帮学生达到清晰自然的发音水平。
-你的学生是中国人，你了解中国学生常见的发音问题。
+主要受众是中文母语学习者。可以参考常见母语迁移，但必须以本次个体证据为准。
 语气平和专业，既指出问题也适当肯定进步。
 对 accuracyScore < 80 的音素重点分析，80+ 的简单带过。
 分析要有针对性，不需要面面俱到。`,
 
-  hard: `你是一位要求较高的目标语言发音教练，目标是让学生听起来清晰、自然、接近目标语言母语者。
-你的学生是中国人，你深谙中国学生所有常见的发音坏习惯和母语负迁移规律。
+  hard: `你是一位要求较高、证据优先的目标语言发音教练，目标是提升可懂度、稳定性与真实语境迁移。
+主要受众是中文母语学习者。群体迁移规律只能作为待验证假设，不能直接当作个人诊断。
 语气直接但不刻薄，所有 accuracyScore < 90 的音素都要分析。
 不要说"已经很棒了"，但可以客观承认做得好的地方。
 对细微的偏差也要指出，比如元音是否饱满、辅音是否干净。`,
 
-  strict: `你是一位严格的目标语言发音教练，目标是把学生训练到接近目标语言母语者水平。
-你的学生是中国人，你深谙中国学生所有常见的发音坏习惯和母语负迁移规律。
-不要客套、不要鼓励、不要说"已经很棒了"、不要说"继续加油"。
-直接指出所有问题，越详细越好。
-学生的目标是 sound like a native speaker，任何有证据支持的偏差都要指出。`,
+  strict: `你是一位严格、直接、证据优先的目标语言发音技术审阅者，目标是提升可懂度、动作控制与迁移保持。
+主要受众是中文母语学习者。群体迁移规律只能作为待验证假设，不能直接当作个人诊断。
+避免空泛客套，用中性、尊重且可执行的语言反馈。
+按沟通影响排序，只指出有证据支持的问题，技术细节可以完整但不能羞辱学习者。
+学习目标是清晰、稳定并适合学习者的真实需要；口音本身不是错误。`,
 };
 
 const LANGUAGE_COACH_CONTEXT: Record<LanguageId, string> = {
@@ -424,6 +424,54 @@ function buildPriorityFixFormatExamples(languageId: LanguageId): string {
 你把三个词分开读了。**立刻改：** 读成 /nɒ.ɾə.ɾɔːl/，t 和 a 连在一起，t 变成弹舌音。反复说 5 遍直到自然。`;
 }
 
+function buildStructuredCoachEvidence(
+  result: AzureAssessmentResult,
+  languageId: LanguageId,
+  target: string,
+  mode: "phoneme" | "sentence",
+) {
+  const supportsDetailedSegments = languageId === "en-US";
+  return {
+    schemaVersion: 1,
+    languageId,
+    taskType: mode === "phoneme" ? "controlled-word" : "sentence",
+    target,
+    rawObservations: {
+      pronunciationScore: result.pronunciationScore,
+      accuracyScore: result.accuracyScore,
+      fluencyScore: result.fluencyScore,
+      completenessScore: result.completenessScore,
+      ...(supportsDetailedSegments && result.prosodyScore != null
+        ? { prosodyScore: result.prosodyScore }
+        : {}),
+      words: result.words.map((word) => ({
+        word: word.word,
+        accuracyScore: word.accuracyScore,
+        errorType: word.errorType,
+        ...(supportsDetailedSegments
+          ? {
+              phonemes: word.phonemes.map((phoneme) => ({
+                phoneme: phoneme.phoneme,
+                accuracyScore: phoneme.accuracyScore,
+              })),
+              syllables: word.syllables.map((syllable) => ({
+                syllable: syllable.syllable,
+                grapheme: syllable.grapheme,
+                accuracyScore: syllable.accuracyScore,
+              })),
+            }
+          : {}),
+      })),
+    },
+    evidenceLimits: {
+      singleRecording: true,
+      supportsDetailedSegments,
+      canProveSubstitution: false,
+      canProveMastery: false,
+      canProveLongTermHabit: false,
+    },
+  };
+}
 export function buildFeedbackPrompt(
   target: string,
   azureResult: AzureAssessmentResult,
@@ -432,7 +480,11 @@ export function buildFeedbackPrompt(
   languageId: LanguageId = "en-US",
   options: FeedbackPromptOptions = {},
 ): string {
-  const azureJson = JSON.stringify(azureResult, null, 2);
+  const azureJson = JSON.stringify(
+    buildStructuredCoachEvidence(azureResult, languageId, target, mode),
+    null,
+    2,
+  );
   const sentenceMode = isSentence(target);
   const languageRulesContext = buildLanguageFeedbackPromptContext(languageId);
   const targetedLanguageRulesContext =
@@ -441,19 +493,21 @@ export function buildFeedbackPrompt(
   const evidenceBoundaryContext = buildEvidenceBoundaryContext(languageId);
   const isEnglish = languageId === "en-US";
 
-  const prosodyScoreLine = sentenceMode
-    ? "\n- prosodyScore: 韵律（语调升降、重音位置、节奏模式）"
-    : "";
+  const prosodyScoreLine =
+    sentenceMode && isEnglish
+      ? "\n- prosodyScore: 韵律（语调升降、重音位置、节奏模式）"
+      : "";
 
-  const prosodyFieldsBlock = sentenceMode
-    ? `
+  const prosodyFieldsBlock =
+    sentenceMode && isEnglish
+      ? `
 韵律子维度 words[].feedback.prosody：
 - words[].feedback.prosody.break.errorTypes: 停顿错误类型（如 MissingBreak、UnexpectedBreak）
 - words[].feedback.prosody.break.breakLength: 停顿时长
 - words[].feedback.prosody.intonation.errorTypes: 语调错误
 - words[].feedback.prosody.intonation.monotone.confidence: 语调单调度（0-1，越高越单调）
 `
-    : "";
+      : "";
 
   const prosodyAnalysisSection = buildProsodyAnalysisSection(
     languageId,
@@ -462,9 +516,8 @@ export function buildFeedbackPrompt(
   const highScoreExtras = buildHighScoreExtras(languageId, sentenceMode);
 
   const sectionNumber = sentenceMode ? "六" : "五";
-  const perfectScoreRule = isEnglish
-    ? '- 所有分数都满分时，summary 写"完美。没有问题。"，其余标签内容留空'
-    : '- 即使所有分数都满分，summary 也只能写"本次录音没有发现明显问题"，不要写"完美"，不要说"已掌握"，并保留 1 条轻量复测或巩固建议';
+  const perfectScoreRule =
+    '- 即使所有分数都满分，summary 也只能写"本次录音没有发现明显问题"，不要写"完美"，不要说"已掌握"，并保留 1 条轻量复测或巩固建议';
 
   return `${COACH_PERSONAS[coachMode]}
 ${languageCoachContext}

@@ -42,10 +42,12 @@ describe("LlmConfigCard", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "GPT" }));
 
-    expect(screen.getByRole("button", { name: "gpt-5.5" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "gpt-5.4" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "gpt-5.6" })).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: "gpt-5.4-mini" }),
+      screen.getByRole("button", { name: "gpt-5.6-sol" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "gpt-5.6-terra" }),
     ).toBeInTheDocument();
     expect(screen.queryByText("o3-mini")).not.toBeInTheDocument();
   });
@@ -59,7 +61,9 @@ describe("LlmConfigCard", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "MiniMax" }));
 
-    expect(screen.getByText(/MiniMax 需要以官方 API 文档填写/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/MiniMax 需要以官方 API 文档填写/),
+    ).toBeInTheDocument();
     expect(
       screen.queryByText(/桌面版不会放开任意 LLM 域名/),
     ).not.toBeInTheDocument();

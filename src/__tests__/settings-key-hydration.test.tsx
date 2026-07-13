@@ -313,7 +313,7 @@ describe("settings key hydration", () => {
 
     render(<CoachModeCard />);
 
-    expect(screen.getByRole("button", { name: /正常/ })).toHaveClass(
+    expect(screen.getByRole("button", { name: /平衡反馈/ })).toHaveClass(
       "border-primary",
     );
 
@@ -322,13 +322,13 @@ describe("settings key hydration", () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: /严师/ })).toHaveClass(
+      expect(screen.getByRole("button", { name: /技术审阅/ })).toHaveClass(
         "border-primary",
       );
     });
   });
 
-  it("updates drill config pass threshold after coach mode hydration", async () => {
+  it("keeps drill evidence threshold stable after coach mode hydration", async () => {
     const { DrillConfig } = await import("@/components/drill/drill-config");
     const { hydrateKeys } = await import("@/lib/api-keys");
     const onStart = vi.fn();
@@ -345,12 +345,12 @@ describe("settings key hydration", () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText(/达标分数：85 分/)).toBeInTheDocument();
+      expect(screen.getByText(/达标分数：70 分/)).toBeInTheDocument();
     });
 
     fireEvent.click(screen.getByRole("button", { name: "开始训练" }));
 
-    expect(onStart).toHaveBeenCalledWith("ee", 10, 85);
+    expect(onStart).toHaveBeenCalledWith("ee", 10, 70);
   });
 
   it("updates the data privacy summary after desktop key hydration", async () => {

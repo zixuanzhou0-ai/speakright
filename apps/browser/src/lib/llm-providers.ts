@@ -15,9 +15,12 @@ export const PRESET_PROVIDERS: Record<ProviderName, PresetProvider> = {
   gpt: {
     label: "GPT",
     baseUrl: "https://api.openai.com/v1",
-    models: ["gpt-5.5", "gpt-5.4", "gpt-5.4-mini", "gpt-5.4-nano"],
+    models: ["gpt-5.6", "gpt-5.6-sol", "gpt-5.6-terra", "gpt-5.6-luna"],
     status: "ready",
-    docsUrl: "https://developers.openai.com/api/docs/models",
+    docsUrl: "https://developers.openai.com/api/docs/guides/latest-model",
+    lastVerifiedAt: "2026-07-13",
+    presetNote:
+      "Recommended presets only; the model field accepts other supported model IDs.",
   },
   gemini: {
     label: "Gemini",
