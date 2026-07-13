@@ -61,7 +61,8 @@ const ISSUE_RULES: IssueRule[] = [
     title: "/iː/ 和 /ɪ/ 没拉开",
     suspectedSubstitution: "/ɪ/ → /iː/",
     impact: "ship/sheep、sit/seat 这类词会被听成另一个词。",
-    fixCue: "/iː/ 拉长绷紧，/ɪ/ 短促放松，别用中文“衣”替代。",
+    fixCue:
+      "先用舌位和音质区分 /iː/ 与 /ɪ/，再观察自然语境中的时长；不要只靠拖长来区分。",
   },
   {
     id: "eh-ae",
@@ -116,7 +117,7 @@ const ISSUE_RULES: IssueRule[] = [
     title: "/l/ 和 /r/ 区分不稳定",
     suspectedSubstitution: "/r/ ↔ /l/",
     impact: "light/right、glass/grass 会被听错，词尾 L 也容易丢。",
-    fixCue: "/l/ 舌尖碰齿龈，/r/ 舌头卷起悬空不碰上颚。",
+    fixCue: "/l/ 舌尖接触齿龈；/ɹ/ 可用舌身聚拢或舌尖上卷，通常不接触上颚。",
   },
   {
     id: "oo-uh",
@@ -124,10 +125,10 @@ const ISSUE_RULES: IssueRule[] = [
     type: "contrast",
     targetPhonemes: ["oo", "uh"],
     triggerPhonemes: ["oo", "uh"],
-    title: "/uː/ 和 /ʊ/ 时长不清楚",
+    title: "/uː/ 和 /ʊ/ 的音质或舌位区分不稳定",
     suspectedSubstitution: "/ʊ/ → /uː/",
     impact: "look/Luke、pull/pool 会靠上下文猜。",
-    fixCue: "/uː/ 圆唇拉长，/ʊ/ 少圆唇、短促收住。",
+    fixCue: "先稳定 /uː/ 与 /ʊ/ 的舌位和圆唇差异，再在自然语境中比较时长。",
   },
   {
     id: "n-ng",
@@ -294,10 +295,7 @@ function scoreStatusForReport(
         "证据不足：存在漏读或多读，本次只保留练习反馈，不生成可信综合分。",
     };
   }
-  if (
-    summary.wordLevelEvidenceCount < 4 ||
-    summary.totalObservedWords < 4
-  ) {
+  if (summary.wordLevelEvidenceCount < 4 || summary.totalObservedWords < 4) {
     return {
       scoreStatus: "insufficient-evidence",
       scoreStatusReason:
@@ -321,7 +319,9 @@ function buildLanguageIssue(
   sampleCount: number,
   rawEvidence: DiagnosisEvidence[],
 ): DiagnosisIssue | null {
-  const unit = getLanguagePhonemes(languageId).find((item) => item.slug === slug);
+  const unit = getLanguagePhonemes(languageId).find(
+    (item) => item.slug === slug,
+  );
   if (!unit || score >= 78) return null;
   const evidence = rawEvidence
     .filter((entry) => entry.phoneme === slug)
@@ -363,7 +363,13 @@ function buildLanguageIssues(
   if (languageId === "en-US") return [];
   return Object.entries(phonemeScores)
     .map(([slug, value]) =>
-      buildLanguageIssue(languageId, slug, value.score, value.sampleCount, rawEvidence),
+      buildLanguageIssue(
+        languageId,
+        slug,
+        value.score,
+        value.sampleCount,
+        rawEvidence,
+      ),
     )
     .filter((issue): issue is DiagnosisIssue => issue !== null);
 }
@@ -398,7 +404,14 @@ function issueFromRule(
     type: rule.type,
     title: rule.title,
     targetPhonemes: rule.targetPhonemes,
-    suspectedSubstitution: rule.suspectedSubstitution,
+    observedWeakness: rule.title,
+    possibleCauses: rule.suspectedSubstitution
+      ? [rule.suspectedSubstitution]
+      : [],
+    disambiguationTest:
+      "\u5148\u7528\u5bf9\u7acb\u8bcd\u548c\u66f4\u591a\u5408\u683c\u5f55\u97f3\u9a8c\u8bc1\u8fd9\u4e2a\u53ef\u80fd\u539f\u56e0\u3002",
+    actionCue: rule.fixCue,
+    confidence: evidence.length >= 2 ? "medium" : "low",
     evidence:
       evidence.length > 0
         ? evidence
@@ -452,7 +465,9 @@ function buildRhythmIssue(
 ): DiagnosisIssue | null {
   const prosody = result.prosodyScore ?? 0;
   const fluency = result.fluencyScore ?? 0;
-  if (Math.max(prosody, fluency) >= 82) return null;
+  const prosodyReady = prosody <= 0 || prosody >= 82;
+  const fluencyReady = fluency <= 0 || fluency >= 82;
+  if (prosodyReady && fluencyReady) return null;
   const score = prosody > 0 ? Math.min(prosody, fluency || prosody) : fluency;
   return {
     id: "stress-rhythm",
@@ -493,7 +508,9 @@ function buildCoverageRhythmIssue(
     .sort((a, b) => a.score - b.score);
 
   const weakest = candidates.find(
-    (item) => Math.max(item.prosody, item.fluency) < 82,
+    (item) =>
+      (item.prosody > 0 && item.prosody < 82) ||
+      (item.fluency > 0 && item.fluency < 82),
   );
   if (!weakest) return null;
 
@@ -715,7 +732,9 @@ export function buildDiagnosisReport({
             issueFromRule(rule, phonemeScores, rawEvidence),
           ).filter((issue): issue is DiagnosisIssue => issue !== null),
           buildFinalConsonantIssue(rawEvidence),
-          usableParagraphResult ? buildRhythmIssue(usableParagraphResult) : null,
+          usableParagraphResult
+            ? buildRhythmIssue(usableParagraphResult)
+            : null,
         ]
       : buildLanguageIssues(languageId, phonemeScores, rawEvidence);
 

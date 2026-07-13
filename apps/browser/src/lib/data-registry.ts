@@ -30,6 +30,7 @@ const ASSESSMENT_STORAGE_KEYS = [
 const LEARNING_STORAGE_KEYS = [
   ...ASSESSMENT_STORAGE_KEYS,
   "speakright_mastery_profile_v2",
+  "speakright_learning_evidence_v3",
   "speakright_mastery_profile_v1",
   "speakright_training_sessions_v2",
   "speakright_practice_history",

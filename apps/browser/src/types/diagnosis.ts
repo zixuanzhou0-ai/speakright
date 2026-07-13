@@ -73,6 +73,11 @@ export interface DiagnosisIssue {
   type: DiagnosisIssueType;
   title: string;
   targetPhonemes: string[];
+  observedWeakness?: string;
+  possibleCauses?: string[];
+  disambiguationTest?: string;
+  actionCue?: string;
+  /** @deprecated Read-only compatibility for legacy reports. */
   suspectedSubstitution?: string;
   evidence: Array<{ text: string; score: number; detail: string }>;
   impact: string;

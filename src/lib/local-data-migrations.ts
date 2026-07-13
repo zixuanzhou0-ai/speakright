@@ -1,20 +1,22 @@
 "use client";
 
+import {
+  LEARNING_EVIDENCE_STORAGE_KEY,
+  migrateLegacyMasteryEvidence,
+} from "@/lib/learning-evidence";
 import type {
   MasteryProfile,
   PackMastery,
   PhonemeMastery,
   TrainingSessionSummary,
 } from "@/types/training";
-
-export const LOCAL_DATA_SCHEMA_VERSION = 2;
+export const LOCAL_DATA_SCHEMA_VERSION = 3;
 export const LOCAL_DATA_SCHEMA_VERSION_KEY =
   "speakright_local_data_schema_version";
 export const LOCAL_DATA_MIGRATED_AT_KEY = "speakright_local_data_migrated_at";
 export const CORRUPT_LOCAL_DATA_KEY = "speakright_corrupt_data_v1";
 
-export const LOCAL_DATA_MIGRATION_EVENT =
-  "speakright:local-data-migration";
+export const LOCAL_DATA_MIGRATION_EVENT = "speakright:local-data-migration";
 
 const MASTERY_V2_KEY = "speakright_mastery_profile_v2";
 const MASTERY_V1_KEY = "speakright_mastery_profile_v1";
@@ -25,6 +27,7 @@ const KNOWN_JSON_STORAGE_KEYS = [
   "speakright_assessment_result",
   MASTERY_V2_KEY,
   MASTERY_V1_KEY,
+  LEARNING_EVIDENCE_STORAGE_KEY,
   TRAINING_SESSIONS_V2_KEY,
   "speakright_practice_history",
   "speakright_score_history",
@@ -268,6 +271,7 @@ export function runLocalDataMigrations(): LocalDataMigrationResult {
   const migratedKeys = [
     ...migrateLegacyMasteryProfile(),
     ...backfillTrainingSessionsFromMastery(),
+    ...(migrateLegacyMasteryEvidence() ? [LEARNING_EVIDENCE_STORAGE_KEY] : []),
   ];
 
   localStorage.setItem(
