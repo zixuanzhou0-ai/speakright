@@ -20,8 +20,9 @@ const fontVariables = {
 } as CSSProperties;
 
 export const metadata: Metadata = {
-  title: "SpeakRight - 发音练习",
-  description: "AI 驱动的美式英语发音矫正工具，帮助中国学生提升发音准确度",
+  title: "SpeakRight - 多语言发音学习",
+  description:
+    "面向中文学习者的多语言发音训练工具，以可懂度、可信证据和迁移保持为目标",
 };
 
 export default function RootLayout({

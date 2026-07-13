@@ -1,7 +1,7 @@
 [package]
 name = "speakright"
 version = "1.0.1"
-description = "AI-powered American English pronunciation coach"
+description = "Evidence-aware multilingual pronunciation learning desktop app"
 authors = ["SpeakRight"]
 license = ""
 repository = ""

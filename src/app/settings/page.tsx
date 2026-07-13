@@ -50,6 +50,8 @@ export default function SettingsPage() {
               type="button"
               role="tab"
               aria-selected={section === item.id}
+              aria-controls={`settings-panel-${item.id}`}
+              id={`settings-tab-${item.id}`}
               onClick={() => setSection(item.id)}
               className={
                 section === item.id
@@ -64,30 +66,48 @@ export default function SettingsPage() {
             </button>
           ))}
         </div>
-        <div role="tabpanel" className="space-y-6">
-          {section === "basic" && (
-            <>
-              <LanguageConfigCard />
-              <PronunciationConfigCard />
-              <CoachModeCard />
-            </>
-          )}
-          {section === "services" && (
-            <>
-              <UsageMonitor />
-              <AzureConfigCard />
-              <ElevenLabsConfigCard />
-              <LlmConfigCard />
-            </>
-          )}
-          {section === "data" && <DataControlCard />}
-          {section === "labs" && (
-            <>
-              <ReleaseCard />
-              <LanguageAvailabilityCard />
-            </>
-          )}
-        </div>
+        <section
+          role="tabpanel"
+          id="settings-panel-basic"
+          aria-labelledby="settings-tab-basic"
+          hidden={section !== "basic"}
+          className="space-y-6"
+        >
+          <LanguageConfigCard />
+          <PronunciationConfigCard />
+          <CoachModeCard />
+        </section>
+        <section
+          role="tabpanel"
+          id="settings-panel-services"
+          aria-labelledby="settings-tab-services"
+          hidden={section !== "services"}
+          className="space-y-6"
+        >
+          <UsageMonitor />
+          <AzureConfigCard />
+          <ElevenLabsConfigCard />
+          <LlmConfigCard />
+        </section>
+        <section
+          role="tabpanel"
+          id="settings-panel-data"
+          aria-labelledby="settings-tab-data"
+          hidden={section !== "data"}
+          className="space-y-6"
+        >
+          <DataControlCard />
+        </section>
+        <section
+          role="tabpanel"
+          id="settings-panel-labs"
+          aria-labelledby="settings-tab-labs"
+          hidden={section !== "labs"}
+          className="space-y-6"
+        >
+          <ReleaseCard />
+          <LanguageAvailabilityCard />
+        </section>
       </div>
     </div>
   );

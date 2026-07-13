@@ -248,6 +248,11 @@ fn secure_store_delete(key: String) -> Result<(), String> {
 }
 
 #[tauri::command]
+fn exit_app(app: AppHandle) {
+    app.exit(0);
+}
+
+#[tauri::command]
 fn desktop_diagnostics(app: AppHandle) -> DesktopDiagnostics {
     match app.path().app_log_dir() {
         Ok(log_dir) => {
@@ -305,6 +310,7 @@ pub fn run() {
         .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_store::Builder::default().build())
         .invoke_handler(tauri::generate_handler![
+            exit_app,
             desktop_diagnostics,
             secure_store_get,
             secure_store_set,

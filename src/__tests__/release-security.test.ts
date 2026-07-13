@@ -160,7 +160,7 @@ describe("release security configuration", () => {
     expect(permissions).toContain("core:window:allow-minimize");
     expect(permissions).toContain("core:window:allow-toggle-maximize");
     expect(permissions).toContain("core:window:allow-is-maximized");
-    expect(permissions).toContain("core:window:allow-close");
+    expect(permissions).not.toContain("core:window:allow-close");
     expect(permissions).toContain("core:window:allow-start-dragging");
     expect(permissions).toContain("core:window:allow-set-focus");
   });
@@ -212,7 +212,9 @@ describe("release security configuration", () => {
 
     expect(cargoToml).toContain("keyring =");
     expect(cargoToml).toContain("windows-native");
-    expect(rustEntry).toContain('const SECURE_STORE_SERVICE: &str = "com.speakright.desktop"');
+    expect(rustEntry).toContain(
+      'const SECURE_STORE_SERVICE: &str = "com.speakright.desktop"',
+    );
     expect(rustEntry).toContain("ALLOWED_SECURE_STORE_KEYS");
     expect(rustEntry).toContain("validate_secure_store_key(key)?");
     expect(rustEntry).toContain("secure_store_get");
@@ -233,13 +235,17 @@ describe("release security configuration", () => {
 
     expect(rustEntry).toContain("tauri_plugin_log::Builder::new()");
     expect(rustEntry).toContain("TargetKind::LogDir");
-    expect(rustEntry).toContain('file_name: Some(LOG_FILE_NAME.into())');
-    expect(rustEntry).toContain("RotationStrategy::KeepSome(LOG_ARCHIVE_COUNT)");
+    expect(rustEntry).toContain("file_name: Some(LOG_FILE_NAME.into())");
+    expect(rustEntry).toContain(
+      "RotationStrategy::KeepSome(LOG_ARCHIVE_COUNT)",
+    );
     expect(rustEntry).toContain("LOG_MAX_FILE_SIZE_BYTES");
     expect(rustEntry).toContain("LOG_TAIL_LINE_COUNT");
     expect(rustEntry).toContain("LOG_TAIL_MAX_LINE_CHARS");
     expect(rustEntry).toContain("LevelFilter::Info");
-    expect(rustEntry).not.toMatch(/if\s+cfg!\(debug_assertions\)[\s\S]{0,160}tauri_plugin_log/);
+    expect(rustEntry).not.toMatch(
+      /if\s+cfg!\(debug_assertions\)[\s\S]{0,160}tauri_plugin_log/,
+    );
 
     const rustLogCalls = rustEntry.match(/log::\w+!\([^)]+\)/g) ?? [];
     expect(rustLogCalls.join("\n")).not.toMatch(/\b(key|value)\b/);

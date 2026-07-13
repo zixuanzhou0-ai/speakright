@@ -121,6 +121,7 @@ function LocalVideoPanel({
           src={selectedSource.localSrc}
           controls
           preload="metadata"
+          poster="/images/video-poster.svg"
           className={videoClass}
         >
           <track kind="captions" />
@@ -281,11 +282,11 @@ export function VideoPlayer({
     return (
       <SpanishSoundsOfSpeechVideoPanel
         videoSet={spanishVideoSet}
-          className={className}
-          teachingVideos={teachingVideos}
-          compact={compact}
-        />
-      );
+        className={className}
+        teachingVideos={teachingVideos}
+        compact={compact}
+      />
+    );
   }
 
   if (lessonSources.length > 0) {
@@ -323,6 +324,7 @@ export function VideoPlayer({
           src={videoSrc}
           controls
           preload="metadata"
+          poster="/images/video-poster.svg"
           className={`block h-auto ${maxHeightClass} max-w-full rounded-lg border bg-black shadow-sm ${languageVideoWidthClass}`}
         >
           <track kind="captions" />
@@ -337,6 +339,7 @@ export function VideoPlayer({
       src={videoSrc}
       controls
       preload="metadata"
+      poster="/images/video-poster.svg"
       className={
         compact
           ? `h-[210px] w-full rounded-lg border bg-black object-contain ${className ?? ""}`
