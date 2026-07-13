@@ -100,7 +100,11 @@ export default function SentenceDrillPage() {
   }, [drill.config, handleStart]);
 
   return (
-    <LanguageModuleGate moduleName="句子训练" readinessKey="sentencePractice">
+    <LanguageModuleGate
+      moduleName="句子训练"
+      readinessKey="sentencePractice"
+      capabilityRoute="guidedTraining"
+    >
       <div
         data-smoke="sentence-drill-page"
         className="h-full flex flex-col px-6 py-4 overflow-y-auto scrollbar-thin"

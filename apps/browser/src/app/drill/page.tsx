@@ -112,7 +112,7 @@ const FREE_MODES = [
 ];
 
 const WRAP_SAFE_ACTION_BUTTON_CLASS =
-  "h-auto min-h-8 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]";
+  "h-auto min-h-11 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]";
 const WRAP_SAFE_BADGE_CLASS =
   "h-auto min-h-5 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]";
 
@@ -279,7 +279,11 @@ export default function DrillPage() {
     ];
 
     return (
-      <LanguageModuleGate moduleName="刻意练习" readinessKey="wordPractice">
+      <LanguageModuleGate
+        moduleName="刻意练习"
+        readinessKey="wordPractice"
+        capabilityRoute="guidedTraining"
+      >
         <div
           className="min-h-full flex flex-col overflow-y-auto px-4 py-4 scrollbar-thin sm:px-6"
           data-smoke="drill-page"
@@ -322,8 +326,6 @@ export default function DrillPage() {
 
           <DrillReportStorageWarning message={reportStorageWarning} />
 
-          <BrowserReadinessCard hasDiagnosis={!!report} />
-
           <div className="grid gap-3 md:grid-cols-2">
             {betaModes.map((mode) => (
               <Link key={mode.href} href={mode.href}>
@@ -346,13 +348,18 @@ export default function DrillPage() {
               </Link>
             ))}
           </div>
+          <BrowserReadinessCard hasDiagnosis={!!report} />
         </div>
       </LanguageModuleGate>
     );
   }
 
   return (
-    <LanguageModuleGate moduleName="刻意练习" readinessKey="wordPractice">
+    <LanguageModuleGate
+      moduleName="刻意练习"
+      readinessKey="wordPractice"
+      capabilityRoute="guidedTraining"
+    >
       <div
         className="min-h-full flex flex-col overflow-y-auto px-4 py-4 scrollbar-thin sm:px-6"
         data-smoke="drill-page"
@@ -364,33 +371,9 @@ export default function DrillPage() {
               今天建议完成 2 个任务：先做到期复习，再做一个主训练
             </p>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <Link href="/drill/evidence">
-              <Button
-                variant="outline"
-                className={`gap-2 cursor-pointer ${WRAP_SAFE_ACTION_BUTTON_CLASS}`}
-                data-smoke="drill-evidence-action"
-              >
-                <BookOpen className="h-4 w-4" />
-                错题本
-              </Button>
-            </Link>
-            <Link data-smoke="start-three-minute-diagnosis" href="/assessment">
-              <Button
-                variant="outline"
-                className={`gap-2 cursor-pointer ${WRAP_SAFE_ACTION_BUTTON_CLASS}`}
-                data-smoke="drill-diagnosis-action"
-              >
-                <ClipboardList className="h-4 w-4" />
-                {report ? "重新 3 分钟诊断" : "开始 3 分钟诊断"}
-              </Button>
-            </Link>
-          </div>
         </div>
 
         <DrillReportStorageWarning message={reportStorageWarning} />
-
-        <BrowserReadinessCard hasDiagnosis={!!report} />
 
         <section className="mb-5 rounded-xl border bg-primary/5 p-5 shadow-sm">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -447,22 +430,33 @@ export default function DrillPage() {
                   {primaryLabel}
                 </Button>
               </Link>
-              {!report && azureReady && (
-                <Link href="/assessment">
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className={`gap-2 cursor-pointer ${WRAP_SAFE_ACTION_BUTTON_CLASS}`}
-                    data-smoke="drill-secondary-diagnosis-action"
-                  >
-                    <ClipboardList className="h-5 w-5" />
-                    开始 3 分钟诊断
-                  </Button>
-                </Link>
-              )}
             </div>
           </div>
         </section>
+
+        <div className="mb-5 flex flex-wrap gap-2">
+          <Link href="/drill/evidence">
+            <Button
+              variant="outline"
+              className={`gap-2 cursor-pointer ${WRAP_SAFE_ACTION_BUTTON_CLASS}`}
+              data-smoke="drill-evidence-action"
+            >
+              <BookOpen className="h-4 w-4" />
+              错题本
+            </Button>
+          </Link>
+          <Link data-smoke="start-three-minute-diagnosis" href="/assessment">
+            <Button
+              variant="outline"
+              className={`gap-2 cursor-pointer ${WRAP_SAFE_ACTION_BUTTON_CLASS}`}
+              data-smoke="drill-diagnosis-action"
+            >
+              <ClipboardList className="h-4 w-4" />
+              {report ? "重新 3 分钟诊断" : "开始 3 分钟诊断"}
+            </Button>
+          </Link>
+        </div>
+        <BrowserReadinessCard hasDiagnosis={!!report} />
 
         <section className="mb-6 rounded-xl border bg-card p-5 shadow-sm">
           <div className="mb-4 flex items-center gap-2">

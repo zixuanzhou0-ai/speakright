@@ -356,8 +356,12 @@ describe("desktop preflight and UI smoke", () => {
     const freePracticeTransfer = readProjectFile(
       "src/lib/free-practice-transfer.ts",
     );
-    expect(freePracticeTransfer).toContain("const matchedWords = unique(targetWords);");
-    expect(freePracticeTransfer).not.toContain("unique(targetWords).slice(0, 6)");
+    expect(freePracticeTransfer).toContain(
+      "const matchedWords = unique(targetWords);",
+    );
+    expect(freePracticeTransfer).not.toContain(
+      "unique(targetWords).slice(0, 6)",
+    );
     expect(freePracticeTransfer).not.toContain(".slice(0, 4)");
     const drillPhonemeLesson = readProjectFile(
       "src/components/drill/drill-phoneme-lesson.tsx",
@@ -366,9 +370,7 @@ describe("desktop preflight and UI smoke", () => {
     expect(drillPhonemeLesson).toContain(
       'data-smoke="drill-lesson-example-list"',
     );
-    expect(drillPhonemeLesson).toContain(
-      'data-smoke="drill-lesson-example"',
-    );
+    expect(drillPhonemeLesson).toContain('data-smoke="drill-lesson-example"');
     expect(drillPhonemeLesson).toContain("phoneme.keywords.map");
     expect(drillPhonemeLesson).not.toContain("phoneme.keywords.slice(0, 6)");
     expect(drillPhonemeLesson).not.toContain("示例单词（点击听发音）");
@@ -435,7 +437,9 @@ describe("desktop preflight and UI smoke", () => {
     );
     expect(languageCard).toContain("getVisibleLanguagePhonologyGaps");
     expect(languageCard).toContain("overflow-wrap:anywhere");
-    expect(languageCard).toContain("建设中：训练进度和高级练习能力会逐步补齐。");
+    expect(languageCard).toContain(
+      "建设中：训练进度和高级练习能力会逐步补齐。",
+    );
     expect(languageCard).toContain("不会播放替代音频");
     expect(languageCard).not.toContain('audit.missingCapabilities.join("、")');
     expect(languageCard).not.toContain("missingPreview");
@@ -476,9 +480,7 @@ describe("desktop preflight and UI smoke", () => {
     expect(elevenLabsCard).toContain('data-smoke="tts-voice-select"');
     expect(elevenLabsCard).toContain('data-smoke="tts-model-select"');
     expect(elevenLabsCard).toContain("flex flex-wrap items-center gap-3");
-    expect(elevenLabsCard).toContain(
-      "WRAP_SAFE_SETTINGS_ACTION_BUTTON_CLASS",
-    );
+    expect(elevenLabsCard).toContain("WRAP_SAFE_SETTINGS_ACTION_BUTTON_CLASS");
     expect(elevenLabsCard).toContain(
       "h-auto min-h-8 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]",
     );
@@ -490,7 +492,9 @@ describe("desktop preflight and UI smoke", () => {
     expect(languageAvailabilityCard).toContain("重新安装最新版桌面端");
     expect(languageAvailabilityCard).not.toContain("缺失或不可读");
     expect(languageAvailabilityCard).toContain("overflow-wrap:anywhere");
-    expect(languageAvailabilityCard).toContain("WRAP_SAFE_LANGUAGE_BADGE_CLASS");
+    expect(languageAvailabilityCard).toContain(
+      "WRAP_SAFE_LANGUAGE_BADGE_CLASS",
+    );
     expect(languageAvailabilityCard).toContain(
       'data-smoke="language-availability-status-badge"',
     );
@@ -527,8 +531,8 @@ describe("desktop preflight and UI smoke", () => {
     expect(connectionStatus).toContain("aria-live");
     expect(connectionStatus).toContain("basis-48");
     expect(connectionStatus).toContain("overflow-wrap:anywhere");
-    expect(select).toContain("data-slot=\"select-trigger\"");
-    expect(select).toContain("data-slot=\"select-value\"");
+    expect(select).toContain('data-slot="select-trigger"');
+    expect(select).toContain('data-slot="select-value"');
     expect(select).toContain("min-h-8 w-full max-w-full");
     expect(select).toContain("whitespace-normal");
     expect(select).toContain("break-words");
@@ -544,7 +548,7 @@ describe("desktop preflight and UI smoke", () => {
     expect(badge).toContain("[overflow-wrap:anywhere]");
     expect(badge).not.toContain("overflow-hidden");
     expect(badge).not.toContain("whitespace-nowrap");
-    expect(button).toContain("data-slot=\"button\"");
+    expect(button).toContain('data-slot="button"');
     expect(button).toContain("text-center");
     expect(button).toContain("break-words");
     expect(button).toContain("whitespace-normal");
@@ -701,7 +705,9 @@ describe("desktop preflight and UI smoke", () => {
     expect(passagePage).toContain(
       "h-auto min-h-5 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]",
     );
-    expect(passagePage).toContain('data-smoke="assessment-passage-prompt-text"');
+    expect(passagePage).toContain(
+      'data-smoke="assessment-passage-prompt-text"',
+    );
     expect(passagePage).toContain(
       "break-words rounded-xl bg-muted/35 p-5 text-xl leading-9 [overflow-wrap:anywhere]",
     );
@@ -884,7 +890,7 @@ describe("desktop preflight and UI smoke", () => {
     );
     expect(drillPage).not.toContain(".slice(0, 2)");
     expect(drillPage).toContain(
-      "h-auto min-h-8 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]",
+      "h-auto min-h-11 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]",
     );
     expect(drillPage).toContain(
       "h-auto min-h-5 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]",
@@ -898,7 +904,6 @@ describe("desktop preflight and UI smoke", () => {
       "drill-evidence-action",
       "drill-diagnosis-action",
       "drill-primary-action",
-      "drill-secondary-diagnosis-action",
     ]) {
       expectSmokeElementUsesWrapSafeClass(
         drillPage,
@@ -964,10 +969,7 @@ describe("desktop preflight and UI smoke", () => {
     expect(scenariosPage).toContain('data-smoke="scenario-assessment-error"');
     expectSmokeAlertWraps(scenariosPage, "scenario-demo-audio-error");
     expectSmokeAlertWraps(scenariosPage, "scenario-assessment-error");
-    expectSmokeAlertWraps(
-      scenariosPage,
-      "scenario-benchmark-archive-warning",
-    );
+    expectSmokeAlertWraps(scenariosPage, "scenario-benchmark-archive-warning");
     expectSmokeAlertWraps(scenariosPage, "scenario-local-save-warning");
     expect(scenariosPage).toContain('data-smoke="scenario-page"');
     expect(scenariosPage).toContain('data-smoke="scenario-prompt-card"');
@@ -1056,7 +1058,9 @@ describe("desktop preflight and UI smoke", () => {
     expect(contrastPage).toContain("flex flex-wrap items-start gap-3");
     expect(contrastPage).toContain("grid grid-cols-1 gap-3 sm:grid-cols-2");
     expect(contrastPage).toContain("set.pairs.map((pair)");
-    expect(contrastPage).not.toContain("set.pairs[0].wordA} / {set.pairs[0].wordB} ...");
+    expect(contrastPage).not.toContain(
+      "set.pairs[0].wordA} / {set.pairs[0].wordB} ...",
+    );
     expect(contrastPage).toContain('data-smoke="contrast-assessment-error"');
     expect(contrastPage).toContain('data-smoke="contrast-assessment-retry"');
     expect(contrastPage).toContain("CONTRAST_ASSESSMENT_FALLBACK_MESSAGE");
@@ -1097,7 +1101,9 @@ describe("desktop preflight and UI smoke", () => {
     expect(packRunner).toContain('data-smoke="pack-runner-intro-card"');
     expect(packRunner).toContain('data-smoke="pack-runner-course-map"');
     expect(packRunner).toContain("WRAP_SAFE_BADGE_CLASS");
-    expect(packRunner).toContain('data-smoke="pack-runner-intro-phoneme-badge"');
+    expect(packRunner).toContain(
+      'data-smoke="pack-runner-intro-phoneme-badge"',
+    );
     expect(packRunner).toContain(
       'data-smoke="pack-runner-course-map-status-badge"',
     );
@@ -1160,7 +1166,9 @@ describe("desktop preflight and UI smoke", () => {
     expect(evidencePage).toContain("evidenceBook.remediations.map");
     expect(evidencePage).not.toContain("topCards");
     expect(evidencePage).not.toContain("topPatterns");
-    expect(evidencePage).not.toContain("remediations = evidenceBook.remediations.slice");
+    expect(evidencePage).not.toContain(
+      "remediations = evidenceBook.remediations.slice",
+    );
     expect(evidencePage).not.toContain("evidenceBook.cards.slice(0, 8)");
     expect(evidencePage).not.toContain("evidenceBook.patterns.slice(0, 6)");
     expect(evidencePage).toContain(

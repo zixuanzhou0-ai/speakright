@@ -373,7 +373,11 @@ export default function AssessmentPage() {
   );
 
   return (
-    <LanguageModuleGate moduleName="发音诊断" readinessKey="diagnosis">
+    <LanguageModuleGate
+      moduleName="发音诊断"
+      readinessKey="diagnosis"
+      capabilityRoute="diagnosis"
+    >
       <div
         className="h-full flex flex-col px-6 py-4 overflow-y-auto scrollbar-thin"
         data-smoke="assessment-page"

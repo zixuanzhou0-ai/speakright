@@ -419,7 +419,11 @@ export default function SentencesPage() {
   // ── Render ──
 
   return (
-    <LanguageModuleGate moduleName="自由练习" readinessKey="sentencePractice">
+    <LanguageModuleGate
+      moduleName="自由练习"
+      readinessKey="sentencePractice"
+      capabilityRoute="freePractice"
+    >
       <div
         className="flex min-h-full flex-col overflow-visible px-4 py-4 sm:px-6 lg:h-full lg:overflow-hidden"
         data-smoke="sentences-page"

@@ -9,10 +9,16 @@ import {
   getDefaultPhonemeSlug,
   getLanguageProfile,
 } from "@/lib/language-profiles";
+import {
+  getLanguageCapabilityPolicy,
+  getRouteCapability,
+  type LanguageCapabilityRoute,
+} from "@/lib/language-capability-policy";
 import { canRecordFormalMastery } from "@/lib/mastery-language-policy";
 
 interface LanguageCoreOnlyBoundaryProps {
   moduleName: string;
+  capabilityRoute?: LanguageCapabilityRoute;
   children: ReactNode;
 }
 
@@ -21,11 +27,22 @@ const WRAP_SAFE_ACTION_BUTTON_CLASS =
 
 export function LanguageCoreOnlyBoundary({
   moduleName,
+  capabilityRoute,
   children,
 }: LanguageCoreOnlyBoundaryProps) {
   const { languageId } = useLanguageConfig();
 
-  if (canRecordFormalMastery(languageId)) return <>{children}</>;
+  const routeCapability = capabilityRoute
+    ? getRouteCapability(
+        getLanguageCapabilityPolicy(languageId),
+        capabilityRoute,
+      )
+    : null;
+  const isAvailable = routeCapability
+    ? routeCapability !== "unavailable"
+    : canRecordFormalMastery(languageId);
+
+  if (isAvailable) return <>{children}</>;
 
   const profile = getLanguageProfile(languageId);
   const defaultPhonemeSlug = getDefaultPhonemeSlug(languageId);

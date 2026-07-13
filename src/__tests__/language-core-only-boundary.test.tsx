@@ -29,12 +29,29 @@ describe("LanguageCoreOnlyBoundary", () => {
     expect(screen.getByText(/俄语公开版先聚焦核心练习/)).toBeInTheDocument();
     expect(screen.getByText("去音标练习")).toBeInTheDocument();
     expect(screen.getByText("去自由练习")).toBeInTheDocument();
-    expect(screen.queryByText("hidden assessment body")).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("hidden assessment body"),
+    ).not.toBeInTheDocument();
     expect(
       screen.getByText(/暂不展示未完成训练、诊断或 mastery 证据/),
     ).toBeInTheDocument();
   });
 
+  it("allows non-English routes declared as Labs by the central policy", () => {
+    languageMock.languageId = "es-ES";
+
+    render(
+      <LanguageCoreOnlyBoundary
+        moduleName="发音诊断"
+        capabilityRoute="diagnosis"
+      >
+        <div>spanish labs body</div>
+      </LanguageCoreOnlyBoundary>,
+    );
+
+    expect(screen.getByText("spanish labs body")).toBeInTheDocument();
+    expect(screen.queryByText("去音标练习")).not.toBeInTheDocument();
+  });
   it("does not wrap English completed modules", () => {
     languageMock.languageId = "en-US";
 
@@ -54,6 +71,12 @@ describe("LanguageCoreOnlyBoundary", () => {
     );
     expect(readProjectFile("src/app/assessment/layout.tsx")).toContain(
       "LanguageCoreOnlyBoundary",
+    );
+    expect(readProjectFile("src/app/drill/layout.tsx")).toContain(
+      'capabilityRoute="guidedTraining"',
+    );
+    expect(readProjectFile("src/app/assessment/layout.tsx")).toContain(
+      'capabilityRoute="diagnosis"',
     );
     expect(readProjectFile("src/app/progress/page.tsx")).toContain(
       "LanguageCoreOnlyBoundary",
