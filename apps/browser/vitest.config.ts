@@ -10,6 +10,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
+      "@speakright/core": path.resolve(__dirname, "../../packages/core/src"),
       "@": path.resolve(__dirname, "./src"),
     },
   },

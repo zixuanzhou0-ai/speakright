@@ -421,7 +421,7 @@ export default function SentencesPage() {
   return (
     <LanguageModuleGate moduleName="自由练习" readinessKey="sentencePractice">
       <div
-        className="h-full flex flex-col px-6 py-4 overflow-hidden"
+        className="flex min-h-full flex-col overflow-visible px-4 py-4 sm:px-6 lg:h-full lg:overflow-hidden"
         data-smoke="sentences-page"
       >
         <div className="mb-2 flex shrink-0 flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -455,7 +455,7 @@ export default function SentencesPage() {
           </p>
         )}
 
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_2fr] flex-1 min-h-0">
+        <div className="grid grid-cols-1 gap-6 lg:min-h-0 lg:flex-1 lg:grid-cols-[1fr_2fr]">
           {/* Left Column */}
           <div className="flex flex-col gap-3 min-h-0 lg:overflow-y-auto scrollbar-thin">
             <SentenceInputCard
@@ -484,6 +484,7 @@ export default function SentencesPage() {
 
             <SentenceRecordingCard
               sentence={sentence}
+              languageId={languageId}
               isRecording={recorder.isRecording}
               elapsedSeconds={recorder.elapsedSeconds}
               maxDurationSeconds={recorder.maxDurationSeconds}

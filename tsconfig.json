@@ -19,7 +19,8 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@speakright/core/*": ["./packages/core/src/*"]
     }
   },
   "include": [
