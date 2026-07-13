@@ -14,7 +14,7 @@
   },
   "scripts": {
     "dev": "next dev --turbopack --port 3000",
-    "prebuild": "node scripts/check-training-audio.mjs",
+    "prebuild": "node ../../scripts/check-training-audio.mjs --target=browser",
     "build": "next build",
     "build:static": "next build",
     "serve:static": "node scripts/serve-static.mjs",

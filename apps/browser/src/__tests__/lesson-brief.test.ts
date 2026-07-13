@@ -99,6 +99,19 @@ function session(
 }
 
 describe("lesson brief", () => {
+  it("describes the first level without claiming a prerequisite passed", () => {
+    const brief = buildLessonBrief({
+      pack: pack(),
+      requestedLevelId: "perception-abx",
+      profile: profile(),
+      reviewQueue: [],
+    });
+
+    expect(brief.startLevelId).toBe("perception-abx");
+    expect(brief.reason).toContain("课程第一层");
+    expect(brief.reason).not.toContain("前置层已经过关");
+  });
+
   it("redirects a deep requested level back to the first unpassed prerequisite", () => {
     const brief = buildLessonBrief({
       pack: pack(),

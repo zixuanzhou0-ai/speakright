@@ -144,7 +144,7 @@ export function buildReviewQueue(
         source: "due-review",
         reason: mastery.masteryState
           ? `${mastery.masteryState} 阶段内容到期复习，防止回到旧习惯。`
-          : "已掌握内容到期复习，防止回到旧习惯。",
+          : "旧版完成记录到期复习，用新标准重新验证。",
         priority: "maintenance",
         dueAt: mastery.nextReviewAt,
       });

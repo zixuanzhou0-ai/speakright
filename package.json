@@ -74,7 +74,9 @@
     "e2e": "playwright test",
     "e2e:update": "playwright test --update-snapshots",
     "e2e:browser": "npm run build:browser && playwright test",
-    "validate:browser:e2e": "npm run lint:browser && npm run typecheck:browser && npm run test:browser && npm run build:browser && playwright test"
+    "validate:browser:e2e": "npm run lint:browser && npm run typecheck:browser && npm run test:browser && npm run build:browser && playwright test",
+    "prebuild": "node scripts/check-training-audio.mjs --target=desktop",
+    "audio:training:check": "node scripts/check-training-audio.mjs --target=all"
   },
   "dependencies": {
     "@base-ui/react": "^1.3.0",

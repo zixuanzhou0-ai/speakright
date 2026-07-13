@@ -625,7 +625,7 @@ export default function TrainingPackPage() {
     const canPromoteMastery = canRecordFormalMastery(languageId);
     const promotionBlockers = [
       usedTargetFallback
-        ? "目标音素未成功对齐，本轮整体分只作反馈，不提升掌握度。"
+        ? "目标音素未成功对齐，本轮整体分只作反馈，不提升正式证据阶段。"
         : null,
       getExperimentalMasteryBlocker(languageId),
     ].filter((item): item is string => item !== null);
@@ -673,8 +673,8 @@ export default function TrainingPackPage() {
                 evidenceStrength: targetScores.length >= 3 ? "strong" : "fair",
                 note:
                   uniqueQualityIssues.length > 0
-                    ? "本轮存在录音质量提示，结果只作为观察，不提升掌握度。"
-                    : "本轮录音质量稳定，可计入掌握度。",
+                    ? "本轮存在录音质量提示，结果只作为观察，不提升正式证据阶段。"
+                    : "本轮录音质量稳定，可计入当前训练证据。",
               }),
               audioQualityScore: minQualityScore,
               audioQualityIssues: uniqueQualityIssues,
@@ -1190,7 +1190,7 @@ export default function TrainingPackPage() {
                     onClick={skipBlockedGate}
                     className="cursor-pointer"
                   >
-                    暂时跳过，不计入掌握
+                    暂时跳过，不计入正式证据
                   </Button>
                 </div>
               </div>

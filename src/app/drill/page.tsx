@@ -32,6 +32,7 @@ import { loadDrillReportForLanguage } from "@/lib/drill-report-storage";
 import { getLanguageProfile } from "@/lib/language-profiles";
 import { isReviewDue, loadMasteryProfile } from "@/lib/mastery-profile";
 import { buildReviewQueue } from "@/lib/review-queue";
+import { formatTrainingTargetUnit } from "@/lib/training-criteria";
 import { buildTrainingMemory } from "@/lib/training-memory";
 import { TRAINING_PACKS } from "@/lib/training-packs";
 import {
@@ -240,15 +241,13 @@ export default function DrillPage() {
   const primaryPack = primaryItem
     ? TRAINING_PACKS.find((pack) => pack.id === primaryItem.packId)
     : null;
-  const primaryHref =
-    azureReady && primaryItem
-      ? packHref(primaryItem.packId, primaryItem.levelId)
-      : azureReady
-        ? "/drill/word"
-        : "/settings";
-  const primaryLabel = azureReady
-    ? "开始今天训练"
-    : "配置 Azure Speech 评分密钥";
+  const primaryPackId =
+    primaryItem?.packId ?? primaryPack?.id ?? TRAINING_PACKS[0].id;
+  const primaryHref = packHref(
+    primaryPackId,
+    azureReady ? primaryItem?.levelId : undefined,
+  );
+  const primaryLabel = "开始今天训练";
 
   if (languageId !== "en-US") {
     const betaModes = [
@@ -380,11 +379,11 @@ export default function DrillPage() {
             <div className="min-w-0">
               <div className="mb-2 flex flex-wrap items-center gap-2">
                 <Badge
-                  variant={azureReady ? "default" : "destructive"}
+                  variant={azureReady ? "default" : "secondary"}
                   className={WRAP_SAFE_BADGE_CLASS}
                   data-smoke="drill-readiness-badge"
                 >
-                  {azureReady ? "评分已就绪" : "需要配置"}
+                  {azureReady ? "评分已就绪" : "离线辨音可开始"}
                 </Badge>
                 <Badge
                   variant="secondary"
@@ -412,7 +411,7 @@ export default function DrillPage() {
                     primaryItem?.reason ??
                     primaryPack?.focus ??
                     "先完成一组目标音训练，再进入复习或自由专项。")
-                  : "Azure Speech 评分密钥配置完成后，桌面端才能进行录音评分和训练证据记录。"}
+                  : "先从不需要密钥的跨说话人辨音开始；进入产出关卡时，再决定连接 Azure 评分或只做录音对比。"}
               </p>
             </div>
             <div className="flex shrink-0 flex-wrap gap-2">
@@ -422,11 +421,7 @@ export default function DrillPage() {
                   className={`gap-2 cursor-pointer ${WRAP_SAFE_ACTION_BUTTON_CLASS}`}
                   data-smoke="drill-primary-action"
                 >
-                  {azureReady ? (
-                    <PlayCircle className="h-5 w-5" />
-                  ) : (
-                    <Settings className="h-5 w-5" />
-                  )}
+                  <PlayCircle className="h-5 w-5" />
                   {primaryLabel}
                 </Button>
               </Link>
@@ -621,7 +616,7 @@ export default function DrillPage() {
                 </p>
               </div>
               <div className="rounded-lg border bg-background px-3 py-2">
-                <p className="text-xs text-muted-foreground">已掌握</p>
+                <p className="text-xs text-muted-foreground">旧版完成记录</p>
                 <p className="text-lg font-bold">
                   {trainingMemory.masteredPacks}
                 </p>
@@ -897,7 +892,7 @@ function PackCard({
               className={WRAP_SAFE_BADGE_CLASS}
               data-smoke="drill-pack-phoneme-badge"
             >
-              {phoneme}
+              {formatTrainingTargetUnit(phoneme)}
             </Badge>
           ))}
           <Badge

@@ -616,7 +616,7 @@ export default function DrillPage() {
                 </p>
               </div>
               <div className="rounded-lg border bg-background px-3 py-2">
-                <p className="text-xs text-muted-foreground">已掌握</p>
+                <p className="text-xs text-muted-foreground">旧版完成记录</p>
                 <p className="text-lg font-bold">
                   {trainingMemory.masteredPacks}
                 </p>

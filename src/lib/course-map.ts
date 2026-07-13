@@ -9,6 +9,7 @@ import {
   firstUnpassedBeforeLevel,
   resolveCourseStartGate,
 } from "./course-gates";
+import { criterionToLegacyPassRule } from "./training-criteria";
 
 export type CourseLevelMapStatus =
   | "current"
@@ -85,7 +86,7 @@ function tasksForLevel(
 }
 
 function passRuleText(level: TrainingLevel): string {
-  const rule = level.passRule;
+  const rule = criterionToLegacyPassRule(level.criterion);
   if (level.kind === "perception") {
     return `听辨正确率 ${Math.round((rule.minCorrectRate ?? 0.8) * 100)}%+`;
   }

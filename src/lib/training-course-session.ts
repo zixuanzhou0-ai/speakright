@@ -1,3 +1,4 @@
+import { evaluateTrainingCriterion } from "@speakright/core/training/criteria";
 import type {
   TrainingLevel,
   TrainingLevelKind,
@@ -18,6 +19,11 @@ export interface CourseAttemptSnapshot {
   attempts: number;
   passedCount: number;
   stuckCount: number;
+  contextIds?: string[];
+  crossSpeakerValid?: boolean;
+  validSampleCount?: number;
+  recordingQualityValid?: boolean;
+  alignmentValid?: boolean;
 }
 
 export function shouldAppendPerceptionReview(
@@ -44,28 +50,18 @@ export function hasLevelPassed(
   level: TrainingLevel,
   snapshot: CourseAttemptSnapshot,
 ): boolean {
-  const rule = level.passRule;
-  if (level.kind === "perception") {
-    const total = snapshot.attempts || level.items.length;
-    return (
-      total > 0 &&
-      snapshot.passedCount / total >= (rule.minCorrectRate ?? 0.8)
-    );
-  }
-  if (rule.minAverageScore != null && snapshot.scores.length > 0) {
-    const average =
-      snapshot.scores.reduce((sum, score) => sum + score, 0) /
-      snapshot.scores.length;
-    if (average < rule.minAverageScore) return false;
-    if (rule.requiredPasses != null) {
-      return snapshot.passedCount >= rule.requiredPasses;
-    }
-    return true;
-  }
-  if (rule.requiredPasses != null) {
-    return snapshot.passedCount >= rule.requiredPasses;
-  }
-  return levelBestScore(snapshot.scores) >= (rule.minTargetScore ?? 75);
+  const contexts = snapshot.contextIds ?? [];
+  return evaluateTrainingCriterion(level.criterion, {
+    correctCount: snapshot.passedCount,
+    totalCount: snapshot.attempts,
+    uniqueContextIds: contexts,
+    crossSpeakerValid: snapshot.crossSpeakerValid,
+    passedCount: snapshot.passedCount,
+    validSampleCount: snapshot.validSampleCount ?? snapshot.attempts,
+    contextCount: new Set(contexts).size,
+    recordingQualityValid: snapshot.recordingQualityValid ?? true,
+    alignmentValid: snapshot.alignmentValid ?? true,
+  }).passed;
 }
 
 export function toLevelSummary(

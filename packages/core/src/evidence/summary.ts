@@ -19,6 +19,13 @@ export interface LearningEvidenceStageSummary {
   highestStageByTarget: Record<string, EvidenceStage>;
 }
 
+function isFormalLearningEvidence(item: LearningEvidenceV3): boolean {
+  return (
+    item.source !== "legacy-migration" &&
+    item.calibrationVersion !== "legacy-unvalidated"
+  );
+}
+
 export function summarizeLearningEvidence(
   evidence: LearningEvidenceV3[],
   languageId: LearningLanguageId,
@@ -27,6 +34,7 @@ export function summarizeLearningEvidence(
   for (const item of evidence) {
     if (
       item.languageId !== languageId ||
+      !isFormalLearningEvidence(item) ||
       item.recordingQuality.status === "invalid" ||
       item.alignmentQuality.status === "invalid"
     ) {

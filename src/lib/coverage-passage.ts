@@ -135,7 +135,7 @@ export const COVERAGE_PASSAGE: CoveragePassage = {
       text: "The school cook put good soup, blue fruit, and a full bowl of noodles on the long wooden table. Luke looked at the menu and took only a little sugar.",
       focus: "检测 /uː/ 与 /ʊ/，并顺带看 /l/、/r/ 和词中弱元音。",
       coachCue:
-        "soup、blue、Luke 拉长圆唇；good、full、looked、took 短而收住。",
+        "soup、blue、Luke 的 /uː/ 舌位较高后、圆唇更明显；good、full、looked、took 的 /ʊ/ 较松且圆唇较弱，时长只作辅助线索。",
       targetPhonemes: ["oo", "uh", "l", "r"],
       targetFeatures: ["oo-uh", "l-r", "weak-forms"],
       evidenceWords: [

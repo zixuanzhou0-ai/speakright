@@ -145,6 +145,17 @@ export function resolveCourseStartGate({
     };
   }
 
+  if (first?.id === requested) {
+    return {
+      requestedLevelId: requested,
+      requestedLevelTitle: requestedTitle,
+      effectiveLevelId: requested,
+      effectiveLevelTitle: requestedTitle,
+      redirected: false,
+      reason: `这是课程第一层，先完成「${requestedTitle}」，再进入动作和输出。`,
+    };
+  }
+
   const prerequisite = firstUnpassedBeforeLevel(pack, requested, profile);
   if (!prerequisite) {
     return {
