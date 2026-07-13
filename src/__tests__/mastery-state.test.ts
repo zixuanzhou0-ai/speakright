@@ -148,6 +148,28 @@ describe("mastery state", () => {
     expect(stage.stageCeiling).toBe(100);
   });
 
+  it("does not map guided transfer directly to retained", () => {
+    const stage = evaluateMasteryStage(
+      undefined,
+      session({
+        transferEvidence: [
+          {
+            layer: "guided",
+            prompt: "Describe a familiar routine with prompts.",
+            score: 86,
+            passed: true,
+            completedAt: 4,
+          },
+        ],
+      }),
+      false,
+      0,
+    );
+
+    expect(stage.state).toBe("integrated");
+    expect(stage.state).not.toBe("retained");
+  });
+
   it("downgrades after repeated failures instead of preserving a stale state", () => {
     const stage = evaluateMasteryStage(
       existing({ masteryState: "retained" }),

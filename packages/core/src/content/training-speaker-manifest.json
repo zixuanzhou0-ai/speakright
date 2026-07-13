@@ -1,0 +1,38 @@
+[
+  {
+    "id": "max",
+    "assetDirectory": "blue",
+    "provider": "elevenlabs",
+    "voiceId": "Gfpl8Yo74Is0W6cPUWWT",
+    "locale": "en-US",
+    "accent": "general-american",
+    "reviewStatus": "reviewed"
+  },
+  {
+    "id": "nichalia",
+    "assetDirectory": "pink",
+    "provider": "elevenlabs",
+    "voiceId": "XfNU2rGpBa01ckF309OY",
+    "locale": "en-US",
+    "accent": "general-american",
+    "reviewStatus": "reviewed"
+  },
+  {
+    "id": "eryn",
+    "assetDirectory": "green",
+    "provider": "elevenlabs",
+    "voiceId": "RaFzMbMIfqBcIurH6XF9",
+    "locale": "en-US",
+    "accent": "general-american",
+    "reviewStatus": "needs-review"
+  },
+  {
+    "id": "brian",
+    "assetDirectory": "amber",
+    "provider": "elevenlabs",
+    "voiceId": "G0yjIg3xY8gEJZkHpjVm",
+    "locale": "en-US",
+    "accent": "general-american",
+    "reviewStatus": "needs-review"
+  }
+]

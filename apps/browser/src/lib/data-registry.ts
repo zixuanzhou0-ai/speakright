@@ -31,6 +31,8 @@ const LEARNING_STORAGE_KEYS = [
   ...ASSESSMENT_STORAGE_KEYS,
   "speakright_mastery_profile_v2",
   "speakright_learning_evidence_v3",
+  "speakright_training_exposure_v1",
+  "speakright_retention_schedule_v1",
   "speakright_mastery_profile_v1",
   "speakright_training_sessions_v2",
   "speakright_practice_history",
@@ -44,6 +46,9 @@ const LEARNING_STORAGE_KEYS = [
 const CACHE_STORAGE_KEYS = [
   "speakright_ipa_cache",
   "speakright_stress_cache",
+] as const;
+const LEARNING_STORAGE_PREFIXES = [
+  "speakright_deep_training_session_v1:",
 ] as const;
 
 const DEVICE_STORAGE_KEYS = [BROWSER_MIC_CHECK_KEY] as const;
@@ -166,6 +171,7 @@ function safeApiKeySummary() {
 
 export async function buildLocalDataExport(): Promise<LocalDataExport> {
   const cacheKeys = prefixedLocalStorageKeys(CACHE_STORAGE_PREFIXES);
+  const learningKeys = prefixedLocalStorageKeys(LEARNING_STORAGE_PREFIXES);
   return {
     schemaVersion: 4,
     exportedAt: new Date().toISOString(),
@@ -173,6 +179,7 @@ export async function buildLocalDataExport(): Promise<LocalDataExport> {
     dataSchema: getLocalDataSchemaStatus(),
     localStorage: {
       ...collectKeys(LEARNING_STORAGE_KEYS),
+      ...collectKeys(learningKeys),
       ...collectKeys(CACHE_STORAGE_KEYS),
       ...collectKeys(DEVICE_STORAGE_KEYS),
       ...collectKeys(cacheKeys),
@@ -203,7 +210,12 @@ export function getLocalDataSummary(): LocalDataSummary {
     ];
     const dataSchema = getLocalDataSchemaStatus();
     return {
-      learningKeys: Object.keys(collectKeys(LEARNING_STORAGE_KEYS)).length,
+      learningKeys: Object.keys(
+        collectKeys([
+          ...LEARNING_STORAGE_KEYS,
+          ...prefixedLocalStorageKeys(LEARNING_STORAGE_PREFIXES),
+        ]),
+      ).length,
       cacheKeys: Object.keys(collectKeys(cacheKeys)).length,
       configuredApiKeys: apiKeys.configured,
       apiKeySlots: apiKeys.totalSlots,
@@ -243,11 +255,13 @@ export async function downloadLocalDataExport(): Promise<void> {
 
 export async function deleteLearningData(): Promise<void> {
   const cacheKeys = prefixedLocalStorageKeys(CACHE_STORAGE_PREFIXES);
+  const learningKeys = prefixedLocalStorageKeys(LEARNING_STORAGE_PREFIXES);
   await clearBenchmarkRecordings();
   await clearTtsCache();
   await clearAllLanguageAudioPacks();
   removeLocalStorageKeys([
     ...LEARNING_STORAGE_KEYS,
+    ...learningKeys,
     ...CACHE_STORAGE_KEYS,
     ...cacheKeys,
   ]);

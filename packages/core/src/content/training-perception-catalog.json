@@ -8,7 +8,10 @@
       { "id": "ee-ih-2", "wordA": "eat", "wordB": "big" },
       { "id": "ee-ih-3", "wordA": "beach", "wordB": "ship" },
       { "id": "ee-ih-4", "wordA": "sleep", "wordB": "swim" },
-      { "id": "ee-ih-5", "wordA": "green", "wordB": "give" }
+      { "id": "ee-ih-5", "wordA": "green", "wordB": "give" },
+      { "id": "ee-ih-6", "wordA": "feel", "wordB": "fill" },
+      { "id": "ee-ih-7", "wordA": "leave", "wordB": "little" },
+      { "id": "ee-ih-8", "wordA": "team", "wordB": "still" }
     ]
   },
   {

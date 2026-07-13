@@ -5,6 +5,14 @@ export type TrainingCriterion =
       minTrials: number;
       minUniquePairs: number;
       crossSpeakerRequired: boolean;
+      minUniqueSpeakers?: number;
+      minSpeakerPairings?: number;
+    }
+  | {
+      kind: "motor-formation";
+      minSelfChecks: number;
+      minRecordedSamples: number;
+      requirePlaybackComparison: boolean;
     }
   | {
       kind: "controlled-production";
@@ -12,6 +20,8 @@ export type TrainingCriterion =
       minValidSamples: number;
       requireRecordingQuality: boolean;
       requireAlignment: boolean;
+      minUniqueMaterials?: number;
+      requiredPositions?: readonly string[];
     }
   | {
       kind: "transfer";
@@ -34,6 +44,13 @@ export interface TrainingCriterionEvidence {
   totalCount?: number;
   uniqueContextIds?: string[];
   crossSpeakerValid?: boolean;
+  speakerIds?: string[];
+  speakerPairings?: string[];
+  completedSelfChecks?: number;
+  recordedSampleCount?: number;
+  playbackComparisonCompleted?: boolean;
+  materialIds?: string[];
+  positions?: string[];
   passedCount?: number;
   validSampleCount?: number;
   contextCount?: number;
@@ -72,6 +89,35 @@ export function evaluateTrainingCriterion(
     if (criterion.crossSpeakerRequired && evidence.crossSpeakerValid !== true) {
       blockers.push("A/B 与 X 必须使用不同说话人");
     }
+    if (
+      criterion.minUniqueSpeakers !== undefined &&
+      new Set(evidence.speakerIds ?? []).size < criterion.minUniqueSpeakers
+    ) {
+      blockers.push("Need unique speakers");
+    }
+    if (
+      criterion.minSpeakerPairings !== undefined &&
+      new Set(evidence.speakerPairings ?? []).size <
+        criterion.minSpeakerPairings
+    ) {
+      blockers.push("Need speaker pairings");
+    }
+    return { passed: blockers.length === 0, blockers };
+  }
+
+  if (criterion.kind === "motor-formation") {
+    if ((evidence.completedSelfChecks ?? 0) < criterion.minSelfChecks) {
+      blockers.push("Complete the required motor self-checks");
+    }
+    if ((evidence.recordedSampleCount ?? 0) < criterion.minRecordedSamples) {
+      blockers.push("Record the required number of samples");
+    }
+    if (
+      criterion.requirePlaybackComparison &&
+      evidence.playbackComparisonCompleted !== true
+    ) {
+      blockers.push("Compare the learner recording with a reference");
+    }
     return { passed: blockers.length === 0, blockers };
   }
 
@@ -95,6 +141,23 @@ export function evaluateTrainingCriterion(
     }
     if (criterion.requireAlignment && evidence.alignmentValid !== true) {
       blockers.push("目标音必须成功对齐");
+    }
+    if (
+      criterion.minUniqueMaterials !== undefined &&
+      new Set(evidence.materialIds ?? []).size < criterion.minUniqueMaterials
+    ) {
+      blockers.push("Cover the required number of unique materials");
+    }
+    if (criterion.requiredPositions?.length) {
+      const observedPositions = new Set(evidence.positions ?? []);
+      const missingPositions = criterion.requiredPositions.filter(
+        (position) => !observedPositions.has(position),
+      );
+      if (missingPositions.length > 0) {
+        blockers.push(
+          `Cover required positions: ${missingPositions.join(", ")}`,
+        );
+      }
     }
     return { passed: blockers.length === 0, blockers };
   }

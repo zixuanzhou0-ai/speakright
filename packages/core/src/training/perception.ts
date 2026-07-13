@@ -29,7 +29,7 @@ export interface PerceptionTrial {
 export interface CreatePerceptionTrialsOptions {
   seed: string | number;
   trialCount?: number;
-  speakers?: readonly [string, string];
+  speakers?: readonly string[];
   audioUri?: (word: string, speakerId: string) => string;
 }
 
@@ -87,8 +87,8 @@ export function createPerceptionTrials(
 
   const trialCount = options.trialCount ?? 8;
   if (trialCount < 1) return [];
-  const speakers = options.speakers ?? (["blue", "pink"] as const);
-  if (speakers[0] === speakers[1]) {
+  const speakers = [...new Set(options.speakers ?? ["blue", "pink"])];
+  if (speakers.length < 2) {
     throw new Error("Perception training requires two different speakers.");
   }
 
@@ -98,6 +98,17 @@ export function createPerceptionTrials(
   const startWithSlotA = random() >= 0.5;
   const startWithFirstSpeaker = random() >= 0.5;
 
+  const orderedSpeakers = startWithFirstSpeaker
+    ? speakers
+    : [...speakers].reverse();
+  const speakerPairings = shuffle(
+    orderedSpeakers.flatMap((referenceSpeaker) =>
+      orderedSpeakers
+        .filter((probeSpeaker) => probeSpeaker !== referenceSpeaker)
+        .map((probeSpeaker) => ({ referenceSpeaker, probeSpeaker })),
+    ),
+    random,
+  );
   return Array.from({ length: trialCount }, (_, index) => {
     const referenceExample = ordered[index % ordered.length];
     const probeExample = ordered[(index + 1) % ordered.length];
@@ -109,12 +120,8 @@ export function createPerceptionTrials(
         : startWithSlotA
           ? "B"
           : "A";
-    const referenceSpeaker =
-      index % 2 === 0
-        ? speakers[startWithFirstSpeaker ? 0 : 1]
-        : speakers[startWithFirstSpeaker ? 1 : 0];
-    const probeSpeaker =
-      referenceSpeaker === speakers[0] ? speakers[1] : speakers[0];
+    const { referenceSpeaker, probeSpeaker } =
+      speakerPairings[index % speakerPairings.length];
     const swapSlots = random() >= 0.5;
     const slotACategory: PerceptionCategory = swapSlots
       ? "category-b"

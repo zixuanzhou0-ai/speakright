@@ -101,7 +101,7 @@ export function highestPassedLayer(
 
 function stateFromLayer(layer: MasteryTaskLayer): MasteryState {
   if (layer === "spontaneous") return "transferred";
-  if (layer === "guided") return "retained";
+  if (layer === "guided") return "integrated";
   if (layer === "connected" || layer === "sentence") return "integrated";
   if (layer === "word") return "controlled";
   if (layer === "perception" || layer === "articulation") return "learning";

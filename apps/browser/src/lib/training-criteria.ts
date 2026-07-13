@@ -15,6 +15,12 @@ export function criterionToLegacyPassRule(
   if (criterion.kind === "perception") {
     return { minCorrectRate: criterion.minCorrectRate };
   }
+  if (criterion.kind === "motor-formation") {
+    return {
+      minTargetScore: 0,
+      requiredPasses: criterion.minRecordedSamples,
+    };
+  }
   return {
     minTargetScore: criterion.minTargetScore,
     requiredPasses: criterion.minValidSamples,
@@ -27,6 +33,9 @@ export function describeTrainingCriterion(level: TrainingLevel): string {
     return `${criterion.minTrials} 次听辨、至少 ${criterion.minUniquePairs} 组对比、正确率 ${Math.round(
       criterion.minCorrectRate * 100,
     )}% 且跨说话人`;
+  }
+  if (criterion.kind === "motor-formation") {
+    return `\u5b8c\u6210 ${criterion.minSelfChecks} \u9879\u52a8\u4f5c\u81ea\u68c0\u3001${criterion.minRecordedSamples} \u6bb5\u672c\u4eba\u5f55\u97f3\uff0c\u5e76\u5b8c\u6210\u4e00\u6b21\u4ea4\u66ff\u64ad\u653e`;
   }
   if (criterion.kind === "retention") {
     return `${criterion.minValidSamples} 个有效样本达到 ${criterion.minTargetScore} 分，使用未训练材料并间隔至少 ${criterion.minDelayHours} 小时`;
@@ -41,9 +50,12 @@ export function describeTrainingCriterion(level: TrainingLevel): string {
 }
 
 export function criterionTargetScore(level: TrainingLevel): number {
-  return level.criterion.kind === "perception"
-    ? 0
-    : level.criterion.minTargetScore;
+  if (
+    level.criterion.kind === "perception" ||
+    level.criterion.kind === "motor-formation"
+  )
+    return 0;
+  return level.criterion.minTargetScore;
 }
 
 export function formatTrainingTargetUnit(unit: string): string {

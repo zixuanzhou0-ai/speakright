@@ -97,8 +97,10 @@ export function buildGuidedTrainingEvidence({
           : level.items.slice(0, snapshot.attempts).map((item) => item.id);
       const contextCount = materialIds.length;
       const sampleCount =
-        snapshot.validSampleCount ??
-        (notApplicable ? snapshot.attempts : snapshot.scores.length);
+        level.kind === "articulation"
+          ? (snapshot.recordedSampleCount ?? 0)
+          : (snapshot.validSampleCount ??
+            (notApplicable ? snapshot.attempts : snapshot.scores.length));
       const targetAverage = average(snapshot.scores);
       const observations: LearningEvidenceV3["observations"] =
         level.kind === "perception"
@@ -164,6 +166,13 @@ export function buildGuidedTrainingEvidence({
           totalCount: snapshot.attempts,
           uniqueContextIds: snapshot.contextIds,
           crossSpeakerValid: snapshot.crossSpeakerValid,
+          speakerIds: snapshot.speakerIds,
+          speakerPairings: snapshot.speakerPairings,
+          completedSelfChecks: snapshot.completedSelfChecks,
+          recordedSampleCount: snapshot.recordedSampleCount,
+          playbackComparisonCompleted: snapshot.playbackComparisonCompleted,
+          materialIds: snapshot.materialIds ?? materialIds,
+          positions: snapshot.positions,
           passedCount: snapshot.passedCount,
           validSampleCount: sampleCount,
           contextCount,

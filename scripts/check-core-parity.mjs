@@ -6,11 +6,15 @@ const pairs = [
   "lib/assessment-evidence-engine.ts",
   "lib/diagnosis-engine.ts",
   "lib/drill-utils.ts",
+  "lib/deep-training-session.ts",
+  "lib/training-exposure.ts",
   "lib/learning-evidence.ts",
   "lib/training-score.ts",
   "lib/azure-attempt-evidence.ts",
   "lib/free-practice-evidence.ts",
+  "lib/mastery-state.ts",
   "lib/training-packs.ts",
+  "lib/retention-schedule.ts",
   "lib/training-error-patterns.ts",
   "lib/training-perception.ts",
   "lib/training-criteria.ts",
@@ -20,6 +24,7 @@ const pairs = [
   "lib/hvpt-evidence.ts",
   "types/diagnosis.ts",
   "types/training.ts",
+  "app/drill/pack/[packId]/pack-runner-client.tsx",
 ];
 
 function normalized(filePath) {
@@ -46,6 +51,10 @@ const wrappers = [
   "apps/browser/src/lib/training-criteria.ts",
   "src/lib/learning-evidence.ts",
   "apps/browser/src/lib/learning-evidence.ts",
+  "src/lib/training-exposure.ts",
+  "apps/browser/src/lib/training-exposure.ts",
+  "src/lib/retention-schedule.ts",
+  "apps/browser/src/lib/retention-schedule.ts",
 ];
 for (const filePath of wrappers) {
   if (!normalized(filePath).includes("@speakright/core/")) {

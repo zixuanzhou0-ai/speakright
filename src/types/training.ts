@@ -93,6 +93,7 @@ export interface TrainingCourseItem {
   successCue: string;
   difficulty: 1 | 2 | 3 | 4 | 5;
   position?: "initial" | "medial" | "final" | "mixed";
+  materialRole?: import("@speakright/core/training/materials").TrainingMaterialRole;
   isRecordable?: boolean;
   contrastText?: string;
 }

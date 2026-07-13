@@ -21,14 +21,15 @@ export interface TrainingEvidenceQuality {
   reasons: string[];
 }
 
-export interface TrainingEvidenceTrace {
+export interface TrainingEvidenceTrace
+  extends Omit<NonNullable<LearningEvidenceV3["trace"]>, "aggregate"> {
   sessionId: string;
   levelId?: string;
   materialIds: string[];
   criterionKind: string;
 }
 
-interface TrainingEvidenceBaseInput {
+export interface TrainingEvidenceBaseInput {
   id: string;
   languageId: LearningLanguageId;
   taskType: EvidenceTaskType;

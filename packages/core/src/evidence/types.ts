@@ -71,6 +71,12 @@ export interface LearningEvidenceV3 {
     materialIds: string[];
     criterionKind: string;
     aggregate: boolean;
+    materialRole?: import("../training/materials").TrainingMaterialRole;
+    speakerIds?: string[];
+    position?: import("../training/materials").TrainingMaterialPosition;
+    phoneticContext?: string;
+    novelty?: import("../training/exposure").TrainingMaterialNovelty;
+    scheduledDelayHours?: number;
   };
 }
 

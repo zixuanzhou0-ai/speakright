@@ -21,6 +21,13 @@ export interface CourseAttemptSnapshot {
   stuckCount: number;
   contextIds?: string[];
   crossSpeakerValid?: boolean;
+  speakerIds?: string[];
+  speakerPairings?: string[];
+  completedSelfChecks?: number;
+  recordedSampleCount?: number;
+  playbackComparisonCompleted?: boolean;
+  materialIds?: string[];
+  positions?: string[];
   validSampleCount?: number;
   recordingQualityValid?: boolean;
   alignmentValid?: boolean;
@@ -56,6 +63,13 @@ export function hasLevelPassed(
     totalCount: snapshot.attempts,
     uniqueContextIds: contexts,
     crossSpeakerValid: snapshot.crossSpeakerValid,
+    speakerIds: snapshot.speakerIds,
+    speakerPairings: snapshot.speakerPairings,
+    completedSelfChecks: snapshot.completedSelfChecks,
+    recordedSampleCount: snapshot.recordedSampleCount,
+    playbackComparisonCompleted: snapshot.playbackComparisonCompleted,
+    materialIds: snapshot.materialIds ?? snapshot.contextIds,
+    positions: snapshot.positions,
     passedCount: snapshot.passedCount,
     validSampleCount: snapshot.validSampleCount ?? snapshot.attempts,
     contextCount: new Set(contexts).size,
