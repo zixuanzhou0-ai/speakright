@@ -281,17 +281,16 @@ export default function DrillPage() {
     return (
       <LanguageModuleGate moduleName="刻意练习" readinessKey="wordPractice">
         <div
-          className="h-full flex flex-col px-6 py-4 overflow-y-auto scrollbar-thin"
+          className="min-h-full flex flex-col overflow-y-auto px-4 py-4 scrollbar-thin sm:px-6"
           data-smoke="drill-page"
         >
           <div className="mb-5 flex flex-col gap-3 shrink-0 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
               <h1 className="break-words text-2xl font-bold [overflow-wrap:anywhere]">
-                {languageProfile.shortLabel}实验训练
+                {languageProfile.shortLabel}发音实验室 Labs
               </h1>
               <p className="mt-1 break-words text-muted-foreground [overflow-wrap:anywhere]">
-                当前语言为 experimental：可以练习和获取反馈，但不生成正式
-                mastery。
+                当前语言处于 Labs：可以练习和获取反馈，但不生成正式 mastery。
               </p>
             </div>
             <Link href="/settings">
@@ -315,7 +314,8 @@ export default function DrillPage() {
               <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
               <p className="min-w-0 break-words">
                 西语、法语、俄语仍处于内测阶段。系统会优先播放内置本地音频；
-                如果 Azure 没有返回可用发音单位证据，就不会用整词分冒充掌握证据。
+                如果 Azure
+                没有返回可用发音单位证据，就不会用整词分冒充掌握证据。
               </p>
             </div>
           </div>
@@ -354,7 +354,7 @@ export default function DrillPage() {
   return (
     <LanguageModuleGate moduleName="刻意练习" readinessKey="wordPractice">
       <div
-        className="h-full flex flex-col px-6 py-4 overflow-y-auto scrollbar-thin"
+        className="min-h-full flex flex-col overflow-y-auto px-4 py-4 scrollbar-thin sm:px-6"
         data-smoke="drill-page"
       >
         <div className="mb-5 flex flex-col gap-3 shrink-0 sm:flex-row sm:items-start sm:justify-between">

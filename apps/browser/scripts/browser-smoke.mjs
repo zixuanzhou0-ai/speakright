@@ -12,8 +12,8 @@ const routes = [
     includes: [
       'data-smoke="settings-page"',
       'data-smoke="api-key-persistence"',
-      'data-smoke="azure-scoring-card"',
-      "未配置 Azure",
+      'data-smoke="language-option"',
+      "基础设置",
     ],
   },
   {

@@ -28,6 +28,10 @@ import {
   summarizeBenchmarkTrend,
 } from "@/lib/benchmark-archive";
 import { getLanguageProfile } from "@/lib/language-profiles";
+import {
+  loadLearningEvidence,
+  summarizeLearningEvidence,
+} from "@/lib/learning-evidence";
 import { canRecordFormalMastery } from "@/lib/mastery-language-policy";
 import {
   getMasteryProfileStorageWarning,
@@ -44,6 +48,13 @@ type ProgressArchiveStatus = {
 const WRAP_SAFE_ACTION_BUTTON_CLASS =
   "max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]";
 
+const EVIDENCE_LADDER = [
+  { stage: "discriminated", label: "\u80fd\u542c\u51fa" },
+  { stage: "controlled", label: "\u53d7\u63a7\u8868\u8fbe" },
+  { stage: "varied", label: "\u591a\u8bcd\u5883\u7a33\u5b9a" },
+  { stage: "transfer_observed", label: "\u53e5\u5b50\u8fc1\u79fb" },
+  { stage: "retention_observed", label: "\u5ef6\u8fdf\u4fdd\u6301" },
+] as const;
 function getProgressArchiveErrorMessage(
   error: unknown,
   fallback: string,
@@ -73,6 +84,9 @@ export default function ProgressPage() {
   const canShowFormalProgress = canRecordFormalMastery(languageId);
   const [recordings, setRecordings] = useState<BenchmarkRecordingMeta[]>([]);
   const [profile, setProfile] = useState<MasteryProfile | null>(null);
+  const [learningEvidence, setLearningEvidence] = useState<
+    ReturnType<typeof loadLearningEvidence>["evidence"]
+  >([]);
   const [archiveStatus, setArchiveStatus] =
     useState<ProgressArchiveStatus | null>(null);
   const [profileStorageWarning, setProfileStorageWarning] = useState<
@@ -91,16 +105,22 @@ export default function ProgressPage() {
     [benchmarkGroups, canShowFormalProgress],
   );
 
+  const evidenceSummary = useMemo(
+    () => summarizeLearningEvidence(learningEvidence, languageId),
+    [languageId, learningEvidence],
+  );
   useEffect(() => {
     if (!canShowFormalProgress) {
       setRecordings([]);
       setProfile(null);
       setProfileStorageWarning(null);
+      setLearningEvidence([]);
       return;
     }
     setRecordings(listBenchmarkRecordings());
     setProfileStorageWarning(getMasteryProfileStorageWarning());
     setProfile(loadMasteryProfile());
+    setLearningEvidence(loadLearningEvidence().evidence);
   }, [canShowFormalProgress]);
 
   if (!canShowFormalProgress) {
@@ -126,6 +146,11 @@ export default function ProgressPage() {
       ).length
     : 0;
   const trainingSessions = profile?.sessions ?? [];
+
+  const evidenceSteps = EVIDENCE_LADDER.map((item) => ({
+    ...item,
+    count: evidenceSummary.stageCounts[item.stage],
+  }));
 
   const playRecording = async (item: BenchmarkRecordingMeta) => {
     setArchiveStatus(null);
@@ -154,7 +179,7 @@ export default function ProgressPage() {
   if (!canShowFormalProgress) {
     return (
       <div
-        className="h-full overflow-y-auto px-6 py-4 scrollbar-thin"
+        className="min-h-full overflow-y-auto px-4 py-4 scrollbar-thin sm:px-6"
         data-smoke="progress-experimental-blocker"
       >
         <div className="mb-5 flex items-center gap-3">
@@ -261,7 +286,7 @@ export default function ProgressPage() {
 
   return (
     <div
-      className="h-full overflow-y-auto px-6 py-4 scrollbar-thin"
+      className="min-h-full overflow-y-auto px-4 py-4 scrollbar-thin sm:px-6"
       data-smoke="progress-page"
     >
       <div className="mb-5 flex items-center gap-3">
@@ -302,7 +327,7 @@ export default function ProgressPage() {
         />
         <Metric
           icon={CheckCircle2}
-          label="已掌握包"
+          label="历史受控记录"
           value={mastered.toString()}
         />
         <Metric
@@ -311,6 +336,64 @@ export default function ProgressPage() {
           value={transferred.toString()}
         />
       </div>
+
+      <section
+        className="mt-5 rounded-xl border bg-card p-5 shadow-sm"
+        data-smoke="learning-evidence-ladder"
+      >
+        <div className="mb-4">
+          <h2 className="text-lg font-bold">
+            {"\u5b66\u4e60\u8bc1\u636e\u9636\u68af"}
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            {
+              "\u8fd9\u91cc\u663e\u793a\u53ef\u8ffd\u6eaf\u7684\u5b66\u4e60\u8bc1\u636e\uff0c\u4e0d\u628a\u5355\u6b21\u9ad8\u5206\u5f53\u4f5c\u5df2\u638c\u63e1\u3002"
+            }
+          </p>
+        </div>
+        {evidenceSummary.totalTargets === 0 ? (
+          <div className="rounded-xl border border-dashed p-5 text-sm text-muted-foreground">
+            <p>
+              {
+                "\u8fd8\u6ca1\u6709\u53ef\u7528\u8bc1\u636e\u3002\u5148\u5b8c\u6210 2 \u5206\u949f\u57fa\u7ebf\uff0c\u6216\u4ece\u7b2c\u4e00\u8f6e\u8fa8\u97f3\u5f00\u59cb\u3002"
+              }
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Link
+                href="/assessment"
+                className="inline-flex min-h-10 items-center rounded-lg bg-primary px-4 font-medium text-primary-foreground"
+              >
+                {"完成 2 分钟基线"}
+              </Link>
+              <Link
+                href="/drill/perception"
+                className="inline-flex min-h-10 items-center rounded-lg border px-4 font-medium text-foreground"
+              >
+                {"开始第一轮辨音"}
+              </Link>
+            </div>
+          </div>
+        ) : (
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+            {evidenceSteps.map((step) => (
+              <div
+                key={step.stage}
+                className="rounded-xl border bg-muted/20 p-4"
+              >
+                <p className="text-sm font-semibold">{step.label}</p>
+                <p className="mt-2 text-2xl font-bold text-primary">
+                  {step.count}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {
+                    "\u4e2a\u76ee\u6807\u5177\u5907\u6b64\u5c42\u6216\u66f4\u9ad8\u8bc1\u636e"
+                  }
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
 
       <div className="mt-5 grid gap-5 xl:grid-cols-[1.1fr_0.9fr]">
         <section className="rounded-xl border bg-card p-5 shadow-sm">

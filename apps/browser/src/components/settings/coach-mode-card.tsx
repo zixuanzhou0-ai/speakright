@@ -7,10 +7,10 @@ import { type CoachMode, setCoachMode } from "@/lib/api-keys";
 import { cn } from "@/lib/utils";
 
 const MODES: { value: CoachMode; label: string; desc: string }[] = [
-  { value: "easy", label: "简单", desc: "像外国朋友一样包容，只指出严重错误" },
-  { value: "normal", label: "正常", desc: "专业教练，平和指导，适度分析" },
-  { value: "hard", label: "略难", desc: "高标准要求，细微偏差也会指出" },
-  { value: "strict", label: "严师", desc: "母语者标准，不留情面，事无巨细" },
+  { value: "easy", label: "关键一项", desc: "只指出一个最影响沟通的问题" },
+  { value: "normal", label: "平衡反馈", desc: "给出 2–3 个优先问题和练习" },
+  { value: "hard", label: "精细反馈", desc: "提供更细的证据与动作提示" },
+  { value: "strict", label: "技术审阅", desc: "全面技术审阅，直接但不羞辱" },
 ];
 
 export function CoachModeCard() {
@@ -29,7 +29,7 @@ export function CoachModeCard() {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
           {MODES.map((m) => (
             <button
               key={m.value}

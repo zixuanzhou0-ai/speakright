@@ -126,7 +126,7 @@ describe("ProgressPage language boundary", () => {
     render(<ProgressPage />);
 
     expect(screen.getByText("进步档案")).toBeInTheDocument();
-    expect(await screen.findByText("已掌握包")).toBeInTheDocument();
+    expect(await screen.findByText("历史受控记录")).toBeInTheDocument();
     expect(await screen.findByText("已迁移")).toBeInTheDocument();
     expect(mocks.listBenchmarkRecordings).toHaveBeenCalledTimes(1);
     expect(mocks.loadMasteryProfile).toHaveBeenCalledTimes(1);
