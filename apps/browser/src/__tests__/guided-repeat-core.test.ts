@@ -53,6 +53,12 @@ describe("guided repeat core", () => {
       "word-feminine",
     ]);
     expect(
+      buildGuidedRepeatSteps(plan)
+        .filter((step) => step.kind === "gap")
+        .slice(0, 2)
+        .map((step) => step.gapKind),
+    ).toEqual(["anchor-imitation", "anchor-imitation"]);
+    expect(
       audio
         .filter((step) => step.role === "anchor-single")
         .map((step) => step.src),
@@ -99,7 +105,9 @@ describe("guided repeat core", () => {
     expect(getGuidedRepeatGapMs(500, "flow", "imitation")).toBe(900);
     expect(getGuidedRepeatGapMs(1000, "standard", "imitation")).toBe(1400);
     expect(getGuidedRepeatGapMs(10_000, "relaxed", "imitation")).toBe(4200);
-    expect(getGuidedRepeatGapMs(0, "standard", "cue")).toBe(450);
+    expect(getGuidedRepeatGapMs(0, "flow", "anchor-imitation")).toBe(900);
+    expect(getGuidedRepeatGapMs(0, "standard", "anchor-imitation")).toBe(1200);
+    expect(getGuidedRepeatGapMs(0, "relaxed", "anchor-imitation")).toBe(1600);
     expect(getGuidedRepeatGapMs(0, "standard", "transition")).toBe(650);
   });
 

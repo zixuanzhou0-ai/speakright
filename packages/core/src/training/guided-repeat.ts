@@ -12,7 +12,10 @@ export type GuidedRepeatAudioRole =
   | "anchor-single"
   | "word-masculine"
   | "word-feminine";
-export type GuidedRepeatGapKind = "cue" | "imitation" | "transition";
+export type GuidedRepeatGapKind =
+  | "anchor-imitation"
+  | "imitation"
+  | "transition";
 
 export interface GuidedRepeatVoicePolicy {
   languageId: GuidedRepeatLanguageId;
@@ -80,7 +83,7 @@ const VOICE_POLICIES: Record<GuidedRepeatLanguageId, GuidedRepeatVoicePolicy> =
 
 const RHYTHM_TIMING = {
   flow: {
-    cue: 300,
+    anchorImitation: 900,
     transition: 450,
     multiplier: 0.7,
     base: 350,
@@ -88,7 +91,7 @@ const RHYTHM_TIMING = {
     max: 2200,
   },
   standard: {
-    cue: 450,
+    anchorImitation: 1200,
     transition: 650,
     multiplier: 0.9,
     base: 500,
@@ -96,7 +99,7 @@ const RHYTHM_TIMING = {
     max: 3200,
   },
   relaxed: {
-    cue: 650,
+    anchorImitation: 1600,
     transition: 900,
     multiplier: 1.15,
     base: 700,
@@ -137,7 +140,7 @@ export function getGuidedRepeatGapMs(
   gapKind: GuidedRepeatGapKind,
 ): number {
   const timing = RHYTHM_TIMING[rhythm];
-  if (gapKind === "cue") return timing.cue;
+  if (gapKind === "anchor-imitation") return timing.anchorImitation;
   if (gapKind === "transition") return timing.transition;
   return Math.round(
     clamp(
@@ -220,7 +223,7 @@ export function buildGuidedRepeatSteps(
         wordIndex,
         turn: 1,
       },
-      { kind: "gap", gapKind: "cue", wordIndex },
+      { kind: "gap", gapKind: "anchor-imitation", wordIndex },
       {
         kind: "audio",
         role: "anchor-single",
@@ -228,7 +231,7 @@ export function buildGuidedRepeatSteps(
         wordIndex,
         turn: 2,
       },
-      { kind: "gap", gapKind: "imitation", wordIndex },
+      { kind: "gap", gapKind: "anchor-imitation", wordIndex },
     );
     steps.push(...buildWordAudioSteps(item, wordIndex));
     if (wordIndex < plan.queue.length - 1) {

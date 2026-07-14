@@ -66,6 +66,9 @@ function phaseLabel(step: GuidedRepeatStep | null): string {
   if (!step) return "准备下一步";
   if (step.kind === "transition") return "切换下一个单词";
   if (step.kind === "gap") {
+    if (step.gapKind === "anchor-imitation") {
+      return "轮到你 · 跟读音标";
+    }
     return step.gapKind === "imitation" ? "轮到你 · 跟读" : "保持节奏";
   }
   if (step.role === "anchor-single") return `听音标 · ${step.turn}/2`;

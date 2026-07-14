@@ -52,6 +52,10 @@ test.describe
 
       await waitForPhase(dialog, "anchor-single-1");
       await page.screenshot({ path: output("02-english-anchor-1.png") });
+      await waitForPhase(dialog, "gap-anchor-imitation");
+      await page.screenshot({
+        path: output("02a-english-anchor-imitation-gap.png"),
+      });
       await waitForPhase(dialog, "anchor-single-2");
       await page.screenshot({ path: output("03-english-anchor-2.png") });
       await waitForPhase(dialog, "word-masculine-1");

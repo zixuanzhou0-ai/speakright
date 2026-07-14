@@ -4,15 +4,23 @@ async function installPhaseRecorder(page: Page) {
   await page.evaluate(() => {
     const target = window as unknown as {
       __guidedRepeatPhases?: string[];
+      __guidedRepeatPhaseEvents?: { phase: string; at: number }[];
       __guidedRepeatObserver?: MutationObserver;
     };
     target.__guidedRepeatPhases = [];
+    target.__guidedRepeatPhaseEvents = [];
     const record = () => {
       const phase = document
         .querySelector('[data-smoke="guided-repeat-phase"]')
         ?.getAttribute("data-phase");
       const phases = target.__guidedRepeatPhases ?? [];
-      if (phase && phases.at(-1) !== phase) phases.push(phase);
+      if (phase && phases.at(-1) !== phase) {
+        phases.push(phase);
+        target.__guidedRepeatPhaseEvents?.push({
+          phase,
+          at: performance.now(),
+        });
+      }
       target.__guidedRepeatPhases = phases;
     };
     target.__guidedRepeatObserver?.disconnect();
@@ -34,6 +42,17 @@ async function phases(page: Page) {
           __guidedRepeatPhases?: string[];
         }
       ).__guidedRepeatPhases ?? [],
+  );
+}
+
+async function phaseEvents(page: Page) {
+  return page.evaluate(
+    () =>
+      (
+        window as unknown as {
+          __guidedRepeatPhaseEvents?: { phase: string; at: number }[];
+        }
+      ).__guidedRepeatPhaseEvents ?? [],
   );
 }
 
@@ -94,9 +113,9 @@ test("English guided repeat starts at the visible word and follows the exact off
     .toBe(true);
   expectSubsequence(await phases(page), [
     "anchor-single-1",
-    "gap-cue",
+    "gap-anchor-imitation",
     "anchor-single-2",
-    "gap-imitation",
+    "gap-anchor-imitation",
     "word-masculine-1",
     "gap-imitation",
     "word-feminine-1",
@@ -105,6 +124,35 @@ test("English guided repeat starts at the visible word and follows the exact off
     "gap-imitation",
     "word-feminine-2",
   ]);
+  const events = await phaseEvents(page);
+  const firstAnchorGap = events.find(
+    (event) => event.phase === "gap-anchor-imitation",
+  );
+  const secondAnchor = events.find(
+    (event) =>
+      event.phase === "anchor-single-2" &&
+      (!firstAnchorGap || event.at > firstAnchorGap.at),
+  );
+  const secondAnchorGap = events.find(
+    (event) =>
+      event.phase === "gap-anchor-imitation" &&
+      (!secondAnchor || event.at > secondAnchor.at),
+  );
+  const firstWord = events.find(
+    (event) =>
+      event.phase === "word-masculine-1" &&
+      (!secondAnchorGap || event.at > secondAnchorGap.at),
+  );
+  expect(firstAnchorGap).toBeDefined();
+  expect(secondAnchor).toBeDefined();
+  expect(secondAnchorGap).toBeDefined();
+  expect(firstWord).toBeDefined();
+  expect(
+    (secondAnchor?.at ?? 0) - (firstAnchorGap?.at ?? 0),
+  ).toBeGreaterThanOrEqual(750);
+  expect(
+    (firstWord?.at ?? 0) - (secondAnchorGap?.at ?? 0),
+  ).toBeGreaterThanOrEqual(750);
   expect(onlineFallbacks).toEqual([]);
   expect(chartWordAudioRequests).toEqual([]);
 
@@ -152,7 +200,11 @@ test("Spanish, French and Russian use a double single-anchor sequence while pres
       )
       .toBe(true);
     const log = await phases(page);
-    expectSubsequence(log, ["anchor-single-1", "gap-cue", "anchor-single-2"]);
+    expectSubsequence(log, [
+      "anchor-single-1",
+      "gap-anchor-imitation",
+      "anchor-single-2",
+    ]);
     await dialog.locator('[data-smoke="guided-repeat-end"]').click();
     await expect(dialog).toBeHidden();
   }
