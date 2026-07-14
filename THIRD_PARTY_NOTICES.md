@@ -35,9 +35,12 @@ source-code license.
   references inform the local IPA chart clips. Treat these media files as
   third-party educational assets, not MIT-licensed source code.
 - **Wikimedia Commons `En-us-cup.ogg` by Dvortygirl**: The local English
-  `cup` normal anchor and its pitch-preserving 0.78x slow derivative are
-  distributed under CC BY-SA 3.0. Exact attribution, hashes, and modifications
-  are recorded in `docs/operations/GUIDED_REPEAT_AUDIO_SOURCES.md`.
+  `cup` normal and pitch-preserving 0.78x slow example-word recordings are
+  distributed under CC BY-SA 3.0. These files are not phoneme anchors.
+- **Wikimedia Commons `PR-open-mid back unrounded vowel2.ogg` by RoachPeter**:
+  The standalone `/ʌ/` phoneme recording used by guided repeat is distributed
+  under CC BY-SA 4.0. Exact attribution, hashes, and modifications for both
+  sources are recorded in `docs/operations/GUIDED_REPEAT_AUDIO_SOURCES.md`.
 - **University of Iowa Sounds of Speech Spanish**: Spanish articulation assets
   and references are used where exact local Spanish mouth/tongue animations are
   available.

@@ -9,8 +9,6 @@ export type GuidedRepeatStatus =
   | "recoverable-error"
   | "completed";
 export type GuidedRepeatAudioRole =
-  | "anchor-normal"
-  | "anchor-slow"
   | "anchor-single"
   | "word-masculine"
   | "word-feminine";
@@ -35,7 +33,7 @@ export interface GuidedRepeatSessionPlan {
   languageId: GuidedRepeatLanguageId;
   soundUnitSlug: string;
   rhythm: GuidedRepeatRhythm;
-  anchorAudio: { normal?: string; slow?: string; single?: string };
+  anchorAudio: { single: string };
   queue: GuidedRepeatQueueItem[];
   totalWords: number;
 }
@@ -214,43 +212,24 @@ export function buildGuidedRepeatSteps(
 ): GuidedRepeatStep[] {
   const steps: GuidedRepeatStep[] = [];
   plan.queue.forEach((item, wordIndex) => {
-    if (plan.languageId === "en-US") {
-      steps.push(
-        {
-          kind: "audio",
-          role: "anchor-normal",
-          src: plan.anchorAudio.normal ?? "",
-          wordIndex,
-        },
-        { kind: "gap", gapKind: "cue", wordIndex },
-        {
-          kind: "audio",
-          role: "anchor-slow",
-          src: plan.anchorAudio.slow ?? "",
-          wordIndex,
-        },
-        { kind: "gap", gapKind: "imitation", wordIndex },
-      );
-    } else {
-      steps.push(
-        {
-          kind: "audio",
-          role: "anchor-single",
-          src: plan.anchorAudio.single ?? "",
-          wordIndex,
-          turn: 1,
-        },
-        { kind: "gap", gapKind: "cue", wordIndex },
-        {
-          kind: "audio",
-          role: "anchor-single",
-          src: plan.anchorAudio.single ?? "",
-          wordIndex,
-          turn: 2,
-        },
-        { kind: "gap", gapKind: "imitation", wordIndex },
-      );
-    }
+    steps.push(
+      {
+        kind: "audio",
+        role: "anchor-single",
+        src: plan.anchorAudio.single,
+        wordIndex,
+        turn: 1,
+      },
+      { kind: "gap", gapKind: "cue", wordIndex },
+      {
+        kind: "audio",
+        role: "anchor-single",
+        src: plan.anchorAudio.single,
+        wordIndex,
+        turn: 2,
+      },
+      { kind: "gap", gapKind: "imitation", wordIndex },
+    );
     steps.push(...buildWordAudioSteps(item, wordIndex));
     if (wordIndex < plan.queue.length - 1) {
       steps.push(
@@ -275,15 +254,8 @@ export function validateGuidedRepeatSessionPlan(
   if (plan.totalWords !== plan.queue.length) {
     issues.push("totalWords does not match queue length");
   }
-  if (plan.languageId === "en-US") {
-    if (!isLocalAudioSrc(plan.anchorAudio.normal)) {
-      issues.push("English normal anchor must be local");
-    }
-    if (!isLocalAudioSrc(plan.anchorAudio.slow)) {
-      issues.push("English slow anchor must be local");
-    }
-  } else if (!isLocalAudioSrc(plan.anchorAudio.single)) {
-    issues.push("non-English anchor must be local");
+  if (!isLocalAudioSrc(plan.anchorAudio.single)) {
+    issues.push("sound-unit anchor must be local");
   }
   const ids = new Set<string>();
   for (const item of plan.queue) {

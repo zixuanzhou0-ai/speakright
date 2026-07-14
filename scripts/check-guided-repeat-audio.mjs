@@ -49,8 +49,7 @@ const chartWords = new Set(
   ),
 );
 for (const word of chartWords) {
-  checkFile(`/audio/ipa/normal/${encodeURIComponent(word)}.mp3`);
-  checkFile(`/audio/ipa/slow/${encodeURIComponent(word)}.mp3`);
+  checkFile(`/audio/ipa/phoneme/${encodeURIComponent(word)}.mp3`);
 }
 
 const englishWords = new Set(

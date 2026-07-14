@@ -12,10 +12,7 @@ const PLAN: GuidedRepeatSessionPlan = {
   languageId: "en-US",
   soundUnitSlug: "ee",
   rhythm: "flow",
-  anchorAudio: {
-    normal: "/audio/ipa/normal/sheep.mp3",
-    slow: "/audio/ipa/slow/sheep.mp3",
-  },
+  anchorAudio: { single: "/audio/ipa/phoneme/green.mp3" },
   queue: [
     {
       materialId: "en-US:ee:sheep",
@@ -41,7 +38,7 @@ class FakeAudioAdapter implements GuidedRepeatAudioAdapter {
   );
   readonly pause = vi.fn(
     (): PlaybackPosition => ({
-      src: "/audio/ipa/normal/sheep.mp3",
+      src: "/audio/ipa/phoneme/green.mp3",
       seekMs: 432,
     }),
   );

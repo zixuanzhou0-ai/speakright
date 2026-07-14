@@ -27,14 +27,11 @@ describe("guided repeat core", () => {
     ).toEqual(["three", "four", "one", "two"]);
   });
 
-  it("builds the exact English sequence for every word", () => {
+  it("repeats the same isolated English phoneme anchor for every word", () => {
     const plan = buildGuidedRepeatSessionPlan({
       languageId: "en-US",
       soundUnitSlug: "ee",
-      anchorAudio: {
-        normal: "/audio/ipa/normal/sheep.mp3",
-        slow: "/audio/ipa/slow/sheep.mp3",
-      },
+      anchorAudio: { single: "/audio/ipa/phoneme/green.mp3" },
       pool: POOL.slice(0, 2),
       currentMaterialId: POOL[0].materialId,
     });
@@ -42,20 +39,29 @@ describe("guided repeat core", () => {
       (step) => step.kind === "audio",
     );
     expect(audio.map((step) => step.role)).toEqual([
-      "anchor-normal",
-      "anchor-slow",
+      "anchor-single",
+      "anchor-single",
       "word-masculine",
       "word-feminine",
       "word-masculine",
       "word-feminine",
-      "anchor-normal",
-      "anchor-slow",
+      "anchor-single",
+      "anchor-single",
       "word-masculine",
       "word-feminine",
       "word-masculine",
       "word-feminine",
     ]);
-    expect(audio.some((step) => step.role === "anchor-single")).toBe(false);
+    expect(
+      audio
+        .filter((step) => step.role === "anchor-single")
+        .map((step) => step.src),
+    ).toEqual([
+      `/audio/ipa/phoneme/green.mp3`,
+      `/audio/ipa/phoneme/green.mp3`,
+      `/audio/ipa/phoneme/green.mp3`,
+      `/audio/ipa/phoneme/green.mp3`,
+    ]);
   });
 
   it("repeats one non-English anchor and keeps Russian voice semantics", () => {
@@ -101,10 +107,7 @@ describe("guided repeat core", () => {
     const plan = buildGuidedRepeatSessionPlan({
       languageId: "en-US",
       soundUnitSlug: "ee",
-      anchorAudio: {
-        normal: "https://example.com/sheep.mp3",
-        slow: "/audio/ipa/slow/sheep.mp3",
-      },
+      anchorAudio: { single: "https://example.com/phoneme.mp3" },
       pool: POOL,
       currentMaterialId: POOL[0].materialId,
     });

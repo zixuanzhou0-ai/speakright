@@ -50,10 +50,10 @@ test.describe
       const dialog = page.locator('[data-smoke="guided-repeat-dialog"]');
       await expect(dialog).toBeVisible();
 
-      await waitForPhase(dialog, "anchor-normal");
-      await page.screenshot({ path: output("02-english-normal.png") });
-      await waitForPhase(dialog, "anchor-slow");
-      await page.screenshot({ path: output("03-english-slow.png") });
+      await waitForPhase(dialog, "anchor-single-1");
+      await page.screenshot({ path: output("02-english-anchor-1.png") });
+      await waitForPhase(dialog, "anchor-single-2");
+      await page.screenshot({ path: output("03-english-anchor-2.png") });
       await waitForPhase(dialog, "word-masculine-1");
       await page.screenshot({ path: output("04-english-masculine.png") });
       await waitForPhase(dialog, "word-feminine-1");
@@ -84,7 +84,7 @@ test.describe
       await page.emulateMedia({ colorScheme: "dark", reducedMotion: "reduce" });
       await page.setViewportSize({ width: 390, height: 844 });
       let dialog = await openGuidedRepeat(page, "/phonemes/ih");
-      await waitForPhase(dialog, "anchor-normal");
+      await waitForPhase(dialog, "anchor-single-1");
       await dialog.locator('[data-smoke="guided-repeat-pause"]').click();
       await waitForPhase(dialog, "paused");
       await page.screenshot({ path: output("09-mobile-390-dark-paused.png") });
@@ -132,15 +132,23 @@ test.describe
       );
       await dialog.locator('[data-rhythm="flow"]').click();
       await waitForPhase(dialog, "completed", 30_000);
-      await expect(dialog.getByRole("button", { name: "\u518d\u6765\u4e00\u8f6e" })).toBeVisible();
       await expect(
-        dialog.getByRole("button", { name: "\u8fd4\u56de\u97f3\u6807\u7ec3\u4e60" }),
+        dialog.getByRole("button", { name: "\u518d\u6765\u4e00\u8f6e" }),
       ).toBeVisible();
-      await expect(dialog).toContainText("\u4e0d\u4ee3\u8868\u5df2\u7ecf\u638c\u63e1");
+      await expect(
+        dialog.getByRole("button", {
+          name: "\u8fd4\u56de\u97f3\u6807\u7ec3\u4e60",
+        }),
+      ).toBeVisible();
+      await expect(dialog).toContainText(
+        "\u4e0d\u4ee3\u8868\u5df2\u7ecf\u638c\u63e1",
+      );
       await page.screenshot({ path: output("15-completed.png") });
 
-      await dialog.getByRole("button", { name: "\u518d\u6765\u4e00\u8f6e" }).click();
-      await waitForPhase(dialog, "anchor-normal");
+      await dialog
+        .getByRole("button", { name: "\u518d\u6765\u4e00\u8f6e" })
+        .click();
+      await waitForPhase(dialog, "anchor-single-1");
     });
 
     test("captures a local audio preparation error without an online fallback", async ({

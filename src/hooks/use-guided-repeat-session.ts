@@ -270,8 +270,6 @@ export function useGuidedRepeatSession({
       try {
         const first = nextPlan.queue[0];
         const sources = [
-          nextPlan.anchorAudio.normal,
-          nextPlan.anchorAudio.slow,
           nextPlan.anchorAudio.single,
           first?.masculineAudioSrc,
           first?.feminineAudioSrc,

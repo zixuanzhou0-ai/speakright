@@ -9,6 +9,7 @@ import {
   validateGuidedRepeatSessionPlan,
 } from "@speakright/core/training/guided-repeat";
 import { getEnglishWordAudioSrc } from "@/hooks/use-word-pronunciation";
+import { getEnglishHeaderPhonemeAudioSrc } from "@/lib/audio-playback-policy";
 import { getStaticLanguageAudioPackEntry } from "@/lib/static-language-audio-pack";
 import type { LanguageId } from "@/types/language";
 import type { KeywordEntry, PhonemeData } from "@/types/phoneme";
@@ -34,17 +35,6 @@ export function guidedRepeatMaterialId(
   word: string,
 ): string {
   return `guided-repeat:${languageId}:${soundUnitSlug}:${normalizeTrainingMaterialContent(word)}`;
-}
-
-function englishAnchorAudio(phoneme: PhonemeData) {
-  if (!phoneme.chartWord) {
-    throw new Error(`音标 ${phoneme.ipa} 缺少正常/慢速锚点名称。`);
-  }
-  const stem = encodeURIComponent(phoneme.chartWord.toLowerCase());
-  return {
-    normal: `/audio/ipa/normal/${stem}.mp3`,
-    slow: `/audio/ipa/slow/${stem}.mp3`,
-  };
 }
 
 export async function buildLocalGuidedRepeatPlan(
@@ -107,10 +97,15 @@ export async function buildLocalGuidedRepeatPlan(
     }),
   );
 
-  const anchorAudio =
+  const anchorSrc =
     input.languageId === "en-US"
-      ? englishAnchorAudio(input.phoneme)
-      : { single: input.phoneme.phonemeAudio?.localSrc };
+      ? (input.phoneme.phonemeAudio?.localSrc ??
+        getEnglishHeaderPhonemeAudioSrc(input.phoneme.chartWord))
+      : input.phoneme.phonemeAudio?.localSrc;
+  if (!anchorSrc) {
+    throw new Error(`音标 ${input.phoneme.ipa} 缺少本地音标本体音频。`);
+  }
+  const anchorAudio = { single: anchorSrc };
   const currentMaterialId = guidedRepeatMaterialId(
     input.languageId,
     input.phoneme.slug,

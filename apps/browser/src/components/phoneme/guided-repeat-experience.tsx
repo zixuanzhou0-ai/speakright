@@ -68,8 +68,6 @@ function phaseLabel(step: GuidedRepeatStep | null): string {
   if (step.kind === "gap") {
     return step.gapKind === "imitation" ? "轮到你 · 跟读" : "保持节奏";
   }
-  if (step.role === "anchor-normal") return "听音标 · 正常";
-  if (step.role === "anchor-slow") return "听音标 · 慢速";
   if (step.role === "anchor-single") return `听音标 · ${step.turn}/2`;
   if (step.role === "word-masculine") return `听单词 · 男声 ${step.turn}/2`;
   return `听单词 · 女声 ${step.turn}/2`;

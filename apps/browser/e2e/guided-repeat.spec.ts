@@ -50,12 +50,19 @@ test("English guided repeat starts at the visible word and follows the exact off
 }) => {
   test.setTimeout(45_000);
   const onlineFallbacks: string[] = [];
+  const chartWordAudioRequests: string[] = [];
   page.on("request", (request) => {
     if (
       request.url().includes("/api/pronunciation") ||
       request.url().includes("/api/elevenlabs")
     ) {
       onlineFallbacks.push(request.url());
+    }
+    if (
+      request.url().includes("/audio/ipa/normal/") ||
+      request.url().includes("/audio/ipa/slow/")
+    ) {
+      chartWordAudioRequests.push(request.url());
     }
   });
 
@@ -86,9 +93,9 @@ test("English guided repeat starts at the visible word and follows the exact off
     })
     .toBe(true);
   expectSubsequence(await phases(page), [
-    "anchor-normal",
+    "anchor-single-1",
     "gap-cue",
-    "anchor-slow",
+    "anchor-single-2",
     "gap-imitation",
     "word-masculine-1",
     "gap-imitation",
@@ -99,6 +106,7 @@ test("English guided repeat starts at the visible word and follows the exact off
     "word-feminine-2",
   ]);
   expect(onlineFallbacks).toEqual([]);
+  expect(chartWordAudioRequests).toEqual([]);
 
   const pauseButton = dialog.locator('[data-smoke="guided-repeat-pause"]');
   await expect(pauseButton).toBeVisible();
