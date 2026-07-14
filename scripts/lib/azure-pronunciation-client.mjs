@@ -47,6 +47,16 @@ export function parseAzurePronunciationResponse(json, languageId) {
       word: word.Word,
       accuracyScore: word.PronunciationAssessment?.AccuracyScore ?? null,
       errorType: word.PronunciationAssessment?.ErrorType ?? null,
+      syllables:
+        languageId === "en-US"
+          ? (word.Syllables ?? []).map((syllable) => ({
+              syllable: syllable.Syllable,
+              grapheme: syllable.Grapheme,
+              accuracyScore:
+                syllable.PronunciationAssessment?.AccuracyScore ?? null,
+              phonemes: collectEnglishPhonemes([syllable]),
+            }))
+          : undefined,
       phonemes:
         languageId === "en-US" ? collectEnglishPhonemes([word]) : undefined,
     })),
