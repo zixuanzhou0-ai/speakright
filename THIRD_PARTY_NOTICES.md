@@ -34,6 +34,10 @@ source-code license.
 - **American IPA Chart / americanipachart.com**: English IPA chart audio/source
   references inform the local IPA chart clips. Treat these media files as
   third-party educational assets, not MIT-licensed source code.
+- **Wikimedia Commons `En-us-cup.ogg` by Dvortygirl**: The local English
+  `cup` normal anchor and its pitch-preserving 0.78x slow derivative are
+  distributed under CC BY-SA 3.0. Exact attribution, hashes, and modifications
+  are recorded in `docs/operations/GUIDED_REPEAT_AUDIO_SOURCES.md`.
 - **University of Iowa Sounds of Speech Spanish**: Spanish articulation assets
   and references are used where exact local Spanish mouth/tongue animations are
   available.

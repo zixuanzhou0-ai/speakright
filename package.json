@@ -75,8 +75,9 @@
     "e2e:update": "playwright test --update-snapshots",
     "e2e:browser": "npm run build:browser && playwright test",
     "validate:browser:e2e": "npm run lint:browser && npm run typecheck:browser && npm run test:browser && npm run build:browser && playwright test",
-    "prebuild": "node scripts/check-training-audio.mjs --target=desktop",
+    "prebuild": "node scripts/check-training-audio.mjs --target=desktop && node scripts/check-guided-repeat-audio.mjs",
     "audio:training:check": "node scripts/check-training-audio.mjs --target=all",
+    "audio:guided-repeat:check": "node scripts/check-guided-repeat-audio.mjs",
     "audio:training:plan": "node scripts/generate-training-speaker-audio.mjs",
     "audio:training:audit": "node scripts/audit-training-audio.mjs",
     "audio:training:review": "node scripts/create-training-audio-review-playlists.mjs"
