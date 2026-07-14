@@ -7,6 +7,7 @@ import { RecordButton } from "@/components/audio/record-button";
 import { RecordingActions } from "@/components/audio/recording-actions";
 import { WaveformDisplay } from "@/components/audio/waveform-display";
 import { FeedbackDisplay } from "@/components/feedback/feedback-display";
+import { GuidedRepeatExperience } from "@/components/phoneme/guided-repeat-experience";
 import { PhonemeStudyCard } from "@/components/phoneme/phoneme-study-card";
 import { PhonemeHighlight } from "@/components/scoring/phoneme-highlight";
 import { ScoreSummary } from "@/components/scoring/score-summary";
@@ -24,6 +25,7 @@ import {
 } from "@/hooks/use-session-state";
 import { useSyllableStress } from "@/hooks/use-syllable-stress";
 import { useWordPronunciation } from "@/hooks/use-word-pronunciation";
+import { setLanguageConfig } from "@/lib/api-keys";
 import { buildAzureAttemptEvidence } from "@/lib/azure-attempt-evidence";
 import { getPhonemeAccuracy } from "@/lib/azure-phoneme-map";
 import {
@@ -83,14 +85,15 @@ const SMOKE_SCORE_SUMMARY_RESULT: AzureAssessmentResult = {
 export function PhonemeDetailPage() {
   const params = useParams<{ phoneme: string }>();
   const router = useRouter();
-  const { languageId } = useLanguageConfig();
+  const { languageId: configuredLanguageId } = useLanguageConfig();
+  const routeLanguagePhoneme = getAnyLanguagePhonemeBySlug(params.phoneme);
+  const languageId = routeLanguagePhoneme?.languageId ?? configuredLanguageId;
   const languageProfile = getLanguageProfile(languageId);
   const selectedLanguagePhoneme = getLanguagePhonemeBySlug(
     languageId,
     params.phoneme,
   );
-  const requestedPhoneme =
-    selectedLanguagePhoneme ?? getAnyLanguagePhonemeBySlug(params.phoneme);
+  const requestedPhoneme = selectedLanguagePhoneme ?? routeLanguagePhoneme;
   const requestedLanguageId = requestedPhoneme?.languageId ?? languageId;
   const isRequestedHiddenPracticeRule =
     requestedPhoneme &&
@@ -112,6 +115,15 @@ export function PhonemeDetailPage() {
     useState(false);
   const [showSmokeScoreSummary, setShowSmokeScoreSummary] = useState(false);
   const autoAssessTriggered = useRef(false);
+
+  useEffect(() => {
+    if (
+      routeLanguagePhoneme?.languageId &&
+      routeLanguagePhoneme.languageId !== configuredLanguageId
+    ) {
+      setLanguageConfig({ languageId: routeLanguagePhoneme.languageId });
+    }
+  }, [configuredLanguageId, routeLanguagePhoneme?.languageId]);
 
   const sessionPrefix = `phonemes:${languageId}:${params.phoneme}`;
   const [sessionStorageWarning, setSessionStorageWarning] = useState<
@@ -310,6 +322,13 @@ export function PhonemeDetailPage() {
   useEffect(() => {
     if (!phoneme) return;
     const handler = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (
+        document.querySelector("[data-guided-repeat-dialog]") ||
+        target?.closest("button, input, textarea, select, [role='dialog']")
+      ) {
+        return;
+      }
       if (e.key === "ArrowRight") handleNext();
       else if (e.key === "ArrowLeft") handlePrevious();
     };
@@ -555,6 +574,34 @@ export function PhonemeDetailPage() {
             onStopWordAudio={() => wordAudio.stop()}
             onStopChartAudio={() => chartAudio.stop()}
             wordHistoryLength={wordHistory.length}
+            guidedRepeatAction={
+              currentWord ? (
+                <GuidedRepeatExperience
+                  languageId={languageId}
+                  phoneme={phoneme}
+                  wordPool={wordPool}
+                  currentWord={currentWord}
+                  disabled={recorder.isRecording || azure.isLoading}
+                  disabledReason={
+                    "\u8bf7\u5148\u7ed3\u675f\u5f53\u524d\u5f55\u97f3\u6216\u8bc4\u5206"
+                  }
+                  onBeforeOpen={() => {
+                    playback.stop();
+                    wordAudio.stop();
+                    chartAudio.stop();
+                  }}
+                  onWordChange={(nextWord) => {
+                    const resolved = wordPool.find(
+                      (entry) => entry.word === nextWord.word,
+                    );
+                    if (!resolved || resolved.word === currentWord.word) return;
+                    setWordDirection(1);
+                    setCurrentWord(resolved);
+                    resetState();
+                  }}
+                />
+              ) : null
+            }
             canGoPrevious={
               languageId === "es-ES"
                 ? wordPool.length > 1

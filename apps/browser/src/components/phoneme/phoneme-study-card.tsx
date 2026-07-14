@@ -3,7 +3,7 @@
 import { ChevronLeft, ChevronRight, Loader2, Volume2 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
 import { PhonemePlayButton } from "@/components/phoneme/phoneme-play-button";
 import { VideoPlayer } from "@/components/phoneme/video-player";
 import { Button } from "@/components/ui/button";
@@ -49,6 +49,7 @@ interface PhonemeStudyCardProps {
   onStopChartAudio: () => void;
   wordHistoryLength: number;
   canGoPrevious?: boolean;
+  guidedRepeatAction?: ReactNode;
 }
 
 interface NonEnglishPracticeTaskProps {
@@ -225,6 +226,7 @@ function NonEnglishPracticeTask({
               onNext();
             }}
             aria-label="下一个示例词"
+            data-smoke="phoneme-next-word"
             className="min-h-11 min-w-11 shrink-0 rounded-full cursor-pointer"
           >
             <ChevronRight className="h-4 w-4" />
@@ -267,6 +269,7 @@ export function PhonemeStudyCard({
   onStopChartAudio,
   wordHistoryLength,
   canGoPrevious,
+  guidedRepeatAction,
 }: PhonemeStudyCardProps) {
   const hasLocalPhonemeAssets = phoneme.languageId === "en-US";
   const displayWord = currentWord?.stressText ?? currentWord?.word;
@@ -422,8 +425,11 @@ export function PhonemeStudyCard({
             />
           ) : (
             <>
-              <div className="mt-2 flex items-center gap-2">
-                <motion.div whileTap={{ scale: 0.9 }}>
+              <div className="mt-2 grid grid-cols-[2.75rem_minmax(0,1fr)_2.75rem] items-center gap-x-2 gap-y-1.5">
+                <motion.div
+                  className="col-start-1 row-start-1"
+                  whileTap={{ scale: 0.9 }}
+                >
                   <Button
                     variant="ghost"
                     size="icon"
@@ -439,7 +445,7 @@ export function PhonemeStudyCard({
                   </Button>
                 </motion.div>
 
-                <div className="relative flex-1 overflow-hidden">
+                <div className="relative col-start-2 row-start-1 min-w-0 overflow-hidden">
                   <AnimatePresence mode="wait" initial={false}>
                     <motion.div
                       key={currentWord.word}
@@ -461,7 +467,8 @@ export function PhonemeStudyCard({
                     >
                       <motion.span
                         animate={{ scale: isWordActive ? 1.05 : 1 }}
-                        className={`font-bold transition-colors ${getCenteredReadableTextClassName(practiceText.density)} ${isWordActive ? "text-primary" : ""}`}
+                        className={`whitespace-nowrap font-bold transition-colors ${getCenteredReadableTextClassName(practiceText.density)} ${isWordActive ? "text-primary" : ""}`}
+                        data-smoke="phoneme-current-word"
                       >
                         {displayWord}
                       </motion.span>
@@ -475,7 +482,7 @@ export function PhonemeStudyCard({
                 </div>
 
                 <div
-                  className="flex shrink-0 overflow-hidden rounded-full border bg-muted/30 p-0.5"
+                  className="col-span-2 col-start-1 row-start-2 flex shrink-0 justify-self-end overflow-hidden rounded-full border bg-muted/30 p-0.5"
                   data-smoke="practice-voice-selector"
                 >
                   {(["blue", "pink"] as const).map((voice) => (
@@ -509,7 +516,7 @@ export function PhonemeStudyCard({
                     onPlayWord(currentWord.word, selectedVoice);
                   }}
                   disabled={wordIsLoading}
-                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full cursor-pointer hover:bg-primary/10 hover:text-primary text-muted-foreground disabled:opacity-50 sm:h-8 sm:w-8"
+                  className="col-start-3 row-start-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full cursor-pointer text-muted-foreground hover:bg-primary/10 hover:text-primary disabled:opacity-50"
                 >
                   {wordIsLoading ? (
                     <Loader2 className="h-5 w-5 animate-spin" />
@@ -518,7 +525,10 @@ export function PhonemeStudyCard({
                   )}
                 </motion.button>
 
-                <motion.div whileTap={{ scale: 0.9 }}>
+                <motion.div
+                  className="col-start-3 row-start-1"
+                  whileTap={{ scale: 0.9 }}
+                >
                   <Button
                     variant="ghost"
                     size="icon"
@@ -527,6 +537,7 @@ export function PhonemeStudyCard({
                       onNext();
                     }}
                     aria-label="下一个示例词"
+                    data-smoke="phoneme-next-word"
                     className="min-h-11 min-w-11 shrink-0 rounded-full cursor-pointer"
                   >
                     <ChevronRight className="h-4 w-4" />
@@ -558,6 +569,9 @@ export function PhonemeStudyCard({
           <div className="mt-3 h-8" />
         )}
 
+        {guidedRepeatAction && (
+          <div className="mt-2 flex justify-center">{guidedRepeatAction}</div>
+        )}
         {/* Progress */}
         <div className="mt-1.5 flex items-center justify-center gap-2">
           <span className="text-xs text-muted-foreground">
