@@ -94,7 +94,22 @@
     "audio:pronunciation:gate": "node scripts/pronunciation-audit.mjs gate --stage=final",
     "audio:pronunciation:test": "node scripts/pronunciation-audit.contract.mjs",
     "audio:pronunciation:reference": "node scripts/pronunciation-audit.mjs reference",
-    "audio:pronunciation:report": "node scripts/pronunciation-audit.mjs report"
+    "audio:pronunciation:report": "node scripts/pronunciation-audit.mjs report",
+    "audio:word-audit:inventory": "node scripts/phoneme-word-audit.mjs inventory",
+    "audio:word-audit:reference": "node scripts/phoneme-word-audit.mjs reference",
+    "audio:word-audit:blind:plan": "node scripts/phoneme-word-audit.mjs blind-plan",
+    "audio:word-audit:whisper": "node scripts/phoneme-word-audit.mjs whisper",
+    "audio:word-audit:azure-stt:run": "node scripts/phoneme-word-audit.mjs azure-stt-run",
+    "audio:word-audit:gemini:smoke": "node scripts/phoneme-word-audit.mjs gemini-smoke",
+    "audio:word-audit:gemini:run": "node scripts/phoneme-word-audit.mjs gemini-run",
+    "audio:word-audit:align:english": "node scripts/phoneme-word-audit.mjs align-english",
+    "audio:word-audit:review": "node scripts/phoneme-word-audit.mjs review",
+    "audio:word-audit:review:serve": "node scripts/phoneme-word-review-server.mjs",
+    "audio:word-audit:regenerate:plan": "node scripts/phoneme-word-audit.mjs regenerate-plan",
+    "audio:word-audit:regenerate": "node scripts/phoneme-word-audit.mjs regenerate",
+    "audio:word-audit:gate": "node scripts/phoneme-word-audit.mjs gate",
+    "audio:word-audit:report": "node scripts/phoneme-word-audit.mjs report",
+    "audio:word-audit:test": "node scripts/phoneme-word-audit.contract.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.3.0",

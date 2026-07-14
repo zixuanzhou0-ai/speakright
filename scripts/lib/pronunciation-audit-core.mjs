@@ -115,7 +115,10 @@ export function redactSecrets(value, keyName = "") {
   return value;
 }
 
-function installTypeScriptRequireHook(root) {
+let installedTypeScriptHookRoot = null;
+
+export function installTypeScriptRequireHook(root) {
+  if (installedTypeScriptHookRoot === root) return;
   const originalResolve = Module._resolveFilename;
   Module._resolveFilename = function resolveAlias(
     request,
@@ -146,14 +149,33 @@ function installTypeScriptRequireHook(root) {
     });
     module._compile(output.outputText, filename);
   };
+  installedTypeScriptHookRoot = root;
 }
 
-function loadEnglishContent(root) {
+export function loadEnglishContent(root) {
   installTypeScriptRequireHook(root);
   const require = createRequire(import.meta.url);
   const { PHONEMES } = require(path.resolve(root, "src/lib/phoneme-data.ts"));
   const { WORD_BANK } = require(path.resolve(root, "src/lib/word-bank.ts"));
   return { PHONEMES, WORD_BANK };
+}
+
+export function loadLanguagePhonemeContent(root) {
+  installTypeScriptRequireHook(root);
+  const require = createRequire(import.meta.url);
+  const { LANGUAGE_PHONEMES } = require(
+    path.resolve(root, "src/lib/language-phonemes.ts"),
+  );
+  return LANGUAGE_PHONEMES;
+}
+
+export function loadPhonemeAssessmentAliases(root) {
+  installTypeScriptRequireHook(root);
+  const require = createRequire(import.meta.url);
+  const { phonemeAssessmentAliases } = require(
+    path.resolve(root, "src/lib/azure-phoneme-map.ts"),
+  );
+  return phonemeAssessmentAliases;
 }
 
 function listAudioFiles(directory) {
