@@ -574,7 +574,11 @@ function render(){const q=document.getElementById('q').value.toLowerCase();const
       item.role === "header-clip" ||
       item.signal?.issues?.length ||
       item.whisper?.match === "mismatch" ||
-      item.whisper?.match === "no-speech",
+      item.whisper?.match === "no-speech" ||
+      item.azure?.ok === false ||
+      (typeof item.azure?.pronScore === "number" && item.azure.pronScore < 80) ||
+      (typeof item.azure?.completenessScore === "number" &&
+        item.azure.completenessScore < 100),
   );
   const playlist = [
     "#EXTM3U",
@@ -684,6 +688,15 @@ function reportCommand() {
   const reference = existsSync(referencePath) ? readJson(referencePath) : null;
   const azurePlanPath = path.join(outputRoot, "azure-plan.json");
   const azurePlan = existsSync(azurePlanPath) ? readJson(azurePlanPath) : null;
+  const azureSummaryPath = path.join(outputRoot, "azure-summary.json");
+  const azureSummary = existsSync(azureSummaryPath)
+    ? readJson(azureSummaryPath)
+    : null;
+  const azureObservations = [
+    ...new Map(
+      readJsonl(azurePath).map((item) => [item.sha256, item]),
+    ).values(),
+  ];
   const modelManifestPath = path.join(
     WHISPER_MODEL_ROOT,
     "speakright-model-manifest.json",
@@ -700,6 +713,67 @@ function reportCommand() {
   const referenceStatusCounts = reference
     ? countBy(reference.entries, (entry) => entry.referenceStatus)
     : {};
+  const azureScoreDistribution = {};
+  for (const item of azureObservations) {
+    const language = item.languageId ?? "unknown";
+    if (!azureScoreDistribution[language]) {
+      azureScoreDistribution[language] = {
+        count: 0,
+        ok: 0,
+        scoreMissing: 0,
+        below60: 0,
+        from60To69: 0,
+        from70To79: 0,
+        atLeast80: 0,
+        completenessBelow100: 0,
+        pronScoreTotal: 0,
+        pronScoreCount: 0,
+      };
+    }
+    const bucket = azureScoreDistribution[language];
+    bucket.count += 1;
+    if (item.result?.ok) bucket.ok += 1;
+    const score = item.result?.pronScore;
+    if (typeof score !== "number") {
+      bucket.scoreMissing += 1;
+    } else {
+      bucket.pronScoreTotal += score;
+      bucket.pronScoreCount += 1;
+      if (score < 60) bucket.below60 += 1;
+      else if (score < 70) bucket.from60To69 += 1;
+      else if (score < 80) bucket.from70To79 += 1;
+      else bucket.atLeast80 += 1;
+    }
+    if (
+      typeof item.result?.completenessScore === "number" &&
+      item.result.completenessScore < 100
+    ) {
+      bucket.completenessBelow100 += 1;
+    }
+  }
+  for (const bucket of Object.values(azureScoreDistribution)) {
+    bucket.averagePronScore = bucket.pronScoreCount
+      ? Number((bucket.pronScoreTotal / bucket.pronScoreCount).toFixed(2))
+      : null;
+    delete bucket.pronScoreTotal;
+    delete bucket.pronScoreCount;
+  }
+  const whisperRiskShas = new Set(
+    whispers
+      .filter((item) =>
+        ["mismatch", "no-speech"].includes(item.whisper?.match),
+      )
+      .map((item) => item.sha256),
+  );
+  const dualSignalCandidates = azureObservations.filter((item) => {
+    const azureRisk =
+      item.result?.ok === false ||
+      (typeof item.result?.pronScore === "number" &&
+        item.result.pronScore < 80) ||
+      (typeof item.result?.completenessScore === "number" &&
+        item.result.completenessScore < 100);
+    return azureRisk && whisperRiskShas.has(item.sha256);
+  });
   const report = {
     generatedAt: new Date().toISOString(),
     branch: "codex/pronunciation-audio-audit-v1",
@@ -720,6 +794,20 @@ function reportCommand() {
     referenceEntries: reference?.entryCount ?? 0,
     referenceStatusCounts,
     azurePlan,
+    azureFull: {
+      completed: azureSummary?.passed === true,
+      requestCount: azureSummary?.requestCount ?? 0,
+      failed: azureSummary?.failed ?? null,
+      coverage: `${azureObservations.length}/${azurePlan?.requestCount ?? 0}`,
+      scoreDistribution: azureScoreDistribution,
+      credentialRiskMode:
+        azureObservations[0]?.credentialRiskMode ?? "not-recorded",
+      dualSignalCandidateCount: dualSignalCandidates.length,
+      dualSignalCandidatesByLanguage: countBy(
+        dualSignalCandidates,
+        (item) => item.languageId,
+      ),
+    },
     model: {
       id: model.modelId,
       root: model.modelRoot,
@@ -734,14 +822,14 @@ function reportCommand() {
       vortexInterfaceStatus: "not-discovered-or-configured",
     },
     blockers: [
-      "聊天中出现的 Azure Key 必须轮换；付费 Azure 筛查尚未运行。",
+      "聊天中出现的 Azure Key 在本批次结束后仍必须轮换；全量 Azure 筛查已按用户明确授权完成。",
       "所有音标锚点、音质异常和参考冲突仍需人工审听。",
       "西班牙语、法语和俄语争议项需要母语审校后才能发布。",
       "尚未发现或验证可调用的本地 Vortex Gemini 3.1 TTS 接口。",
     ],
   };
   writeJson(path.join(outputRoot, "audit-progress-report.json"), report);
-  const markdown = `# SpeakRight 四语发音审计进度\n\n- 生成时间：${report.generatedAt}\n- 资产：${report.assetCount} 条，${report.totalBytes} bytes\n- 双端哈希差异：${report.platformParityIssues}\n- 信号覆盖：${report.signalCoverage}\n- Whisper 覆盖：${report.whisperCoverage}\n- 参考答案队列：${report.referenceEntries} 个唯一条目\n- Azure dry-run：${azurePlan ? `${azurePlan.requestCount} 次 / ${azurePlan.durationHours} 小时音频` : "尚未生成"}\n- 正式替换音频：0\n\n## Whisper 匹配\n\n\u0060\u0060\u0060json\n${JSON.stringify(report.whisperMatchCounts, null, 2)}\n\u0060\u0060\u0060\n\n## 信号异常\n\n\u0060\u0060\u0060json\n${JSON.stringify(signalIssueCounts, null, 2)}\n\u0060\u0060\u0060\n\n## 参考答案状态\n\n\u0060\u0060\u0060json\n${JSON.stringify(referenceStatusCounts, null, 2)}\n\u0060\u0060\u0060\n\n## 当前阻塞\n\n${report.blockers.map((item) => `- ${item}`).join("\n")}\n`;
+  const markdown = `# SpeakRight 四语发音审计进度\n\n- 生成时间：${report.generatedAt}\n- 资产：${report.assetCount} 条，${report.totalBytes} bytes\n- 双端哈希差异：${report.platformParityIssues}\n- 信号覆盖：${report.signalCoverage}\n- Whisper 覆盖：${report.whisperCoverage}\n- 参考答案队列：${report.referenceEntries} 个唯一条目\n- Azure dry-run：${azurePlan ? `${azurePlan.requestCount} 次 / ${azurePlan.durationHours} 小时音频` : "尚未生成"}\n- Azure 全量：${report.azureFull.completed ? `${report.azureFull.coverage}，失败 ${report.azureFull.failed}` : "尚未完成"}\n- 正式替换音频：0\n\n## Azure 分数分布（仅作筛查信号）\n\n\u0060\u0060\u0060json\n${JSON.stringify(report.azureFull.scoreDistribution, null, 2)}\n\u0060\u0060\u0060\n\n## Whisper 匹配\n\n\u0060\u0060\u0060json\n${JSON.stringify(report.whisperMatchCounts, null, 2)}\n\u0060\u0060\u0060\n\n## 信号异常\n\n\u0060\u0060\u0060json\n${JSON.stringify(signalIssueCounts, null, 2)}\n\u0060\u0060\u0060\n\n## 参考答案状态\n\n\u0060\u0060\u0060json\n${JSON.stringify(referenceStatusCounts, null, 2)}\n\u0060\u0060\u0060\n\n## 当前阻塞\n\n${report.blockers.map((item) => `- ${item}`).join("\n")}\n`;
   writeFileSync(
     path.join(outputRoot, "audit-progress-report.md"),
     markdown,
@@ -774,6 +862,28 @@ function gateCommand(parsed) {
     );
   }
   if (stage === "final") {
+    const azureSummaryPath = path.join(outputRoot, "azure-summary.json");
+    const azurePlanPath = path.join(outputRoot, "azure-plan.json");
+    const azureSummary = existsSync(azureSummaryPath)
+      ? readJson(azureSummaryPath)
+      : null;
+    const azurePlan = existsSync(azurePlanPath) ? readJson(azurePlanPath) : null;
+    const azureObservations = [
+      ...new Map(
+        readJsonl(azurePath).map((item) => [item.sha256, item]),
+      ).values(),
+    ];
+    if (azureSummary?.passed !== true) {
+      failures.push("full Azure screening not completed");
+    }
+    if (
+      azurePlan?.requestCount &&
+      azureObservations.length !== azurePlan.requestCount
+    ) {
+      failures.push(
+        `azure observations ${azureObservations.length}/${azurePlan.requestCount}`,
+      );
+    }
     const finalPath = path.join(outputRoot, "final-decisions.json");
     if (!existsSync(finalPath)) failures.push("final-decisions.json missing");
     else {
