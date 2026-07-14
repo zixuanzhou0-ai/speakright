@@ -67,3 +67,7 @@ next-env.d.ts
 /playwright-report/
 /test-results/
 /blob-report/
+
+# Python audit bytecode
+__pycache__/
+*.pyc
