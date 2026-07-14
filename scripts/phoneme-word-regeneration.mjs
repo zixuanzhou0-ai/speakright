@@ -562,17 +562,19 @@ async function convertToAzureWav(candidate) {
   return wavPath;
 }
 
-const homophoneGroups = () =>
-  readJson(
+let cachedHomophoneGroups = null;
+let cachedCmuReference = null;
+function classify(expected, actual, languageId) {
+  cachedHomophoneGroups ??= readJson(
     path.resolve(root, "scripts/data/phoneme-word-audit-homophones.json"),
   ).groups;
-function classify(expected, actual, languageId) {
+  cachedCmuReference ??= loadCmuDictReference();
   return classifyBlindTranscript({
     expected,
     actual,
     languageId,
-    homophoneGroups: homophoneGroups(),
-    cmuReference: loadCmuDictReference(),
+    homophoneGroups: cachedHomophoneGroups,
+    cmuReference: cachedCmuReference,
   });
 }
 
@@ -991,9 +993,32 @@ function gateCommand() {
     }
   }
   if (existsSync(promotionPath)) {
+    const sourceById = new Map(
+      plan.sourceAssets.map((source) => [source.sourceAssetId, source]),
+    );
     for (const replacement of readJson(promotionPath).replacements) {
       if (replacement.status !== "machine-replaced-pending-human")
         issues.push(`invalid-status:${replacement.sourceAssetId}`);
+      const source = sourceById.get(replacement.sourceAssetId);
+      if (!source) {
+        issues.push(`promotion-source-missing:${replacement.sourceAssetId}`);
+        continue;
+      }
+      for (const [platform, relativePath] of [
+        ["desktop", source.desktopPath],
+        ["browser", source.browserPath],
+      ]) {
+        const absolutePath = path.resolve(root, relativePath);
+        if (!existsSync(absolutePath)) {
+          issues.push(
+            `promoted-file-missing:${platform}:${replacement.sourceAssetId}`,
+          );
+        } else if (sha256File(absolutePath) !== replacement.newSha256) {
+          issues.push(
+            `promoted-sha-mismatch:${platform}:${replacement.sourceAssetId}`,
+          );
+        }
+      }
     }
   }
   const serialized = [planPath, generatedPath, selectionPath, promotionPath]

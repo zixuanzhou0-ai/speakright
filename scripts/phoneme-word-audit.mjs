@@ -249,7 +249,6 @@ function referenceCommand() {
           )}#${languageAnchor[entry.languageId]}`,
           ...(entry.languageId === "en-US" && entry.status === "conflict"
             ? {
-                merriamWebster: `https://www.merriam-webster.com/dictionary/${encodeURIComponent(entry.text)}`,
                 cambridge: `https://dictionary.cambridge.org/us/dictionary/english/${encodeURIComponent(
                   entry.text.toLocaleLowerCase("en-US").replaceAll(" ", "-"),
                 )}`,

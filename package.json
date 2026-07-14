@@ -115,6 +115,7 @@
     "audio:word-audit:candidates:select": "node scripts/phoneme-word-regeneration.mjs select",
     "audio:word-audit:candidates:promote": "node scripts/phoneme-word-regeneration.mjs promote",
     "audio:word-audit:candidates:gate": "node scripts/phoneme-word-regeneration.mjs gate",
+    "audio:word-audit:candidates:report": "node scripts/export-phoneme-word-regeneration-report.mjs",
     "audio:word-audit:regeneration:test": "node scripts/phoneme-word-regeneration.contract.mjs",
     "audio:word-audit:gate": "node scripts/phoneme-word-audit.mjs gate",
     "audio:word-audit:report": "node scripts/phoneme-word-audit.mjs report",

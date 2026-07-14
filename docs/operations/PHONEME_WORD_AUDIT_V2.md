@@ -77,7 +77,7 @@ Whisper 与 Azure 的两路一致性分层结果：
 - P1：716 条。英语 CMUdict 一致，但仍需独立第二来源。
 - P2-native：1,314 条。三种 Labs 语言需要 Wiktionary候选和母语者裁决。
 
-被忽略输出目录中的 `reference-review-queue.json` 提供每个词的 Wiktionary入口；英语冲突项同时提供 Merriam-Webster 与 Cambridge入口。第三方音频只用于人耳参照，不复制进产品。
+被忽略输出目录中的 `reference-review-queue.json` 提供每个词的 Wiktionary入口；英语冲突项同时提供两家权威美式词典的人工裁决入口。第三方音频只用于人耳参照，不复制进产品。
 
 ## 人工审听
 
