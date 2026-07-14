@@ -5,6 +5,7 @@ Branch: `codex/guided-repeat-vnext`
 Protected baseline tag: `pre-guided-repeat-upgrade-2026-07-14`
 Baseline commit: `453fd5a70b26e9d61016b37d5edaab6dbe4880dd`
 Correction commit: `caa7cf2` (`fix(audio): use isolated phoneme anchors in guided repeat`)
+Latest UX/timing commit: `965878c` (`fix(ux): center voice controls and lengthen phoneme pauses`)
 
 ## Corrected audio semantics
 
@@ -33,6 +34,10 @@ asset trees. Source, conversion details, and hashes are recorded in
   rhythm, voice semantics, retry/defer behavior, and completion rules.
 - English, Spanish, French, and Russian all play the same local phoneme/sound-unit
   anchor twice, followed by masculine, feminine, masculine, feminine word audio.
+- Both anchor playbacks now have a dedicated imitation window: 900 ms in flow,
+  1,200 ms in standard, and 1,600 ms in relaxed rhythm.
+- The A/B selector and word playback action form one centered control cluster
+  beneath the current word in both browser and desktop builds.
 - The queue starts at the word currently displayed, freezes its pool for the
   session, and completes one rotation without random selection.
 - The session is local-audio-only. No Azure, LLM, online dictionary, or TTS
@@ -54,6 +59,7 @@ asset trees. Source, conversion details, and hashes are recorded in
 5. `3fac03dc` - `test(e2e): validate guided repeat across browser and desktop`
 6. `e40c17e9` - `test(e2e): cover guided repeat completion state`
 7. `caa7cf2` - `fix(audio): use isolated phoneme anchors in guided repeat`
+8. `965878c` - `fix(ux): center voice controls and lengthen phoneme pauses`
 
 No branch or tag was pushed as part of this work.
 
@@ -65,8 +71,8 @@ No branch or tag was pushed as part of this work.
 | Browser Biome lint | Passed, 420 files |
 | Root TypeScript | Passed |
 | Browser TypeScript | Passed |
-| Root Vitest | Passed, 160 files / 875 tests |
-| Browser Vitest | Passed, 135 files / 710 tests |
+| Root Vitest | Passed, 160 files / 876 tests |
+| Browser Vitest | Passed, 135 files / 711 tests |
 | Shared-core parity | Passed, 28 parity pairs |
 | Guided-repeat audio gate | Passed, 40 English phoneme anchors, 732 English word entries, 2,109 multilingual entries, 11,634 platform files |
 | Browser production build | Passed, 198 static pages |
@@ -81,7 +87,9 @@ No branch or tag was pushed as part of this work.
 The English browser journey additionally asserts that the first and second
 anchor phases use the same `/audio/ipa/phoneme/...` source and that guided
 repeat makes zero requests to `/audio/ipa/normal/` or
-`/audio/ipa/slow/`.
+`/audio/ipa/slow/`. The real flow-rhythm journey records phase timestamps and
+verifies that both anchor imitation windows remain visible for at least 750 ms;
+the shared configuration is 900 ms.
 
 The audio gate verifies required paths, non-empty files, semantic voice-slot
 mapping, and byte parity between browser and desktop. It does not replace a full
@@ -112,7 +120,8 @@ Ignored evidence directory:
 
 1. `01-entry-1280-light.png`
 2. `02-english-anchor-1.png`
-3. `03-english-anchor-2.png`
+3. `02a-english-anchor-imitation-gap.png`
+4. `03-english-anchor-2.png`
 4. `04-english-masculine.png`
 5. `05-english-feminine.png`
 6. `06-imitation-gap.png`
@@ -127,18 +136,20 @@ Ignored evidence directory:
 15. `15-completed.png`
 
 The correction-specific desktop-width screenshots were opened and reviewed.
-The labels now read `听音标 · 1/2` and `听音标 · 2/2`, with no normal/slow
-claim. The 390px dark paused state and completion state were also reviewed:
-the primary controls remain visible, there is no clipping or horizontal
-overflow, and completion makes no scoring or mastery claim.
+The labels read `听音标 · 1/2`, `轮到你 · 跟读音标`, and
+`听音标 · 2/2`, with no normal/slow claim. The new A/B plus playback capsule
+is centered beneath the word and aligned with the word-navigation axis. The
+390px dark paused state and completion state were also reviewed: primary
+controls remain visible, there is no clipping or horizontal overflow, and
+completion makes no scoring or mastery claim.
 
 ## Desktop artifacts after the correction
 
 | Artifact | Bytes | SHA-256 |
 |---|---:|---|
-| `speakright.exe` | 677,706,752 | `EC4C18B07859421C09DE8B1C4763E51BE8B4C670901DB08DBD35C73DCC56D82D` |
-| MSI | 667,529,216 | `89D337006BD19DD4E952D2C36BEDF7FCF1724E9B76F4B4C23C7D9044F3EDB9B7` |
-| NSIS setup | 672,035,726 | `D95FEE3FDEDFA469BC0DE831F343E5698B5324C5FF8CD8BABDBE4C4E7F63E495` |
+| `speakright.exe` | 677,710,848 | `990CEEA06D03F8DB67A65EC03EEA1A8748E8CEF7E236DE085FC7CAA536E21AD4` |
+| MSI | 667,525,120 | `6D8183EBD204C842601BC3D8624A4A86658CB514F24A3FB02C4411F7F29E4776` |
+| NSIS setup | 671,994,029 | `411F10946931895517DCC25067C48CF4621C446387508CA3D423E7CBDA1F708C` |
 
 The corrected Release executable was rebuilt from the shared source and passed
 artifact and installer consistency checks. It still requires a human-operated
@@ -171,7 +182,8 @@ dark, and reduced-motion matrix also remains a manual release acceptance step.
 
 No known feature P0 or P1 defect remains in the corrected shared code, asset
 gate, builds, or automated browser journeys. The previous English normal/slow
-semantic defect is fixed and protected by contract and E2E assertions. The
+semantic defect, the detached A/B layout, and the too-short first anchor gap are
+fixed and protected by contract, layout, timestamp, and E2E assertions. The
 feature is ready for controlled user testing, but it is not declared
 public-release-ready until code signing and the remaining human native acceptance
 steps are completed.
