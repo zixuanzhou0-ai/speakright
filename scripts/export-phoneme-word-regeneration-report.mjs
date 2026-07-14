@@ -1,4 +1,3 @@
-import { execFileSync } from "node:child_process";
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -46,17 +45,15 @@ const countBy = (items, keySelector) => {
   );
 };
 
-const gitRevision = (revision) =>
-  execFileSync(
-    "git",
-    [
-      "-c",
-      `safe.directory=${repoRoot.replaceAll("\\", "/")}`,
-      "rev-parse",
-      revision,
-    ],
-    { cwd: repoRoot, encoding: "utf8" },
-  ).trim();
+const reportHeadArgument = process.argv.find((argument) =>
+  argument.startsWith("--head-sha="),
+);
+const generatedAtSha = reportHeadArgument?.slice("--head-sha=".length);
+if (!generatedAtSha || !/^[0-9a-f]{40}$/u.test(generatedAtSha)) {
+  throw new Error(
+    "Pass the audited Git revision as --head-sha=<40-character SHA>.",
+  );
+}
 
 const plan = await readJson("regeneration-plan.json");
 const selection = await readJson("candidate-selection.json");
@@ -136,8 +133,7 @@ const usageBefore = 734;
 const usageAfter = plan.subscription.characterCount;
 const usageDelta = usageAfter - usageBefore;
 const usageDifference = usageDelta - actualTtsCharacterCost;
-const baselineSha = gitRevision("pre-audio-regeneration-2026-07-15^{}");
-const generatedAtSha = gitRevision("HEAD");
+const baselineSha = "80f87802fc0ebc1a526472f9a66964f9fb9b5b9f";
 
 const languageRows = ["en-US", "es-ES", "fr-FR", "ru-RU"]
   .map((languageId) => {
@@ -157,9 +153,9 @@ const topReasons = Object.entries(reasonCounts)
 
 const report = `# SpeakRight 416 条高风险音频重制报告（V1）
 
-生成日期：2026-07-15  
-安全起点：\`${baselineSha}\`  
-报告生成时提交：\`${generatedAtSha}\`  
+生成日期：2026-07-15<br>
+安全起点：\`${baselineSha}\`<br>
+报告生成时提交：\`${generatedAtSha}\`<br>
 计划 SHA-256：\`${plan.planSha256}\`
 
 ## 结论
