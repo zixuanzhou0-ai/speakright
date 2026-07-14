@@ -112,7 +112,7 @@ The tracked reviewed-findings ledger is:
 
 A generated local copy may also exist at:
 
-`E:/SpeakRightDesktopRepo/src-tauri/target/ipa-audit/non-english-ipa-audit-input.json`
+`src-tauri/target/ipa-audit/non-english-ipa-audit-input.json`
 
 It now contains the final expanded UI corpus rather than only the base source
 arrays. Current count: 2641 rows.

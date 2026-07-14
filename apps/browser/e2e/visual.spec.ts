@@ -3,14 +3,32 @@ import { expect, test } from "@playwright/test";
 async function settle(page: import("@playwright/test").Page) {
   await page.evaluate(async () => {
     await document.fonts.ready;
+    const finiteAnimations = document.getAnimations().filter((animation) => {
+      const iterations = animation.effect?.getTiming().iterations;
+      return iterations !== Infinity;
+    });
+    await Promise.all(
+      finiteAnimations.map((animation) =>
+        animation.finished.catch(() => undefined),
+      ),
+    );
+    await new Promise<void>((resolve) =>
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() => {
+          resolve();
+        }),
+      ),
+    );
   });
 }
 
 test("mobile drill above the fold visual contract", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/drill");
   await settle(page);
   await expect(page).toHaveScreenshot("drill-mobile-390.png", {
+    animations: "allow",
     fullPage: false,
   });
 });
