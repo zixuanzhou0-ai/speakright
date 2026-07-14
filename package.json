@@ -77,7 +77,9 @@
     "validate:browser:e2e": "npm run lint:browser && npm run typecheck:browser && npm run test:browser && npm run build:browser && playwright test",
     "prebuild": "node scripts/check-training-audio.mjs --target=desktop",
     "audio:training:check": "node scripts/check-training-audio.mjs --target=all",
-    "audio:training:plan": "node scripts/generate-training-speaker-audio.mjs"
+    "audio:training:plan": "node scripts/generate-training-speaker-audio.mjs",
+    "audio:training:audit": "node scripts/audit-training-audio.mjs",
+    "audio:training:review": "node scripts/create-training-audio-review-playlists.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.3.0",

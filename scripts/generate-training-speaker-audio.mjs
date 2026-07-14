@@ -30,9 +30,24 @@ const words = Array.from(
     ),
   ),
 ).sort();
-const requestedSpeakers = speakers.filter(
-  (speaker) => speaker.reviewStatus === "needs-review",
+const speakerArgument = process.argv.find((argument) =>
+  argument.startsWith("--speakers="),
 );
+const requestedSpeakerIds = new Set(
+  (speakerArgument?.slice("--speakers=".length) ?? "")
+    .split(",")
+    .map((speakerId) => speakerId.trim())
+    .filter(Boolean),
+);
+const requestedSpeakers = requestedSpeakerIds.size
+  ? speakers.filter((speaker) => requestedSpeakerIds.has(speaker.id))
+  : speakers.filter((speaker) => speaker.reviewStatus === "needs-review");
+const unknownSpeakerIds = [...requestedSpeakerIds].filter(
+  (speakerId) => !speakers.some((speaker) => speaker.id === speakerId),
+);
+if (unknownSpeakerIds.length > 0) {
+  throw new Error(`Unknown speaker ids: ${unknownSpeakerIds.join(", ")}`);
+}
 const execute = process.argv.includes("--execute");
 const paidConfirmed = process.argv.includes("--confirm-paid-generation");
 const apiKey = process.env.ELEVENLABS_API_KEY;
@@ -76,7 +91,7 @@ const characters = missing.reduce((sum, task) => sum + task.word.length, 0);
 console.log("SpeakRight four-speaker core audio plan");
 console.log(`Catalog: ${catalog.length} packs, ${words.length} unique words`);
 console.log(
-  `New reviewed-pending voices: ${requestedSpeakers
+  `Requested voices: ${requestedSpeakers
     .map((speaker) => speaker.id)
     .join(", ")}`,
 );

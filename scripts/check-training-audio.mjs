@@ -28,6 +28,33 @@ const catalog = JSON.parse(
     "utf8",
   ),
 );
+const speakerManifest = JSON.parse(
+  await readFile(
+    path.join(
+      projectRoot,
+      "packages",
+      "core",
+      "src",
+      "content",
+      "training-speaker-manifest.json",
+    ),
+    "utf8",
+  ),
+);
+const reviewedSpeakers = speakerManifest.filter(
+  (speaker) => speaker.reviewStatus === "reviewed",
+);
+
+// Isolated TTS can select the wrong pronunciation for these homographs.
+// Core perception material must use an unambiguous word or a reviewed sentence.
+const AMBIGUOUS_ISOLATED_WORDS = new Set([
+  "close",
+  "lead",
+  "live",
+  "read",
+  "tear",
+  "wind",
+]);
 const roots = {
   desktop: path.join(projectRoot, "public"),
   browser: path.join(projectRoot, "apps", "browser", "public"),
@@ -35,6 +62,9 @@ const roots = {
 const selected =
   target === "all" ? Object.entries(roots) : [[target, roots[target]]];
 const invalid = [];
+if (reviewedSpeakers.length < 2) {
+  invalid.push("核心听辨至少需要两名已审听说话人");
+}
 const missing = [];
 const hashes = new Map();
 
@@ -56,7 +86,13 @@ for (const entry of catalog) {
     }
     ids.add(example.id);
     for (const word of [example.wordA, example.wordB]) {
-      for (const speaker of ["blue", "pink"]) {
+      if (AMBIGUOUS_ISOLATED_WORDS.has(word.toLowerCase())) {
+        invalid.push(
+          `${entry.packId}: ${word} 是容易产生歧义的同形异音词，不得进入核心听辨材料`,
+        );
+      }
+      for (const speakerEntry of reviewedSpeakers) {
+        const speaker = speakerEntry.assetDirectory;
         const relativePath = path.join(
           "audio",
           "words",
@@ -102,6 +138,6 @@ if (invalid.length > 0 || missing.length > 0) {
     0,
   );
   console.log(
-    `核心听辨音频门禁通过：${catalog.length} 个训练包，${examples} 组对比，${selected.length} 个平台双说话人资产完整。`,
+    `核心听辨音频门禁通过：${catalog.length} 个训练包，${examples} 组对比，${selected.length} 个平台 × ${reviewedSpeakers.length} 名已审听说话人资产完整。`,
   );
 }
