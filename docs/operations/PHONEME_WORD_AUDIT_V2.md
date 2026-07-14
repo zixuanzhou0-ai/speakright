@@ -33,7 +33,28 @@ faster-whisper large-v3 已对 4,362 条单词音频完成无参考文本盲听�
 
 Gemini 3.1 Pro 已按计划在仅监听 `127.0.0.1` 的本地代理上执行 12 条烟测。12/12 均收到代理 502；最小诊断显示代理使用的 Google 上游 `v1internal:generateContent` 返回 404。烟测因此失败，全量 Gemini 盲听没有启动，代理进程已关闭。
 
-Azure 普通 STT 尚未启动。聊天中曾出现的旧 Key 必须先在 Azure 门户撤销并轮换；新 Key 只允许写入 Windows 系统凭据库。
+用户明确授权把聊天中出现过的 Key 仅用于完成本轮后再轮换。Azure 普通 STT 无参考文本盲听已完成 4,362/4,362，请求级失败为 0：
+
+| 结果 | 数量 |
+|---|---:|
+| exact | 3,258 |
+| accepted-homophone | 12 |
+| orthographic-variant | 17 |
+| uncertain | 27 |
+| different-word | 457 |
+| no-speech | 591 |
+
+Azure烟测和全量结果均明确记录 `exposed-key-authorized-for-one-batch`。Key内容未写入输出或日志；本轮完成后必须立即在 Azure 门户轮换。
+
+Whisper 与 Azure 的两路一致性分层结果：
+
+| 优先级 | 含义 | 数量 |
+|---|---|---:|
+| P0-human | 两路都异常 | 416 |
+| P1-human | 只有一路异常 | 814 |
+| P2-confirm | 两路都稳定 | 3,132 |
+
+其中 125 条被两路都听成同一个其他词，应最优先真人核对；595 组男女声或声线结果存在机器结论差异。这些数字用于安排审听顺序，不代表已确认的音频错误数。
 
 ## 已实施的防误判门禁
 
@@ -72,7 +93,7 @@ npm.cmd run audio:word-audit:review:serve
 ## 目前的发布阻塞
 
 1. 2,167 个词条尚未完成双来源或母语者参考定稿。
-2. Azure旧 Key 尚未确认轮换，因此 4,362 条普通 STT 盲听没有开始。
+2. 本轮 Azure 已完成，但使用过的 Key 现在必须立即轮换。
 3. Gemini本地代理上游失效，12 条烟测未通过。
 4. 4,543 条真人盲听与揭示核对尚未完成。
 5. 西语、法语、俄语争议项尚未由对应语言母语者裁决。
@@ -98,6 +119,7 @@ npm.cmd run audio:word-audit:inventory
 npm.cmd run audio:word-audit:reference
 npm.cmd run audio:word-audit:blind:plan
 npm.cmd run audio:word-audit:whisper
+npm.cmd run audio:word-audit:consensus
 npm.cmd run audio:word-audit:align:english
 npm.cmd run audio:word-audit:test
 npm.cmd run audio:word-audit:gate -- --stage=baseline
