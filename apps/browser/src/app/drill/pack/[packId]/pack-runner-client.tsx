@@ -355,6 +355,8 @@ export default function TrainingPackPage() {
           materialId: `${pack.id}:perception:${asset.speakerId}:${asset.word}`,
           packId: pack.id,
           role: "baseline",
+          contentKey: asset.word,
+          source: "guided-course",
         });
       }
       return;
@@ -367,6 +369,8 @@ export default function TrainingPackPage() {
       materialId: currentMaterialId,
       packId: pack.id,
       role,
+      contentKey: currentItem.referenceText ?? currentItem.text,
+      source: "guided-course",
     });
     setMaterialNovelty((current) =>
       current[currentMaterialId]

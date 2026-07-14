@@ -79,4 +79,25 @@ describe("training exposure storage", () => {
     expect(first.noveltyBeforeExposure).toBe("confirmed-untrained");
     expect(retry.noveltyBeforeExposure).toBe("exposed");
   });
+
+  it("keeps guided-repeat source metadata and blocks content leakage", () => {
+    expect(
+      markCourseItemExposed({
+        materialId: "en-US:ee:sheep",
+        packId: "guided-repeat:en-US:ee",
+        role: "practice",
+        contentKey: "Sheep",
+        source: "guided-repeat",
+        seenAt: 300,
+      }),
+    ).toBe(true);
+
+    expect(loadTrainingExposureState().store.exposures[0]).toMatchObject({
+      contentKey: "Sheep",
+      source: "guided-repeat",
+    });
+    expect(getTrainingMaterialNovelty("transfer:other-id", " sheep ")).toBe(
+      "exposed",
+    );
+  });
 });

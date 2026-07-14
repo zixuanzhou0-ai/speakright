@@ -138,6 +138,8 @@ export default function RetentionReviewPage() {
       materialId: currentMaterial.id,
       packId: currentMaterial.packId,
       role: "retention",
+      contentKey: currentMaterial.text,
+      source: "retention-review",
     });
     setNoveltyByMaterial((current) => ({
       ...current,

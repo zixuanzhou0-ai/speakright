@@ -9,6 +9,8 @@ export interface TrainingMaterialExposure {
   materialId: string;
   packId: string;
   role: TrainingMaterialRole;
+  contentKey?: string;
+  source?: string;
   firstSeenAt: number;
   lastSeenAt: number;
   attemptCount: number;
@@ -79,6 +81,8 @@ export function recordTrainingMaterialExposure(
     materialId: input.materialId,
     packId: input.packId,
     role: input.role,
+    contentKey: input.contentKey ?? current?.contentKey,
+    source: input.source ?? current?.source,
     firstSeenAt: current?.firstSeenAt ?? seenAt,
     lastSeenAt: seenAt,
     attemptCount: (current?.attemptCount ?? 0) + 1,
@@ -103,16 +107,40 @@ export function hasTrainingMaterialExposure(
   return store.exposures.some((exposure) => exposure.materialId === materialId);
 }
 
+export function normalizeTrainingMaterialContent(value: string): string {
+  return value
+    .normalize("NFKC")
+    .toLocaleLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .trim()
+    .replace(/\s+/g, " ");
+}
+
+export function hasTrainingContentExposure(
+  store: TrainingExposureStoreV1,
+  contentKey: string,
+): boolean {
+  const normalized = normalizeTrainingMaterialContent(contentKey);
+  return (
+    Boolean(normalized) &&
+    store.exposures.some(
+      (exposure) =>
+        exposure.contentKey !== undefined &&
+        normalizeTrainingMaterialContent(exposure.contentKey) === normalized,
+    )
+  );
+}
+
 export function trainingMaterialNovelty(
   store: TrainingExposureStoreV1 | null | undefined,
   materialId: string,
   hasHistoricalExposureData: boolean,
+  contentKey?: string,
 ): TrainingMaterialNovelty {
   if (!hasHistoricalExposureData) return "unknown";
-  return hasTrainingMaterialExposure(
-    store ?? emptyTrainingExposureStore(),
-    materialId,
-  )
+  const resolvedStore = store ?? emptyTrainingExposureStore();
+  return hasTrainingMaterialExposure(resolvedStore, materialId) ||
+    (contentKey ? hasTrainingContentExposure(resolvedStore, contentKey) : false)
     ? "exposed"
     : "confirmed-untrained";
 }

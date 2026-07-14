@@ -83,7 +83,10 @@ export function saveTrainingExposureStore(
 }
 
 export function markTrainingMaterialExposed(
-  material: Pick<TrainingMaterialDescriptor, "id" | "packId" | "role">,
+  material: Pick<TrainingMaterialDescriptor, "id" | "packId" | "role"> & {
+    contentKey?: string;
+    source?: string;
+  },
   seenAt = Date.now(),
 ): boolean {
   const state = loadTrainingExposureState();
@@ -92,6 +95,8 @@ export function markTrainingMaterialExposed(
       materialId: material.id,
       packId: material.packId,
       role: material.role,
+      contentKey: material.contentKey,
+      source: material.source,
       seenAt,
     }),
   );
@@ -99,12 +104,14 @@ export function markTrainingMaterialExposed(
 
 export function getTrainingMaterialNovelty(
   materialId: string,
+  contentKey?: string,
 ): TrainingMaterialNovelty {
   const state = loadTrainingExposureState();
   return trainingMaterialNovelty(
     state.store,
     materialId,
     state.hasHistoricalExposureData,
+    contentKey,
   );
 }
 
@@ -117,9 +124,14 @@ export function presentCourseItem(input: {
   materialId: string;
   packId: string;
   role: TrainingMaterialRole;
+  contentKey?: string;
+  source?: string;
   seenAt?: number;
 }): PresentedTrainingMaterial {
-  const noveltyBeforeExposure = getTrainingMaterialNovelty(input.materialId);
+  const noveltyBeforeExposure = getTrainingMaterialNovelty(
+    input.materialId,
+    input.contentKey,
+  );
   return {
     noveltyBeforeExposure,
     saved: markTrainingMaterialExposed(
@@ -127,6 +139,8 @@ export function presentCourseItem(input: {
         id: input.materialId,
         packId: input.packId,
         role: input.role,
+        contentKey: input.contentKey,
+        source: input.source,
       },
       input.seenAt,
     ),
@@ -137,6 +151,8 @@ export function markCourseItemExposed(input: {
   materialId: string;
   packId: string;
   role: TrainingMaterialRole;
+  contentKey?: string;
+  source?: string;
   seenAt?: number;
 }): boolean {
   return markTrainingMaterialExposed(
@@ -144,6 +160,8 @@ export function markCourseItemExposed(input: {
       id: input.materialId,
       packId: input.packId,
       role: input.role,
+      contentKey: input.contentKey,
+      source: input.source,
     },
     input.seenAt,
   );
