@@ -103,6 +103,7 @@
     "audio:word-audit:gemini:smoke": "node scripts/phoneme-word-audit.mjs gemini-smoke",
     "audio:word-audit:gemini:run": "node scripts/phoneme-word-audit.mjs gemini-run",
     "audio:word-audit:align:english": "node scripts/phoneme-word-audit.mjs align-english",
+    "audio:word-audit:consensus": "node scripts/phoneme-word-audit.mjs consensus",
     "audio:word-audit:review": "node scripts/phoneme-word-audit.mjs review",
     "audio:word-audit:review:serve": "node scripts/phoneme-word-review-server.mjs",
     "audio:word-audit:regenerate:plan": "node scripts/phoneme-word-audit.mjs regenerate-plan",

@@ -9,6 +9,7 @@ import { loadCmuDictReference } from "./lib/cmudict-reference.mjs";
 import {
   applyGoldPronunciationDecisions,
   assertLoopbackUrl,
+  buildBlindConsensus,
   buildBlindListenerPrompt,
   buildGeminiBlindRequest,
   buildGoldPronunciations,
@@ -149,6 +150,33 @@ test("blind transcript classification accepts homophones without verifying spell
     }),
     "different-word",
   );
+});
+
+test("machine consensus prioritizes agreement on the same wrong word", () => {
+  const asset = {
+    assetId: "asset",
+    sha256: "sha",
+    languageId: "en-US",
+    text: "ship",
+    role: "example-word",
+    voiceGender: "feminine",
+  };
+  const consensus = buildBlindConsensus({
+    asset,
+    observations: {
+      whisper: {
+        heardText: "sheep",
+        outcome: "different-word",
+      },
+      azureStt: {
+        heardText: "sheep",
+        outcome: "different-word",
+      },
+    },
+  });
+  assert.equal(consensus.category, "all-risk");
+  assert.equal(consensus.sameAlternative, true);
+  assert.equal(consensus.priority, "P0-human");
 });
 
 test("blind prompts and Azure URLs contain no expected answer or reference text", () => {

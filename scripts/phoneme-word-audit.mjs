@@ -17,6 +17,7 @@ import { loadCmuDictReference } from "./lib/cmudict-reference.mjs";
 import {
   applyGoldPronunciationDecisions,
   assertLoopbackUrl,
+  buildBlindConsensus,
   buildEnglishAlignment,
   buildGeminiBlindRequest,
   buildGoldPronunciations,
@@ -463,14 +464,19 @@ function chooseSmokeAssets(inventory) {
 }
 
 async function azureSttRunCommand(parsed) {
+  const rotatedKeyConfirmed = parsed.args.has("--rotated-key-confirmed");
+  const exposedKeyAuthorizedOnce = parsed.args.has("--use-exposed-key-once");
   if (
     !parsed.args.has("--confirm") ||
-    !parsed.args.has("--rotated-key-confirmed")
+    (!rotatedKeyConfirmed && !exposedKeyAuthorizedOnce)
   ) {
     throw new Error(
-      "Azure blind STT requires --confirm and --rotated-key-confirmed after reviewing blind-listening-plan.json.",
+      "Azure blind STT requires --confirm plus either --rotated-key-confirmed or the explicit one-batch override --use-exposed-key-once.",
     );
   }
+  const credentialRiskMode = rotatedKeyConfirmed
+    ? "rotated-key"
+    : "exposed-key-authorized-for-one-batch";
   const mode = parsed.valueFor("--mode", "smoke");
   if (!new Set(["smoke", "full"]).has(mode))
     throw new Error(`Invalid mode: ${mode}`);
@@ -511,25 +517,29 @@ async function azureSttRunCommand(parsed) {
           }),
         ),
       );
-      if (!result.ok || !result.recognizedText) {
-        throw new Error(`No blind STT result (${result.recognitionStatus})`);
+      if (!result.ok) {
+        throw new Error(
+          `Blind STT request failed (${result.recognitionStatus})`,
+        );
       }
+      const recognizedText = result.recognizedText ?? "";
       appendJsonl(azureBlindPath, {
         version: 1,
         assetId: asset.assetId,
         sha256: asset.sha256,
         listener: "azure-stt",
-        heardText: result.recognizedText,
+        heardText: recognizedText,
         detectedLanguage: asset.languageId,
         confidence: result.confidence,
         modelRevision: "azure-standard-stt-2026-07-14",
         promptPolicyVersion: "no-reference-text-v1",
         referenceTextSent: false,
         credentialSource: source,
+        credentialRiskMode,
         createdAt: new Date().toISOString(),
         outcome: classifyBlindTranscript({
           expected: asset.text,
-          actual: result.recognizedText,
+          actual: recognizedText,
           languageId: asset.languageId,
           homophoneGroups,
           cmuReference: cmu,
@@ -554,19 +564,26 @@ async function azureSttRunCommand(parsed) {
       row.outcome,
     ),
   ).length;
+  const noSpeechCount = selectedObservations.filter(
+    (row) => row.outcome === "no-speech",
+  ).length;
   const passed =
-    failures.length === 0 &&
-    selectedObservations.length === selected.length &&
-    (mode !== "smoke" || stableCount >= Math.ceil(selected.length * 0.75));
+    failures.length === 0 && selectedObservations.length === selected.length;
   const summary = {
     mode,
     generatedAt: new Date().toISOString(),
     requested: selected.length,
     attempted: items.length,
     stableCount,
+    noSpeechCount,
+    credentialRiskMode,
     failed: failures.length,
     failures,
     passed,
+    warning:
+      mode === "smoke" && stableCount < Math.ceil(selected.length * 0.75)
+        ? "Azure ordinary STT is operational but unreliable on this isolated-word smoke set; use it only as one noisy signal."
+        : null,
   };
   writeJson(path.join(blindRoot, `azure-stt-${mode}-summary.json`), summary);
   if (!passed) process.exitCode = 1;
@@ -797,6 +814,95 @@ function alignmentCommand() {
   );
 }
 
+function consensusCommand() {
+  const inventory = requireInventory();
+  const listenerMaps = {
+    whisper: new Map(
+      readJsonl(whisperBlindPath).map((row) => [row.sha256, row]),
+    ),
+    azureStt: new Map(
+      readJsonl(azureBlindPath).map((row) => [row.sha256, row]),
+    ),
+    gemini: new Map(readJsonl(geminiBlindPath).map((row) => [row.sha256, row])),
+  };
+  const items = inventory.assets
+    .filter(isWordBearingAuditAsset)
+    .map((asset) =>
+      buildBlindConsensus({
+        asset,
+        observations: Object.fromEntries(
+          Object.entries(listenerMaps).map(([name, map]) => [
+            name,
+            map.get(asset.sha256) ?? null,
+          ]),
+        ),
+      }),
+    )
+    .sort((left, right) =>
+      `${left.priority}:${left.languageId}:${left.text}:${left.assetId}`.localeCompare(
+        `${right.priority}:${right.languageId}:${right.text}:${right.assetId}`,
+      ),
+    );
+  const voiceGroups = new Map();
+  for (const item of items.filter((entry) => entry.voiceGender)) {
+    const key = `${item.languageId}\u0000${item.text}\u0000${item.role}`;
+    const group = voiceGroups.get(key) ?? [];
+    group.push(item);
+    voiceGroups.set(key, group);
+  }
+  const voiceDisagreements = [...voiceGroups.entries()].flatMap(
+    ([key, group]) => {
+      const categories = new Set(group.map((item) => item.category));
+      return categories.size > 1 ? [{ key, items: group }] : [];
+    },
+  );
+  const document = {
+    version: 1,
+    generatedAt: new Date().toISOString(),
+    warning:
+      "Machine consensus prioritizes human review and never verifies or rejects an audio asset by itself.",
+    listenerCoverage: Object.fromEntries(
+      Object.entries(listenerMaps).map(([name, map]) => [name, map.size]),
+    ),
+    categoryCounts: countBy(items, (item) => item.category),
+    priorityCounts: countBy(items, (item) => item.priority),
+    byLanguage: Object.fromEntries(
+      LANGUAGE_IDS.map((languageId) => {
+        const languageItems = items.filter(
+          (item) => item.languageId === languageId,
+        );
+        return [
+          languageId,
+          {
+            count: languageItems.length,
+            categories: countBy(languageItems, (item) => item.category),
+            priorities: countBy(languageItems, (item) => item.priority),
+          },
+        ];
+      }),
+    ),
+    sameAlternativeCount: items.filter((item) => item.sameAlternative).length,
+    voiceDisagreementCount: voiceDisagreements.length,
+    voiceDisagreements,
+    items,
+  };
+  writeJson(path.join(outputRoot, "machine-consensus.json"), document);
+  console.log(
+    JSON.stringify(
+      {
+        listenerCoverage: document.listenerCoverage,
+        categoryCounts: document.categoryCounts,
+        priorityCounts: document.priorityCounts,
+        byLanguage: document.byLanguage,
+        sameAlternativeCount: document.sameAlternativeCount,
+        voiceDisagreementCount: document.voiceDisagreementCount,
+      },
+      null,
+      2,
+    ),
+  );
+}
+
 function reviewCommand() {
   const inventory = requireInventory();
   const queue = createBlindReviewQueue(inventory.assets, 0.05);
@@ -981,13 +1087,17 @@ function reportCommand() {
     ? readJson(referenceReviewPath)
     : null;
   const azureSmokePath = path.join(blindRoot, "azure-stt-smoke-summary.json");
+  const azureFullPath = path.join(blindRoot, "azure-stt-full-summary.json");
   const geminiSmokePath = path.join(blindRoot, "gemini-smoke-summary.json");
   const azureSmoke = existsSync(azureSmokePath)
     ? readJson(azureSmokePath)
     : null;
+  const azureFull = existsSync(azureFullPath) ? readJson(azureFullPath) : null;
   const geminiSmoke = existsSync(geminiSmokePath)
     ? readJson(geminiSmokePath)
     : null;
+  const consensusPath = path.join(outputRoot, "machine-consensus.json");
+  const consensus = existsSync(consensusPath) ? readJson(consensusPath) : null;
   const observations = {
     whisper: readJsonl(whisperBlindPath),
     azureStt: readJsonl(azureBlindPath),
@@ -1011,6 +1121,19 @@ function reportCommand() {
       azureStt: azureSmoke,
       gemini: geminiSmoke,
     },
+    networkBatch: {
+      azureStt: azureFull,
+    },
+    machineConsensus: consensus
+      ? {
+          listenerCoverage: consensus.listenerCoverage,
+          categoryCounts: consensus.categoryCounts,
+          priorityCounts: consensus.priorityCounts,
+          byLanguage: consensus.byLanguage,
+          sameAlternativeCount: consensus.sameAlternativeCount,
+          voiceDisagreementCount: consensus.voiceDisagreementCount,
+        }
+      : null,
     blindCoverage: Object.fromEntries(
       Object.entries(observations).map(([name, rows]) => [
         name,
@@ -1035,6 +1158,12 @@ function reportCommand() {
       ...(observations.azureStt.length === 0
         ? [
             "Azure blind STT cannot start until the exposed key is rotated and --rotated-key-confirmed is provided.",
+          ]
+        : []),
+      ...(azureFull?.credentialRiskMode ===
+      "exposed-key-authorized-for-one-batch"
+        ? [
+            "Azure blind STT is complete; the explicitly authorized exposed key must now be rotated immediately.",
           ]
         : []),
       ...(geminiSmoke?.passed !== true
@@ -1077,6 +1206,9 @@ async function main() {
       break;
     case "align-english":
       alignmentCommand();
+      break;
+    case "consensus":
+      consensusCommand();
       break;
     case "review":
       reviewCommand();

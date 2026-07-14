@@ -554,6 +554,76 @@ export function classifyBlindTranscript({
   return "different-word";
 }
 
+const STABLE_BLIND_OUTCOMES = new Set([
+  "exact",
+  "accepted-homophone",
+  "orthographic-variant",
+]);
+
+export function buildBlindConsensus({ asset, observations }) {
+  const available = Object.entries(observations ?? {}).filter(
+    ([, observation]) => Boolean(observation),
+  );
+  const stable = available.filter(([, observation]) =>
+    STABLE_BLIND_OUTCOMES.has(observation.outcome),
+  );
+  const risk = available.filter(
+    ([, observation]) => !STABLE_BLIND_OUTCOMES.has(observation.outcome),
+  );
+  const differentWords = available.filter(
+    ([, observation]) => observation.outcome === "different-word",
+  );
+  const normalizedAlternatives = differentWords
+    .map(([, observation]) =>
+      normalizeAuditText(observation.heardText, asset.languageId),
+    )
+    .filter(Boolean);
+  const expected = normalizeAuditText(asset.text, asset.languageId);
+  const sameAlternative =
+    normalizedAlternatives.length >= 2 &&
+    new Set(normalizedAlternatives).size === 1 &&
+    normalizedAlternatives[0] !== expected;
+  const category =
+    available.length < 2
+      ? "insufficient"
+      : risk.length === 0
+        ? "all-stable"
+        : stable.length === 0
+          ? "all-risk"
+          : "mixed";
+  const priority =
+    sameAlternative || category === "all-risk"
+      ? "P0-human"
+      : category === "mixed"
+        ? "P1-human"
+        : category === "all-stable"
+          ? "P2-confirm"
+          : "blocked";
+  return {
+    assetId: asset.assetId,
+    sha256: asset.sha256,
+    languageId: asset.languageId,
+    text: asset.text,
+    role: asset.role,
+    voiceGender: asset.voiceGender,
+    category,
+    priority,
+    listenerCount: available.length,
+    stableListeners: stable.map(([name]) => name),
+    riskListeners: risk.map(([name]) => name),
+    sameAlternative,
+    heard: Object.fromEntries(
+      available.map(([name, observation]) => [
+        name,
+        {
+          text: observation.heardText ?? "",
+          outcome: observation.outcome,
+        },
+      ]),
+    ),
+  };
+}
+
 export function levenshteinDistance(left, right) {
   const a = Array.from(left ?? "");
   const b = Array.from(right ?? "");
