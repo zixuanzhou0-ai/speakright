@@ -1,4 +1,9 @@
 import type { TrainingCriterion } from "@speakright/core/training/criteria";
+import {
+  type DeepTrainingMaterial,
+  EE_IH_GOLD_CURRICULUM,
+} from "@speakright/core/training/deep-curriculum";
+import { REVIEWED_TRAINING_SPEAKER_IDS } from "@speakright/core/training/speakers";
 import type { DrillItem } from "@/types/drill";
 import type {
   MasteryRule,
@@ -33,11 +38,10 @@ const CRITERIA = {
     crossSpeakerRequired: true,
   },
   articulation: {
-    kind: "controlled-production",
-    minTargetScore: 0,
-    minValidSamples: 1,
-    requireRecordingQuality: false,
-    requireAlignment: false,
+    kind: "motor-formation",
+    minSelfChecks: 3,
+    minRecordedSamples: 2,
+    requirePlaybackComparison: true,
   },
   syllable: {
     kind: "controlled-production",
@@ -81,7 +85,77 @@ const CRITERIA = {
     requireRecordingQuality: true,
     requireAlignment: true,
   },
+  transfer: {
+    kind: "transfer",
+    minTargetScore: 78,
+    minValidSamples: 3,
+    minContexts: 2,
+    requireUntrainedMaterial: true,
+  },
 } satisfies Record<TrainingLevelKind, TrainingCriterion>;
+
+const EE_IH_GOLD_CRITERIA = {
+  perception: {
+    kind: "perception",
+    minCorrectRate: 0.875,
+    minTrials: 16,
+    minUniquePairs: 8,
+    crossSpeakerRequired: true,
+    minUniqueSpeakers: 4,
+    minSpeakerPairings: 6,
+  },
+  syllable: {
+    kind: "controlled-production",
+    minTargetScore: 78,
+    minValidSamples: 6,
+    minPassedSamples: 5,
+    minUniqueMaterials: 6,
+    requireRecordingQuality: true,
+    requireAlignment: true,
+  },
+  word: {
+    kind: "controlled-production",
+    minTargetScore: 82,
+    minValidSamples: 10,
+    minPassedSamples: 8,
+    minUniqueMaterials: 10,
+    requireRecordingQuality: true,
+    requireAlignment: true,
+  },
+  "minimal-pair": {
+    kind: "controlled-production",
+    minTargetScore: 82,
+    minValidSamples: 8,
+    minPassedSamples: 6,
+    minUniqueMaterials: 8,
+    requireRecordingQuality: true,
+    requireAlignment: true,
+  },
+  sentence: {
+    kind: "controlled-production",
+    minTargetScore: 82,
+    minValidSamples: 6,
+    minPassedSamples: 5,
+    requireRecordingQuality: true,
+    requireAlignment: true,
+  },
+  shadowing: {
+    kind: "controlled-production",
+    minTargetScore: 82,
+    minValidSamples: 4,
+    minPassedSamples: 3,
+    requireRecordingQuality: true,
+    requireAlignment: true,
+  },
+  "mixed-review": {
+    kind: "controlled-production",
+    minTargetScore: 82,
+    minValidSamples: 6,
+    minPassedSamples: 4,
+    requireRecordingQuality: true,
+    requireAlignment: true,
+  },
+} satisfies Record<string, TrainingCriterion>;
 
 function item(
   text: string,
@@ -412,10 +486,10 @@ export const TRAINING_PACKS: TrainingPack[] = [
         audioB: "/audio/words/pink/teethe.mp3",
       },
       {
-        wordA: "clothes",
-        wordB: "clothe",
-        audioA: "/audio/words/blue/clothes.mp3",
-        audioB: "/audio/words/pink/clothe.mp3",
+        wordA: "bays",
+        wordB: "bathe",
+        audioA: "/audio/words/blue/bays.mp3",
+        audioB: "/audio/words/pink/bathe.mp3",
       },
     ],
     wordLadder: [
@@ -450,11 +524,11 @@ export const TRAINING_PACKS: TrainingPack[] = [
         phonemeB: "dh",
       },
       {
-        wordA: "close",
-        ipaA: "/kloʊz/",
+        wordA: "bays",
+        ipaA: "/beɪz/",
         phonemeA: "z",
-        wordB: "clothe",
-        ipaB: "/kloʊð/",
+        wordB: "bathe",
+        ipaB: "/beɪð/",
         phonemeB: "dh",
       },
     ],
@@ -1096,6 +1170,10 @@ function courseItem(
       | "playbackText"
       | "position"
       | "isRecordable"
+      | "materialRole"
+      | "phoneticContext"
+      | "scheduledDelayHours"
+      | "responseMode"
     >
   > = {},
 ): TrainingCourseItem {
@@ -1112,6 +1190,10 @@ function courseItem(
     successCue,
     difficulty,
     position: options.position,
+    materialRole: options.materialRole,
+    phoneticContext: options.phoneticContext,
+    scheduledDelayHours: options.scheduledDelayHours,
+    responseMode: options.responseMode,
     isRecordable: options.isRecordable,
     contrastText,
   };
@@ -2254,7 +2336,7 @@ const CURATED_COURSE_BANK: Record<string, CuratedCourseBank> = {
       pair("zen", "then", "z", "dh", "/zen/", "/ðen/"),
       pair("breeze", "breathe", "z", "dh", "/briːz/", "/briːð/"),
       pair("tease", "teethe", "z", "dh", "/tiːz/", "/tiːð/"),
-      pair("close", "clothe", "z", "dh", "/kloʊz/", "/kloʊð/"),
+      pair("bays", "bathe", "z", "dh", "/beɪz/", "/beɪð/"),
       pair("zay", "they", "z", "dh", "", "/ðeɪ/"),
       pair("zose", "those", "z", "dh", "", "/ðoʊz/"),
       pair("doze", "those", "z", "dh", "/doʊz/", "/ðoʊz/"),
@@ -4154,6 +4236,67 @@ function naturalPairText(pair: MinimalPairItem | PairSeed): string {
   return `${pair.wordA} ${pair.wordB}`;
 }
 
+function goldMaterials(
+  pack: TrainingPack,
+  kind: DeepTrainingMaterial["kind"],
+  role?: DeepTrainingMaterial["role"],
+): DeepTrainingMaterial[] | null {
+  if (pack.id !== EE_IH_GOLD_CURRICULUM.packId) return null;
+  return EE_IH_GOLD_CURRICULUM.materials.filter(
+    (material) =>
+      material.kind === kind && (role === undefined || material.role === role),
+  );
+}
+
+function goldCourseItems(
+  pack: TrainingPack,
+  kind: DeepTrainingMaterial["kind"],
+  role?: DeepTrainingMaterial["role"],
+): TrainingCourseItem[] | null {
+  const materials = goldMaterials(pack, kind, role);
+  if (!materials) return null;
+  return materials.map((material) => {
+    const isPair = material.kind === "minimal-pair";
+    const isPrompt = material.kind === "guided-prompt";
+    const referenceText =
+      isPair && material.contrastText
+        ? `${material.text} ${material.contrastText}`
+        : material.text;
+    const focusPoint =
+      material.role === "far-transfer"
+        ? "首次作答前不播放示范，用新材料检验能否迁移。"
+        : material.role === "near-transfer"
+          ? "先独立尝试，再用一个动作提示校正。"
+          : "只盯住本题的目标音动作，不用整体分替代目标音证据。";
+    return courseItem(
+      material.id,
+      referenceText,
+      material.targetUnits,
+      focusPoint,
+      "只追求流利或整体相似，可能掩盖目标音仍未稳定。",
+      isPrompt
+        ? "完成一段本人表达并回听；本题只保存观察，不做自动诊断。"
+        : "目标音成功对齐，录音质量合格，并达到本层判定标准。",
+      material.difficulty,
+      material.ipa,
+      material.contrastText,
+      {
+        displayText: isPair
+          ? `${material.text} / ${material.contrastText}`
+          : material.text,
+        referenceText,
+        playbackText: isPrompt ? undefined : referenceText,
+        position: material.position,
+        materialRole: material.role,
+        phoneticContext: material.phoneticContext,
+        scheduledDelayHours: material.scheduledDelayHours,
+        responseMode: isPrompt ? "open-response" : "reference",
+        isRecordable: !isPrompt,
+      },
+    );
+  });
+}
+
 function buildPerceptionLevel(pack: TrainingPack): TrainingLevel {
   const catalog = getPerceptionCatalogEntry(pack.id);
   const pairs = (catalog?.examples ?? []).map((example) => ({
@@ -4174,7 +4317,10 @@ function buildPerceptionLevel(pack: TrainingPack): TrainingLevel {
     kind: "perception",
     goal: "先听出目标差异，再进入发音动作。",
     coachCue: "不要急着读。先判断 X 更像 A 还是 B，听不准就会练成旧习惯。",
-    criterion: CRITERIA.perception,
+    criterion:
+      pack.id === "ee-ih" && REVIEWED_TRAINING_SPEAKER_IDS.length >= 4
+        ? EE_IH_GOLD_CRITERIA.perception
+        : CRITERIA.perception,
     items: pairs.slice(0, 8).map((item, index) =>
       courseItem(
         `perception-${index + 1}`,
@@ -4277,6 +4423,18 @@ function buildArticulationLevel(pack: TrainingPack): TrainingLevel {
 }
 
 function buildSyllableLevel(pack: TrainingPack): TrainingLevel {
+  const gold = goldCourseItems(pack, "syllable", "practice");
+  if (gold) {
+    return {
+      id: "syllable-bridge",
+      title: "音节桥接",
+      kind: "syllable",
+      goal: "用可对齐的短词组合建立 6 个以上有效样本，并覆盖不同相邻音。",
+      coachCue: "先慢速做出音质与舌位差异，再恢复自然时长。",
+      criterion: EE_IH_GOLD_CRITERIA.syllable,
+      items: gold,
+    };
+  }
   const bank = bankForPack(pack);
   return {
     id: "syllable-bridge",
@@ -4376,6 +4534,18 @@ function pairWordItem(
 }
 
 function buildWordLevel(pack: TrainingPack): TrainingLevel {
+  const gold = goldCourseItems(pack, "word", "practice");
+  if (gold) {
+    return {
+      id: "word-ladder",
+      title: "单词与位置变化",
+      kind: "word",
+      goal: "用 16 个词覆盖清浊尾音、辅音连缀和多音节语境。",
+      coachCue: "首次录音后只补一个动作提示，再换相邻音或词境验证。",
+      criterion: EE_IH_GOLD_CRITERIA.word,
+      items: gold,
+    };
+  }
   return {
     id: "word-ladder",
     title: "单词阶梯",
@@ -4388,6 +4558,18 @@ function buildWordLevel(pack: TrainingPack): TrainingLevel {
 }
 
 function buildPairLevel(pack: TrainingPack): TrainingLevel {
+  const gold = goldCourseItems(pack, "minimal-pair", "practice");
+  if (gold) {
+    return {
+      id: "minimal-pair-ladder",
+      title: "最小对立与随机切换",
+      kind: "minimal-pair",
+      goal: "随机切换 8 组对立词，整体分不能替代目标音证据。",
+      coachCue: "先预测差异，再录制和交替播放；不要用同一个舌位读两边。",
+      criterion: EE_IH_GOLD_CRITERIA["minimal-pair"],
+      items: gold,
+    };
+  }
   const bank = bankForPack(pack);
   const pairs =
     bank?.pairs.map(pairSeedToMinimalPair) ?? cycle(pack.minimalPairs, 8);
@@ -4425,6 +4607,18 @@ function buildPairLevel(pack: TrainingPack): TrainingLevel {
 }
 
 function buildSentenceLevel(pack: TrainingPack): TrainingLevel {
+  const gold = goldCourseItems(pack, "sentence", "practice");
+  if (gold) {
+    return {
+      id: "sentence-ladder",
+      title: "句子与语流变化",
+      kind: "sentence",
+      goal: "覆盖重读、非重读、不同语速和句内位置。",
+      coachCue: "先保住元音音质和舌位，再恢复自然节奏；时长只是辅助线索。",
+      criterion: EE_IH_GOLD_CRITERIA.sentence,
+      items: gold,
+    };
+  }
   const bank = bankForPack(pack);
   if (bank) {
     return {
@@ -4483,6 +4677,18 @@ function buildSentenceLevel(pack: TrainingPack): TrainingLevel {
 }
 
 function buildShadowingLevel(pack: TrainingPack): TrainingLevel {
+  const gold = goldCourseItems(pack, "shadowing", "practice");
+  if (gold) {
+    return {
+      id: "shadowing-transfer",
+      title: "分块影子跟读",
+      kind: "shadowing",
+      goal: "完成 4 条自然语流材料，检查目标音在节奏变化中是否稳定。",
+      coachCue: "慢半拍跟读，保留重弱关系，同时让 /iː/ 与 /ɪ/ 仍可区分。",
+      criterion: EE_IH_GOLD_CRITERIA.shadowing,
+      items: gold,
+    };
+  }
   const bank = bankForPack(pack);
   const sourceSentences =
     bank?.shadowing ??
@@ -4511,6 +4717,21 @@ function buildShadowingLevel(pack: TrainingPack): TrainingLevel {
 }
 
 function buildMixedReviewLevel(pack: TrainingPack): TrainingLevel {
+  if (pack.id === EE_IH_GOLD_CURRICULUM.packId) {
+    const gold = [
+      ...(goldCourseItems(pack, "word", "near-transfer") ?? []),
+      ...(goldCourseItems(pack, "sentence", "near-transfer") ?? []),
+    ];
+    return {
+      id: "mixed-review",
+      title: "变化语境验证",
+      kind: "mixed-review",
+      goal: "换词、换位置和换句境，检查受控动作能否稳定。",
+      coachCue: "先独立尝试，再查看一个提示；本层最高只到 varied。",
+      criterion: EE_IH_GOLD_CRITERIA["mixed-review"],
+      items: gold,
+    };
+  }
   const words = wordItemsFromPack(pack).slice(0, 2);
   const pairs = buildPairLevel(pack).items.slice(0, 2);
   const sentences = buildSentenceLevel(pack).items.slice(0, 2);
@@ -4535,6 +4756,24 @@ function buildMixedReviewLevel(pack: TrainingPack): TrainingLevel {
   };
 }
 
+function buildTransferLevel(pack: TrainingPack): TrainingLevel {
+  const items = [
+    ...(goldCourseItems(pack, "word", "far-transfer") ?? []),
+    ...(goldCourseItems(pack, "sentence", "far-transfer") ?? []),
+    ...(goldCourseItems(pack, "guided-prompt", "far-transfer") ?? []),
+  ];
+  return {
+    id: "untrained-transfer",
+    title: "未训练材料迁移",
+    kind: "transfer",
+    goal: "不预先播放答案，用 3 个可评分新材料和 1 个引导表达检查真实迁移。",
+    coachCue:
+      "先独立完成；评分只使用目标音成功对齐的固定材料，引导表达只保存观察。",
+    criterion: CRITERIA.transfer,
+    items,
+  };
+}
+
 function buildCourse(pack: TrainingPack) {
   const paths = DEFAULT_REMEDIATION_PATHS.filter((path) => {
     if (path.id === "rebuild-target") return true;
@@ -4555,6 +4794,9 @@ function buildCourse(pack: TrainingPack) {
       buildSentenceLevel(pack),
       buildShadowingLevel(pack),
       buildMixedReviewLevel(pack),
+      ...(pack.id === EE_IH_GOLD_CURRICULUM.packId
+        ? [buildTransferLevel(pack)]
+        : []),
     ],
     errorPatterns: TRAINING_ERROR_PATTERNS.filter((pattern) =>
       pattern.appliesToPackIds.includes(pack.id),
@@ -4569,6 +4811,20 @@ for (const pack of TRAINING_PACKS) {
 
 export function getTrainingPack(packId: string): TrainingPack | null {
   return TRAINING_PACKS.find((pack) => pack.id === packId) ?? null;
+}
+
+export function getRetentionMaterialIds(
+  packId: string,
+  scheduledDelayHours: 24 | 168 | 504,
+): string[] {
+  if (packId !== EE_IH_GOLD_CURRICULUM.packId) return [];
+  return EE_IH_GOLD_CURRICULUM.materials
+    .filter(
+      (material) =>
+        material.role === "retention" &&
+        material.scheduledDelayHours === scheduledDelayHours,
+    )
+    .map((material) => material.id);
 }
 
 export function getPackForPhoneme(phoneme: string): TrainingPack | null {

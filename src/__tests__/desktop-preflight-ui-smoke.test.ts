@@ -78,7 +78,10 @@ describe("desktop preflight and UI smoke", () => {
   it("checks the release executable and static desktop configuration", () => {
     const script = readProjectFile("scripts/desktop-preflight.mjs");
 
-    expect(script).toContain("E:\\\\SpeakRightDesktopRepo");
+    expect(script).toContain("const root = process.cwd()");
+    expect(script).toContain("gitTopLevel");
+    expect(script).toContain(`safe.directory=\${root}`);
+    expect(script).not.toContain("SpeakRightDesktopRepo");
     expect(script).toContain("com.speakright.desktop");
     expect(script).toContain("../out");
     expect(script).toContain("release executable is missing");

@@ -4,6 +4,7 @@ import {
   getTrainingMaterialNovelty,
   loadTrainingExposureState,
   markCourseItemExposed,
+  presentCourseItem,
   TRAINING_EXPOSURE_STORAGE_KEY,
 } from "@/lib/training-exposure";
 
@@ -52,5 +53,30 @@ describe("training exposure storage", () => {
         raw: "{broken",
       }),
     ]);
+  });
+
+  it("captures novelty before exposure and never reuses it on a retry", () => {
+    markCourseItemExposed({
+      materialId: "practice-seed",
+      packId: "ee-ih",
+      role: "practice",
+      seenAt: 50,
+    });
+
+    const first = presentCourseItem({
+      materialId: "retention-held-out",
+      packId: "ee-ih",
+      role: "retention",
+      seenAt: 100,
+    });
+    const retry = presentCourseItem({
+      materialId: "retention-held-out",
+      packId: "ee-ih",
+      role: "retention",
+      seenAt: 200,
+    });
+
+    expect(first.noveltyBeforeExposure).toBe("confirmed-untrained");
+    expect(retry.noveltyBeforeExposure).toBe("exposed");
   });
 });

@@ -225,9 +225,9 @@ export const HVPT_CONTRASTS: HvptContrast[] = [
         difficulty: 5,
       },
       {
-        wordA: "close",
-        wordB: "clothe",
-        context: "spelling trap",
+        wordA: "bays",
+        wordB: "bathe",
+        context: "matched rhyme",
         difficulty: 5,
       },
       {

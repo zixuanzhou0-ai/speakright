@@ -75,35 +75,35 @@ export const EE_IH_GOLD_CURRICULUM: EnglishDepthCurriculum = {
       "Natural duration as a secondary cue",
     ),
 
-    material("ee-ih-syllable-01", "practice", "syllable", "see-sih", {
+    material("ee-ih-syllable-01", "practice", "syllable", "see sit", {
       phoneticContext: "s_",
       difficulty: 1,
     }),
-    material("ee-ih-syllable-02", "practice", "syllable", "tee-tih", {
+    material("ee-ih-syllable-02", "practice", "syllable", "tea tip", {
       phoneticContext: "t_",
       difficulty: 1,
     }),
-    material("ee-ih-syllable-03", "practice", "syllable", "fee-fih", {
+    material("ee-ih-syllable-03", "practice", "syllable", "fee fit", {
       phoneticContext: "f_",
       difficulty: 1,
     }),
-    material("ee-ih-syllable-04", "practice", "syllable", "kee-kih", {
+    material("ee-ih-syllable-04", "practice", "syllable", "key kit", {
       phoneticContext: "k_",
       difficulty: 2,
     }),
-    material("ee-ih-syllable-05", "practice", "syllable", "eem-im", {
+    material("ee-ih-syllable-05", "practice", "syllable", "bead bid", {
       phoneticContext: "_m",
       difficulty: 2,
     }),
-    material("ee-ih-syllable-06", "practice", "syllable", "een-in", {
+    material("ee-ih-syllable-06", "practice", "syllable", "seen sin", {
       phoneticContext: "_n",
       difficulty: 2,
     }),
-    material("ee-ih-syllable-07", "practice", "syllable", "eel-il", {
+    material("ee-ih-syllable-07", "practice", "syllable", "feel fill", {
       phoneticContext: "_l",
       difficulty: 3,
     }),
-    material("ee-ih-syllable-08", "practice", "syllable", "eest-ist", {
+    material("ee-ih-syllable-08", "practice", "syllable", "feast fist", {
       phoneticContext: "_st",
       difficulty: 3,
     }),
@@ -168,7 +168,7 @@ export const EE_IH_GOLD_CURRICULUM: EnglishDepthCurriculum = {
       phoneticContext: "kw_k",
       difficulty: 2,
     }),
-    material("ee-ih-word-13", "practice", "word", "minute", {
+    material("ee-ih-word-13", "practice", "word", "visit", {
       position: "mixed",
       phoneticContext: "multisyllabic",
       difficulty: 3,
@@ -197,8 +197,8 @@ export const EE_IH_GOLD_CURRICULUM: EnglishDepthCurriculum = {
       contrastText: "fit",
       difficulty: 2,
     }),
-    material("ee-ih-pair-03", "practice", "minimal-pair", "leave", {
-      contrastText: "live",
+    material("ee-ih-pair-03", "practice", "minimal-pair", "leak", {
+      contrastText: "lick",
       difficulty: 2,
     }),
     material("ee-ih-pair-04", "practice", "minimal-pair", "beat", {
@@ -367,6 +367,11 @@ export const EE_IH_GOLD_CURRICULUM: EnglishDepthCurriculum = {
       difficulty: 3,
       scheduledDelayHours: 24,
     }),
+    material("ee-ih-retention-24-word-2", "retention", "word", "briefing", {
+      position: "mixed",
+      difficulty: 4,
+      scheduledDelayHours: 24,
+    }),
     material(
       "ee-ih-retention-24-sentence",
       "retention",
@@ -387,6 +392,11 @@ export const EE_IH_GOLD_CURRICULUM: EnglishDepthCurriculum = {
       difficulty: 3,
       scheduledDelayHours: 168,
     }),
+    material("ee-ih-retention-168-word-2", "retention", "word", "sequence", {
+      position: "mixed",
+      difficulty: 4,
+      scheduledDelayHours: 168,
+    }),
     material(
       "ee-ih-retention-168-sentence",
       "retention",
@@ -403,6 +413,11 @@ export const EE_IH_GOLD_CURRICULUM: EnglishDepthCurriculum = {
     ),
 
     material("ee-ih-retention-504-word", "retention", "word", "efficient", {
+      position: "mixed",
+      difficulty: 4,
+      scheduledDelayHours: 504,
+    }),
+    material("ee-ih-retention-504-word-2", "retention", "word", "specific", {
       position: "mixed",
       difficulty: 4,
       scheduledDelayHours: 504,
@@ -430,6 +445,20 @@ export interface DeepCurriculumValidation {
   counts: Record<TrainingMaterialRole, number>;
 }
 
+function normalizedMaterialContent(material: DeepTrainingMaterial): string {
+  const normalize = (value: string) =>
+    value
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  const parts = [material.text, material.contrastText]
+    .filter((value): value is string => Boolean(value))
+    .map(normalize);
+  if (material.kind === "minimal-pair") parts.sort();
+  return `${material.kind}:${parts.join("|")}`;
+}
+
 export function validateEnglishDepthCurriculum(
   curriculum: EnglishDepthCurriculum,
 ): DeepCurriculumValidation {
@@ -438,6 +467,24 @@ export function validateEnglishDepthCurriculum(
     (conflict) =>
       `${conflict.materialId} appears in multiple roles: ${conflict.roles.join(", ")}`,
   );
+  const rolesByContent = new Map<string, Set<TrainingMaterialRole>>();
+  for (const material of curriculum.materials) {
+    if (material.role === "instruction") continue;
+    const fingerprint = normalizedMaterialContent(material);
+    const roles = rolesByContent.get(fingerprint) ?? new Set();
+    roles.add(material.role);
+    rolesByContent.set(fingerprint, roles);
+  }
+  for (const [fingerprint, roles] of rolesByContent) {
+    if (roles.size > 1) {
+      issues.push(
+        `${fingerprint} repeats across material roles: ${Array.from(roles)
+          .sort()
+          .join(", ")}`,
+      );
+    }
+  }
+
   const counts = {
     baseline: 0,
     instruction: 0,

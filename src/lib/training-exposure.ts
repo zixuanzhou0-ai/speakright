@@ -108,6 +108,31 @@ export function getTrainingMaterialNovelty(
   );
 }
 
+export interface PresentedTrainingMaterial {
+  noveltyBeforeExposure: TrainingMaterialNovelty;
+  saved: boolean;
+}
+
+export function presentCourseItem(input: {
+  materialId: string;
+  packId: string;
+  role: TrainingMaterialRole;
+  seenAt?: number;
+}): PresentedTrainingMaterial {
+  const noveltyBeforeExposure = getTrainingMaterialNovelty(input.materialId);
+  return {
+    noveltyBeforeExposure,
+    saved: markTrainingMaterialExposed(
+      {
+        id: input.materialId,
+        packId: input.packId,
+        role: input.role,
+      },
+      input.seenAt,
+    ),
+  };
+}
+
 export function markCourseItemExposed(input: {
   materialId: string;
   packId: string;

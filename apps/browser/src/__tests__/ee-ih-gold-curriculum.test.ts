@@ -37,14 +37,37 @@ describe("ee-ih gold curriculum", () => {
     expect(new Set(heldOut.map((item) => item.id)).size).toBe(heldOut.length);
   });
 
-  it("reserves three new materials for every delayed retest", () => {
+  it("reserves three scored materials plus one open observation for every delayed retest", () => {
     for (const delay of [24, 168, 504]) {
       expect(
         EE_IH_GOLD_CURRICULUM.materials.filter(
           (item) =>
             item.role === "retention" && item.scheduledDelayHours === delay,
         ),
-      ).toHaveLength(3);
+      ).toHaveLength(4);
     }
+  });
+  it("detects semantic material leakage even when IDs differ", () => {
+    const practiceWord = EE_IH_GOLD_CURRICULUM.materials.find(
+      (item) => item.role === "practice" && item.kind === "word",
+    );
+    expect(practiceWord).toBeTruthy();
+    if (!practiceWord) return;
+
+    const leaked = {
+      ...EE_IH_GOLD_CURRICULUM,
+      materials: [
+        ...EE_IH_GOLD_CURRICULUM.materials,
+        {
+          ...practiceWord,
+          id: "different-id-same-content",
+          role: "far-transfer" as const,
+        },
+      ],
+    };
+    const result = validateEnglishDepthCurriculum(leaked);
+
+    expect(result.valid).toBe(false);
+    expect(result.issues.some((issue) => issue.includes("repeats"))).toBe(true);
   });
 });

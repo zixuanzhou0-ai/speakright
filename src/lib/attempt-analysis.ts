@@ -52,7 +52,9 @@ export function analyzeAttempt({
 }: AttemptAnalysisInput): AttemptAnalysis {
   const score = getPassScore(result, item.targetPhonemes);
   const threshold =
-    criterion && criterion.kind !== "perception"
+    criterion &&
+    criterion.kind !== "perception" &&
+    criterion.kind !== "motor-formation"
       ? criterion.minTargetScore
       : levelKind === "syllable"
         ? 78

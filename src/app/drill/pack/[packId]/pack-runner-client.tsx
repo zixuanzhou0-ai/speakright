@@ -1,5 +1,8 @@
 "use client";
 
+import { buildTrainingAttemptEvidence } from "@speakright/core/evidence/training";
+import { evaluateTrainingCriterion } from "@speakright/core/training/criteria";
+import type { TrainingMaterialNovelty } from "@speakright/core/training/exposure";
 import {
   isCrossSpeakerPerceptionTrial,
   type PerceptionTrial,
@@ -22,7 +25,7 @@ import {
 import { motion } from "motion/react";
 import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { RecordButton } from "@/components/audio/record-button";
 import { RecordingQualityPanel } from "@/components/audio/recording-quality-panel";
 import { WaveformDisplay } from "@/components/audio/waveform-display";
@@ -55,10 +58,17 @@ import {
   buildDeepPracticeCoach,
   type DeepPracticeCoach,
 } from "@/lib/deep-practice-coach";
+import {
+  loadDeepTrainingSession,
+  saveDeepTrainingSession,
+} from "@/lib/deep-training-session";
 import { buildGuidedAttemptEvidence } from "@/lib/guided-attempt-evidence";
 import { buildGuidedTrainingEvidence } from "@/lib/guided-training-evidence";
 import { getLanguageProfile } from "@/lib/language-profiles";
-import { appendLearningEvidence } from "@/lib/learning-evidence";
+import {
+  appendLearningEvidence,
+  DEFAULT_CALIBRATION_VERSION,
+} from "@/lib/learning-evidence";
 import {
   buildLessonBrief,
   buildSessionDebrief,
@@ -86,6 +96,7 @@ import {
   type RecordingQualityReport,
   reliabilityFromRecordingQuality,
 } from "@/lib/recording-quality";
+import { scheduleRetentionAfterTransfer } from "@/lib/retention-schedule";
 import { buildReviewQueue, buildSessionReviewItems } from "@/lib/review-queue";
 import {
   type CourseAttemptSnapshot,
@@ -104,8 +115,13 @@ import {
   getRemediationPath,
   TRAINING_ERROR_PATTERNS,
 } from "@/lib/training-error-patterns";
-import { getTrainingPack } from "@/lib/training-packs";
 import {
+  markCourseItemExposed,
+  presentCourseItem,
+} from "@/lib/training-exposure";
+import { getRetentionMaterialIds, getTrainingPack } from "@/lib/training-packs";
+import {
+  createFocusedPackPerceptionTrials,
   createPackPerceptionTrials,
   perceptionTrialToCourseItem,
 } from "@/lib/training-perception";
@@ -135,6 +151,23 @@ type RunnerPhase =
   | { type: "completed"; summary: TrainingSessionSummary };
 
 type ActiveSlot = "A" | "B" | "X" | null;
+
+interface MotorFormationEvidence {
+  completedSelfChecks: number;
+  recordedSampleCount: number;
+  playbackComparisonCompleted: boolean;
+}
+
+function mergeMaterialNovelty(
+  current: TrainingMaterialNovelty | undefined,
+  next: TrainingMaterialNovelty | undefined,
+): TrainingMaterialNovelty | undefined {
+  if (!next) return current;
+  if (!current) return next;
+  if (current === "exposed" || next === "exposed") return "exposed";
+  if (current === "unknown" || next === "unknown") return "unknown";
+  return "confirmed-untrained";
+}
 
 interface AttemptResult {
   text: string;
@@ -236,6 +269,9 @@ export default function TrainingPackPage() {
   const [perceptionAnswer, setPerceptionAnswer] = useState<boolean | null>(
     null,
   );
+  const [missedPerceptionPairIds, setMissedPerceptionPairIds] = useState<
+    string[]
+  >([]);
   const [failedAttempts, setFailedAttempts] = useState(0);
   const [lastAttempt, setLastAttempt] = useState<AttemptResult | null>(null);
   const [results, setResults] = useState<AttemptResult[]>([]);
@@ -258,9 +294,14 @@ export default function TrainingPackPage() {
     RemediationResult[]
   >([]);
   const [localSaveWarning, setLocalSaveWarning] = useState<string | null>(null);
+  const [materialNovelty, setMaterialNovelty] = useState<
+    Record<string, TrainingMaterialNovelty>
+  >({});
+  const [sessionReady, setSessionReady] = useState(false);
 
   const startedAtRef = useRef(Date.now());
   const qualityReportsRef = useRef<RecordingQualityReport[]>([]);
+  const restoredPackRef = useRef<string | null>(null);
   const recorder = useRecorder();
   const azure = useAzureAssessment();
   const wordAudio = useWordPronunciation();
@@ -287,12 +328,118 @@ export default function TrainingPackPage() {
     currentLevel && phase.type === "course"
       ? currentItems[phase.position.itemIndex % currentItems.length]
       : null;
+  const currentMaterialId =
+    pack && currentLevel && currentItem
+      ? currentItem.materialRole
+        ? currentItem.id
+        : `${pack.id}:${currentLevel.id}:${currentItem.id}`
+      : null;
+  const currentMaterialNovelty = currentMaterialId
+    ? materialNovelty[currentMaterialId]
+    : undefined;
   const currentPerceptionTrial =
     currentLevel?.kind === "perception" &&
     phase.type === "course" &&
     perceptionTrials.length > 0
       ? perceptionTrials[phase.position.itemIndex % perceptionTrials.length]
       : null;
+  useEffect(() => {
+    if (!pack || !currentLevel || !currentItem) return;
+    if (currentLevel.kind === "perception" && currentPerceptionTrial) {
+      for (const asset of [
+        currentPerceptionTrial.referenceA,
+        currentPerceptionTrial.referenceB,
+        currentPerceptionTrial.probe,
+      ]) {
+        markCourseItemExposed({
+          materialId: `${pack.id}:perception:${asset.speakerId}:${asset.word}`,
+          packId: pack.id,
+          role: "baseline",
+        });
+      }
+      return;
+    }
+    const role =
+      currentItem.materialRole ??
+      (currentLevel.kind === "articulation" ? "instruction" : "practice");
+    if (!currentMaterialId) return;
+    const presented = presentCourseItem({
+      materialId: currentMaterialId,
+      packId: pack.id,
+      role,
+    });
+    setMaterialNovelty((current) =>
+      current[currentMaterialId]
+        ? current
+        : {
+            ...current,
+            [currentMaterialId]: presented.noveltyBeforeExposure,
+          },
+    );
+    if (!presented.saved) {
+      setLocalSaveWarning(
+        "当前材料的暴露记录未能保存；本轮不会宣称材料未经训练。",
+      );
+    }
+  }, [
+    pack,
+    currentLevel,
+    currentItem,
+    currentPerceptionTrial,
+    currentMaterialId,
+  ]);
+
+  useEffect(() => {
+    if (!pack || !course || restoredPackRef.current === pack.id) return;
+    restoredPackRef.current = pack.id;
+    const saved = loadDeepTrainingSession(pack.id);
+    if (saved) {
+      startedAtRef.current = saved.startedAt;
+      setPhase(
+        saved.phase.type === "course"
+          ? { type: "course", position: saved.phase.position }
+          : { type: "intro" },
+      );
+      setPerceptionTrials(saved.perceptionTrials);
+      setPerceptionCorrect(saved.perceptionCorrect);
+      setPerceptionTotal(saved.perceptionTotal);
+      setPerceptionExtraRemaining(saved.perceptionExtraRemaining);
+      setLevelStats(saved.levelStats);
+      setPerceptionAnswer(null);
+    }
+    setSessionReady(true);
+  }, [pack, course]);
+
+  useEffect(() => {
+    if (!sessionReady || !pack) return;
+    const persistedPhase =
+      phase.type === "completed" ? { type: "completed" as const } : phase;
+    const saved = saveDeepTrainingSession({
+      version: 1,
+      packId: pack.id,
+      startedAt: startedAtRef.current,
+      updatedAt: Date.now(),
+      phase: persistedPhase,
+      perceptionTrials,
+      perceptionCorrect,
+      perceptionTotal,
+      perceptionExtraRemaining,
+      levelStats,
+    });
+    if (!saved) {
+      setLocalSaveWarning("当前训练进度未能保存；请保持页面打开并稍后重试。");
+    }
+  }, [
+    sessionReady,
+    pack,
+    phase,
+    perceptionTrials,
+    perceptionCorrect,
+    perceptionTotal,
+    perceptionExtraRemaining,
+    levelStats,
+  ]);
+
   const xIsA = currentPerceptionTrial?.probeMatches === "A";
   const progressText =
     phase.type === "course" && currentLevel
@@ -449,7 +596,6 @@ export default function TrainingPackPage() {
       createPackPerceptionTrials(
         pack.id,
         `${pack.id}-${Date.now().toString()}`,
-        8,
       ),
     );
     setPerceptionCorrect(0);
@@ -457,10 +603,12 @@ export default function TrainingPackPage() {
     setPerceptionExtraRemaining(0);
     setPerceptionAnswer(null);
     setFailedAttempts(0);
+    setMissedPerceptionPairIds([]);
     setLastAttempt(null);
     setResults([]);
     setWorstAttempt(null);
     setLevelStats({});
+    setMaterialNovelty({});
     setStuckPatternIds([]);
     setFocusedReviewItems([]);
     setGateBlockedReason(null);
@@ -482,14 +630,22 @@ export default function TrainingPackPage() {
 
   const updateLevelStats = (
     level: TrainingLevel,
-    score: number,
+    score: number | undefined,
     passed: boolean,
     stuck = false,
     details?: {
       contextId: string;
       validSample: boolean;
-      recordingQualityValid: boolean;
-      alignmentValid: boolean;
+      recordingQualityValid?: boolean;
+      alignmentValid?: boolean;
+      materialId?: string;
+      position?: TrainingCourseItem["position"];
+      novelty?: TrainingMaterialNovelty;
+      completedSelfChecks?: number;
+      recordedSampleCount?: number;
+      playbackComparisonCompleted?: boolean;
+      speakerIds?: string[];
+      speakerPairings?: string[];
     },
   ) => {
     setLevelStats((current) => {
@@ -498,7 +654,8 @@ export default function TrainingPackPage() {
         ...current,
         [level.id]: {
           ...snapshot,
-          scores: [...snapshot.scores, score],
+          scores:
+            score === undefined ? snapshot.scores : [...snapshot.scores, score],
           attempts: snapshot.attempts + 1,
           passedCount: snapshot.passedCount + (passed ? 1 : 0),
           stuckCount: snapshot.stuckCount + (stuck ? 1 : 0),
@@ -517,6 +674,22 @@ export default function TrainingPackPage() {
             details?.alignmentValid === undefined
               ? snapshot.alignmentValid
               : (snapshot.alignmentValid ?? true) && details.alignmentValid,
+          completedSelfChecks:
+            details?.completedSelfChecks ?? snapshot.completedSelfChecks,
+          recordedSampleCount:
+            details?.recordedSampleCount ?? snapshot.recordedSampleCount,
+          playbackComparisonCompleted:
+            details?.playbackComparisonCompleted ??
+            snapshot.playbackComparisonCompleted,
+          speakerIds: details?.speakerIds ?? snapshot.speakerIds,
+          speakerPairings: details?.speakerPairings ?? snapshot.speakerPairings,
+          materialIds: details?.materialId
+            ? [...(snapshot.materialIds ?? []), details.materialId]
+            : snapshot.materialIds,
+          positions: details?.position
+            ? [...(snapshot.positions ?? []), details.position]
+            : snapshot.positions,
+          novelty: mergeMaterialNovelty(snapshot.novelty, details?.novelty),
         },
       };
     });
@@ -543,6 +716,11 @@ export default function TrainingPackPage() {
         type: "course",
         position: { ...phase.position, itemIndex: nextItem },
       });
+      return;
+    }
+
+    if (currentLevel.kind === "transfer") {
+      completeSession();
       return;
     }
 
@@ -698,9 +876,25 @@ export default function TrainingPackPage() {
       })),
       createdAt: completedSummary.completedAt,
     });
-    const evidenceSaved = guidedEvidence.every((item) =>
+    const evidenceSaveResults = guidedEvidence.map((item) =>
       appendLearningEvidence(item),
     );
+    const evidenceSaved = evidenceSaveResults.every(Boolean);
+    const transferEvidence = guidedEvidence.find(
+      (item) => item.evidenceStage === "transfer_observed",
+    );
+    const retentionScheduled = transferEvidence
+      ? scheduleRetentionAfterTransfer({
+          packId: pack.id,
+          transferEvidenceId: transferEvidence.id,
+          observedAt: completedSummary.completedAt,
+          materialIdsByDelay: {
+            24: getRetentionMaterialIds(pack.id, 24),
+            168: getRetentionMaterialIds(pack.id, 168),
+            504: getRetentionMaterialIds(pack.id, 504),
+          },
+        })
+      : true;
     let nextLocalSaveWarning: string | null = null;
     if (canPromoteMastery) {
       const profile = recordTrainingSession(
@@ -714,6 +908,10 @@ export default function TrainingPackPage() {
     }
     if (!evidenceSaved) {
       nextLocalSaveWarning = "训练已完成，但 V3 学习证据未能写入本机存储。";
+    }
+    if (!retentionScheduled) {
+      nextLocalSaveWarning =
+        "迁移证据已保存，但 1/7/21 天复测任务未能写入本机存储。";
     }
     setLocalSaveWarning(nextLocalSaveWarning);
     setPhase({ type: "completed", summary: completedSummary });
@@ -761,6 +959,17 @@ export default function TrainingPackPage() {
     setPerceptionCorrect(nextCorrect);
     setPerceptionTotal(nextTotal);
     setPerceptionAnswer(correct);
+    if (!correct) {
+      setMissedPerceptionPairIds((current) =>
+        Array.from(
+          new Set([
+            ...current,
+            currentPerceptionTrial.pairId,
+            currentPerceptionTrial.probePairId,
+          ]),
+        ),
+      );
+    }
     const evidenceSaved = appendLearningEvidence(
       buildPerceptionAttemptEvidence({
         sessionId: `${pack.id}-${startedAtRef.current}`,
@@ -792,6 +1001,17 @@ export default function TrainingPackPage() {
           crossSpeakerValid:
             (snapshot.crossSpeakerValid ?? true) &&
             isCrossSpeakerPerceptionTrial(currentPerceptionTrial),
+          speakerIds: [
+            ...(snapshot.speakerIds ?? []),
+            currentPerceptionTrial.referenceSpeakerId,
+            currentPerceptionTrial.probeSpeakerId,
+          ],
+          speakerPairings: [
+            ...(snapshot.speakerPairings ?? []),
+            currentPerceptionTrial.referenceSpeakerId +
+              "->" +
+              currentPerceptionTrial.probeSpeakerId,
+          ],
         },
       };
     });
@@ -819,9 +1039,10 @@ export default function TrainingPackPage() {
       currentItem,
     );
     if (!gate.passed) {
-      const reviewTrials = createPackPerceptionTrials(
+      const reviewTrials = createFocusedPackPerceptionTrials(
         pack.id,
         `${pack.id}-review-${perceptionTotal.toString()}`,
+        missedPerceptionPairIds,
         4,
       );
       setPerceptionTrials(reviewTrials);
@@ -854,6 +1075,7 @@ export default function TrainingPackPage() {
     }
     setPerceptionExtraRemaining(0);
     setGateBlockedReason(null);
+    setMissedPerceptionPairIds([]);
     const nextLevel = phase.position.levelIndex + 1;
     if (nextLevel >= course.levels.length) {
       completeSession();
@@ -940,6 +1162,9 @@ export default function TrainingPackPage() {
       validSample: qualityReport?.canSubmit === true && !analysis.usedFallback,
       recordingQualityValid: qualityReport?.canSubmit === true,
       alignmentValid: !analysis.usedFallback,
+      materialId: currentMaterialId ?? currentItem.id,
+      position: currentItem.position,
+      novelty: currentMaterialNovelty,
     });
     setFailedAttempts(nextFailedAttempts);
     setLastAttempt(attempt);
@@ -1081,16 +1306,93 @@ export default function TrainingPackPage() {
     azure.reset();
   };
 
-  const completeNonRecordingItem = () => {
-    if (currentLevel) {
-      updateLevelStats(currentLevel, 100, true);
+  const completeMotorFormation = (evidence: MotorFormationEvidence) => {
+    if (currentLevel && currentItem) {
+      updateLevelStats(currentLevel, undefined, true, false, {
+        contextId: currentItem.id,
+        validSample: false,
+        recordingQualityValid: true,
+        alignmentValid: true,
+        materialId: currentMaterialId ?? currentItem.id,
+        position: currentItem.position,
+        novelty: currentMaterialNovelty,
+        ...evidence,
+      });
     }
     advance();
   };
 
+  const completeOpenResponse = () => {
+    if (!currentLevel || !currentItem || !recorder.audioBlob) return;
+    const quality = recordingQuality.report;
+    const materialId = currentMaterialId ?? currentItem.id;
+    const evidenceSaved = appendLearningEvidence(
+      buildTrainingAttemptEvidence({
+        id: `${pack.id}-${startedAtRef.current}-${currentItem.id}-open`,
+        languageId,
+        taskType: "spontaneous-transfer",
+        targetUnits: pack.targetPhonemes,
+        observations: [
+          {
+            metric: "task-completion",
+            text: "Learner recorded and reviewed an open response; no automatic pronunciation conclusion was produced.",
+            source: "task",
+          },
+        ],
+        recordingQuality: {
+          status:
+            quality == null
+              ? "unknown"
+              : quality.canSubmit
+                ? "good"
+                : "invalid",
+          score: quality?.score,
+          reasons: quality?.issues.map((issue) => issue.title) ?? [
+            "Open response quality was not automatically verified.",
+          ],
+        },
+        alignmentQuality: {
+          status: "unknown",
+          reasons: [
+            "Open responses are observations only and do not use reference-text alignment.",
+          ],
+        },
+        calibrationVersion: DEFAULT_CALIBRATION_VERSION,
+        createdAt: Date.now(),
+        trace: {
+          sessionId: `${pack.id}-${startedAtRef.current}`,
+          levelId: currentLevel.id,
+          materialIds: [materialId],
+          criterionKind: "open-response-observation",
+          materialRole: currentItem.materialRole,
+          novelty: currentMaterialNovelty,
+        },
+      }),
+    );
+    updateLevelStats(currentLevel, undefined, false, false, {
+      contextId: currentItem.id,
+      validSample: false,
+      materialId,
+      position: currentItem.position,
+      novelty: currentMaterialNovelty,
+    });
+    if (!evidenceSaved) {
+      setLocalSaveWarning(
+        "表达录音仍保留在当前页面，但原始观察未能写入本机存储。",
+      );
+    }
+    recorder.reset();
+    recordingQuality.reset();
+    advance();
+  };
+
+  const completeNonRecordingItem = completeMotorFormation;
+  const shouldShowOpenResponse =
+    currentLevel && currentItem?.responseMode === "open-response";
   const shouldShowRecording =
     currentLevel &&
     currentItem &&
+    currentItem.responseMode !== "open-response" &&
     !["perception", "articulation"].includes(currentLevel.kind);
 
   return (
@@ -1227,7 +1529,38 @@ export default function TrainingPackPage() {
               <ArticulationStep
                 level={currentLevel}
                 item={currentItem}
+                audioBlob={recorder.audioBlob}
+                stream={recorder.stream}
+                isRecording={recorder.isRecording}
+                recorderError={recorder.error}
+                isReferencePlaying={wordAudio.isPlaying || tts.isPlaying}
+                onPlayReference={playReference}
+                onStartRecording={() => {
+                  clearReferenceAudioState();
+                  recorder.startRecording();
+                }}
+                onStopRecording={recorder.stopRecording}
+                onResetRecording={recorder.reset}
                 onNext={completeNonRecordingItem}
+              />
+            )}
+
+            {shouldShowOpenResponse && currentItem && (
+              <OpenResponseStep
+                item={currentItem}
+                audioBlob={recorder.audioBlob}
+                stream={recorder.stream}
+                isRecording={recorder.isRecording}
+                recorderError={recorder.error}
+                qualityReport={recordingQuality.report}
+                isAnalyzingQuality={recordingQuality.isAnalyzing}
+                onStartRecording={() => {
+                  clearReferenceAudioState();
+                  recorder.startRecording();
+                }}
+                onStopRecording={recorder.stopRecording}
+                onResetRecording={recorder.reset}
+                onComplete={completeOpenResponse}
               />
             )}
 
@@ -1236,6 +1569,7 @@ export default function TrainingPackPage() {
                 pack={pack}
                 level={currentLevel}
                 scoringAvailable={scoringAvailable}
+                allowReferencePlayback={currentLevel.kind !== "transfer"}
                 item={currentItem}
                 threshold={criterionTargetScore(currentLevel)}
                 failedAttempts={failedAttempts}
@@ -1885,14 +2219,89 @@ function PerceptionStep({
 function ArticulationStep({
   level,
   item,
+  audioBlob,
+  stream,
+  isRecording,
+  recorderError,
+  isReferencePlaying,
+  onPlayReference,
+  onStartRecording,
+  onStopRecording,
+  onResetRecording,
   onNext,
 }: {
   level: TrainingLevel;
   item: TrainingCourseItem;
-  onNext: () => void;
+  audioBlob: Blob | null;
+  stream: MediaStream | null;
+  isRecording: boolean;
+  recorderError: string | null;
+  isReferencePlaying: boolean;
+  onPlayReference: () => void;
+  onStartRecording: () => void;
+  onStopRecording: () => void;
+  onResetRecording: () => void;
+  onNext: (evidence: MotorFormationEvidence) => void;
 }) {
   const itemText = item.displayText ?? item.text;
   const itemDensity = getPracticeTextDensity(itemText);
+
+  const motorChecks = [
+    "舌位与目标音提示一致",
+    "双唇和下颌没有额外用力",
+    "能感受到两个目标音的音质差异",
+  ];
+  const [completedChecks, setCompletedChecks] = useState<Set<number>>(
+    new Set(),
+  );
+  const [recordedSampleCount, setRecordedSampleCount] = useState(0);
+  const [referencePlayed, setReferencePlayed] = useState(false);
+  const [learnerPlayed, setLearnerPlayed] = useState(false);
+  const [learnerAudioUrl, setLearnerAudioUrl] = useState<string | null>(null);
+  const countedBlobRef = useRef<Blob | null>(null);
+
+  useEffect(() => {
+    if (!audioBlob) {
+      setLearnerAudioUrl(null);
+      return;
+    }
+    const url = URL.createObjectURL(audioBlob);
+    setLearnerAudioUrl(url);
+    setLearnerPlayed(false);
+    return () => URL.revokeObjectURL(url);
+  }, [audioBlob]);
+
+  const playbackComparisonCompleted = referencePlayed && learnerPlayed;
+  const motorCriterion =
+    level.criterion.kind === "motor-formation"
+      ? level.criterion
+      : {
+          kind: "motor-formation" as const,
+          minSelfChecks: 3,
+          minRecordedSamples: 2,
+          requirePlaybackComparison: true,
+        };
+  const motorEvidence: MotorFormationEvidence = {
+    completedSelfChecks: completedChecks.size,
+    recordedSampleCount,
+    playbackComparisonCompleted,
+  };
+  const motorGate = evaluateTrainingCriterion(motorCriterion, motorEvidence);
+
+  const countCurrentRecording = () => {
+    if (!audioBlob || countedBlobRef.current === audioBlob) return;
+    countedBlobRef.current = audioBlob;
+    setRecordedSampleCount((current) => current + 1);
+  };
+
+  const toggleCheck = (index: number) => {
+    setCompletedChecks((current) => {
+      const next = new Set(current);
+      if (next.has(index)) next.delete(index);
+      else next.add(index);
+      return next;
+    });
+  };
 
   return (
     <motion.div
@@ -1931,9 +2340,243 @@ function ArticulationStep({
           </p>
         </div>
       </div>
-      <Button onClick={onNext} className="mt-5 cursor-pointer">
+      <div className="mt-6 grid gap-4 lg:grid-cols-2">
+        <section className="rounded-lg border p-4">
+          <p className="font-semibold">动作自检</p>
+          <div className="mt-3 space-y-2">
+            {motorChecks.map((label, index) => {
+              const checked = completedChecks.has(index);
+              return (
+                <label
+                  key={label}
+                  className="flex min-h-11 w-full cursor-pointer items-center gap-3 rounded-lg border px-3 py-2 text-left hover:bg-muted"
+                >
+                  <input
+                    type="checkbox"
+                    className="sr-only"
+                    checked={checked}
+                    onChange={() => toggleCheck(index)}
+                  />
+                  <span
+                    className={cn(
+                      "flex h-5 w-5 shrink-0 items-center justify-center rounded border",
+                      checked &&
+                        "border-primary bg-primary text-primary-foreground",
+                    )}
+                  >
+                    {checked && <Check className="h-3.5 w-3.5" />}
+                  </span>
+                  <span className="text-sm">{label}</span>
+                </label>
+              );
+            })}
+          </div>
+        </section>
+        <section className="rounded-lg border p-4">
+          <p className="font-semibold">录音并交替比较</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            至少录制两段，并分别听过示范和自己的录音；这里只确认完成动作练习，不判断舌位一定正确。
+          </p>
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              className="min-h-11"
+              onClick={() => {
+                setReferencePlayed(true);
+                onPlayReference();
+              }}
+              disabled={isReferencePlaying}
+            >
+              <Volume2 className="mr-2 h-4 w-4" />
+              {isReferencePlaying ? "播放中" : "听示范"}
+            </Button>
+            <RecordButton
+              isRecording={isRecording}
+              onStart={onStartRecording}
+              onStop={onStopRecording}
+            />
+            <span className="text-sm text-muted-foreground">
+              已记录 {recordedSampleCount}/2
+            </span>
+          </div>
+          <WaveformDisplay audioBlob={audioBlob} stream={stream} />
+          {learnerAudioUrl && (
+            // biome-ignore lint/a11y/useMediaCaption: Learner recordings have no known transcript.
+            <audio
+              className="mt-3 w-full"
+              controls
+              src={learnerAudioUrl}
+              onPlay={() => setLearnerPlayed(true)}
+              aria-label="播放本人练习录音"
+            />
+          )}
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Button
+              type="button"
+              variant="secondary"
+              className="min-h-11"
+              disabled={!audioBlob || countedBlobRef.current === audioBlob}
+              onClick={countCurrentRecording}
+            >
+              计入本段录音
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              className="min-h-11"
+              disabled={isRecording}
+              onClick={onResetRecording}
+            >
+              重新录制
+            </Button>
+          </div>
+          {recorderError && (
+            <p role="alert" className="mt-3 text-sm text-destructive">
+              {recorderError}
+            </p>
+          )}
+        </section>
+      </div>
+      {!motorGate.passed && (
+        <p className="mt-4 text-sm text-muted-foreground">
+          {motorGate.blockers[0]}
+        </p>
+      )}
+
+      <Button
+        onClick={() => onNext(motorEvidence)}
+        disabled={!motorGate.passed}
+        className="mt-5 min-h-11 cursor-pointer"
+      >
         我能做出这个动作，下一步
       </Button>
+    </motion.div>
+  );
+}
+
+function OpenResponseStep({
+  item,
+  audioBlob,
+  stream,
+  isRecording,
+  recorderError,
+  qualityReport,
+  isAnalyzingQuality,
+  onStartRecording,
+  onStopRecording,
+  onResetRecording,
+  onComplete,
+}: {
+  item: TrainingCourseItem;
+  audioBlob: Blob | null;
+  stream: MediaStream | null;
+  isRecording: boolean;
+  recorderError: string | null;
+  qualityReport: RecordingQualityReport | null;
+  isAnalyzingQuality: boolean;
+  onStartRecording: () => void;
+  onStopRecording: () => void;
+  onResetRecording: () => void;
+  onComplete: () => void;
+}) {
+  const [learnerAudioUrl, setLearnerAudioUrl] = useState<string | null>(null);
+  const [learnerPlayed, setLearnerPlayed] = useState(false);
+
+  useEffect(() => {
+    if (!audioBlob) {
+      setLearnerAudioUrl(null);
+      setLearnerPlayed(false);
+      return;
+    }
+    const url = URL.createObjectURL(audioBlob);
+    setLearnerAudioUrl(url);
+    setLearnerPlayed(false);
+    return () => URL.revokeObjectURL(url);
+  }, [audioBlob]);
+
+  const canComplete =
+    !!audioBlob &&
+    learnerPlayed &&
+    qualityReport?.canSubmit === true &&
+    !isAnalyzingQuality;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="rounded-xl border bg-card p-6 shadow-sm"
+      data-smoke="pack-runner-open-response"
+    >
+      <Badge variant="secondary" className={WRAP_SAFE_BADGE_CLASS}>
+        引导表达
+      </Badge>
+      <h2 className="mt-4 text-xl font-bold">用自己的话完成表达</h2>
+      <p className="mt-3 whitespace-pre-wrap break-words text-base leading-relaxed">
+        {item.displayText ?? item.text}
+      </p>
+      <div className="mt-4 rounded-lg border border-primary/20 bg-primary/5 p-4 text-sm">
+        <p className="font-semibold">先独立表达，不播放标准答案</p>
+        <p className="mt-1 text-muted-foreground">
+          这段录音只保存为迁移观察，不做文本对齐，也不会凭单次表达生成“已掌握”结论。
+        </p>
+      </div>
+
+      <div className="mt-6 flex flex-col items-center gap-3">
+        <RecordButton
+          isRecording={isRecording}
+          onStart={onStartRecording}
+          onStop={onStopRecording}
+          disabled={isAnalyzingQuality}
+        />
+        <WaveformDisplay audioBlob={audioBlob} stream={stream} />
+        {isAnalyzingQuality && (
+          <p className="text-xs text-muted-foreground">正在检查录音质量...</p>
+        )}
+        <RecordingQualityPanel report={qualityReport} compact />
+        {learnerAudioUrl && (
+          // biome-ignore lint/a11y/useMediaCaption: Learner recordings have no known transcript.
+          <audio
+            className="w-full max-w-xl"
+            controls
+            src={learnerAudioUrl}
+            onPlay={() => setLearnerPlayed(true)}
+            aria-label="播放本人的引导表达录音"
+          />
+        )}
+        {audioBlob && !learnerPlayed && (
+          <p className="text-sm text-muted-foreground">
+            请先完整听一次自己的录音，再确认完成。
+          </p>
+        )}
+        {recorderError && (
+          <p role="alert" className="text-sm text-destructive">
+            {recorderError}
+          </p>
+        )}
+        <div className="flex flex-wrap justify-center gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            className="min-h-11"
+            disabled={isRecording}
+            onClick={() => {
+              setLearnerPlayed(false);
+              onResetRecording();
+            }}
+          >
+            重新录制
+          </Button>
+          <Button
+            type="button"
+            className="min-h-11"
+            disabled={!canComplete}
+            onClick={onComplete}
+          >
+            保存观察并完成本轮
+          </Button>
+        </div>
+      </div>
     </motion.div>
   );
 }
@@ -1942,6 +2585,7 @@ function RecordingStep({
   pack,
   level,
   scoringAvailable,
+  allowReferencePlayback,
   item,
   threshold,
   failedAttempts,
@@ -1975,6 +2619,7 @@ function RecordingStep({
   pack: TrainingPack;
   level: TrainingLevel;
   scoringAvailable: boolean;
+  allowReferencePlayback: boolean;
   item: TrainingCourseItem;
   threshold: number;
   failedAttempts: number;
@@ -2066,31 +2711,47 @@ function RecordingStep({
         {item.focusPoint}
       </p>
 
-      <motion.button
-        type="button"
-        whileHover={{ scale: 1.08 }}
-        whileTap={{ scale: 0.95 }}
-        onClick={onPlayReference}
-        disabled={isLoadingReference}
-        className="mx-auto mt-5 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary cursor-pointer disabled:opacity-50"
-      >
-        {isLoadingReference ? (
-          <Loader2 className="h-5 w-5 animate-spin" />
-        ) : (
-          <Volume2 className="h-5 w-5" />
-        )}
-      </motion.button>
-      <p className="mt-1 text-xs text-muted-foreground">
-        {isPlaying ? "正在播放..." : "先听标准发音"}
-      </p>
-      {referenceError && (
-        <p
-          role="alert"
-          data-smoke="pack-runner-reference-audio-error"
-          className="mx-auto mt-3 max-w-md rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300"
+      {allowReferencePlayback ? (
+        <>
+          <motion.button
+            type="button"
+            aria-label="播放标准示范"
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={onPlayReference}
+            disabled={isLoadingReference}
+            className="mx-auto mt-5 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary cursor-pointer disabled:opacity-50"
+          >
+            {isLoadingReference ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : (
+              <Volume2 className="h-5 w-5" />
+            )}
+          </motion.button>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {isPlaying ? "正在播放..." : "听标准发音"}
+          </p>
+          {referenceError && (
+            <p
+              role="alert"
+              data-smoke="pack-runner-reference-audio-error"
+              className="mx-auto mt-3 max-w-md rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300"
+            >
+              {referenceError}
+            </p>
+          )}
+        </>
+      ) : (
+        <div
+          role="note"
+          data-smoke="pack-runner-transfer-no-reference"
+          className="mx-auto mt-5 max-w-xl rounded-lg border border-primary/20 bg-primary/5 p-3 text-left text-sm"
         >
-          {referenceError}
-        </p>
+          <p className="font-semibold">本题先不播放示范</p>
+          <p className="mt-1 text-muted-foreground">
+            这是未训练材料迁移检查。先独立录音；完成本轮后再进入补练，不用答案提示污染第一次证据。
+          </p>
+        </div>
       )}
       {!scoringAvailable && (
         <div
@@ -2099,7 +2760,9 @@ function RecordingStep({
         >
           <p className="font-semibold">当前未连接 Azure 评分</p>
           <p className="mt-1">
-            你仍可听示范、录音并点击波形回放；这次练习不会写入正式学习阶段。
+            {allowReferencePlayback
+              ? "你仍可听示范、录音并点击波形回放；这次练习不会写入正式学习阶段。"
+              : "你仍可完成首次录音和回放；没有自动评分时只保存练习，不生成迁移结论。"}
           </p>
         </div>
       )}

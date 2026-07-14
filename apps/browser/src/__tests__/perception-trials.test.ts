@@ -1,6 +1,7 @@
 import { isCrossSpeakerPerceptionTrial } from "@speakright/core/training/perception";
 import { describe, expect, it } from "vitest";
 import {
+  createFocusedPackPerceptionTrials,
   createPackPerceptionTrials,
   perceptionTrialToCourseItem,
 } from "@/lib/training-perception";
@@ -44,5 +45,15 @@ describe("cross-speaker ABX perception trials", () => {
     expect(item.id).toContain("perception-trial");
     expect(item.isRecordable).toBe(false);
     expect(item.focusPoint).toContain("X");
+  });
+  it("focuses extra trials on contrasts missed in the first pass", () => {
+    const trials = createFocusedPackPerceptionTrials(
+      "ee-ih",
+      "focused-review",
+      ["ee-ih-7"],
+      4,
+    );
+
+    expect(trials.some((trial) => trial.pairId === "ee-ih-7")).toBe(true);
   });
 });

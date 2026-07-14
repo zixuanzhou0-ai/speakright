@@ -36,6 +36,7 @@ export type TrainingLevelKind =
   | "word"
   | "minimal-pair"
   | "sentence"
+  | "transfer"
   | "shadowing"
   | "mixed-review";
 
@@ -92,6 +93,9 @@ export interface TrainingCourseItem {
   commonMistake: string;
   successCue: string;
   difficulty: 1 | 2 | 3 | 4 | 5;
+  phoneticContext?: string;
+  scheduledDelayHours?: number;
+  responseMode?: "reference" | "open-response";
   position?: "initial" | "medial" | "final" | "mixed";
   materialRole?: import("@speakright/core/training/materials").TrainingMaterialRole;
   isRecordable?: boolean;

@@ -31,6 +31,7 @@ import { isAzureConfigReady } from "@/lib/azure-config";
 import { loadDrillReportForLanguage } from "@/lib/drill-report-storage";
 import { getLanguageProfile } from "@/lib/language-profiles";
 import { isReviewDue, loadMasteryProfile } from "@/lib/mastery-profile";
+import { dueRetentionReviews } from "@/lib/retention-schedule";
 import { buildReviewQueue } from "@/lib/review-queue";
 import { formatTrainingTargetUnit } from "@/lib/training-criteria";
 import { buildTrainingMemory } from "@/lib/training-memory";
@@ -188,12 +189,14 @@ export default function DrillPage() {
   >(null);
   const [profile, setProfile] = useState<MasteryProfile | null>(null);
   const [azureReady, setAzureReady] = useState(false);
+  const [hasDueRetention, setHasDueRetention] = useState(false);
 
   useEffect(() => {
     const loadedReport = loadDrillReportForLanguage(languageId);
     setReport(loadedReport.report);
     setReportStorageWarning(loadedReport.warning);
     setProfile(loadMasteryProfile());
+    setHasDueRetention(dueRetentionReviews().length > 0);
     const refreshAzureState = () => {
       const config = getAzureConfig();
       setAzureReady(isAzureConfigReady(config));
@@ -243,11 +246,10 @@ export default function DrillPage() {
     : null;
   const primaryPackId =
     primaryItem?.packId ?? primaryPack?.id ?? TRAINING_PACKS[0].id;
-  const primaryHref = packHref(
-    primaryPackId,
-    azureReady ? primaryItem?.levelId : undefined,
-  );
-  const primaryLabel = "开始今天训练";
+  const primaryHref = hasDueRetention
+    ? "/drill/retention"
+    : packHref(primaryPackId, azureReady ? primaryItem?.levelId : undefined);
+  const primaryLabel = hasDueRetention ? "开始到期复测" : "开始今天训练";
 
   if (languageId !== "en-US") {
     const betaModes = [
@@ -367,7 +369,9 @@ export default function DrillPage() {
           <div className="min-w-0">
             <h1 className="text-2xl font-bold">今日学习计划</h1>
             <p className="mt-1 text-muted-foreground">
-              今天建议完成 2 个任务：先做到期复习，再做一个主训练
+              {hasDueRetention
+                ? "先完成到期保持复测，再做一个主训练"
+                : "完成一个 10–15 分钟深度训练会话"}
             </p>
           </div>
         </div>
@@ -383,7 +387,11 @@ export default function DrillPage() {
                   className={WRAP_SAFE_BADGE_CLASS}
                   data-smoke="drill-readiness-badge"
                 >
-                  {azureReady ? "评分已就绪" : "离线辨音可开始"}
+                  {hasDueRetention
+                    ? "保持复测已到期"
+                    : azureReady
+                      ? "评分已就绪"
+                      : "离线辨音可开始"}
                 </Badge>
                 <Badge
                   variant="secondary"
@@ -403,15 +411,19 @@ export default function DrillPage() {
                 )}
               </div>
               <h2 className="text-xl font-bold">
-                {primaryPack?.title ?? "从一个高影响发音开始"}
+                {hasDueRetention
+                  ? "用新材料检查是否真正保持"
+                  : (primaryPack?.title ?? "从一个高影响发音开始")}
               </h2>
               <p className="mt-1 max-w-3xl text-sm text-muted-foreground">
-                {azureReady
-                  ? (primaryItem?.learningObjective ??
-                    primaryItem?.reason ??
-                    primaryPack?.focus ??
-                    "先完成一组目标音训练，再进入复习或自由专项。")
-                  : "先从不需要密钥的跨说话人辨音开始；进入产出关卡时，再决定连接 Azure 评分或只做录音对比。"}
+                {hasDueRetention
+                  ? "复测前不播放示范；只有新材料、多样本、目标音对齐和实际延迟同时满足时，才会形成保持证据。"
+                  : azureReady
+                    ? (primaryItem?.learningObjective ??
+                      primaryItem?.reason ??
+                      primaryPack?.focus ??
+                      "先完成一组目标音训练，再进入复习或自由专项。")
+                    : "先从不需要密钥的跨说话人辨音开始；进入产出关卡时，再决定连接 Azure 评分或只做录音对比。"}
               </p>
             </div>
             <div className="flex shrink-0 flex-wrap gap-2">

@@ -27,7 +27,7 @@ describe("retention scheduler", () => {
     ).toHaveLength(1);
   });
 
-  it("keeps a failed attempt and leaves the task due", () => {
+  it("keeps a failed observation without reusing exposed retention material", () => {
     const task = schedule.tasks[0];
     const failed = recordRetentionReviewAttempt(schedule, task.id, {
       attemptedAt: task.dueAt,
@@ -36,11 +36,11 @@ describe("retention scheduler", () => {
     });
 
     expect(failed.tasks[0].attempts).toHaveLength(1);
-    expect(failed.tasks[0].completedAt).toBeUndefined();
-    expect(getDueRetentionTasks(failed, task.dueAt + 1)).toHaveLength(1);
+    expect(failed.tasks[0].completedAt).toBe(task.dueAt);
+    expect(getDueRetentionTasks(failed, task.dueAt + 1)).toEqual([]);
   });
 
-  it("preserves attempt history after success", () => {
+  it("does not overwrite a completed failed review with a later result", () => {
     const task = schedule.tasks[0];
     const failed = recordRetentionReviewAttempt(schedule, task.id, {
       attemptedAt: task.dueAt,
@@ -53,7 +53,7 @@ describe("retention scheduler", () => {
     });
 
     expect(passed.tasks[0].attempts).toHaveLength(2);
-    expect(passed.tasks[0].completedAt).toBe(task.dueAt + 1_000);
+    expect(passed.tasks[0].completedAt).toBe(task.dueAt);
     expect(completedRetentionReviewCount(passed, "ee-ih")).toBe(1);
     expect(getDueRetentionTasks(passed, task.dueAt + 2_000)).toEqual([]);
   });

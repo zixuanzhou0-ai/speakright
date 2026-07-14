@@ -84,9 +84,11 @@ export function recordRetentionReviewAttempt(
       return {
         ...task,
         attempts: [...task.attempts, attempt],
-        completedAt:
-          task.completedAt ??
-          (attempt.passed ? attempt.attemptedAt : undefined),
+        // A due review is resolved once the learner completes it, even when
+        // the evidence does not pass. Re-presenting the same material would
+        // no longer be an untrained retention check. Failed observations stay
+        // in history while the next scheduled interval uses fresh material.
+        completedAt: task.completedAt ?? attempt.attemptedAt,
       };
     }),
   };

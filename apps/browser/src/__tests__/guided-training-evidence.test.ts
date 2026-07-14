@@ -23,10 +23,36 @@ describe("guided training evidence", () => {
             levelId: level.id,
             kind: level.kind,
             scores: [],
-            attempts: 8,
-            passedCount: 7,
+            attempts: 16,
+            passedCount: 14,
             stuckCount: 0,
-            contextIds: ["p1", "p2", "p3", "p4", "p1", "p2", "p3", "p4"],
+            contextIds: [
+              "p1",
+              "p2",
+              "p3",
+              "p4",
+              "p5",
+              "p6",
+              "p7",
+              "p8",
+              "p1",
+              "p2",
+              "p3",
+              "p4",
+              "p5",
+              "p6",
+              "p7",
+              "p8",
+            ],
+            speakerIds: ["max", "nichalia", "eryn", "brian"],
+            speakerPairings: [
+              "max:nichalia",
+              "max:eryn",
+              "max:brian",
+              "nichalia:eryn",
+              "nichalia:brian",
+              "eryn:brian",
+            ],
             crossSpeakerValid: true,
           },
         },
@@ -36,8 +62,8 @@ describe("guided training evidence", () => {
     expect(evidence.evidenceStage).toBe("discriminated");
     expect(evidence.recordingQuality.status).toBe("not-applicable");
     expect(evidence.alignmentQuality.status).toBe("not-applicable");
-    expect(evidence.sampleCount).toBe(8);
-    expect(evidence.contextCount).toBe(4);
+    expect(evidence.sampleCount).toBe(16);
+    expect(evidence.contextCount).toBe(8);
     expect(evidence.trace).toMatchObject({
       sessionId: "session-1",
       levelId: level.id,

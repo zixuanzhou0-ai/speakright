@@ -23,16 +23,27 @@ export function criterionToLegacyPassRule(
   }
   return {
     minTargetScore: criterion.minTargetScore,
-    requiredPasses: criterion.minValidSamples,
+    requiredPasses:
+      criterion.kind === "controlled-production"
+        ? (criterion.minPassedSamples ?? criterion.minValidSamples)
+        : criterion.minValidSamples,
   };
 }
 
 export function describeTrainingCriterion(level: TrainingLevel): string {
   const criterion = level.criterion;
   if (criterion.kind === "perception") {
+    const speakerCoverage = [
+      criterion.minUniqueSpeakers
+        ? `${criterion.minUniqueSpeakers} 名说话人`
+        : null,
+      criterion.minSpeakerPairings
+        ? `${criterion.minSpeakerPairings} 种组合`
+        : null,
+    ].filter(Boolean);
     return `${criterion.minTrials} 次听辨、至少 ${criterion.minUniquePairs} 组对比、正确率 ${Math.round(
       criterion.minCorrectRate * 100,
-    )}% 且跨说话人`;
+    )}% 且跨说话人${speakerCoverage.length ? `（${speakerCoverage.join("、")}）` : ""}`;
   }
   if (criterion.kind === "motor-formation") {
     return `\u5b8c\u6210 ${criterion.minSelfChecks} \u9879\u52a8\u4f5c\u81ea\u68c0\u3001${criterion.minRecordedSamples} \u6bb5\u672c\u4eba\u5f55\u97f3\uff0c\u5e76\u5b8c\u6210\u4e00\u6b21\u4ea4\u66ff\u64ad\u653e`;
@@ -46,7 +57,9 @@ export function describeTrainingCriterion(level: TrainingLevel): string {
   if (criterion.minTargetScore <= 0) {
     return `完成 ${criterion.minValidSamples} 个动作自检`;
   }
-  return `${criterion.minValidSamples} 个有效样本达到目标音 ${criterion.minTargetScore} 分`;
+  const requiredPasses =
+    criterion.minPassedSamples ?? criterion.minValidSamples;
+  return `${criterion.minValidSamples} 个有效样本中至少 ${requiredPasses} 个达到目标音 ${criterion.minTargetScore} 分`;
 }
 
 export function criterionTargetScore(level: TrainingLevel): number {

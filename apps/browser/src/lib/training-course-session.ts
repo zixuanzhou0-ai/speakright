@@ -1,4 +1,5 @@
 import { evaluateTrainingCriterion } from "@speakright/core/training/criteria";
+import type { TrainingMaterialNovelty } from "@speakright/core/training/exposure";
 import type {
   TrainingLevel,
   TrainingLevelKind,
@@ -30,6 +31,7 @@ export interface CourseAttemptSnapshot {
   positions?: string[];
   validSampleCount?: number;
   recordingQualityValid?: boolean;
+  novelty?: TrainingMaterialNovelty;
   alignmentValid?: boolean;
 }
 
@@ -75,6 +77,7 @@ export function hasLevelPassed(
     contextCount: new Set(contexts).size,
     recordingQualityValid: snapshot.recordingQualityValid ?? true,
     alignmentValid: snapshot.alignmentValid ?? true,
+    untrainedMaterial: snapshot.novelty === "confirmed-untrained",
   }).passed;
 }
 

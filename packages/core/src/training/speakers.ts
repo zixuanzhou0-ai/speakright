@@ -18,6 +18,10 @@ export const DEFAULT_TRAINING_SPEAKER_IDS = TRAINING_SPEAKERS.map(
   (speaker) => speaker.id,
 ) as TrainingSpeakerId[];
 
+export const REVIEWED_TRAINING_SPEAKER_IDS = TRAINING_SPEAKERS.filter(
+  (speaker) => speaker.reviewStatus === "reviewed",
+).map((speaker) => speaker.id) as TrainingSpeakerId[];
+
 export function getTrainingSpeaker(
   speakerId: string,
 ): TrainingSpeaker | undefined {

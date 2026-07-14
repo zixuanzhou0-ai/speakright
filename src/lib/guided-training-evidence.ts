@@ -34,6 +34,8 @@ function taskTypeFor(level: TrainingLevel): EvidenceTaskType {
       return "sentence";
     case "shadowing":
       return "connected-speech";
+    case "transfer":
+      return "guided-transfer";
     case "mixed-review":
       return "sentence";
     default:
@@ -44,6 +46,7 @@ function taskTypeFor(level: TrainingLevel): EvidenceTaskType {
 function requestedStageFor(level: TrainingLevel): EvidenceStage {
   if (level.kind === "perception") return "discriminated";
   if (level.kind === "articulation") return "introduced";
+  if (level.kind === "transfer") return "transfer_observed";
   if (
     level.kind === "sentence" ||
     level.kind === "shadowing" ||
@@ -159,6 +162,8 @@ export function buildGuidedTrainingEvidence({
           levelId: level.id,
           materialIds,
           criterionKind: level.criterion.kind,
+          materialRole: level.kind === "transfer" ? "far-transfer" : undefined,
+          novelty: snapshot.novelty,
         },
         criterion: level.criterion,
         criterionEvidence: {
@@ -171,6 +176,7 @@ export function buildGuidedTrainingEvidence({
           completedSelfChecks: snapshot.completedSelfChecks,
           recordedSampleCount: snapshot.recordedSampleCount,
           playbackComparisonCompleted: snapshot.playbackComparisonCompleted,
+          untrainedMaterial: snapshot.novelty === "confirmed-untrained",
           materialIds: snapshot.materialIds ?? materialIds,
           positions: snapshot.positions,
           passedCount: snapshot.passedCount,

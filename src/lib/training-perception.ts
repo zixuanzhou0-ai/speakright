@@ -4,6 +4,10 @@ import type {
   PerceptionTrial,
 } from "@speakright/core/training/perception";
 import { createPerceptionTrials } from "@speakright/core/training/perception";
+import {
+  REVIEWED_TRAINING_SPEAKER_IDS,
+  trainingSpeakerAudioUri,
+} from "@speakright/core/training/speakers";
 import type { TrainingCourseItem } from "@/types/training";
 
 interface PerceptionCatalogEntry {
@@ -40,12 +44,35 @@ export function getPerceptionExamples(packId: string): PerceptionExample[] {
 export function createPackPerceptionTrials(
   packId: string,
   seed: string | number,
-  trialCount = 8,
+  trialCount = packId === "ee-ih" && REVIEWED_TRAINING_SPEAKER_IDS.length >= 4
+    ? 16
+    : 8,
 ): PerceptionTrial[] {
   return createPerceptionTrials(getPerceptionExamples(packId), {
     seed,
     trialCount,
-    speakers: ["blue", "pink"],
+    speakers: REVIEWED_TRAINING_SPEAKER_IDS,
+    audioUri: trainingSpeakerAudioUri,
+  });
+}
+
+export function createFocusedPackPerceptionTrials(
+  packId: string,
+  seed: string | number,
+  focusPairIds: readonly string[],
+  trialCount = 4,
+): PerceptionTrial[] {
+  const examples = getPerceptionExamples(packId);
+  const focus = new Set(focusPairIds);
+  const preferred = examples.filter((example) => focus.has(example.id));
+  const remaining = examples.filter((example) => !focus.has(example.id));
+  const candidateCount = Math.max(4, preferred.length);
+  const candidates = [...preferred, ...remaining].slice(0, candidateCount);
+  return createPerceptionTrials(candidates, {
+    seed,
+    trialCount,
+    speakers: REVIEWED_TRAINING_SPEAKER_IDS,
+    audioUri: trainingSpeakerAudioUri,
   });
 }
 

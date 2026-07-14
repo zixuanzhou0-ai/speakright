@@ -18,6 +18,7 @@ export type TrainingCriterion =
       kind: "controlled-production";
       minTargetScore: number;
       minValidSamples: number;
+      minPassedSamples?: number;
       requireRecordingQuality: boolean;
       requireAlignment: boolean;
       minUniqueMaterials?: number;
@@ -93,42 +94,56 @@ export function evaluateTrainingCriterion(
       criterion.minUniqueSpeakers !== undefined &&
       new Set(evidence.speakerIds ?? []).size < criterion.minUniqueSpeakers
     ) {
-      blockers.push("Need unique speakers");
+      blockers.push(
+        `\u81f3\u5c11\u8986\u76d6 ${criterion.minUniqueSpeakers} \u540d\u4e0d\u540c\u8bf4\u8bdd\u4eba`,
+      );
     }
     if (
       criterion.minSpeakerPairings !== undefined &&
       new Set(evidence.speakerPairings ?? []).size <
         criterion.minSpeakerPairings
     ) {
-      blockers.push("Need speaker pairings");
+      blockers.push(
+        `\u81f3\u5c11\u8986\u76d6 ${criterion.minSpeakerPairings} \u79cd\u8bf4\u8bdd\u4eba\u7ec4\u5408`,
+      );
     }
     return { passed: blockers.length === 0, blockers };
   }
 
   if (criterion.kind === "motor-formation") {
     if ((evidence.completedSelfChecks ?? 0) < criterion.minSelfChecks) {
-      blockers.push("Complete the required motor self-checks");
+      blockers.push(
+        `\u5b8c\u6210\u81f3\u5c11 ${criterion.minSelfChecks} \u9879\u52a8\u4f5c\u81ea\u68c0`,
+      );
     }
     if ((evidence.recordedSampleCount ?? 0) < criterion.minRecordedSamples) {
-      blockers.push("Record the required number of samples");
+      blockers.push(
+        `\u81f3\u5c11\u5f55\u5236 ${criterion.minRecordedSamples} \u6bb5\u672c\u4eba\u6837\u672c`,
+      );
     }
     if (
       criterion.requirePlaybackComparison &&
       evidence.playbackComparisonCompleted !== true
     ) {
-      blockers.push("Compare the learner recording with a reference");
+      blockers.push(
+        "\u5b8c\u6210\u4e00\u6b21\u672c\u4eba\u5f55\u97f3\u4e0e\u793a\u8303\u7684\u4ea4\u66ff\u64ad\u653e",
+      );
     }
     return { passed: blockers.length === 0, blockers };
   }
 
   const validSamples = evidence.validSampleCount ?? 0;
+  const requiredPassedSamples =
+    criterion.kind === "controlled-production"
+      ? (criterion.minPassedSamples ?? criterion.minValidSamples)
+      : criterion.minValidSamples;
   const passedCount = evidence.passedCount ?? 0;
   if (validSamples < criterion.minValidSamples) {
     blockers.push(`至少 ${criterion.minValidSamples} 个有效样本`);
   }
-  if (passedCount < criterion.minValidSamples) {
+  if (passedCount < requiredPassedSamples) {
     blockers.push(
-      `至少 ${criterion.minValidSamples} 个样本达到 ${criterion.minTargetScore} 分`,
+      `至少 ${requiredPassedSamples} 个样本达到 ${criterion.minTargetScore} 分`,
     );
   }
 
@@ -146,7 +161,9 @@ export function evaluateTrainingCriterion(
       criterion.minUniqueMaterials !== undefined &&
       new Set(evidence.materialIds ?? []).size < criterion.minUniqueMaterials
     ) {
-      blockers.push("Cover the required number of unique materials");
+      blockers.push(
+        `\u8986\u76d6\u81f3\u5c11 ${criterion.minUniqueMaterials} \u9879\u4e0d\u540c\u6750\u6599`,
+      );
     }
     if (criterion.requiredPositions?.length) {
       const observedPositions = new Set(evidence.positions ?? []);
@@ -155,7 +172,7 @@ export function evaluateTrainingCriterion(
       );
       if (missingPositions.length > 0) {
         blockers.push(
-          `Cover required positions: ${missingPositions.join(", ")}`,
+          `\u8fd8\u9700\u8986\u76d6\u8fd9\u4e9b\u97f3\u4f4d\u4f4d\u7f6e\uff1a${missingPositions.join("\u3001")}`,
         );
       }
     }

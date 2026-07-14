@@ -28,7 +28,7 @@ describe("retention schedule storage", () => {
     expect(dueRetentionReviews(1_000 + 24 * 60 * 60 * 1000)).toHaveLength(1);
   });
 
-  it("keeps a failed due task recoverable", () => {
+  it("stores a failed review and keeps exposed material out of the due queue", () => {
     scheduleRetentionAfterTransfer({
       packId: "ee-ih",
       transferEvidenceId: "transfer-1",
@@ -46,7 +46,10 @@ describe("retention schedule storage", () => {
         passed: false,
       }),
     ).toBe(true);
-    expect(dueRetentionReviews(task.dueAt + 1)).toHaveLength(1);
+    const storedTask = loadRetentionSchedule().tasks[0];
+    expect(storedTask.attempts).toHaveLength(1);
+    expect(storedTask.completedAt).toBe(task.dueAt);
+    expect(dueRetentionReviews(task.dueAt + 1)).toEqual([]);
   });
 
   it("quarantines a corrupt schedule", () => {

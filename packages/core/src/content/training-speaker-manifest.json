@@ -24,7 +24,7 @@
     "voiceId": "RaFzMbMIfqBcIurH6XF9",
     "locale": "en-US",
     "accent": "general-american",
-    "reviewStatus": "needs-review"
+    "reviewStatus": "reviewed"
   },
   {
     "id": "brian",
@@ -33,6 +33,6 @@
     "voiceId": "G0yjIg3xY8gEJZkHpjVm",
     "locale": "en-US",
     "accent": "general-american",
-    "reviewStatus": "needs-review"
+    "reviewStatus": "reviewed"
   }
 ]
