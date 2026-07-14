@@ -115,6 +115,8 @@ export function PhonemeDetailPage() {
   const [showSmokeAssessmentTiles, setShowSmokeAssessmentTiles] =
     useState(false);
   const [showSmokeScoreSummary, setShowSmokeScoreSummary] = useState(false);
+  const [showSmokeGuidedRepeatSingleWord, setShowSmokeGuidedRepeatSingleWord] =
+    useState(false);
   const autoAssessTriggered = useRef(false);
 
   useEffect(() => {
@@ -226,6 +228,9 @@ export function PhonemeDetailPage() {
       searchParams.get("smokeAssessmentTiles") === "1",
     );
     setShowSmokeScoreSummary(searchParams.get("smokeScoreSummary") === "1");
+    setShowSmokeGuidedRepeatSingleWord(
+      searchParams.get("smokeGuidedRepeatSingleWord") === "1",
+    );
   }, []);
 
   useEffect(() => {
@@ -584,7 +589,9 @@ export function PhonemeDetailPage() {
                 <GuidedRepeatExperience
                   languageId={languageId}
                   phoneme={phoneme}
-                  wordPool={wordPool}
+                  wordPool={
+                    showSmokeGuidedRepeatSingleWord ? [currentWord] : wordPool
+                  }
                   currentWord={currentWord}
                   disabled={recorder.isRecording || azure.isLoading}
                   disabledReason={

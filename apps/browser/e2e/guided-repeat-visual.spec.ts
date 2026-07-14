@@ -121,6 +121,28 @@ test.describe
       }
     });
 
+    test("captures completion and restart without scoring language", async ({
+      page,
+    }) => {
+      test.setTimeout(45_000);
+      await page.setViewportSize({ width: 1280, height: 800 });
+      const dialog = await openGuidedRepeat(
+        page,
+        "/phonemes/ee?smokeGuidedRepeatSingleWord=1",
+      );
+      await dialog.locator('[data-rhythm="flow"]').click();
+      await waitForPhase(dialog, "completed", 30_000);
+      await expect(dialog.getByRole("button", { name: "\u518d\u6765\u4e00\u8f6e" })).toBeVisible();
+      await expect(
+        dialog.getByRole("button", { name: "\u8fd4\u56de\u97f3\u6807\u7ec3\u4e60" }),
+      ).toBeVisible();
+      await expect(dialog).toContainText("\u4e0d\u4ee3\u8868\u5df2\u7ecf\u638c\u63e1");
+      await page.screenshot({ path: output("15-completed.png") });
+
+      await dialog.getByRole("button", { name: "\u518d\u6765\u4e00\u8f6e" }).click();
+      await waitForPhase(dialog, "anchor-normal");
+    });
+
     test("captures a local audio preparation error without an online fallback", async ({
       page,
     }) => {

@@ -142,7 +142,12 @@ function GuidedRepeatSession({
 
   if (session.status === "completed") {
     return (
-      <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-5 py-8 text-center">
+      <div
+        aria-live="polite"
+        className="flex min-h-0 flex-1 flex-col items-center justify-center px-5 py-8 text-center"
+        data-smoke="guided-repeat-phase"
+        data-phase="completed"
+      >
         <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
           <Headphones className="h-7 w-7" />
         </div>
