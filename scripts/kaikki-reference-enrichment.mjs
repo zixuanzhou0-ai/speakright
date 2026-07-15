@@ -10,6 +10,7 @@ import {
   buildReferenceOutputs,
   getDefaultKaikkiOutputDir,
   parseKaikkiHtml,
+  rebaseKaikkiCheckpoint,
   sha256,
 } from "./lib/kaikki-reference-enrichment-core.mjs";
 
@@ -57,8 +58,10 @@ function parseArgs(argv) {
       options.maxItems = Number.parseInt(argv[++index], 10);
     else throw new Error(`Unknown argument: ${arg}`);
   }
-  if (!["plan", "fetch", "parse"].includes(command)) {
-    throw new Error(`Unknown command: ${command}. Use plan, fetch, or parse.`);
+  if (!["plan", "fetch", "parse", "rebase"].includes(command)) {
+    throw new Error(
+      `Unknown command: ${command}. Use plan, fetch, parse, or rebase.`,
+    );
   }
   if (!Number.isFinite(options.delayMs) || options.delayMs < 500) {
     throw new Error("--delay-ms must be at least 500");
@@ -326,11 +329,83 @@ async function runParse(options) {
   );
 }
 
+function assertPathWithin(rootPath, candidatePath, message) {
+  const relative = path.relative(rootPath, candidatePath);
+  if (!relative || relative.startsWith("..") || path.isAbsolute(relative)) {
+    throw new Error(message);
+  }
+}
+
+async function validateRebasedHtmlCache(outputDir, checkpoint) {
+  const realOutputDir = await fs.realpath(outputDir);
+  for (const [sourceUrl, record] of Object.entries(checkpoint.items)) {
+    if (record.status === "fetch-failed") continue;
+    const htmlPath = path.resolve(outputDir, record.htmlFile);
+    assertPathWithin(
+      outputDir,
+      htmlPath,
+      `Unsafe HTML cache path for ${sourceUrl}`,
+    );
+
+    let realHtmlPath;
+    try {
+      realHtmlPath = await fs.realpath(htmlPath);
+    } catch (error) {
+      if (error?.code === "ENOENT") {
+        throw new Error(
+          `Missing HTML cache for ${sourceUrl}: ${record.htmlFile}`,
+        );
+      }
+      throw error;
+    }
+    assertPathWithin(
+      realOutputDir,
+      realHtmlPath,
+      `HTML cache resolves outside output directory for ${sourceUrl}`,
+    );
+    const stats = await fs.stat(realHtmlPath);
+    if (!stats.isFile()) {
+      throw new Error(`HTML cache is not a file for ${sourceUrl}`);
+    }
+    const html = await fs.readFile(realHtmlPath, "utf8");
+    const expectedSha256 = record.observation?.htmlSha256;
+    if (expectedSha256 && sha256(html) !== expectedSha256) {
+      throw new Error(`HTML cache SHA-256 mismatch for ${sourceUrl}`);
+    }
+  }
+}
+
+async function runRebase(options) {
+  const plan = await loadValidatedPlan(options);
+  const checkpointPath = path.join(options.outputDir, "checkpoint.json");
+  const previousCheckpoint = await readJson(checkpointPath);
+  const checkpoint = rebaseKaikkiCheckpoint(plan, previousCheckpoint);
+  await validateRebasedHtmlCache(options.outputDir, checkpoint);
+  await atomicWriteJson(checkpointPath, checkpoint);
+  console.log(
+    JSON.stringify(
+      {
+        checkpoint: checkpointPath,
+        sourcePlanSha256: checkpoint.lastOperation.sourcePlanSha256,
+        planSha256: checkpoint.planSha256,
+        reusedItemCount: checkpoint.lastOperation.reusedItemCount,
+        reusedFetchedItemCount: checkpoint.lastOperation.reusedFetchedItemCount,
+        carriedForwardFailureCount:
+          checkpoint.lastOperation.carriedForwardFailureCount,
+        networkRequestsMade: 0,
+      },
+      null,
+      2,
+    ),
+  );
+}
+
 async function main() {
   const options = parseArgs(process.argv.slice(2));
   if (options.command === "plan") await writePlan(options);
   else if (options.command === "fetch") await runFetch(options);
-  else await runParse(options);
+  else if (options.command === "parse") await runParse(options);
+  else await runRebase(options);
 }
 
 main().catch((error) => {

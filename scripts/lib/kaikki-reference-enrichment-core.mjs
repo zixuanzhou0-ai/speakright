@@ -230,6 +230,85 @@ export function buildKaikkiReferencePlan({
   };
 }
 
+export function rebaseKaikkiCheckpoint(plan, previousCheckpoint) {
+  if (
+    !plan ||
+    typeof plan.planSha256 !== "string" ||
+    !plan.planSha256 ||
+    !Array.isArray(plan.items)
+  ) {
+    throw new Error("Current Kaikki plan is invalid");
+  }
+  if (!previousCheckpoint || typeof previousCheckpoint !== "object") {
+    throw new Error("Previous Kaikki checkpoint is invalid");
+  }
+
+  const items = {};
+  const unavailable = [];
+  let reusedFetchedItemCount = 0;
+  let carriedForwardFailureCount = 0;
+  for (const item of plan.items) {
+    if (
+      !item ||
+      typeof item.sourceUrl !== "string" ||
+      typeof item.languageId !== "string"
+    ) {
+      throw new Error("Current Kaikki plan contains an invalid item");
+    }
+    const sourceUrl = assertSafeKaikkiUrl(item.sourceUrl, item.languageId);
+    if (items[sourceUrl]) {
+      throw new Error(
+        `Current Kaikki plan contains duplicate URL: ${sourceUrl}`,
+      );
+    }
+    const record = previousCheckpoint.items?.[sourceUrl];
+    const isFetchedCache =
+      record?.status === "fetched" &&
+      typeof record.htmlFile === "string" &&
+      Boolean(record.htmlFile.trim());
+    const isTerminalFailure =
+      record?.status === "fetch-failed" &&
+      typeof record.error === "string" &&
+      Boolean(record.error.trim()) &&
+      record.htmlFile == null &&
+      record.observation == null;
+    if (record?.status === "fetched" && !isFetchedCache) {
+      unavailable.push(sourceUrl);
+      continue;
+    }
+    if (!isFetchedCache && !isTerminalFailure) {
+      unavailable.push(sourceUrl);
+      continue;
+    }
+    if (isFetchedCache) reusedFetchedItemCount += 1;
+    else carriedForwardFailureCount += 1;
+    items[sourceUrl] = structuredClone(record);
+  }
+
+  if (unavailable.length > 0) {
+    throw new Error(
+      `Offline Kaikki checkpoint rebase requires fetched HTML or a terminal fetch-failed record for every current URL; unavailable: ${unavailable.join(", ")}`,
+    );
+  }
+
+  return {
+    ...structuredClone(previousCheckpoint),
+    version: previousCheckpoint.version ?? 1,
+    planSha256: plan.planSha256,
+    items,
+    lastOperation: {
+      operation: "rebase",
+      mode: "offline",
+      sourcePlanSha256: previousCheckpoint.planSha256 ?? null,
+      targetPlanSha256: plan.planSha256,
+      reusedItemCount: plan.items.length,
+      reusedFetchedItemCount,
+      carriedForwardFailureCount,
+      networkRequestsMade: 0,
+    },
+  };
+}
+
 export function decodeHtmlEntities(value) {
   return String(value)
     .replace(/&#x([0-9a-f]+);/giu, (_, hex) =>

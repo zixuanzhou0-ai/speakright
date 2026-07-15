@@ -11,6 +11,7 @@ import {
   buildReferenceOutputs,
   getDefaultKaikkiOutputDir,
   parseKaikkiHtml,
+  rebaseKaikkiCheckpoint,
 } from "./lib/kaikki-reference-enrichment-core.mjs";
 
 let assertions = 0;
@@ -119,6 +120,57 @@ assert.equal(
   true,
 );
 assertions += 6;
+
+const oldCheckpoint = {
+  version: 1,
+  planSha256: "old-plan",
+  networkRequestsMade: 7,
+  items: Object.fromEntries(
+    planA.items.map((item, index) => [
+      item.sourceUrl,
+      {
+        status: "fetched",
+        htmlFile: `html/${index}.html`,
+        observation: { htmlSha256: `sha-${index}` },
+      },
+    ]),
+  ),
+};
+oldCheckpoint.items["https://kaikki.org/unused.html"] = {
+  status: "fetched",
+  htmlFile: "html/unused.html",
+};
+const rebasedCheckpoint = rebaseKaikkiCheckpoint(planA, oldCheckpoint);
+assert.equal(rebasedCheckpoint.planSha256, planA.planSha256);
+assert.equal(rebasedCheckpoint.lastOperation.operation, "rebase");
+assert.equal(rebasedCheckpoint.lastOperation.mode, "offline");
+assert.equal(rebasedCheckpoint.lastOperation.networkRequestsMade, 0);
+assert.equal(rebasedCheckpoint.lastOperation.reusedItemCount, planA.wordCount);
+assert.equal(rebasedCheckpoint.networkRequestsMade, 7);
+assert.deepEqual(
+  Object.keys(rebasedCheckpoint.items).sort(),
+  planA.items.map((item) => item.sourceUrl).sort(),
+);
+assert.notEqual(
+  rebasedCheckpoint.items[planA.items[0].sourceUrl],
+  oldCheckpoint.items[planA.items[0].sourceUrl],
+);
+assertions += 8;
+
+const incompleteCheckpoint = structuredClone(oldCheckpoint);
+delete incompleteCheckpoint.items[planA.items[0].sourceUrl];
+assert.throws(
+  () => rebaseKaikkiCheckpoint(planA, incompleteCheckpoint),
+  /requires fetched HTML or a terminal fetch-failed record.*unavailable/u,
+);
+assertions += 1;
+const missingHtmlCheckpoint = structuredClone(oldCheckpoint);
+delete missingHtmlCheckpoint.items[planA.items[0].sourceUrl].htmlFile;
+assert.throws(
+  () => rebaseKaikkiCheckpoint(planA, missingHtmlCheckpoint),
+  /requires fetched HTML or a terminal fetch-failed record.*unavailable/u,
+);
+assertions += 1;
 
 const fixtureUrl = buildKaikkiWordUrl("fr-FR", "fichier");
 const fixtureHtml = `<!doctype html>
