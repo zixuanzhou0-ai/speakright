@@ -97,6 +97,8 @@
     "audio:pronunciation:report": "node scripts/pronunciation-audit.mjs report",
     "audio:word-audit:inventory": "node scripts/phoneme-word-audit.mjs inventory",
     "audio:word-audit:reference": "node scripts/phoneme-word-audit.mjs reference",
+    "audio:word-audit:reference:english:plan": "node scripts/english-reference-decisions.mjs plan",
+    "audio:word-audit:reference:english:test": "node scripts/english-reference-decisions.contract.mjs",
     "audio:word-audit:blind:plan": "node scripts/phoneme-word-audit.mjs blind-plan",
     "audio:word-audit:whisper": "node scripts/phoneme-word-audit.mjs whisper",
     "audio:word-audit:azure-stt:run": "node scripts/phoneme-word-audit.mjs azure-stt-run",
