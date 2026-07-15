@@ -163,12 +163,19 @@ export async function transcribeElevenLabsScribe({
   languageCode,
 }) {
   const bytes = await readFile(audioPath);
+  const extension = path.extname(audioPath).toLocaleLowerCase("en-US");
+  const mimeType =
+    extension === ".wav"
+      ? "audio/wav"
+      : extension === ".mp3"
+        ? "audio/mpeg"
+        : "application/octet-stream";
   const form = new FormData();
   form.set("model_id", "scribe_v2");
   form.set("language_code", languageCode);
   form.set(
     "file",
-    new Blob([bytes], { type: "audio/mpeg" }),
+    new Blob([bytes], { type: mimeType }),
     path.basename(audioPath),
   );
   const response = await fetch("https://api.elevenlabs.io/v1/speech-to-text", {
