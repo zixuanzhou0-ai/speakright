@@ -23,7 +23,7 @@
     {
       "key": "а",
       "text": "а",
-      "ipa": "/ja/ ~ /a/",
+      "ipa": "/a/",
       "soundUnitSlugs": [
         "ru-iotated-vowels"
       ],
@@ -4586,7 +4586,7 @@
     {
       "key": "дома",
       "text": "дома",
-      "ipa": "/dom/ ~ /dɐˈma/",
+      "ipa": "/dɐˈma/",
       "soundUnitSlugs": [
         "ru-unstressed-o-a"
       ],
@@ -4976,7 +4976,7 @@
     {
       "key": "дуба",
       "text": "дуба",
-      "ipa": "/dup/ ~ /duˈba/",
+      "ipa": "/duˈba/",
       "soundUnitSlugs": [
         "ru-final-devoicing"
       ],
@@ -6634,7 +6634,7 @@
     {
       "key": "и",
       "text": "и",
-      "ipa": "/i/ ~ /ɨ/",
+      "ipa": "/i/",
       "soundUnitSlugs": [
         "ru-y"
       ],
@@ -9273,7 +9273,7 @@
     {
       "key": "мат",
       "text": "мат",
-      "ipa": "/mat/ ~ /matʲ/",
+      "ipa": "/mat/",
       "soundUnitSlugs": [
         "ru-soft-sign"
       ],
@@ -14731,7 +14731,7 @@
     {
       "key": "сам",
       "text": "сам",
-      "ipa": "/sʲɪmʲˈja/ ~ /sam/",
+      "ipa": "/sam/",
       "soundUnitSlugs": [
         "ru-unstressed-e-ya"
       ],
@@ -20437,7 +20437,7 @@
     {
       "key": "шить",
       "text": "шить",
-      "ipa": "/ʂɨtʲ/ ~ /ʐɨtʲ/",
+      "ipa": "/ʂɨtʲ/",
       "soundUnitSlugs": [
         "ru-sh-zh"
       ],
@@ -20761,7 +20761,7 @@
     {
       "key": "ы",
       "text": "ы",
-      "ipa": "/i/ ~ /ɨ/",
+      "ipa": "/ɨ/",
       "soundUnitSlugs": [
         "ru-y"
       ],

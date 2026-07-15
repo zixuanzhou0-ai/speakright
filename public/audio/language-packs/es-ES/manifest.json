@@ -571,7 +571,7 @@
     {
       "key": "baca",
       "text": "baca",
-      "ipa": "/ˈbaka/ ~ /ˈbaka/",
+      "ipa": "/ˈbaka/",
       "soundUnitSlugs": [
         "es-bv"
       ],
@@ -1113,7 +1113,7 @@
     {
       "key": "bono",
       "text": "bono",
-      "ipa": "/ˈbweno/ ~ /ˈbono/",
+      "ipa": "/ˈbono/",
       "soundUnitSlugs": [
         "es-diphthongs-w"
       ],
@@ -1760,7 +1760,7 @@
     {
       "key": "cana",
       "text": "cana",
-      "ipa": "/ˈkana/ ~ /ˈkaɲa/",
+      "ipa": "/ˈkana/",
       "soundUnitSlugs": [
         "es-ny"
       ],
@@ -1780,7 +1780,7 @@
     {
       "key": "caña",
       "text": "caña",
-      "ipa": "/ˈkana/ ~ /ˈkaɲa/",
+      "ipa": "/ˈkaɲa/",
       "soundUnitSlugs": [
         "es-ny"
       ],
@@ -1984,7 +1984,7 @@
     {
       "key": "caza",
       "text": "caza",
-      "ipa": "/ˈkasa/ ~ /ˈkaθa/",
+      "ipa": "/ˈkaθa/",
       "soundUnitSlugs": [
         "es-theta"
       ],
@@ -2235,7 +2235,7 @@
     {
       "key": "ciclo",
       "text": "ciclo",
-      "ipa": "/ˈtʃiko/ ~ /ˈθiklo/",
+      "ipa": "/ˈθiklo/",
       "soundUnitSlugs": [
         "es-ch"
       ],
@@ -6600,7 +6600,7 @@
     {
       "key": "lata",
       "text": "lata",
-      "ipa": "/ˈlata/ ~ /ˈrata/",
+      "ipa": "/ˈlata/",
       "soundUnitSlugs": [
         "es-l"
       ],
@@ -6869,7 +6869,7 @@
     {
       "key": "llama",
       "text": "llama",
-      "ipa": "/ˈʝama/ ~ /ˈʝema/",
+      "ipa": "/ˈʝama/",
       "soundUnitSlugs": [
         "es-y-ll"
       ],
@@ -9651,7 +9651,7 @@
     {
       "key": "peso",
       "text": "peso",
-      "ipa": "/ˈpiso/ ~ /ˈpeso/",
+      "ipa": "/ˈpeso/",
       "soundUnitSlugs": [
         "es-i"
       ],
@@ -9722,7 +9722,7 @@
     {
       "key": "piso",
       "text": "piso",
-      "ipa": "/ˈpiso/ ~ /ˈpeso/",
+      "ipa": "/ˈpiso/",
       "soundUnitSlugs": [
         "es-i"
       ],
@@ -12668,7 +12668,7 @@
     {
       "key": "ven",
       "text": "ven",
-      "ipa": "/bjen/ ~ /ben/",
+      "ipa": "/ben/",
       "soundUnitSlugs": [
         "es-diphthongs-j"
       ],

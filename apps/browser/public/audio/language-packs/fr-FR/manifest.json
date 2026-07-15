@@ -280,7 +280,7 @@
     {
       "key": "anneau",
       "text": "anneau",
-      "ipa": "/aɲo/ ~ /ano/",
+      "ipa": "/ano/",
       "soundUnitSlugs": [
         "fr-ny"
       ],
@@ -5430,7 +5430,7 @@
     {
       "key": "fil",
       "text": "fil",
-      "ipa": "/fij/ ~ /fil/",
+      "ipa": "/fil/",
       "soundUnitSlugs": [
         "fr-glide-j"
       ],
@@ -7119,7 +7119,7 @@
     {
       "key": "in",
       "text": "in",
-      "ipa": "/œ̃/ ~ /ɛ̃/",
+      "ipa": "/ɛ̃/",
       "soundUnitSlugs": [
         "fr-un"
       ],
@@ -8981,7 +8981,7 @@
     {
       "key": "les livres",
       "text": "les livres",
-      "ipa": "/lez‿ami/ ~ /le livʁ/",
+      "ipa": "/le livʁ/",
       "soundUnitSlugs": [
         "fr-liaison"
       ],
@@ -9304,7 +9304,7 @@
     {
       "key": "lu",
       "text": "lu",
-      "ipa": "/ʁy/ ~ /ly/",
+      "ipa": "/ly/",
       "soundUnitSlugs": [
         "fr-r"
       ],
@@ -13406,7 +13406,7 @@
     {
       "key": "ptit",
       "text": "ptit",
-      "ipa": "/pəti/ ~ /pti/",
+      "ipa": "/pti/",
       "soundUnitSlugs": [
         "fr-schwa"
       ],
@@ -15292,7 +15292,7 @@
     {
       "key": "su",
       "text": "su",
-      "ipa": "/si/ ~ /sy/",
+      "ipa": "/sy/",
       "soundUnitSlugs": [
         "fr-y"
       ],
@@ -17044,7 +17044,7 @@
     {
       "key": "vent",
       "text": "vent",
-      "ipa": "/vɛ̃/ ~ /vɑ̃/",
+      "ipa": "/vɑ̃/",
       "soundUnitSlugs": [
         "fr-in"
       ],
