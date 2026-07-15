@@ -82,3 +82,26 @@
 - 352 条未替换项中，350 条参考状态为 `needs-native-review`，2 条为 `conflict`；需要对应语言母语者或语音学审校者解决参考后，才允许第三候选。
 - EXE、MSI 与 NSIS 尚未代码签名，公开发布门禁因此失败；当前安装包只用于受控内部测试。
 - 本报告不把 Whisper、Azure、Scribe 或 TTS 自己的输出当作发音真相。
+
+## 64 条替换音频真人盲听
+
+已增加独立的本地盲听工作流，用于把 64 条
+`machine-replaced-pending-human` 音频交给真人逐条确认：
+
+```powershell
+npm.cmd run audio:word-audit:promoted-review:test
+npm.cmd run audio:word-audit:promoted-review:visual
+npm.cmd run audio:word-audit:promoted-review:serve
+npm.cmd run audio:word-audit:promoted-review:summary
+```
+
+- 正式范围为 64 条替换音频，加 3 条隐藏一致性复听，共 67 条。
+- 盲听阶段只显示语言、匿名说话人和音频，不发送目标词、IPA、目标音、候选身份或既有真人结论。
+- 隐藏复听只出现在原项之后，且至少间隔 12 项；完成度同时比较实际听到的词和可选 IPA。
+- 3 条隐藏复听穿插在主队列中，不集中暴露在末尾；若前后答案不一致，旧判断会先归档，再由界面引导重新复核。
+- 每条真人记录绑定当前候选 ID、正式音频 SHA-256 和批次摘要；音频变化后旧结论不能复用。
+- 记录使用临时文件和备份恢复，损坏或不兼容记录会被隔离，不会静默套用。
+- 参考答案仍为 `needs-native-review` 时，即使真人听成目标词，也不会自动升级为
+  `verified-auditory`。
+- 本地 Chrome 已验证真实 MP3 解码/短播放、桌面与 390px 布局、答案揭示和控制台零错误。
+- 正式真人审听尚未开始，当前进度为盲听 `0/67`、定稿 `0/64`。
