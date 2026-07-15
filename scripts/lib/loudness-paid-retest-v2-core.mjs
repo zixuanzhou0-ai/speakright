@@ -15,7 +15,7 @@ export const LOUDNESS_RETEST_V2_VERSION = 2;
 export const LOUDNESS_RETEST_V2_POLICY_VERSION =
   "safe-loudness-v2-whisper-azure-scribe-blind-v2";
 export const LOUDNESS_PROMOTION_V2_POLICY_VERSION =
-  "safe-loudness-v2-three-listener-promotion-v1";
+  "safe-loudness-v2-three-listener-partial-promotion-v2";
 export const LOUDNESS_RETEST_V2_EXPECTED_COUNT =
   PROMOTED_LOUDNESS_V2_EXPECTED_ASSET_COUNT;
 export const LOUDNESS_RETEST_V2_CONCURRENCY = 2;
@@ -498,20 +498,78 @@ export function assertPromotionV2Authorization({
   return true;
 }
 
+export function verifyLoudnessPromotionV2Plan(document) {
+  const { promotionPlanSha256, ...planCore } = document ?? {};
+  assertSha(promotionPlanSha256, "promotion plan SHA");
+  if (digestJson(planCore) !== promotionPlanSha256) {
+    throw new Error("Immutable promotion plan digest mismatch");
+  }
+  if (
+    planCore.version !== 1 ||
+    planCore.policyVersion !== LOUDNESS_PROMOTION_V2_POLICY_VERSION ||
+    planCore.immutable !== true ||
+    planCore.dryRun !== true ||
+    planCore.formalAssetsModified !== false
+  ) {
+    throw new Error("Unsupported immutable promotion plan policy");
+  }
+  if (
+    planCore.retestPlanSha256 === undefined ||
+    planCore.sourcePlanSha256 !== SAFE_LOUDNESS_V2_SOURCE_PLAN_SHA ||
+    planCore.sourceGenerationReportSha256 !==
+      SAFE_LOUDNESS_V2_GENERATION_REPORT_SHA
+  ) {
+    throw new Error("Promotion plan is not bound to reviewed safe v2 evidence");
+  }
+  const rows = assertCount(planCore.rows, "promotionPlan.rows");
+  uniqueMap(rows, (row) => row.assetId, "promotion plan rows");
+  const eligibleRows = rows.filter((row) => row.eligible === true);
+  const blockedRows = rows.filter((row) => row.eligible !== true);
+  if (
+    planCore.assetCount !== rows.length ||
+    planCore.eligibleCount !== eligibleRows.length ||
+    planCore.blockedCount !== blockedRows.length ||
+    planCore.eligibleCount + planCore.blockedCount !== rows.length
+  ) {
+    throw new Error("Promotion plan eligibility counts are inconsistent");
+  }
+  if (
+    eligibleRows.some((row) => (row.reasons?.length ?? 0) !== 0) ||
+    blockedRows.some((row) => (row.reasons?.length ?? 0) === 0)
+  ) {
+    throw new Error("Promotion plan eligibility does not match row reasons");
+  }
+  if (
+    eligibleRows.some((row) =>
+      LOUDNESS_RETEST_V2_PROVIDERS.some((provider) => {
+        const result = row.providerResults?.[provider];
+        return (
+          result?.reusable !== true ||
+          result?.passing !== true ||
+          !isPromotionPassingOutcome(result?.outcome)
+        );
+      }),
+    )
+  ) {
+    throw new Error(
+      "Eligible promotion row has not passed all three listeners",
+    );
+  }
+  return promotionPlanSha256;
+}
+
 export function buildPromotionTransactionEntries(promotionPlan, transactionId) {
   if (!/^[0-9a-f-]{36}$/iu.test(transactionId ?? "")) {
     throw new Error("Promotion transaction ID must be a UUID");
   }
-  if (
-    promotionPlan?.eligibleCount !== LOUDNESS_RETEST_V2_EXPECTED_COUNT ||
-    promotionPlan?.blockedCount !== 0 ||
-    promotionPlan.rows?.some((row) => !row.eligible)
-  ) {
-    throw new Error(
-      "All 28 candidates must be eligible before formal promotion",
-    );
+  verifyLoudnessPromotionV2Plan(promotionPlan);
+  const eligibleRows = promotionPlan.rows.filter(
+    (row) => row.eligible === true,
+  );
+  if (eligibleRows.length === 0) {
+    throw new Error("At least one candidate must be eligible for promotion");
   }
-  return promotionPlan.rows.map((row) => {
+  return eligibleRows.map((row) => {
     const formal = assertFormalAudioPaths({
       desktopPath: row.source.desktopPath,
       browserPath: row.source.browserPath,

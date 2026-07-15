@@ -450,6 +450,14 @@ function applyPromotion(result, parsed) {
     result.promotionPlan,
     transactionId,
   );
+  const blocked = result.promotionPlan.rows
+    .filter((row) => !row.eligible)
+    .map((row) => ({
+      assetId: row.assetId,
+      languageId: row.languageId,
+      sourceSha256: row.source.sha256,
+      reasons: [...row.reasons],
+    }));
   const transactionRoot = path.join(
     result.bundleRoot,
     "promotion-transactions",
@@ -464,6 +472,7 @@ function applyPromotion(result, parsed) {
     status: "preparing",
     formalAssetsModified: false,
     entries,
+    blocked,
   };
   journalPath = writeJournalSnapshot(
     transactionRoot,
@@ -557,6 +566,8 @@ function applyPromotion(result, parsed) {
           status: "completed",
           transactionId,
           replacementCount: entries.length,
+          blockedCount: blocked.length,
+          blocked,
           journalPath: toRepoRelative(journalPath),
           formalAssetsModified: true,
         },

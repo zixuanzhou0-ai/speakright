@@ -15,6 +15,7 @@ import {
   LOUDNESS_RETEST_V2_VERSION,
   SAFE_LOUDNESS_V2_GENERATION_REPORT_SHA,
   SAFE_LOUDNESS_V2_SOURCE_PLAN_SHA,
+  verifyLoudnessPromotionV2Plan,
   verifyLoudnessRetestV2Plan,
 } from "./lib/loudness-paid-retest-v2-core.mjs";
 import { digestJson } from "./lib/promoted-audio-loudness-v2-core.mjs";
@@ -388,7 +389,7 @@ const entries = buildPromotionTransactionEntries(
 );
 check(
   entries.length === 28,
-  "promotion transaction must remain all-or-nothing",
+  "a fully eligible promotion must include all 28 candidates",
 );
 check(
   entries.every(
@@ -402,8 +403,104 @@ check(
 );
 rejects(
   () => buildPromotionTransactionEntries(emptyPromotion, transactionId),
-  /All 28 candidates must be eligible/u,
-  "partial promotion transactions are forbidden",
+  /At least one candidate must be eligible/u,
+  "a promotion transaction must contain at least one eligible candidate",
+);
+
+const threeBlockedCheckpoints = clone(allPassingCheckpoints);
+for (const blockedCandidate of plan.candidates.slice(0, 3)) {
+  const blockedCheckpoint = threeBlockedCheckpoints.find(
+    (row) =>
+      row.assetId === blockedCandidate.assetId &&
+      row.provider === "whisper-large-v3",
+  );
+  blockedCheckpoint.outcome = "different-word";
+}
+const partialPromotion = buildLoudnessPromotionV2Plan({
+  retestPlan: plan,
+  checkpoints: threeBlockedCheckpoints,
+  ...states,
+});
+check(
+  verifyLoudnessPromotionV2Plan(partialPromotion) ===
+    partialPromotion.promotionPlanSha256,
+  "partial promotion plan must retain an exact immutable digest",
+);
+check(
+  partialPromotion.eligibleCount === 25 && partialPromotion.blockedCount === 3,
+  "fixture must contain exactly 25 eligible and 3 blocked rows",
+);
+check(
+  assertPromotionV2Authorization({
+    confirmed: true,
+    reviewedRetestPlanSha256: plan.planSha256,
+    currentRetestPlanSha256: plan.planSha256,
+    reviewedPromotionPlanSha256: partialPromotion.promotionPlanSha256,
+    currentPromotionPlanSha256: partialPromotion.promotionPlanSha256,
+  }),
+  "partial promotion still requires exact retest and promotion SHAs plus confirm",
+);
+const blockedRows = partialPromotion.rows.filter((row) => !row.eligible);
+const partialEntries = buildPromotionTransactionEntries(
+  partialPromotion,
+  transactionId,
+);
+check(
+  partialEntries.length === 25,
+  "partial promotion transaction must include only the 25 eligible rows",
+);
+check(
+  partialEntries.every(
+    (entry) => !blockedRows.some((row) => row.assetId === entry.assetId),
+  ),
+  "blocked rows must never enter the promotion transaction",
+);
+const simulatedFormalShas = new Map(
+  states.sourceStates.map((row) => [
+    row.assetId,
+    {
+      desktopSha256: row.desktopSha256,
+      browserSha256: row.browserSha256,
+    },
+  ]),
+);
+for (const entry of partialEntries) {
+  simulatedFormalShas.set(entry.assetId, {
+    desktopSha256: entry.candidateSha256,
+    browserSha256: entry.candidateSha256,
+  });
+}
+check(
+  blockedRows.every((row) => {
+    const simulated = simulatedFormalShas.get(row.assetId);
+    return (
+      simulated.desktopSha256 === row.source.sha256 &&
+      simulated.browserSha256 === row.source.sha256
+    );
+  }),
+  "all three blocked formal desktop/browser SHAs must remain unchanged",
+);
+const tamperedPartialPromotion = clone(partialPromotion);
+tamperedPartialPromotion.rows[3].eligible = false;
+rejects(
+  () =>
+    buildPromotionTransactionEntries(tamperedPartialPromotion, transactionId),
+  /Immutable promotion plan digest mismatch/u,
+  "a transaction must reject any promotion plan changed after review",
+);
+const forgedListenerPromotion = clone(partialPromotion);
+const forgedEligibleRow = forgedListenerPromotion.rows.find(
+  (row) => row.eligible,
+);
+forgedEligibleRow.providerResults["azure-stt"].passing = false;
+const forgedListenerCore = { ...forgedListenerPromotion };
+delete forgedListenerCore.promotionPlanSha256;
+forgedListenerPromotion.promotionPlanSha256 = digestJson(forgedListenerCore);
+rejects(
+  () =>
+    buildPromotionTransactionEntries(forgedListenerPromotion, transactionId),
+  /not passed all three listeners/u,
+  "partial promotion must never weaken an eligible row's three-listener gate",
 );
 
 check(
@@ -474,6 +571,15 @@ check(
 check(
   cliSource.includes("writeJournalSnapshot"),
   "promotion journaling must use append-only immutable snapshots",
+);
+check(
+  cliSource.includes("rollbackTransactions(entries, transactionId)"),
+  "any eligible-subset transaction failure must invoke rollback",
+);
+check(
+  cliSource.includes("blockedCount: blocked.length") &&
+    cliSource.includes("sourceSha256: row.source.sha256"),
+  "promotion journal/output must explicitly list blocked source SHAs",
 );
 
 console.log(
