@@ -101,6 +101,29 @@ test("reference decisions require two independent sources before confirmation", 
       }),
     /two independent sources/,
   );
+  assert.throws(
+    () =>
+      applyGoldPronunciationDecisions(entries, {
+        version: 1,
+        entries: [
+          {
+            languageId: "en-US",
+            text: "ship",
+            canonicalIpa: "ʃɪp",
+            status: "two-source-confirmed",
+            sources: [
+              {
+                name: "Wiktionary en-US",
+                independenceGroup: "wiktionary",
+                value: "ʃɪp",
+              },
+              { name: "Kaikki", independenceGroup: "wiktionary", value: "ʃɪp" },
+            ],
+          },
+        ],
+      }),
+    /two independent sources/,
+  );
   const merged = applyGoldPronunciationDecisions(entries, {
     version: 1,
     revision: "test",

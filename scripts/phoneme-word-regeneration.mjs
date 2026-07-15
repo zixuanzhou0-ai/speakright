@@ -33,12 +33,14 @@ import {
 import {
   assertPromotionAllowed,
   assertRegenerationPlan,
+  assertThirdRoundPlan,
   buildRegenerationPlan,
-  buildThirdRoundCandidate,
+  buildThirdRoundPlan,
   ELEVENLABS_SAFETY_RESERVE,
   EXPECTED_FIRST_ROUND_CANDIDATE_COUNT,
   EXPECTED_REGENERATION_ASSET_COUNT,
   evaluateCandidate,
+  isGeneratedCandidateCacheReusable,
   MAX_REGENERATION_CANDIDATE_COUNT,
   selectCandidateForAsset,
 } from "./lib/phoneme-word-regeneration-core.mjs";
@@ -69,6 +71,7 @@ const azurePronunciationPath = path.join(
 const scribeBlindPath = path.join(analysisRoot, "scribe-v2.jsonl");
 const selectionPath = path.join(regenerationRoot, "candidate-selection.json");
 const promotionPath = path.join(regenerationRoot, "promotion-ledger.json");
+const thirdRoundPlanPath = path.join(regenerationRoot, "third-round-plan.json");
 const fixedAzureRegion = "switzerlandnorth";
 
 function parseArgs(values) {
@@ -341,6 +344,32 @@ function requirePlan(parsed) {
   return plan;
 }
 
+function loadCurrentThirdPlanInputs(plan) {
+  const inventory = requireJson(
+    path.join(auditRoot, "inventory.json"),
+    "Run the current word-audio inventory before third-round planning.",
+  );
+  const gold = requireJson(
+    path.join(auditRoot, "gold-pronunciations.json"),
+    "Run the current pronunciation reference audit before third-round planning.",
+  );
+  const currentAssetById = new Map(
+    inventory.assets.map((asset) => [asset.assetId, asset]),
+  );
+  const currentShaByPath = new Map();
+  for (const source of plan.sourceAssets) {
+    for (const relativePath of [source.desktopPath, source.browserPath]) {
+      if (currentShaByPath.has(relativePath)) continue;
+      const absolutePath = path.resolve(root, relativePath);
+      currentShaByPath.set(
+        relativePath,
+        existsSync(absolutePath) ? sha256File(absolutePath) : null,
+      );
+    }
+  }
+  return { gold, currentAssetById, currentShaByPath };
+}
+
 const candidateAudioPath = (candidateId) =>
   path.join(audioRoot, `${candidateId}.mp3`);
 const generatedById = () =>
@@ -353,11 +382,11 @@ async function generateCandidates(candidates) {
   const existing = generatedById();
   const pending = candidates.filter((candidate) => {
     const cached = existing.get(candidate.candidateId);
-    return (
-      !cached ||
-      cached.sourceSha256 !== candidate.sourceSha256 ||
-      !existsSync(candidateAudioPath(candidate.candidateId))
-    );
+    return !isGeneratedCandidateCacheReusable({
+      cached,
+      candidate,
+      audioExists: existsSync(candidateAudioPath(candidate.candidateId)),
+    });
   });
   await runPool(pending, 2, async (candidate, index) => {
     let locators = [];
@@ -408,15 +437,49 @@ async function generateCandidates(candidates) {
   });
 }
 
+function thirdPlanCommand() {
+  const plan = assertRegenerationPlan(
+    requireJson(planPath, "Run regeneration dry-run first."),
+  );
+  const selection = requireJson(
+    selectionPath,
+    "Run A/B selection before planning the third round.",
+  );
+  const currentInputs = loadCurrentThirdPlanInputs(plan);
+  const thirdPlan = buildThirdRoundPlan({
+    plan,
+    selection,
+    ...currentInputs,
+  });
+  writeJson(thirdRoundPlanPath, thirdPlan);
+  console.log(
+    JSON.stringify(
+      {
+        thirdRoundPlanPath: path.relative(root, thirdRoundPlanPath),
+        basePlanSha256: thirdPlan.basePlanSha256,
+        thirdPlanSha256: thirdPlan.thirdPlanSha256,
+        candidateCount: thirdPlan.candidateCount,
+        blockedCount: thirdPlan.blockedCount,
+        characterCount: thirdPlan.characterCount,
+        sourceDurationSeconds: thirdPlan.sourceDurationSeconds,
+        safetyReserve: thirdPlan.safetyReserve,
+        paidCallsMade: false,
+      },
+      null,
+      2,
+    ),
+  );
+}
+
 async function generateCommand(parsed) {
   requireFlag(parsed, "--confirm", "Paid TTS generation requires --confirm");
   const plan = requirePlan(parsed);
   if (!plan.allVoicesAvailable)
     throw new Error("An original voice failed metadata checks");
-  if (!plan.safetyReserveSatisfied)
-    throw new Error("The 5,000-credit safety reserve is not satisfied");
   const round = Number(parsed.valueFor("--round", "1"));
   if (round === 1) {
+    if (!plan.safetyReserveSatisfied)
+      throw new Error("The 5,000-credit safety reserve is not satisfied");
     if (plan.candidates.length !== EXPECTED_FIRST_ROUND_CANDIDATE_COUNT)
       throw new Error("First round must contain 832 candidates");
     await generateCandidates(plan.candidates);
@@ -427,45 +490,39 @@ async function generateCommand(parsed) {
     selectionPath,
     "Run A/B selection before the third round.",
   );
-  const resultById = new Map(
-    selection.results.map((result) => [result.candidateId, result]),
-  );
-  const candidates = [];
-  const blocked = [];
-  for (const source of plan.sourceAssets) {
-    const pair = plan.candidates
-      .filter((item) => item.sourceAssetId === source.sourceAssetId)
-      .map((item) => ({
-        ...item,
-        status: resultById.get(item.candidateId)?.status,
-      }));
-    if (pair.some((item) => item.status === "machine-passed")) continue;
-    try {
-      candidates.push(buildThirdRoundCandidate(source, pair));
-    } catch (error) {
-      blocked.push({
-        sourceAssetId: source.sourceAssetId,
-        status: "blocked-reference-unresolved",
-        reason: error.message,
-      });
-    }
-  }
-  if (
-    plan.candidates.length + candidates.length >
-    MAX_REGENERATION_CANDIDATE_COUNT
-  )
-    throw new Error("Candidate ceiling exceeded");
-  writeJson(path.join(regenerationRoot, "third-round-plan.json"), {
-    generatedAt: new Date().toISOString(),
-    candidateCount: candidates.length,
-    characterCount: candidates.reduce(
-      (sum, item) => sum + item.characterCount,
-      0,
+  const currentInputs = loadCurrentThirdPlanInputs(plan);
+  const thirdPlan = assertThirdRoundPlan(
+    requireJson(
+      thirdRoundPlanPath,
+      "Run the pure third-plan command and review it before generation.",
     ),
-    blocked,
-    candidates,
-  });
-  await generateCandidates(candidates);
+    { plan, selection, ...currentInputs },
+  );
+  const expectedThirdPlanSha = parsed.valueFor("--third-plan-sha");
+  if (
+    !expectedThirdPlanSha ||
+    expectedThirdPlanSha !== thirdPlan.thirdPlanSha256
+  ) {
+    throw new Error(
+      "The exact --third-plan-sha from the reviewed third-round plan is required",
+    );
+  }
+  const { value: credential } = await readSpeakRightCredential("elevenlabs");
+  if (!credential?.apiKey) throw new Error("ElevenLabs credential is missing");
+  const subscription = await fetchElevenLabsSubscription(credential.apiKey);
+  const remainingAfterThirdRound =
+    typeof subscription.remaining === "number"
+      ? subscription.remaining - thirdPlan.characterCount
+      : null;
+  if (
+    remainingAfterThirdRound === null ||
+    remainingAfterThirdRound < thirdPlan.safetyReserve
+  ) {
+    throw new Error(
+      "The exact third-round cost would violate the 5,000-credit safety reserve",
+    );
+  }
+  await generateCandidates(thirdPlan.candidates);
 }
 
 function buildCandidateInventory() {
@@ -1052,6 +1109,9 @@ async function main() {
     case "plan":
       await planCommand();
       break;
+    case "third-plan":
+      thirdPlanCommand();
+      break;
     case "generate":
       await generateCommand(parsed);
       break;
@@ -1078,7 +1138,7 @@ async function main() {
       break;
     default:
       throw new Error(
-        "Usage: phoneme-word-regeneration.mjs <plan|generate|signal|whisper|azure|scribe|select|promote|gate>",
+        "Usage: phoneme-word-regeneration.mjs <plan|third-plan|generate|signal|whisper|azure|scribe|select|promote|gate>",
       );
   }
 }

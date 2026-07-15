@@ -443,7 +443,7 @@ export function applyGoldPronunciationDecisions(entries, ledger) {
       );
     }
     const sources = Array.isArray(decision.sources) ? decision.sources : [];
-    const independentSourceNames = new Set(
+    const independentSourceGroups = new Set(
       sources
         .filter(
           (source) =>
@@ -452,11 +452,15 @@ export function applyGoldPronunciationDecisions(entries, ledger) {
               .toLocaleLowerCase("en-US")
               .includes("speakright"),
         )
-        .map((source) => String(source.name).trim().toLocaleLowerCase("en-US")),
+        .map((source) =>
+          String(source.independenceGroup ?? source.publisherId ?? source.name)
+            .trim()
+            .toLocaleLowerCase("en-US"),
+        ),
     );
     if (
       ["two-source-confirmed", "variant-confirmed"].includes(decision.status) &&
-      independentSourceNames.size < 2
+      independentSourceGroups.size < 2
     ) {
       throw new Error(
         `Confirmed reference requires two independent sources: ${decision.languageId}:${decision.text}`,

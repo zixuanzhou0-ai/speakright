@@ -5,16 +5,22 @@ import test from "node:test";
 import {
   assertPromotionAllowed,
   assertRegenerationPlan,
-  buildRegenerationPlan,
+  assertThirdRoundPlan,
   buildThirdRoundCandidate,
+  buildThirdRoundPlan,
+  computeCandidateConfigDigest,
+  computeReferenceDigest,
   computeRegenerationPlanSha,
+  computeThirdRoundPlanSha,
   EXPECTED_ASSETS_BY_LANGUAGE,
   EXPECTED_ASSETS_BY_VOICE,
   EXPECTED_FIRST_ROUND_CANDIDATE_COUNT,
   EXPECTED_FIRST_ROUND_CHARACTERS,
   EXPECTED_REGENERATION_ASSET_COUNT,
   evaluateCandidate,
+  isGeneratedCandidateCacheReusable,
   MAX_REGENERATION_CANDIDATE_COUNT,
+  normalizePronunciationDictionaryIpa,
   selectCandidateForAsset,
 } from "./lib/phoneme-word-regeneration-core.mjs";
 
@@ -24,25 +30,11 @@ const output = path.resolve(
   "outputs/phoneme-word-auditory-audit-2026-07-14",
 );
 const readJson = (filePath) => JSON.parse(readFileSync(filePath, "utf8"));
-const manifests = Object.fromEntries(
-  ["es-ES", "fr-FR", "ru-RU"].map((languageId) => [
-    languageId,
-    readJson(
-      path.resolve(
-        root,
-        `public/audio/language-packs/${languageId}/manifest.json`,
-      ),
-    ),
-  ]),
-);
 
 function buildPlan() {
-  return buildRegenerationPlan({
-    inventory: readJson(path.join(output, "inventory.json")),
-    consensus: readJson(path.join(output, "machine-consensus.json")),
-    gold: readJson(path.join(output, "gold-pronunciations.json")),
-    manifests,
-  });
+  return readJson(
+    path.join(output, "regenerated-candidates", "regeneration-plan.json"),
+  );
 }
 
 const plan = buildPlan();
@@ -133,12 +125,255 @@ test("third candidate requires two failed candidates and two-source reference", 
   const confirmed = {
     ...source,
     referenceStatus: "two-source-confirmed",
+    referenceSources: [{ name: "source-a" }, { name: "source-b" }],
     referenceSourceCount: 2,
+    referenceDigest: undefined,
+    relationshipIssues: [],
   };
   const third = buildThirdRoundCandidate(confirmed, pair);
   assert.equal(third.generationRound, 3);
   assert.equal(third.modelId, "eleven_v3");
   assert.equal(third.pronunciationDictionary.alphabet, "ipa");
+  assert.equal(third.configDigest, computeCandidateConfigDigest(third));
+});
+
+test("pronunciation dictionary preserves stress and only strips outer delimiters", () => {
+  assert.equal(
+    normalizePronunciationDictionaryIpa("  /ˌɪn.tɚˈnæʃ.ə.nəl/  "),
+    "ˌɪn.tɚˈnæʃ.ə.nəl",
+  );
+  assert.equal(normalizePronunciationDictionaryIpa(" /a b/ "), "a b");
+});
+
+test("third candidate rejects pair IPA pollution, relationship issues, and duplicate sources", () => {
+  const source = plan.sourceAssets[0];
+  const pair = plan.candidates
+    .filter((candidate) => candidate.sourceAssetId === source.sourceAssetId)
+    .map((candidate) => ({ ...candidate, status: "machine-failed" }));
+  const confirmed = {
+    ...source,
+    referenceStatus: "two-source-confirmed",
+    referenceSources: [{ name: "a" }, { name: "b" }],
+    referenceDigest: undefined,
+    relationshipIssues: [],
+  };
+  assert.throws(
+    () =>
+      buildThirdRoundCandidate(
+        { ...confirmed, canonicalIpa: "/a/ ~ /b/" },
+        pair,
+      ),
+    /polluted IPA/,
+  );
+  assert.throws(
+    () =>
+      buildThirdRoundCandidate(
+        { ...confirmed, relationshipIssues: ["target-unit-missing"] },
+        pair,
+      ),
+    /relationship issues/,
+  );
+  assert.throws(
+    () =>
+      buildThirdRoundCandidate(
+        {
+          ...confirmed,
+          referenceSources: [{ name: "same" }, { name: "same" }],
+        },
+        pair,
+      ),
+    /unresolved reference/,
+  );
+  assert.throws(
+    () =>
+      buildThirdRoundCandidate(
+        {
+          ...confirmed,
+          referenceSources: [
+            { name: "Wiktionary" },
+            { name: "Kaikki derived from Wiktionary" },
+          ],
+        },
+        pair,
+      ),
+    /unresolved reference/,
+  );
+  assert.throws(
+    () =>
+      buildThirdRoundCandidate(
+        {
+          ...confirmed,
+          referenceSources: [
+            { name: "mirror-a", independenceGroup: "publisher-one" },
+            { name: "mirror-b", publisherId: "publisher-one" },
+          ],
+        },
+        pair,
+      ),
+    /unresolved reference/,
+  );
+});
+
+test("reference digest covers source provenance and normalized evidence", () => {
+  const base = {
+    canonicalIpa: "/ˈtɛst/",
+    referenceStatus: "two-source-confirmed",
+    relationshipIssues: [],
+    referenceSources: [
+      {
+        name: "dictionary-a",
+        independenceGroup: "publisher-a",
+        publisherId: "publisher-a",
+        url: "https://example.test/a",
+        revisionOrDate: "2026-07-15",
+        license: "CC-BY",
+        rawValue: " /ˈtɛst/ ",
+        normalizedValue: "ˈtɛst",
+      },
+    ],
+  };
+  const digest = computeReferenceDigest(base);
+  for (const changed of [
+    { url: "https://example.test/b" },
+    { license: "CC-BY-SA" },
+    { rawValue: "/test/" },
+    { normalizedValue: "test" },
+    { independenceGroup: "publisher-b" },
+    { publisherId: "publisher-b" },
+  ]) {
+    assert.notEqual(
+      computeReferenceDigest({
+        ...base,
+        referenceSources: [{ ...base.referenceSources[0], ...changed }],
+      }),
+      digest,
+    );
+  }
+});
+
+function buildReviewedThirdPlanFixture() {
+  const source = plan.sourceAssets[0];
+  const sourceCandidateIds = new Set(
+    plan.candidates
+      .filter((candidate) => candidate.sourceAssetId === source.sourceAssetId)
+      .map((candidate) => candidate.candidateId),
+  );
+  const selection = {
+    results: plan.candidates.map((candidate) => ({
+      candidateId: candidate.candidateId,
+      status: sourceCandidateIds.has(candidate.candidateId)
+        ? "machine-failed"
+        : "machine-passed",
+    })),
+  };
+  const gold = {
+    entries: [
+      {
+        languageId: source.languageId,
+        text: source.text,
+        canonicalIpa: "/ˈtɛst/",
+        status: "two-source-confirmed",
+        sources: [
+          { name: "dictionary-a", revisionOrDate: "v1", value: "ˈtɛst" },
+          { name: "dictionary-b", revisionOrDate: "v2", value: "ˈtɛst" },
+        ],
+        syllableCount: 1,
+        primaryStress: 1,
+      },
+    ],
+  };
+  const currentAssetById = new Map([
+    [source.sourceAssetId, { ...source, relationshipIssues: [] }],
+  ]);
+  const currentShaByPath = new Map([
+    [source.desktopPath, source.sourceSha256],
+    [source.browserPath, source.sourceSha256],
+  ]);
+  return {
+    source,
+    selection,
+    gold,
+    currentAssetById,
+    currentShaByPath,
+  };
+}
+
+test("pure third-round plan overlays current references and has an immutable SHA", () => {
+  const fixture = buildReviewedThirdPlanFixture();
+  const thirdPlan = buildThirdRoundPlan({ plan, ...fixture });
+  assert.equal(thirdPlan.candidateCount, 1);
+  assert.equal(thirdPlan.blockedCount, 0);
+  assert.equal(thirdPlan.paidCallsMade, false);
+  assert.equal(
+    thirdPlan.characterCount,
+    thirdPlan.candidates[0].characterCount,
+  );
+  assert.equal(
+    thirdPlan.sourceDurationSeconds,
+    Number(fixture.source.durationSeconds),
+  );
+  assert.equal(thirdPlan.thirdPlanSha256, computeThirdRoundPlanSha(thirdPlan));
+  assert.equal(
+    thirdPlan.candidates[0].pronunciationDictionary.phoneme,
+    "ˈtɛst",
+  );
+  assertThirdRoundPlan(thirdPlan, { plan, ...fixture });
+
+  const changed = {
+    ...thirdPlan,
+    characterCount: thirdPlan.characterCount + 1,
+  };
+  assert.throws(
+    () => assertThirdRoundPlan(changed, { plan, ...fixture }),
+    /immutable payload/,
+  );
+});
+
+test("third-round plan blocks stale desktop or browser source SHA", () => {
+  const fixture = buildReviewedThirdPlanFixture();
+  fixture.currentShaByPath.set(fixture.source.browserPath, "changed");
+  const thirdPlan = buildThirdRoundPlan({ plan, ...fixture });
+  assert.equal(thirdPlan.candidateCount, 0);
+  assert.equal(thirdPlan.blockedCount, 1);
+  assert.match(thirdPlan.blocked[0].reason, /Current source SHA changed/);
+});
+
+test("candidate cache requires source, reference, and generation config digests", () => {
+  const legacyCandidate = plan.candidates[0];
+  const candidate = {
+    ...legacyCandidate,
+    referenceDigest: "reference-digest",
+    configDigest: "config-digest",
+  };
+  const cached = { ...candidate };
+  assert.equal(
+    isGeneratedCandidateCacheReusable({
+      cached: legacyCandidate,
+      candidate: legacyCandidate,
+      audioExists: true,
+    }),
+    false,
+  );
+  assert.equal(
+    isGeneratedCandidateCacheReusable({ cached, candidate, audioExists: true }),
+    true,
+  );
+  assert.equal(
+    isGeneratedCandidateCacheReusable({
+      cached: { ...cached, referenceDigest: "stale" },
+      candidate,
+      audioExists: true,
+    }),
+    false,
+  );
+  assert.equal(
+    isGeneratedCandidateCacheReusable({
+      cached: { ...cached, configDigest: "stale" },
+      candidate,
+      audioExists: true,
+    }),
+    false,
+  );
 });
 
 const stable = { outcome: "exact", answerLeakage: false };
@@ -262,4 +497,22 @@ test("blind clients contain no prompt or expected-word field", () => {
   assert.doesNotMatch(scribeBody, /keyterm|expected[_-]?word|prompt/iu);
   const azureSource = readFileSync("scripts/lib/azure-stt-client.mjs", "utf8");
   assert.doesNotMatch(azureSource, /ReferenceText|Pronunciation-Assessment/iu);
+});
+
+test("round C requires both reviewed plan SHAs and reserves only its exact cost", () => {
+  const source = readFileSync("scripts/phoneme-word-regeneration.mjs", "utf8");
+  assert.match(source, /Paid TTS generation requires --confirm/u);
+  assert.match(
+    source,
+    /exact --plan-sha from the reviewed dry-run is required/u,
+  );
+  assert.match(
+    source,
+    /exact --third-plan-sha from the reviewed third-round plan is required/u,
+  );
+  assert.match(source, /subscription\.remaining - thirdPlan\.characterCount/u);
+  assert.doesNotMatch(
+    source,
+    /subscription\.remaining\s*-\s*plan\.firstRoundCharacters\s*-\s*thirdPlan\.characterCount/u,
+  );
 });
