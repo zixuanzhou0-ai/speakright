@@ -241,12 +241,23 @@ function mergeMissingItems(items, keys, normalizeAudioPackText) {
         soundUnitSlugs: new Set(item.soundUnitSlugs),
         kinds: new Set([item.kind]),
         sources: new Set([item.source]),
+        relationshipKinds: new Map(
+          item.soundUnitSlugs.map((soundUnitSlug) => [
+            soundUnitSlug,
+            new Set([item.relationshipKind]),
+          ]),
+        ),
       });
       continue;
     }
     for (const slug of item.soundUnitSlugs) current.soundUnitSlugs.add(slug);
     current.kinds.add(item.kind);
     current.sources.add(item.source);
+    for (const soundUnitSlug of item.soundUnitSlugs) {
+      const relations = current.relationshipKinds.get(soundUnitSlug) ?? new Set();
+      relations.add(item.relationshipKind);
+      current.relationshipKinds.set(soundUnitSlug, relations);
+    }
   }
 
   return [...missing.values()]
@@ -255,6 +266,18 @@ function mergeMissingItems(items, keys, normalizeAudioPackText) {
       soundUnitSlugs: [...item.soundUnitSlugs].sort(),
       kinds: [...item.kinds].sort(),
       sources: [...item.sources].sort(),
+      relationshipKinds: [...item.relationshipKinds.entries()]
+        .flatMap(([soundUnitSlug, values]) =>
+          [...values].map((relationshipKind) => ({
+            soundUnitSlug,
+            relationshipKind,
+          })),
+        )
+        .sort(
+          (a, b) =>
+            a.soundUnitSlug.localeCompare(b.soundUnitSlug) ||
+            a.relationshipKind.localeCompare(b.relationshipKind),
+        ),
     }))
     .sort((a, b) => a.text.localeCompare(b.text));
 }
@@ -349,6 +372,18 @@ function manifestItem(languageId, item, fileName, outPath) {
     soundUnitSlugs: item.soundUnitSlugs,
     kinds: item.kinds,
     sources: item.sources,
+    relationshipKinds: item.relationshipKinds.some(
+      (entry) => entry.relationshipKind === "contrast-member",
+    )
+      ? item.relationshipKinds
+      : undefined,
+    relationshipKind:
+      item.relationshipKinds.length > 0 &&
+      item.relationshipKinds.every(
+        (entry) => entry.relationshipKind === "contrast-member",
+      )
+        ? "contrast-member"
+        : undefined,
     fileName,
     audioSrc: `/audio/language-packs/${languageId}/${fileName}`,
     bytes: statSync(outPath).size,

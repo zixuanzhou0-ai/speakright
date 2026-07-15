@@ -103,7 +103,7 @@ export function redactSecrets(value, keyName = "") {
     );
   }
   const isSafeDigest =
-    /(?:sha256|checksum|hash)$/iu.test(keyName) &&
+    /(?:sha256|checksum|hash|digest)$/iu.test(keyName) &&
     /^[a-f0-9]{64}$/iu.test(value);
   if (
     typeof value === "string" &&
@@ -200,9 +200,10 @@ function relativePublicPath(root, filePath) {
 }
 
 function roleFromLanguageItem(item) {
+  const text = String(item.text ?? "").trim();
+  if (!/\s/u.test(text)) return "example-word";
   if (item.kinds?.includes("sentence")) return "sentence";
-  if (/\s/u.test(String(item.text ?? "").trim())) return "phrase";
-  return "example-word";
+  return "phrase";
 }
 
 function resolveSpeakerByDirectory(manifest, directory) {
@@ -265,6 +266,10 @@ function createAsset(root, metadata) {
     text: metadata.text,
     expectedIpa: metadata.expectedIpa,
     targetUnits: metadata.targetUnits ?? [],
+    kinds: metadata.kinds ?? [],
+    sources: metadata.sources ?? [],
+    relationshipKinds: metadata.relationshipKinds ?? [],
+    relationshipKind: metadata.relationshipKind ?? "target-example",
     voiceSlot: metadata.voiceSlot,
     speakerId: metadata.speakerId,
     publicPath: metadata.publicPath,
@@ -372,6 +377,10 @@ export function buildPronunciationInventory(root) {
             text: item.text,
             expectedIpa: item.ipa,
             targetUnits: item.soundUnitSlugs ?? [],
+            kinds: item.kinds ?? [],
+            sources: item.sources ?? [],
+            relationshipKinds: item.relationshipKinds ?? [],
+            relationshipKind: item.relationshipKind ?? "target-example",
             voiceSlot,
             speakerId:
               manifest.voices?.[voiceSlot]?.voiceName ??

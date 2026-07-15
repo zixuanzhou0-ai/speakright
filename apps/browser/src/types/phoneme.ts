@@ -24,6 +24,7 @@ export interface KeywordEntry {
   dialect?: LanguageId | "es-419";
   sourceRefs?: string[];
   needsReview?: boolean;
+  relationshipKind?: "target-example" | "contrast-member";
 }
 
 export interface PhonemeTeachingResource {

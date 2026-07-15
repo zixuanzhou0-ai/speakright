@@ -1,5 +1,5 @@
-﻿import type { PhonemeData } from "@/types/phoneme";
-import { unit } from "@/lib/language-sound-units/utils";
+﻿import { unit } from "@/lib/language-sound-units/utils";
+import type { PhonemeData } from "@/types/phoneme";
 
 type RussianHardContinuantInput = {
   slug: string;
@@ -1586,7 +1586,7 @@ export const RUSSIAN_PHONEMES: PhonemeData[] = [
       { word: "традиция", ipa: "/trɐˈdʲitsɨjə/", stressText: "тради́ция" },
       { word: "месяц", ipa: "/ˈmʲesʲɪts/", stressText: "ме́сяц" },
       { word: "двадцать", ipa: "/ˈdvatsətʲ/", stressText: "два́дцать" },
-      { word: "пятьдесят", ipa: "/pʲɪdʲɪˈsʲat/", stressText: "пятьдеся́т" },
+      { word: "певец", ipa: "/pʲɪˈvʲets/", stressText: "певе́ц" },
       { word: "процент", ipa: "/prɐˈtsent/", stressText: "проце́нт" },
       { word: "цена центра", ipa: "/tsɨˈna ˈtsentrə/" },
       { word: "улица и центр", ipa: "/ˈulʲɪtsə i tsentr/" },
@@ -1773,7 +1773,7 @@ export const RUSSIAN_PHONEMES: PhonemeData[] = [
       { word: "семья", ipa: "/sʲɪmʲˈja/", stressText: "семья́" },
       { word: "язык", ipa: "/jɪˈzɨk/", stressText: "язы́к" },
       { word: "сегодня", ipa: "/sʲɪˈvodnʲə/", stressText: "сего́дня" },
-      { word: "минута", ipa: "/mʲɪˈnutə/", stressText: "мину́та" },
+      { word: "пятьдесят", ipa: "/pʲɪdʲɪˈsʲat/", stressText: "пятьдеся́т" },
       { word: "директор", ipa: "/dʲɪˈrʲektər/", stressText: "дире́ктор" },
       { word: "билет", ipa: "/bʲɪˈlʲet/", stressText: "биле́т" },
       { word: "земля", ipa: "/zʲɪˈmlʲa/", stressText: "земля́" },
@@ -1787,7 +1787,8 @@ export const RUSSIAN_PHONEMES: PhonemeData[] = [
       { word: "пять билетов", ipa: "/pʲætʲ bʲɪˈlʲetəf/" },
       { word: "Это билет в театр.", ipa: "/ˈetə bʲɪˈlʲet f tʲɪˈatr/" },
       { word: "семья сегодня", ipa: "/sʲɪmʲˈja sʲɪˈvodnʲə/" },
-      { word: "билет в театр", ipa: "/bʲɪˈlʲet f tʲɪˈatr/" },
+      { word: "весна в городе", stressText: "весна́ в го́роде", ipa: "/vʲɪsˈna v ˈgorədʲe/" },
+      { word: "банк и билет", ipa: "/bank i bʲɪˈlʲet/", stressText: "банк и биле́т" },
       { word: "язык человека", ipa: "/jɪˈzɨk tɕɪlɐˈvʲekə/" },
       { word: "интересная минута", ipa: "/ɪntʲɪˈrʲesnəjə mʲɪˈnutə/" },
     ],

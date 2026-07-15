@@ -96,6 +96,24 @@ function normalizeIpaForSearch(value) {
     .replaceAll("_", "");
 }
 
+function relationshipKindForUnit(asset, soundUnitSlug) {
+  const matching = (asset.relationshipKinds ?? []).filter(
+    (entry) => entry.soundUnitSlug === soundUnitSlug,
+  );
+  if (
+    matching.some((entry) => entry.relationshipKind === "target-example")
+  ) {
+    return "target-example";
+  }
+  if (
+    matching.length > 0 &&
+    matching.every((entry) => entry.relationshipKind === "contrast-member")
+  ) {
+    return "contrast-member";
+  }
+  return asset.relationshipKind ?? "target-example";
+}
+
 function buildPageRelation(asset, languagePhonemes, assessmentAliases) {
   const pages = languagePhonemes[asset.languageId] ?? [];
   const relations = [];
@@ -127,6 +145,7 @@ function buildPageRelation(asset, languagePhonemes, assessmentAliases) {
             ? normalizedAliases.some((alias) => normalizedWord.includes(alias))
             : null,
         acceptedTargetAliases: aliases,
+        relationshipKind: relationshipKindForUnit(asset, unit),
       });
     }
   }
@@ -197,7 +216,10 @@ export function buildPhonemeWordAuditInventory(
       if (pageRelations.length === 0)
         relationshipIssues.push("page-unresolved");
       for (const relation of pageRelations) {
-        if (relation.targetPresentInCurrentIpa === false) {
+        if (
+          relation.targetPresentInCurrentIpa === false &&
+          relation.relationshipKind !== "contrast-member"
+        ) {
           relationshipIssues.push(
             `target-missing:${relation.pageId}:${relation.targetIpa}`,
           );
@@ -221,6 +243,16 @@ export function buildPhonemeWordAuditInventory(
         targetUnits: pageRelations.map((relation) => relation.targetUnit),
         phonemePageIds: pageRelations.map((relation) => relation.pageId),
         pageRelations,
+        relationshipKinds: effectiveAsset.relationshipKinds ?? [],
+        relationshipKind:
+          pageRelations.length > 0 &&
+          pageRelations.every(
+            (relation) => relation.relationshipKind === "contrast-member",
+          )
+            ? "contrast-member"
+            : (effectiveAsset.relationshipKind ?? "target-example"),
+        kinds: effectiveAsset.kinds ?? [],
+        sources: effectiveAsset.sources ?? [],
         speakerId: asset.speakerId ?? null,
         voiceSlot: asset.voiceSlot ?? null,
         voiceGender,

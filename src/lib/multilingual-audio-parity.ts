@@ -33,6 +33,10 @@ export type MultilingualPracticeItemSource =
   | "contrast"
   | "sentence";
 
+export type MultilingualPracticeRelationshipKind =
+  | "target-example"
+  | "contrast-member";
+
 export interface MultilingualPracticeItem {
   languageId: MultilingualAudioParityLanguageId;
   text: string;
@@ -40,6 +44,7 @@ export interface MultilingualPracticeItem {
   soundUnitSlugs: string[];
   kind: MultilingualPracticeItemKind;
   source: MultilingualPracticeItemSource;
+  relationshipKind: MultilingualPracticeRelationshipKind;
 }
 
 export interface MultilingualAudioParityUnitSummary {
@@ -130,6 +135,8 @@ function practiceItem(
   ipa: string | undefined,
   soundUnitSlugs: string[],
   source: MultilingualPracticeItemSource,
+  relationshipKind: MultilingualPracticeRelationshipKind =
+    source === "contrast" ? "contrast-member" : "target-example",
 ): MultilingualPracticeItem | null {
   const cleanedText = cleanText(text);
   const cleanedIpa = cleanText(ipa ?? "");
@@ -146,6 +153,7 @@ function practiceItem(
     soundUnitSlugs: slugs,
     kind: inferKind(cleanedText, source),
     source,
+    relationshipKind,
   };
 }
 
@@ -154,12 +162,14 @@ function keywordToItem(
   slug: string,
   keyword: KeywordEntry,
 ): MultilingualPracticeItem | null {
+  const relationshipKind = keyword.relationshipKind ?? "target-example";
   return practiceItem(
     languageId,
     keyword.word,
     keyword.ipa,
     [slug],
-    "phoneme-keyword",
+    relationshipKind === "contrast-member" ? "contrast" : "phoneme-keyword",
+    relationshipKind,
   );
 }
 

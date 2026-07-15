@@ -64,10 +64,64 @@ function buildPracticeMetadata(items, normalizeAudioPackText) {
     }
     const key = normalizeAudioPackText(item.text);
     const current = grouped.get(key) ?? [];
-    current.push({ ipa: item.ipa, source: item.source });
+    current.push({
+      ipa: item.ipa,
+      source: item.source,
+      kind: item.kind,
+      soundUnitSlugs: item.soundUnitSlugs,
+      relationshipKind: item.relationshipKind,
+    });
     grouped.set(key, current);
   }
   return grouped;
+}
+
+function buildCurrentManifestMetadata(entries) {
+  const soundUnitSlugs = new Set();
+  const sources = new Set();
+  const kinds = new Set();
+  const relationshipKindsBySlug = new Map();
+
+  for (const entry of entries ?? []) {
+    sources.add(entry.source);
+    kinds.add(entry.kind);
+    for (const soundUnitSlug of entry.soundUnitSlugs ?? []) {
+      soundUnitSlugs.add(soundUnitSlug);
+      const current = relationshipKindsBySlug.get(soundUnitSlug) ?? new Set();
+      current.add(entry.relationshipKind);
+      relationshipKindsBySlug.set(soundUnitSlug, current);
+    }
+  }
+
+  const relationshipKinds = [...relationshipKindsBySlug.entries()]
+    .flatMap(([soundUnitSlug, values]) =>
+      [...values].map((relationshipKind) => ({
+        soundUnitSlug,
+        relationshipKind,
+      })),
+    )
+    .sort(
+      (a, b) =>
+        a.soundUnitSlug.localeCompare(b.soundUnitSlug) ||
+        a.relationshipKind.localeCompare(b.relationshipKind),
+    );
+
+  const hasContrastMember = relationshipKinds.some(
+    (entry) => entry.relationshipKind === "contrast-member",
+  );
+  return {
+    soundUnitSlugs: [...soundUnitSlugs].sort(),
+    sources: [...sources].sort(),
+    kinds: [...kinds].sort(),
+    relationshipKinds: hasContrastMember ? relationshipKinds : undefined,
+    relationshipKind:
+      relationshipKinds.length > 0 &&
+      relationshipKinds.every(
+        (entry) => entry.relationshipKind === "contrast-member",
+      )
+        ? "contrast-member"
+        : undefined,
+  };
 }
 
 function resolveSplitIpa(languageId, item, entries) {
@@ -106,9 +160,14 @@ function synchronizeManifest(
     const entries =
       practiceMetadata.get(textKey) ?? practiceMetadata.get(itemKey);
     const ipa = resolveSplitIpa(languageId, item, entries);
-    if (ipa === item.ipa) return item;
-    changedItems += 1;
-    return { ...item, ipa };
+    if (!entries) return item;
+    const nextItem = {
+      ...item,
+      ipa,
+      ...buildCurrentManifestMetadata(entries),
+    };
+    if (JSON.stringify(nextItem) !== JSON.stringify(item)) changedItems += 1;
+    return nextItem;
   });
   return { manifest: { ...manifest, items }, changedItems };
 }

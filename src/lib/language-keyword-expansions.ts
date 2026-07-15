@@ -1086,10 +1086,18 @@ function deckKeywordsForUnit(
     if (contrast.targetUnitSlug !== slug) continue;
     const [leftIpa, rightIpa] = splitContrastIpa(contrast.ipa);
     keywords.push(
-      withDeckStressText(deckId, { word: contrast.left, ipa: leftIpa }),
+      withDeckStressText(deckId, {
+        word: contrast.left,
+        ipa: leftIpa,
+        relationshipKind: "contrast-member",
+      }),
     );
     keywords.push(
-      withDeckStressText(deckId, { word: contrast.right, ipa: rightIpa }),
+      withDeckStressText(deckId, {
+        word: contrast.right,
+        ipa: rightIpa,
+        relationshipKind: "contrast-member",
+      }),
     );
   }
 

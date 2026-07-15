@@ -50,6 +50,77 @@ test("phoneme-page audit inventory is exact and preserves page relationships", (
     EXPECTED_WORD_BEARING_ASSET_COUNT,
   );
 });
+test("contrast members keep page relationships without false target-missing issues", () => {
+  const contrastRelations = inventory.assets.flatMap((asset) =>
+    asset.pageRelations
+      .filter((relation) => relation.relationshipKind === "contrast-member")
+      .map((relation) => ({ asset, relation })),
+  );
+  assert.ok(contrastRelations.length > 0);
+  for (const { asset, relation } of contrastRelations) {
+    assert.equal(
+      asset.relationshipIssues.includes(
+        `target-missing:${relation.pageId}:${relation.targetIpa}`,
+      ),
+      false,
+      `${asset.languageId} ${asset.text} ${relation.pageId}`,
+    );
+  }
+
+  const ptit = inventory.assets.find(
+    (asset) => asset.languageId === "fr-FR" && asset.text === "ptit",
+  );
+  const schwaRelation = ptit.pageRelations.find(
+    (relation) => relation.pageId === "fr-schwa",
+  );
+  assert.equal(schwaRelation.relationshipKind, "contrast-member");
+  assert.equal(schwaRelation.targetPresentInCurrentIpa, false);
+  assert.equal(ptit.relationshipIssues.length, 0);
+});
+
+test("direct multilingual examples remain strict after relationship repair", () => {
+  const aigu = inventory.assets.find(
+    (asset) => asset.languageId === "fr-FR" && asset.text === "aigu",
+  );
+  assert.ok(aigu.phonemePageIds.includes("fr-y"));
+  assert.ok(!aigu.phonemePageIds.includes("fr-glide-hui"));
+  assert.equal(aigu.relationshipKind, "target-example");
+  assert.equal(aigu.relationshipIssues.length, 0);
+
+  const mel = inventory.assets.find(
+    (asset) => asset.languageId === "ru-RU" && asset.text === "мел",
+  );
+  const hardSoftRelation = mel.pageRelations.find(
+    (relation) => relation.pageId === "ru-soft-n-l-r",
+  );
+  assert.equal(hardSoftRelation.relationshipKind, "target-example");
+  assert.equal(hardSoftRelation.targetPresentInCurrentIpa, true);
+  assert.ok(
+    !mel.relationshipIssues.some((issue) => issue.includes("ru-soft-n-l-r")),
+  );
+
+  const directKnownIssue = inventory.assets.find(
+    (asset) => asset.languageId === "en-US" && asset.text === "wrap",
+  );
+  assert.equal(directKnownIssue.relationshipKind, "target-example");
+  assert.ok(
+    directKnownIssue.relationshipIssues.includes("target-missing:w:/w/"),
+  );
+});
+
+test("Russian fifty is classified by vowel reduction rather than nonexistent ts", () => {
+  const assets = inventory.assets.filter(
+    (asset) => asset.languageId === "ru-RU" && asset.text === "пятьдесят",
+  );
+  assert.ok(assets.length > 0);
+  for (const asset of assets) {
+    assert.ok(asset.phonemePageIds.includes("ru-unstressed-e-ya"));
+    assert.ok(!asset.phonemePageIds.includes("ru-ts"));
+    assert.equal(asset.relationshipKind, "target-example");
+    assert.equal(asset.relationshipIssues.length, 0);
+  }
+});
+
 
 test("voice gender semantics are language-specific and Russian slots are reversed", () => {
   const russianBlue = inventory.assets.find(
