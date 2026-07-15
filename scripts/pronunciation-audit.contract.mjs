@@ -57,12 +57,16 @@ test("secret redaction removes credential fields and suspicious long values", ()
     unknown: "A".repeat(64),
     safe: "short-value",
     sha256: "a".repeat(64),
+    referenceDigest: "b".repeat(64),
+    invalidDigest: "not-a-64-character-hex-digest".repeat(3),
   });
   assert.equal(result.subscriptionKey, "[REDACTED]");
   assert.equal(result.nested.authorization, "[REDACTED]");
   assert.equal(result.unknown, "[REDACTED-LONG-VALUE]");
   assert.equal(result.safe, "short-value");
   assert.equal(result.sha256, "a".repeat(64));
+  assert.equal(result.referenceDigest, "b".repeat(64));
+  assert.equal(result.invalidDigest, "[REDACTED-LONG-VALUE]");
 });
 
 test("inventory covers every canonical desktop asset and browser copy", () => {

@@ -31,6 +31,28 @@ export const STABLE_BLIND_OUTCOMES = new Set([
   "accepted-homophone",
   "orthographic-variant",
 ]);
+export async function runFailStopPool(items, concurrency, worker) {
+  let cursor = 0;
+  let stopped = false;
+  let firstError = null;
+  await Promise.all(
+    Array.from({ length: concurrency }, async () => {
+      while (!stopped) {
+        const index = cursor;
+        if (index >= items.length) return;
+        cursor += 1;
+        try {
+          await worker(items[index], index);
+        } catch (error) {
+          stopped = true;
+          firstError ??= error;
+          return;
+        }
+      }
+    }),
+  );
+  if (firstError) throw firstError;
+}
 
 const ENGLISH_VOICES = {
   blue: {
@@ -196,6 +218,31 @@ function candidateConfigPayload(candidate) {
   };
 }
 
+function candidateTtsGenerationPayload(candidate) {
+  return {
+    candidateId: candidate.candidateId,
+    sourceAssetId: candidate.sourceAssetId,
+    languageId: candidate.languageId,
+    text: candidate.text,
+    voiceId: candidate.voiceId,
+    voiceName: candidate.voiceName,
+    voiceGender: candidate.voiceGender,
+    voiceSlot: candidate.voiceSlot,
+    modelId: candidate.modelId,
+    languageCode: candidate.languageCode,
+    voiceSettings: candidate.voiceSettings,
+    generationRound: candidate.generationRound,
+    label: candidate.label,
+    seed: candidate.seed,
+    characterCount: candidate.characterCount,
+    pronunciationDictionary: candidate.pronunciationDictionary ?? null,
+  };
+}
+
+export function computeCandidateTtsConfigDigest(candidate) {
+  return digest(JSON.stringify(candidateTtsGenerationPayload(candidate)));
+}
+
 export function computeCandidateConfigDigest(candidate) {
   return digest(JSON.stringify(candidateConfigPayload(candidate)));
 }
@@ -205,6 +252,7 @@ function attachCandidateDigests(candidate, source) {
   const withReference = { ...candidate, referenceDigest };
   return {
     ...withReference,
+    ttsConfigDigest: computeCandidateTtsConfigDigest(withReference),
     configDigest: computeCandidateConfigDigest(withReference),
   };
 }
@@ -284,10 +332,12 @@ export function buildRegenerationPlan({
   const goldByKey = new Map(
     gold.entries.map((entry) => [goldKey(entry.languageId, entry.text), entry]),
   );
-  const risks = consensus.items.filter((item) => item.priority === "P0-human");
+  const risks = consensus.items.filter((item) =>
+    ["P0-human", "blocked"].includes(item.priority),
+  );
   if (risks.length !== EXPECTED_REGENERATION_ASSET_COUNT) {
     throw new Error(
-      `Regeneration scope must contain ${EXPECTED_REGENERATION_ASSET_COUNT} P0 assets, received ${risks.length}`,
+      `Regeneration scope must contain ${EXPECTED_REGENERATION_ASSET_COUNT} locked-risk assets, received ${risks.length}`,
     );
   }
 
@@ -521,8 +571,105 @@ export function buildThirdRoundCandidate(source, failedPair) {
   );
 }
 
+function selectionPayload(selection) {
+  return {
+    version: selection.version,
+    basePlanSha256: selection.basePlanSha256,
+    thirdPlanSha256: selection.thirdPlanSha256 ?? null,
+    thirdPlanInputSelectionSha256:
+      selection.thirdPlanInputSelectionSha256 ?? null,
+    promotedSourceAssetIds: [
+      ...(selection.promotedSourceAssetIds ?? []),
+    ].sort(),
+    generatedCandidateCount: selection.generatedCandidateCount,
+    passedCandidateCount: selection.passedCandidateCount,
+    failedCandidateCount: selection.failedCandidateCount,
+    selectedAssetCount: selection.selectedAssetCount,
+    unresolvedAssetCount: selection.unresolvedAssetCount,
+    resultCounts: selection.resultCounts,
+    results: selection.results,
+    selected: selection.selected,
+  };
+}
+
 export function computeSelectionDigest(selection) {
-  return digest(JSON.stringify(selection));
+  return digest(JSON.stringify(selectionPayload(selection)));
+}
+
+export function computeBaseSelectionDigest(selection) {
+  return digest(
+    JSON.stringify({
+      basePlanSha256: selection.basePlanSha256,
+      promotedSourceAssetIds: [
+        ...(selection.promotedSourceAssetIds ?? []),
+      ].sort(),
+      results: (selection.results ?? []).filter(
+        (result) => result.generationRound !== 3,
+      ),
+    }),
+  );
+}
+
+export function buildSelectionRecord({
+  basePlanSha256,
+  thirdPlanSha256 = null,
+  thirdPlanInputSelectionSha256 = null,
+  promotedSourceAssetIds = [],
+  totalSourceAssetCount,
+  results,
+  selected,
+}) {
+  const promoted = [...new Set(promotedSourceAssetIds)].sort();
+  const record = {
+    version: 2,
+    generatedAt: new Date().toISOString(),
+    basePlanSha256,
+    thirdPlanSha256,
+    thirdPlanInputSelectionSha256,
+    promotedSourceAssetIds: promoted,
+    generatedCandidateCount: results.length,
+    passedCandidateCount: results.filter(
+      (item) => item.status === "machine-passed",
+    ).length,
+    failedCandidateCount: results.filter(
+      (item) => item.status === "machine-failed",
+    ).length,
+    selectedAssetCount: selected.length,
+    unresolvedAssetCount:
+      totalSourceAssetCount - promoted.length - selected.length,
+    resultCounts: countBy(results, (item) => item.status),
+    results,
+    selected,
+  };
+  record.baseSelectionSha256 = computeBaseSelectionDigest(record);
+  record.selectionSha256 = computeSelectionDigest(record);
+  return record;
+}
+
+export function assertSelectionRecord(
+  selection,
+  { basePlanSha256, thirdPlanSha256 = null, promotedSourceAssetIds = [] },
+) {
+  if (selection.basePlanSha256 !== basePlanSha256) {
+    throw new Error("Selection was built from a different base plan");
+  }
+  if ((selection.thirdPlanSha256 ?? null) !== (thirdPlanSha256 ?? null)) {
+    throw new Error("Selection was built from a different third-round plan");
+  }
+  const expectedPromoted = [...new Set(promotedSourceAssetIds)].sort();
+  if (
+    JSON.stringify([...(selection.promotedSourceAssetIds ?? [])].sort()) !==
+    JSON.stringify(expectedPromoted)
+  ) {
+    throw new Error("Selection promoted-source set changed");
+  }
+  if (selection.baseSelectionSha256 !== computeBaseSelectionDigest(selection)) {
+    throw new Error("Selection base digest is stale");
+  }
+  if (selection.selectionSha256 !== computeSelectionDigest(selection)) {
+    throw new Error("Selection digest is stale");
+  }
+  return selection;
 }
 
 function thirdRoundPlanPayload(plan) {
@@ -530,6 +677,7 @@ function thirdRoundPlanPayload(plan) {
     version: plan.version,
     basePlanSha256: plan.basePlanSha256,
     selectionSha256: plan.selectionSha256,
+    promotedSourceAssetIds: plan.promotedSourceAssetIds,
     baseCandidateCount: plan.baseCandidateCount,
     maximumCandidateCount: plan.maximumCandidateCount,
     candidateCount: plan.candidateCount,
@@ -547,7 +695,7 @@ export function computeThirdRoundPlanSha(plan) {
   return digest(JSON.stringify(thirdRoundPlanPayload(plan)));
 }
 
-function overlayCurrentReference(source, reference, currentAsset) {
+export function overlayCurrentReference(source, reference, currentAsset) {
   const overlay = {
     ...source,
     canonicalIpa: reference?.canonicalIpa ?? source.canonicalIpa,
@@ -580,9 +728,14 @@ export function buildThirdRoundPlan({
       entry,
     ]),
   );
+  const promotedSourceAssetIds = [
+    ...new Set(selection.promotedSourceAssetIds ?? []),
+  ].sort();
+  const promotedSourceIds = new Set(promotedSourceAssetIds);
   const candidates = [];
   const blocked = [];
   for (const baseSource of plan.sourceAssets) {
+    if (promotedSourceIds.has(baseSource.sourceAssetId)) continue;
     const pair = plan.candidates
       .filter((item) => item.sourceAssetId === baseSource.sourceAssetId)
       .map((item) => ({
@@ -629,7 +782,9 @@ export function buildThirdRoundPlan({
     version: REGENERATION_VERSION,
     generatedAt: new Date().toISOString(),
     basePlanSha256: plan.planSha256,
-    selectionSha256: computeSelectionDigest(selection),
+    selectionSha256:
+      selection.baseSelectionSha256 ?? computeSelectionDigest(selection),
+    promotedSourceAssetIds,
     baseCandidateCount: plan.candidates.length,
     maximumCandidateCount: MAX_REGENERATION_CANDIDATE_COUNT,
     candidateCount: candidates.length,
@@ -674,10 +829,31 @@ export function assertThirdRoundPlan(
   if (thirdPlan.basePlanSha256 !== plan.planSha256) {
     throw new Error("Third-round plan was built from a different base plan");
   }
-  if (thirdPlan.selectionSha256 !== computeSelectionDigest(selection)) {
+  const selectionAnchor =
+    selection.thirdPlanInputSelectionSha256 ??
+    selection.baseSelectionSha256 ??
+    computeSelectionDigest(selection);
+  if (thirdPlan.selectionSha256 !== selectionAnchor) {
     throw new Error(
       "Third-round plan was built from different selection results",
     );
+  }
+  const thirdPromoted = new Set(thirdPlan.promotedSourceAssetIds ?? []);
+  const selectionPromoted = new Set(selection.promotedSourceAssetIds ?? []);
+  const thirdCandidateSources = new Set(
+    thirdPlan.candidates.map((candidate) => candidate.sourceAssetId),
+  );
+  if (
+    [...thirdPromoted].some(
+      (sourceAssetId) => !selectionPromoted.has(sourceAssetId),
+    ) ||
+    [...selectionPromoted].some(
+      (sourceAssetId) =>
+        !thirdPromoted.has(sourceAssetId) &&
+        !thirdCandidateSources.has(sourceAssetId),
+    )
+  ) {
+    throw new Error("Third-round promoted-source set changed");
   }
   if (thirdPlan.paidCallsMade !== false) {
     throw new Error("Third-round planning must never make paid calls");
@@ -717,7 +893,11 @@ export function assertThirdRoundPlan(
     if (candidate.generationRound !== 3) {
       throw new Error("Third-round plan contains a non-C candidate");
     }
-    if (candidate.configDigest !== computeCandidateConfigDigest(candidate)) {
+    if (
+      candidate.ttsConfigDigest !==
+        computeCandidateTtsConfigDigest(candidate) ||
+      candidate.configDigest !== computeCandidateConfigDigest(candidate)
+    ) {
       throw new Error(
         `Candidate config digest changed: ${candidate.candidateId}`,
       );
@@ -742,15 +922,261 @@ export function isGeneratedCandidateCacheReusable({
   );
 }
 
+export function withCurrentCandidateAuditContext(candidate, source) {
+  const current = attachCandidateDigests(
+    {
+      ...candidate,
+      canonicalIpa: source.canonicalIpa,
+      sourceSha256: source.sourceSha256,
+    },
+    source,
+  );
+  if (candidate.generationRound === 3) {
+    for (const [field, expected] of [
+      ["sourceSha256", current.sourceSha256],
+      ["referenceDigest", current.referenceDigest],
+      ["configDigest", current.configDigest],
+    ]) {
+      if (candidate[field] !== expected) {
+        throw new Error(
+          `Third candidate ${candidate.candidateId} has stale ${field}`,
+        );
+      }
+    }
+  }
+  return current;
+}
+
+export function bindGeneratedCandidateHistory({
+  candidate,
+  historyRows,
+  actualAudioSha256,
+}) {
+  if (!actualAudioSha256) return null;
+  const expectedTtsDigest = computeCandidateTtsConfigDigest(candidate);
+  const matching = [...historyRows].reverse().find((row) => {
+    if (
+      row?.candidateId !== candidate.candidateId ||
+      row?.candidateSha256 !== actualAudioSha256 ||
+      computeCandidateTtsConfigDigest(row) !== expectedTtsDigest
+    ) {
+      return false;
+    }
+    if (candidate.generationRound !== 3) return true;
+    return (
+      row.sourceSha256 === candidate.sourceSha256 &&
+      row.referenceDigest === candidate.referenceDigest &&
+      row.configDigest === candidate.configDigest
+    );
+  });
+  if (!matching) return null;
+  return {
+    ...matching,
+    ...candidate,
+    candidateSha256: actualAudioSha256,
+    relativePath: matching.relativePath,
+    characterCost: matching.characterCost ?? null,
+    requestIdFingerprint: matching.requestIdFingerprint ?? null,
+    pronunciationDictionaryLocators:
+      matching.pronunciationDictionaryLocators ?? [],
+    generatedAt: matching.generatedAt,
+    status: "generated",
+    ttsConfigDigest: expectedTtsDigest,
+    auditContextMigrated:
+      candidate.generationRound !== 3 &&
+      (matching.sourceSha256 !== candidate.sourceSha256 ||
+        matching.referenceDigest !== candidate.referenceDigest ||
+        matching.configDigest !== candidate.configDigest),
+  };
+}
+
+export function bindGeneratedCandidateHistories({
+  plannedCandidates,
+  historyRows,
+  actualAudioShaByCandidateId,
+  excludedSourceAssetIds = new Set(),
+}) {
+  const byId = new Map();
+  for (const row of historyRows) {
+    const values = byId.get(row.candidateId) ?? [];
+    values.push(row);
+    byId.set(row.candidateId, values);
+  }
+  const bound = [];
+  const issues = [];
+  for (const candidate of plannedCandidates) {
+    if (excludedSourceAssetIds.has(candidate.sourceAssetId)) continue;
+    const rows = byId.get(candidate.candidateId) ?? [];
+    const actualAudioSha256 = actualAudioShaByCandidateId.get(
+      candidate.candidateId,
+    );
+    const resolved = bindGeneratedCandidateHistory({
+      candidate,
+      historyRows: rows,
+      actualAudioSha256,
+    });
+    if (resolved) bound.push(resolved);
+    else if (rows.length > 0 || actualAudioSha256) {
+      issues.push(`stale-generated-candidate:${candidate.candidateId}`);
+    }
+  }
+  return { bound, issues };
+}
+
+export function bindCandidateObservations({
+  candidates,
+  rows,
+  idField = "candidateId",
+  shaField = "candidateSha256",
+}) {
+  const rowsById = new Map();
+  for (const row of rows) {
+    const id = row?.[idField];
+    if (!id) continue;
+    const values = rowsById.get(id) ?? [];
+    values.push(row);
+    rowsById.set(id, values);
+  }
+  const byCandidateId = new Map();
+  const issues = [];
+  for (const candidate of candidates) {
+    const candidateRows = rowsById.get(candidate.candidateId) ?? [];
+    const current = [...candidateRows]
+      .reverse()
+      .find((row) => row?.[shaField] === candidate.candidateSha256);
+    if (current) byCandidateId.set(candidate.candidateId, current);
+    else if (candidateRows.length > 0) {
+      issues.push(`stale-observation:${candidate.candidateId}`);
+    }
+  }
+  return { byCandidateId, issues };
+}
+
+export function validatePromotionLedger({
+  plan,
+  ledger,
+  generatedHistory,
+  actualAudioShaByCandidateId,
+  formalShaByPath,
+  postProcessingLineageBySourceAssetId = new Map(),
+  additionalPlannedCandidates = [],
+}) {
+  if (!ledger) {
+    return {
+      version: 2,
+      generatedAt: null,
+      replacementCount: 0,
+      warning:
+        "Machine-replaced candidates still require human auditory confirmation.",
+      replacements: [],
+    };
+  }
+  const sourceById = new Map(
+    plan.sourceAssets.map((source) => [source.sourceAssetId, source]),
+  );
+  const candidateById = new Map(
+    [...plan.candidates, ...additionalPlannedCandidates].map((candidate) => [
+      candidate.candidateId,
+      candidate,
+    ]),
+  );
+  const seenSources = new Set();
+  const replacements = ledger.replacements.map((replacement) => {
+    const source = sourceById.get(replacement.sourceAssetId);
+    const candidate = candidateById.get(replacement.candidateId);
+    if (
+      !source ||
+      !candidate ||
+      candidate.sourceAssetId !== source.sourceAssetId
+    ) {
+      throw new Error(
+        `Promotion ledger identity mismatch: ${replacement.sourceAssetId}`,
+      );
+    }
+    if (seenSources.has(source.sourceAssetId)) {
+      throw new Error(`Duplicate promoted source: ${source.sourceAssetId}`);
+    }
+    seenSources.add(source.sourceAssetId);
+    const bound = bindGeneratedCandidateHistory({
+      candidate,
+      historyRows: generatedHistory.filter(
+        (row) => row.candidateId === candidate.candidateId,
+      ),
+      actualAudioSha256: actualAudioShaByCandidateId.get(candidate.candidateId),
+    });
+    const lineage = postProcessingLineageBySourceAssetId.get(
+      source.sourceAssetId,
+    );
+    const directFormal = source.sourceSha256 === bound?.candidateSha256;
+    const validatedPostProcessing = Boolean(
+      lineage &&
+        lineage.sourceSha256 === bound?.candidateSha256 &&
+        lineage.candidateSha256 === source.sourceSha256 &&
+        lineage.desktopPath === source.desktopPath &&
+        lineage.browserPath === source.browserPath,
+    );
+    if (
+      !bound ||
+      (!directFormal && !validatedPostProcessing) ||
+      replacement.newSha256 !== bound.candidateSha256 ||
+      formalShaByPath.get(source.desktopPath) !== source.sourceSha256 ||
+      formalShaByPath.get(source.browserPath) !== source.sourceSha256
+    ) {
+      throw new Error(
+        `Promoted candidate/formal SHA mismatch: ${source.sourceAssetId}`,
+      );
+    }
+    return {
+      ...replacement,
+      newSha256: bound.candidateSha256,
+      status: "already-promoted-pending-human",
+      currentFormalSha256: source.sourceSha256,
+      postProcessingLineageValidated: validatedPostProcessing,
+    };
+  });
+  if (ledger.replacementCount !== replacements.length) {
+    throw new Error("Promotion ledger replacement count changed");
+  }
+  return {
+    ...ledger,
+    version: 2,
+    replacementCount: replacements.length,
+    replacements,
+  };
+}
+
+export function automaticSelectionReferenceIssues(source) {
+  const issues = [];
+  if (
+    !["two-source-confirmed", "variant-confirmed"].includes(
+      source?.referenceStatus,
+    )
+  ) {
+    issues.push("reference-not-confirmed");
+  }
+  if (independentReferenceSourceCount(source ?? {}) < 2) {
+    issues.push("reference-independent-sources-below-two");
+  }
+  if (hasRelationshipIssues(source?.relationshipIssues)) {
+    issues.push("relationship-issues-present");
+  }
+  return issues;
+}
+
+export function computeObservationDigest(value) {
+  return digest(JSON.stringify(value ?? null));
+}
+
 export function evaluateCandidate({
   candidate,
+  source,
   signal,
   whisper,
   azure,
   scribe,
   azurePronunciation,
 }) {
-  const reasons = [];
+  const reasons = [...automaticSelectionReferenceIssues(source)];
   if (!signal?.ok || (signal?.issues?.length ?? 0) > 0)
     reasons.push("signal-failed");
   for (const [listener, observation] of [

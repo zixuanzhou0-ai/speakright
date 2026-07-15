@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 
 import { execFile } from "node:child_process";
+import { randomUUID } from "node:crypto";
 import {
   appendFileSync,
   existsSync,
   mkdirSync,
+  readdirSync,
   readFileSync,
   renameSync,
   rmSync,
@@ -12,6 +14,7 @@ import {
 } from "node:fs";
 import path from "node:path";
 import { promisify } from "node:util";
+import { atomicPromoteBatch } from "./lib/atomic-audio-promotion.mjs";
 import { assessAzurePronunciation } from "./lib/azure-pronunciation-client.mjs";
 import { recognizeAzureWordBlind } from "./lib/azure-stt-client.mjs";
 import {
@@ -19,13 +22,25 @@ import {
   normalizeComparableEnglishIpa,
 } from "./lib/cmudict-reference.mjs";
 import {
+  archiveElevenLabsPronunciationDictionary,
   createElevenLabsPronunciationDictionary,
   fetchElevenLabsModels,
   fetchElevenLabsSubscription,
   fetchElevenLabsVoice,
+  listElevenLabsPronunciationDictionaries,
   synthesizeElevenLabsCandidate,
   transcribeElevenLabsScribe,
 } from "./lib/elevenlabs-audio-clients.mjs";
+import {
+  assertDictionaryLifecycleClear,
+  assertGeneratedDictionaryBinding,
+  assertThirdRoundDictionaryPlan,
+  buildThirdRoundDictionaryPlan,
+} from "./lib/elevenlabs-dictionary-lifecycle-core.mjs";
+import {
+  cleanupTemporaryDictionaries,
+  withTemporaryPronunciationDictionaries,
+} from "./lib/elevenlabs-dictionary-lifecycle-workflow.mjs";
 import {
   classifyBlindTranscript,
   WORD_AUDIT_OUTPUT_NAME,
@@ -33,16 +48,24 @@ import {
 import {
   assertPromotionAllowed,
   assertRegenerationPlan,
+  assertSelectionRecord,
   assertThirdRoundPlan,
+  bindCandidateObservations,
+  bindGeneratedCandidateHistories,
   buildRegenerationPlan,
+  buildSelectionRecord,
   buildThirdRoundPlan,
+  computeObservationDigest,
   ELEVENLABS_SAFETY_RESERVE,
   EXPECTED_FIRST_ROUND_CANDIDATE_COUNT,
   EXPECTED_REGENERATION_ASSET_COUNT,
   evaluateCandidate,
-  isGeneratedCandidateCacheReusable,
   MAX_REGENERATION_CANDIDATE_COUNT,
+  overlayCurrentReference,
+  runFailStopPool,
   selectCandidateForAsset,
+  validatePromotionLedger,
+  withCurrentCandidateAuditContext,
 } from "./lib/phoneme-word-regeneration-core.mjs";
 import {
   redactSecrets,
@@ -72,6 +95,15 @@ const scribeBlindPath = path.join(analysisRoot, "scribe-v2.jsonl");
 const selectionPath = path.join(regenerationRoot, "candidate-selection.json");
 const promotionPath = path.join(regenerationRoot, "promotion-ledger.json");
 const thirdRoundPlanPath = path.join(regenerationRoot, "third-round-plan.json");
+const dictionaryPlanPath = path.join(regenerationRoot, "dictionary-plan.json");
+const dictionaryLifecyclePath = path.join(
+  regenerationRoot,
+  "dictionary-lifecycle.json",
+);
+const dictionaryLifecycleEventsPath = path.join(
+  regenerationRoot,
+  "dictionary-lifecycle-events.jsonl",
+);
 const fixedAzureRegion = "switzerlandnorth";
 
 function parseArgs(values) {
@@ -127,6 +159,16 @@ function requireJson(filePath, instruction) {
   return readJson(filePath);
 }
 
+function loadDictionaryLifecycleRegistry() {
+  return existsSync(dictionaryLifecyclePath)
+    ? readJson(dictionaryLifecyclePath)
+    : null;
+}
+
+const persistDictionaryLifecycleRegistry = (registry) =>
+  writeJson(dictionaryLifecyclePath, registry);
+const appendDictionaryLifecycleEvent = (event) =>
+  appendJsonl(dictionaryLifecycleEventsPath, event);
 function readManifests() {
   return Object.fromEntries(
     ["es-ES", "fr-FR", "ru-RU"].map((languageId) => [
@@ -149,15 +191,6 @@ function loadSignalBySha() {
   return new Map(readJsonl(filePath).map((row) => [row.sha256, row.signal]));
 }
 
-function countBy(values, selector) {
-  const result = {};
-  for (const value of values) {
-    const key = selector(value) ?? "unknown";
-    result[key] = (result[key] ?? 0) + 1;
-  }
-  return result;
-}
-
 async function withRetry(worker) {
   for (let attempt = 0; attempt < 4; attempt += 1) {
     try {
@@ -172,18 +205,6 @@ async function withRetry(worker) {
     }
   }
   throw new Error("Retry loop exhausted");
-}
-
-async function runPool(items, concurrency, worker) {
-  let cursor = 0;
-  await Promise.all(
-    Array.from({ length: concurrency }, async () => {
-      while (cursor < items.length) {
-        const index = cursor++;
-        await worker(items[index], index);
-      }
-    }),
-  );
 }
 
 function normalizeLabel(value) {
@@ -237,6 +258,65 @@ function inspectVoiceMetadata(source, metadata, modelIds) {
   };
 }
 
+function offlinePlanCommand() {
+  const plan = buildRegenerationPlan({
+    inventory: requireJson(
+      path.join(auditRoot, "inventory.json"),
+      "Run the word audit inventory first.",
+    ),
+    consensus: requireJson(
+      path.join(auditRoot, "machine-consensus.json"),
+      "Run machine consensus first.",
+    ),
+    gold: requireJson(
+      path.join(auditRoot, "gold-pronunciations.json"),
+      "Run pronunciation references first.",
+    ),
+    manifests: readManifests(),
+    signalBySha: loadSignalBySha(),
+  });
+  const offlinePlan = {
+    ...plan,
+    credentialSource: "not-read-offline",
+    subscription: null,
+    voiceChecks: [],
+    allVoicesAvailable: false,
+    thirdRoundModelAvailable: false,
+    estimatedScribeMinutesFirstRound: Number(
+      ((plan.sourceDurationSeconds * 2) / 60).toFixed(3),
+    ),
+    estimatedScribeMinutesMaximum: Number(
+      ((plan.sourceDurationSeconds * 3) / 60).toFixed(3),
+    ),
+    remainingAfterFirstRound: null,
+    safetyReserveSatisfied: false,
+    paidCallsMade: false,
+    networkRequestsMade: 0,
+    generationLocked: true,
+  };
+  writeJson(planPath, offlinePlan);
+  console.log(
+    JSON.stringify(
+      {
+        planPath: path.relative(root, planPath),
+        planSha256: offlinePlan.planSha256,
+        sourceAssets: offlinePlan.sourceAssetCount,
+        firstRoundCandidates: offlinePlan.firstRoundCandidateCount,
+        byLanguage: offlinePlan.byLanguage,
+        byVoice: offlinePlan.byVoice,
+        allVoicesAvailable: false,
+        thirdRoundModelAvailable: false,
+        safetyReserveSatisfied: false,
+        generationLocked: true,
+        networkRequestsMade: 0,
+        paidCallsMade: false,
+      },
+      null,
+      2,
+    ),
+  );
+}
+
 async function planCommand() {
   const plan = buildRegenerationPlan({
     inventory: requireJson(
@@ -272,7 +352,7 @@ async function planCommand() {
     ).values(),
   ];
   const voiceChecks = [];
-  await runPool(voices, 2, async (source) => {
+  await runFailStopPool(voices, 2, async (source) => {
     const metadata = await withRetry(() =>
       fetchElevenLabsVoice(credential.apiKey, source.voiceId),
     );
@@ -291,6 +371,7 @@ async function planCommand() {
     subscription,
     voiceChecks,
     allVoicesAvailable: voiceChecks.every((check) => check.passed),
+    thirdRoundModelAvailable: modelIds.has("eleven_v3"),
     estimatedScribeMinutesFirstRound: Number(
       ((plan.sourceDurationSeconds * 2) / 60).toFixed(3),
     ),
@@ -322,6 +403,7 @@ async function planCommand() {
         estimatedScribeMinutesFirstRound:
           dryRun.estimatedScribeMinutesFirstRound,
         allVoicesAvailable: dryRun.allVoicesAvailable,
+        thirdRoundModelAvailable: dryRun.thirdRoundModelAvailable,
         voiceChecks,
         paidCallsMade: false,
       }),
@@ -372,45 +454,257 @@ function loadCurrentThirdPlanInputs(plan) {
 
 const candidateAudioPath = (candidateId) =>
   path.join(audioRoot, `${candidateId}.mp3`);
-const generatedById = () =>
-  new Map(readJsonl(generatedPath).map((row) => [row.candidateId, row]));
+const generatedHistoryRows = () => readJsonl(generatedPath);
 
-async function generateCandidates(candidates) {
+function actualCandidateShaById(candidateIds) {
+  return new Map(
+    [...candidateIds].map((candidateId) => {
+      const audioPath = candidateAudioPath(candidateId);
+      return [
+        candidateId,
+        existsSync(audioPath) ? sha256File(audioPath) : null,
+      ];
+    }),
+  );
+}
+
+function formalShaByPath(plan) {
+  return new Map(
+    plan.sourceAssets.flatMap((source) =>
+      [source.desktopPath, source.browserPath].map((relativePath) => {
+        const absolutePath = path.resolve(root, relativePath);
+        return [
+          relativePath,
+          existsSync(absolutePath) ? sha256File(absolutePath) : null,
+        ];
+      }),
+    ),
+  );
+}
+
+function loadPostProcessingLineage() {
+  const lineageRoot = path.join(auditRoot, "loudness-normalization-v2");
+  const result = new Map();
+  if (!existsSync(lineageRoot)) return result;
+  const pending = [lineageRoot];
+  while (pending.length > 0) {
+    const directory = pending.pop();
+    for (const entry of readdirSync(directory, { withFileTypes: true })) {
+      const absolutePath = path.join(directory, entry.name);
+      if (entry.isDirectory()) {
+        pending.push(absolutePath);
+        continue;
+      }
+      if (!/^journal-completed-[a-f0-9]+\.json$/u.test(entry.name)) continue;
+      const journal = readJson(absolutePath);
+      if (
+        journal.status !== "completed" ||
+        journal.formalAssetsModified !== true
+      )
+        continue;
+      for (const item of journal.entries ?? []) {
+        const candidatePath = path.resolve(root, item.candidatePath);
+        if (
+          !existsSync(candidatePath) ||
+          sha256File(candidatePath) !== item.candidateSha256
+        ) {
+          throw new Error(
+            `Completed post-processing lineage candidate changed: ${item.assetId}`,
+          );
+        }
+        const value = {
+          sourceSha256: item.sourceSha256,
+          candidateSha256: item.candidateSha256,
+          desktopPath: item.desktop.targetPath.replaceAll("\\", "/"),
+          browserPath: item.browser.targetPath.replaceAll("\\", "/"),
+        };
+        const prior = result.get(item.assetId);
+        if (prior && JSON.stringify(prior) !== JSON.stringify(value)) {
+          throw new Error(
+            `Conflicting post-processing lineage: ${item.assetId}`,
+          );
+        }
+        result.set(item.assetId, value);
+      }
+    }
+  }
+  return result;
+}
+
+function loadPromotionState(plan, additionalPlannedCandidates = []) {
+  const historyRows = generatedHistoryRows();
+  const candidateIds = new Set(
+    [...plan.candidates, ...additionalPlannedCandidates].map(
+      (item) => item.candidateId,
+    ),
+  );
+  return validatePromotionLedger({
+    plan,
+    ledger: existsSync(promotionPath) ? readJson(promotionPath) : null,
+    generatedHistory: historyRows,
+    actualAudioShaByCandidateId: actualCandidateShaById(candidateIds),
+    formalShaByPath: formalShaByPath(plan),
+    postProcessingLineageBySourceAssetId: loadPostProcessingLineage(),
+    additionalPlannedCandidates,
+  });
+}
+
+function currentSourceById(
+  plan,
+  currentInputs = loadCurrentThirdPlanInputs(plan),
+) {
+  const goldByKey = new Map(
+    (currentInputs.gold.entries ?? []).map((entry) => [
+      `${entry.languageId}\u0000${String(entry.text)
+        .normalize("NFKC")
+        .toLocaleLowerCase(entry.languageId)}`,
+      entry,
+    ]),
+  );
+  return new Map(
+    plan.sourceAssets.map((source) => [
+      source.sourceAssetId,
+      overlayCurrentReference(
+        source,
+        goldByKey.get(
+          `${source.languageId}\u0000${String(source.text)
+            .normalize("NFKC")
+            .toLocaleLowerCase(source.languageId)}`,
+        ),
+        currentInputs.currentAssetById.get(source.sourceAssetId),
+      ),
+    ]),
+  );
+}
+
+function bindActiveGeneratedCandidates({ plan, thirdPlan = null }) {
+  const sources = currentSourceById(plan);
+  const promotion = loadPromotionState(plan, thirdPlan?.candidates ?? []);
+  const promotedSourceAssetIds = new Set(
+    promotion.replacements.map((item) => item.sourceAssetId),
+  );
+  const firstRound = plan.candidates.map((candidate) =>
+    withCurrentCandidateAuditContext(
+      candidate,
+      sources.get(candidate.sourceAssetId),
+    ),
+  );
+  const thirdRound = (thirdPlan?.candidates ?? []).map((candidate) =>
+    withCurrentCandidateAuditContext(
+      candidate,
+      sources.get(candidate.sourceAssetId),
+    ),
+  );
+  const plannedCandidates = [...firstRound, ...thirdRound];
+  const bound = bindGeneratedCandidateHistories({
+    plannedCandidates,
+    historyRows: generatedHistoryRows(),
+    actualAudioShaByCandidateId: actualCandidateShaById(
+      new Set(plannedCandidates.map((item) => item.candidateId)),
+    ),
+    excludedSourceAssetIds: promotedSourceAssetIds,
+  });
+  return {
+    ...bound,
+    sources,
+    promotion,
+    promotedSourceAssetIds,
+    plannedCandidates,
+  };
+}
+
+function loadValidatedThirdPlan(plan) {
+  if (!existsSync(thirdRoundPlanPath)) return null;
+  const selection = requireJson(
+    selectionPath,
+    "Candidate selection is required to validate the third-round plan.",
+  );
+  const thirdPlan = requireJson(
+    thirdRoundPlanPath,
+    "Third-round plan is missing.",
+  );
+  const promotion = loadPromotionState(plan, thirdPlan.candidates ?? []);
+  assertSelectionRecord(selection, {
+    basePlanSha256: plan.planSha256,
+    thirdPlanSha256: selection.thirdPlanSha256 ?? null,
+    promotedSourceAssetIds: selection.promotedSourceAssetIds ?? [],
+  });
+  const currentlyPromoted = new Set(
+    promotion.replacements.map((item) => item.sourceAssetId),
+  );
+  if (
+    (selection.promotedSourceAssetIds ?? []).some(
+      (sourceAssetId) => !currentlyPromoted.has(sourceAssetId),
+    )
+  ) {
+    throw new Error("Selection references a promotion absent from the ledger");
+  }
+  return assertThirdRoundPlan(thirdPlan, {
+    plan,
+    selection,
+    ...loadCurrentThirdPlanInputs(plan),
+  });
+}
+
+const EXPECTED_THIRD_ROUND_RULES = Object.freeze({
+  "en-US": 11,
+  "fr-FR": 96,
+});
+
+function loadValidatedDictionaryPlan(thirdPlan) {
+  return assertThirdRoundDictionaryPlan(
+    requireJson(
+      dictionaryPlanPath,
+      "Run the pure third-plan command and review its dictionary plan before round-C generation.",
+    ),
+    thirdPlan,
+    { expectedRulesByLanguage: EXPECTED_THIRD_ROUND_RULES },
+  );
+}
+
+function pendingGeneratedCandidates(candidates) {
+  const binding = bindGeneratedCandidateHistories({
+    plannedCandidates: candidates,
+    historyRows: generatedHistoryRows(),
+    actualAudioShaByCandidateId: actualCandidateShaById(
+      new Set(candidates.map((item) => item.candidateId)),
+    ),
+  });
+  const existing = new Set(
+    binding.bound.flatMap((candidate) =>
+      candidate.generationRound === 3 &&
+      !candidate.pronunciationDictionaryLifecycle
+        ? []
+        : [candidate.candidateId],
+    ),
+  );
+  return candidates.filter((candidate) => !existing.has(candidate.candidateId));
+}
+
+async function generateCandidates(
+  candidates,
+  { dictionaryBindingByLanguage = null } = {},
+) {
   const { value: credential, source: credentialSource } =
     await readSpeakRightCredential("elevenlabs");
   if (!credential?.apiKey) throw new Error("ElevenLabs credential is missing");
-  const existing = generatedById();
-  const pending = candidates.filter((candidate) => {
-    const cached = existing.get(candidate.candidateId);
-    return !isGeneratedCandidateCacheReusable({
-      cached,
-      candidate,
-      audioExists: existsSync(candidateAudioPath(candidate.candidateId)),
-    });
-  });
-  await runPool(pending, 2, async (candidate, index) => {
-    let locators = [];
-    if (candidate.generationRound === 3) {
-      const dictionary = await withRetry(() =>
-        createElevenLabsPronunciationDictionary({
-          apiKey: credential.apiKey,
-          candidate,
-        }),
+  const pending = pendingGeneratedCandidates(candidates);
+  await runFailStopPool(pending, 2, async (candidate, index) => {
+    const lifecycleBinding =
+      candidate.generationRound === 3
+        ? dictionaryBindingByLanguage?.get(candidate.languageId)
+        : null;
+    if (candidate.generationRound === 3 && !lifecycleBinding) {
+      throw new Error(
+        `Round-C candidate has no shared dictionary binding: ${candidate.candidateId}`,
       );
-      locators = [
-        {
-          pronunciation_dictionary_id: dictionary.id,
-          version_id: dictionary.versionId,
-        },
-      ];
     }
-    const result = await withRetry(() =>
-      synthesizeElevenLabsCandidate({
-        apiKey: credential.apiKey,
-        candidate,
-        pronunciationDictionaryLocators: locators,
-      }),
-    );
+    const locators = lifecycleBinding ? [lifecycleBinding.locator] : [];
+    const result = await synthesizeElevenLabsCandidate({
+      apiKey: credential.apiKey,
+      candidate,
+      pronunciationDictionaryLocators: locators,
+    });
     const outputPath = candidateAudioPath(candidate.candidateId);
     mkdirSync(path.dirname(outputPath), { recursive: true });
     const temporary = `${outputPath}.tmp`;
@@ -426,12 +720,14 @@ async function generateCandidates(candidates) {
         ? sha256Bytes(result.requestId)
         : null,
       pronunciationDictionaryLocators: locators,
+      ...(lifecycleBinding
+        ? { pronunciationDictionaryLifecycle: lifecycleBinding }
+        : {}),
       credentialSource,
       generatedAt: new Date().toISOString(),
       status: "generated",
     };
     appendJsonl(generatedPath, row);
-    existing.set(candidate.candidateId, row);
     if ((index + 1) % 20 === 0 || index + 1 === pending.length)
       console.log(`Generated ${index + 1}/${pending.length}`);
   });
@@ -445,23 +741,46 @@ function thirdPlanCommand() {
     selectionPath,
     "Run A/B selection before planning the third round.",
   );
+  const promotion = loadPromotionState(plan);
+  assertSelectionRecord(selection, {
+    basePlanSha256: plan.planSha256,
+    thirdPlanSha256: null,
+    promotedSourceAssetIds: promotion.replacements.map(
+      (item) => item.sourceAssetId,
+    ),
+  });
   const currentInputs = loadCurrentThirdPlanInputs(plan);
   const thirdPlan = buildThirdRoundPlan({
     plan,
     selection,
     ...currentInputs,
   });
+  const dictionaryPlan = assertThirdRoundDictionaryPlan(
+    buildThirdRoundDictionaryPlan(thirdPlan),
+    thirdPlan,
+    { expectedRulesByLanguage: EXPECTED_THIRD_ROUND_RULES },
+  );
   writeJson(thirdRoundPlanPath, thirdPlan);
+  writeJson(dictionaryPlanPath, dictionaryPlan);
   console.log(
     JSON.stringify(
       {
         thirdRoundPlanPath: path.relative(root, thirdRoundPlanPath),
+        dictionaryPlanPath: path.relative(root, dictionaryPlanPath),
         basePlanSha256: thirdPlan.basePlanSha256,
         thirdPlanSha256: thirdPlan.thirdPlanSha256,
         candidateCount: thirdPlan.candidateCount,
         blockedCount: thirdPlan.blockedCount,
         characterCount: thirdPlan.characterCount,
         sourceDurationSeconds: thirdPlan.sourceDurationSeconds,
+        dictionaryCount: dictionaryPlan.dictionaryCount,
+        dictionaryRuleCounts: Object.fromEntries(
+          dictionaryPlan.dictionaries.map((dictionary) => [
+            dictionary.languageId,
+            dictionary.ruleCount,
+          ]),
+        ),
+        dictionaryPlanSha256: dictionaryPlan.dictionaryPlanSha256,
         safetyReserve: thirdPlan.safetyReserve,
         paidCallsMade: false,
       },
@@ -482,14 +801,35 @@ async function generateCommand(parsed) {
       throw new Error("The 5,000-credit safety reserve is not satisfied");
     if (plan.candidates.length !== EXPECTED_FIRST_ROUND_CANDIDATE_COUNT)
       throw new Error("First round must contain 832 candidates");
-    await generateCandidates(plan.candidates);
+    const promotion = loadPromotionState(plan);
+    const promoted = new Set(
+      promotion.replacements.map((item) => item.sourceAssetId),
+    );
+    await generateCandidates(
+      plan.candidates.filter(
+        (candidate) => !promoted.has(candidate.sourceAssetId),
+      ),
+    );
     return;
   }
   if (round !== 3) throw new Error("Only round 1 or 3 is allowed");
+  if (plan.thirdRoundModelAvailable !== true) {
+    throw new Error(
+      "Round-C generation requires a reviewed network plan with eleven_v3 available",
+    );
+  }
   const selection = requireJson(
     selectionPath,
     "Run A/B selection before the third round.",
   );
+  const promotion = loadPromotionState(plan);
+  assertSelectionRecord(selection, {
+    basePlanSha256: plan.planSha256,
+    thirdPlanSha256: null,
+    promotedSourceAssetIds: promotion.replacements.map(
+      (item) => item.sourceAssetId,
+    ),
+  });
   const currentInputs = loadCurrentThirdPlanInputs(plan);
   const thirdPlan = assertThirdRoundPlan(
     requireJson(
@@ -498,6 +838,7 @@ async function generateCommand(parsed) {
     ),
     { plan, selection, ...currentInputs },
   );
+  const dictionaryPlan = loadValidatedDictionaryPlan(thirdPlan);
   const expectedThirdPlanSha = parsed.valueFor("--third-plan-sha");
   if (
     !expectedThirdPlanSha ||
@@ -522,19 +863,59 @@ async function generateCommand(parsed) {
       "The exact third-round cost would violate the 5,000-credit safety reserve",
     );
   }
-  await generateCandidates(thirdPlan.candidates);
+  const pending = pendingGeneratedCandidates(thirdPlan.candidates);
+  const lifecycleClients = {
+    createDictionary: createElevenLabsPronunciationDictionary,
+    listDictionaries: listElevenLabsPronunciationDictionaries,
+    archiveDictionary: archiveElevenLabsPronunciationDictionary,
+  };
+  const registry = loadDictionaryLifecycleRegistry();
+  if (pending.length === 0) {
+    try {
+      assertDictionaryLifecycleClear(registry);
+    } catch {
+      const cleaned = await cleanupTemporaryDictionaries({
+        registry,
+        dictionaryPlan,
+        apiKey: credential.apiKey,
+        listDictionaries: lifecycleClients.listDictionaries,
+        archiveDictionary: lifecycleClients.archiveDictionary,
+        persistRegistry: persistDictionaryLifecycleRegistry,
+        appendEvent: appendDictionaryLifecycleEvent,
+        discoverPlannedNames: false,
+      });
+      persistDictionaryLifecycleRegistry(cleaned);
+      assertDictionaryLifecycleClear(cleaned);
+    }
+    return;
+  }
+  const lifecycle = await withTemporaryPronunciationDictionaries({
+    registry,
+    dictionaryPlan,
+    sessionId: randomUUID(),
+    apiKey: credential.apiKey,
+    clients: lifecycleClients,
+    persistRegistry: persistDictionaryLifecycleRegistry,
+    appendEvent: appendDictionaryLifecycleEvent,
+    worker: ({ bindingByLanguage }) =>
+      generateCandidates(pending, {
+        dictionaryBindingByLanguage: bindingByLanguage,
+      }),
+  });
+  persistDictionaryLifecycleRegistry(lifecycle.registry);
 }
 
 function buildCandidateInventory() {
   const plan = assertRegenerationPlan(
     requireJson(planPath, "Regeneration plan is missing"),
   );
-  const sourceById = new Map(
-    plan.sourceAssets.map((source) => [source.sourceAssetId, source]),
-  );
-  const generated = [...generatedById().values()].filter((candidate) =>
-    existsSync(candidateAudioPath(candidate.candidateId)),
-  );
+  const thirdPlan = loadValidatedThirdPlan(plan);
+  const state = bindActiveGeneratedCandidates({ plan, thirdPlan });
+  if (state.issues.length > 0) {
+    throw new Error(`Stale generated candidates: ${state.issues.join(", ")}`);
+  }
+  const sourceById = state.sources;
+  const generated = state.bound;
   const assets = generated.map((candidate) => {
     const source = sourceById.get(candidate.sourceAssetId);
     const audioPath = candidateAudioPath(candidate.candidateId);
@@ -678,9 +1059,12 @@ async function azureCommand(parsed) {
     "Azure candidate validation requires --confirm",
   );
   const plan = requirePlan(parsed);
-  const sourceById = new Map(
-    plan.sourceAssets.map((source) => [source.sourceAssetId, source]),
-  );
+  const thirdPlan = loadValidatedThirdPlan(plan);
+  const state = bindActiveGeneratedCandidates({ plan, thirdPlan });
+  if (state.issues.length > 0) {
+    throw new Error(`Stale generated candidates: ${state.issues.join(", ")}`);
+  }
+  const sourceById = state.sources;
   const { value: azure, source: credentialSource } =
     await readSpeakRightCredential("azure");
   if (
@@ -695,18 +1079,16 @@ async function azureCommand(parsed) {
   const existingPronunciation = new Map(
     readJsonl(azurePronunciationPath).map((row) => [row.candidateSha256, row]),
   );
-  const candidates = [...generatedById().values()];
-  await runPool(candidates, 2, async (candidate, index) => {
+  const candidates = state.bound;
+  await runFailStopPool(candidates, 2, async (candidate, index) => {
     const wavPath = await convertToAzureWav(candidate);
     if (!existingBlind.has(candidate.candidateSha256)) {
-      const blind = await withRetry(() =>
-        recognizeAzureWordBlind({
-          subscriptionKey: azure.subscriptionKey,
-          region: fixedAzureRegion,
-          languageId: candidate.languageId,
-          wavPath,
-        }),
-      );
+      const blind = await recognizeAzureWordBlind({
+        subscriptionKey: azure.subscriptionKey,
+        region: fixedAzureRegion,
+        languageId: candidate.languageId,
+        wavPath,
+      });
       appendJsonl(azureBlindPath, {
         version: 1,
         candidateId: candidate.candidateId,
@@ -729,16 +1111,14 @@ async function azureCommand(parsed) {
       candidate.languageId === "en-US" &&
       !existingPronunciation.has(candidate.candidateSha256)
     ) {
-      const result = await withRetry(() =>
-        assessAzurePronunciation({
-          subscriptionKey: azure.subscriptionKey,
-          region: fixedAzureRegion,
-          languageId: candidate.languageId,
-          referenceText: candidate.text,
-          wavPath,
-          role: "example-word",
-        }),
-      );
+      const result = await assessAzurePronunciation({
+        subscriptionKey: azure.subscriptionKey,
+        region: fixedAzureRegion,
+        languageId: candidate.languageId,
+        referenceText: candidate.text,
+        wavPath,
+        role: "example-word",
+      });
       const { rawResponse: _rawResponse, ...safeResult } = result;
       appendJsonl(azurePronunciationPath, {
         version: 1,
@@ -765,24 +1145,31 @@ async function scribeCommand(parsed) {
     "--confirm",
     "ElevenLabs Scribe validation requires --confirm",
   );
-  requirePlan(parsed);
+  const plan = requirePlan(parsed);
   const { value: credential, source: credentialSource } =
     await readSpeakRightCredential("elevenlabs");
   if (!credential?.apiKey) throw new Error("ElevenLabs credential is missing");
   const existing = new Map(
     readJsonl(scribeBlindPath).map((row) => [row.candidateSha256, row]),
   );
-  const candidates = [...generatedById().values()].filter(
+  const thirdPlan = loadValidatedThirdPlan(
+    assertRegenerationPlan(
+      requireJson(planPath, "Regeneration plan is missing"),
+    ),
+  );
+  const state = bindActiveGeneratedCandidates({ plan, thirdPlan });
+  if (state.issues.length > 0) {
+    throw new Error(`Stale generated candidates: ${state.issues.join(", ")}`);
+  }
+  const candidates = state.bound.filter(
     (candidate) => !existing.has(candidate.candidateSha256),
   );
-  await runPool(candidates, 2, async (candidate, index) => {
-    const result = await withRetry(() =>
-      transcribeElevenLabsScribe({
-        apiKey: credential.apiKey,
-        audioPath: candidateAudioPath(candidate.candidateId),
-        languageCode: candidate.languageCode,
-      }),
-    );
+  await runFailStopPool(candidates, 2, async (candidate, index) => {
+    const result = await transcribeElevenLabsScribe({
+      apiKey: credential.apiKey,
+      audioPath: candidateAudioPath(candidate.candidateId),
+      languageCode: candidate.languageCode,
+    });
     appendJsonl(scribeBlindPath, {
       version: 1,
       candidateId: candidate.candidateId,
@@ -807,35 +1194,43 @@ async function scribeCommand(parsed) {
 }
 
 function buildWhisperBlindRows(candidates) {
-  const rawById = new Map(
-    readJsonl(path.join(analysisRoot, "whisper.jsonl")).map((row) => [
-      row.assetId,
-      row,
-    ]),
-  );
-  return new Map(
-    candidates.map((candidate) => {
-      const raw = rawById.get(candidate.candidateId);
-      const heardText = raw?.whisper?.transcript ?? "";
-      return [
-        candidate.candidateId,
-        {
-          candidateId: candidate.candidateId,
-          candidateSha256: candidate.candidateSha256,
-          listener: "whisper-large-v3",
-          heardText,
-          outcome: raw
-            ? classify(candidate.text, heardText, candidate.languageId)
-            : "missing",
-          promptSent: false,
-          expectedWordSent: false,
-          answerLeakage: false,
-        },
-      ];
-    }),
-  );
+  const binding = bindCandidateObservations({
+    candidates,
+    rows: readJsonl(path.join(analysisRoot, "whisper.jsonl")),
+    idField: "assetId",
+    shaField: "sha256",
+  });
+  return {
+    issues: binding.issues,
+    byCandidateId: new Map(
+      candidates.flatMap((candidate) => {
+        const raw = binding.byCandidateId.get(candidate.candidateId);
+        if (!raw) return [];
+        const heardText = raw.whisper?.transcript ?? "";
+        return [
+          [
+            candidate.candidateId,
+            {
+              candidateId: candidate.candidateId,
+              candidateSha256: candidate.candidateSha256,
+              listener: "whisper-large-v3",
+              heardText,
+              outcome: classify(
+                candidate.text,
+                heardText,
+                candidate.languageId,
+              ),
+              promptSent: false,
+              expectedWordSent: false,
+              answerLeakage: false,
+              rawObservation: raw,
+            },
+          ],
+        ];
+      }),
+    ),
+  };
 }
-
 function median(values) {
   const sorted = values
     .filter(Number.isFinite)
@@ -879,129 +1274,213 @@ function signalDistance(source, signal, medians) {
   return Number((loudness + duration).toFixed(6));
 }
 
-function selectCommand() {
-  const plan = assertRegenerationPlan(
-    requireJson(planPath, "Regeneration plan is missing"),
+function loadThirdPlanForActiveCandidates(plan) {
+  const hasThirdRoundAudio = generatedHistoryRows().some(
+    (row) =>
+      row.generationRound === 3 &&
+      existsSync(candidateAudioPath(row.candidateId)),
   );
-  const candidates = [...generatedById().values()];
-  const sourceById = new Map(
-    plan.sourceAssets.map((source) => [source.sourceAssetId, source]),
+  return hasThirdRoundAudio ? loadValidatedThirdPlan(plan) : null;
+}
+
+function assertCurrentDictionaryLifecycle({ thirdPlan, state }) {
+  const registry = loadDictionaryLifecycleRegistry();
+  assertDictionaryLifecycleClear(registry);
+  const roundThreeCandidates = state.bound.filter(
+    (candidate) => candidate.generationRound === 3,
   );
-  const signalById = new Map(
-    readJsonl(path.join(analysisRoot, "signal.jsonl")).map((row) => [
-      row.assetId,
-      row.signal,
-    ]),
-  );
-  const whisperById = buildWhisperBlindRows(candidates);
-  const azureById = new Map(
-    readJsonl(azureBlindPath).map((row) => [row.candidateId, row]),
-  );
-  const scribeById = new Map(
-    readJsonl(scribeBlindPath).map((row) => [row.candidateId, row]),
-  );
-  const pronunciationById = new Map(
-    readJsonl(azurePronunciationPath).map((row) => [row.candidateId, row.gate]),
-  );
+  if (roundThreeCandidates.length === 0) return true;
+  if (!thirdPlan) {
+    throw new Error(
+      "Bound round-C candidates require a validated third-round plan",
+    );
+  }
+  const dictionaryPlan = loadValidatedDictionaryPlan(thirdPlan);
+  for (const candidate of roundThreeCandidates) {
+    assertGeneratedDictionaryBinding({
+      candidate,
+      generated: candidate,
+      dictionaryPlan,
+      registry,
+    });
+  }
+  return true;
+}
+function buildCurrentSelection(plan) {
+  const thirdPlan = loadThirdPlanForActiveCandidates(plan);
+  const state = bindActiveGeneratedCandidates({ plan, thirdPlan });
+  assertCurrentDictionaryLifecycle({ thirdPlan, state });
+  if (state.issues.length > 0) {
+    throw new Error(`Stale generated candidates: ${state.issues.join(", ")}`);
+  }
+  const candidates = state.bound;
+  const signalBinding = bindCandidateObservations({
+    candidates,
+    rows: readJsonl(path.join(analysisRoot, "signal.jsonl")),
+    idField: "assetId",
+    shaField: "sha256",
+  });
+  const whisperBinding = buildWhisperBlindRows(candidates);
+  const azureBinding = bindCandidateObservations({
+    candidates,
+    rows: readJsonl(azureBlindPath),
+  });
+  const scribeBinding = bindCandidateObservations({
+    candidates,
+    rows: readJsonl(scribeBlindPath),
+  });
+  const pronunciationBinding = bindCandidateObservations({
+    candidates: candidates.filter(
+      (candidate) => candidate.languageId === "en-US",
+    ),
+    rows: readJsonl(azurePronunciationPath),
+  });
+  const staleEvidenceIssues = [
+    ...signalBinding.issues,
+    ...whisperBinding.issues,
+    ...azureBinding.issues,
+    ...scribeBinding.issues,
+    ...pronunciationBinding.issues,
+  ];
+  if (staleEvidenceIssues.length > 0) {
+    throw new Error(
+      `Stale candidate observations: ${staleEvidenceIssues.join(", ")}`,
+    );
+  }
   const medians = voiceMedians(plan);
   const results = candidates.map((candidate) => {
-    const source = sourceById.get(candidate.sourceAssetId);
-    const signal = signalById.get(candidate.candidateId);
+    const source = state.sources.get(candidate.sourceAssetId);
+    const signalRow = signalBinding.byCandidateId.get(candidate.candidateId);
+    const whisper = whisperBinding.byCandidateId.get(candidate.candidateId);
+    const azure = azureBinding.byCandidateId.get(candidate.candidateId);
+    const scribe = scribeBinding.byCandidateId.get(candidate.candidateId);
+    const pronunciationRow = pronunciationBinding.byCandidateId.get(
+      candidate.candidateId,
+    );
+    const azurePronunciation = pronunciationRow?.result
+      ? englishPronunciationSummary(source, pronunciationRow.result)
+      : null;
     const result = evaluateCandidate({
       candidate,
-      signal: signal
+      source,
+      signal: signalRow?.signal
         ? {
-            ...signal,
-            distanceFromVoiceMedian: signalDistance(source, signal, medians),
+            ...signalRow.signal,
+            distanceFromVoiceMedian: signalDistance(
+              source,
+              signalRow.signal,
+              medians,
+            ),
           }
         : null,
-      whisper: whisperById.get(candidate.candidateId),
-      azure: azureById.get(candidate.candidateId),
-      scribe: scribeById.get(candidate.candidateId),
-      azurePronunciation: pronunciationById.get(candidate.candidateId),
+      whisper,
+      azure,
+      scribe,
+      azurePronunciation,
     });
-    if ((source.relationshipIssues?.length ?? 0) > 0) {
-      result.status = "machine-failed";
-      result.reasons.push(
-        ...source.relationshipIssues.map((issue) => `relationship-${issue}`),
-      );
-    }
-    return { ...candidate, ...result };
+    return {
+      ...candidate,
+      ...result,
+      evidenceSha256: {
+        signalSha256: computeObservationDigest(signalRow),
+        whisperSha256: computeObservationDigest(whisper?.rawObservation),
+        azureSha256: computeObservationDigest(azure),
+        scribeSha256: computeObservationDigest(scribe),
+        azurePronunciationSha256: computeObservationDigest(pronunciationRow),
+      },
+    };
   });
-  const selected = plan.sourceAssets.flatMap((source) => {
+  const selected = [...state.sources.values()].flatMap((source) => {
+    if (state.promotedSourceAssetIds.has(source.sourceAssetId)) return [];
     const choice = selectCandidateForAsset(
       results.filter((result) => result.sourceAssetId === source.sourceAssetId),
     );
     return choice ? [choice] : [];
   });
-  writeJson(selectionPath, {
-    version: 1,
-    generatedAt: new Date().toISOString(),
-    generatedCandidateCount: candidates.length,
-    passedCandidateCount: results.filter(
-      (item) => item.status === "machine-passed",
-    ).length,
-    failedCandidateCount: results.filter(
-      (item) => item.status === "machine-failed",
-    ).length,
-    selectedAssetCount: selected.length,
-    unresolvedAssetCount: plan.sourceAssetCount - selected.length,
-    resultCounts: countBy(results, (item) => item.status),
+  const selection = buildSelectionRecord({
+    basePlanSha256: plan.planSha256,
+    thirdPlanSha256: thirdPlan?.thirdPlanSha256 ?? null,
+    thirdPlanInputSelectionSha256: thirdPlan?.selectionSha256 ?? null,
+    promotedSourceAssetIds: [...state.promotedSourceAssetIds],
+    totalSourceAssetCount: plan.sourceAssetCount,
     results,
     selected,
   });
+  return { selection, state, thirdPlan };
+}
+
+function selectCommand() {
+  const plan = assertRegenerationPlan(
+    requireJson(planPath, "Regeneration plan is missing"),
+  );
+  const { selection, state } = buildCurrentSelection(plan);
+  writeJson(promotionPath, state.promotion);
+  writeJson(selectionPath, selection);
   console.log(
-    `Selected ${selected.length}/${plan.sourceAssetCount}; unresolved ${plan.sourceAssetCount - selected.length}`,
+    `Selected ${selection.selectedAssetCount}/${plan.sourceAssetCount - selection.promotedSourceAssetIds.length} active assets; promoted exceptions ${selection.promotedSourceAssetIds.length}; unresolved ${selection.unresolvedAssetCount}`,
   );
 }
-
-function atomicReplace(filePath, bytes) {
-  const temporary = `${filePath}.regen.tmp`;
-  writeFileSync(temporary, bytes);
-  rmSync(filePath, { force: true });
-  renameSync(temporary, filePath);
-}
-
 function promoteCommand(parsed) {
   requireFlag(parsed, "--confirm", "Formal promotion requires --confirm");
   const plan = requirePlan(parsed);
-  const selection = requireJson(
+  const storedSelection = requireJson(
     selectionPath,
     "Run candidate selection first.",
   );
-  const sourceById = new Map(
-    plan.sourceAssets.map((source) => [source.sourceAssetId, source]),
+  const rebuilt = buildCurrentSelection(plan);
+  assertSelectionRecord(storedSelection, {
+    basePlanSha256: plan.planSha256,
+    thirdPlanSha256: rebuilt.thirdPlan?.thirdPlanSha256 ?? null,
+    promotedSourceAssetIds: rebuilt.state.promotion.replacements.map(
+      (item) => item.sourceAssetId,
+    ),
+  });
+  if (storedSelection.selectionSha256 !== rebuilt.selection.selectionSha256) {
+    throw new Error("Selection is stale; rerun select before promotion");
+  }
+  const sourceById = rebuilt.state.sources;
+  const generated = new Map(
+    rebuilt.state.bound.map((candidate) => [candidate.candidateId, candidate]),
   );
-  const generated = generatedById();
-  const rows = [];
-  for (const selected of selection.selected) {
+  const existingRows = rebuilt.state.promotion.replacements;
+  const alreadyPromoted = new Set(
+    existingRows.map((replacement) => replacement.sourceAssetId),
+  );
+  const rows = [...existingRows];
+  const promotionOperations = [];
+  for (const selected of storedSelection.selected) {
+    if (alreadyPromoted.has(selected.sourceAssetId)) continue;
     const source = sourceById.get(selected.sourceAssetId);
-    const candidate = { ...generated.get(selected.candidateId), ...selected };
+    const generatedCandidate = generated.get(selected.candidateId);
+    if (!source || !generatedCandidate) {
+      throw new Error(
+        `Selected candidate is not current: ${selected.candidateId}`,
+      );
+    }
+    const candidate = { ...generatedCandidate, ...selected };
     const desktopPath = path.resolve(root, source.desktopPath);
     const browserPath = path.resolve(root, source.browserPath);
-    const currentSha = sha256File(desktopPath);
     assertPromotionAllowed({
       source,
       candidate,
-      currentSourceSha256: currentSha,
+      currentSourceSha256: sha256File(desktopPath),
     });
-    if (sha256File(browserPath) !== currentSha)
+    if (sha256File(browserPath) !== source.sourceSha256) {
       throw new Error(`Source parity changed for ${source.sourceAssetId}`);
+    }
     const candidatePath = candidateAudioPath(candidate.candidateId);
     const bytes = readFileSync(candidatePath);
     const candidateSha = sha256File(candidatePath);
-    if (candidateSha !== candidate.candidateSha256)
+    if (candidateSha !== candidate.candidateSha256) {
       throw new Error(`Candidate SHA changed for ${candidate.candidateId}`);
-    atomicReplace(desktopPath, bytes);
-    atomicReplace(browserPath, bytes);
-    if (
-      sha256File(desktopPath) !== candidateSha ||
-      sha256File(browserPath) !== candidateSha
-    ) {
-      throw new Error(
-        `Post-promotion parity failed for ${source.sourceAssetId}`,
-      );
     }
+    promotionOperations.push({
+      desktopPath,
+      browserPath,
+      bytes,
+      candidateSha256: candidateSha,
+      expectedOldSha256: source.sourceSha256,
+    });
     rows.push({
       sourceAssetId: source.sourceAssetId,
       candidateId: candidate.candidateId,
@@ -1012,21 +1491,34 @@ function promoteCommand(parsed) {
       voiceId: candidate.voiceId,
       modelId: candidate.modelId,
       seed: candidate.seed,
-      status: "machine-replaced-pending-human",
+      generationRound: candidate.generationRound,
+      referenceDigest: candidate.referenceDigest,
+      configDigest: candidate.configDigest,
+      ttsConfigDigest: candidate.ttsConfigDigest,
+      status: "already-promoted-pending-human",
       promotedAt: new Date().toISOString(),
     });
   }
-  writeJson(promotionPath, {
-    version: 1,
+  const nextLedger = {
+    version: 2,
     generatedAt: new Date().toISOString(),
     replacementCount: rows.length,
     warning:
       "Machine-replaced candidates still require human auditory confirmation.",
     replacements: rows,
+  };
+  atomicPromoteBatch({
+    operations: promotionOperations,
+    ledgerPath: promotionPath,
+    ledgerBytes: Buffer.from(
+      `${JSON.stringify(redactSecrets(nextLedger), null, 2)}\n`,
+      "utf8",
+    ),
   });
-  console.log(`Promoted ${rows.length} machine-validated candidates.`);
+  console.log(
+    `Promoted ${rows.length - existingRows.length} new candidates; preserved ${existingRows.length} already-promoted exceptions.`,
+  );
 }
-
 function gateCommand() {
   const plan = assertRegenerationPlan(
     requireJson(planPath, "Regeneration plan is missing"),
@@ -1036,49 +1528,57 @@ function gateCommand() {
     issues.push("scope-not-416");
   if (plan.firstRoundCandidateCount !== EXPECTED_FIRST_ROUND_CANDIDATE_COUNT)
     issues.push("first-round-not-832");
-  const generated = [...generatedById().values()];
-  if (generated.length > MAX_REGENERATION_CANDIDATE_COUNT)
+  const history = generatedHistoryRows();
+  if (
+    new Set(history.map((row) => row.candidateId)).size >
+    MAX_REGENERATION_CANDIDATE_COUNT
+  )
     issues.push("candidate-ceiling-exceeded");
-  if (existsSync(selectionPath)) {
-    const selection = readJson(selectionPath);
-    const selectedIds = new Set(
-      selection.selected.map((item) => item.candidateId),
-    );
-    for (const item of selection.results) {
-      if (selectedIds.has(item.candidateId) && item.status !== "machine-passed")
-        issues.push(`selected-unpassed:${item.candidateId}`);
-    }
-  }
-  if (existsSync(promotionPath)) {
-    const sourceById = new Map(
-      plan.sourceAssets.map((source) => [source.sourceAssetId, source]),
-    );
-    for (const replacement of readJson(promotionPath).replacements) {
-      if (replacement.status !== "machine-replaced-pending-human")
-        issues.push(`invalid-status:${replacement.sourceAssetId}`);
-      const source = sourceById.get(replacement.sourceAssetId);
-      if (!source) {
-        issues.push(`promotion-source-missing:${replacement.sourceAssetId}`);
-        continue;
-      }
-      for (const [platform, relativePath] of [
-        ["desktop", source.desktopPath],
-        ["browser", source.browserPath],
-      ]) {
-        const absolutePath = path.resolve(root, relativePath);
-        if (!existsSync(absolutePath)) {
-          issues.push(
-            `promoted-file-missing:${platform}:${replacement.sourceAssetId}`,
-          );
-        } else if (sha256File(absolutePath) !== replacement.newSha256) {
-          issues.push(
-            `promoted-sha-mismatch:${platform}:${replacement.sourceAssetId}`,
-          );
+  let current = null;
+  try {
+    current = buildCurrentSelection(plan);
+    if (current.state.issues.length > 0) issues.push(...current.state.issues);
+    if (existsSync(selectionPath)) {
+      const stored = readJson(selectionPath);
+      try {
+        assertSelectionRecord(stored, {
+          basePlanSha256: plan.planSha256,
+          thirdPlanSha256: current.thirdPlan?.thirdPlanSha256 ?? null,
+          promotedSourceAssetIds: current.state.promotion.replacements.map(
+            (item) => item.sourceAssetId,
+          ),
+        });
+        if (stored.selectionSha256 !== current.selection.selectionSha256) {
+          issues.push("stale-selection-evidence-or-candidate-sha");
         }
+      } catch (error) {
+        issues.push(
+          `invalid-selection:${error instanceof Error ? error.message : String(error)}`,
+        );
+      }
+    } else {
+      issues.push("selection-missing");
+    }
+    for (const replacement of current.state.promotion.replacements) {
+      if (replacement.status !== "already-promoted-pending-human") {
+        issues.push(`invalid-promoted-exception:${replacement.sourceAssetId}`);
       }
     }
+  } catch (error) {
+    issues.push(
+      `binding-or-promotion-validation:${error instanceof Error ? error.message : String(error)}`,
+    );
   }
-  const serialized = [planPath, generatedPath, selectionPath, promotionPath]
+  const serialized = [
+    planPath,
+    generatedPath,
+    selectionPath,
+    promotionPath,
+    thirdRoundPlanPath,
+    dictionaryPlanPath,
+    dictionaryLifecyclePath,
+    dictionaryLifecycleEventsPath,
+  ]
     .filter(existsSync)
     .map((filePath) => readFileSync(filePath, "utf8"))
     .join("\n");
@@ -1093,21 +1593,26 @@ function gateCommand() {
     passed: issues.length === 0,
     issues,
     sourceAssetCount: plan.sourceAssetCount,
-    generatedCandidateCount: generated.length,
-    promotionCount: existsSync(promotionPath)
-      ? readJson(promotionPath).replacementCount
-      : 0,
+    generatedHistoryCount: history.length,
+    activeBoundCandidateCount: current?.state.bound.length ?? 0,
+    promotedExceptionCount:
+      current?.state.promotion.replacementCount ??
+      (existsSync(promotionPath)
+        ? readJson(promotionPath).replacementCount
+        : 0),
   };
   writeJson(path.join(regenerationRoot, "candidate-gate.json"), report);
   console.log(JSON.stringify(report, null, 2));
   if (!report.passed) process.exitCode = 1;
 }
-
 async function main() {
   const parsed = parseArgs(process.argv.slice(2));
   switch (parsed.command) {
     case "plan":
       await planCommand();
+      break;
+    case "plan-offline":
+      offlinePlanCommand();
       break;
     case "third-plan":
       thirdPlanCommand();
@@ -1138,7 +1643,7 @@ async function main() {
       break;
     default:
       throw new Error(
-        "Usage: phoneme-word-regeneration.mjs <plan|third-plan|generate|signal|whisper|azure|scribe|select|promote|gate>",
+        "Usage: phoneme-word-regeneration.mjs <plan|plan-offline|third-plan|generate|signal|whisper|azure|scribe|select|promote|gate>",
       );
   }
 }

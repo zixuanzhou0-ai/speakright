@@ -110,14 +110,126 @@ export async function synthesizeElevenLabsCandidate({
   };
 }
 
+function requireDictionaryString(value, field, context) {
+  if (typeof value !== "string" || value.length === 0) {
+    throw new Error(`${context} returned an invalid ${field}`);
+  }
+  return value;
+}
+
+function requireDictionaryRuleCount(value, field, context) {
+  if (!Number.isSafeInteger(value) || value < 0) {
+    throw new Error(`${context} returned an invalid ${field}`);
+  }
+  return value;
+}
+
+function normalizePronunciationDictionaryRule(rule, index) {
+  if (!rule || typeof rule !== "object") {
+    throw new Error(`Pronunciation dictionary rule ${index} is invalid`);
+  }
+  const stringToReplace = rule.stringToReplace ?? rule.string_to_replace;
+  if (typeof stringToReplace !== "string" || stringToReplace.length === 0) {
+    throw new Error(
+      `Pronunciation dictionary rule ${index} has no stringToReplace`,
+    );
+  }
+  const normalized = {
+    type: rule.type,
+    string_to_replace: stringToReplace,
+  };
+  const caseSensitive = rule.caseSensitive ?? rule.case_sensitive;
+  const wordBoundaries = rule.wordBoundaries ?? rule.word_boundaries;
+  if (caseSensitive !== undefined) {
+    if (typeof caseSensitive !== "boolean") {
+      throw new Error(
+        `Pronunciation dictionary rule ${index} has invalid caseSensitive`,
+      );
+    }
+    normalized.case_sensitive = caseSensitive;
+  }
+  if (wordBoundaries !== undefined) {
+    if (typeof wordBoundaries !== "boolean") {
+      throw new Error(
+        `Pronunciation dictionary rule ${index} has invalid wordBoundaries`,
+      );
+    }
+    normalized.word_boundaries = wordBoundaries;
+  }
+  if (rule.type === "phoneme") {
+    normalized.phoneme = requireDictionaryString(
+      rule.phoneme,
+      "phoneme",
+      `Pronunciation dictionary rule ${index}`,
+    );
+    normalized.alphabet = requireDictionaryString(
+      rule.alphabet,
+      "alphabet",
+      `Pronunciation dictionary rule ${index}`,
+    );
+  } else if (rule.type === "alias") {
+    normalized.alias = requireDictionaryString(
+      rule.alias,
+      "alias",
+      `Pronunciation dictionary rule ${index}`,
+    );
+  } else {
+    throw new Error(
+      `Pronunciation dictionary rule ${index} has unsupported type`,
+    );
+  }
+  return normalized;
+}
+
+function normalizeDictionaryMetadata(payload, context) {
+  const archivedTime = payload.archived_time_unix;
+  if (
+    archivedTime !== null &&
+    archivedTime !== undefined &&
+    (!Number.isSafeInteger(archivedTime) || archivedTime <= 0)
+  ) {
+    throw new Error(`${context} returned an invalid archived_time_unix`);
+  }
+  return {
+    id: requireDictionaryString(payload.id, "id", context),
+    latestVersionId: requireDictionaryString(
+      payload.latest_version_id,
+      "latest_version_id",
+      context,
+    ),
+    latestVersionRulesNum: requireDictionaryRuleCount(
+      payload.latest_version_rules_num,
+      "latest_version_rules_num",
+      context,
+    ),
+    name: requireDictionaryString(payload.name, "name", context),
+    permissionOnResource: payload.permission_on_resource ?? null,
+    createdBy: payload.created_by ?? null,
+    creationTimeUnix: payload.creation_time_unix ?? null,
+    archivedTimeUnix: archivedTime ?? null,
+    description: payload.description ?? null,
+  };
+}
+
 export async function createElevenLabsPronunciationDictionary({
   apiKey,
-  candidate,
+  name,
+  description = null,
+  rules,
 }) {
-  if (!candidate.pronunciationDictionary) {
-    throw new Error(
-      "Third-round candidate is missing a pronunciation dictionary rule",
-    );
+  requireDictionaryString(name, "name", "Pronunciation dictionary request");
+  if (!Array.isArray(rules) || rules.length === 0) {
+    throw new Error("Pronunciation dictionary requires at least one rule");
+  }
+  const normalizedRules = rules.map(normalizePronunciationDictionaryRule);
+  const seenStrings = new Set();
+  for (const rule of normalizedRules) {
+    if (seenStrings.has(rule.string_to_replace)) {
+      throw new Error(
+        `Duplicate pronunciation dictionary rule: ${rule.string_to_replace}`,
+      );
+    }
+    seenStrings.add(rule.string_to_replace);
   }
   const response = await fetch(
     "https://api.elevenlabs.io/v1/pronunciation-dictionaries/add-from-rules",
@@ -128,17 +240,9 @@ export async function createElevenLabsPronunciationDictionary({
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        name: `SpeakRight-${candidate.candidateId}`,
-        description: "Temporary audited candidate dictionary",
-        rules: [
-          {
-            type: "phoneme",
-            alphabet: candidate.pronunciationDictionary.alphabet,
-            string_to_replace:
-              candidate.pronunciationDictionary.stringToReplace,
-            phoneme: candidate.pronunciationDictionary.phoneme,
-          },
-        ],
+        name,
+        ...(description === null ? {} : { description }),
+        rules: normalizedRules,
       }),
       signal: AbortSignal.timeout(30_000),
     },
@@ -151,12 +255,153 @@ export async function createElevenLabsPronunciationDictionary({
       JSON.stringify(payload).slice(0, 300),
     );
   }
-  return {
-    id: payload.id,
-    versionId: payload.version_id,
+  const result = {
+    id: requireDictionaryString(
+      payload.id,
+      "id",
+      "Pronunciation dictionary creation",
+    ),
+    versionId: requireDictionaryString(
+      payload.version_id,
+      "version_id",
+      "Pronunciation dictionary creation",
+    ),
+    versionRulesNum: requireDictionaryRuleCount(
+      payload.version_rules_num,
+      "version_rules_num",
+      "Pronunciation dictionary creation",
+    ),
+    name: requireDictionaryString(
+      payload.name,
+      "name",
+      "Pronunciation dictionary creation",
+    ),
+    description: payload.description ?? null,
   };
+  if (result.name !== name) {
+    throw new Error("Pronunciation dictionary creation returned another name");
+  }
+  if (result.versionRulesNum !== normalizedRules.length) {
+    throw new Error(
+      "Pronunciation dictionary creation returned an unexpected rule count",
+    );
+  }
+  return result;
 }
 
+export async function archiveElevenLabsPronunciationDictionary({
+  apiKey,
+  pronunciationDictionaryId,
+}) {
+  requireDictionaryString(
+    pronunciationDictionaryId,
+    "pronunciationDictionaryId",
+    "Pronunciation dictionary archive request",
+  );
+  const response = await fetch(
+    `https://api.elevenlabs.io/v1/pronunciation-dictionaries/${encodeURIComponent(pronunciationDictionaryId)}`,
+    {
+      method: "PATCH",
+      headers: {
+        "xi-api-key": apiKey,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ archived: true }),
+      signal: AbortSignal.timeout(30_000),
+    },
+  );
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw createHttpError(
+      "ElevenLabs pronunciation dictionary archive failed",
+      response,
+      JSON.stringify(payload).slice(0, 300),
+    );
+  }
+  const result = normalizeDictionaryMetadata(
+    payload,
+    "Pronunciation dictionary archive",
+  );
+  if (result.id !== pronunciationDictionaryId) {
+    throw new Error("Pronunciation dictionary archive returned another id");
+  }
+  if (result.archivedTimeUnix === null) {
+    throw new Error(
+      "Pronunciation dictionary archive response has no archived_time_unix",
+    );
+  }
+  return result;
+}
+
+export async function listElevenLabsPronunciationDictionaries({
+  apiKey,
+  exactName = null,
+}) {
+  if (exactName !== null) {
+    requireDictionaryString(
+      exactName,
+      "exactName",
+      "Pronunciation dictionary list request",
+    );
+  }
+  const pronunciationDictionaries = [];
+  const seenCursors = new Set();
+  let cursor = null;
+  let pageCount = 0;
+  while (true) {
+    const url = new URL(
+      "https://api.elevenlabs.io/v1/pronunciation-dictionaries",
+    );
+    url.searchParams.set("page_size", "100");
+    url.searchParams.set("sort", "name");
+    url.searchParams.set("sort_direction", "ascending");
+    if (cursor) url.searchParams.set("cursor", cursor);
+    const response = await fetch(url, {
+      headers: { "xi-api-key": apiKey },
+      signal: AbortSignal.timeout(30_000),
+    });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw createHttpError(
+        "ElevenLabs pronunciation dictionary list failed",
+        response,
+        JSON.stringify(payload).slice(0, 300),
+      );
+    }
+    if (!Array.isArray(payload.pronunciation_dictionaries)) {
+      throw new Error(
+        "Pronunciation dictionary list returned no pronunciation_dictionaries",
+      );
+    }
+    if (typeof payload.has_more !== "boolean") {
+      throw new Error(
+        "Pronunciation dictionary list returned invalid has_more",
+      );
+    }
+    pageCount += 1;
+    for (const dictionary of payload.pronunciation_dictionaries) {
+      const normalized = normalizeDictionaryMetadata(
+        dictionary,
+        "Pronunciation dictionary list",
+      );
+      if (exactName === null || normalized.name === exactName) {
+        pronunciationDictionaries.push(normalized);
+      }
+    }
+    if (!payload.has_more) break;
+    const nextCursor = requireDictionaryString(
+      payload.next_cursor,
+      "next_cursor",
+      "Pronunciation dictionary list",
+    );
+    if (seenCursors.has(nextCursor)) {
+      throw new Error("Pronunciation dictionary list repeated its cursor");
+    }
+    seenCursors.add(nextCursor);
+    cursor = nextCursor;
+  }
+  return { pronunciationDictionaries, pageCount };
+}
 export async function transcribeElevenLabsScribe({
   apiKey,
   audioPath,
