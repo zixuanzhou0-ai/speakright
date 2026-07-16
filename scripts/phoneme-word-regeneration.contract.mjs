@@ -39,6 +39,8 @@ import {
   normalizePronunciationDictionaryIpa,
   runFailStopPool,
   selectCandidateForAsset,
+  THIRD_ROUND_STRATEGY_DICTIONARY,
+  THIRD_ROUND_STRATEGY_TEXT_ONLY,
   validatePromotionLedger,
   withCurrentCandidateAuditContext,
 } from "./lib/phoneme-word-regeneration-core.mjs";
@@ -205,7 +207,38 @@ test("third candidate requires two failed candidates and two-source reference", 
   assert.equal(third.generationRound, 3);
   assert.equal(third.modelId, "eleven_v3");
   assert.equal(third.pronunciationDictionary.alphabet, "ipa");
+  assert.equal(third.generationStrategy, THIRD_ROUND_STRATEGY_DICTIONARY);
   assert.equal(third.configDigest, computeCandidateConfigDigest(third));
+});
+
+test("text-only round-C remains immutable and never claims a dictionary", () => {
+  const source = plan.sourceAssets[0];
+  const pair = plan.candidates
+    .filter((candidate) => candidate.sourceAssetId === source.sourceAssetId)
+    .map((candidate) => ({ ...candidate, status: "machine-failed" }));
+  const confirmed = {
+    ...source,
+    referenceStatus: "two-source-confirmed",
+    referenceSources: [{ name: "source-a" }, { name: "source-b" }],
+    referenceSourceCount: 2,
+    referenceDigest: undefined,
+    relationshipIssues: [],
+  };
+  const dictionary = buildThirdRoundCandidate(confirmed, pair);
+  const textOnly = buildThirdRoundCandidate(confirmed, pair, {
+    generationStrategy: THIRD_ROUND_STRATEGY_TEXT_ONLY,
+  });
+  assert.equal(textOnly.generationStrategy, THIRD_ROUND_STRATEGY_TEXT_ONLY);
+  assert.equal(textOnly.pronunciationDictionary, undefined);
+  assert.notEqual(textOnly.configDigest, dictionary.configDigest);
+  assert.notEqual(textOnly.ttsConfigDigest, dictionary.ttsConfigDigest);
+  assert.throws(
+    () =>
+      buildThirdRoundCandidate(confirmed, pair, {
+        generationStrategy: "silent-fallback",
+      }),
+    /Unsupported third-round strategy/,
+  );
 });
 
 test("pronunciation dictionary preserves stress and only strips outer delimiters", () => {
@@ -396,6 +429,35 @@ test("pure third-round plan overlays current references and has an immutable SHA
   };
   assert.throws(
     () => assertThirdRoundPlan(changed, { plan, ...fixture }),
+    /immutable payload/,
+  );
+});
+
+test("third-round strategy is plan-bound and changes the reviewed SHA", () => {
+  const fixture = buildReviewedThirdPlanFixture();
+  const dictionaryPlan = buildThirdRoundPlan({ plan, ...fixture });
+  const textOnlyPlan = buildThirdRoundPlan({
+    plan,
+    ...fixture,
+    generationStrategy: THIRD_ROUND_STRATEGY_TEXT_ONLY,
+  });
+  assert.equal(
+    dictionaryPlan.generationStrategy,
+    THIRD_ROUND_STRATEGY_DICTIONARY,
+  );
+  assert.equal(textOnlyPlan.generationStrategy, THIRD_ROUND_STRATEGY_TEXT_ONLY);
+  assert.equal(textOnlyPlan.candidates[0].pronunciationDictionary, undefined);
+  assert.notEqual(textOnlyPlan.thirdPlanSha256, dictionaryPlan.thirdPlanSha256);
+  assertThirdRoundPlan(textOnlyPlan, { plan, ...fixture });
+  assert.throws(
+    () =>
+      assertThirdRoundPlan(
+        {
+          ...textOnlyPlan,
+          generationStrategy: THIRD_ROUND_STRATEGY_DICTIONARY,
+        },
+        { plan, ...fixture },
+      ),
     /immutable payload/,
   );
 });

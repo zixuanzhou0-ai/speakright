@@ -64,6 +64,8 @@ import {
   overlayCurrentReference,
   runFailStopPool,
   selectCandidateForAsset,
+  THIRD_ROUND_STRATEGY_DICTIONARY,
+  THIRD_ROUND_STRATEGY_TEXT_ONLY,
   validatePromotionLedger,
   withCurrentCandidateAuditContext,
 } from "./lib/phoneme-word-regeneration-core.mjs";
@@ -673,6 +675,7 @@ function pendingGeneratedCandidates(candidates) {
   const existing = new Set(
     binding.bound.flatMap((candidate) =>
       candidate.generationRound === 3 &&
+      candidate.generationStrategy === THIRD_ROUND_STRATEGY_DICTIONARY &&
       !candidate.pronunciationDictionaryLifecycle
         ? []
         : [candidate.candidateId],
@@ -691,12 +694,25 @@ async function generateCandidates(
   const pending = pendingGeneratedCandidates(candidates);
   await runFailStopPool(pending, 2, async (candidate, index) => {
     const lifecycleBinding =
-      candidate.generationRound === 3
+      candidate.generationRound === 3 &&
+      candidate.generationStrategy === THIRD_ROUND_STRATEGY_DICTIONARY
         ? dictionaryBindingByLanguage?.get(candidate.languageId)
         : null;
-    if (candidate.generationRound === 3 && !lifecycleBinding) {
+    if (
+      candidate.generationRound === 3 &&
+      candidate.generationStrategy === THIRD_ROUND_STRATEGY_DICTIONARY &&
+      !lifecycleBinding
+    ) {
       throw new Error(
         `Round-C candidate has no shared dictionary binding: ${candidate.candidateId}`,
+      );
+    }
+    if (
+      candidate.generationStrategy === THIRD_ROUND_STRATEGY_TEXT_ONLY &&
+      (lifecycleBinding || candidate.pronunciationDictionary)
+    ) {
+      throw new Error(
+        `Text-only round-C candidate unexpectedly has a dictionary binding: ${candidate.candidateId}`,
       );
     }
     const locators = lifecycleBinding ? [lifecycleBinding.locator] : [];
@@ -733,7 +749,18 @@ async function generateCandidates(
   });
 }
 
-function thirdPlanCommand() {
+function thirdPlanCommand(parsed) {
+  const generationStrategy = parsed.valueFor(
+    "--strategy",
+    THIRD_ROUND_STRATEGY_DICTIONARY,
+  );
+  if (
+    ![THIRD_ROUND_STRATEGY_DICTIONARY, THIRD_ROUND_STRATEGY_TEXT_ONLY].includes(
+      generationStrategy,
+    )
+  ) {
+    throw new Error(`Unsupported third-round strategy: ${generationStrategy}`);
+  }
   const plan = assertRegenerationPlan(
     requireJson(planPath, "Run regeneration dry-run first."),
   );
@@ -754,33 +781,43 @@ function thirdPlanCommand() {
     plan,
     selection,
     ...currentInputs,
+    generationStrategy,
   });
-  const dictionaryPlan = assertThirdRoundDictionaryPlan(
-    buildThirdRoundDictionaryPlan(thirdPlan),
-    thirdPlan,
-    { expectedRulesByLanguage: EXPECTED_THIRD_ROUND_RULES },
-  );
+  const dictionaryPlan =
+    generationStrategy === THIRD_ROUND_STRATEGY_DICTIONARY
+      ? assertThirdRoundDictionaryPlan(
+          buildThirdRoundDictionaryPlan(thirdPlan),
+          thirdPlan,
+          { expectedRulesByLanguage: EXPECTED_THIRD_ROUND_RULES },
+        )
+      : null;
   writeJson(thirdRoundPlanPath, thirdPlan);
-  writeJson(dictionaryPlanPath, dictionaryPlan);
+  if (dictionaryPlan) writeJson(dictionaryPlanPath, dictionaryPlan);
+  else rmSync(dictionaryPlanPath, { force: true });
   console.log(
     JSON.stringify(
       {
         thirdRoundPlanPath: path.relative(root, thirdRoundPlanPath),
-        dictionaryPlanPath: path.relative(root, dictionaryPlanPath),
+        generationStrategy,
+        dictionaryPlanPath: dictionaryPlan
+          ? path.relative(root, dictionaryPlanPath)
+          : null,
         basePlanSha256: thirdPlan.basePlanSha256,
         thirdPlanSha256: thirdPlan.thirdPlanSha256,
         candidateCount: thirdPlan.candidateCount,
         blockedCount: thirdPlan.blockedCount,
         characterCount: thirdPlan.characterCount,
         sourceDurationSeconds: thirdPlan.sourceDurationSeconds,
-        dictionaryCount: dictionaryPlan.dictionaryCount,
-        dictionaryRuleCounts: Object.fromEntries(
-          dictionaryPlan.dictionaries.map((dictionary) => [
-            dictionary.languageId,
-            dictionary.ruleCount,
-          ]),
-        ),
-        dictionaryPlanSha256: dictionaryPlan.dictionaryPlanSha256,
+        dictionaryCount: dictionaryPlan?.dictionaryCount ?? 0,
+        dictionaryRuleCounts: dictionaryPlan
+          ? Object.fromEntries(
+              dictionaryPlan.dictionaries.map((dictionary) => [
+                dictionary.languageId,
+                dictionary.ruleCount,
+              ]),
+            )
+          : {},
+        dictionaryPlanSha256: dictionaryPlan?.dictionaryPlanSha256 ?? null,
         safetyReserve: thirdPlan.safetyReserve,
         paidCallsMade: false,
       },
@@ -838,7 +875,19 @@ async function generateCommand(parsed) {
     ),
     { plan, selection, ...currentInputs },
   );
-  const dictionaryPlan = loadValidatedDictionaryPlan(thirdPlan);
+  const expectedGenerationStrategy = parsed.valueFor("--strategy");
+  if (
+    !expectedGenerationStrategy ||
+    expectedGenerationStrategy !== thirdPlan.generationStrategy
+  ) {
+    throw new Error(
+      "The exact --strategy from the reviewed third-round plan is required",
+    );
+  }
+  const dictionaryPlan =
+    thirdPlan.generationStrategy === THIRD_ROUND_STRATEGY_DICTIONARY
+      ? loadValidatedDictionaryPlan(thirdPlan)
+      : null;
   const expectedThirdPlanSha = parsed.valueFor("--third-plan-sha");
   if (
     !expectedThirdPlanSha ||
@@ -870,6 +919,11 @@ async function generateCommand(parsed) {
     archiveDictionary: archiveElevenLabsPronunciationDictionary,
   };
   const registry = loadDictionaryLifecycleRegistry();
+  if (thirdPlan.generationStrategy === THIRD_ROUND_STRATEGY_TEXT_ONLY) {
+    assertDictionaryLifecycleClear(registry);
+    await generateCandidates(pending);
+    return;
+  }
   if (pending.length === 0) {
     try {
       assertDictionaryLifecycleClear(registry);
@@ -1295,6 +1349,26 @@ function assertCurrentDictionaryLifecycle({ thirdPlan, state }) {
       "Bound round-C candidates require a validated third-round plan",
     );
   }
+  if (thirdPlan.generationStrategy === THIRD_ROUND_STRATEGY_TEXT_ONLY) {
+    for (const candidate of roundThreeCandidates) {
+      if (
+        candidate.generationStrategy !== THIRD_ROUND_STRATEGY_TEXT_ONLY ||
+        candidate.pronunciationDictionary ||
+        candidate.pronunciationDictionaryLifecycle ||
+        (candidate.pronunciationDictionaryLocators ?? []).length > 0
+      ) {
+        throw new Error(
+          `Text-only round-C candidate has stale dictionary metadata: ${candidate.candidateId}`,
+        );
+      }
+    }
+    return true;
+  }
+  if (thirdPlan.generationStrategy !== THIRD_ROUND_STRATEGY_DICTIONARY) {
+    throw new Error(
+      `Unsupported active third-round strategy: ${thirdPlan.generationStrategy}`,
+    );
+  }
   const dictionaryPlan = loadValidatedDictionaryPlan(thirdPlan);
   for (const candidate of roundThreeCandidates) {
     assertGeneratedDictionaryBinding({
@@ -1615,7 +1689,7 @@ async function main() {
       offlinePlanCommand();
       break;
     case "third-plan":
-      thirdPlanCommand();
+      thirdPlanCommand(parsed);
       break;
     case "generate":
       await generateCommand(parsed);

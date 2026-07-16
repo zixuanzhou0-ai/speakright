@@ -7,6 +7,8 @@ export const MAX_REGENERATION_CANDIDATE_COUNT = 1248;
 export const EXPECTED_FIRST_ROUND_CHARACTERS = 3650;
 export const MAX_REGENERATION_CHARACTERS = 5475;
 export const ELEVENLABS_SAFETY_RESERVE = 5000;
+export const THIRD_ROUND_STRATEGY_DICTIONARY = "pronunciation-dictionary-v1";
+export const THIRD_ROUND_STRATEGY_TEXT_ONLY = "text-only-eleven-v3-v1";
 
 export const EXPECTED_ASSETS_BY_LANGUAGE = {
   "en-US": 23,
@@ -213,6 +215,9 @@ function candidateConfigPayload(candidate) {
     seed: candidate.seed,
     sourceSha256: candidate.sourceSha256,
     characterCount: candidate.characterCount,
+    ...(candidate.generationStrategy
+      ? { generationStrategy: candidate.generationStrategy }
+      : {}),
     pronunciationDictionary: candidate.pronunciationDictionary ?? null,
     referenceDigest: candidate.referenceDigest,
   };
@@ -235,6 +240,9 @@ function candidateTtsGenerationPayload(candidate) {
     label: candidate.label,
     seed: candidate.seed,
     characterCount: candidate.characterCount,
+    ...(candidate.generationStrategy
+      ? { generationStrategy: candidate.generationStrategy }
+      : {}),
     pronunciationDictionary: candidate.pronunciationDictionary ?? null,
   };
 }
@@ -497,7 +505,18 @@ export function assertRegenerationPlan(plan) {
   return plan;
 }
 
-export function buildThirdRoundCandidate(source, failedPair) {
+export function buildThirdRoundCandidate(
+  source,
+  failedPair,
+  { generationStrategy = THIRD_ROUND_STRATEGY_DICTIONARY } = {},
+) {
+  if (
+    ![THIRD_ROUND_STRATEGY_DICTIONARY, THIRD_ROUND_STRATEGY_TEXT_ONLY].includes(
+      generationStrategy,
+    )
+  ) {
+    throw new Error(`Unsupported third-round strategy: ${generationStrategy}`);
+  }
   if (
     failedPair.length !== 2 ||
     failedPair.some((candidate) => candidate.status !== "machine-failed")
@@ -541,6 +560,14 @@ export function buildThirdRoundCandidate(source, failedPair) {
   if (!pronunciationDictionaryIpa) {
     throw new Error(`Third candidate IPA is empty for ${source.sourceAssetId}`);
   }
+  const pronunciationDictionary =
+    generationStrategy === THIRD_ROUND_STRATEGY_DICTIONARY
+      ? {
+          alphabet: "ipa",
+          stringToReplace: source.text,
+          phoneme: pronunciationDictionaryIpa,
+        }
+      : null;
   return attachCandidateDigests(
     {
       candidateId: candidateId(source.sourceAssetId, "C"),
@@ -560,11 +587,8 @@ export function buildThirdRoundCandidate(source, failedPair) {
       seed: seedFor(source.sourceAssetId, "C"),
       sourceSha256: source.sourceSha256,
       characterCount: source.characterCount,
-      pronunciationDictionary: {
-        alphabet: "ipa",
-        stringToReplace: source.text,
-        phoneme: pronunciationDictionaryIpa,
-      },
+      generationStrategy,
+      ...(pronunciationDictionary ? { pronunciationDictionary } : {}),
       status: "planned",
     },
     source,
@@ -675,6 +699,7 @@ export function assertSelectionRecord(
 function thirdRoundPlanPayload(plan) {
   return {
     version: plan.version,
+    generationStrategy: plan.generationStrategy,
     basePlanSha256: plan.basePlanSha256,
     selectionSha256: plan.selectionSha256,
     promotedSourceAssetIds: plan.promotedSourceAssetIds,
@@ -717,6 +742,7 @@ export function buildThirdRoundPlan({
   gold,
   currentAssetById = new Map(),
   currentShaByPath = new Map(),
+  generationStrategy = THIRD_ROUND_STRATEGY_DICTIONARY,
 }) {
   assertRegenerationPlan(plan);
   const resultById = new Map(
@@ -760,7 +786,9 @@ export function buildThirdRoundPlan({
           `Current source SHA changed for ${source.sourceAssetId}; refusing third candidate`,
         );
       }
-      candidates.push(buildThirdRoundCandidate(source, pair));
+      candidates.push(
+        buildThirdRoundCandidate(source, pair, { generationStrategy }),
+      );
     } catch (error) {
       blocked.push({
         sourceAssetId: source.sourceAssetId,
@@ -780,6 +808,7 @@ export function buildThirdRoundPlan({
   );
   const thirdPlan = {
     version: REGENERATION_VERSION,
+    generationStrategy,
     generatedAt: new Date().toISOString(),
     basePlanSha256: plan.planSha256,
     selectionSha256:
@@ -864,6 +893,7 @@ export function assertThirdRoundPlan(
     gold,
     currentAssetById,
     currentShaByPath,
+    generationStrategy: thirdPlan.generationStrategy,
   });
   if (rebuilt.thirdPlanSha256 !== thirdPlan.thirdPlanSha256) {
     throw new Error(
