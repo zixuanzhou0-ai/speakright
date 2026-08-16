@@ -23,6 +23,7 @@ import {
 } from "./lib/release-evidence-source-digest.mjs";
 
 const root = process.cwd();
+const GUIDED_REPEAT_CAPTURE_SAFE_MARGIN = 12;
 const evidenceTempRoot = path.join(
   path.dirname(root),
   `${path.basename(root)}ReleaseEvidenceTemp`,
@@ -247,7 +248,26 @@ async function assertFreePracticeText(page, label) {
   }
 }
 
-async function prepareShot(page, shot) {
+async function focusMobileGuidedRepeat(page, shot, viewport) {
+  if (shot.id !== "guided-repeat" || viewport.width >= 1024) return;
+  await page.evaluate(async () => {
+    const setup = document.querySelector('[data-smoke="guided-repeat-setup"]');
+    const cta = document.querySelector('[data-smoke="guided-repeat-start"]');
+    if (!(setup instanceof HTMLElement) || !(cta instanceof HTMLElement)) {
+      throw new Error("Guided-repeat mobile capture target is missing.");
+    }
+    setup.scrollTo({
+      behavior: "instant",
+      left: 0,
+      top: Math.max(0, setup.scrollHeight - setup.clientHeight),
+    });
+    await new Promise((resolve) =>
+      requestAnimationFrame(() => requestAnimationFrame(resolve)),
+    );
+  });
+}
+
+async function prepareShot(page, shot, viewport) {
   await page.goto(shot.route, { waitUntil: "load" });
 
   if (shot.id === "guided-repeat") {
@@ -276,6 +296,8 @@ async function prepareShot(page, shot) {
     );
   }
 
+  await focusMobileGuidedRepeat(page, shot, viewport);
+
   if (shot.bannerKind === "example-score") {
     const banner = page.locator(
       '[data-release-evidence-banner="example-score"]',
@@ -291,80 +313,120 @@ async function prepareShot(page, shot) {
   return bannerPlacement;
 }
 
-async function measureLayoutGeometry(page) {
-  return page.evaluate(() => {
-    const rectangle = (element) => {
-      if (!element) return null;
-      const rect = element.getBoundingClientRect();
-      return {
-        left: rect.left,
-        top: rect.top,
-        right: rect.right,
-        bottom: rect.bottom,
-        width: rect.width,
-        height: rect.height,
-      };
-    };
-    const overlaps = (left, right) =>
-      Boolean(
-        left &&
-          right &&
-          Math.max(left.left, right.left) < Math.min(left.right, right.right) &&
-          Math.max(left.top, right.top) < Math.min(left.bottom, right.bottom),
-      );
-    const heading = rectangle(document.querySelector("#main-content h1"));
-    const main = document.querySelector("#main-content");
-    const appShell = main?.parentElement;
-    const titlebar = rectangle(appShell?.previousElementSibling);
-    const desktopSidebar = rectangle(
-      [...(appShell?.querySelectorAll("aside") ?? [])].find((element) => {
-        const style = getComputedStyle(element);
+async function measureLayoutGeometry(page, shot, viewport) {
+  return page.evaluate(
+    ({ captureGuidedRepeat, guidedRepeatSafeMargin }) => {
+      const rectangle = (element) => {
+        if (!element) return null;
         const rect = element.getBoundingClientRect();
-        return style.display !== "none" && rect.width > 0 && rect.height > 0;
-      }),
-    );
-    const mobileNavigationCandidate = rectangle(
-      document.querySelector('[aria-label="打开学习导航"]')?.closest("div"),
-    );
-    const mobileNavigation =
-      mobileNavigationCandidate?.width > 0 &&
-      mobileNavigationCandidate?.height > 0
-        ? mobileNavigationCandidate
-        : null;
-    const tolerance = 0.75;
-    const rectangleInsideViewport = (rect) =>
-      Boolean(
-        rect &&
-          rect.left >= -tolerance &&
-          rect.top >= -tolerance &&
-          rect.right <= window.innerWidth + tolerance &&
-          rect.bottom <= window.innerHeight + tolerance,
+        return {
+          left: rect.left,
+          top: rect.top,
+          right: rect.right,
+          bottom: rect.bottom,
+          width: rect.width,
+          height: rect.height,
+        };
+      };
+      const overlaps = (left, right) =>
+        Boolean(
+          left &&
+            right &&
+            Math.max(left.left, right.left) <
+              Math.min(left.right, right.right) &&
+            Math.max(left.top, right.top) < Math.min(left.bottom, right.bottom),
+        );
+      const heading = rectangle(document.querySelector("#main-content h1"));
+      const main = document.querySelector("#main-content");
+      const appShell = main?.parentElement;
+      const titlebar = rectangle(appShell?.previousElementSibling);
+      const desktopSidebar = rectangle(
+        [...(appShell?.querySelectorAll("aside") ?? [])].find((element) => {
+          const style = getComputedStyle(element);
+          const rect = element.getBoundingClientRect();
+          return style.display !== "none" && rect.width > 0 && rect.height > 0;
+        }),
       );
-    const titlebarComplete =
-      rectangleInsideViewport(titlebar) &&
-      Math.abs(titlebar.left) <= tolerance &&
-      Math.abs(titlebar.top) <= tolerance &&
-      Math.abs(titlebar.right - window.innerWidth) <= tolerance &&
-      titlebar.height >= 35;
-    const navigationComplete = mobileNavigation
-      ? rectangleInsideViewport(mobileNavigation) &&
-        mobileNavigation.top >= titlebar.bottom - tolerance &&
-        mobileNavigation.height >= 47
-      : desktopSidebar
-        ? rectangleInsideViewport(desktopSidebar) &&
-          desktopSidebar.top >= titlebar.bottom - tolerance
-        : false;
-    return {
-      heading,
-      titlebar,
-      desktopSidebar,
-      mobileNavigation,
-      navigationTitleOverlap: overlaps(heading, mobileNavigation),
-      globalChromeWithinViewport: titlebarComplete && navigationComplete,
-      windowScroll: { x: window.scrollX, y: window.scrollY },
-      mainScrollTop: main?.scrollTop ?? null,
-    };
-  });
+      const mobileNavigationCandidate = rectangle(
+        document.querySelector('[aria-label="打开学习导航"]')?.closest("div"),
+      );
+      const mobileNavigation =
+        mobileNavigationCandidate?.width > 0 &&
+        mobileNavigationCandidate?.height > 0
+          ? mobileNavigationCandidate
+          : null;
+      const tolerance = 0.75;
+      const rectangleInsideViewport = (rect) =>
+        Boolean(
+          rect &&
+            rect.left >= -tolerance &&
+            rect.top >= -tolerance &&
+            rect.right <= window.innerWidth + tolerance &&
+            rect.bottom <= window.innerHeight + tolerance,
+        );
+      const titlebarComplete =
+        rectangleInsideViewport(titlebar) &&
+        Math.abs(titlebar.left) <= tolerance &&
+        Math.abs(titlebar.top) <= tolerance &&
+        Math.abs(titlebar.right - window.innerWidth) <= tolerance &&
+        titlebar.height >= 35;
+      const navigationComplete = mobileNavigation
+        ? rectangleInsideViewport(mobileNavigation) &&
+          mobileNavigation.top >= titlebar.bottom - tolerance &&
+          mobileNavigation.height >= 47
+        : desktopSidebar
+          ? rectangleInsideViewport(desktopSidebar) &&
+            desktopSidebar.top >= titlebar.bottom - tolerance
+          : false;
+      let guidedRepeatFocus = null;
+      if (captureGuidedRepeat) {
+        const ctaElement = document.querySelector(
+          '[data-smoke="guided-repeat-start"]',
+        );
+        const planElement = ctaElement?.parentElement;
+        const setupElement = document.querySelector(
+          '[data-smoke="guided-repeat-setup"]',
+        );
+        const cta = rectangle(ctaElement);
+        const plan = rectangle(planElement);
+        const ctaSafetyMarginPx = cta
+          ? Math.min(
+              cta.left,
+              cta.top,
+              window.innerWidth - cta.right,
+              window.innerHeight - cta.bottom,
+            )
+          : Number.NEGATIVE_INFINITY;
+        guidedRepeatFocus = {
+          cta,
+          plan,
+          ctaSafetyMarginPx,
+          requiredSafetyMarginPx: guidedRepeatSafeMargin,
+          ctaWithinViewport:
+            rectangleInsideViewport(cta) &&
+            ctaSafetyMarginPx >= guidedRepeatSafeMargin,
+          planWithinViewport: rectangleInsideViewport(plan),
+          setupScrollTop:
+            setupElement instanceof HTMLElement ? setupElement.scrollTop : null,
+        };
+      }
+      return {
+        heading,
+        titlebar,
+        desktopSidebar,
+        mobileNavigation,
+        navigationTitleOverlap: overlaps(heading, mobileNavigation),
+        globalChromeWithinViewport: titlebarComplete && navigationComplete,
+        windowScroll: { x: window.scrollX, y: window.scrollY },
+        mainScrollTop: main?.scrollTop ?? null,
+        guidedRepeatFocus,
+      };
+    },
+    {
+      captureGuidedRepeat: shot.id === "guided-repeat" && viewport.width < 1024,
+      guidedRepeatSafeMargin: GUIDED_REPEAT_CAPTURE_SAFE_MARGIN,
+    },
+  );
 }
 
 async function proveFixtureBuild(page) {
@@ -479,8 +541,33 @@ async function main() {
       await mkdir(viewportDir, { recursive: true });
 
       for (const shot of RELEASE_EVIDENCE_SHOTS) {
-        const bannerGeometry = await prepareShot(page, shot);
-        const layoutGeometry = await measureLayoutGeometry(page);
+        const bannerGeometry = await prepareShot(page, shot, viewport);
+        const layoutGeometry = await measureLayoutGeometry(
+          page,
+          shot,
+          viewport,
+        );
+        const expectsGuidedRepeatFocus =
+          shot.id === "guided-repeat" && viewport.width < 1024;
+        if (
+          expectsGuidedRepeatFocus &&
+          (!layoutGeometry.guidedRepeatFocus?.ctaWithinViewport ||
+            !layoutGeometry.guidedRepeatFocus?.planWithinViewport ||
+            layoutGeometry.guidedRepeatFocus.ctaSafetyMarginPx <
+              GUIDED_REPEAT_CAPTURE_SAFE_MARGIN)
+        ) {
+          throw new Error(
+            `Guided-repeat CTA capture is clipped on ${viewport.id}: ${JSON.stringify(layoutGeometry.guidedRepeatFocus)}`,
+          );
+        }
+        if (
+          !expectsGuidedRepeatFocus &&
+          layoutGeometry.guidedRepeatFocus !== null
+        ) {
+          throw new Error(
+            `Unexpected guided-repeat mobile focus geometry on ${viewport.id} ${shot.id}.`,
+          );
+        }
         if (layoutGeometry.navigationTitleOverlap) {
           throw new Error(
             `Mobile navigation overlaps the page title on ${viewport.id} ${shot.id}: ${JSON.stringify(layoutGeometry)}`,

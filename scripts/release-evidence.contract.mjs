@@ -124,6 +124,14 @@ for (const scriptPath of [
   assert.match(source, /EXAMPLE_SCORE_DISCLOSURE/);
 }
 
+const browserCaptureSource = await readFile(
+  path.join(root, "scripts/capture-browser-release-evidence.mjs"),
+  "utf8",
+);
+assert.match(browserCaptureSource, /GUIDED_REPEAT_CAPTURE_SAFE_MARGIN = 12/);
+assert.match(browserCaptureSource, /guidedRepeatFocus/);
+assert.match(browserCaptureSource, /Guided-repeat CTA capture is clipped/);
+
 function pngDimensions(buffer) {
   assert.deepEqual(
     [...buffer.subarray(0, 8)],
@@ -519,6 +527,7 @@ async function validateScreenshotManifest(edition, viewports) {
             "globalChromeWithinViewport",
             "windowScroll",
             "mainScrollTop",
+            "guidedRepeatFocus",
           ]
         : [
             "banner",
@@ -564,6 +573,44 @@ async function validateScreenshotManifest(edition, viewports) {
     }
     if (edition === "browser" && viewport.width < 1024) {
       assert.equal(entry.geometry.navigationTitleOverlap, false);
+    }
+    const expectsGuidedRepeatFocus =
+      edition === "browser" &&
+      viewport.width < 1024 &&
+      shot.id === "guided-repeat";
+    if (expectsGuidedRepeatFocus) {
+      assertRecord(entry.geometry.guidedRepeatFocus, `${key} guided focus`);
+      assertExactKeys(
+        entry.geometry.guidedRepeatFocus,
+        [
+          "cta",
+          "plan",
+          "ctaSafetyMarginPx",
+          "requiredSafetyMarginPx",
+          "ctaWithinViewport",
+          "planWithinViewport",
+          "setupScrollTop",
+        ],
+        `${key} guided focus`,
+      );
+      for (const [label, rectangle] of [
+        ["CTA", entry.geometry.guidedRepeatFocus.cta],
+        ["plan", entry.geometry.guidedRepeatFocus.plan],
+      ]) {
+        assertRecord(rectangle, `${key} guided ${label}`);
+        assertExactKeys(
+          rectangle,
+          ["left", "top", "right", "bottom", "width", "height"],
+          `${key} guided ${label}`,
+        );
+      }
+      assert.equal(entry.geometry.guidedRepeatFocus.requiredSafetyMarginPx, 12);
+      assert.ok(entry.geometry.guidedRepeatFocus.ctaSafetyMarginPx >= 12);
+      assert.equal(entry.geometry.guidedRepeatFocus.ctaWithinViewport, true);
+      assert.equal(entry.geometry.guidedRepeatFocus.planWithinViewport, true);
+      assert.ok(entry.geometry.guidedRepeatFocus.setupScrollTop > 0);
+    } else if (edition === "browser") {
+      assert.equal(entry.geometry.guidedRepeatFocus, null);
     }
     assert.equal(
       entry.scoreDisclosure,
