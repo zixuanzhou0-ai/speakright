@@ -350,24 +350,59 @@ describe("open-source readiness files", () => {
     expect(currentDocs).not.toMatch(/\btomorrow(?:'s)?\b/i);
   });
 
-  it("keeps README screenshot assets present", () => {
+  it("keeps README release evidence current and present", () => {
     const readme = read("README.md");
-    for (const screenshot of [
-      "settings.png",
-      "english-phoneme-score.png",
-      "free-practice.png",
-      "english-assessment.png",
-      "spanish-phoneme.png",
-      "french-phoneme.png",
-      "russian-phoneme.png",
-    ]) {
-      const markdownPath = `docs/assets/screenshots/${screenshot}`;
+    const representativeEvidence = [
+      "docs/assets/screenshots/release/v1.1.0/browser/1280x800/guided-repeat.png",
+      "docs/assets/screenshots/release/v1.1.0/browser/1280x800/free-practice.png",
+      "docs/assets/screenshots/release/v1.1.0/browser/1280x800/diagnosis-example.png",
+      "docs/assets/screenshots/release/v1.1.0/browser/1280x800/settings.png",
+      "docs/assets/screenshots/release/v1.1.0/desktop/1280x920/guided-repeat.png",
+      "docs/assets/screenshots/release/v1.1.0/desktop/1280x920/free-practice.png",
+      "docs/assets/screenshots/release/v1.1.0/desktop/1280x920/diagnosis-example.png",
+      "docs/assets/screenshots/release/v1.1.0/desktop/1280x920/settings.png",
+      "docs/assets/demo/speakright-v1.1.0-overview.mp4",
+      "docs/assets/demo/speakright-v1.1.0-overview.en.vtt",
+    ];
+
+    for (const markdownPath of representativeEvidence) {
       expect(readme).toContain(markdownPath);
       expect(existsSync(join(projectRoot, markdownPath)), markdownPath).toBe(
         true,
       );
     }
-    expect(readme).toMatch(/smoke-only demo\s+state/);
+
+    const matrices = [
+      {
+        edition: "browser",
+        viewports: ["1280x800", "390x844", "360x800"],
+      },
+      { edition: "desktop", viewports: ["1280x920", "1024x800"] },
+    ];
+    const shots = [
+      "guided-repeat",
+      "free-practice",
+      "diagnosis-example",
+      "settings",
+      "progress-example",
+      "no-key",
+    ];
+
+    for (const { edition, viewports } of matrices) {
+      for (const viewport of viewports) {
+        for (const shot of shots) {
+          const screenshotPath =
+            `docs/assets/screenshots/release/v1.1.0/${edition}/` +
+            `${viewport}/${shot}.png`;
+          expect(
+            existsSync(join(projectRoot, screenshotPath)),
+            screenshotPath,
+          ).toBe(true);
+        }
+      }
+    }
+
+    expect(readme).toContain("Example data — not a live Azure score");
     expect(readme).toContain("real user scores come from Azure");
   });
 
