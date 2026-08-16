@@ -6,6 +6,7 @@ import os from "node:os";
 import path from "node:path";
 import { digestAssetFamily, walkFiles } from "./lib/asset-rights-core.mjs";
 import {
+  compareReleaseEvidencePaths,
   materializeReleaseEvidenceAssets,
   releaseEvidenceAssetSet,
 } from "./lib/release-evidence-assets.mjs";
@@ -31,7 +32,18 @@ async function writeFixture(projectRoot) {
     mkdir(path.join(projectRoot, "docs", "assets"), { recursive: true }),
     mkdir(path.join(projectRoot, "scripts", "lib"), { recursive: true }),
   ]);
-  await writeFile(path.join(publicRoot, "audio", "demo.mp3"), "demo-audio");
+  const approvedAudio = [
+    "audio/-lead.mp3",
+    "audio/MqQWUsHbmdI.mp3",
+    "audio/a_y0qGSC-ZY.mp3",
+    "audio/demo.mp3",
+  ].sort(compareReleaseEvidencePaths);
+  for (const relativePath of approvedAudio) {
+    await writeFile(
+      path.join(publicRoot, ...relativePath.split("/")),
+      `fixture:${relativePath}`,
+    );
+  }
   await writeFile(
     path.join(publicRoot, "videos", "phonemes", "ignored.mp4"),
     "ignored-local-video",
@@ -57,7 +69,7 @@ async function writeFixture(projectRoot) {
     path.join(projectRoot, "scripts", "lib", "release-evidence-assets.mjs"),
     "// fixture evidence policy input\n",
   );
-  const digest = await digestAssetFamily(publicRoot, ["audio/demo.mp3"]);
+  const digest = await digestAssetFamily(publicRoot, approvedAudio);
   const registry = {
     $schema: "./asset-rights-registry.schema.json",
     version: 1,
@@ -68,7 +80,7 @@ async function writeFixture(projectRoot) {
         id: "fixture-audio",
         path: "audio/*.mp3",
         sha256: digest,
-        assetCount: 1,
+        assetCount: approvedAudio.length,
         kind: "audio",
         sourceName: "Release evidence contract fixture",
         creator: "SpeakRight test fixture",
@@ -81,7 +93,7 @@ async function writeFixture(projectRoot) {
     ],
   };
   await writeFile(registryPath, `${JSON.stringify(registry, null, 2)}\n`);
-  return { publicRoot, registryPath };
+  return { approvedAudio, publicRoot, registryPath };
 }
 
 async function main() {
@@ -89,7 +101,8 @@ async function main() {
     path.join(os.tmpdir(), "speakright-release-evidence-assets-contract-"),
   );
   try {
-    const { publicRoot, registryPath } = await writeFixture(projectRoot);
+    const { approvedAudio, publicRoot, registryPath } =
+      await writeFixture(projectRoot);
     git(projectRoot, ["init", "--quiet"]);
     git(projectRoot, [
       "config",
@@ -106,10 +119,10 @@ async function main() {
       "browser",
       sourceCommit,
     );
-    assert.equal(initial.summary.fileCount, 1);
+    assert.equal(initial.summary.fileCount, approvedAudio.length);
     assert.deepEqual(
       initial.files.map((entry) => entry.path),
-      ["audio/demo.mp3"],
+      approvedAudio,
     );
 
     const destinationRoot = path.join(projectRoot, "staging-browser");
@@ -120,7 +133,10 @@ async function main() {
       projectRoot,
     });
     assert.deepEqual(materialized.assetSet, initial.summary);
-    assert.deepEqual(await walkFiles(destinationRoot), ["audio/demo.mp3"]);
+    assert.deepEqual(
+      (await walkFiles(destinationRoot)).sort(compareReleaseEvidencePaths),
+      approvedAudio,
+    );
     assert.equal(
       existsSync(
         path.join(destinationRoot, "videos", "phonemes", "ignored.mp4"),

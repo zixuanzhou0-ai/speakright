@@ -21,6 +21,10 @@ const ASSET_POLICY_PATHS = [
 const COPY_FALLBACK_CODES = new Set(["EACCES", "ENOTSUP", "EPERM", "EXDEV"]);
 const fileDigestCache = new Map();
 
+export function compareReleaseEvidencePaths(left, right) {
+  return left.localeCompare(right, "en");
+}
+
 function git(projectRoot, arguments_, options = {}) {
   return execFileSync("git", ["-C", projectRoot, ...arguments_], {
     encoding: "utf8",
@@ -130,7 +134,9 @@ export async function releaseEvidenceAssetSet(
     );
   }
   const trackedSet = new Set(packagedFiles);
-  const releaseFiles = filesForEdition(analysis, edition);
+  const releaseFiles = filesForEdition(analysis, edition).sort(
+    compareReleaseEvidencePaths,
+  );
   if (releaseFiles.length === 0) {
     throw new Error(`Release-evidence ${edition} asset set is empty.`);
   }
@@ -210,9 +216,18 @@ export async function materializeReleaseEvidenceAssets({
       copied += 1;
     }
   }
-  const materializedFiles = await walkFiles(destinationRoot);
-  const expectedFiles = assetSet.files.map((entry) => entry.path);
-  if (JSON.stringify(materializedFiles) !== JSON.stringify(expectedFiles)) {
+  const materializedFiles = (await walkFiles(destinationRoot)).sort(
+    compareReleaseEvidencePaths,
+  );
+  const expectedFiles = assetSet.files
+    .map((entry) => entry.path)
+    .sort(compareReleaseEvidencePaths);
+  if (
+    materializedFiles.length !== expectedFiles.length ||
+    materializedFiles.some(
+      (relativePath, index) => relativePath !== expectedFiles[index],
+    )
+  ) {
     throw new Error(
       `Materialized ${edition} asset paths differ from the approved tracked set.`,
     );
