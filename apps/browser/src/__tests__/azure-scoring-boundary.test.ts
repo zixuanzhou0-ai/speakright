@@ -98,6 +98,9 @@ describe("Azure scoring boundary", () => {
     expect(phonemePage).toContain(
       'searchParams.get("smokeScoreSummary") === "1"',
     );
+    expect(phonemePage).toContain(
+      'process.env.NEXT_PUBLIC_SPEAKRIGHT_TEST_FIXTURES === "1"',
+    );
     expect(phonemePage).toContain("azure.result ??");
     expect(phonemePage).not.toContain(
       "scoreSummaryResult = SMOKE_SCORE_SUMMARY_RESULT",

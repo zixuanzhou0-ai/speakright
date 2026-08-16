@@ -64,6 +64,13 @@ describe("desktop preflight and UI smoke", () => {
     );
   });
 
+  it("keeps the desktop app shell wheel-scrollable on long pages", () => {
+    const layout = readProjectFile("src/app/layout.tsx");
+
+    expect(layout).toContain("overflow-y-auto scrollbar-thin lg:h-full");
+    expect(layout).not.toContain("lg:h-full lg:overflow-hidden");
+  });
+
   it("fails preflight with a clear prompt when speakright.exe is running", () => {
     const script = readProjectFile("scripts/desktop-preflight.mjs");
 
@@ -124,15 +131,24 @@ describe("desktop preflight and UI smoke", () => {
     expect(packageJson.scripts["validate:desktop"]).toContain(
       "desktop:ui-smoke",
     );
-    expect(
-      packageJson.scripts["validate:desktop"].indexOf("desktop:artifact-smoke"),
-    ).toBeLessThan(
-      packageJson.scripts["validate:desktop"].indexOf("desktop:ui-smoke"),
+    const validation = packageJson.scripts["validate:desktop"];
+    expect(validation.indexOf("desktop:build:ui-smoke")).toBeLessThan(
+      validation.indexOf("desktop:ui-smoke"),
+    );
+    const productionBuild = validation.indexOf("npm run desktop:build &&");
+    expect(validation.indexOf("desktop:ui-smoke")).toBeLessThan(
+      productionBuild,
+    );
+    expect(productionBuild).toBeLessThan(
+      validation.indexOf("desktop:artifact-smoke"),
     );
   });
 
   it("opens key release routes without recording or ElevenLabs generation", () => {
     const script = readProjectFile("scripts/desktop-ui-smoke.mjs");
+
+    expect(script).toContain("SPEAKRIGHT_SECURE_STORE_SERVICE");
+    expect(script).toContain("findConflictingSpeakRightProcesses");
 
     expect(script).toContain("/settings");
     expect(script).toContain("/phonemes/ee");
@@ -184,6 +200,25 @@ describe("desktop preflight and UI smoke", () => {
     expect(script).toContain("sentenceHooksReady");
     expect(script).toContain("sentence-input-card");
     expect(script).toContain("sentence-recording-card");
+    expect(script).toContain("SPEAKRIGHT_DESKTOP_TTS_SCREENSHOT_DIR");
+    expect(script).toContain("SPEAKRIGHT_UI_SMOKE_EXECUTABLE");
+    expect(script).toContain("SPEAKRIGHT_UI_SMOKE_DEBUGGING_PORT");
+    expect(script).toContain("SPEAKRIGHT_UI_SMOKE_TTS_ONLY");
+    expect(script).toContain("captureDesktopTtsScreenshots");
+    expect(script).toContain("desktop-free-practice-tts-playing-");
+    expect(script).toContain("desktop-free-practice-tts-complete-");
+    expect(script).toContain("Page.captureScreenshot");
+    expect(script).toContain("width: 1280, height: 920");
+    expect(script).toContain("width: 1024, height: 800");
+    expect(script).toContain(
+      "Mi perro corre por la plaza. La niña compra pan, queso y zumo por la mañana.",
+    );
+    expect(script).toContain(
+      "/audio/language-packs/es-ES/mi-perro-corre-por-la-plaza-la-nina-compra-4d4bed99c7.mp3",
+    );
+    expect(script).toContain("read-along-untimed-status");
+    expect(script).toContain("replayDoesNotCoverText");
+    expect(script).toContain("leftColumnCanReachRecording");
     expect(script).toContain("/assessment");
     expect(script).toContain("assessmentHooksReady");
     expect(script).toContain("assessment-intro-card");
@@ -259,7 +294,7 @@ describe("desktop preflight and UI smoke", () => {
     expect(script).toContain('tile.tabIndex === "-1"');
     expect(script).toContain('tile.role === "button"');
     expect(script).toContain('tile.tabIndex === "0"');
-    expect(script).toContain("scoringTileAudioPolicy=ok");
+    expect(script).toContain("labsScoringTileBoundary=ok");
     expect(script).toContain("usage-history-target");
     expect(script).toContain("pronunciation-test-row");
     expect(script).toContain("data-control-api-key-toggle-row");
@@ -298,6 +333,8 @@ describe("desktop preflight and UI smoke", () => {
     const sentencesPage = readProjectFile("src/app/sentences/page.tsx");
     expect(sentencesPage).toContain('data-smoke="sentences-page"');
     expect(sentencesPage).toContain('data-smoke="free-practice-clear-session"');
+    expect(sentencesPage).toContain('data-smoke="free-practice-layout"');
+    expect(sentencesPage).toContain('data-smoke="free-practice-left-column"');
     expect(sentencesPage).toContain(
       "mb-2 flex shrink-0 flex-col gap-2 sm:flex-row sm:items-center sm:justify-between",
     );
@@ -316,6 +353,9 @@ describe("desktop preflight and UI smoke", () => {
     );
     expect(sentenceInputCard).toContain("free-practice-word-audio-error");
     expect(sentenceInputCard).toContain("free-practice-tts-error");
+    expect(sentenceInputCard).toContain("free-practice-tts-output");
+    expect(sentenceInputCard).toContain("free-practice-tts-replay");
+    expect(sentenceInputCard).toContain("shrink-0 space-y-3 rounded-xl border");
     expect(sentenceInputCard).toContain("free-practice-target-pack-badge");
     expect(sentenceInputCard).toContain("free-practice-suggestion-pack-badge");
     expect(sentenceInputCard).toContain("free-practice-suggestion-word");
@@ -398,8 +438,47 @@ describe("desktop preflight and UI smoke", () => {
     expect(script).toContain("headerAudioReady");
     expect(script).toContain('.includes("发音")');
     expect(script).not.toContain("MediaRecorder");
-    expect(script).not.toContain("elevenlabs");
+    expect(script).not.toContain("/api/elevenlabs");
+    expect(script).not.toContain("elevenLabsTts");
     expect(script).not.toContain("generate-word-audio");
+  });
+
+  it("isolates desktop smoke credentials and only blocks the same executable", () => {
+    const uiSmoke = readProjectFile("scripts/desktop-ui-smoke.mjs");
+    const releaseSmoke = readProjectFile("scripts/desktop-smoke.mjs");
+    const evidenceCapture = readProjectFile(
+      "scripts/capture-desktop-release-evidence.mjs",
+    );
+    const processBoundary = readProjectFile(
+      "scripts/lib/windows-process-boundary.mjs",
+    );
+    const rustRuntime = readProjectFile("src-tauri/src/lib.rs");
+
+    expect(releaseSmoke).toContain("SPEAKRIGHT_DESKTOP_SMOKE_EXECUTABLE");
+    expect(releaseSmoke).toContain("SPEAKRIGHT_SECURE_STORE_SERVICE");
+    expect(releaseSmoke).toContain("SPEAKRIGHT_LOG_DIR");
+    expect(releaseSmoke).toContain("SPEAKRIGHT_SETTINGS_STORE_PATH");
+    expect(releaseSmoke).toContain("release-smoke-$" + "{randomUUID()}");
+    expect(releaseSmoke).toContain("findConflictingSpeakRightProcesses");
+    expect(evidenceCapture).toContain("SPEAKRIGHT_SECURE_STORE_SERVICE");
+    expect(evidenceCapture).toContain("findConflictingSpeakRightProcesses");
+    expect(uiSmoke).toContain("ui-smoke-$" + "{randomUUID()}");
+    expect(uiSmoke).toContain("SPEAKRIGHT_LOG_DIR");
+    expect(uiSmoke).toContain("SPEAKRIGHT_SETTINGS_STORE_PATH");
+    expect(rustRuntime).toContain(
+      'const LOG_DIR_ENV: &str = "SPEAKRIGHT_LOG_DIR"',
+    );
+    expect(rustRuntime).toContain(
+      'const SETTINGS_STORE_PATH_ENV: &str = "SPEAKRIGHT_SETTINGS_STORE_PATH"',
+    );
+    expect(rustRuntime).toContain("desktop_settings_store_path");
+    expect(rustRuntime).toContain("validate_settings_store_path_override");
+    expect(rustRuntime).toContain("TargetKind::Folder");
+    expect(rustRuntime).toContain("validate_log_directory_override");
+    expect(processBoundary).toContain("Get-CimInstance Win32_Process");
+    expect(processBoundary).toContain("process-path-unavailable");
+    expect(processBoundary).not.toContain("taskkill");
+    expect(processBoundary).not.toContain("Stop-Process");
   });
 
   it("keeps Settings and usage text from falling back to ellipsis", () => {
@@ -615,7 +694,7 @@ describe("desktop preflight and UI smoke", () => {
     expect(useTtsAligned).toContain("normalizeStandardTtsError");
     expect(useTts).not.toContain("e.message");
     expect(useTtsAligned).not.toContain("e.message");
-    expect(ttsErrors).toContain("无法连接 ElevenLabs");
+    expect(ttsErrors).toContain("无法连接当前标准示范服务");
     expect(ttsErrors).toContain("本地标准示范缓存不可用");
   });
 

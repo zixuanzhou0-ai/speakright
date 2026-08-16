@@ -84,7 +84,7 @@ describe("PhonemeCard header audio", () => {
       />,
     );
 
-    const ipa = screen.getByText("/ae/");
+    const ipa = screen.getByRole("button", { name: "播放音标 /ae/" });
     expectHeaderAudioMetadata(ipa, {
       kind: "chart",
       src: "/audio/ipa/phoneme/cat.mp3",
@@ -93,8 +93,7 @@ describe("PhonemeCard header audio", () => {
       fadeOutMs: "55",
     });
     expect(ipa).toHaveAttribute("data-smoke", "phoneme-card-ipa-audio");
-    expect(ipa).toHaveAttribute("role", "button");
-    expect(ipa).toHaveAttribute("tabindex", "0");
+    expect(ipa.tagName).toBe("BUTTON");
 
     const speaker = document.querySelector(
       '[data-smoke="phoneme-card-header-audio-button"]',
@@ -295,7 +294,7 @@ describe("PhonemeCard header audio", () => {
     expect(player.play).not.toHaveBeenCalled();
   });
 
-  it("plays verified header audio from the keyboard with the same one-shot policy", () => {
+  it("uses a native button for keyboard-operable verified header audio", () => {
     const player = mockPlayer();
     render(
       <PhonemeCard
@@ -307,7 +306,10 @@ describe("PhonemeCard header audio", () => {
       />,
     );
 
-    fireEvent.keyDown(screen.getByText("/ae/"), { key: " " });
+    const ipa = screen.getByRole("button", { name: "播放音标 /ae/" });
+    ipa.focus();
+    expect(ipa).toHaveFocus();
+    fireEvent.click(ipa);
 
     expect(player.play).toHaveBeenCalledWith("/audio/ipa/phoneme/cat.mp3", {
       startMs: 25,
@@ -329,11 +331,28 @@ describe("PhonemeCard header audio", () => {
       />,
     );
 
-    fireEvent.click(screen.getByAltText("cat"));
+    fireEvent.click(screen.getByRole("button", { name: "播放示例词 cat" }));
 
     expect(player.play).toHaveBeenCalledWith("/audio/ipa/normal/cat.mp3", {
       volume: 1.6,
     });
+  });
+
+  it("keeps navigation and audio controls as sibling interactive elements", () => {
+    render(
+      <PhonemeCard
+        player={mockPlayer()}
+        phoneme={phoneme({ chartWord: "cat", chartImage: "cat" })}
+      />,
+    );
+
+    const navigation = screen.getByRole("link", {
+      name: "学习音标 /ae/，示例词 cat",
+    });
+    expect(navigation.querySelector("button")).toBeNull();
+    expect(
+      screen.getByRole("button", { name: "播放示例词 cat" }),
+    ).toBeInTheDocument();
   });
 
   it("shows experimental phonology inventory badges for non-English realization units", () => {

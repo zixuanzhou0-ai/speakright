@@ -2,9 +2,23 @@ import { act, renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useTtsAligned } from "@/hooks/use-tts-aligned";
 
+interface MockHowlOptions {
+  onload?: () => void;
+  onplay?: () => void;
+  onend?: () => void;
+  onstop?: () => void;
+  onloaderror?: () => void;
+  onplayerror?: () => void;
+}
+
 const mocks = vi.hoisted(() => ({
   elevenLabsTtsAligned: vi.fn(),
+  hermesXaiTts: vi.fn(),
+  vertexGeminiTts: vi.fn(),
   getElevenLabsConfig: vi.fn(),
+  getStandardTtsConfig: vi.fn(),
+  getVertexGeminiTtsConfig: vi.fn(),
+  subscribeToStorage: vi.fn(),
   getLanguageAudioPackEntry: vi.fn(),
   getStaticLanguageAudioPackEntry: vi.fn(),
   getTtsFromCache: vi.fn(),
@@ -15,10 +29,15 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock("@/lib/api-client", () => ({
   elevenLabsTtsAligned: mocks.elevenLabsTtsAligned,
+  hermesXaiTts: mocks.hermesXaiTts,
+  vertexGeminiTts: mocks.vertexGeminiTts,
 }));
 
 vi.mock("@/lib/api-keys", () => ({
   getElevenLabsConfig: mocks.getElevenLabsConfig,
+  getStandardTtsConfig: mocks.getStandardTtsConfig,
+  getVertexGeminiTtsConfig: mocks.getVertexGeminiTtsConfig,
+  subscribeToStorage: mocks.subscribeToStorage,
 }));
 
 vi.mock("@/lib/language-audio-pack-cache", () => ({
@@ -43,14 +62,12 @@ vi.mock("howler", () => ({
   },
   Howl: mocks.Howl.mockImplementation(function (
     this: unknown,
-    options: {
-      onplay?: () => void;
-      onstop?: () => void;
-    },
+    options: MockHowlOptions,
   ) {
     let isPlaying = false;
     return {
       play: () => {
+        options.onload?.();
         isPlaying = true;
         options.onplay?.();
         return 1;
@@ -86,6 +103,9 @@ describe("useTtsAligned", () => {
       voiceId: "test-voice",
       modelId: "eleven_flash_v2_5",
     });
+    mocks.getStandardTtsConfig.mockReturnValue({ provider: "elevenlabs" });
+    mocks.getVertexGeminiTtsConfig.mockReturnValue({ voiceName: "Kore" });
+    mocks.subscribeToStorage.mockImplementation(() => () => {});
     mocks.getTtsFromCache.mockResolvedValue(null);
     mocks.getLanguageAudioPackEntry.mockResolvedValue(null);
     mocks.getStaticLanguageAudioPackEntry.mockResolvedValue(null);
@@ -105,6 +125,12 @@ describe("useTtsAligned", () => {
         ],
       },
     });
+    mocks.hermesXaiTts.mockResolvedValue(
+      new Blob([new Uint8Array([4, 5, 6])], { type: "audio/mpeg" }),
+    );
+    mocks.vertexGeminiTts.mockResolvedValue(
+      new Blob([new Uint8Array([7, 8, 9])], { type: "audio/wav" }),
+    );
 
     vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) =>
       window.setTimeout(() => callback(performance.now()), 16),
@@ -169,7 +195,7 @@ describe("useTtsAligned", () => {
     await waitFor(() => {
       expect(mocks.getTtsFromCache).toHaveBeenCalledWith(
         "Bonjour",
-        "test-voice",
+        "elevenlabs:test-voice:eleven_multilingual_v2",
         0.84,
         "fr-FR",
       );
@@ -184,10 +210,11 @@ describe("useTtsAligned", () => {
         speed: 0.84,
         languageCode: "fr",
       },
+      expect.any(AbortSignal),
     );
     expect(mocks.setTtsToCache).toHaveBeenCalledWith(
       "Bonjour",
-      "test-voice",
+      "elevenlabs:test-voice:eleven_multilingual_v2",
       0.84,
       expect.any(Blob),
       expect.any(Object),
@@ -206,7 +233,9 @@ describe("useTtsAligned", () => {
     });
 
     expect(result.current.error).toContain("无法播放标准示范");
-    expect(result.current.error).toContain("设置页配置 ElevenLabs");
+    expect(result.current.error).toContain(
+      "ElevenLabs、爱马仕 Grok 或 Vertex Gemini",
+    );
     expect(result.current.error).toContain("随应用提供示范音频");
     expect(result.current.error).toContain("单词词典发音只负责单词复读");
   });
@@ -242,7 +271,7 @@ describe("useTtsAligned", () => {
     });
 
     expect(result.current.error).toContain("无法播放标准示范");
-    expect(result.current.error).toContain("无法连接 ElevenLabs");
+    expect(result.current.error).toContain("无法连接当前标准示范服务");
     expect(result.current.error).not.toContain("Failed to fetch");
   });
 
@@ -281,6 +310,7 @@ describe("useTtsAligned", () => {
     expect(mocks.Howl).toHaveBeenNthCalledWith(
       1,
       expect.objectContaining({
+        src: ["/audio/language-packs/fr-FR/bonjour-pink-acf26f7271.mp3"],
         html5: false,
         volume: 12,
       }),
@@ -288,6 +318,7 @@ describe("useTtsAligned", () => {
     expect(mocks.Howl).toHaveBeenNthCalledWith(
       2,
       expect.objectContaining({
+        src: ["/audio/language-packs/fr-FR/bonjour-pink-acf26f7271.mp3"],
         html5: false,
         volume: 12,
       }),
@@ -305,8 +336,10 @@ describe("useTtsAligned", () => {
     });
 
     expect(result.current.error).toBeNull();
-    expect(fetch).toHaveBeenCalledWith("/audio/language-packs/es-ES/hola.mp3");
-    expect(URL.createObjectURL).toHaveBeenCalled();
+    expect(fetch).toHaveBeenCalledWith("/audio/language-packs/es-ES/hola.mp3", {
+      signal: expect.any(AbortSignal),
+    });
+    expect(URL.createObjectURL).not.toHaveBeenCalled();
     expect(mocks.getTtsFromCache).not.toHaveBeenCalled();
     expect(mocks.elevenLabsTtsAligned).not.toHaveBeenCalled();
     expect(mocks.setTtsToCache).not.toHaveBeenCalled();
@@ -325,12 +358,473 @@ describe("useTtsAligned", () => {
 
     expect(mocks.Howl).toHaveBeenCalledWith(
       expect.objectContaining({
-        src: ["blob:test-audio"],
+        src: ["/audio/language-packs/fr-FR/bonjour-pink-acf26f7271.mp3"],
         html5: false,
         volume: 12,
       }),
     );
     expect(mocks.elevenLabsTtsAligned).not.toHaveBeenCalled();
+  });
+
+  it("routes Hermes audio without a fake alignment and keeps replay available", async () => {
+    mocks.getStandardTtsConfig.mockReturnValue({ provider: "hermes-grok" });
+    mocks.getElevenLabsConfig.mockReturnValue(null);
+    const { result } = renderHook(() => useTtsAligned());
+
+    await act(async () => {
+      await result.current.speak("Hermes audio.", {
+        languageId: "en-US",
+        speed: 0.9,
+      });
+    });
+
+    expect(mocks.getTtsFromCache).not.toHaveBeenCalled();
+    expect(mocks.hermesXaiTts).toHaveBeenCalledWith("Hermes audio.", {
+      languageId: "en-US",
+      speed: 0.9,
+      signal: expect.any(AbortSignal),
+    });
+    expect(mocks.elevenLabsTtsAligned).not.toHaveBeenCalled();
+    expect(mocks.setTtsToCache).not.toHaveBeenCalled();
+    expect(result.current.wordTimings).toEqual([]);
+    expect(result.current.hasAudio).toBe(true);
+
+    act(() => result.current.replay());
+    expect(mocks.Howl).toHaveBeenCalledTimes(2);
+    expect(mocks.hermesXaiTts).toHaveBeenCalledTimes(1);
+  });
+
+  it("routes Vertex WAV audio without persistent cache or fake alignment", async () => {
+    mocks.getStandardTtsConfig.mockReturnValue({ provider: "vertex-gemini" });
+    mocks.getElevenLabsConfig.mockReturnValue(null);
+    mocks.getVertexGeminiTtsConfig.mockReturnValue({ voiceName: "Callirrhoe" });
+    const { result } = renderHook(() => useTtsAligned());
+
+    await act(async () => {
+      await result.current.speak("Vertex audio.", {
+        languageId: "fr-FR",
+        speed: 0.9,
+      });
+    });
+
+    expect(mocks.getTtsFromCache).not.toHaveBeenCalled();
+    expect(mocks.vertexGeminiTts).toHaveBeenCalledWith("Vertex audio.", {
+      languageId: "fr-FR",
+      speed: 0.9,
+      voiceName: "Callirrhoe",
+      signal: expect.any(AbortSignal),
+    });
+    expect(mocks.setTtsToCache).not.toHaveBeenCalled();
+    expect(result.current.wordTimings).toEqual([]);
+    expect(result.current.hasAudio).toBe(true);
+    expect(mocks.Howl).toHaveBeenCalledWith(
+      expect.objectContaining({ format: ["wav"] }),
+    );
+  });
+
+  it("keeps loading active until playback really starts", async () => {
+    let events: MockHowlOptions | undefined;
+    mocks.Howl.mockImplementationOnce(function (
+      this: unknown,
+      options: MockHowlOptions,
+    ) {
+      events = options;
+      let isPlaying = false;
+      return {
+        play: () => {
+          isPlaying = true;
+          return 1;
+        },
+        playing: () => isPlaying,
+        seek: () => 0,
+        unload: () => {
+          isPlaying = false;
+        },
+      };
+    });
+    const { result } = renderHook(() => useTtsAligned());
+
+    await act(async () => {
+      await result.current.speak("Testing audio.", 0.85);
+    });
+
+    expect(result.current.isLoading).toBe(true);
+    expect(result.current.isPlaying).toBe(false);
+    expect(result.current.hasAudio).toBe(false);
+
+    act(() => events?.onload?.());
+    expect(result.current.isLoading).toBe(true);
+    expect(result.current.hasAudio).toBe(true);
+
+    act(() => events?.onplay?.());
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.isPlaying).toBe(true);
+
+    act(() => events?.onend?.());
+    expect(result.current.isPlaying).toBe(false);
+    expect(result.current.hasAudio).toBe(true);
+  });
+
+  it("reports playback errors while keeping successfully loaded audio replayable", async () => {
+    let events: MockHowlOptions | undefined;
+    mocks.Howl.mockImplementationOnce(function (
+      this: unknown,
+      options: MockHowlOptions,
+    ) {
+      events = options;
+      return {
+        play: () => 1,
+        playing: () => false,
+        seek: () => 0,
+        unload: vi.fn(),
+      };
+    });
+    const { result } = renderHook(() => useTtsAligned());
+
+    await act(async () => {
+      await result.current.speak("Testing audio.", 0.85);
+    });
+    act(() => {
+      events?.onload?.();
+      events?.onplayerror?.();
+    });
+
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.isPlaying).toBe(false);
+    expect(result.current.hasAudio).toBe(true);
+    expect(result.current.error).toContain("音频播放失败");
+  });
+
+  it("clears replay state when the current Howl fails to load", async () => {
+    let events: MockHowlOptions | undefined;
+    mocks.Howl.mockImplementationOnce(function (
+      this: unknown,
+      options: MockHowlOptions,
+    ) {
+      events = options;
+      return {
+        play: () => 1,
+        playing: () => false,
+        seek: () => 0,
+        unload: vi.fn(),
+      };
+    });
+    const { result } = renderHook(() => useTtsAligned());
+
+    await act(async () => {
+      await result.current.speak("Testing audio.", 0.85);
+    });
+    act(() => events?.onloaderror?.());
+
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.isPlaying).toBe(false);
+    expect(result.current.hasAudio).toBe(false);
+    expect(result.current.error).toContain("音频加载失败");
+
+    act(() => result.current.replay());
+    expect(mocks.Howl).toHaveBeenCalledTimes(1);
+  });
+
+  it("settles playback state when the current Howl stops", async () => {
+    let events: MockHowlOptions | undefined;
+    mocks.Howl.mockImplementationOnce(function (
+      this: unknown,
+      options: MockHowlOptions,
+    ) {
+      events = options;
+      let isPlaying = false;
+      return {
+        play: () => {
+          isPlaying = true;
+          return 1;
+        },
+        playing: () => isPlaying,
+        seek: () => 0.5,
+        unload: () => {
+          isPlaying = false;
+        },
+      };
+    });
+    const { result } = renderHook(() => useTtsAligned());
+
+    await act(async () => {
+      await result.current.speak("Testing audio.", 0.85);
+    });
+    act(() => {
+      events?.onload?.();
+      events?.onplay?.();
+      events?.onstop?.();
+    });
+
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.isPlaying).toBe(false);
+    expect(result.current.currentTime).toBe(0);
+    expect(result.current.hasAudio).toBe(true);
+  });
+
+  it("handles a Howl constructor exception without exposing replay", async () => {
+    mocks.Howl.mockImplementationOnce(() => {
+      throw new Error("constructor failed");
+    });
+    const { result } = renderHook(() => useTtsAligned());
+
+    await act(async () => {
+      await result.current.speak("Testing audio.", 0.85);
+    });
+
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.isPlaying).toBe(false);
+    expect(result.current.hasAudio).toBe(false);
+    expect(result.current.error).toContain("无法开始播放");
+  });
+
+  it("handles a synchronous Howl play exception without exposing replay", async () => {
+    mocks.Howl.mockImplementationOnce(() => ({
+      play: () => {
+        throw new Error("play failed");
+      },
+      playing: () => false,
+      seek: () => 0,
+      unload: vi.fn(),
+    }));
+    const { result } = renderHook(() => useTtsAligned());
+
+    await act(async () => {
+      await result.current.speak("Testing audio.", 0.85);
+    });
+
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.isPlaying).toBe(false);
+    expect(result.current.hasAudio).toBe(false);
+    expect(result.current.error).toContain("无法开始播放");
+  });
+
+  it("ignores callbacks from an older Howl generation", async () => {
+    const generations: MockHowlOptions[] = [];
+    const createControlledHowl = function (
+      this: unknown,
+      options: MockHowlOptions,
+    ) {
+      generations.push(options);
+      let isPlaying = false;
+      return {
+        play: () => {
+          isPlaying = true;
+          return 1;
+        },
+        playing: () => isPlaying,
+        seek: () => 0,
+        unload: () => {
+          isPlaying = false;
+        },
+      };
+    };
+    mocks.Howl.mockImplementationOnce(createControlledHowl);
+    mocks.Howl.mockImplementationOnce(createControlledHowl);
+    const { result } = renderHook(() => useTtsAligned());
+
+    await act(async () => {
+      await result.current.speak("First audio.", 0.85);
+      await result.current.speak("Second audio.", 0.85);
+    });
+    act(() => {
+      generations[1]?.onload?.();
+      generations[1]?.onplay?.();
+    });
+    expect(result.current.isPlaying).toBe(true);
+    expect(result.current.hasAudio).toBe(true);
+
+    act(() => {
+      generations[0]?.onloaderror?.();
+      generations[0]?.onplayerror?.();
+      generations[0]?.onend?.();
+    });
+
+    expect(result.current.isPlaying).toBe(true);
+    expect(result.current.hasAudio).toBe(true);
+    expect(result.current.error).toBeNull();
+  });
+
+  it("invalidates loaded audio when TTS configuration changes", async () => {
+    const { result } = renderHook(() => useTtsAligned());
+
+    await act(async () => {
+      await result.current.speak("Testing audio.", 0.85);
+    });
+    expect(result.current.hasAudio).toBe(true);
+
+    const storageSubscriber = mocks.subscribeToStorage.mock.calls.at(-1)?.[0];
+    act(() => storageSubscriber?.());
+
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.isPlaying).toBe(false);
+    expect(result.current.hasAudio).toBe(false);
+    expect(result.current.wordTimings).toEqual([]);
+  });
+
+  it("lets a new text, language, and speed identity supersede an older request", async () => {
+    const pending = deferred<{
+      audio_base64: string;
+      alignment: {
+        characters: string[];
+        character_start_times_seconds: number[];
+        character_end_times_seconds: number[];
+      };
+    }>();
+    mocks.elevenLabsTtsAligned.mockReturnValueOnce(pending.promise);
+    const { result } = renderHook(() => useTtsAligned());
+
+    act(() => {
+      void result.current.speak("Old text.", {
+        languageId: "en-US",
+        speed: 0.8,
+      });
+    });
+    await waitFor(() => {
+      expect(mocks.elevenLabsTtsAligned).toHaveBeenCalledTimes(1);
+    });
+    const firstSignal = mocks.elevenLabsTtsAligned.mock.calls[0]?.[5] as
+      | AbortSignal
+      | undefined;
+
+    await act(async () => {
+      await result.current.speak("Bonjour", {
+        languageId: "fr-FR",
+        speed: 0.9,
+      });
+    });
+    expect(mocks.elevenLabsTtsAligned).toHaveBeenLastCalledWith(
+      "test-key",
+      "test-voice",
+      "Bonjour",
+      "eleven_multilingual_v2",
+      { speed: 0.9, languageCode: "fr" },
+      expect.any(AbortSignal),
+    );
+    expect(firstSignal?.aborted).toBe(true);
+
+    await act(async () => {
+      pending.resolve({
+        audio_base64: "AA==",
+        alignment: {
+          characters: Array.from("Old text."),
+          character_start_times_seconds: [
+            0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4,
+          ],
+          character_end_times_seconds: [
+            0.04, 0.09, 0.14, 0.19, 0.24, 0.29, 0.34, 0.39, 0.44,
+          ],
+        },
+      });
+      await pending.promise;
+    });
+
+    expect(mocks.Howl).toHaveBeenCalledTimes(1);
+    expect(result.current.hasAudio).toBe(true);
+  });
+
+  it("invalidates an in-flight request when the subscribed TTS configuration changes", async () => {
+    const pending = deferred<{
+      audio_base64: string;
+      alignment: {
+        characters: string[];
+        character_start_times_seconds: number[];
+        character_end_times_seconds: number[];
+      };
+    }>();
+    mocks.elevenLabsTtsAligned.mockReturnValueOnce(pending.promise);
+    const { result } = renderHook(() => useTtsAligned());
+
+    act(() => {
+      void result.current.speak("Pending audio.", 0.85);
+    });
+    await waitFor(() => {
+      expect(mocks.elevenLabsTtsAligned).toHaveBeenCalledTimes(1);
+    });
+    const pendingSignal = mocks.elevenLabsTtsAligned.mock.calls[0]?.[5] as
+      | AbortSignal
+      | undefined;
+
+    const storageSubscriber = mocks.subscribeToStorage.mock.calls.at(-1)?.[0];
+    act(() => storageSubscriber?.());
+    expect(pendingSignal?.aborted).toBe(true);
+
+    await act(async () => {
+      pending.resolve({
+        audio_base64: "AA==",
+        alignment: {
+          characters: Array.from("Pending audio."),
+          character_start_times_seconds: Array.from(
+            { length: 14 },
+            (_, index) => index * 0.05,
+          ),
+          character_end_times_seconds: Array.from(
+            { length: 14 },
+            (_, index) => index * 0.05 + 0.04,
+          ),
+        },
+      });
+      await pending.promise;
+    });
+
+    expect(mocks.Howl).not.toHaveBeenCalled();
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.hasAudio).toBe(false);
+  });
+
+  it("aborts an in-flight request when playback is stopped", async () => {
+    const pending = deferred<{
+      audio_base64: string;
+      alignment: null;
+    }>();
+    mocks.elevenLabsTtsAligned.mockReturnValueOnce(pending.promise);
+    const { result } = renderHook(() => useTtsAligned());
+
+    act(() => {
+      void result.current.speak("Pending audio.", 0.85);
+    });
+    await waitFor(() => {
+      expect(mocks.elevenLabsTtsAligned).toHaveBeenCalledTimes(1);
+    });
+    const signal = mocks.elevenLabsTtsAligned.mock.calls[0]?.[5] as
+      | AbortSignal
+      | undefined;
+
+    act(() => result.current.stop());
+    expect(signal?.aborted).toBe(true);
+    expect(result.current.isLoading).toBe(false);
+
+    await act(async () => {
+      pending.resolve({ audio_base64: "AA==", alignment: null });
+      await pending.promise;
+    });
+    expect(mocks.Howl).not.toHaveBeenCalled();
+  });
+
+  it("aborts an in-flight request when the hook unmounts", async () => {
+    const pending = deferred<{
+      audio_base64: string;
+      alignment: null;
+    }>();
+    mocks.elevenLabsTtsAligned.mockReturnValueOnce(pending.promise);
+    const { result, unmount } = renderHook(() => useTtsAligned());
+
+    act(() => {
+      void result.current.speak("Pending audio.", 0.85);
+    });
+    await waitFor(() => {
+      expect(mocks.elevenLabsTtsAligned).toHaveBeenCalledTimes(1);
+    });
+    const signal = mocks.elevenLabsTtsAligned.mock.calls[0]?.[5] as
+      | AbortSignal
+      | undefined;
+
+    unmount();
+    expect(signal?.aborted).toBe(true);
+
+    pending.resolve({ audio_base64: "AA==", alignment: null });
+    await pending.promise;
+    expect(mocks.Howl).not.toHaveBeenCalled();
   });
 
   it("ignores a stale pending TTS response after reset", async () => {
@@ -357,12 +851,18 @@ describe("useTtsAligned", () => {
         "Old text.",
         "eleven_flash_v2_5",
         0.85,
+        expect.any(AbortSignal),
       );
     });
+
+    const pendingSignal = mocks.elevenLabsTtsAligned.mock.calls[0]?.[5] as
+      | AbortSignal
+      | undefined;
 
     act(() => {
       result.current.reset();
     });
+    expect(pendingSignal?.aborted).toBe(true);
 
     await act(async () => {
       pending.resolve({

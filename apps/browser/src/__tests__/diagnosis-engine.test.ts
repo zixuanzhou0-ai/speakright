@@ -109,6 +109,54 @@ describe("buildDiagnosisReport", () => {
     expect(report.issues[0].nextLesson?.levelId).toBe("perception-abx");
   });
 
+  it("keeps preview-assisted word recordings out of the independent baseline", () => {
+    const report = buildDiagnosisReport({
+      wordRecordings: [
+        {
+          prompt: {
+            word: "think",
+            ipa: "/θɪŋk/",
+            targetPhonemes: ["th"],
+          },
+          source: "word",
+          supportLevel: "independent",
+          result: resultForWord("think", [
+            { phoneme: "th", accuracyScore: 40 },
+          ]),
+        },
+        {
+          prompt: {
+            word: "three",
+            ipa: "/θriː/",
+            targetPhonemes: ["th"],
+          },
+          source: "word",
+          supportLevel: "preview-assisted",
+          result: resultForWord("three", [{ phoneme: "th", accuracyScore: 5 }]),
+        },
+      ],
+      paragraphText: "paragraph",
+      paragraphResult: resultForWord("paragraph", [
+        { phoneme: "th", accuracyScore: 80 },
+      ]),
+    });
+
+    expect(report.phonemeScores.th).toEqual({ score: 60, sampleCount: 2 });
+    expect(report.evidenceSummary?.independentWordRecordings).toBe(1);
+    expect(report.evidenceSummary?.previewAssistedWordRecordings).toBe(1);
+    expect(report.evidenceSummary?.notes.join(" ")).toContain(
+      "未计入独立诊断基线",
+    );
+    expect(
+      report.rawEvidence.find(
+        (entry) => entry.supportLevel === "preview-assisted",
+      ),
+    ).toMatchObject({
+      text: "three",
+      recommendedAction: "request-more-samples",
+    });
+  });
+
   it("keeps weak fluency visible when prosody is strong", () => {
     const report = buildDiagnosisReport({
       wordRecordings: [],

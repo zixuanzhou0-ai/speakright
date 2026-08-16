@@ -1,23 +1,286 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   elevenLabsTts,
   elevenLabsTtsAligned,
   fetchElevenLabsUsage,
   fetchPronunciation,
+  hermesXaiStatus,
+  hermesXaiTts,
   testElevenLabs,
+  vertexGeminiStatus,
+  vertexGeminiTts,
 } from "@/lib/api-client";
 
 const mocks = vi.hoisted(() => ({
   apiFetch: vi.fn(),
+  invoke: vi.fn(),
+  isTauriEnvironment: vi.fn(() => false),
 }));
 
 vi.mock("@/lib/tauri-http", () => ({
   apiFetch: mocks.apiFetch,
 }));
 
+vi.mock("@/lib/tauri-runtime", () => ({
+  isTauriEnvironment: mocks.isTauriEnvironment,
+}));
+
+vi.mock("@tauri-apps/api/core", () => ({
+  invoke: mocks.invoke,
+}));
+
+function deferred<T>() {
+  let resolve!: (value: T) => void;
+  const promise = new Promise<T>((res) => {
+    resolve = res;
+  });
+  return { promise, resolve };
+}
+
 describe("desktop audio API client errors", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mocks.isTauriEnvironment.mockReturnValue(false);
+  });
+
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("routes Hermes audio through Tauri without exposing credentials", async () => {
+    mocks.isTauriEnvironment.mockReturnValue(true);
+    mocks.invoke.mockResolvedValueOnce({
+      audioBase64: "AA==",
+      mimeType: "audio/mpeg",
+    });
+
+    const audio = await hermesXaiTts("Hello", {
+      languageId: "en-US",
+      speed: 0.9,
+    });
+
+    expect(mocks.invoke).toHaveBeenCalledWith("hermes_xai_tts", {
+      text: "Hello",
+      languageId: "en-US",
+      speed: 0.9,
+    });
+    expect(audio).toBeInstanceOf(Blob);
+    expect(audio.size).toBe(1);
+  });
+
+  it("routes Vertex Gemini status and WAV audio through Tauri", async () => {
+    mocks.isTauriEnvironment.mockReturnValue(true);
+    mocks.invoke
+      .mockResolvedValueOnce({
+        available: true,
+        model: "gemini-3.1-flash-tts-preview",
+        authReady: true,
+        projectConfigured: true,
+      })
+      .mockResolvedValueOnce({
+        audioBase64: "AA==",
+        mimeType: "audio/wav",
+      });
+
+    await expect(vertexGeminiStatus()).resolves.toMatchObject({
+      available: true,
+      authReady: true,
+      projectConfigured: true,
+    });
+    const audio = await vertexGeminiTts("Hello", {
+      languageId: "en-US",
+      speed: 0.9,
+      voiceName: "Aoede",
+    });
+
+    expect(mocks.invoke).toHaveBeenNthCalledWith(
+      1,
+      "vertex_gemini_status",
+      undefined,
+    );
+    expect(mocks.invoke).toHaveBeenNthCalledWith(2, "vertex_gemini_tts", {
+      text: "Hello",
+      languageId: "en-US",
+      speed: 0.9,
+      voiceName: "Aoede",
+    });
+    expect(audio.type).toBe("audio/wav");
+    expect(audio.size).toBe(1);
+  });
+
+  it("checks AbortSignal before and after non-cancellable Tauri invokes", async () => {
+    mocks.isTauriEnvironment.mockReturnValue(true);
+    const alreadyAborted = new AbortController();
+    alreadyAborted.abort();
+
+    await expect(
+      hermesXaiTts("Hello", { signal: alreadyAborted.signal }),
+    ).rejects.toMatchObject({ name: "AbortError" });
+    expect(mocks.invoke).not.toHaveBeenCalled();
+
+    const pending = deferred<{
+      audioBase64: string;
+      mimeType: string;
+    }>();
+    mocks.invoke.mockReturnValueOnce(pending.promise);
+    const controller = new AbortController();
+    const request = vertexGeminiTts("Hello", {
+      voiceName: "Aoede",
+      signal: controller.signal,
+    });
+    await vi.waitFor(() => expect(mocks.invoke).toHaveBeenCalledTimes(1));
+
+    controller.abort();
+    pending.resolve({ audioBase64: "AA==", mimeType: "audio/wav" });
+
+    await expect(request).rejects.toMatchObject({ name: "AbortError" });
+  });
+
+  it("uses the localhost Hermes bridge outside Tauri", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            available: true,
+            voice_id: "eve",
+            protocolVersion: 1,
+            sessionToken: "test-session-token",
+          }),
+          { headers: { "Content-Type": "application/json" } },
+        ),
+      )
+      .mockResolvedValueOnce(
+        new Response(new Uint8Array([1, 2, 3]), {
+          headers: { "Content-Type": "audio/mpeg" },
+        }),
+      );
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(hermesXaiStatus()).resolves.toMatchObject({
+      available: true,
+      voiceId: "eve",
+    });
+    const audio = await hermesXaiTts("Hello", { speed: 1 });
+
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      1,
+      "http://127.0.0.1:17831/health",
+      expect.any(Object),
+    );
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      2,
+      "http://127.0.0.1:17831/tts",
+      expect.objectContaining({
+        method: "POST",
+        headers: expect.objectContaining({
+          "X-SpeakRight-Bridge-Token": "test-session-token",
+        }),
+        body: JSON.stringify({
+          text: "Hello",
+          languageId: "en-US",
+          speed: 1,
+        }),
+      }),
+    );
+    expect(audio.size).toBe(3);
+  });
+
+  it("merges an external abort signal into the Hermes bridge timeout signal", async () => {
+    let bridgeSignal: AbortSignal | undefined;
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            available: true,
+            protocolVersion: 1,
+            sessionToken: "abort-test-token",
+          }),
+          { headers: { "Content-Type": "application/json" } },
+        ),
+      )
+      .mockImplementationOnce(
+        (_url: string, init: RequestInit) =>
+          new Promise<Response>((_resolve, reject) => {
+            bridgeSignal = init.signal ?? undefined;
+            bridgeSignal?.addEventListener(
+              "abort",
+              () => reject(bridgeSignal?.reason),
+              { once: true },
+            );
+          }),
+      );
+    vi.stubGlobal("fetch", fetchMock);
+    await hermesXaiStatus();
+
+    const controller = new AbortController();
+    const request = hermesXaiTts("Hello", { signal: controller.signal });
+    await vi.waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+    expect(bridgeSignal).not.toBe(controller.signal);
+
+    controller.abort();
+
+    await expect(request).rejects.toMatchObject({ name: "AbortError" });
+    expect(bridgeSignal?.aborted).toBe(true);
+  });
+
+  it("merges an external abort signal into the Vertex bridge timeout signal", async () => {
+    let bridgeSignal: AbortSignal | undefined;
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            available: true,
+            authReady: true,
+            projectConfigured: true,
+            protocolVersion: 1,
+            sessionToken: "vertex-abort-token",
+          }),
+          { headers: { "Content-Type": "application/json" } },
+        ),
+      )
+      .mockImplementationOnce(
+        (_url: string, init: RequestInit) =>
+          new Promise<Response>((_resolve, reject) => {
+            bridgeSignal = init.signal ?? undefined;
+            bridgeSignal?.addEventListener(
+              "abort",
+              () => reject(bridgeSignal?.reason),
+              { once: true },
+            );
+          }),
+      );
+    vi.stubGlobal("fetch", fetchMock);
+    await vertexGeminiStatus();
+
+    const controller = new AbortController();
+    const request = vertexGeminiTts("Hello", {
+      voiceName: "Kore",
+      signal: controller.signal,
+    });
+    await vi.waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+    expect(bridgeSignal).not.toBe(controller.signal);
+
+    controller.abort();
+
+    await expect(request).rejects.toMatchObject({ name: "AbortError" });
+    expect(bridgeSignal?.aborted).toBe(true);
+  });
+
+  it("rejects an unauthenticated process occupying the Hermes bridge port", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        new Response(JSON.stringify({ available: true, provider: "xai" }), {
+          headers: { "Content-Type": "application/json" },
+        }),
+      ),
+    );
+
+    await expect(hermesXaiStatus()).resolves.toMatchObject({
+      available: false,
+      detail: expect.stringContaining("不是兼容的 SpeakRight 爱马仕桥接"),
+    });
   });
 
   it("returns Chinese ElevenLabs connection-test errors", async () => {
@@ -80,6 +343,29 @@ describe("desktop audio API client errors", () => {
       elevenLabsTtsAligned("secret", "VoiceId12345", "hello", "missing-model"),
     ).rejects.toThrow(
       "ElevenLabs 声音或模型不可用，请检查 Voice ID 和 Model。",
+    );
+  });
+
+  it("forwards AbortSignal to ElevenLabs aligned TTS", async () => {
+    mocks.apiFetch.mockResolvedValueOnce(
+      new Response(JSON.stringify({ audio_base64: "AA==", alignment: null }), {
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+    const controller = new AbortController();
+
+    await elevenLabsTtsAligned(
+      "secret",
+      "VoiceId12345",
+      "hello",
+      "eleven_flash_v2_5",
+      0.9,
+      controller.signal,
+    );
+
+    expect(mocks.apiFetch).toHaveBeenCalledWith(
+      expect.stringContaining("/with-timestamps"),
+      expect.objectContaining({ signal: controller.signal }),
     );
   });
 

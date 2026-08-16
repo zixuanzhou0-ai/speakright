@@ -103,6 +103,32 @@ test("desktop keeps the familiar sidebar and hides the mobile trigger", async ({
   ).toBeVisible();
 });
 
+test("desktop settings responds to mouse-wheel scrolling", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 640 });
+  await page.goto("/settings");
+  await page.getByRole("tab").nth(1).click();
+
+  const main = page.locator("#main-content");
+  await expect(main).toBeVisible();
+  const dimensions = await main.evaluate((element) => ({
+    clientHeight: element.clientHeight,
+    scrollHeight: element.scrollHeight,
+    scrollTop: element.scrollTop,
+  }));
+  expect(dimensions.scrollHeight).toBeGreaterThan(dimensions.clientHeight);
+
+  const box = await main.boundingBox();
+  if (!box) {
+    throw new Error("Main content bounding box is unavailable");
+  }
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.wheel(0, 600);
+
+  await expect
+    .poll(() => main.evaluate((element) => element.scrollTop))
+    .toBeGreaterThan(dimensions.scrollTop);
+});
+
 test("200 percent zoom equivalent remains usable", async ({ page }) => {
   await page.setViewportSize({ width: 640, height: 800 });
   await page.goto("/settings");

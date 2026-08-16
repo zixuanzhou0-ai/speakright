@@ -89,11 +89,44 @@ test("keyboard skip link and settings tabs keep visible focus", async ({
   await page.keyboard.press("Enter");
   await expect(page.locator("#main-content")).toBeFocused();
 
+  const basic = page.getByRole("tab", { name: "基础设置" });
   const services = page.getByRole("tab", { name: "服务连接" });
-  await services.focus();
+  await basic.focus();
+  await expect(basic).toBeFocused();
+  await page.keyboard.press("ArrowRight");
   await expect(services).toBeFocused();
-  await page.keyboard.press("Enter");
   await expect(services).toHaveAttribute("aria-selected", "true");
+  await expect(services).toHaveAttribute(
+    "aria-controls",
+    "settings-panel-services",
+  );
+});
+
+test("free-practice TTS shortcut deep-links to the provider selector", async ({
+  page,
+}) => {
+  await page.goto("/settings?section=services#standard-tts");
+
+  await expect(
+    page.getByRole("tab", { name: "服务连接" }),
+  ).toHaveAttribute("aria-selected", "true");
+  await expect(page.locator("#standard-tts")).toBeVisible();
+  await expect(
+    page.locator('[data-smoke="tts-provider-selector"]'),
+  ).toBeVisible();
+});
+
+test("cloud-processing disclosure deep-links to the privacy details", async ({
+  page,
+}) => {
+  await page.goto("/settings?section=data#privacy-details");
+
+  await expect(page.getByRole("tab", { name: "数据与隐私" })).toHaveAttribute(
+    "aria-selected",
+    "true",
+  );
+  await expect(page.locator("#privacy-details")).toBeVisible();
+  await expect(page.getByText("SpeakRight 不运营第一方录音收集服务器")).toBeVisible();
 });
 
 test("dark mode and reduced motion do not block the primary flow", async ({

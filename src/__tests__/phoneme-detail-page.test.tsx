@@ -10,6 +10,9 @@ const mocks = vi.hoisted(() => ({
   markWordPracticedForLanguage: vi.fn(),
   routerReplace: vi.fn(),
   reset: vi.fn(),
+  audioPlayerStop: vi.fn(),
+  wordAudioStop: vi.fn(),
+  startRecording: vi.fn(),
   languageId: "en-US" as "en-US" | "es-ES" | "fr-FR" | "ru-RU",
   phonemeSlug: "ee",
 }));
@@ -20,7 +23,11 @@ vi.mock("next/navigation", () => ({
 }));
 
 vi.mock("@/components/audio/record-button", () => ({
-  RecordButton: () => <button type="button">录音</button>,
+  RecordButton: ({ onStart }: { onStart: () => void }) => (
+    <button type="button" onClick={onStart}>
+      录音
+    </button>
+  ),
 }));
 
 vi.mock("@/components/audio/recording-actions", () => ({
@@ -60,7 +67,7 @@ vi.mock("@/hooks/use-audio-player", () => ({
     isPlaying: false,
     play: vi.fn(),
     playBlob: vi.fn(),
-    stop: vi.fn(),
+    stop: mocks.audioPlayerStop,
   }),
 }));
 
@@ -97,7 +104,7 @@ vi.mock("@/hooks/use-recorder", () => ({
     isConverting: false,
     autoStopped: false,
     error: null,
-    startRecording: vi.fn(),
+    startRecording: mocks.startRecording,
     stopRecording: vi.fn(),
     reset: mocks.reset,
   }),
@@ -113,7 +120,7 @@ vi.mock("@/hooks/use-word-pronunciation", () => ({
     isLoading: false,
     error: null,
     playWord: vi.fn(),
-    stop: vi.fn(),
+    stop: mocks.wordAudioStop,
     clearError: vi.fn(),
   }),
 }));
@@ -204,6 +211,16 @@ describe("PhonemeDetailPage local persistence warnings", () => {
       expect(mocks.requestFeedback).toHaveBeenCalled();
     });
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  });
+
+  it("stops every practice audio source before recording starts", () => {
+    render(<PhonemeDetailPage />);
+
+    fireEvent.click(screen.getByRole("button", { name: "录音" }));
+
+    expect(mocks.audioPlayerStop).toHaveBeenCalledTimes(2);
+    expect(mocks.wordAudioStop).toHaveBeenCalledTimes(1);
+    expect(mocks.startRecording).toHaveBeenCalledTimes(1);
   });
 
   it("blocks direct access to non-English rule units from the phoneme practice page", () => {

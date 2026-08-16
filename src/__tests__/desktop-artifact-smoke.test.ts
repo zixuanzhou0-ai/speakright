@@ -11,9 +11,7 @@ describe("desktop artifact smoke wiring", () => {
     ) as { scripts: Record<string, string> };
 
     expect(packageJson.scripts.build).toContain("desktop-build.mjs");
-    expect(packageJson.scripts["desktop:build"]).toContain(
-      "desktop-build.mjs",
-    );
+    expect(packageJson.scripts["desktop:build"]).toContain("desktop-build.mjs");
     expect(packageJson.scripts["desktop:launch-release"]).toContain(
       "desktop-launch-release.mjs",
     );
@@ -40,7 +38,7 @@ describe("desktop artifact smoke wiring", () => {
 
     expect(buildScript).toContain("CARGO_BUILD_JOBS");
     expect(buildScript).toContain('env.CARGO_BUILD_JOBS = "1"');
-    expect(buildScript).toContain("process.platform === \"win32\"");
+    expect(buildScript).toContain('process.platform === "win32"');
     expect(buildScript).toContain("tauri.cmd");
     expect(buildScript).toContain('["build", ...process.argv.slice(2)]');
     expect(buildScript).not.toContain("audio:parity:generate");
@@ -113,11 +111,16 @@ describe("desktop artifact smoke wiring", () => {
     );
     expect(desktopValidation).toContain("desktop:release-report");
     expect(desktopValidation).toContain("desktop:installer-smoke");
+    expect(desktopValidation).toContain("desktop:installer-roundtrip");
+    expect(
+      desktopValidation.indexOf("desktop:installer-roundtrip"),
+    ).toBeLessThan(desktopValidation.indexOf("desktop:release-report"));
     expect(desktopValidation.indexOf("desktop:release-report")).toBeLessThan(
       desktopValidation.indexOf("desktop:installer-smoke"),
     );
     const desktopCiValidation = packageJson.scripts["validate:desktop-ci"];
     expect(desktopCiValidation).toContain("desktop:installer-smoke");
+    expect(desktopCiValidation).toContain("desktop:installer-roundtrip");
   });
 
   it("checks the desktop static export and core local assets", () => {
@@ -166,6 +169,12 @@ describe("desktop artifact smoke wiring", () => {
     expect(installerSmokeScript).toContain("ProductCode");
     expect(installerSmokeScript).toContain("UpgradeCode");
     expect(installerSmokeScript).toContain("SHA-256");
+    expect(installerSmokeScript).toContain(
+      "local-only MSI metadata also passed",
+    );
+    expect(installerSmokeScript).toContain(
+      "release report must contain only the published EXE and NSIS artifacts",
+    );
   });
 
   it("checks the release executable writes runtime diagnostics during smoke", () => {
@@ -229,9 +238,9 @@ describe("desktop artifact smoke wiring", () => {
     expect(workflow).toMatch(
       /cancel-in-progress:\s+\$\{\{\s*!startsWith\(github\.ref,\s*'refs\/tags\/v'\)\s*\}\}/,
     );
-    expect(workflow).toContain("timeout-minutes: 70");
-    expect(workflow).toContain("timeout-minutes: 55");
-    expect(workflow).toContain("Validate desktop build");
+    expect(workflow).toContain("timeout-minutes: 80");
+    expect(workflow).toContain("timeout-minutes: 60");
+    expect(workflow).toContain("Validate publishable desktop build");
     expect(workflow).toContain("npm run validate:desktop-ci");
   });
 });

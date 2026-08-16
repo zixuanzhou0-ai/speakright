@@ -15,12 +15,30 @@ function output(name: string) {
 async function openGuidedRepeat(
   page: import("@playwright/test").Page,
   route: string,
+  options: {
+    mode?: "quick" | "standard" | "intensive";
+    start?: boolean;
+  } = {},
 ) {
   await page.goto(route);
   await page.locator('[data-smoke="guided-repeat-trigger"]').click();
   const dialog = page.locator('[data-smoke="guided-repeat-dialog"]');
   await expect(dialog).toBeVisible();
+  if (options.start !== false) {
+    await startGuidedRepeat(dialog, options.mode);
+  }
   return dialog;
+}
+
+async function startGuidedRepeat(
+  dialog: import("@playwright/test").Locator,
+  mode: "quick" | "standard" | "intensive" = "standard",
+) {
+  await expect(
+    dialog.locator('[data-smoke="guided-repeat-setup"]'),
+  ).toBeVisible();
+  await dialog.locator(`[data-smoke="guided-repeat-mode-${mode}"]`).click();
+  await dialog.locator('[data-smoke="guided-repeat-start"]').click();
 }
 
 async function waitForPhase(
@@ -31,6 +49,15 @@ async function waitForPhase(
   await expect(
     dialog.locator('[data-smoke="guided-repeat-phase"]'),
   ).toHaveAttribute("data-phase", phase, { timeout });
+  if (phase.startsWith("anchor-single") || phase.startsWith("word-")) {
+    await expect(
+      dialog.locator('[data-smoke="guided-repeat-hero"]'),
+    ).toHaveAttribute("data-speaking", "true", { timeout });
+  } else if (phase.startsWith("gap-") || phase.endsWith("paused")) {
+    await expect(
+      dialog.locator('[data-smoke="guided-repeat-hero"]'),
+    ).toHaveAttribute("data-speaking", "false", { timeout });
+  }
 }
 
 test.describe
@@ -46,9 +73,11 @@ test.describe
         fullPage: true,
       });
 
-      await page.locator('[data-smoke="guided-repeat-trigger"]').click();
-      const dialog = page.locator('[data-smoke="guided-repeat-dialog"]');
-      await expect(dialog).toBeVisible();
+      const dialog = await openGuidedRepeat(page, "/phonemes/ee", {
+        start: false,
+      });
+      await page.screenshot({ path: output("01a-mode-setup.png") });
+      await startGuidedRepeat(dialog);
 
       await waitForPhase(dialog, "anchor-single-1");
       await page.screenshot({ path: output("02-english-anchor-1.png") });
@@ -68,6 +97,7 @@ test.describe
       const pause = dialog.locator('[data-smoke="guided-repeat-pause"]');
       await pause.click();
       await waitForPhase(dialog, "paused");
+      await page.waitForTimeout(250);
       await page.screenshot({ path: output("07-manual-pause.png") });
       await pause.click();
 
@@ -79,6 +109,7 @@ test.describe
         document.dispatchEvent(new Event("visibilitychange"));
       });
       await waitForPhase(dialog, "auto-paused");
+      await page.waitForTimeout(250);
       await page.screenshot({ path: output("08-auto-pause.png") });
     });
 
@@ -91,6 +122,7 @@ test.describe
       await waitForPhase(dialog, "anchor-single-1");
       await dialog.locator('[data-smoke="guided-repeat-pause"]').click();
       await waitForPhase(dialog, "paused");
+      await page.waitForTimeout(250);
       await page.screenshot({ path: output("09-mobile-390-dark-paused.png") });
 
       await page.keyboard.press("Escape");
@@ -99,9 +131,22 @@ test.describe
         reducedMotion: "reduce",
       });
       await page.setViewportSize({ width: 640, height: 400 });
-      dialog = await openGuidedRepeat(page, "/phonemes/uh2");
+      dialog = await openGuidedRepeat(page, "/phonemes/uh2", {
+        start: false,
+      });
+      await expect(
+        dialog.locator('[data-smoke="guided-repeat-start"]'),
+      ).toBeVisible();
+      await page.screenshot({ path: output("10a-compact-mode-setup.png") });
+      await startGuidedRepeat(dialog);
+      await waitForPhase(dialog, "anchor-single-1");
       const pause = dialog.locator('[data-smoke="guided-repeat-pause"]');
       await expect(pause).toBeVisible();
+      const phoneme = dialog.locator('[data-smoke="guided-repeat-phoneme"]');
+      const transform = await phoneme.evaluate(
+        (element) => getComputedStyle(element).transform,
+      );
+      expect(transform).toMatch(/^(none|matrix\(1, 0, 0, 1, 0, 0\))$/);
       const box = await dialog.boundingBox();
       expect(box).not.toBeNull();
       expect((box?.y ?? -1) + (box?.height ?? 999)).toBeLessThanOrEqual(400);
@@ -120,6 +165,8 @@ test.describe
         const dialog = await openGuidedRepeat(page, sample.route);
         await waitForPhase(dialog, "word-masculine-1");
         await dialog.locator('[data-smoke="guided-repeat-pause"]').click();
+        await waitForPhase(dialog, "paused");
+        await page.waitForTimeout(250);
         await page.screenshot({ path: output(sample.file) });
         await page.keyboard.press("Escape");
       }
@@ -144,9 +191,7 @@ test.describe
           name: "\u8fd4\u56de\u97f3\u6807\u7ec3\u4e60",
         }),
       ).toBeVisible();
-      await expect(dialog).toContainText(
-        "\u4e0d\u4ee3\u8868\u5df2\u7ecf\u638c\u63e1",
-      );
+      await expect(dialog).toContainText("不代表系统已经判定掌握");
       await page.screenshot({ path: output("15-completed.png") });
 
       await dialog
@@ -164,6 +209,7 @@ test.describe
       await page.locator('[data-smoke="guided-repeat-trigger"]').click();
       const dialog = page.locator('[data-smoke="guided-repeat-dialog"]');
       await expect(dialog).toBeVisible();
+      await startGuidedRepeat(dialog);
       await expect(dialog.getByRole("alert")).toBeVisible();
       await page.screenshot({ path: output("14-local-audio-error.png") });
     });

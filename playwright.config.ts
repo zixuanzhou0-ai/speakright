@@ -16,6 +16,10 @@ export default defineConfig({
     },
   },
   fullyParallel: false,
+  // Real bundled audio drives several short visual phases. Capping workers
+  // keeps screenshot capture from starving the browser and skipping a phase
+  // under CPU contention, while the phase/state assertions remain unchanged.
+  workers: process.env.CI ? 2 : 4,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 2 : 0,
   reporter: process.env.CI

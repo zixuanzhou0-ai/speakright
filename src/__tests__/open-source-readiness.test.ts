@@ -44,7 +44,10 @@ const SECRET_PATTERNS = [
   { name: "openai-key", regex: /sk-(?:proj-)?[A-Za-z0-9_-]{40,}/ },
   { name: "anthropic-key", regex: /sk-ant-[A-Za-z0-9_-]{40,}/ },
   { name: "elevenlabs-key", regex: /sk_[A-Za-z0-9]{32,}/ },
-  { name: "github-token", regex: /(?:github_pat_[A-Za-z0-9_]{20,}|gh[pousr]_[A-Za-z0-9_]{30,})/ },
+  {
+    name: "github-token",
+    regex: /(?:github_pat_[A-Za-z0-9_]{20,}|gh[pousr]_[A-Za-z0-9_]{30,})/,
+  },
   { name: "google-api-key", regex: /AIza[0-9A-Za-z_-]{35}/ },
   { name: "aws-access-key", regex: /AKIA[0-9A-Z]{16}/ },
   { name: "slack-token", regex: /xox[baprs]-[A-Za-z0-9-]{30,}/ },
@@ -86,13 +89,15 @@ describe("open-source readiness files", () => {
 
   it("keeps the asset license boundary explicit", () => {
     const license = read("LICENSE");
+    const notice = read("NOTICE.md");
     const notices = read("THIRD_PARTY_NOTICES.md");
 
-    expect(license).toContain("Bundled audio, video, image, voice");
-    expect(notices).toMatch(
-      /does not\s+automatically relicense bundled third-party media/,
-    );
-    expect(notices).toContain("Do not add new ElevenLabs-generated audio");
+    expect(license).toMatch(/^MIT License/);
+    expect(license).not.toContain("Additional project notice");
+    expect(notice).toContain("not automatically relicensed under MIT");
+    expect(notice).toContain("docs/assets/asset-rights-registry.json");
+    expect(notices).toContain("does not relicense bundled third-party");
+    expect(notices).toContain("Add no third-party media");
   });
 
   it("keeps contribution rules aligned with release constraints", () => {
@@ -109,27 +114,41 @@ describe("open-source readiness files", () => {
     expect(contributing).toContain("Release EXE");
     expect(contributing).toContain("Do not generate ElevenLabs audio");
     expect(contributing).toContain("Triage Routing");
-    expect(contributing).toContain("`Installation or startup help` issue template");
+    expect(contributing).toContain(
+      "`Installation or startup help` issue template",
+    );
     expect(contributing).toContain("`Bug report` issue template");
-    expect(contributing).toContain("`IPA or pronunciation audit` issue template");
-    expect(contributing).toContain("`Audio gap or provider request` issue template");
+    expect(contributing).toContain(
+      "`IPA or pronunciation audit` issue template",
+    );
+    expect(contributing).toContain(
+      "`Audio gap or provider request` issue template",
+    );
     expect(contributing).toContain("`SECURITY.md` private report");
     expect(contributing).toContain("quota-impacting provider work");
     expect(contributing).toContain("latest dry-run result");
     expect(contributing).toContain("text/audio scope");
     expect(contributing).toContain("approval owner");
-    expect(contributing).toContain("Spanish, French, and Russian are experimental");
+    expect(contributing).toContain(
+      "Spanish, French, and Russian are experimental",
+    );
     expect(support).toContain("Release EXE");
     expect(support).toContain("installation/startup issue template");
     expect(support).toContain("SmartScreen");
     expect(support).toContain("SECURITY.md");
     expect(support).toContain("needs-review");
     expect(support).toContain("audio/provider issue template");
-    expect(support).toContain("Do not ask contributors to generate ElevenLabs audio");
-    expect(support).toContain("Provider-quota requests should include the dry-run result");
+    expect(support).toContain(
+      "Do not ask contributors to generate ElevenLabs audio",
+    );
+    expect(support).toContain(
+      "Provider-quota requests should include the dry-run result",
+    );
     expect(support).toContain("estimate the text/audio scope");
     expect(support).toContain("approval before anyone runs");
-    expect(support).toContain("Log excerpts only if they are short and redacted");
+    expect(support).toContain(
+      "Log excerpts only if they are short and redacted",
+    );
     expect(support).toContain("Full diagnostics bundles");
     expect(security).toContain("Windows artifacts are currently unsigned");
   });
@@ -142,7 +161,9 @@ describe("open-source readiness files", () => {
     const bugReport = read(".github/ISSUE_TEMPLATE/bug_report.md");
     const featureRequest = read(".github/ISSUE_TEMPLATE/feature_request.md");
     const ipaAudit = read(".github/ISSUE_TEMPLATE/ipa_audit.md");
-    const audioProvider = read(".github/ISSUE_TEMPLATE/audio_provider_request.md");
+    const audioProvider = read(
+      ".github/ISSUE_TEMPLATE/audio_provider_request.md",
+    );
     const issueRouting = read(".github/ISSUE_TEMPLATE/README.md");
     const pullRequest = read(".github/pull_request_template.md");
 
@@ -151,7 +172,9 @@ describe("open-source readiness files", () => {
     expect(issueConfig).toContain("SUPPORT.md");
     expect(issueConfig).toContain("Security report");
     expect(installationStartup).toContain("Installation or startup help");
-    expect(installationStartup).toContain("Downloaded installer or Release EXE");
+    expect(installationStartup).toContain(
+      "Downloaded installer or Release EXE",
+    );
     expect(installationStartup).toContain("Built from source");
     expect(installationStartup).toContain("npm run desktop:build");
     expect(installationStartup).toContain("speakright.exe");
@@ -167,7 +190,9 @@ describe("open-source readiness files", () => {
     expect(installationStartup).toContain("diagnostics bundles");
     expect(installationStartup).toContain("C:\\Users\\name");
     expect(installationStartup).toContain("ElevenLabs");
-    expect(installationStartup).toContain("Spanish, French, and Russian remain experimental");
+    expect(installationStartup).toContain(
+      "Spanish, French, and Russian remain experimental",
+    );
     expect(bugReport).toContain("Release EXE");
     expect(bugReport).toContain("Spanish, French, or Russian");
     expect(bugReport).toContain("Network state");
@@ -209,7 +234,9 @@ describe("open-source readiness files", () => {
     expect(audioProvider).toContain("without explicit maintainer approval");
     expect(audioProvider).toContain("included a dry-run result");
     expect(audioProvider).toContain("expected text/audio scope");
-    expect(audioProvider).toContain("Spanish, French, and Russian remain experimental");
+    expect(audioProvider).toContain(
+      "Spanish, French, and Russian remain experimental",
+    );
     expect(issueRouting).toContain("Issue Routing");
     expect(issueRouting).toContain("Installation or startup help");
     expect(issueRouting).toContain("unsigned Windows artifact");
@@ -225,18 +252,28 @@ describe("open-source readiness files", () => {
     expect(issueRouting).toContain("bearer tokens");
     expect(issueRouting).toContain("C:\\Users\\name");
     expect(issueRouting).toContain("Full diagnostics bundles");
-    expect(issueRouting).toContain("Do not ask contributors to generate ElevenLabs audio");
-    expect(issueRouting).toContain("include the dry-run result plus expected text/audio scope");
-    expect(issueRouting).toContain("Spanish, French, and Russian remain experimental");
+    expect(issueRouting).toContain(
+      "Do not ask contributors to generate ElevenLabs audio",
+    );
+    expect(issueRouting).toContain(
+      "include the dry-run result plus expected text/audio scope",
+    );
+    expect(issueRouting).toContain(
+      "Spanish, French, and Russian remain experimental",
+    );
     expect(issueRouting).toContain("evidenceMastery");
     expect(pullRequest).toContain("I did not use localhost/dev server");
     expect(pullRequest).toContain("I did not generate ElevenLabs audio");
-    expect(pullRequest).toContain("Spanish, French, and Russian remain experimental");
+    expect(pullRequest).toContain(
+      "Spanish, French, and Russian remain experimental",
+    );
     expect(pullRequest).toContain("`IPA or pronunciation audit`");
     expect(pullRequest).toContain("source evidence");
     expect(pullRequest).toContain("`Audio gap or provider");
     expect(pullRequest).toContain("paid-provider/quota request");
-    expect(pullRequest).toContain("Any provider-quota work includes a dry-run result");
+    expect(pullRequest).toContain(
+      "Any provider-quota work includes a dry-run result",
+    );
     expect(pullRequest).toContain("expected text/audio scope");
     expect(pullRequest).toContain("explicit maintainer approval");
     expect(pullRequest).toContain("private recording");
@@ -252,18 +289,27 @@ describe("open-source readiness files", () => {
     expect(pullRequest).toContain("I followed `CODE_OF_CONDUCT.md`");
   });
 
-  it("keeps Windows workflow artifacts separated by controlled-test and signed-release status", () => {
-    const workflow = read(".github/workflows/build-windows.yml");
+  it("keeps Browser Stable and unsigned Desktop Preview release channels separate", () => {
+    const validationWorkflow = read(".github/workflows/build-windows.yml");
+    const browserRelease = read(".github/workflows/release-browser.yml");
+    const desktopPreview = read(
+      ".github/workflows/release-desktop-preview.yml",
+    );
 
-    expect(workflow).toContain("Enforce public release signing");
-    expect(workflow).toContain("npm run desktop:release-gate");
-    expect(workflow).toContain("Upload controlled-test artifacts");
-    expect(workflow).toContain("github.event_name == 'workflow_dispatch'");
-    expect(workflow).toContain("speakright-windows-controlled-test-artifacts");
-    expect(workflow).toContain("Upload signed release artifacts");
-    expect(workflow).toContain("startsWith(github.ref, 'refs/tags/v')");
-    expect(workflow).toContain("speakright-windows-signed-release-artifacts");
-    expect(workflow).not.toContain("name: speakright-windows-installers");
+    expect(validationWorkflow).toContain("Upload desktop validation reports");
+    expect(validationWorkflow).toContain(
+      "speakright-windows-validation-reports",
+    );
+    expect(validationWorkflow).not.toContain("target/release/speakright.exe");
+    expect(validationWorkflow).not.toContain("bundle/nsis/*.exe");
+    expect(validationWorkflow).not.toContain("    tags:");
+    expect(browserRelease).toContain("Release Browser Stable");
+    expect(browserRelease).toContain("--edition browser");
+    expect(browserRelease).not.toContain("--prerelease --title");
+    expect(desktopPreview).toContain("Release Desktop Preview");
+    expect(desktopPreview).toContain("--edition desktop");
+    expect(desktopPreview).toContain("desktop:preview-release-gate");
+    expect(desktopPreview).toContain("--prerelease");
   });
 
   it("keeps the current handoff aligned with the evidence-first contract", () => {
@@ -296,7 +342,9 @@ describe("open-source readiness files", () => {
 
     expect(archive).toContain("Latest local full gate");
     expect(archive).toContain("No ElevenLabs calls were made");
-    expect(archiveIndex).toMatch(/must not be used\s+as current implementation/);
+    expect(archiveIndex).toMatch(
+      /must not be used\s+as current implementation/,
+    );
     expect(currentDocs).not.toContain("current release-hardening proof matrix");
     expect(currentDocs).not.toContain("docs/operations/RC_EVIDENCE_AUDIT.md");
     expect(currentDocs).not.toMatch(/\btomorrow(?:'s)?\b/i);
@@ -328,9 +376,12 @@ describe("open-source readiness files", () => {
     const rootRunbook = read("DESKTOP_STARTUP_RUNBOOK.md");
     const rootHandoff = read("NEXT_CHAT_HANDOFF.md");
     const installation = read("docs/INSTALLATION.md");
-    const docs = [rootInstallation, rootRunbook, rootHandoff, installation].join(
-      "\n",
-    );
+    const docs = [
+      rootInstallation,
+      rootRunbook,
+      rootHandoff,
+      installation,
+    ].join("\n");
 
     expect(rootInstallation).toContain("docs/INSTALLATION.md");
     expect(rootInstallation).toContain("npm run desktop:preflight");
@@ -342,6 +393,47 @@ describe("open-source readiness files", () => {
     expect(installation).toContain("Build From Source");
     expect(docs).not.toContain("E:\\SpeakRightDesktopRepo");
     expect(docs).not.toContain("C:\\Users\\Administrator");
+  });
+
+  it("does not imply that an ordinary desktop uninstall deletes user data", () => {
+    const privacy = read("PRIVACY.md");
+
+    expect(privacy).toContain(
+      "An ordinary uninstall may retain local learning data, preferences, and caches",
+    );
+    expect(privacy).toContain("Settings → Data & privacy → Reset local data");
+    expect(privacy).toContain("choose whether to also delete API keys");
+    expect(privacy).toContain("Delete app data");
+    expect(privacy).toContain(
+      "does not claim to validate deletion of user data",
+    );
+    expect(privacy).toContain(
+      "must be deleted separately in the relevant provider account",
+    );
+    expect(privacy).not.toMatch(
+      /uninstall(?:ing|s|ed)?[^.]{0,80}(?:deletes?|removes?) all local data/i,
+    );
+  });
+
+  it("keeps the approved real-user evidence thresholds explicit", () => {
+    const summary = read("docs/validation/USER_TESTING_SUMMARY.md");
+
+    expect(summary).toContain(
+      "Consented adult Chinese-speaking learners (age 18+)",
+    );
+    expect(summary).toContain(
+      "Device and microphone environment categories, with a count for each",
+    );
+    expect(summary).toContain("Independent review 1");
+    expect(summary).toContain("Independent review 2");
+    expect(summary).toContain(
+      "At least 20 consented adult Chinese-speaking learners",
+    );
+    expect(summary).toContain(
+      "At least three distinct device or microphone environment categories",
+    );
+    expect(summary).toContain("Two independent reviews are documented");
+    expect(summary).toContain("application-readiness gate remains open");
   });
 
   it("keeps public developer and release npm scripts explicit and zero-generation by default", () => {
@@ -360,6 +452,7 @@ describe("open-source readiness files", () => {
       "typecheck",
       "lint",
       "build:desktop-frontend",
+      "build:browser:production",
       "desktop:build",
       "desktop:preflight",
       "desktop:launch-release",
@@ -369,6 +462,10 @@ describe("open-source readiness files", () => {
       "ipa:audit:export",
       "validate:internal-release",
       "validate:public-release",
+      "check:release-version",
+      "release:evidence:check",
+      "security:audit:npm",
+      "security:sbom:cargo",
     ]) {
       expect(scripts[scriptName], scriptName).toEqual(expect.any(String));
     }
@@ -382,7 +479,10 @@ describe("open-source readiness files", () => {
     expect(scripts["audio:parity:dry-run"]).toContain("--dry-run");
     expect(scripts["audio:loudness:dry-run"]).toContain("--dry-run");
     expect(scripts["validate:public-release"]).toContain("validate:release");
-    expect(scripts["validate:release"]).toContain("desktop:release-gate");
+    expect(scripts["validate:release"]).toContain("validate:desktop-preview");
+    expect(scripts["validate:signed-desktop-release"]).toContain(
+      "desktop:release-gate",
+    );
 
     const routineValidationScripts = [
       scripts.validate,

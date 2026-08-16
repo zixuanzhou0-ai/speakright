@@ -1,4 +1,10 @@
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AzureConfigCard } from "@/components/settings/azure-config-card";
 import { ConnectionStatus } from "@/components/settings/connection-status";
@@ -9,14 +15,24 @@ import { SettingsStorageWarning } from "@/components/settings/settings-storage-w
 
 const mocks = vi.hoisted(() => ({
   fetchPronunciation: vi.fn(),
+  hermesXaiStatus: vi.fn(),
+  hermesXaiTts: vi.fn(),
+  standardTtsProvider: "elevenlabs" as
+    | "elevenlabs"
+    | "hermes-grok"
+    | "vertex-gemini",
   setAzureConfig: vi.fn(),
   setElevenLabsConfig: vi.fn(),
   setLlmConfig: vi.fn(),
+  setStandardTtsConfig: vi.fn(),
+  setVertexGeminiTtsConfig: vi.fn(),
   testAzure: vi.fn(),
   testElevenLabs: vi.fn(),
   testLlm: vi.fn(),
   toastError: vi.fn(),
   toastSuccess: vi.fn(),
+  vertexGeminiStatus: vi.fn(),
+  vertexGeminiTts: vi.fn(),
 }));
 
 vi.mock("@/hooks/use-api-keys", () => ({
@@ -24,10 +40,16 @@ vi.mock("@/hooks/use-api-keys", () => ({
   useElevenLabsConfig: () => null,
   useLanguageConfig: () => ({ languageId: "en-US" }),
   useLlmConfig: () => null,
+  useStandardTtsConfig: () => ({ provider: mocks.standardTtsProvider }),
+  useVertexGeminiTtsConfig: () => ({ voiceName: "Kore" }),
 }));
 
 vi.mock("@/lib/api-client", () => ({
   fetchPronunciation: mocks.fetchPronunciation,
+  hermesXaiStatus: mocks.hermesXaiStatus,
+  hermesXaiTts: mocks.hermesXaiTts,
+  vertexGeminiStatus: mocks.vertexGeminiStatus,
+  vertexGeminiTts: mocks.vertexGeminiTts,
   testAzure: mocks.testAzure,
   testElevenLabs: mocks.testElevenLabs,
   testLlm: mocks.testLlm,
@@ -40,10 +62,16 @@ vi.mock("@/lib/api-keys", () => ({
     "speakright_elevenlabs_config",
     "speakright_llm_config",
   ],
-  APP_PREFERENCE_STORAGE_KEYS: ["speakright_coach_mode"],
+  APP_PREFERENCE_STORAGE_KEYS: [
+    "speakright_standard_tts_config",
+    "speakright_vertex_gemini_tts_config",
+    "speakright_coach_mode",
+  ],
   setAzureConfig: mocks.setAzureConfig,
   setElevenLabsConfig: mocks.setElevenLabsConfig,
   setLlmConfig: mocks.setLlmConfig,
+  setStandardTtsConfig: mocks.setStandardTtsConfig,
+  setVertexGeminiTtsConfig: mocks.setVertexGeminiTtsConfig,
 }));
 
 vi.mock("sonner", () => ({
@@ -56,6 +84,7 @@ vi.mock("sonner", () => ({
 describe("settings connection errors", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mocks.standardTtsProvider = "elevenlabs";
   });
 
   it("keeps Azure connection-test provider errors actionable in Chinese", async () => {
@@ -71,7 +100,9 @@ describe("settings connection errors", () => {
     fireEvent.click(screen.getByRole("button", { name: "测试连接" }));
 
     expect(
-      await screen.findByText("无法连接 Azure Speech，请检查网络、代理或 Azure 区域后重试。"),
+      await screen.findByText(
+        "无法连接 Azure Speech，请检查网络、代理或 Azure 区域后重试。",
+      ),
     ).toBeInTheDocument();
   });
 
@@ -87,15 +118,102 @@ describe("settings connection errors", () => {
     expect(
       screen.getByText(/未配置 Azure 时可以浏览课程和播放已内置音频/),
     ).toHaveAttribute("data-smoke", "azure-missing-key-guidance");
-    expect(screen.getByText(/录音评分、诊断和训练达标判定不可用/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/录音评分、诊断和训练达标判定不可用/),
+    ).toBeInTheDocument();
     expect(
       screen.getByText(/未配置 ElevenLabs 时，已内置单词和语言包音频仍可播放/),
     ).toHaveAttribute("data-smoke", "elevenlabs-missing-key-guidance");
-    expect(screen.getByText(/自由输入的句子\/短语标准示范/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/自由输入的句子\/短语标准示范/),
+    ).toBeInTheDocument();
     expect(
       screen.getByText(/未配置 AI 教练 Key 时，Azure 数字评分仍可用/),
     ).toHaveAttribute("data-smoke", "llm-missing-key-guidance");
     expect(screen.getByText(/不会卡住评分流程/)).toBeInTheDocument();
+  });
+
+  it("shows the standard TTS provider switch and local Hermes guidance", () => {
+    const elevenLabsView = render(<ElevenLabsConfigCard />);
+    const selector = screen.getByRole("group", {
+      name: "选择标准示范 TTS",
+    });
+
+    expect(selector).toHaveAttribute("data-smoke", "tts-provider-selector");
+    expect(screen.getByRole("button", { name: /ElevenLabs/ })).toHaveAttribute(
+      "data-smoke",
+      "tts-provider-elevenlabs",
+    );
+    const hermesButton = screen.getByRole("button", { name: /爱马仕 Grok/ });
+    expect(hermesButton).toHaveAttribute(
+      "data-smoke",
+      "tts-provider-hermes-grok",
+    );
+
+    fireEvent.click(hermesButton);
+    expect(mocks.setStandardTtsConfig).toHaveBeenCalledWith({
+      provider: "hermes-grok",
+    });
+    elevenLabsView.unmount();
+
+    mocks.standardTtsProvider = "hermes-grok";
+    render(<ElevenLabsConfigCard />);
+
+    expect(
+      screen
+        .getByText(/无需同时打开桌面端/)
+        .closest('[data-smoke="hermes-grok-local-guidance"]'),
+    ).toBeInTheDocument();
+    expect(screen.queryByLabelText("API Key")).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "检测爱马仕状态" }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole("button", { name: "试听短句（会产生用量）" }),
+    ).toBeVisible();
+  });
+
+  it("shows Vertex Gemini as a third provider and checks status without generating audio", async () => {
+    mocks.vertexGeminiStatus.mockResolvedValue({
+      available: true,
+      model: "gemini-3.1-flash-tts-preview",
+      authReady: true,
+      projectConfigured: true,
+    });
+    mocks.standardTtsProvider = "vertex-gemini";
+    render(<ElevenLabsConfigCard />);
+
+    const vertexButton = screen.getByRole("button", {
+      name: /Vertex AI · Gemini 3.1/,
+    });
+    expect(vertexButton).toHaveAttribute(
+      "data-smoke",
+      "tts-provider-vertex-gemini",
+    );
+    expect(
+      screen
+        .getByText(/SpeakRight 不保存 Google 密钥/)
+        .closest('[data-smoke="vertex-gemini-local-guidance"]'),
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText("音色")).toHaveTextContent("Kore");
+    expect(
+      screen.getByRole("button", { name: "检测 Vertex 状态" }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole("button", { name: "试听短句（会产生用量）" }),
+    ).toBeVisible();
+    expect(mocks.vertexGeminiStatus).not.toHaveBeenCalled();
+    expect(mocks.vertexGeminiTts).not.toHaveBeenCalled();
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "检测 Vertex 状态" }),
+    );
+    expect(
+      await screen.findByText("本机 Vertex AI 项目与 ADC 授权已就绪"),
+    ).toBeInTheDocument();
+    expect(screen.getByText("项目：已配置")).toBeInTheDocument();
+    expect(screen.getByText("ADC：已就绪")).toBeInTheDocument();
+    expect(mocks.vertexGeminiTts).not.toHaveBeenCalled();
   });
 
   it("shows a persistent Settings alert when local key storage fails", () => {
@@ -274,10 +392,7 @@ describe("settings connection errors", () => {
       "data-smoke",
       "settings-connection-status",
     );
-    expect(screen.getByRole("alert")).toHaveAttribute(
-      "aria-live",
-      "assertive",
-    );
+    expect(screen.getByRole("alert")).toHaveAttribute("aria-live", "assertive");
   });
 
   it("announces non-error Settings connection states politely", () => {
