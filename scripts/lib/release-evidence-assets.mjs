@@ -12,6 +12,7 @@ import {
 
 const ASSET_SET_PREFIX = "speakright-release-evidence-assets-v1\0";
 const ASSET_POLICY_PATHS = [
+  ".gitattributes",
   "public",
   "docs/assets/asset-rights-registry.json",
   "docs/assets/asset-rights-registry.schema.json",

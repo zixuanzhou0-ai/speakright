@@ -1,0 +1,20 @@
+* text=auto eol=lf
+
+# Packaged media and release binaries must never receive text conversion.
+*.avif -text
+*.gif -text
+*.ico -text
+*.jpeg -text
+*.jpg -text
+*.png -text
+*.webp -text
+*.m4a -text
+*.mp3 -text
+*.ogg -text
+*.wav -text
+*.mp4 -text
+*.webm -text
+*.pdf -text
+*.zip -text
+*.exe -text
+*.msi -text

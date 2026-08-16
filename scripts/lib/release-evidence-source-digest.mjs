@@ -39,12 +39,14 @@ const EXCLUDED_DIRECTORIES = new Set([
 
 const INPUTS = {
   browser: [
+    ".gitattributes",
     "apps/browser",
     "packages/core",
     "package.json",
     "package-lock.json",
   ],
   desktop: [
+    ".gitattributes",
     "src",
     "src-tauri",
     "packages/core",

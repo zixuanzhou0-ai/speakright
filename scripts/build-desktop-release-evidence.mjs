@@ -290,6 +290,7 @@ async function main() {
     });
   }
   for (const file of [
+    ".gitattributes",
     "next-env.d.ts",
     "next.config.ts",
     "package-lock.json",

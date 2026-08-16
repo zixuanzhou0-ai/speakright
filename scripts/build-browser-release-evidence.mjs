@@ -122,14 +122,9 @@ async function main() {
     recursive: true,
     filter: copyFilter(path.join(root, "packages", "core")),
   });
-  await copyFile(
-    path.join(root, "package.json"),
-    path.join(workspace, "package.json"),
-  );
-  await copyFile(
-    path.join(root, "package-lock.json"),
-    path.join(workspace, "package-lock.json"),
-  );
+  for (const file of [".gitattributes", "package.json", "package-lock.json"]) {
+    await copyFile(path.join(root, file), path.join(workspace, file));
+  }
   const sourceSnapshot = await releaseEvidenceSourceDigest(
     workspace,
     "browser",

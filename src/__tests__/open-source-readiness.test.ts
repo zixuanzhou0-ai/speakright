@@ -74,6 +74,7 @@ describe("open-source readiness files", () => {
       "INSTALLATION.md",
       "DESKTOP_STARTUP_RUNBOOK.md",
       "NEXT_CHAT_HANDOFF.md",
+      ".gitattributes",
       ".env.example",
       ".github/ISSUE_TEMPLATE/installation_startup.md",
       ".github/ISSUE_TEMPLATE/bug_report.md",
@@ -98,6 +99,15 @@ describe("open-source readiness files", () => {
     expect(notice).toContain("docs/assets/asset-rights-registry.json");
     expect(notices).toContain("does not relicense bundled third-party");
     expect(notices).toContain("Add no third-party media");
+  });
+
+  it("keeps clean checkouts byte-stable across Windows and CI", () => {
+    const attributes = read(".gitattributes");
+
+    expect(attributes).toContain("* text=auto eol=lf");
+    for (const extension of ["png", "mp3", "wav", "mp4", "zip", "exe", "msi"]) {
+      expect(attributes).toContain(`*.${extension} -text`);
+    }
   });
 
   it("keeps contribution rules aligned with release constraints", () => {

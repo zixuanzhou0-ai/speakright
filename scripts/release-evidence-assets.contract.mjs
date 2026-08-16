@@ -53,6 +53,10 @@ async function writeFixture(projectRoot) {
     "public/videos/phonemes/\n",
   );
   await writeFile(
+    path.join(projectRoot, ".gitattributes"),
+    "* text=auto eol=lf\n",
+  );
+  await writeFile(
     path.join(
       projectRoot,
       "docs",
