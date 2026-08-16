@@ -5,6 +5,7 @@ import { existsSync } from "node:fs";
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
+import { isExactWindowsSettingsStorePath } from "./capture-desktop-release-evidence.mjs";
 import { releaseEvidenceAssetSet } from "./lib/release-evidence-assets.mjs";
 import {
   BROWSER_EVIDENCE_VIEWPORTS,
@@ -131,6 +132,33 @@ const browserCaptureSource = await readFile(
 assert.match(browserCaptureSource, /GUIDED_REPEAT_CAPTURE_SAFE_MARGIN = 12/);
 assert.match(browserCaptureSource, /guidedRepeatFocus/);
 assert.match(browserCaptureSource, /Guided-repeat CTA capture is clipped/);
+
+const canonicalSettingsDirectory = "C:\\Temp\\speakright-run\\settings";
+for (const accepted of [
+  "C:\\Temp\\speakright-run\\settings\\speakright-settings.json",
+  "\\\\?\\C:\\Temp\\speakright-run\\settings\\speakright-settings.json",
+  "c:/TEMP/SPEAKRIGHT-RUN/SETTINGS/SPEAKRIGHT-SETTINGS.JSON",
+]) {
+  assert.equal(
+    isExactWindowsSettingsStorePath(accepted, canonicalSettingsDirectory),
+    true,
+    `Expected the canonical settings identity to be accepted: ${accepted}`,
+  );
+}
+for (const rejected of [
+  "C:\\Temp\\speakright-run\\settings-other\\speakright-settings.json",
+  "C:\\Temp\\speakright-run\\settings\\sibling.json",
+  "C:\\Temp\\speakright-run\\settings\\..\\settings\\speakright-settings.json",
+  "\\\\server\\share\\speakright-settings.json",
+  "\\\\?\\UNC\\server\\share\\speakright-settings.json",
+  "C:\\Temp\\speakright-run\\settings-prefix\\speakright-settings.json",
+]) {
+  assert.equal(
+    isExactWindowsSettingsStorePath(rejected, canonicalSettingsDirectory),
+    false,
+    `Expected the non-canonical settings identity to be rejected: ${rejected}`,
+  );
+}
 
 function pngDimensions(buffer) {
   assert.deepEqual(

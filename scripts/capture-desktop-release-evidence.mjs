@@ -1,10 +1,18 @@
 import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync } from "node:fs";
-import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import {
+  mkdir,
+  mkdtemp,
+  readFile,
+  realpath,
+  rm,
+  writeFile,
+} from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import process from "node:process";
+import { pathToFileURL } from "node:url";
 import { releaseEvidenceAssetSet } from "./lib/release-evidence-assets.mjs";
 import {
   DESKTOP_EVIDENCE_BROWSER_ARGUMENTS,
@@ -29,6 +37,7 @@ import {
 
 const root = process.cwd();
 const timeoutMs = 15_000;
+const SETTINGS_STORE_FILE_NAME = "speakright-settings.json";
 const evidenceTempRoot = path.join(
   path.dirname(root),
   `${path.basename(root)}ReleaseEvidenceTemp`,
@@ -95,6 +104,45 @@ function delay(ms) {
 
 function sha256(buffer) {
   return createHash("sha256").update(buffer).digest("hex");
+}
+
+function localWindowsPathIdentity(value) {
+  if (typeof value !== "string" || value.length === 0 || value.includes("\0")) {
+    return null;
+  }
+  let candidate = value.replaceAll("/", "\\");
+  const segments = candidate.split("\\").filter(Boolean);
+  if (segments.some((segment) => segment === "." || segment === "..")) {
+    return null;
+  }
+  if (candidate.toLowerCase().startsWith("\\\\?\\unc\\")) {
+    candidate = `\\\\${candidate.slice(8)}`;
+  } else if (candidate.startsWith("\\\\?\\")) {
+    candidate = candidate.slice(4);
+  }
+  if (
+    candidate.startsWith("\\\\") ||
+    candidate.startsWith("\\\\.\\") ||
+    !/^[A-Za-z]:\\/u.test(candidate)
+  ) {
+    return null;
+  }
+  return path.win32.normalize(candidate).toLowerCase();
+}
+
+export function isExactWindowsSettingsStorePath(
+  resolvedStorePath,
+  canonicalSettingsDirectory,
+) {
+  const actual = localWindowsPathIdentity(resolvedStorePath);
+  const directory = localWindowsPathIdentity(canonicalSettingsDirectory);
+  if (!actual || !directory) return false;
+  const expected = path.win32.join(directory, SETTINGS_STORE_FILE_NAME);
+  return (
+    actual === expected &&
+    path.win32.dirname(actual) === directory &&
+    path.win32.basename(actual) === SETTINGS_STORE_FILE_NAME
+  );
 }
 
 async function assertCurrentSourceSnapshot(expected, expectedCommit) {
@@ -540,14 +588,14 @@ async function proveFixtureBuild(cdp) {
   );
 }
 
-async function inspectRuntimeBoundary(cdp, settingsStorePath) {
+async function inspectRuntimeBoundary(cdp, canonicalSettingsDirectory) {
   await navigate(
     cdp,
     "/settings?section=labs",
     '[data-smoke="release-status"]',
   );
   await delay(500);
-  return evaluate(
+  const observation = await evaluate(
     cdp,
     `
 (async () => {
@@ -572,12 +620,24 @@ async function inspectRuntimeBoundary(cdp, settingsStorePath) {
     nativeHttpAttempts: Array.isArray(attempts) ? attempts.length : null,
     secureStoreSlotsEmpty: secureValues.every((value) => value === null),
     localSecretSlotsEmpty: keys.every((key) => localStorage.getItem(key) === null),
-    settingsStorePathIsolated:
-      resolvedSettingsStorePath === ${JSON.stringify(settingsStorePath)}
+    resolvedSettingsStorePath
   };
 })()
 `,
   );
+  return {
+    ok: observation?.ok === true,
+    reason:
+      typeof observation?.reason === "string" ? observation.reason : undefined,
+    guardActive: observation?.guardActive === true,
+    nativeHttpAttempts: observation?.nativeHttpAttempts ?? null,
+    secureStoreSlotsEmpty: observation?.secureStoreSlotsEmpty === true,
+    localSecretSlotsEmpty: observation?.localSecretSlotsEmpty === true,
+    settingsStorePathIsolated: isExactWindowsSettingsStorePath(
+      observation?.resolvedSettingsStorePath,
+      canonicalSettingsDirectory,
+    ),
+  };
 }
 
 function assertRuntimeBoundary(boundary, phase) {
@@ -693,11 +753,12 @@ async function main() {
   );
   const logDir = path.join(profileRoot, "logs");
   const settingsDir = path.join(profileRoot, "settings");
-  const settingsStorePath = path.join(settingsDir, "speakright-settings.json");
+  const settingsStorePath = path.join(settingsDir, SETTINGS_STORE_FILE_NAME);
   await Promise.all([
     mkdir(logDir, { recursive: true }),
     mkdir(settingsDir, { recursive: true }),
   ]);
+  const canonicalSettingsDirectory = await realpath(settingsDir);
   const child = spawn(executable, [], {
     detached: false,
     env: buildEnv(
@@ -768,7 +829,7 @@ async function main() {
     await setViewport(cdp, DESKTOP_EVIDENCE_VIEWPORTS[0]);
     await proveFixtureBuild(cdp);
     assertRuntimeBoundary(
-      await inspectRuntimeBoundary(cdp, settingsStorePath),
+      await inspectRuntimeBoundary(cdp, canonicalSettingsDirectory),
       "pre-capture verification",
     );
 
@@ -826,7 +887,7 @@ async function main() {
       );
     }
     assertRuntimeBoundary(
-      await inspectRuntimeBoundary(cdp, settingsStorePath),
+      await inspectRuntimeBoundary(cdp, canonicalSettingsDirectory),
       "post-capture verification",
     );
   } finally {
@@ -899,7 +960,12 @@ async function main() {
   console.log(`Desktop release evidence manifest: ${manifestPath}`);
 }
 
-main().catch((error) => {
-  console.error(error instanceof Error ? error.message : String(error));
-  process.exit(1);
-});
+const invokedAsScript =
+  typeof process.argv[1] === "string" &&
+  pathToFileURL(path.resolve(process.argv[1])).href === import.meta.url;
+if (invokedAsScript) {
+  main().catch((error) => {
+    console.error(error instanceof Error ? error.message : String(error));
+    process.exit(1);
+  });
+}
