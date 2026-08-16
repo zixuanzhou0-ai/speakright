@@ -1,0 +1,225 @@
+{
+  "schemaVersion": 1,
+  "version": "1.1.0",
+  "edition": "browser-and-desktop",
+  "durationSeconds": 74,
+  "dimensions": {
+    "width": 1280,
+    "height": 720
+  },
+  "codec": "h264",
+  "videoStreams": 1,
+  "audioStreams": 0,
+  "subtitleLanguage": "en",
+  "burnedCaptions": true,
+  "subtitles": [
+    {
+      "format": "srt",
+      "path": "docs/assets/demo/speakright-v1.1.0-overview.en.srt",
+      "sha256": "13e076cbd005dcf9e5d9c48825a098d30ec37b7a36b8e071d4a0f1c83cf2fadf"
+    },
+    {
+      "format": "webvtt",
+      "path": "docs/assets/demo/speakright-v1.1.0-overview.en.vtt",
+      "sha256": "81c30cfa7d0bc0c7cd9e406582ac2ec2d55f87cc725e451b56b1b112640d399f"
+    }
+  ],
+  "scoreDisclosure": "示例数据 / Example data — not a live Azure score",
+  "paidApiCalls": false,
+  "userData": false,
+  "sourceCommit": "eb9ed5e7ec4f4de5c7f8aa1e18fd4f36f0ecdef4",
+  "generatorSnapshot": {
+    "schemaVersion": 1,
+    "sha256": "d7b0fc92cafe3449e690937a9f66e824dfc874c7e1989e44832b2d5322270047",
+    "fileCount": 16,
+    "totalBytes": 214435
+  },
+  "path": "docs/assets/demo/speakright-v1.1.0-overview.mp4",
+  "sha256": "5d12b70272fd66f0772bdf19a58cb5379d65eb6e4943745e42f902dd930860e0",
+  "frames": [
+    {
+      "edition": "demo",
+      "id": "title",
+      "durationSeconds": 5,
+      "caption": "SpeakRight helps Chinese-speaking learners build repeatable pronunciation practice.",
+      "path": "docs/assets/demo/frames/01-title.png",
+      "width": 1280,
+      "height": 720,
+      "sha256": "ffd6ebd43cb4f2295774a602482a1232bac4d212400874465d761ad93e1f2afc",
+      "scoreDisclosureOverlay": false,
+      "sourceEvidence": null
+    },
+    {
+      "edition": "demo",
+      "id": "browser-guided-repeat",
+      "durationSeconds": 8,
+      "caption": "Guided Repeat offers quick, standard, and intensive modes without imposing a fixed word limit.",
+      "path": "docs/assets/demo/frames/02-browser-guided-repeat.png",
+      "width": 1280,
+      "height": 720,
+      "sha256": "5e34f8426f3449b0475525125f4e512f6b38f34c6989b866b6426e1ddbffcb9d",
+      "scoreDisclosureOverlay": false,
+      "sourceEvidence": {
+        "edition": "browser",
+        "id": "guided-repeat",
+        "path": "docs/assets/screenshots/release/v1.1.0/browser/1280x800/guided-repeat.png",
+        "sha256": "59dadc17abeefaac6079d2a13d7f16bc5a707f51365d36cbae931e5564e63d24",
+        "viewport": "1280x800",
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "edition": "demo",
+      "id": "browser-free-practice",
+      "durationSeconds": 8,
+      "caption": "Free Practice keeps text, standard-demo TTS controls, recording, and feedback in one workspace.",
+      "path": "docs/assets/demo/frames/03-browser-free-practice.png",
+      "width": 1280,
+      "height": 720,
+      "sha256": "fde8f58dc1d32375e61b271133522db7b62fc7afb1af96647405c08542288df4",
+      "scoreDisclosureOverlay": false,
+      "sourceEvidence": {
+        "edition": "browser",
+        "id": "free-practice",
+        "path": "docs/assets/screenshots/release/v1.1.0/browser/1280x800/free-practice.png",
+        "sha256": "b0b53102f158d86666bcb863c5b1fdbef673e8215d4edf7f7e0929c6e44b4f81",
+        "viewport": "1280x800",
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "edition": "demo",
+      "id": "browser-diagnosis",
+      "durationSeconds": 8,
+      "caption": "The diagnosis view connects evidence to a focused training prescription. Scores shown here are example data.",
+      "path": "docs/assets/demo/frames/04-browser-diagnosis.png",
+      "width": 1280,
+      "height": 720,
+      "sha256": "afc621bb73e298ebcc240cb28c96458261b1b02f021eb7826457c19ed3f95987",
+      "scoreDisclosureOverlay": true,
+      "sourceEvidence": {
+        "edition": "browser",
+        "id": "diagnosis-example",
+        "path": "docs/assets/screenshots/release/v1.1.0/browser/1280x800/diagnosis-example.png",
+        "sha256": "6a6dc65879d4d810cc2754167be90409ad593e3570beacf18ea41eff0c3e2103",
+        "viewport": "1280x800",
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "edition": "demo",
+      "id": "browser-progress",
+      "durationSeconds": 8,
+      "caption": "Progress records evidence stages and retained practice history instead of claiming mastery from one score.",
+      "path": "docs/assets/demo/frames/05-browser-progress.png",
+      "width": 1280,
+      "height": 720,
+      "sha256": "ed1becd49e8a4aa0b71e96bd7bd28190ab85ab9bf6bcd38d8b7ab5804085acde",
+      "scoreDisclosureOverlay": true,
+      "sourceEvidence": {
+        "edition": "browser",
+        "id": "progress-example",
+        "path": "docs/assets/screenshots/release/v1.1.0/browser/1280x800/progress-example.png",
+        "sha256": "9ce0fba67b19a0bdfb44cf47db3aa78f44fdddd3c7403a49e4287e7d6e96f8b0",
+        "viewport": "1280x800",
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "edition": "demo",
+      "id": "browser-settings",
+      "durationSeconds": 8,
+      "caption": "Browser settings explain BYOK storage, provider boundaries, privacy controls, and release identity.",
+      "path": "docs/assets/demo/frames/06-browser-settings.png",
+      "width": 1280,
+      "height": 720,
+      "sha256": "1bf612ce36fc2d3ca8f4f61e48e0d842a5d45cd1102fd6899740e4be1c80e17c",
+      "scoreDisclosureOverlay": false,
+      "sourceEvidence": {
+        "edition": "browser",
+        "id": "settings",
+        "path": "docs/assets/screenshots/release/v1.1.0/browser/1280x800/settings.png",
+        "sha256": "7867252c76f4844e471900888ee72a96c9aa4c74c43eca0d4574e5456491065b",
+        "viewport": "1280x800",
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "edition": "demo",
+      "id": "desktop-guided-repeat",
+      "durationSeconds": 8,
+      "caption": "The Windows Desktop preview follows the same learning flow while using local Tauri capabilities.",
+      "path": "docs/assets/demo/frames/07-desktop-guided-repeat.png",
+      "width": 1280,
+      "height": 720,
+      "sha256": "d4b73f79c1e66bdb16219a181a2cd5becf1c3d84c5ab419307d10f2fbcbaca47",
+      "scoreDisclosureOverlay": false,
+      "sourceEvidence": {
+        "edition": "desktop",
+        "id": "guided-repeat",
+        "path": "docs/assets/screenshots/release/v1.1.0/desktop/1280x920/guided-repeat.png",
+        "sha256": "67b90f42e8d85b74fa19e7991a27e9431e9ec1cf27e89ff3043b391cb1751939",
+        "viewport": "1280x920",
+        "width": 1280,
+        "height": 920
+      }
+    },
+    {
+      "edition": "demo",
+      "id": "desktop-diagnosis",
+      "durationSeconds": 8,
+      "caption": "Desktop evidence uses the same explicit example-data disclosure and never calls a paid API during capture.",
+      "path": "docs/assets/demo/frames/08-desktop-diagnosis.png",
+      "width": 1280,
+      "height": 720,
+      "sha256": "a39202a06a8602e589593f7290f78b0cdc94664dac14c6725b779b285c4da232",
+      "scoreDisclosureOverlay": true,
+      "sourceEvidence": {
+        "edition": "desktop",
+        "id": "diagnosis-example",
+        "path": "docs/assets/screenshots/release/v1.1.0/desktop/1280x920/diagnosis-example.png",
+        "sha256": "8ba94955e45dc53d40241e0b7641f45f75b050cc0387903a9462e25657b17e5d",
+        "viewport": "1280x920",
+        "width": 1280,
+        "height": 920
+      }
+    },
+    {
+      "edition": "demo",
+      "id": "desktop-no-key",
+      "durationSeconds": 8,
+      "caption": "A no-key state remains usable for local learning content and clearly explains how cloud scoring is enabled.",
+      "path": "docs/assets/demo/frames/09-desktop-no-key.png",
+      "width": 1280,
+      "height": 720,
+      "sha256": "09324fbbde980992c343b8414b6f044410ab7ac299cd69128c9b401495252a09",
+      "scoreDisclosureOverlay": false,
+      "sourceEvidence": {
+        "edition": "desktop",
+        "id": "no-key",
+        "path": "docs/assets/screenshots/release/v1.1.0/desktop/1280x920/no-key.png",
+        "sha256": "da2f818696d07f7e3c4a8997d0fa7a12f00d4752b6d6408f23fb2ab43e956bd5",
+        "viewport": "1280x920",
+        "width": 1280,
+        "height": 920
+      }
+    },
+    {
+      "edition": "demo",
+      "id": "end",
+      "durationSeconds": 5,
+      "caption": "The repository publishes versioned, reviewable checks, privacy boundaries, and truthful release status.",
+      "path": "docs/assets/demo/frames/10-end.png",
+      "width": 1280,
+      "height": 720,
+      "sha256": "c221376ffb0df6f0e759b6b065db574b032360bd7e6fdbbb35e0af4bd31d5784",
+      "scoreDisclosureOverlay": false,
+      "sourceEvidence": null
+    }
+  ]
+}

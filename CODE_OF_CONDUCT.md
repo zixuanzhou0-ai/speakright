@@ -1,8 +1,9 @@
 # Code Of Conduct
 
-SpeakRight Desktop is a pronunciation-learning project. Discussions can touch
-accent, language identity, learner confidence, recordings, and source evidence,
-so contributors are expected to keep the project respectful and evidence-first.
+SpeakRight is a pronunciation-learning project with Windows Desktop and Browser
+Edition surfaces. Discussions can touch accent, language identity, learner
+confidence, recordings, and source evidence, so contributors are expected to
+keep the project respectful and evidence-first.
 
 ## Expected Behavior
 

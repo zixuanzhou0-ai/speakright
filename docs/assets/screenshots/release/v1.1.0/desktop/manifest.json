@@ -1,0 +1,315 @@
+{
+  "schemaVersion": 1,
+  "version": "1.1.0",
+  "edition": "desktop",
+  "fixtureBuildRequired": true,
+  "paidApiCalls": false,
+  "assetSet": {
+    "schemaVersion": 1,
+    "fileCount": 6590,
+    "totalBytes": 480736295,
+    "pathDigestSha256": "db90c82f6351e72a452eb04f1ef12bc188da44ad5b47d6ac49e22a6676961325",
+    "pathHashDigestSha256": "bc9da063e3b94e5f7f9c9e30c878536b9fc55ed571b34f151e003a23ceff52d8",
+    "registrySha256": "211b7682fcfe9e93947f12e29d35e8f481699b68ac3dcbc55f6cd980bfe77aba"
+  },
+  "generatorSnapshot": {
+    "schemaVersion": 1,
+    "sha256": "d7b0fc92cafe3449e690937a9f66e824dfc874c7e1989e44832b2d5322270047",
+    "fileCount": 16,
+    "totalBytes": 214435
+  },
+  "captureTransport": {
+    "additionalBrowserArgsSha256": "422deba0edb5bebce82abe55f41191198e210ee406b862753208667d52de6d0b",
+    "mode": "ephemeral-loopback-cdp",
+    "portFile": "WebView2/EBWebView/DevToolsActivePort"
+  },
+  "credentialNamespace": "com.speakright.desktop.release-evidence-25700f611f33fcb6",
+  "sourceSnapshot": {
+    "schemaVersion": 1,
+    "sha256": "84c5b859779b700031950f2faa56cba10848ac55748ff4ac3e3da955d9c6b1e2",
+    "fileCount": 480
+  },
+  "sourceWorktreeClean": true,
+  "buildManifestSha256": "d5da78bdb2dc0714a00582e20556c78f46663da4ed76a48212223f182d5dc72a",
+  "nativeHttpAttempts": 0,
+  "secureStoreSlotsEmpty": true,
+  "runtimeIsolation": {
+    "logDirectory": "os-temp-child",
+    "logInitialized": true,
+    "logRetained": false,
+    "settingsStorePath": "os-temp-child",
+    "settingsStoreRetained": false,
+    "webViewProfile": "os-temp-child",
+    "profileRetained": false
+  },
+  "networkGuard": {
+    "nativeHttp": "fail-closed",
+    "nativeHttpCapability": false,
+    "externalConnectCsp": false,
+    "rustExternalProviders": "fail-closed",
+    "tauriHttpGuardSha256": "912d4cf660188b58989b2422e9dc25ffef4d3bc8c6bae76630e67212392a5e49",
+    "rustGuardSha256": "bd85a66a49776c70426ae485a8671f1388fa5649d810495547f344ad5b3fc38b"
+  },
+  "sourceCommit": "eb9ed5e7ec4f4de5c7f8aa1e18fd4f36f0ecdef4",
+  "executable": {
+    "fileName": "speakright.exe",
+    "sha256": "e28e781f8792e6d8aa0ff6fead2445e7c0ddb3156b957ad411ee9a7fe0fd139e"
+  },
+  "networkPolicy": "HTTPS and loopback provider requests blocked; isolated Tauri origins allowed; external responses must remain zero",
+  "attemptedExternalOrigins": [],
+  "successfulExternalOrigins": [],
+  "artifacts": [
+    {
+      "edition": "desktop",
+      "viewport": "1280x920",
+      "id": "guided-repeat",
+      "path": "docs/assets/screenshots/release/v1.1.0/desktop/1280x920/guided-repeat.png",
+      "width": 1280,
+      "height": 920,
+      "sha256": "67b90f42e8d85b74fa19e7991a27e9431e9ec1cf27e89ff3043b391cb1751939",
+      "geometry": {
+        "banner": {
+          "left": 471.3020935058594,
+          "top": 228,
+          "right": 808.6979370117188,
+          "bottom": 261.58333587646484
+        },
+        "bannerCollisions": 0,
+        "bannerWithinViewport": true,
+        "bannerOccludedPoints": 0
+      },
+      "scoreDisclosure": null
+    },
+    {
+      "edition": "desktop",
+      "viewport": "1280x920",
+      "id": "free-practice",
+      "path": "docs/assets/screenshots/release/v1.1.0/desktop/1280x920/free-practice.png",
+      "width": 1280,
+      "height": 920,
+      "sha256": "48012e2251413d290506f730bf48b73e8aca915cfa41eb0eaf46879e9ef5f5e8",
+      "geometry": {
+        "banner": {
+          "left": 596.3021240234375,
+          "top": 46,
+          "right": 933.6979675292969,
+          "bottom": 79.58333587646484
+        },
+        "bannerCollisions": 0,
+        "bannerWithinViewport": true,
+        "bannerOccludedPoints": 0
+      },
+      "scoreDisclosure": null
+    },
+    {
+      "edition": "desktop",
+      "viewport": "1280x920",
+      "id": "diagnosis-example",
+      "path": "docs/assets/screenshots/release/v1.1.0/desktop/1280x920/diagnosis-example.png",
+      "width": 1280,
+      "height": 920,
+      "sha256": "8ba94955e45dc53d40241e0b7641f45f75b050cc0387903a9462e25657b17e5d",
+      "geometry": {
+        "banner": {
+          "left": 597.0833740234375,
+          "top": 46,
+          "right": 932.9167175292969,
+          "bottom": 79.58333587646484
+        },
+        "bannerCollisions": 0,
+        "bannerWithinViewport": true,
+        "bannerOccludedPoints": 0
+      },
+      "scoreDisclosure": "示例数据 / Example data — not a live Azure score"
+    },
+    {
+      "edition": "desktop",
+      "viewport": "1280x920",
+      "id": "settings",
+      "path": "docs/assets/screenshots/release/v1.1.0/desktop/1280x920/settings.png",
+      "width": 1280,
+      "height": 920,
+      "sha256": "ea5c78dc41582d944e59c2157ac3483c0df4596d4dcec594fe49090b77a80f83",
+      "geometry": {
+        "banner": {
+          "left": 596.3021240234375,
+          "top": 46,
+          "right": 933.6979675292969,
+          "bottom": 79.58333587646484
+        },
+        "bannerCollisions": 0,
+        "bannerWithinViewport": true,
+        "bannerOccludedPoints": 0
+      },
+      "scoreDisclosure": null
+    },
+    {
+      "edition": "desktop",
+      "viewport": "1280x920",
+      "id": "progress-example",
+      "path": "docs/assets/screenshots/release/v1.1.0/desktop/1280x920/progress-example.png",
+      "width": 1280,
+      "height": 920,
+      "sha256": "9c6886c89e3b8e9bfb8b96537c5026e86671e8fe1a8a97b55a70efee6a8546df",
+      "geometry": {
+        "banner": {
+          "left": 597.0833740234375,
+          "top": 46,
+          "right": 932.9167175292969,
+          "bottom": 79.58333587646484
+        },
+        "bannerCollisions": 0,
+        "bannerWithinViewport": true,
+        "bannerOccludedPoints": 0
+      },
+      "scoreDisclosure": "示例数据 / Example data — not a live Azure score"
+    },
+    {
+      "edition": "desktop",
+      "viewport": "1280x920",
+      "id": "no-key",
+      "path": "docs/assets/screenshots/release/v1.1.0/desktop/1280x920/no-key.png",
+      "width": 1280,
+      "height": 920,
+      "sha256": "da2f818696d07f7e3c4a8997d0fa7a12f00d4752b6d6408f23fb2ab43e956bd5",
+      "geometry": {
+        "banner": {
+          "left": 560.7083740234375,
+          "top": 369.8333435058594,
+          "right": 969.2813110351562,
+          "bottom": 403.4166793823242
+        },
+        "bannerCollisions": 0,
+        "bannerWithinViewport": true,
+        "bannerOccludedPoints": 0
+      },
+      "scoreDisclosure": null
+    },
+    {
+      "edition": "desktop",
+      "viewport": "1024x800",
+      "id": "guided-repeat",
+      "path": "docs/assets/screenshots/release/v1.1.0/desktop/1024x800/guided-repeat.png",
+      "width": 1024,
+      "height": 800,
+      "sha256": "8e3c4c01cc4ac9d88f6ef8c41535350d2c9919ad66944c3611cf553fc5d92587",
+      "geometry": {
+        "banner": {
+          "left": 343.3020935058594,
+          "top": 168,
+          "right": 680.6979370117188,
+          "bottom": 201.58333587646484
+        },
+        "bannerCollisions": 0,
+        "bannerWithinViewport": true,
+        "bannerOccludedPoints": 0
+      },
+      "scoreDisclosure": null
+    },
+    {
+      "edition": "desktop",
+      "viewport": "1024x800",
+      "id": "free-practice",
+      "path": "docs/assets/screenshots/release/v1.1.0/desktop/1024x800/free-practice.png",
+      "width": 1024,
+      "height": 800,
+      "sha256": "f22df9a8ebd1d3b63ead011236db04d9ca9589b59d153ba299f3793b9e98adf3",
+      "geometry": {
+        "banner": {
+          "left": 468.3020935058594,
+          "top": 46,
+          "right": 805.6979370117188,
+          "bottom": 79.58333587646484
+        },
+        "bannerCollisions": 0,
+        "bannerWithinViewport": true,
+        "bannerOccludedPoints": 0
+      },
+      "scoreDisclosure": null
+    },
+    {
+      "edition": "desktop",
+      "viewport": "1024x800",
+      "id": "diagnosis-example",
+      "path": "docs/assets/screenshots/release/v1.1.0/desktop/1024x800/diagnosis-example.png",
+      "width": 1024,
+      "height": 800,
+      "sha256": "f20a8ffa3fff14661dbc563321181ab24c06ffeced9b54a0efc9552ef646d16d",
+      "geometry": {
+        "banner": {
+          "left": 469.0833435058594,
+          "top": 46,
+          "right": 804.9166870117188,
+          "bottom": 79.58333587646484
+        },
+        "bannerCollisions": 0,
+        "bannerWithinViewport": true,
+        "bannerOccludedPoints": 0
+      },
+      "scoreDisclosure": "示例数据 / Example data — not a live Azure score"
+    },
+    {
+      "edition": "desktop",
+      "viewport": "1024x800",
+      "id": "settings",
+      "path": "docs/assets/screenshots/release/v1.1.0/desktop/1024x800/settings.png",
+      "width": 1024,
+      "height": 800,
+      "sha256": "b353b876c3d808ed74822e5816bee8708ac7668665310cf307af8a2ca265257f",
+      "geometry": {
+        "banner": {
+          "left": 468.3020935058594,
+          "top": 46,
+          "right": 805.6979370117188,
+          "bottom": 79.58333587646484
+        },
+        "bannerCollisions": 0,
+        "bannerWithinViewport": true,
+        "bannerOccludedPoints": 0
+      },
+      "scoreDisclosure": null
+    },
+    {
+      "edition": "desktop",
+      "viewport": "1024x800",
+      "id": "progress-example",
+      "path": "docs/assets/screenshots/release/v1.1.0/desktop/1024x800/progress-example.png",
+      "width": 1024,
+      "height": 800,
+      "sha256": "6c04da796a425c883521d3b6a0ce7bfdc1ab7cc8b57d12c8c0858c92b4b182c0",
+      "geometry": {
+        "banner": {
+          "left": 469.0833435058594,
+          "top": 46,
+          "right": 804.9166870117188,
+          "bottom": 79.58333587646484
+        },
+        "bannerCollisions": 0,
+        "bannerWithinViewport": true,
+        "bannerOccludedPoints": 0
+      },
+      "scoreDisclosure": "示例数据 / Example data — not a live Azure score"
+    },
+    {
+      "edition": "desktop",
+      "viewport": "1024x800",
+      "id": "no-key",
+      "path": "docs/assets/screenshots/release/v1.1.0/desktop/1024x800/no-key.png",
+      "width": 1024,
+      "height": 800,
+      "sha256": "c9b962ee9df0ed23dc3230ba5e9d049524b02e7ef0ea70fbd60a178385b82661",
+      "geometry": {
+        "banner": {
+          "left": 432.7083435058594,
+          "top": 299.8333435058594,
+          "right": 841.2812805175781,
+          "bottom": 333.4166793823242
+        },
+        "bannerCollisions": 0,
+        "bannerWithinViewport": true,
+        "bannerOccludedPoints": 0
+      },
+      "scoreDisclosure": null
+    }
+  ]
+}

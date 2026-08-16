@@ -1,0 +1,1055 @@
+{
+  "schemaVersion": 1,
+  "version": "1.1.0",
+  "edition": "browser",
+  "fixtureBuildRequired": true,
+  "paidApiCalls": false,
+  "assetSet": {
+    "schemaVersion": 1,
+    "fileCount": 6590,
+    "totalBytes": 480736295,
+    "pathDigestSha256": "9676567a8125305c88210ad1597c17a272b64e06f792abab954f7fabff127e1f",
+    "pathHashDigestSha256": "b001504e759072f4411c0f44e7d1c93900b15def935c5c04bacbf5dc71bdf6d9",
+    "registrySha256": "211b7682fcfe9e93947f12e29d35e8f481699b68ac3dcbc55f6cd980bfe77aba"
+  },
+  "generatorSnapshot": {
+    "schemaVersion": 1,
+    "sha256": "d7b0fc92cafe3449e690937a9f66e824dfc874c7e1989e44832b2d5322270047",
+    "fileCount": 16,
+    "totalBytes": 214435
+  },
+  "outputTree": {
+    "schemaVersion": 1,
+    "sha256": "1eaefae8812eb535b3e8f45a0bda7fffce848712708ceeb14a8d38eab293a448",
+    "fileCount": 7652,
+    "totalBytes": 504297666
+  },
+  "sourceCommit": "eb9ed5e7ec4f4de5c7f8aa1e18fd4f36f0ecdef4",
+  "sourceWorktreeClean": true,
+  "sourceSnapshot": {
+    "schemaVersion": 1,
+    "sha256": "66143f3614361eb8c547636f50ebff9b7bd8ef838bea4edcf659a60f0edfe907",
+    "fileCount": 471
+  },
+  "buildManifestSha256": "496d3437efd35d4aa2109c2a02019f09a28d983e6fa9e448cc604b0177f48f6d",
+  "browserVersion": "151.0.4129.86",
+  "blockedExternalOrigins": [],
+  "artifacts": [
+    {
+      "edition": "browser",
+      "viewport": "1280x800",
+      "id": "guided-repeat",
+      "path": "docs/assets/screenshots/release/v1.1.0/browser/1280x800/guided-repeat.png",
+      "width": 1280,
+      "height": 800,
+      "sha256": "59dadc17abeefaac6079d2a13d7f16bc5a707f51365d36cbae931e5564e63d24",
+      "geometry": {
+        "banner": {
+          "left": 470.96875,
+          "top": 168,
+          "right": 809.03125,
+          "bottom": 202.25
+        },
+        "bannerCollisions": 0,
+        "bannerWithinViewport": true,
+        "bannerOccludedPoints": 0,
+        "heading": {
+          "left": 297,
+          "top": 202.625,
+          "right": 362.984375,
+          "bottom": 238.625,
+          "width": 65.984375,
+          "height": 36
+        },
+        "titlebar": {
+          "left": 0,
+          "top": 0,
+          "right": 1280,
+          "bottom": 36,
+          "width": 1280,
+          "height": 36
+        },
+        "desktopSidebar": {
+          "left": 0,
+          "top": 36,
+          "right": 260,
+          "bottom": 800,
+          "width": 260,
+          "height": 764
+        },
+        "mobileNavigation": null,
+        "navigationTitleOverlap": false,
+        "globalChromeWithinViewport": true,
+        "windowScroll": {
+          "x": 0,
+          "y": 0
+        },
+        "mainScrollTop": 0,
+        "guidedRepeatFocus": null
+      },
+      "scoreDisclosure": null
+    },
+    {
+      "edition": "browser",
+      "viewport": "1280x800",
+      "id": "free-practice",
+      "path": "docs/assets/screenshots/release/v1.1.0/browser/1280x800/free-practice.png",
+      "width": 1280,
+      "height": 800,
+      "sha256": "b0b53102f158d86666bcb863c5b1fdbef673e8215d4edf7f7e0929c6e44b4f81",
+      "geometry": {
+        "banner": {
+          "left": 600.96875,
+          "top": 46,
+          "right": 939.03125,
+          "bottom": 80.25
+        },
+        "bannerCollisions": 0,
+        "bannerWithinViewport": true,
+        "bannerOccludedPoints": 0,
+        "heading": {
+          "left": 284,
+          "top": 96.25,
+          "right": 380,
+          "bottom": 128.25,
+          "width": 96,
+          "height": 32
+        },
+        "titlebar": {
+          "left": 0,
+          "top": 0,
+          "right": 1280,
+          "bottom": 36,
+          "width": 1280,
+          "height": 36
+        },
+        "desktopSidebar": {
+          "left": 0,
+          "top": 36,
+          "right": 260,
+          "bottom": 800,
+          "width": 260,
+          "height": 764
+        },
+        "mobileNavigation": null,
+        "navigationTitleOverlap": false,
+        "globalChromeWithinViewport": true,
+        "windowScroll": {
+          "x": 0,
+          "y": 0
+        },
+        "mainScrollTop": 0,
+        "guidedRepeatFocus": null
+      },
+      "scoreDisclosure": null
+    },
+    {
+      "edition": "browser",
+      "viewport": "1280x800",
+      "id": "diagnosis-example",
+      "path": "docs/assets/screenshots/release/v1.1.0/browser/1280x800/diagnosis-example.png",
+      "width": 1280,
+      "height": 800,
+      "sha256": "6a6dc65879d4d810cc2754167be90409ad593e3570beacf18ea41eff0c3e2103",
+      "geometry": {
+        "banner": {
+          "left": 601.75,
+          "top": 46,
+          "right": 938.25,
+          "bottom": 80.25
+        },
+        "bannerCollisions": 0,
+        "bannerWithinViewport": true,
+        "bannerOccludedPoints": 0,
+        "heading": {
+          "left": 284,
+          "top": 96.25,
+          "right": 1256,
+          "bottom": 128.25,
+          "width": 972,
+          "height": 32
+        },
+        "titlebar": {
+          "left": 0,
+          "top": 0,
+          "right": 1280,
+          "bottom": 36,
+          "width": 1280,
+          "height": 36
+        },
+        "desktopSidebar": {
+          "left": 0,
+          "top": 36,
+          "right": 260,
+          "bottom": 800,
+          "width": 260,
+          "height": 764
+        },
+        "mobileNavigation": null,
+        "navigationTitleOverlap": false,
+        "globalChromeWithinViewport": true,
+        "windowScroll": {
+          "x": 0,
+          "y": 0
+        },
+        "mainScrollTop": 0,
+        "guidedRepeatFocus": null
+      },
+      "scoreDisclosure": "示例数据 / Example data — not a live Azure score"
+    },
+    {
+      "edition": "browser",
+      "viewport": "1280x800",
+      "id": "settings",
+      "path": "docs/assets/screenshots/release/v1.1.0/browser/1280x800/settings.png",
+      "width": 1280,
+      "height": 800,
+      "sha256": "7867252c76f4844e471900888ee72a96c9aa4c74c43eca0d4574e5456491065b",
+      "geometry": {
+        "banner": {
+          "left": 600.96875,
+          "top": 46,
+          "right": 939.03125,
+          "bottom": 80.25
+        },
+        "bannerCollisions": 0,
+        "bannerWithinViewport": true,
+        "bannerOccludedPoints": 0,
+        "heading": {
+          "left": 284,
+          "top": 96.25,
+          "right": 1256,
+          "bottom": 128.25,
+          "width": 972,
+          "height": 32
+        },
+        "titlebar": {
+          "left": 0,
+          "top": 0,
+          "right": 1280,
+          "bottom": 36,
+          "width": 1280,
+          "height": 36
+        },
+        "desktopSidebar": {
+          "left": 0,
+          "top": 36,
+          "right": 260,
+          "bottom": 800,
+          "width": 260,
+          "height": 764
+        },
+        "mobileNavigation": null,
+        "navigationTitleOverlap": false,
+        "globalChromeWithinViewport": true,
+        "windowScroll": {
+          "x": 0,
+          "y": 0
+        },
+        "mainScrollTop": 0,
+        "guidedRepeatFocus": null
+      },
+      "scoreDisclosure": null
+    },
+    {
+      "edition": "browser",
+      "viewport": "1280x800",
+      "id": "progress-example",
+      "path": "docs/assets/screenshots/release/v1.1.0/browser/1280x800/progress-example.png",
+      "width": 1280,
+      "height": 800,
+      "sha256": "9ce0fba67b19a0bdfb44cf47db3aa78f44fdddd3c7403a49e4287e7d6e96f8b0",
+      "geometry": {
+        "banner": {
+          "left": 601.75,
+          "top": 46,
+          "right": 938.25,
+          "bottom": 80.25
+        },
+        "bannerCollisions": 0,
+        "bannerWithinViewport": true,
+        "bannerOccludedPoints": 0,
+        "heading": {
+          "left": 328,
+          "top": 96.25,
+          "right": 729.125,
+          "bottom": 128.25,
+          "width": 401.125,
+          "height": 32
+        },
+        "titlebar": {
+          "left": 0,
+          "top": 0,
+          "right": 1280,
+          "bottom": 36,
+          "width": 1280,
+          "height": 36
+        },
+        "desktopSidebar": {
+          "left": 0,
+          "top": 36,
+          "right": 260,
+          "bottom": 800,
+          "width": 260,
+          "height": 764
+        },
+        "mobileNavigation": null,
+        "navigationTitleOverlap": false,
+        "globalChromeWithinViewport": true,
+        "windowScroll": {
+          "x": 0,
+          "y": 0
+        },
+        "mainScrollTop": 0,
+        "guidedRepeatFocus": null
+      },
+      "scoreDisclosure": "示例数据 / Example data — not a live Azure score"
+    },
+    {
+      "edition": "browser",
+      "viewport": "1280x800",
+      "id": "no-key",
+      "path": "docs/assets/screenshots/release/v1.1.0/browser/1280x800/no-key.png",
+      "width": 1280,
+      "height": 800,
+      "sha256": "2551efe1420a6d1430f730eca6182ef633b59a4b99a031872a7a1d422434b184",
+      "geometry": {
+        "banner": {
+          "left": 565.375,
+          "top": 308.5,
+          "right": 974.625,
+          "bottom": 342.75
+        },
+        "bannerCollisions": 0,
+        "bannerWithinViewport": true,
+        "bannerOccludedPoints": 0,
+        "heading": {
+          "left": 284,
+          "top": -596,
+          "right": 1256,
+          "bottom": -564,
+          "width": 972,
+          "height": 32
+        },
+        "titlebar": {
+          "left": 0,
+          "top": 0,
+          "right": 1280,
+          "bottom": 36,
+          "width": 1280,
+          "height": 36
+        },
+        "desktopSidebar": {
+          "left": 0,
+          "top": 36,
+          "right": 260,
+          "bottom": 800,
+          "width": 260,
+          "height": 764
+        },
+        "mobileNavigation": null,
+        "navigationTitleOverlap": false,
+        "globalChromeWithinViewport": true,
+        "windowScroll": {
+          "x": 0,
+          "y": 0
+        },
+        "mainScrollTop": 648,
+        "guidedRepeatFocus": null
+      },
+      "scoreDisclosure": null
+    },
+    {
+      "edition": "browser",
+      "viewport": "390x844",
+      "id": "guided-repeat",
+      "path": "docs/assets/screenshots/release/v1.1.0/browser/390x844/guided-repeat.png",
+      "width": 390,
+      "height": 844,
+      "sha256": "e5be8291828cf4319298f73552ccf43ef81bddeb4b1dda2708dc830f51ee63ff",
+      "geometry": {
+        "banner": {
+          "left": 25.96875,
+          "top": 86,
+          "right": 364.03125,
+          "bottom": 120.25
+        },
+        "bannerCollisions": 0,
+        "bannerWithinViewport": true,
+        "bannerOccludedPoints": 0,
+        "heading": {
+          "left": 29,
+          "top": 389.5,
+          "right": 94.984375,
+          "bottom": 425.5,
+          "width": 65.984375,
+          "height": 36
+        },
+        "titlebar": {
+          "left": 0,
+          "top": 0,
+          "right": 390,
+          "bottom": 36,
+          "width": 390,
+          "height": 36
+        },
+        "desktopSidebar": null,
+        "mobileNavigation": {
+          "left": 0,
+          "top": 36,
+          "right": 390,
+          "bottom": 84,
+          "width": 390,
+          "height": 48
+        },
+        "navigationTitleOverlap": false,
+        "globalChromeWithinViewport": true,
+        "windowScroll": {
+          "x": 0,
+          "y": 0
+        },
+        "mainScrollTop": 0,
+        "guidedRepeatFocus": {
+          "cta": {
+            "left": 37,
+            "top": 731.25,
+            "right": 353,
+            "bottom": 779.25,
+            "width": 316,
+            "height": 48
+          },
+          "plan": {
+            "left": 24,
+            "top": 666.25,
+            "right": 366,
+            "bottom": 792.25,
+            "width": 342,
+            "height": 126
+          },
+          "ctaSafetyMarginPx": 37,
+          "requiredSafetyMarginPx": 12,
+          "ctaWithinViewport": true,
+          "planWithinViewport": true,
+          "setupScrollTop": 92
+        }
+      },
+      "scoreDisclosure": null
+    },
+    {
+      "edition": "browser",
+      "viewport": "390x844",
+      "id": "free-practice",
+      "path": "docs/assets/screenshots/release/v1.1.0/browser/390x844/free-practice.png",
+      "width": 390,
+      "height": 844,
+      "sha256": "d6b4467e961284a7d300eb1d8775caa934edc618d227a7da68f2df63890959d9",
+      "geometry": {
+        "banner": {
+          "left": 25.96875,
+          "top": 94,
+          "right": 364.03125,
+          "bottom": 128.25
+        },
+        "bannerCollisions": 0,
+        "bannerWithinViewport": true,
+        "bannerOccludedPoints": 0,
+        "heading": {
+          "left": 16,
+          "top": 144.25,
+          "right": 374,
+          "bottom": 176.25,
+          "width": 358,
+          "height": 32
+        },
+        "titlebar": {
+          "left": 0,
+          "top": 0,
+          "right": 390,
+          "bottom": 36,
+          "width": 390,
+          "height": 36
+        },
+        "desktopSidebar": null,
+        "mobileNavigation": {
+          "left": 0,
+          "top": 36,
+          "right": 390,
+          "bottom": 84,
+          "width": 390,
+          "height": 48
+        },
+        "navigationTitleOverlap": false,
+        "globalChromeWithinViewport": true,
+        "windowScroll": {
+          "x": 0,
+          "y": 0
+        },
+        "mainScrollTop": 0,
+        "guidedRepeatFocus": null
+      },
+      "scoreDisclosure": null
+    },
+    {
+      "edition": "browser",
+      "viewport": "390x844",
+      "id": "diagnosis-example",
+      "path": "docs/assets/screenshots/release/v1.1.0/browser/390x844/diagnosis-example.png",
+      "width": 390,
+      "height": 844,
+      "sha256": "d9fe808fa121ef6ce7240cb816a6a3dddea9619dfb297ca79082fef2abc824ea",
+      "geometry": {
+        "banner": {
+          "left": 26.75,
+          "top": 94,
+          "right": 363.25,
+          "bottom": 128.25
+        },
+        "bannerCollisions": 0,
+        "bannerWithinViewport": true,
+        "bannerOccludedPoints": 0,
+        "heading": {
+          "left": 24,
+          "top": 144.25,
+          "right": 366,
+          "bottom": 176.25,
+          "width": 342,
+          "height": 32
+        },
+        "titlebar": {
+          "left": 0,
+          "top": 0,
+          "right": 390,
+          "bottom": 36,
+          "width": 390,
+          "height": 36
+        },
+        "desktopSidebar": null,
+        "mobileNavigation": {
+          "left": 0,
+          "top": 36,
+          "right": 390,
+          "bottom": 84,
+          "width": 390,
+          "height": 48
+        },
+        "navigationTitleOverlap": false,
+        "globalChromeWithinViewport": true,
+        "windowScroll": {
+          "x": 0,
+          "y": 0
+        },
+        "mainScrollTop": 0,
+        "guidedRepeatFocus": null
+      },
+      "scoreDisclosure": "示例数据 / Example data — not a live Azure score"
+    },
+    {
+      "edition": "browser",
+      "viewport": "390x844",
+      "id": "settings",
+      "path": "docs/assets/screenshots/release/v1.1.0/browser/390x844/settings.png",
+      "width": 390,
+      "height": 844,
+      "sha256": "079078ba11a2111e819d7aa2b430c26e4e6046644afc2580524d1aed3f94bd80",
+      "geometry": {
+        "banner": {
+          "left": 25.96875,
+          "top": 94,
+          "right": 364.03125,
+          "bottom": 128.25
+        },
+        "bannerCollisions": 0,
+        "bannerWithinViewport": true,
+        "bannerOccludedPoints": 0,
+        "heading": {
+          "left": 16,
+          "top": 144.25,
+          "right": 374,
+          "bottom": 176.25,
+          "width": 358,
+          "height": 32
+        },
+        "titlebar": {
+          "left": 0,
+          "top": 0,
+          "right": 390,
+          "bottom": 36,
+          "width": 390,
+          "height": 36
+        },
+        "desktopSidebar": null,
+        "mobileNavigation": {
+          "left": 0,
+          "top": 36,
+          "right": 390,
+          "bottom": 84,
+          "width": 390,
+          "height": 48
+        },
+        "navigationTitleOverlap": false,
+        "globalChromeWithinViewport": true,
+        "windowScroll": {
+          "x": 0,
+          "y": 0
+        },
+        "mainScrollTop": 0,
+        "guidedRepeatFocus": null
+      },
+      "scoreDisclosure": null
+    },
+    {
+      "edition": "browser",
+      "viewport": "390x844",
+      "id": "progress-example",
+      "path": "docs/assets/screenshots/release/v1.1.0/browser/390x844/progress-example.png",
+      "width": 390,
+      "height": 844,
+      "sha256": "bc4838e2e652ad7869759d0c0ef21d2e58d17ef547984051ac55d2c10b7d861d",
+      "geometry": {
+        "banner": {
+          "left": 26.75,
+          "top": 94,
+          "right": 363.25,
+          "bottom": 128.25
+        },
+        "bannerCollisions": 0,
+        "bannerWithinViewport": true,
+        "bannerOccludedPoints": 0,
+        "heading": {
+          "left": 62.203125,
+          "top": 144.25,
+          "right": 374,
+          "bottom": 176.25,
+          "width": 311.796875,
+          "height": 32
+        },
+        "titlebar": {
+          "left": 0,
+          "top": 0,
+          "right": 390,
+          "bottom": 36,
+          "width": 390,
+          "height": 36
+        },
+        "desktopSidebar": null,
+        "mobileNavigation": {
+          "left": 0,
+          "top": 36,
+          "right": 390,
+          "bottom": 84,
+          "width": 390,
+          "height": 48
+        },
+        "navigationTitleOverlap": false,
+        "globalChromeWithinViewport": true,
+        "windowScroll": {
+          "x": 0,
+          "y": 0
+        },
+        "mainScrollTop": 0,
+        "guidedRepeatFocus": null
+      },
+      "scoreDisclosure": "示例数据 / Example data — not a live Azure score"
+    },
+    {
+      "edition": "browser",
+      "viewport": "390x844",
+      "id": "no-key",
+      "path": "docs/assets/screenshots/release/v1.1.0/browser/390x844/no-key.png",
+      "width": 390,
+      "height": 844,
+      "sha256": "aaadce08e58409c67a1786b022cf6ec2377cb99b838c5d4af35c1fffdc49e1a2",
+      "geometry": {
+        "banner": {
+          "left": 32,
+          "top": 320.390625,
+          "right": 358,
+          "bottom": 370.890625
+        },
+        "bannerCollisions": 0,
+        "bannerWithinViewport": true,
+        "bannerOccludedPoints": 0,
+        "heading": {
+          "left": 16,
+          "top": -1072,
+          "right": 374,
+          "bottom": -1040,
+          "width": 358,
+          "height": 32
+        },
+        "titlebar": {
+          "left": 0,
+          "top": 0,
+          "right": 390,
+          "bottom": 36,
+          "width": 390,
+          "height": 36
+        },
+        "desktopSidebar": null,
+        "mobileNavigation": {
+          "left": 0,
+          "top": 36,
+          "right": 390,
+          "bottom": 84,
+          "width": 390,
+          "height": 48
+        },
+        "navigationTitleOverlap": false,
+        "globalChromeWithinViewport": true,
+        "windowScroll": {
+          "x": 0,
+          "y": 0
+        },
+        "mainScrollTop": 1172,
+        "guidedRepeatFocus": null
+      },
+      "scoreDisclosure": null
+    },
+    {
+      "edition": "browser",
+      "viewport": "360x800",
+      "id": "guided-repeat",
+      "path": "docs/assets/screenshots/release/v1.1.0/browser/360x800/guided-repeat.png",
+      "width": 360,
+      "height": 800,
+      "sha256": "3892f5ed8200ec98224bf6b66d6dd5795c53185f7134ca0a72c0c21c23669bab",
+      "geometry": {
+        "banner": {
+          "left": 12,
+          "top": 86,
+          "right": 348,
+          "bottom": 136.5
+        },
+        "bannerCollisions": 0,
+        "bannerWithinViewport": true,
+        "bannerOccludedPoints": 0,
+        "heading": {
+          "left": 29,
+          "top": 312.25,
+          "right": 94.984375,
+          "bottom": 348.25,
+          "width": 65.984375,
+          "height": 36
+        },
+        "titlebar": {
+          "left": 0,
+          "top": 0,
+          "right": 360,
+          "bottom": 36,
+          "width": 360,
+          "height": 36
+        },
+        "desktopSidebar": null,
+        "mobileNavigation": {
+          "left": 0,
+          "top": 36,
+          "right": 360,
+          "bottom": 84,
+          "width": 360,
+          "height": 48
+        },
+        "navigationTitleOverlap": false,
+        "globalChromeWithinViewport": true,
+        "windowScroll": {
+          "x": 0,
+          "y": 0
+        },
+        "mainScrollTop": 0,
+        "guidedRepeatFocus": {
+          "cta": {
+            "left": 37,
+            "top": 687.5,
+            "right": 323,
+            "bottom": 735.5,
+            "width": 286,
+            "height": 48
+          },
+          "plan": {
+            "left": 24,
+            "top": 622.5,
+            "right": 336,
+            "bottom": 748.5,
+            "width": 312,
+            "height": 126
+          },
+          "ctaSafetyMarginPx": 37,
+          "requiredSafetyMarginPx": 12,
+          "ctaWithinViewport": true,
+          "planWithinViewport": true,
+          "setupScrollTop": 152
+        }
+      },
+      "scoreDisclosure": null
+    },
+    {
+      "edition": "browser",
+      "viewport": "360x800",
+      "id": "free-practice",
+      "path": "docs/assets/screenshots/release/v1.1.0/browser/360x800/free-practice.png",
+      "width": 360,
+      "height": 800,
+      "sha256": "7cdbf49449140047a40250512f7a72ab10d639cd815094f0896fba5d31c6bdfe",
+      "geometry": {
+        "banner": {
+          "left": 12,
+          "top": 94,
+          "right": 348,
+          "bottom": 144.5
+        },
+        "bannerCollisions": 0,
+        "bannerWithinViewport": true,
+        "bannerOccludedPoints": 0,
+        "heading": {
+          "left": 16,
+          "top": 160.5,
+          "right": 344,
+          "bottom": 192.5,
+          "width": 328,
+          "height": 32
+        },
+        "titlebar": {
+          "left": 0,
+          "top": 0,
+          "right": 360,
+          "bottom": 36,
+          "width": 360,
+          "height": 36
+        },
+        "desktopSidebar": null,
+        "mobileNavigation": {
+          "left": 0,
+          "top": 36,
+          "right": 360,
+          "bottom": 84,
+          "width": 360,
+          "height": 48
+        },
+        "navigationTitleOverlap": false,
+        "globalChromeWithinViewport": true,
+        "windowScroll": {
+          "x": 0,
+          "y": 0
+        },
+        "mainScrollTop": 0,
+        "guidedRepeatFocus": null
+      },
+      "scoreDisclosure": null
+    },
+    {
+      "edition": "browser",
+      "viewport": "360x800",
+      "id": "diagnosis-example",
+      "path": "docs/assets/screenshots/release/v1.1.0/browser/360x800/diagnosis-example.png",
+      "width": 360,
+      "height": 800,
+      "sha256": "49fee3f0d9b1d8434b60edd585b865ff026c406d37dd987f69ec1156c5c26c0f",
+      "geometry": {
+        "banner": {
+          "left": 12,
+          "top": 94,
+          "right": 348,
+          "bottom": 144.5
+        },
+        "bannerCollisions": 0,
+        "bannerWithinViewport": true,
+        "bannerOccludedPoints": 0,
+        "heading": {
+          "left": 24,
+          "top": 160.5,
+          "right": 336,
+          "bottom": 192.5,
+          "width": 312,
+          "height": 32
+        },
+        "titlebar": {
+          "left": 0,
+          "top": 0,
+          "right": 360,
+          "bottom": 36,
+          "width": 360,
+          "height": 36
+        },
+        "desktopSidebar": null,
+        "mobileNavigation": {
+          "left": 0,
+          "top": 36,
+          "right": 360,
+          "bottom": 84,
+          "width": 360,
+          "height": 48
+        },
+        "navigationTitleOverlap": false,
+        "globalChromeWithinViewport": true,
+        "windowScroll": {
+          "x": 0,
+          "y": 0
+        },
+        "mainScrollTop": 0,
+        "guidedRepeatFocus": null
+      },
+      "scoreDisclosure": "示例数据 / Example data — not a live Azure score"
+    },
+    {
+      "edition": "browser",
+      "viewport": "360x800",
+      "id": "settings",
+      "path": "docs/assets/screenshots/release/v1.1.0/browser/360x800/settings.png",
+      "width": 360,
+      "height": 800,
+      "sha256": "1059244e1d3f336d72b3df4e6393db0d912666efafcffe2062389c3ce7d6022b",
+      "geometry": {
+        "banner": {
+          "left": 12,
+          "top": 94,
+          "right": 348,
+          "bottom": 144.5
+        },
+        "bannerCollisions": 0,
+        "bannerWithinViewport": true,
+        "bannerOccludedPoints": 0,
+        "heading": {
+          "left": 16,
+          "top": 160.5,
+          "right": 344,
+          "bottom": 192.5,
+          "width": 328,
+          "height": 32
+        },
+        "titlebar": {
+          "left": 0,
+          "top": 0,
+          "right": 360,
+          "bottom": 36,
+          "width": 360,
+          "height": 36
+        },
+        "desktopSidebar": null,
+        "mobileNavigation": {
+          "left": 0,
+          "top": 36,
+          "right": 360,
+          "bottom": 84,
+          "width": 360,
+          "height": 48
+        },
+        "navigationTitleOverlap": false,
+        "globalChromeWithinViewport": true,
+        "windowScroll": {
+          "x": 0,
+          "y": 0
+        },
+        "mainScrollTop": 0,
+        "guidedRepeatFocus": null
+      },
+      "scoreDisclosure": null
+    },
+    {
+      "edition": "browser",
+      "viewport": "360x800",
+      "id": "progress-example",
+      "path": "docs/assets/screenshots/release/v1.1.0/browser/360x800/progress-example.png",
+      "width": 360,
+      "height": 800,
+      "sha256": "9168ead8ad5fb032517cf8a450ce927a190f5bdb8f30ff8eac480a42e38ab22c",
+      "geometry": {
+        "banner": {
+          "left": 12,
+          "top": 94,
+          "right": 348,
+          "bottom": 144.5
+        },
+        "bannerCollisions": 0,
+        "bannerWithinViewport": true,
+        "bannerOccludedPoints": 0,
+        "heading": {
+          "left": 59.234375,
+          "top": 160.5,
+          "right": 344,
+          "bottom": 192.5,
+          "width": 284.765625,
+          "height": 32
+        },
+        "titlebar": {
+          "left": 0,
+          "top": 0,
+          "right": 360,
+          "bottom": 36,
+          "width": 360,
+          "height": 36
+        },
+        "desktopSidebar": null,
+        "mobileNavigation": {
+          "left": 0,
+          "top": 36,
+          "right": 360,
+          "bottom": 84,
+          "width": 360,
+          "height": 48
+        },
+        "navigationTitleOverlap": false,
+        "globalChromeWithinViewport": true,
+        "windowScroll": {
+          "x": 0,
+          "y": 0
+        },
+        "mainScrollTop": 0,
+        "guidedRepeatFocus": null
+      },
+      "scoreDisclosure": "示例数据 / Example data — not a live Azure score"
+    },
+    {
+      "edition": "browser",
+      "viewport": "360x800",
+      "id": "no-key",
+      "path": "docs/assets/screenshots/release/v1.1.0/browser/360x800/no-key.png",
+      "width": 360,
+      "height": 800,
+      "sha256": "34ef636294221a66750b970911b05847f4af5dab7d43d43c959df2900bcfd9dd",
+      "geometry": {
+        "banner": {
+          "left": 32,
+          "top": 298.390625,
+          "right": 328,
+          "bottom": 348.890625
+        },
+        "bannerCollisions": 0,
+        "bannerWithinViewport": true,
+        "bannerOccludedPoints": 0,
+        "heading": {
+          "left": 16,
+          "top": -1094,
+          "right": 344,
+          "bottom": -1062,
+          "width": 328,
+          "height": 32
+        },
+        "titlebar": {
+          "left": 0,
+          "top": 0,
+          "right": 360,
+          "bottom": 36,
+          "width": 360,
+          "height": 36
+        },
+        "desktopSidebar": null,
+        "mobileNavigation": {
+          "left": 0,
+          "top": 36,
+          "right": 360,
+          "bottom": 84,
+          "width": 360,
+          "height": 48
+        },
+        "navigationTitleOverlap": false,
+        "globalChromeWithinViewport": true,
+        "windowScroll": {
+          "x": 0,
+          "y": 0
+        },
+        "mainScrollTop": 1194,
+        "guidedRepeatFocus": null
+      },
+      "scoreDisclosure": null
+    }
+  ]
+}

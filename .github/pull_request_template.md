@@ -2,6 +2,13 @@
 
 - 
 
+## Scope
+
+- [ ] Windows Desktop
+- [ ] Browser Edition
+- [ ] Shared platform-neutral logic/data
+- [ ] Documentation or governance only
+
 ## Validation
 
 - [ ] `npm run test`
@@ -11,10 +18,14 @@
 - [ ] `npm run desktop:preflight`
 - [ ] `npm run desktop:ui-smoke`
 - [ ] Release EXE manual check, if user-visible desktop behavior changed
+- [ ] `npm run lint:browser`, if Browser Edition changed
+- [ ] `npm run typecheck:browser`, if Browser Edition changed
+- [ ] `npm run test:browser`, if Browser Edition changed
+- [ ] `npm run build:browser`, if Browser Edition changed
 
 ## Release And Safety Checks
 
-- [ ] I did not use localhost/dev server as the release acceptance path.
+- [ ] I did not use localhost/dev server as the Desktop release acceptance path; Browser Edition was validated through its documented production static-server route.
 - [ ] I did not generate ElevenLabs audio or spend TTS credits.
 - [ ] Spanish, French, and Russian remain experimental.
 - [ ] Any IPA/pronunciation dispute is linked to the `IPA or pronunciation audit`
@@ -38,6 +49,10 @@
       evidence.
 - [ ] I did not add API keys, tokens, recordings, private user data, or
       unreviewed third-party media.
+- [ ] Public metrics and maturity claims link to reviewable evidence; automated
+      checks, synthetic audio, stars, clones, and downloads are not called users.
+- [ ] Any new storage, provider, recording, or export behavior is reflected in
+      `PRIVACY.md`.
 - [ ] I followed `CODE_OF_CONDUCT.md` for learner, accent, IPA, and privacy
       discussion.
 

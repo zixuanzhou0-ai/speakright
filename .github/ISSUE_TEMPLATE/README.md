@@ -7,7 +7,7 @@ vulnerability, do not open a public issue; follow `SECURITY.md` instead.
 | Report type | Use this path |
 | --- | --- |
 | Download, installer, unsigned Windows artifact, source build, Release EXE launch, or first-launch degraded state | `Installation or startup help` |
-| UI layout, Settings, scoring, drill, free practice, or assessment behavior after the app opens | `Bug report` |
+| UI layout, Settings, scoring, drill, free practice, or assessment behavior after Windows Desktop or Browser Edition opens | `Bug report` |
 | Missing bundled audio, wrong clickable audio source, loudness/clipping mismatch, or provider/quota-impacting work | `Audio gap or provider request` |
 | Spanish, French, Russian, or English IPA/pronunciation dispute with sources | `IPA or pronunciation audit` |
 | Product, language-learning, or desktop workflow improvement | `Feature request` |
@@ -16,7 +16,8 @@ vulnerability, do not open a public issue; follow `SECURITY.md` instead.
 
 Public issue reports should use evidence from the Release EXE or installer when
 they describe user-facing desktop behavior. A localhost/dev-server tab is not
-release acceptance.
+release acceptance. Browser Edition reports should name the browser version and
+the documented localhost or static-server route used.
 
 Keep public evidence minimal and redacted. Before posting screenshots or log
 excerpts, remove API keys, bearer tokens, private practice text, local

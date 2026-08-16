@@ -2,6 +2,10 @@
 
 Date: 2026-07-13
 
+> Historical snapshot. Its counts and unsigned-artifact policy describe the
+> dated branch below, not the v1.1.0 release candidate. Current distribution
+> rules live in `README.md` and `docs/INSTALLATION.md`.
+
 Branch: `codex/desktop-learning-parity`
 
 Baseline: `c9e4f8ea8ef1ff8b8c49bc79c4d7e1be3c355857`
