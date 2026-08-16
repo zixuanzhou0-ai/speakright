@@ -13,6 +13,7 @@ interface SpanishSoundsOfSpeechVideoPanelProps {
   className?: string;
   teachingVideos?: LanguageTeachingVideoAsset[];
   compact?: boolean;
+  onPlaybackError?: () => void;
 }
 
 interface SpanishPanelClip {
@@ -52,6 +53,7 @@ export function SpanishSoundsOfSpeechVideoPanel({
   className,
   teachingVideos = [],
   compact = false,
+  onPlaybackError,
 }: SpanishSoundsOfSpeechVideoPanelProps) {
   const [selection, setSelection] = useState({
     slug: videoSet.slug,
@@ -139,6 +141,7 @@ export function SpanishSoundsOfSpeechVideoPanel({
             src={selectedClip.localSrc}
             controls
             preload="metadata"
+            onError={onPlaybackError}
             className={`block h-auto ${maxHeightClass} max-w-full rounded-md border bg-black shadow-sm ${videoWidthClassForClip(selectedClip)}`}
           >
             <track kind="captions" />

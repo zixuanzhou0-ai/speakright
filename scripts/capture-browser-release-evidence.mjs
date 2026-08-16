@@ -4,15 +4,20 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 import { chromium } from "@playwright/test";
+import { releaseEvidenceAssetSet } from "./lib/release-evidence-assets.mjs";
 import {
   BROWSER_EVIDENCE_VIEWPORTS,
   EXAMPLE_SCORE_DISCLOSURE,
   evidenceBannerExpression,
+  FREE_PRACTICE_DEMO_TEXT,
   RELEASE_EVIDENCE_SHOTS,
   RELEASE_EVIDENCE_VERSION,
   storageSeedExpression,
 } from "./lib/release-evidence-fixtures.mjs";
+import { releaseEvidenceOutputTree } from "./lib/release-evidence-output-tree.mjs";
 import {
+  releaseEvidenceGeneratorDigest,
+  releaseEvidenceGeneratorGitProvenance,
   releaseEvidenceGitProvenance,
   releaseEvidenceSourceDigest,
 } from "./lib/release-evidence-source-digest.mjs";
@@ -115,16 +120,55 @@ function assertBuildManifest(manifest) {
     manifest.edition !== "browser" ||
     manifest.fixtureBuild !== true ||
     manifest.paidApiCalls !== false ||
+    manifest.assetSet?.schemaVersion !== 1 ||
+    !Number.isInteger(manifest.assetSet?.fileCount) ||
+    manifest.assetSet.fileCount <= 0 ||
+    !Number.isSafeInteger(manifest.assetSet?.totalBytes) ||
+    manifest.assetSet.totalBytes <= 0 ||
+    !/^[a-f0-9]{64}$/.test(manifest.assetSet?.pathDigestSha256 ?? "") ||
+    !/^[a-f0-9]{64}$/.test(manifest.assetSet?.pathHashDigestSha256 ?? "") ||
+    !/^[a-f0-9]{64}$/.test(manifest.assetSet?.registrySha256 ?? "") ||
+    manifest.generatorSnapshot?.schemaVersion !== 1 ||
+    !/^[a-f0-9]{64}$/.test(manifest.generatorSnapshot?.sha256 ?? "") ||
+    !Number.isInteger(manifest.generatorSnapshot?.fileCount) ||
+    !Number.isSafeInteger(manifest.generatorSnapshot?.totalBytes) ||
+    manifest.outputTree?.schemaVersion !== 1 ||
+    !/^[a-f0-9]{64}$/.test(manifest.outputTree?.sha256 ?? "") ||
+    !Number.isInteger(manifest.outputTree?.fileCount) ||
+    !Number.isSafeInteger(manifest.outputTree?.totalBytes) ||
     !/^[a-f0-9]{40}$/.test(manifest.sourceCommit ?? "") ||
     manifest.sourceWorktreeClean !== true ||
     manifest.sourceSnapshot?.schemaVersion !== 1 ||
     !/^[a-f0-9]{64}$/.test(manifest.sourceSnapshot?.sha256 ?? "") ||
     !Number.isInteger(manifest.sourceSnapshot?.fileCount) ||
     manifest.sourceSnapshot.fileCount <= 0 ||
-    !/^[a-f0-9]{64}$/.test(manifest.outputIndexSha256 ?? "")
+    manifest.output !== "apps/browser/out"
   ) {
     throw new Error("Browser evidence build provenance check failed.");
   }
+}
+
+async function assertCurrentGeneratorSnapshot(expected, expectedCommit) {
+  releaseEvidenceGeneratorGitProvenance(root, expectedCommit);
+  const current = await releaseEvidenceGeneratorDigest(root);
+  if (JSON.stringify(current) !== JSON.stringify(expected)) {
+    throw new Error(
+      "Release-evidence generator snapshot changed; rebuild first.",
+    );
+  }
+  return current;
+}
+
+async function assertCurrentAssetSet(expected, expectedCommit) {
+  const current = (
+    await releaseEvidenceAssetSet(root, "browser", expectedCommit)
+  ).summary;
+  if (JSON.stringify(current) !== JSON.stringify(expected)) {
+    throw new Error(
+      "Browser tracked release asset set changed after the isolated evidence build; rebuild before capture.",
+    );
+  }
+  return current;
 }
 
 async function assertCurrentSourceSnapshot(expected, expectedCommit) {
@@ -187,17 +231,34 @@ async function settle(page) {
   });
 }
 
+async function assertFreePracticeText(page, label) {
+  const textbox = page.getByRole("textbox", { name: "练习文本" });
+  await page.waitForFunction((expected) => {
+    const textarea = document.querySelector('textarea[aria-label="练习文本"]');
+    return (
+      textarea instanceof HTMLTextAreaElement && textarea.value === expected
+    );
+  }, FREE_PRACTICE_DEMO_TEXT);
+  const inputValue = await textbox.inputValue();
+  if (inputValue !== FREE_PRACTICE_DEMO_TEXT) {
+    throw new Error(
+      `${label} free-practice text mismatch: ${JSON.stringify(inputValue)}`,
+    );
+  }
+}
+
 async function prepareShot(page, shot) {
-  await page.goto(shot.route, { waitUntil: "domcontentloaded" });
+  await page.goto(shot.route, { waitUntil: "load" });
 
   if (shot.id === "guided-repeat") {
     await page.locator('[data-smoke="guided-repeat-trigger"]').click();
   } else if (shot.id === "free-practice") {
-    await page
-      .getByRole("textbox", { name: "练习文本" })
-      .fill(
-        "Clear speech grows through deliberate listening and repeatable practice.",
-      );
+    const textbox = page.getByRole("textbox", { name: "练习文本" });
+    await textbox.waitFor({ state: "visible" });
+    await settle(page);
+    await page.waitForTimeout(250);
+    await textbox.fill(FREE_PRACTICE_DEMO_TEXT);
+    await assertFreePracticeText(page, "post-fill");
   } else if (shot.id === "diagnosis-example") {
     await page.getByRole("button", { name: "查看上次报告" }).click();
   }
@@ -223,6 +284,9 @@ async function prepareShot(page, shot) {
     if ((await banner.textContent()) !== EXAMPLE_SCORE_DISCLOSURE) {
       throw new Error(`Missing score disclosure on ${shot.id}.`);
     }
+  }
+  if (shot.id === "free-practice") {
+    await assertFreePracticeText(page, "pre-screenshot");
   }
   return bannerPlacement;
 }
@@ -333,18 +397,41 @@ async function main() {
     buildManifest.sourceSnapshot,
     buildManifest.sourceCommit,
   );
+  await assertCurrentAssetSet(
+    buildManifest.assetSet,
+    buildManifest.sourceCommit,
+  );
+  await assertCurrentGeneratorSnapshot(
+    buildManifest.generatorSnapshot,
+    buildManifest.sourceCommit,
+  );
+  const isolatedOutputRoot = assertEvidenceTempPath(
+    path.join(path.dirname(buildManifestPath), buildManifest.output),
+    "Browser evidence output",
+  );
+  const outputTree = await releaseEvidenceOutputTree(isolatedOutputRoot);
+  if (JSON.stringify(outputTree) !== JSON.stringify(buildManifest.outputTree)) {
+    throw new Error("Browser output tree differs from its build manifest.");
+  }
+  const servedTreeResponse = await fetch(
+    new URL("/.well-known/speakright-release-evidence-tree.json", baseURL),
+  );
+  if (
+    !servedTreeResponse.ok ||
+    JSON.stringify(await servedTreeResponse.json()) !==
+      JSON.stringify(outputTree)
+  ) {
+    throw new Error(
+      "Browser evidence server is not serving the bound output tree.",
+    );
+  }
   const servedIndexResponse = await fetch(new URL("/index.html", baseURL));
   if (!servedIndexResponse.ok) {
     throw new Error(
       "Browser evidence server did not return its index document.",
     );
   }
-  const servedIndex = Buffer.from(await servedIndexResponse.arrayBuffer());
-  if (sha256(servedIndex) !== buildManifest.outputIndexSha256) {
-    throw new Error(
-      "Browser evidence server does not match the isolated build manifest.",
-    );
-  }
+  await servedIndexResponse.arrayBuffer();
   const browser = await chromium.launch({
     args: [
       "--disable-background-networking",
@@ -460,6 +547,19 @@ async function main() {
     buildManifest.sourceSnapshot,
     buildManifest.sourceCommit,
   );
+  const assetSet = await assertCurrentAssetSet(
+    buildManifest.assetSet,
+    buildManifest.sourceCommit,
+  );
+  const generatorSnapshot = await assertCurrentGeneratorSnapshot(
+    buildManifest.generatorSnapshot,
+    buildManifest.sourceCommit,
+  );
+  const postCaptureOutputTree =
+    await releaseEvidenceOutputTree(isolatedOutputRoot);
+  if (JSON.stringify(postCaptureOutputTree) !== JSON.stringify(outputTree)) {
+    throw new Error("Browser output tree changed during evidence capture.");
+  }
 
   const manifestPath = path.join(outputRoot, "manifest.json");
   await writeFile(
@@ -471,6 +571,9 @@ async function main() {
         edition: "browser",
         fixtureBuildRequired: true,
         paidApiCalls: false,
+        assetSet,
+        generatorSnapshot,
+        outputTree,
         sourceCommit: buildManifest.sourceCommit,
         sourceWorktreeClean: true,
         sourceSnapshot: buildManifest.sourceSnapshot,

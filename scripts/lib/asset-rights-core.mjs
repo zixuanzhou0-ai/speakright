@@ -1,6 +1,10 @@
+import { execFile } from "node:child_process";
 import { createHash } from "node:crypto";
 import { promises as fs } from "node:fs";
 import path from "node:path";
+import { promisify } from "node:util";
+
+const execFileAsync = promisify(execFile);
 
 export const ASSET_RIGHTS_DIGEST_PREFIX = "speakright-asset-rights-v1\0";
 
@@ -127,6 +131,149 @@ export async function walkFiles(rootDirectory) {
 
   await visit(rootDirectory);
   return files;
+}
+
+export async function listGitTrackedPackagedFiles({
+  projectRoot,
+  canonicalRoot,
+}) {
+  const resolvedProjectRoot = path.resolve(projectRoot);
+  const resolvedCanonicalRoot = path.resolve(canonicalRoot);
+  const relativeCanonicalRoot = path.relative(
+    resolvedProjectRoot,
+    resolvedCanonicalRoot,
+  );
+
+  if (
+    relativeCanonicalRoot === "" ||
+    relativeCanonicalRoot === ".." ||
+    relativeCanonicalRoot.startsWith(`..${path.sep}`) ||
+    path.isAbsolute(relativeCanonicalRoot)
+  ) {
+    throw new Error(
+      "The canonical asset root must be a child of the Git project root.",
+    );
+  }
+
+  const gitPrefix = toPosixPath(relativeCanonicalRoot);
+  const { stdout } = await execFileAsync(
+    "git",
+    ["-C", resolvedProjectRoot, "ls-files", "--cached", "-z", "--", gitPrefix],
+    {
+      encoding: "buffer",
+      maxBuffer: 32 * 1024 * 1024,
+    },
+  );
+  const prefix = `${gitPrefix}/`;
+
+  return stdout
+    .toString("utf8")
+    .split("\0")
+    .filter(Boolean)
+    .map((trackedPath) => {
+      const normalizedPath = trackedPath.replaceAll("\\", "/");
+      if (!normalizedPath.startsWith(prefix)) {
+        throw new Error(
+          `Git returned a tracked path outside ${gitPrefix}: ${normalizedPath}`,
+        );
+      }
+      return normalizedPath.slice(prefix.length);
+    })
+    .filter((relativePath) => path.posix.basename(relativePath) !== ".gitkeep")
+    .sort((left, right) => left.localeCompare(right));
+}
+
+async function resolvePackagedFiles(canonicalRoot, packagedFiles) {
+  if (packagedFiles === undefined) {
+    return { files: await walkFiles(canonicalRoot), errors: [] };
+  }
+  if (!Array.isArray(packagedFiles)) {
+    return {
+      files: [],
+      errors: ["packagedFiles must be an array of canonical-root paths."],
+    };
+  }
+
+  const errors = [];
+  const files = [];
+  const seen = new Set();
+  const resolvedCanonicalRoot = path.resolve(canonicalRoot);
+  let realCanonicalRoot;
+  try {
+    realCanonicalRoot = await fs.realpath(resolvedCanonicalRoot);
+  } catch (error) {
+    return {
+      files: [],
+      errors: [`Cannot resolve canonical asset root (${error.message}).`],
+    };
+  }
+
+  for (const relativePath of packagedFiles) {
+    if (!hasSafeRelativePath(relativePath)) {
+      errors.push(`Packaged asset path is unsafe: ${String(relativePath)}.`);
+      continue;
+    }
+    if (path.posix.basename(relativePath) === ".gitkeep") continue;
+    if (seen.has(relativePath)) {
+      errors.push(`Duplicate packaged asset path: ${relativePath}.`);
+      continue;
+    }
+    seen.add(relativePath);
+
+    const absolutePath = path.resolve(
+      resolvedCanonicalRoot,
+      ...relativePath.split("/"),
+    );
+    const relativeToRoot = path.relative(resolvedCanonicalRoot, absolutePath);
+    if (
+      relativeToRoot === "" ||
+      relativeToRoot === ".." ||
+      relativeToRoot.startsWith(`..${path.sep}`) ||
+      path.isAbsolute(relativeToRoot)
+    ) {
+      errors.push(`Packaged asset resolves outside public/: ${relativePath}.`);
+      continue;
+    }
+
+    try {
+      const info = await fs.lstat(absolutePath);
+      if (info.isSymbolicLink()) {
+        errors.push(
+          `Packaged asset must not be a symbolic link: ${relativePath}.`,
+        );
+        continue;
+      }
+      if (!info.isFile()) {
+        errors.push(`Packaged asset is not a regular file: ${relativePath}.`);
+        continue;
+      }
+      const realFilePath = await fs.realpath(absolutePath);
+      const relativeRealPath = path.relative(realCanonicalRoot, realFilePath);
+      if (
+        relativeRealPath === "" ||
+        relativeRealPath === ".." ||
+        relativeRealPath.startsWith(`..${path.sep}`) ||
+        path.isAbsolute(relativeRealPath)
+      ) {
+        errors.push(
+          `Packaged asset real path escapes the canonical root: ${relativePath}.`,
+        );
+        continue;
+      }
+    } catch (error) {
+      errors.push(
+        `Tracked packaged asset is unavailable: ${relativePath} (${error.message}).`,
+      );
+      continue;
+    }
+
+    files.push(relativePath);
+  }
+
+  return {
+    files: files.sort((left, right) => left.localeCompare(right)),
+    errors,
+  };
 }
 
 export async function digestAssetFamily(canonicalRoot, relativePaths) {
@@ -562,6 +709,7 @@ async function findAbsolutePathLeaks(canonicalRoot, relativePaths) {
 export async function analyzeAssetRights({
   canonicalRoot,
   registry,
+  packagedFiles,
   verifyDigests = true,
 }) {
   const errors = validateRegistryShape(registry);
@@ -575,7 +723,12 @@ export async function analyzeAssetRights({
     };
   }
 
-  const files = await walkFiles(canonicalRoot);
+  const packagedFileResult = await resolvePackagedFiles(
+    canonicalRoot,
+    packagedFiles,
+  );
+  errors.push(...packagedFileResult.errors);
+  const files = packagedFileResult.files;
   const claimsByFile = new Map();
   const recordResults = [];
 
@@ -686,10 +839,15 @@ export function filesForEdition(analysis, edition) {
   return [...selected].sort();
 }
 
-export async function refreshRegistryDigests({ canonicalRoot, registry }) {
+export async function refreshRegistryDigests({
+  canonicalRoot,
+  registry,
+  packagedFiles,
+}) {
   const analysis = await analyzeAssetRights({
     canonicalRoot,
     registry,
+    packagedFiles,
     verifyDigests: false,
   });
   if (analysis.errors.length > 0) {

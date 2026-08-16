@@ -2,6 +2,7 @@ import { createReadStream, existsSync, statSync } from "node:fs";
 import { createServer } from "node:http";
 import path from "node:path";
 import process from "node:process";
+import { releaseEvidenceOutputTree } from "./lib/release-evidence-output-tree.mjs";
 
 const workspaceRoot = process.cwd();
 const allowedRoot = path.join(
@@ -44,6 +45,7 @@ if (!Number.isInteger(port) || port < 1024 || port > 65535) {
     "Evidence server port must be an integer from 1024 to 65535.",
   );
 }
+const outputTree = await releaseEvidenceOutputTree(root);
 
 const contentTypes = new Map([
   [".css", "text/css; charset=utf-8"],
@@ -75,6 +77,14 @@ function resolveRequestPath(requestUrl) {
 }
 
 const server = createServer((request, response) => {
+  if (request.url === "/.well-known/speakright-release-evidence-tree.json") {
+    response.writeHead(200, {
+      "Cache-Control": "no-store",
+      "Content-Type": "application/json; charset=utf-8",
+    });
+    response.end(`${JSON.stringify(outputTree)}\n`);
+    return;
+  }
   const filePath = resolveRequestPath(request.url || "/");
   if (!filePath || !existsSync(filePath)) {
     response.writeHead(404);

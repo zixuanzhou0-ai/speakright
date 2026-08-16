@@ -5,8 +5,10 @@ import { existsSync } from "node:fs";
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
+import { releaseEvidenceAssetSet } from "./lib/release-evidence-assets.mjs";
 import {
   BROWSER_EVIDENCE_VIEWPORTS,
+  DESKTOP_EVIDENCE_BROWSER_ARGUMENTS,
   DESKTOP_EVIDENCE_VIEWPORTS,
   EXAMPLE_SCORE_DISCLOSURE,
   RELEASE_EVIDENCE_SHOTS,
@@ -14,6 +16,8 @@ import {
   RELEASE_EVIDENCE_VERSION,
 } from "./lib/release-evidence-fixtures.mjs";
 import {
+  releaseEvidenceGeneratorDigest,
+  releaseEvidenceGeneratorGitProvenance,
   releaseEvidenceGitProvenance,
   releaseEvidenceSourceDigest,
 } from "./lib/release-evidence-source-digest.mjs";
@@ -33,6 +37,26 @@ const unknownArguments = process.argv
       argument !== "--artifacts" && argument !== "--browser-artifacts",
   );
 assert.deepEqual(unknownArguments, [], "Unknown release evidence arguments");
+
+for (const contract of [
+  "release-evidence-assets.contract.mjs",
+  "release-evidence-generator.contract.mjs",
+  "release-evidence-output-tree.contract.mjs",
+]) {
+  const result = spawnSync(
+    process.execPath,
+    [path.join(root, "scripts", contract)],
+    {
+      cwd: root,
+      encoding: "utf8",
+    },
+  );
+  assert.equal(
+    result.status,
+    0,
+    `${contract} failed:\n${result.stderr || result.stdout}`,
+  );
+}
 
 assert.deepEqual(
   BROWSER_EVIDENCE_VIEWPORTS.map((item) => item.id),
@@ -216,6 +240,9 @@ async function validateScreenshotManifest(edition, viewports) {
           "edition",
           "fixtureBuildRequired",
           "paidApiCalls",
+          "assetSet",
+          "generatorSnapshot",
+          "outputTree",
           "sourceCommit",
           "sourceWorktreeClean",
           "sourceSnapshot",
@@ -230,6 +257,9 @@ async function validateScreenshotManifest(edition, viewports) {
           "edition",
           "fixtureBuildRequired",
           "paidApiCalls",
+          "assetSet",
+          "generatorSnapshot",
+          "captureTransport",
           "sourceCommit",
           "sourceWorktreeClean",
           "sourceSnapshot",
@@ -274,8 +304,61 @@ async function validateScreenshotManifest(edition, viewports) {
     await releaseEvidenceSourceDigest(root, edition),
     `${edition} evidence was not built from the current source snapshot`,
   );
+  assertExactKeys(
+    manifest.generatorSnapshot,
+    ["schemaVersion", "sha256", "fileCount", "totalBytes"],
+    `${edition} generator snapshot`,
+  );
+  assert.equal(manifest.generatorSnapshot.schemaVersion, 1);
+  assertSha256(manifest.generatorSnapshot.sha256, `${edition} generators`);
+  assert.ok(manifest.generatorSnapshot.fileCount > 0);
+  assert.ok(manifest.generatorSnapshot.totalBytes > 0);
+  releaseEvidenceGeneratorGitProvenance(root, manifest.sourceCommit);
+  assert.deepEqual(
+    manifest.generatorSnapshot,
+    await releaseEvidenceGeneratorDigest(root),
+    `${edition} generator snapshot differs from sourceCommit`,
+  );
+  assertExactKeys(
+    manifest.assetSet,
+    [
+      "schemaVersion",
+      "fileCount",
+      "totalBytes",
+      "pathDigestSha256",
+      "pathHashDigestSha256",
+      "registrySha256",
+    ],
+    `${edition} asset set`,
+  );
+  assert.equal(manifest.assetSet.schemaVersion, 1);
+  assert.equal(Number.isInteger(manifest.assetSet.fileCount), true);
+  assert.ok(manifest.assetSet.fileCount > 0);
+  assert.equal(Number.isSafeInteger(manifest.assetSet.totalBytes), true);
+  assert.ok(manifest.assetSet.totalBytes > 0);
+  assertSha256(manifest.assetSet.pathDigestSha256, `${edition} asset paths`);
+  assertSha256(
+    manifest.assetSet.pathHashDigestSha256,
+    `${edition} asset path/hash pairs`,
+  );
+  assertSha256(manifest.assetSet.registrySha256, `${edition} asset registry`);
+  assert.deepEqual(
+    manifest.assetSet,
+    (await releaseEvidenceAssetSet(root, edition, manifest.sourceCommit))
+      .summary,
+    `${edition} evidence asset set differs from current tracked release assets`,
+  );
 
   if (edition === "browser") {
+    assertExactKeys(
+      manifest.outputTree,
+      ["schemaVersion", "sha256", "fileCount", "totalBytes"],
+      "browser output tree",
+    );
+    assert.equal(manifest.outputTree.schemaVersion, 1);
+    assertSha256(manifest.outputTree.sha256, "browser output tree");
+    assert.ok(manifest.outputTree.fileCount > 0);
+    assert.ok(manifest.outputTree.totalBytes > 0);
     assert.equal(typeof manifest.browserVersion, "string");
     assert.match(manifest.browserVersion, /^\d+(?:\.\d+){1,3}$/);
     assertStringArray(
@@ -283,6 +366,18 @@ async function validateScreenshotManifest(edition, viewports) {
       "browser blockedExternalOrigins",
     );
   } else {
+    assertExactKeys(
+      manifest.captureTransport,
+      ["additionalBrowserArgsSha256", "mode", "portFile"],
+      "desktop captureTransport",
+    );
+    assert.deepEqual(manifest.captureTransport, {
+      additionalBrowserArgsSha256: digest(
+        Buffer.from(DESKTOP_EVIDENCE_BROWSER_ARGUMENTS),
+      ),
+      mode: "ephemeral-loopback-cdp",
+      portFile: "WebView2/EBWebView/DevToolsActivePort",
+    });
     assert.match(
       manifest.credentialNamespace,
       /^com\.speakright\.desktop\.release-evidence-[0-9a-f]{16}$/,
@@ -484,7 +579,10 @@ async function validateScreenshotManifest(edition, viewports) {
       .sort(),
     `${edition} screenshot directory contains an unexpected PNG set`,
   );
-  return validated;
+  return {
+    entries: validated,
+    sourceCommit: manifest.sourceCommit,
+  };
 }
 
 const EXPECTED_DEMO_FRAMES = [
@@ -680,7 +778,7 @@ function probeDemo(videoPath) {
   return { duration, video: videos[0] };
 }
 
-async function validateDemo(screenshotEntries) {
+async function validateDemo(screenshotEntries, evidenceSourceCommit) {
   const demoRootRelative = "docs/assets/demo";
   const manifest = JSON.parse(
     await readFile(
@@ -706,6 +804,8 @@ async function validateDemo(screenshotEntries) {
       "scoreDisclosure",
       "paidApiCalls",
       "userData",
+      "sourceCommit",
+      "generatorSnapshot",
       "path",
       "sha256",
       "frames",
@@ -723,6 +823,22 @@ async function validateDemo(screenshotEntries) {
   assert.equal(manifest.burnedCaptions, true);
   assert.equal(manifest.paidApiCalls, false);
   assert.equal(manifest.userData, false);
+  assert.match(manifest.sourceCommit, /^[a-f0-9]{40}$/);
+  assert.equal(
+    manifest.sourceCommit,
+    evidenceSourceCommit,
+    "Demo sourceCommit must match both screenshot manifests",
+  );
+  releaseEvidenceGeneratorGitProvenance(root, manifest.sourceCommit);
+  assertExactKeys(
+    manifest.generatorSnapshot,
+    ["schemaVersion", "sha256", "fileCount", "totalBytes"],
+    "demo generator snapshot",
+  );
+  assert.deepEqual(
+    manifest.generatorSnapshot,
+    await releaseEvidenceGeneratorDigest(root),
+  );
   assert.equal(manifest.scoreDisclosure, EXAMPLE_SCORE_DISCLOSURE);
   assert.equal(typeof manifest.durationSeconds, "number");
   assert.equal(Number.isFinite(manifest.durationSeconds), true);
@@ -857,19 +973,25 @@ async function validateDemo(screenshotEntries) {
 
 if (requireArtifacts || requireBrowserArtifacts) {
   const screenshotEntries = new Map();
-  const browserEntries = await validateScreenshotManifest(
+  const browserEvidence = await validateScreenshotManifest(
     "browser",
     BROWSER_EVIDENCE_VIEWPORTS,
   );
-  for (const [key, entry] of browserEntries) screenshotEntries.set(key, entry);
+  for (const [key, entry] of browserEvidence.entries)
+    screenshotEntries.set(key, entry);
   if (requireArtifacts) {
-    const desktopEntries = await validateScreenshotManifest(
+    const desktopEvidence = await validateScreenshotManifest(
       "desktop",
       DESKTOP_EVIDENCE_VIEWPORTS,
     );
-    for (const [key, entry] of desktopEntries)
+    assert.equal(
+      desktopEvidence.sourceCommit,
+      browserEvidence.sourceCommit,
+      "Browser and Desktop screenshot manifests must share one sourceCommit",
+    );
+    for (const [key, entry] of desktopEvidence.entries)
       screenshotEntries.set(key, entry);
-    await validateDemo(screenshotEntries);
+    await validateDemo(screenshotEntries, browserEvidence.sourceCommit);
   }
 }
 

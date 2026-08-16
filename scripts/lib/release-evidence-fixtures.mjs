@@ -53,6 +53,15 @@ export const RELEASE_EVIDENCE_SHOTS = [
 export const EXAMPLE_SCORE_DISCLOSURE =
   "示例数据 / Example data — not a live Azure score";
 
+export const FREE_PRACTICE_DEMO_TEXT =
+  "Clear speech grows through deliberate listening and repeatable practice.";
+
+export const DESKTOP_EVIDENCE_BROWSER_ARGUMENTS = [
+  "--remote-debugging-port=0",
+  "--remote-allow-origins=*",
+  "--disable-background-networking",
+].join(" ");
+
 const FIXED_TIMESTAMP = Date.UTC(2026, 7, 16, 12, 0, 0);
 
 const diagnosisReport = {

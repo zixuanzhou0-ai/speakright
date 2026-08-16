@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import {
   analyzeAssetRights,
   filesForEdition,
+  listGitTrackedPackagedFiles,
   readJson,
   walkFiles,
 } from "./lib/asset-rights-core.mjs";
@@ -49,7 +50,15 @@ async function digestFile(filePath) {
 }
 
 const registry = await readJson(registryPath);
-const analysis = await analyzeAssetRights({ canonicalRoot, registry });
+const packagedFiles = await listGitTrackedPackagedFiles({
+  projectRoot,
+  canonicalRoot,
+});
+const analysis = await analyzeAssetRights({
+  canonicalRoot,
+  registry,
+  packagedFiles,
+});
 if (analysis.errors.length > 0) {
   throw new Error(
     `Browser asset sync blocked by rights validation:\n- ${analysis.errors.join("\n- ")}`,

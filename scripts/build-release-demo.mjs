@@ -17,6 +17,10 @@ import {
   EXAMPLE_SCORE_DISCLOSURE,
   RELEASE_EVIDENCE_VERSION,
 } from "./lib/release-evidence-fixtures.mjs";
+import {
+  releaseEvidenceGeneratorDigest,
+  releaseEvidenceGeneratorGitProvenance,
+} from "./lib/release-evidence-source-digest.mjs";
 
 const root = process.cwd();
 const demoRoot = path.join(root, "docs", "assets", "demo");
@@ -519,6 +523,34 @@ function sanitizeDiagnostic(value) {
 }
 
 async function main() {
+  const evidenceManifests = await Promise.all(
+    ["browser", "desktop"].map((edition) =>
+      readFile(
+        path.join(
+          root,
+          "docs",
+          "assets",
+          "screenshots",
+          "release",
+          `v${RELEASE_EVIDENCE_VERSION}`,
+          edition,
+          "manifest.json",
+        ),
+        "utf8",
+      ).then(JSON.parse),
+    ),
+  );
+  const sourceCommit = evidenceManifests[0]?.sourceCommit;
+  if (
+    !/^[a-f0-9]{40}$/.test(sourceCommit ?? "") ||
+    evidenceManifests.some((manifest) => manifest.sourceCommit !== sourceCommit)
+  ) {
+    throw new Error(
+      "Demo evidence editions must share one full source commit.",
+    );
+  }
+  releaseEvidenceGeneratorGitProvenance(root, sourceCommit);
+  const generatorSnapshot = await releaseEvidenceGeneratorDigest(root);
   const { ffmpegExecutable, ffprobeExecutable } = await preflightToolchain();
   await mkdir(demoRoot, { recursive: true });
   let stagingRoot;
@@ -669,6 +701,8 @@ async function main() {
       scoreDisclosure: EXAMPLE_SCORE_DISCLOSURE,
       paidApiCalls: false,
       userData: false,
+      sourceCommit,
+      generatorSnapshot,
       path: path.relative(root, finalOutputPath).replaceAll("\\", "/"),
       sha256: sha256(videoBuffer),
       frames: frameArtifacts,
@@ -682,6 +716,16 @@ async function main() {
     }
     await writeFile(manifestPath, serializedManifest, "utf8");
     JSON.parse(await readFile(manifestPath, "utf8"));
+
+    releaseEvidenceGeneratorGitProvenance(root, sourceCommit);
+    const postBuildGeneratorSnapshot =
+      await releaseEvidenceGeneratorDigest(root);
+    if (
+      JSON.stringify(postBuildGeneratorSnapshot) !==
+      JSON.stringify(generatorSnapshot)
+    ) {
+      throw new Error("Release-evidence generators changed during demo build.");
+    }
 
     await commitArtifacts([
       { staged: frameRoot, final: finalFrameRoot },

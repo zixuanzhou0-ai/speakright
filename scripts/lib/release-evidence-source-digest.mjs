@@ -1,9 +1,29 @@
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { readdir, readFile } from "node:fs/promises";
+import { lstat, readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 
 export const RELEASE_EVIDENCE_SOURCE_DIGEST_SCHEMA = 1;
+export const RELEASE_EVIDENCE_GENERATOR_DIGEST_SCHEMA = 1;
+
+export const RELEASE_EVIDENCE_GENERATOR_INPUTS = Object.freeze([
+  "scripts/build-browser-release-evidence.mjs",
+  "scripts/build-desktop-release-evidence.mjs",
+  "scripts/build-release-demo.mjs",
+  "scripts/capture-browser-release-evidence.mjs",
+  "scripts/capture-desktop-release-evidence.mjs",
+  "scripts/serve-release-evidence-static.mjs",
+  "scripts/release-evidence.contract.mjs",
+  "scripts/release-evidence-assets.contract.mjs",
+  "scripts/release-evidence-generator.contract.mjs",
+  "scripts/release-evidence-output-tree.contract.mjs",
+  "scripts/lib/asset-rights-core.mjs",
+  "scripts/lib/release-evidence-assets.mjs",
+  "scripts/lib/release-evidence-fixtures.mjs",
+  "scripts/lib/release-evidence-output-tree.mjs",
+  "scripts/lib/release-evidence-source-digest.mjs",
+  "scripts/lib/windows-process-boundary.mjs",
+]);
 
 const EXCLUDED_DIRECTORIES = new Set([
   ".next",
@@ -57,30 +77,25 @@ function runGit(baseRoot, args, label) {
   return result.stdout.trim();
 }
 
-function assertCleanInputs(baseRoot, inputs, edition) {
+function assertCleanInputs(baseRoot, inputs, label) {
   const status = runGit(
     baseRoot,
     ["status", "--porcelain=v1", "--untracked-files=all", "--", ...inputs],
-    `verify the ${edition} source worktree`,
+    `verify the ${label} worktree`,
   );
   if (status) {
     throw new Error(
-      `Release evidence ${edition} source inputs must be committed and clean.`,
+      `Release evidence ${label} inputs must be committed and clean.`,
     );
   }
 }
 
-export function releaseEvidenceGitProvenance(
-  baseRoot,
-  edition,
-  expectedCommit,
-) {
-  const inputs = inputsForEdition(edition);
+function gitInputProvenance(baseRoot, inputs, label, expectedCommit) {
   const head = runGit(baseRoot, ["rev-parse", "HEAD"], "resolve HEAD");
   if (!/^[0-9a-f]{40}$/.test(head)) {
     throw new Error("Release evidence requires a concrete Git source commit.");
   }
-  assertCleanInputs(baseRoot, inputs, edition);
+  assertCleanInputs(baseRoot, inputs, label);
 
   if (expectedCommit === undefined) {
     return { commit: head, sourceWorktreeClean: true };
@@ -102,16 +117,39 @@ export function releaseEvidenceGitProvenance(
     { cwd: baseRoot, encoding: "utf8" },
   );
   if (treeDiff.status === 1) {
-    throw new Error(
-      `Current ${edition} source inputs differ from sourceCommit.`,
-    );
+    throw new Error(`Current ${label} inputs differ from sourceCommit.`);
   }
   if (treeDiff.status !== 0) {
     throw new Error(
-      `Could not compare ${edition} sourceCommit inputs for release evidence.`,
+      `Could not compare ${label} sourceCommit inputs for release evidence.`,
     );
   }
   return { commit: expectedCommit, sourceWorktreeClean: true };
+}
+
+export function releaseEvidenceGitProvenance(
+  baseRoot,
+  edition,
+  expectedCommit,
+) {
+  return gitInputProvenance(
+    baseRoot,
+    inputsForEdition(edition),
+    `${edition} source`,
+    expectedCommit,
+  );
+}
+
+export function releaseEvidenceGeneratorGitProvenance(
+  baseRoot,
+  expectedCommit,
+) {
+  return gitInputProvenance(
+    baseRoot,
+    RELEASE_EVIDENCE_GENERATOR_INPUTS,
+    "generator",
+    expectedCommit,
+  );
 }
 
 function shouldExclude(relativePath) {
@@ -123,16 +161,30 @@ function shouldExclude(relativePath) {
   );
 }
 
-async function collectFiles(baseRoot, relativePath, files) {
-  if (shouldExclude(relativePath)) return;
+async function collectFiles(baseRoot, relativePath, files, excludeBuildFiles) {
+  if (excludeBuildFiles && shouldExclude(relativePath)) return;
   const absolutePath = path.join(baseRoot, relativePath);
-  const entries = await readdir(absolutePath, { withFileTypes: true }).catch(
-    () => null,
-  );
-  if (!entries) {
+  const info = await lstat(absolutePath).catch(() => null);
+  if (!info) {
+    throw new Error(
+      `Release evidence digest input is missing: ${relativePath}`,
+    );
+  }
+  if (info.isSymbolicLink()) {
+    throw new Error(
+      `Release evidence digest refuses symlinks: ${relativePath}`,
+    );
+  }
+  if (info.isFile()) {
     files.push(relativePath);
     return;
   }
+  if (!info.isDirectory()) {
+    throw new Error(
+      `Release evidence digest input is not a regular file or directory: ${relativePath}`,
+    );
+  }
+  const entries = await readdir(absolutePath, { withFileTypes: true });
   for (const entry of entries.sort((left, right) =>
     left.name.localeCompare(right.name, "en"),
   )) {
@@ -141,23 +193,35 @@ async function collectFiles(baseRoot, relativePath, files) {
         `Release evidence source digest refuses symlinks: ${relativePath}/${entry.name}`,
       );
     }
-    await collectFiles(baseRoot, path.join(relativePath, entry.name), files);
+    await collectFiles(
+      baseRoot,
+      path.join(relativePath, entry.name),
+      files,
+      excludeBuildFiles,
+    );
   }
 }
 
-export async function releaseEvidenceSourceDigest(baseRoot, edition) {
-  const inputs = inputsForEdition(edition);
+async function digestInputs({
+  baseRoot,
+  excludeBuildFiles,
+  inputs,
+  prefix,
+  schemaVersion,
+}) {
   const files = [];
-  for (const input of inputs) await collectFiles(baseRoot, input, files);
+  for (const input of inputs) {
+    await collectFiles(baseRoot, input, files, excludeBuildFiles);
+  }
   files.sort((left, right) => left.localeCompare(right, "en"));
 
   const hash = createHash("sha256");
-  hash.update(
-    `speakright-release-evidence-source-v${RELEASE_EVIDENCE_SOURCE_DIGEST_SCHEMA}\0`,
-  );
+  hash.update(`${prefix}${schemaVersion}\0`);
+  let totalBytes = 0;
   for (const relativePath of files) {
     const normalizedPath = relativePath.replaceAll("\\", "/");
     const contents = await readFile(path.join(baseRoot, relativePath));
+    totalBytes += contents.length;
     hash.update(normalizedPath);
     hash.update("\0");
     hash.update(String(contents.length));
@@ -166,8 +230,34 @@ export async function releaseEvidenceSourceDigest(baseRoot, edition) {
     hash.update("\0");
   }
   return {
-    schemaVersion: RELEASE_EVIDENCE_SOURCE_DIGEST_SCHEMA,
+    schemaVersion,
     sha256: hash.digest("hex"),
     fileCount: files.length,
+    totalBytes,
   };
+}
+
+export async function releaseEvidenceSourceDigest(baseRoot, edition) {
+  const digest = await digestInputs({
+    baseRoot,
+    excludeBuildFiles: true,
+    inputs: inputsForEdition(edition),
+    prefix: "speakright-release-evidence-source-v",
+    schemaVersion: RELEASE_EVIDENCE_SOURCE_DIGEST_SCHEMA,
+  });
+  return {
+    schemaVersion: digest.schemaVersion,
+    sha256: digest.sha256,
+    fileCount: digest.fileCount,
+  };
+}
+
+export async function releaseEvidenceGeneratorDigest(baseRoot) {
+  return digestInputs({
+    baseRoot,
+    excludeBuildFiles: false,
+    inputs: RELEASE_EVIDENCE_GENERATOR_INPUTS,
+    prefix: "speakright-release-evidence-generator-v",
+    schemaVersion: RELEASE_EVIDENCE_GENERATOR_DIGEST_SCHEMA,
+  });
 }

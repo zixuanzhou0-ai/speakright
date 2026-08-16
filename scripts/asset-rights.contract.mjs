@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
 import { promises as fs } from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -7,6 +8,7 @@ import {
   digestAssetFamily,
   digestFile,
   filesForEdition,
+  listGitTrackedPackagedFiles,
   refreshRegistryDigests,
 } from "./lib/asset-rights-core.mjs";
 
@@ -65,6 +67,93 @@ try {
     "audio/sample.mp3",
     "manifest.json",
   ]);
+
+  await fs.writeFile(
+    path.join(canonicalRoot, "audio", "local-only.mp3"),
+    "ignored local media",
+  );
+  await fs.writeFile(
+    path.join(tempRoot, ".gitignore"),
+    "/public/audio/local-only.mp3\n",
+  );
+  execFileSync("git", ["init"], { cwd: tempRoot, stdio: "ignore" });
+  execFileSync(
+    "git",
+    [
+      "add",
+      "--",
+      ".gitignore",
+      "public/audio/sample.mp3",
+      "public/manifest.json",
+    ],
+    { cwd: tempRoot, stdio: "ignore" },
+  );
+  const trackedPackagedFiles = await listGitTrackedPackagedFiles({
+    projectRoot: tempRoot,
+    canonicalRoot,
+  });
+  assert.deepEqual(trackedPackagedFiles, ["audio/sample.mp3", "manifest.json"]);
+
+  const trackedRefreshed = await refreshRegistryDigests({
+    canonicalRoot,
+    registry: registryFor(),
+    packagedFiles: trackedPackagedFiles,
+  });
+  assert.equal(
+    trackedRefreshed.records[0].assetCount,
+    1,
+    "untracked local media must not affect a release record count",
+  );
+  const trackedOnly = await analyzeAssetRights({
+    canonicalRoot,
+    registry: trackedRefreshed,
+    packagedFiles: trackedPackagedFiles,
+  });
+  assert.deepEqual(
+    trackedOnly.errors,
+    [],
+    "untracked local media must not make a tracked release gate fail or pass",
+  );
+  assert.deepEqual(filesForEdition(trackedOnly, "browser"), [
+    "audio/sample.mp3",
+    "manifest.json",
+  ]);
+  assert.ok(
+    !filesForEdition(trackedOnly, "browser").includes("audio/local-only.mp3"),
+    "untracked local media must never enter an edition asset set",
+  );
+
+  const missingTracked = await analyzeAssetRights({
+    canonicalRoot,
+    registry: trackedRefreshed,
+    packagedFiles: [...trackedPackagedFiles, "audio/tracked-but-missing.mp3"],
+  });
+  assert.ok(
+    missingTracked.errors.some((error) =>
+      error.includes("Tracked packaged asset is unavailable"),
+    ),
+    "a tracked release path missing from disk must fail closed",
+  );
+
+  const localReference = await refreshRegistryDigests({
+    canonicalRoot,
+    registry: registryFor("reference-only"),
+    packagedFiles: ["manifest.json"],
+  });
+  const localReferenceAnalysis = await analyzeAssetRights({
+    canonicalRoot,
+    registry: localReference,
+    packagedFiles: ["manifest.json"],
+  });
+  assert.deepEqual(
+    localReferenceAnalysis.errors,
+    [],
+    "physical local-only media may remain outside the tracked release set",
+  );
+  assert.deepEqual(filesForEdition(localReferenceAnalysis, "browser"), [
+    "manifest.json",
+  ]);
+  await fs.unlink(path.join(canonicalRoot, "audio", "local-only.mp3"));
 
   await fs.writeFile(
     path.join(canonicalRoot, "audio", "sample.mp3"),

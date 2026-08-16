@@ -1,16 +1,15 @@
 # Browser public mirror migration
 
-Status: implementation ready; tracked-file removal intentionally not performed
-by the asset-compliance subtask.
+Status: completed for the tracked Browser mirror.
 
 ## Canonical and generated locations
 
-- Canonical, retained source: `public/`
+- Canonical tracked package source: Git-tracked files under `public/`
 - Generated Browser mirror: `apps/browser/public/`
 - Generator: `scripts/sync-browser-assets.mjs`
 - Rights gate: `scripts/asset-rights.mjs check`
 
-The current Browser mirror contains 6,591 tracked duplicates grouped as:
+The former Browser mirror contained 6,591 tracked duplicates grouped as:
 
 | Generated path to remove from Git tracking | Tracked files |
 | --- | ---: |
@@ -18,20 +17,20 @@ The current Browser mirror contains 6,591 tracked duplicates grouped as:
 | `apps/browser/public/images/**` | 132 |
 | `apps/browser/public/videos/**` | 210 |
 
-Ignored local phoneme teaching videos are also generated from the canonical
-root but are not part of the tracked-removal count.
+Those generated Browser paths are no longer tracked. Ignored maintainer-local
+phoneme teaching videos are not part of the public package set and are not
+copied by Browser sync.
 
-## Safe integration order
+## Ongoing invariant
 
-1. Preserve the current worktree backup and review the complete deletion diff.
-2. Add `node ../../scripts/sync-browser-assets.mjs --write --prune` to Browser
-   `predev` and `prebuild` (or invoke the equivalent root command before each
-   Browser build).
-3. Run `node scripts/asset-rights.mjs check` and a full Browser build from a
-   clean copy.
-4. Remove only the three generated subtrees above from Git tracking. Do not
-   remove the canonical root `public/` tree.
-5. Re-run the sync check, Browser build, and Browser E2E suite.
+1. Stage and review every new canonical release asset before refreshing rights
+   digests.
+2. Browser `predev` and `prebuild` run
+   `node ../../scripts/sync-browser-assets.mjs --write --prune`.
+3. The rights gate and sync both derive their input from Git-tracked
+   `public/` files, then apply the edition and redistribution policy.
+4. Run the rights check, sync check, Browser build, and Browser E2E suite from
+   a clean checkout before release.
 
 `apps/browser/.gitignore` already ignores the generated `public/` directory.
 The sync script refuses any destination other than the exact

@@ -93,6 +93,11 @@ jobs:
           RELEASE_TAG: ${{ steps.release.outputs.release_tag }}
         run: npm run check:release-version -- --edition desktop --tag "$env:RELEASE_TAG"
 
+      - name: Verify real user-testing publication evidence
+        run: |
+          npm run user-testing:evidence:test
+          npm run user-testing:evidence:check
+
       - name: Verify Desktop and Browser core parity
         run: npm run check:core-parity
 

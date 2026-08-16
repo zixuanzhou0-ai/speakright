@@ -12,8 +12,17 @@ import {
 } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
-import { RELEASE_EVIDENCE_VERSION } from "./lib/release-evidence-fixtures.mjs";
 import {
+  materializeReleaseEvidenceAssets,
+  releaseEvidenceAssetSet,
+} from "./lib/release-evidence-assets.mjs";
+import {
+  DESKTOP_EVIDENCE_BROWSER_ARGUMENTS,
+  RELEASE_EVIDENCE_VERSION,
+} from "./lib/release-evidence-fixtures.mjs";
+import {
+  releaseEvidenceGeneratorDigest,
+  releaseEvidenceGeneratorGitProvenance,
   releaseEvidenceGitProvenance,
   releaseEvidenceSourceDigest,
 } from "./lib/release-evidence-source-digest.mjs";
@@ -174,6 +183,13 @@ export async function apiFetch(
   const tauriConfig = JSON.parse(await readFile(tauriConfigPath, "utf8"));
   tauriConfig.app.security.csp =
     "default-src 'self' asset: http://asset.localhost; script-src 'self' 'unsafe-inline'; connect-src 'self' ipc: http://ipc.localhost; font-src 'self'; img-src 'self' asset: http://asset.localhost blob: data:; style-src 'self' 'unsafe-inline'; media-src 'self' blob: asset: http://asset.localhost; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'";
+  const mainWindow = tauriConfig.app?.windows?.[0];
+  if (!mainWindow || "additionalBrowserArgs" in mainWindow) {
+    throw new Error(
+      "Evidence WebView transport requires one reviewed window without existing additionalBrowserArgs.",
+    );
+  }
+  mainWindow.additionalBrowserArgs = DESKTOP_EVIDENCE_BROWSER_ARGUMENTS;
   await writeFile(
     tauriConfigPath,
     `${JSON.stringify(tauriConfig, null, 2)}\n`,
@@ -261,6 +277,8 @@ async function main() {
   );
   const provenance = releaseEvidenceGitProvenance(root, "desktop");
   const commit = provenance.commit;
+  releaseEvidenceGeneratorGitProvenance(root, commit);
+  const generatorSnapshot = await releaseEvidenceGeneratorDigest(root);
 
   await rm(workspace, { force: true, recursive: true });
   await mkdir(workspace, { recursive: true });
@@ -303,11 +321,16 @@ async function main() {
     "utf8",
   );
   const runtimeGuard = await hardenEvidenceRuntime(workspace);
+  const assetMaterialization = await materializeReleaseEvidenceAssets({
+    destinationRoot: path.join(workspace, "public"),
+    edition: "desktop",
+    expectedCommit: commit,
+    projectRoot: root,
+  });
   await junction(
     path.join(root, "node_modules"),
     path.join(workspace, "node_modules"),
   );
-  await junction(path.join(root, "public"), path.join(workspace, "public"));
 
   const tauriCli = path.join(
     root,
@@ -342,6 +365,25 @@ async function main() {
     );
   }
   releaseEvidenceGitProvenance(root, "desktop", commit);
+  releaseEvidenceGeneratorGitProvenance(root, commit);
+  const postBuildGeneratorSnapshot = await releaseEvidenceGeneratorDigest(root);
+  if (
+    JSON.stringify(postBuildGeneratorSnapshot) !==
+    JSON.stringify(generatorSnapshot)
+  ) {
+    throw new Error(
+      "Release-evidence generators changed during Desktop build.",
+    );
+  }
+  const postBuildAssetSet = (
+    await releaseEvidenceAssetSet(root, "desktop", commit)
+  ).summary;
+  if (
+    JSON.stringify(postBuildAssetSet) !==
+    JSON.stringify(assetMaterialization.assetSet)
+  ) {
+    throw new Error("Desktop release-evidence assets changed during build.");
+  }
 
   const executable = path.join(cargoTarget, "release", "speakright.exe");
   if (!existsSync(executable)) {
@@ -360,6 +402,15 @@ async function main() {
         fixtureBuild: true,
         fixtureGate: "NEXT_PUBLIC_SPEAKRIGHT_TEST_FIXTURES=1",
         paidApiCalls: false,
+        assetSet: assetMaterialization.assetSet,
+        generatorSnapshot,
+        captureTransport: {
+          additionalBrowserArgsSha256: sha256(
+            Buffer.from(DESKTOP_EVIDENCE_BROWSER_ARGUMENTS),
+          ),
+          mode: "ephemeral-loopback-cdp",
+          portFile: "WebView2/EBWebView/DevToolsActivePort",
+        },
         credentialNamespace,
         sourceSnapshot,
         runtimeIsolation: {
@@ -387,6 +438,9 @@ async function main() {
     "utf8",
   );
   console.log(`Isolated Desktop evidence build: ${workspace}`);
+  console.log(
+    `Desktop evidence assets: ${assetMaterialization.assetSet.fileCount} files (${assetMaterialization.hardlinked} hardlinks, ${assetMaterialization.copied} copies).`,
+  );
   console.log(`Desktop fixture executable: ${executable}`);
   console.log(`Formal root out and Cargo target were not modified: ${root}`);
 }

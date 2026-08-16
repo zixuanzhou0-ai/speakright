@@ -420,7 +420,7 @@ describe("desktop preflight and UI smoke", () => {
     const videoPlayer = readProjectFile(
       "src/components/phoneme/video-player.tsx",
     );
-    expect(videoPlayer).toContain("resources.map");
+    expect(videoPlayer).toContain("fallbackResources.map");
     expect(videoPlayer).toContain('data-smoke="video-fallback-resource-card"');
     expect(videoPlayer).not.toContain("resources.slice(0, 3)");
     const wordPronunciationHook = readProjectFile(

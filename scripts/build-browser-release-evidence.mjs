@@ -1,5 +1,4 @@
 import { spawnSync } from "node:child_process";
-import { createHash } from "node:crypto";
 import {
   copyFile,
   cp,
@@ -11,8 +10,15 @@ import {
 } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
-import { RELEASE_EVIDENCE_VERSION } from "./lib/release-evidence-fixtures.mjs";
 import {
+  materializeReleaseEvidenceAssets,
+  releaseEvidenceAssetSet,
+} from "./lib/release-evidence-assets.mjs";
+import { RELEASE_EVIDENCE_VERSION } from "./lib/release-evidence-fixtures.mjs";
+import { releaseEvidenceOutputTree } from "./lib/release-evidence-output-tree.mjs";
+import {
+  releaseEvidenceGeneratorDigest,
+  releaseEvidenceGeneratorGitProvenance,
   releaseEvidenceGitProvenance,
   releaseEvidenceSourceDigest,
 } from "./lib/release-evidence-source-digest.mjs";
@@ -102,6 +108,8 @@ async function main() {
   const coreRoot = path.join(workspace, "packages", "core");
   const provenance = releaseEvidenceGitProvenance(root, "browser");
   const commit = provenance.commit;
+  releaseEvidenceGeneratorGitProvenance(root, commit);
+  const generatorSnapshot = await releaseEvidenceGeneratorDigest(root);
 
   await rm(workspace, { force: true, recursive: true });
   await mkdir(browserRoot, { recursive: true });
@@ -144,10 +152,12 @@ async function main() {
     path.join(sourceBrowserRoot, "node_modules"),
     path.join(browserRoot, "node_modules"),
   );
-  await junction(
-    path.join(sourceBrowserRoot, "public"),
-    path.join(browserRoot, "public"),
-  );
+  const assetMaterialization = await materializeReleaseEvidenceAssets({
+    destinationRoot: path.join(browserRoot, "public"),
+    edition: "browser",
+    expectedCommit: commit,
+    projectRoot: root,
+  });
 
   const nextCli = path.join(
     sourceBrowserRoot,
@@ -176,9 +186,29 @@ async function main() {
     );
   }
   releaseEvidenceGitProvenance(root, "browser", commit);
+  releaseEvidenceGeneratorGitProvenance(root, commit);
+  const postBuildGeneratorSnapshot = await releaseEvidenceGeneratorDigest(root);
+  if (
+    JSON.stringify(postBuildGeneratorSnapshot) !==
+    JSON.stringify(generatorSnapshot)
+  ) {
+    throw new Error(
+      "Release-evidence generators changed during Browser build.",
+    );
+  }
+  const postBuildAssetSet = (
+    await releaseEvidenceAssetSet(root, "browser", commit)
+  ).summary;
+  if (
+    JSON.stringify(postBuildAssetSet) !==
+    JSON.stringify(assetMaterialization.assetSet)
+  ) {
+    throw new Error("Browser release-evidence assets changed during build.");
+  }
 
-  const indexPath = path.join(browserRoot, "out", "index.html");
-  const index = await readFile(indexPath);
+  const outputTree = await releaseEvidenceOutputTree(
+    path.join(browserRoot, "out"),
+  );
   await writeFile(
     path.join(workspace, "build-manifest.json"),
     `${JSON.stringify(
@@ -189,11 +219,13 @@ async function main() {
         fixtureBuild: true,
         fixtureGate: "NEXT_PUBLIC_SPEAKRIGHT_TEST_FIXTURES=1",
         paidApiCalls: false,
+        assetSet: assetMaterialization.assetSet,
+        generatorSnapshot,
         sourceCommit: commit,
         sourceWorktreeClean: true,
         sourceSnapshot,
         output: "apps/browser/out",
-        outputIndexSha256: createHash("sha256").update(index).digest("hex"),
+        outputTree,
       },
       null,
       2,
@@ -201,6 +233,9 @@ async function main() {
     "utf8",
   );
   console.log(`Isolated Browser evidence build: ${browserRoot}`);
+  console.log(
+    `Browser evidence assets: ${assetMaterialization.assetSet.fileCount} files (${assetMaterialization.hardlinked} hardlinks, ${assetMaterialization.copied} copies).`,
+  );
   console.log(`Formal Browser output was not modified: ${sourceBrowserRoot}`);
 }
 

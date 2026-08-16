@@ -3,6 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   analyzeAssetRights,
+  listGitTrackedPackagedFiles,
   readJson,
   refreshRegistryDigests,
   validateAssetRightsDocuments,
@@ -26,9 +27,17 @@ if (!new Set(["check", "update"]).has(command)) {
 }
 
 const registry = await readJson(registryPath);
+const packagedFiles = await listGitTrackedPackagedFiles({
+  projectRoot,
+  canonicalRoot,
+});
 
 if (command === "update") {
-  const updated = await refreshRegistryDigests({ canonicalRoot, registry });
+  const updated = await refreshRegistryDigests({
+    canonicalRoot,
+    registry,
+    packagedFiles,
+  });
   await fs.writeFile(
     registryPath,
     `${JSON.stringify(updated, null, 2)}\n`,
@@ -44,6 +53,7 @@ const checkedRegistry =
 const analysis = await analyzeAssetRights({
   canonicalRoot,
   registry: checkedRegistry,
+  packagedFiles,
 });
 analysis.errors.push(...(await validateAssetRightsDocuments(projectRoot)));
 if (analysis.errors.length > 0) {

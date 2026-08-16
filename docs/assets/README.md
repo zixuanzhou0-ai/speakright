@@ -1,8 +1,10 @@
 # Asset rights registry
 
-`public/` is SpeakRight's canonical packaged-asset tree. Browser Edition uses a
-generated mirror at `apps/browser/public/`; that mirror is not an independent
-source of truth.
+`public/` is SpeakRight's canonical asset location, but the public package set
+is strictly the files tracked by Git under that directory. Ignored or untracked
+maintainer-local files are not packaged inputs and cannot satisfy a registry
+record. Browser Edition uses a generated mirror at `apps/browser/public/`;
+that mirror is not an independent source of truth.
 
 The registry stores one `AssetRightsRecord` per media family. `path` is a POSIX
 glob relative to `public/`. `sha256` is a deterministic tree digest over every
@@ -44,6 +46,7 @@ node scripts/sync-browser-assets.mjs --write
 
 `update` is intentional code generation after a reviewed asset or source-detail
 change; it is not a way to approve unknown media. Update legal metadata first,
-review the manifest and registry diff, then refresh the digests. Browser sync
-validates rights before copying. Stale files are removed only with the explicit
-`--prune` flag.
+stage the reviewed asset, review the manifest and registry diff, then refresh
+the digests. An untracked file is intentionally invisible to both digest
+refresh and Browser sync. Browser sync validates the tracked package set before
+copying. Stale files are removed only with the explicit `--prune` flag.

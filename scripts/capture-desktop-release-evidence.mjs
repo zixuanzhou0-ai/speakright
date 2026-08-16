@@ -2,19 +2,23 @@ import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync } from "node:fs";
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
-import net from "node:net";
 import os from "node:os";
 import path from "node:path";
 import process from "node:process";
+import { releaseEvidenceAssetSet } from "./lib/release-evidence-assets.mjs";
 import {
+  DESKTOP_EVIDENCE_BROWSER_ARGUMENTS,
   DESKTOP_EVIDENCE_VIEWPORTS,
   EXAMPLE_SCORE_DISCLOSURE,
   evidenceBannerExpression,
+  FREE_PRACTICE_DEMO_TEXT,
   RELEASE_EVIDENCE_SHOTS,
   RELEASE_EVIDENCE_VERSION,
   storageSeedExpression,
 } from "./lib/release-evidence-fixtures.mjs";
 import {
+  releaseEvidenceGeneratorDigest,
+  releaseEvidenceGeneratorGitProvenance,
   releaseEvidenceGitProvenance,
   releaseEvidenceSourceDigest,
 } from "./lib/release-evidence-source-digest.mjs";
@@ -119,47 +123,43 @@ function pngDimensions(buffer) {
   return { width: buffer.readUInt32BE(16), height: buffer.readUInt32BE(20) };
 }
 
-function getOpenPort() {
-  return new Promise((resolve, reject) => {
-    const server = net.createServer();
-    server.once("error", reject);
-    server.listen(0, "127.0.0.1", () => {
-      const address = server.address();
-      server.close(() => {
-        if (!address || typeof address === "string") {
-          reject(new Error("Could not reserve a WebView2 debugging port."));
-          return;
-        }
-        resolve(address.port);
-      });
-    });
-  });
+async function assertCurrentAssetSet(expected, expectedCommit) {
+  const current = (
+    await releaseEvidenceAssetSet(root, "desktop", expectedCommit)
+  ).summary;
+  if (JSON.stringify(current) !== JSON.stringify(expected)) {
+    throw new Error(
+      "Desktop tracked release asset set changed after the isolated evidence build; rebuild before capture.",
+    );
+  }
+  return current;
 }
 
-function buildEnv(
-  debuggingPort,
-  profileRoot,
-  credentialNamespace,
-  logDir,
-  settingsStorePath,
-) {
+async function assertCurrentGeneratorSnapshot(expected, expectedCommit) {
+  releaseEvidenceGeneratorGitProvenance(root, expectedCommit);
+  const current = await releaseEvidenceGeneratorDigest(root);
+  if (JSON.stringify(current) !== JSON.stringify(expected)) {
+    throw new Error(
+      "Release-evidence generator snapshot changed; rebuild first.",
+    );
+  }
+  return current;
+}
+
+function buildEnv(profileRoot, credentialNamespace, logDir, settingsStorePath) {
   const sensitiveName =
     /API.?KEY|TOKEN|SECRET|PASSWORD|AZURE|ELEVEN|OPENAI|ANTHROPIC|GEMINI|GOOGLE|VERTEX|XAI|GROK|HERMES|GCLOUD|PROXY/i;
   const sanitizedEnvironment = Object.fromEntries(
     Object.entries(process.env).filter(([name]) => !sensitiveName.test(name)),
   );
-  const captureArgs = [
-    `--remote-debugging-port=${debuggingPort}`,
-    "--remote-allow-origins=*",
-    "--disable-background-networking",
-  ].join(" ");
+  delete sanitizedEnvironment.WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS;
+  delete sanitizedEnvironment.WEBVIEW2_USER_DATA_FOLDER;
   return {
     ...sanitizedEnvironment,
     SPEAKRIGHT_LOG_DIR: logDir,
     SPEAKRIGHT_RELEASE_EVIDENCE_CAPTURE: "1",
     SPEAKRIGHT_SECURE_STORE_SERVICE: credentialNamespace,
     SPEAKRIGHT_SETTINGS_STORE_PATH: settingsStorePath,
-    WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS: captureArgs,
     WEBVIEW2_USER_DATA_FOLDER: path.join(profileRoot, "WebView2"),
   };
 }
@@ -181,11 +181,39 @@ async function waitForRuntimeLog(logDir) {
   throw new Error("Desktop evidence did not initialize its isolated TEMP log.");
 }
 
-async function waitForDevtoolsTarget(debuggingPort) {
+async function waitForDevtoolsTarget(profileRoot, childState) {
   const deadline = Date.now() + timeoutMs;
   let lastError = null;
+  const portFile = path.join(
+    profileRoot,
+    "WebView2",
+    "EBWebView",
+    "DevToolsActivePort",
+  );
   while (Date.now() < deadline) {
+    if (childState.error) {
+      throw new Error(
+        `Desktop evidence process failed to start: ${childState.error.message}`,
+      );
+    }
+    if (childState.exited) {
+      throw new Error(
+        `Desktop evidence process exited before WebView2 was ready (code=${String(childState.code)}, signal=${String(childState.signal)}).`,
+      );
+    }
     try {
+      const document = await readFile(portFile, "utf8");
+      const [portLine] = document.trim().split(/\r?\n/);
+      const debuggingPort = Number(portLine);
+      if (
+        !Number.isInteger(debuggingPort) ||
+        debuggingPort < 1 ||
+        debuggingPort > 65_535
+      ) {
+        throw new Error(
+          "WebView2 DevToolsActivePort contained an invalid port.",
+        );
+      }
       const response = await fetch(
         `http://127.0.0.1:${debuggingPort}/json/list`,
       );
@@ -393,6 +421,23 @@ async function settle(cdp) {
   );
 }
 
+async function assertFreePracticeText(cdp, label) {
+  await waitForCondition(
+    cdp,
+    `
+(() => {
+  const textarea = document.querySelector('textarea[aria-label="练习文本"]');
+  const value = textarea instanceof HTMLTextAreaElement ? textarea.value : null;
+  return {
+    ok: value === ${JSON.stringify(FREE_PRACTICE_DEMO_TEXT)},
+    value,
+  };
+})()
+`,
+    `${label} free-practice text`,
+  );
+}
+
 async function prepareShot(cdp, shot) {
   const initialSelector =
     shot.id === "guided-repeat"
@@ -410,19 +455,22 @@ async function prepareShot(cdp, shot) {
       `document.querySelector('[data-smoke="guided-repeat-trigger"]')?.click(); ({ ok: true })`,
     );
   } else if (shot.id === "free-practice") {
+    await settle(cdp);
+    await delay(250);
     await evaluate(
       cdp,
       `
 (() => {
-  const textarea = document.querySelector('textarea');
+  const textarea = document.querySelector('textarea[aria-label="练习文本"]');
   const setter = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value')?.set;
-  setter?.call(textarea, 'Clear speech grows through deliberate listening and repeatable practice.');
+  setter?.call(textarea, ${JSON.stringify(FREE_PRACTICE_DEMO_TEXT)});
   textarea?.dispatchEvent(new Event('input', { bubbles: true }));
   textarea?.dispatchEvent(new Event('change', { bubbles: true }));
-  return { ok: Boolean(textarea) };
+  return { ok: textarea?.value === ${JSON.stringify(FREE_PRACTICE_DEMO_TEXT)} };
 })()
 `,
     );
+    await assertFreePracticeText(cdp, "post-fill");
   } else if (shot.id === "diagnosis-example") {
     await evaluate(
       cdp,
@@ -470,6 +518,9 @@ async function prepareShot(cdp, shot) {
     if (disclosure.text !== EXAMPLE_SCORE_DISCLOSURE) {
       throw new Error(`Missing score disclosure on ${shot.id}.`);
     }
+  }
+  if (shot.id === "free-practice") {
+    await assertFreePracticeText(cdp, "pre-screenshot");
   }
   return bannerPlacement;
 }
@@ -573,6 +624,25 @@ async function main() {
     buildManifest.edition !== "desktop" ||
     buildManifest.fixtureBuild !== true ||
     buildManifest.paidApiCalls !== false ||
+    buildManifest.assetSet?.schemaVersion !== 1 ||
+    !Number.isInteger(buildManifest.assetSet?.fileCount) ||
+    buildManifest.assetSet.fileCount <= 0 ||
+    !Number.isSafeInteger(buildManifest.assetSet?.totalBytes) ||
+    buildManifest.assetSet.totalBytes <= 0 ||
+    !/^[a-f0-9]{64}$/.test(buildManifest.assetSet?.pathDigestSha256 ?? "") ||
+    !/^[a-f0-9]{64}$/.test(
+      buildManifest.assetSet?.pathHashDigestSha256 ?? "",
+    ) ||
+    !/^[a-f0-9]{64}$/.test(buildManifest.assetSet?.registrySha256 ?? "") ||
+    buildManifest.generatorSnapshot?.schemaVersion !== 1 ||
+    !/^[a-f0-9]{64}$/.test(buildManifest.generatorSnapshot?.sha256 ?? "") ||
+    !Number.isInteger(buildManifest.generatorSnapshot?.fileCount) ||
+    !Number.isSafeInteger(buildManifest.generatorSnapshot?.totalBytes) ||
+    buildManifest.captureTransport?.mode !== "ephemeral-loopback-cdp" ||
+    buildManifest.captureTransport?.portFile !==
+      "WebView2/EBWebView/DevToolsActivePort" ||
+    buildManifest.captureTransport?.additionalBrowserArgsSha256 !==
+      sha256(Buffer.from(DESKTOP_EVIDENCE_BROWSER_ARGUMENTS)) ||
     !/^com\.speakright\.desktop\.release-evidence-[a-f0-9]{16}$/.test(
       buildManifest.credentialNamespace,
     ) ||
@@ -602,6 +672,14 @@ async function main() {
     buildManifest.sourceSnapshot,
     buildManifest.sourceCommit,
   );
+  await assertCurrentAssetSet(
+    buildManifest.assetSet,
+    buildManifest.sourceCommit,
+  );
+  await assertCurrentGeneratorSnapshot(
+    buildManifest.generatorSnapshot,
+    buildManifest.sourceCommit,
+  );
 
   const running = await findConflictingSpeakRightProcesses(executable);
   if (running.length > 0) {
@@ -610,7 +688,6 @@ async function main() {
     );
   }
 
-  const debuggingPort = await getOpenPort();
   const profileRoot = await mkdtemp(
     path.join(os.tmpdir(), "speakright-release-evidence-"),
   );
@@ -624,7 +701,6 @@ async function main() {
   const child = spawn(executable, [], {
     detached: false,
     env: buildEnv(
-      debuggingPort,
       profileRoot,
       buildManifest.credentialNamespace,
       logDir,
@@ -633,6 +709,20 @@ async function main() {
     stdio: "ignore",
     windowsHide: false,
   });
+  const childState = {
+    code: null,
+    error: null,
+    exited: false,
+    signal: null,
+  };
+  child.once("error", (error) => {
+    childState.error = error;
+  });
+  child.once("exit", (code, signal) => {
+    childState.code = code;
+    childState.exited = true;
+    childState.signal = signal;
+  });
   const artifacts = [];
   const attemptedExternalOrigins = new Set();
   const successfulExternalOrigins = new Set();
@@ -640,7 +730,7 @@ async function main() {
   let runtimeLogInitialized = false;
 
   try {
-    const target = await waitForDevtoolsTarget(debuggingPort);
+    const target = await waitForDevtoolsTarget(profileRoot, childState);
     cdp = await createCdpClient(target.webSocketDebuggerUrl);
     await cdp.send("Runtime.enable");
     await cdp.send("Page.enable");
@@ -752,6 +842,14 @@ async function main() {
     buildManifest.sourceSnapshot,
     buildManifest.sourceCommit,
   );
+  const assetSet = await assertCurrentAssetSet(
+    buildManifest.assetSet,
+    buildManifest.sourceCommit,
+  );
+  const generatorSnapshot = await assertCurrentGeneratorSnapshot(
+    buildManifest.generatorSnapshot,
+    buildManifest.sourceCommit,
+  );
 
   const manifestPath = path.join(outputRoot, "manifest.json");
   await writeFile(
@@ -763,6 +861,9 @@ async function main() {
         edition: "desktop",
         fixtureBuildRequired: true,
         paidApiCalls: false,
+        assetSet,
+        generatorSnapshot,
+        captureTransport: buildManifest.captureTransport,
         credentialNamespace: buildManifest.credentialNamespace,
         sourceSnapshot: buildManifest.sourceSnapshot,
         sourceWorktreeClean: true,

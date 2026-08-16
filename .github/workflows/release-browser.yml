@@ -94,6 +94,11 @@ jobs:
           RELEASE_TAG: ${{ steps.release.outputs.release_tag }}
         run: npm run check:release-version -- --edition browser --tag "$env:RELEASE_TAG"
 
+      - name: Verify real user-testing publication evidence
+        run: |
+          npm run user-testing:evidence:test
+          npm run user-testing:evidence:check
+
       - name: Verify Desktop and Browser core parity
         run: npm run check:core-parity
 
@@ -173,7 +178,7 @@ jobs:
             commitSha = $env:RELEASE_COMMIT_SHA
             generatedAt = [DateTime]::UtcNow.ToString("o")
             testFixtures = $false
-            checks = @("lint", "typecheck", "unit", "core-parity", "build", "static-smoke", "e2e", "production-fixture-guard", "npm-audit", "cargo-audit", "asset-rights", "docs-links", "release-evidence")
+            checks = @("lint", "typecheck", "unit", "core-parity", "build", "static-smoke", "e2e", "production-fixture-guard", "npm-audit", "cargo-audit", "asset-rights", "docs-links", "release-evidence", "user-testing-evidence")
           } | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath (Join-Path $outputDir "SpeakRight_Browser_${version}_validation-report.json") -Encoding utf8
 
       - name: Stage Browser release assets

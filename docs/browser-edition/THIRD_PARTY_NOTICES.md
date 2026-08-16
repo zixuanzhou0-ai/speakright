@@ -36,6 +36,12 @@ A `reference-only` record is never copied. Missing, modified, unregistered, or
 multiply claimed media blocks the build instead of becoming a silent missing
 asset or an unsupported redistribution claim.
 
+Only files tracked by Git under the canonical `public/` tree are considered
+packaged inputs. Ignored or untracked maintainer-local files cannot satisfy a
+rights record and are never copied into Browser Edition. In particular, the
+optional Rachel's English phoneme clips are `reference-only`; Browser Edition
+uses the official-source fallback card instead of bundling them.
+
 Current Browser asset families include the English IPA audio, generated word
 and multilingual audio, Fluent Emoji illustrations, approved articulation and
 lesson media, the provider-identification mark, and the SpeakRight-authored
