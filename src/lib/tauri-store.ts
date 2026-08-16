@@ -7,12 +7,19 @@
 import type { LazyStore } from "@tauri-apps/plugin-store";
 import { isTauriEnvironment } from "@/lib/tauri-runtime";
 
+const DEFAULT_STORE_PATH = "speakright-settings.json";
 let storeInstance: LazyStore | null = null;
 
 async function getStore(): Promise<LazyStore> {
   if (!storeInstance) {
-    const { LazyStore } = await import("@tauri-apps/plugin-store");
-    storeInstance = new LazyStore("speakright-settings.json");
+    const [{ invoke }, { LazyStore }] = await Promise.all([
+      import("@tauri-apps/api/core"),
+      import("@tauri-apps/plugin-store"),
+    ]);
+    const isolatedPath = await invoke<string | null>(
+      "desktop_settings_store_path",
+    );
+    storeInstance = new LazyStore(isolatedPath ?? DEFAULT_STORE_PATH);
   }
   return storeInstance;
 }

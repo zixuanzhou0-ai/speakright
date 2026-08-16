@@ -50,7 +50,13 @@ async function main() {
     .filter((artifact) => !artifact.sha256)
     .map((artifact) => artifact.type ?? artifact.path ?? "unknown");
   const missingPaths = report.artifacts
-    .filter((artifact) => !artifact.path || !existsSync(artifact.path))
+    .filter((artifact) => {
+      if (!artifact.path) return true;
+      const artifactPath = path.isAbsolute(artifact.path)
+        ? artifact.path
+        : path.join(root, artifact.path);
+      return !existsSync(artifactPath);
+    })
     .map((artifact) => artifact.type ?? artifact.path ?? "unknown");
 
   if (missingHashes.length > 0) {
@@ -70,7 +76,7 @@ async function main() {
       [
         "Desktop public release gate failed: unsigned artifacts are present.",
         `Unsigned: ${unsignedArtifacts.join(", ") || "unknown"}.`,
-        "Use this build for controlled internal testing only, or sign the EXE/MSI/NSIS artifacts before public release.",
+        "Use this build for controlled internal testing only, or sign every published desktop artifact before a future Desktop Stable release.",
       ].join(" "),
     );
   }

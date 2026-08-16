@@ -3,7 +3,7 @@
   "source": "University of Iowa Sounds of Speech Spanish",
   "sourceBaseUrl": "https://soundsofspeech.uiowa.edu/assets/phonemes/es",
   "localBasePath": "/videos/language-assets/es-ES/examples",
-  "note": "Downloaded from official Sounds of Speech Spanish examples/*.mp4 endpoints after user-stated authorization for local educational/open-source bundling. Use exact filenames from examples[].video.",
+  "note": "Downloaded from official Sounds of Speech Spanish examples/*.mp4 endpoints under the maintainer's written redistribution permission (public evidence reference SR-EVIDENCE-2026-IOWA-001). Use exact filenames from examples[].video.",
   "phonemes": [
     {
       "slug": "es-a",

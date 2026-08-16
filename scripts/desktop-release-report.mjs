@@ -4,6 +4,7 @@ import { existsSync } from "node:fs";
 import { mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { promisify } from "node:util";
+import { hasExactPassingRoundtripChecks } from "./desktop-installer-roundtrip-core.mjs";
 
 const execFileAsync = promisify(execFile);
 
@@ -19,24 +20,11 @@ function artifactCandidates(version) {
   return [
     {
       type: "exe",
-      path: path.join(root, "src-tauri", "target", "release", "speakright.exe"),
-    },
-    {
-      type: "msi",
-      path: path.join(
-        root,
-        "src-tauri",
-        "target",
-        "release",
-        "bundle",
-        "msi",
-        `${productName}_${version}_x64_en-US.msi`,
-      ),
+      path: "src-tauri/target/release/speakright.exe",
     },
     {
       type: "nsis",
       path: path.join(
-        root,
         "src-tauri",
         "target",
         "release",
@@ -46,6 +34,17 @@ function artifactCandidates(version) {
       ),
     },
   ];
+}
+
+function installerRoundtripPath(version) {
+  return path.join(
+    root,
+    "src-tauri",
+    "target",
+    "release",
+    "bundle",
+    `${productName}_${version}_installer-roundtrip.json`,
+  );
 }
 
 async function sha256(filePath) {
@@ -82,18 +81,60 @@ async function signatureStatus(filePath) {
 }
 
 async function describeArtifact(artifact) {
-  if (!existsSync(artifact.path)) {
-    throw new Error(`Missing desktop release artifact: ${artifact.path}`);
+  const relativePath = artifact.path.replaceAll("\\", "/");
+  const absolutePath = path.join(root, relativePath);
+  if (!existsSync(absolutePath)) {
+    throw new Error(`Missing desktop release artifact: ${relativePath}`);
   }
-  const info = await stat(artifact.path);
-  const signature = await signatureStatus(artifact.path);
+  const info = await stat(absolutePath);
+  const signature = await signatureStatus(absolutePath);
   return {
     type: artifact.type,
-    path: artifact.path,
+    path: relativePath,
     bytes: info.size,
-    sha256: await sha256(artifact.path),
+    sha256: await sha256(absolutePath),
     signature,
     signed: signature ? signature.Status === "Valid" : null,
+  };
+}
+
+async function describeInstallerRoundtrip(version, nsisArtifact) {
+  const absolutePath = installerRoundtripPath(version);
+  if (!existsSync(absolutePath)) {
+    throw new Error(
+      `Missing desktop installer round-trip report. Run npm run desktop:installer-roundtrip first.`,
+    );
+  }
+  const summary = JSON.parse(await readFile(absolutePath, "utf8"));
+  if (
+    summary.schemaVersion !== 1 ||
+    summary.productName !== productName ||
+    summary.version !== version ||
+    summary.platform !== "win32" ||
+    summary.status !== "passed" ||
+    !hasExactPassingRoundtripChecks(summary.checks) ||
+    summary.cleanup?.sandboxRemoved !== true
+  ) {
+    throw new Error(
+      "Desktop installer round-trip report is not a passing Windows result.",
+    );
+  }
+  if (
+    summary.installer?.fileName !== path.basename(nsisArtifact.path) ||
+    summary.installer?.bytes !== nsisArtifact.bytes ||
+    summary.installer?.sha256 !== nsisArtifact.sha256
+  ) {
+    throw new Error(
+      "Desktop installer round-trip report does not match the current NSIS artifact.",
+    );
+  }
+  return {
+    path: path.relative(root, absolutePath).replaceAll("\\", "/"),
+    sha256: await sha256(absolutePath),
+    status: summary.status,
+    completedAt: summary.completedAt,
+    checks: summary.checks,
+    cleanup: summary.cleanup,
   };
 }
 
@@ -104,13 +145,29 @@ async function main() {
       describeArtifact(artifact),
     ),
   );
+  const nsisArtifact = artifacts.find((artifact) => artifact.type === "nsis");
+  if (!nsisArtifact) {
+    throw new Error("Desktop release report is missing the NSIS artifact.");
+  }
+  const installerRoundtrip = await describeInstallerRoundtrip(
+    artifactVersion,
+    nsisArtifact,
+  );
   const report = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     productName,
     version: artifactVersion,
     generatedAt: new Date().toISOString(),
     platform: process.platform,
     artifacts,
+    installerRoundtrip,
+    distribution: {
+      channel: "desktop-preview",
+      publishedArtifactTypes: ["exe", "nsis"],
+      installerType: "nsis",
+      excludedArtifactTypes: ["msi"],
+      note: `MSI may be built for local metadata validation, but it is not a v${artifactVersion} Desktop Preview release artifact.`,
+    },
     signing: {
       allValid:
         artifacts.every((artifact) => artifact.signed === true) || false,
@@ -119,13 +176,7 @@ async function main() {
         .map((artifact) => artifact.type),
     },
   };
-  const outputDir = path.join(
-    root,
-    "src-tauri",
-    "target",
-    "release",
-    "bundle",
-  );
+  const outputDir = path.join(root, "src-tauri", "target", "release", "bundle");
   await mkdir(outputDir, { recursive: true });
   const outputPath = path.join(
     outputDir,
@@ -135,7 +186,7 @@ async function main() {
   console.log(`Desktop release report written: ${outputPath}`);
   for (const artifact of artifacts) {
     console.log(
-      `${artifact.type}: ${artifact.bytes} bytes sha256=${artifact.sha256}${artifact.signature ? ` signature=${artifact.signature.Status}` : ""}`,
+      `${artifact.type}: ${artifact.path} ${artifact.bytes} bytes sha256=${artifact.sha256}${artifact.signature ? ` signature=${artifact.signature.Status}` : ""}`,
     );
   }
   if (report.signing.unsignedArtifacts.length > 0) {

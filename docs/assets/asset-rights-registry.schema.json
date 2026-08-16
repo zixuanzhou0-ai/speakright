@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/zixuanzhou0-ai/speakright/blob/main/docs/assets/asset-rights-registry.schema.json",
+  "title": "SpeakRight asset rights registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "version", "canonicalRoot", "generatedAt", "records"],
+  "properties": {
+    "$schema": { "const": "./asset-rights-registry.schema.json" },
+    "version": { "const": 1 },
+    "canonicalRoot": { "const": "public" },
+    "generatedAt": { "type": "string", "format": "date" },
+    "records": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/assetRightsRecord" }
+    }
+  },
+  "$defs": {
+    "assetRightsRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "dependentRequired": {
+        "sourceDetailsPath": ["sourceDetailsSha256"],
+        "sourceDetailsSha256": ["sourceDetailsPath"]
+      },
+      "required": [
+        "id",
+        "path",
+        "sha256",
+        "assetCount",
+        "kind",
+        "sourceName",
+        "creator",
+        "evidenceRef",
+        "redistribution",
+        "modifications",
+        "editions",
+        "reviewedAt"
+      ],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]+$" },
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "assetCount": { "type": "integer", "minimum": 0 },
+        "kind": { "enum": ["audio", "image", "video"] },
+        "sourceName": { "type": "string", "minLength": 1 },
+        "sourceUrl": { "type": "string", "format": "uri" },
+        "sourceDetailsPath": { "type": "string", "minLength": 1 },
+        "sourceDetailsSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "creator": { "type": "string", "minLength": 1 },
+        "licenseSpdx": { "type": "string", "minLength": 1 },
+        "evidenceRef": {
+          "type": "string",
+          "pattern": "^[A-Z0-9][A-Z0-9._:-]{5,127}$"
+        },
+        "redistribution": {
+          "enum": ["approved", "restricted-bundle", "reference-only"]
+        },
+        "modifications": { "type": "string" },
+        "attribution": { "type": "string" },
+        "editions": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "enum": ["browser", "desktop"] }
+        },
+        "reviewedAt": { "type": "string", "format": "date" }
+      }
+    }
+  }
+}

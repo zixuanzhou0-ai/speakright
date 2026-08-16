@@ -20,6 +20,9 @@
 # production
 /build
 
+# generated from the canonical root public/ tree by scripts/sync-browser-assets.mjs
+/public/
+
 # misc
 .DS_Store
 *.pem

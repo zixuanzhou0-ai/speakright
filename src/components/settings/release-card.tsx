@@ -2,10 +2,14 @@
 
 import type React from "react";
 import {
+  Bug,
   Calendar,
   Code2,
+  FileLock2,
+  GitCommitHorizontal,
   MonitorCog,
   PackageCheck,
+  Scale,
   ShieldAlert,
 } from "lucide-react";
 
@@ -29,6 +33,10 @@ const WRAP_SAFE_RELEASE_LINK_CLASS =
 
 export function ReleaseCard() {
   const release = DESKTOP_RELEASE_INFO;
+  const buildId =
+    release.commitSha === "development"
+      ? "本地开发构建"
+      : release.commitSha.slice(0, 12);
 
   return (
     <Card
@@ -96,9 +104,19 @@ export function ReleaseCard() {
           <div className="flex gap-2">
             <ShieldAlert className="mt-0.5 size-4 shrink-0" />
             <p className="break-words [overflow-wrap:anywhere]">
-              {release.notes.unsigned}
+              {release.notes.status}
             </p>
           </div>
+        </div>
+
+        <div
+          className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground"
+          data-smoke="release-build-identity"
+        >
+          <GitCommitHorizontal className="size-3.5 shrink-0" />
+          <span className="break-all">构建 {buildId}</span>
+          <span aria-hidden="true">·</span>
+          <span className="break-words">{release.builtAt}</span>
         </div>
 
         <div className="flex flex-wrap gap-2 border-t pt-4">
@@ -127,6 +145,45 @@ export function ReleaseCard() {
           >
             <PackageCheck className="size-3.5" />
             Release 说明
+          </DesktopExternalLink>
+          <DesktopExternalLink
+            className={buttonVariants({
+              size: "sm",
+              variant: "ghost",
+              className: WRAP_SAFE_RELEASE_LINK_CLASS,
+            })}
+            copyMessage="Issues 链接已复制，请在浏览器中打开"
+            data-smoke="release-issues-link"
+            href={release.issuesUrl}
+          >
+            <Bug className="size-3.5" />
+            问题反馈
+          </DesktopExternalLink>
+          <DesktopExternalLink
+            className={buttonVariants({
+              size: "sm",
+              variant: "ghost",
+              className: WRAP_SAFE_RELEASE_LINK_CLASS,
+            })}
+            copyMessage="隐私说明链接已复制，请在浏览器中打开"
+            data-smoke="release-privacy-link"
+            href={release.privacyUrl}
+          >
+            <FileLock2 className="size-3.5" />
+            隐私说明
+          </DesktopExternalLink>
+          <DesktopExternalLink
+            className={buttonVariants({
+              size: "sm",
+              variant: "ghost",
+              className: WRAP_SAFE_RELEASE_LINK_CLASS,
+            })}
+            copyMessage="开源许可证链接已复制，请在浏览器中打开"
+            data-smoke="release-license-link"
+            href={release.licenseUrl}
+          >
+            <Scale className="size-3.5" />
+            开源许可证
           </DesktopExternalLink>
         </div>
 

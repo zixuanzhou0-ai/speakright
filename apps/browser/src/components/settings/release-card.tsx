@@ -2,11 +2,15 @@
 
 import type React from "react";
 import {
+  Bug,
   Calendar,
   Code2,
+  FileLock2,
+  GitCommitHorizontal,
   MonitorCog,
   PackageCheck,
-  ShieldAlert,
+  Scale,
+  ShieldCheck,
 } from "lucide-react";
 
 import { BrowserExternalLink } from "@/components/common/browser-external-link";
@@ -29,6 +33,10 @@ const WRAP_SAFE_RELEASE_LINK_CLASS =
 
 export function ReleaseCard() {
   const release = BROWSER_RELEASE_INFO;
+  const buildId =
+    release.commitSha === "development"
+      ? "本地开发构建"
+      : release.commitSha.slice(0, 12);
 
   return (
     <Card
@@ -83,22 +91,32 @@ export function ReleaseCard() {
             value={release.build.framework}
           />
           <ReleaseFact
-            icon={<ShieldAlert className="size-4" />}
-            label="安装包签名"
-            value={release.build.signatureLabel}
+            icon={<ShieldCheck className="size-4" />}
+            label="发行方式"
+            value={release.build.distributionLabel}
           />
         </div>
 
         <div
-          className="rounded-lg border border-amber-500/25 bg-amber-500/10 p-3 text-sm text-amber-900 dark:text-amber-200"
-          data-smoke="release-unsigned-warning"
+          className="rounded-lg border border-primary/20 bg-primary/5 p-3 text-sm text-foreground"
+          data-smoke="release-browser-distribution-note"
         >
           <div className="flex gap-2">
-            <ShieldAlert className="mt-0.5 size-4 shrink-0" />
+            <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" />
             <p className="break-words [overflow-wrap:anywhere]">
-              {release.notes.unsigned}
+              {release.notes.status}
             </p>
           </div>
+        </div>
+
+        <div
+          className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground"
+          data-smoke="release-build-identity"
+        >
+          <GitCommitHorizontal className="size-3.5 shrink-0" />
+          <span className="break-all">构建 {buildId}</span>
+          <span aria-hidden="true">·</span>
+          <span className="break-words">{release.builtAt}</span>
         </div>
 
         <div className="flex flex-wrap gap-2 border-t pt-4">
@@ -127,6 +145,42 @@ export function ReleaseCard() {
           >
             <PackageCheck className="size-3.5" />
             Release 说明
+          </BrowserExternalLink>
+          <BrowserExternalLink
+            className={buttonVariants({
+              size: "sm",
+              variant: "ghost",
+              className: WRAP_SAFE_RELEASE_LINK_CLASS,
+            })}
+            data-smoke="release-issues-link"
+            href={release.issuesUrl}
+          >
+            <Bug className="size-3.5" />
+            问题反馈
+          </BrowserExternalLink>
+          <BrowserExternalLink
+            className={buttonVariants({
+              size: "sm",
+              variant: "ghost",
+              className: WRAP_SAFE_RELEASE_LINK_CLASS,
+            })}
+            data-smoke="release-privacy-link"
+            href={release.privacyUrl}
+          >
+            <FileLock2 className="size-3.5" />
+            隐私说明
+          </BrowserExternalLink>
+          <BrowserExternalLink
+            className={buttonVariants({
+              size: "sm",
+              variant: "ghost",
+              className: WRAP_SAFE_RELEASE_LINK_CLASS,
+            })}
+            data-smoke="release-license-link"
+            href={release.licenseUrl}
+          >
+            <Scale className="size-3.5" />
+            开源许可证
           </BrowserExternalLink>
         </div>
 

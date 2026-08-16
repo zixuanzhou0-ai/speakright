@@ -1,4 +1,5 @@
 import { execFile, spawn } from "node:child_process";
+import { randomUUID } from "node:crypto";
 import { existsSync } from "node:fs";
 import {
   mkdir,
@@ -12,16 +13,29 @@ import net from "node:net";
 import os from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
+import {
+  findConflictingSpeakRightProcesses,
+  formatSpeakRightProcessConflicts,
+} from "./lib/windows-process-boundary.mjs";
 
 const execFileAsync = promisify(execFile);
 
 const root = process.cwd();
+const desktopSmokeExecutableOverride =
+  process.env.SPEAKRIGHT_DESKTOP_SMOKE_EXECUTABLE?.trim()
+    ? process.env.SPEAKRIGHT_DESKTOP_SMOKE_EXECUTABLE.trim()
+    : null;
 const expectedTitle = "SpeakRight";
-const appIdentifier = "com.speakright.desktop";
 const expectedRuntimeLogLine = "SpeakRight desktop runtime initialized";
 const timeoutMs = Number(process.env.SPEAKRIGHT_SMOKE_TIMEOUT_MS ?? 15_000);
+const desktopSmokeSecureStoreService = `com.speakright.desktop.release-smoke-${randomUUID()}`;
 
 function executablePath() {
+  if (desktopSmokeExecutableOverride) {
+    return path.isAbsolute(desktopSmokeExecutableOverride)
+      ? desktopSmokeExecutableOverride
+      : path.resolve(root, desktopSmokeExecutableOverride);
+  }
   if (process.platform === "win32") {
     return path.join(root, "src-tauri", "target", "release", "speakright.exe");
   }
@@ -68,6 +82,8 @@ async function createSmokeProfileRoot() {
     path.join(os.tmpdir(), "speakright-desktop-smoke-"),
   );
   await mkdir(path.join(rootDir, "WebView2"), { recursive: true });
+  await mkdir(path.join(rootDir, "logs"), { recursive: true });
+  await mkdir(path.join(rootDir, "settings"), { recursive: true });
   return rootDir;
 }
 
@@ -80,6 +96,7 @@ function buildSmokeEnv(debuggingPort, smokeProfileRoot) {
   ].join(" ");
   const env = {
     ...process.env,
+    SPEAKRIGHT_SECURE_STORE_SERVICE: desktopSmokeSecureStoreService,
     WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS: [existingArgs, smokeArgs]
       .filter(Boolean)
       .join(" "),
@@ -87,23 +104,23 @@ function buildSmokeEnv(debuggingPort, smokeProfileRoot) {
   if (!smokeProfileRoot) return env;
   return {
     ...env,
+    SPEAKRIGHT_LOG_DIR: path.join(smokeProfileRoot, "logs"),
+    SPEAKRIGHT_SETTINGS_STORE_PATH: path.join(
+      smokeProfileRoot,
+      "settings",
+      "speakright-settings.json",
+    ),
     WEBVIEW2_USER_DATA_FOLDER: path.join(smokeProfileRoot, "WebView2"),
   };
 }
 
-function runtimeLogPath() {
-  if (process.platform !== "win32") return null;
-  const localAppData = process.env.LOCALAPPDATA;
-  if (!localAppData) {
-    throw new Error(
-      "LOCALAPPDATA is not set; cannot locate desktop runtime logs.",
-    );
-  }
-  return path.join(localAppData, appIdentifier, "logs", "speakright.log");
+function runtimeLogPath(smokeProfileRoot) {
+  if (process.platform !== "win32" || !smokeProfileRoot) return null;
+  return path.join(smokeProfileRoot, "logs", "speakright.log");
 }
 
-async function captureRuntimeLogEvidence(smokeStartedAt) {
-  const logPath = runtimeLogPath();
+async function captureRuntimeLogEvidence(smokeStartedAt, smokeProfileRoot) {
+  const logPath = runtimeLogPath(smokeProfileRoot);
   if (!logPath) return null;
 
   const deadline = Date.now() + 5_000;
@@ -567,6 +584,75 @@ async function clickVisibleButtonByText(
   );
 }
 
+async function assertProductionFixtureQueriesUnavailable(cdp) {
+  const fixtureQuery =
+    "/phonemes/ee?smokeScoreSummary=1&smokeAssessmentTiles=1&smokeGuidedRepeatSingleWord=1";
+  await evaluate(
+    cdp,
+    `window.location.assign(new URL(${JSON.stringify(fixtureQuery)}, window.location.href).href); "navigating";`,
+  );
+  await waitForSelector(cdp, '[data-smoke="phoneme-detail-page"]');
+  await delay(500);
+
+  const fixtureState = await evaluate(
+    cdp,
+    `
+(() => ({
+  pathname: window.location.pathname,
+  search: window.location.search,
+  scoreSummaryReachable: !!document.querySelector('[data-smoke="phoneme-score-summary"]'),
+  assessmentTilesReachable: !!document.querySelector('[data-smoke="assessment-phoneme-tile-fixture"]')
+}))()
+`,
+  );
+  if (
+    fixtureState?.pathname !== "/phonemes/ee" ||
+    !fixtureState?.search?.includes("smokeScoreSummary=1")
+  ) {
+    throw new Error(
+      `Desktop production fixture assertion did not reach the requested route: ${JSON.stringify(fixtureState)}`,
+    );
+  }
+  if (
+    fixtureState.scoreSummaryReachable ||
+    fixtureState.assessmentTilesReachable
+  ) {
+    throw new Error(
+      `Desktop production EXE exposed score fixtures: ${JSON.stringify(fixtureState)}`,
+    );
+  }
+
+  await clickVisibleButtonByText(cdp, "强化跟读");
+  await waitForSelector(cdp, '[data-smoke="guided-repeat-setup"]');
+  const guidedRepeatState = await evaluate(
+    cdp,
+    `
+(() => {
+  const setup = document.querySelector('[data-smoke="guided-repeat-setup"]');
+  const setupText = setup?.textContent || "";
+  const totalWords = Number(setupText.match(/全部\\s+(\\d+)\\s+个词/)?.[1] || 0);
+  return {
+    setupVisible: !!setup,
+    totalWords,
+    setupText: setupText.slice(0, 500)
+  };
+})()
+`,
+  );
+  if (!guidedRepeatState?.setupVisible || guidedRepeatState.totalWords <= 1) {
+    throw new Error(
+      `Desktop production EXE exposed smokeGuidedRepeatSingleWord or could not prove the full pool: ${JSON.stringify(guidedRepeatState)}`,
+    );
+  }
+
+  return {
+    scoreSummaryUnreachable: true,
+    assessmentTilesUnreachable: true,
+    guidedRepeatSingleWordUnreachable: true,
+    guidedRepeatTotalWords: guidedRepeatState.totalWords,
+  };
+}
+
 async function captureInteractiveEvidence(debuggingPort) {
   if (!debuggingPort || process.platform !== "win32") return null;
 
@@ -604,12 +690,8 @@ async function captureInteractiveEvidence(debuggingPort) {
       );
     }
     const screenshot = await captureWebviewEvidence(cdp);
-
-    await evaluate(
-      cdp,
-      'window.location.assign(new URL("/phonemes", window.location.href).href); "navigating";',
-    );
-    await waitForSelector(cdp, '[data-smoke="phoneme-detail-page"]');
+    const productionFixtureGuard =
+      await assertProductionFixtureQueriesUnavailable(cdp);
 
     await evaluate(
       cdp,
@@ -626,7 +708,7 @@ async function captureInteractiveEvidence(debuggingPort) {
     await waitForSelector(cdp, '[data-smoke="desktop-llm-policy"]');
     await waitForSelector(
       cdp,
-      '[data-smoke="release-status"][data-release-channel="controlled-test"][data-signature-status="NotSigned"]',
+      '[data-smoke="release-status"][data-release-channel="preview"][data-signature-status="NotSigned"]',
     );
     await waitForSelector(cdp, '[data-smoke="release-unsigned-warning"]');
 
@@ -1464,6 +1546,7 @@ async function captureInteractiveEvidence(debuggingPort) {
       localResetPreservedKey: localReset.preservedApiKey,
       benchmarkAudioCleared:
         benchmarkAudioClear.clearedMeta && benchmarkAudioClear.clearedAudio,
+      productionFixtureGuard,
       logPath: diagnostics.bundle.logPath,
       logBytes: diagnostics.bundle.logBytes,
       screenshot,
@@ -1511,6 +1594,12 @@ async function smoke() {
       `Desktop release executable is missing. Build first: ${exe}`,
     );
   }
+  const alreadyRunning = await findConflictingSpeakRightProcesses(exe);
+  if (alreadyRunning.length > 0) {
+    throw new Error(
+      `The desktop smoke executable is already running. Close only that test instance before retrying: ${formatSpeakRightProcessConflicts(alreadyRunning)}`,
+    );
+  }
 
   const debuggingPort =
     process.platform === "win32" ? await getOpenPort() : null;
@@ -1547,7 +1636,7 @@ async function smoke() {
       if (process.platform !== "win32" || observedTitle === expectedTitle) {
         await delay(1_000);
         const [runtimeLog, interactiveEvidence] = await Promise.all([
-          captureRuntimeLogEvidence(smokeStartedAt),
+          captureRuntimeLogEvidence(smokeStartedAt, smokeProfileRoot),
           captureInteractiveEvidence(debuggingPort),
         ]);
         console.log(
@@ -1561,7 +1650,7 @@ async function smoke() {
               ? `runtimeLog="${runtimeLog.path}" bytes=${runtimeLog.bytes}`
               : "",
             interactiveEvidence
-              ? `diagnostics="${interactiveEvidence.diagnosticsDownload}" learningData="${interactiveEvidence.learningDataDownload}" learningDeletePreservedKey=${interactiveEvidence.learningDeletePreservedKey} apiKeysDeleted=${interactiveEvidence.apiKeysDeleted} localResetPreservedKey=${interactiveEvidence.localResetPreservedKey} benchmarkAudioCleared=${interactiveEvidence.benchmarkAudioCleared} retiredPronunciationSourceHidden=${interactiveEvidence.retiredPronunciationSourceHidden} route=${interactiveEvidence.route} appIdentifier=${interactiveEvidence.appIdentifier} llmCustomDisabled=${interactiveEvidence.llmCustomDisabled} tauriGlobalExposed=${interactiveEvidence.tauriGlobalExposed} tauriInvokeAvailable=${interactiveEvidence.tauriInvokeAvailable} location=${interactiveEvidence.locationProtocol}//${interactiveEvidence.locationHostname}${interactiveEvidence.locationPort ? `:${interactiveEvidence.locationPort}` : ""} releaseServedFromDevServer=${interactiveEvidence.releaseServedFromDevServer}`
+              ? `diagnostics="${interactiveEvidence.diagnosticsDownload}" learningData="${interactiveEvidence.learningDataDownload}" learningDeletePreservedKey=${interactiveEvidence.learningDeletePreservedKey} apiKeysDeleted=${interactiveEvidence.apiKeysDeleted} localResetPreservedKey=${interactiveEvidence.localResetPreservedKey} benchmarkAudioCleared=${interactiveEvidence.benchmarkAudioCleared} retiredPronunciationSourceHidden=${interactiveEvidence.retiredPronunciationSourceHidden} fixtureQueriesUnavailable=${interactiveEvidence.productionFixtureGuard.scoreSummaryUnreachable && interactiveEvidence.productionFixtureGuard.assessmentTilesUnreachable && interactiveEvidence.productionFixtureGuard.guidedRepeatSingleWordUnreachable} guidedRepeatTotalWords=${interactiveEvidence.productionFixtureGuard.guidedRepeatTotalWords} route=${interactiveEvidence.route} appIdentifier=${interactiveEvidence.appIdentifier} llmCustomDisabled=${interactiveEvidence.llmCustomDisabled} tauriGlobalExposed=${interactiveEvidence.tauriGlobalExposed} tauriInvokeAvailable=${interactiveEvidence.tauriInvokeAvailable} location=${interactiveEvidence.locationProtocol}//${interactiveEvidence.locationHostname}${interactiveEvidence.locationPort ? `:${interactiveEvidence.locationPort}` : ""} releaseServedFromDevServer=${interactiveEvidence.releaseServedFromDevServer}`
               : "",
           ]
             .filter(Boolean)

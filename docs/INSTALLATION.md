@@ -1,42 +1,45 @@
 # Installation Guide
 
-## Controlled-Test Installer Boundary
+## Unsigned Community Preview Boundary
 
-Do not treat GitHub Releases as a public signed download page yet. If you are a
-maintainer or tester in the controlled-test track, use the installer filename
-named by the current release notes and verify it against
-`docs/archive/2026-06-desktop-release/RC_EVIDENCE_AUDIT.md`.
+SpeakRight may publish a Windows package only as an explicitly labelled
+**unsigned community preview**. It is not the signed Desktop Stable channel.
+Use only the filename named by the current GitHub pre-release, verify its
+published SHA-256 checksum, and read the release-specific validation report.
 
-The filenames below are not a general download recommendation. A controlled-test
-artifact is valid only when the current release notes name it and the evidence
-audit still matches the tree you are evaluating.
+An installer is valid only when its release notes name it and its checksum,
+SBOM, commit, and validation evidence match the artifact being evaluated.
 
-This build is not code-signed yet. Use it only for controlled testing until the
-Windows EXE/MSI/NSIS artifacts are signed.
-If you are evaluating the public source repository without joining that
-controlled-test track, prefer **Build From Source** below or wait for a signed
-public Windows release.
-Published GitHub Release assets can lag behind the current `main` branch; check
-the release notes and `docs/archive/2026-06-desktop-release/RC_EVIDENCE_AUDIT.md` before treating an
-installer as the latest validated RC.
+The community-preview build is not code-signed. Windows SmartScreen may warn or
+block it. Never bypass antivirus or organization policy; build from source or
+wait for a future signed Desktop Stable release if an unsigned executable is
+not acceptable. Published assets can lag behind `main`, so treat the release
+tag and release notes—not the working branch—as the artifact source of truth.
 
-Controlled-test setup filename currently referenced by the release notes:
-
-```text
-SpeakRight_1.0.1_x64-setup.exe
-```
-
-Controlled-test MSI filename currently referenced by the release notes:
+The v1.1.0 preview publishes one installer: the versioned NSIS setup that passed
+the automated install/start/exit/uninstall round-trip. It also publishes the
+bare Release EXE for transparent inspection and portable evaluation. Exact
+checksums are populated by the release. Expected binary names are:
 
 ```text
-SpeakRight_1.0.1_x64_en-US.msi
+SpeakRight_1.1.0_x64-setup.exe
 ```
+
+```text
+speakright.exe
+```
+
+The Tauri build may also produce an MSI, and local CI may inspect its metadata.
+That MSI has not passed the real installation round-trip used for the preview,
+so it is intentionally excluded from the v1.1.0 release report, staging
+directory, checksum manifest, and GitHub pre-release assets. Do not redistribute
+it as an official v1.1.0 preview installer.
 
 ## Install on Windows
 
-1. Run the installer.
+1. Run the published `SpeakRight_1.1.0_x64-setup.exe` NSIS installer.
 2. If Windows SmartScreen appears, stop and confirm this is the expected
-   controlled-test build from the project GitHub Release before choosing any
+   unsigned community-preview build from the project GitHub pre-release before choosing any
    bypass option on a personal/test machine where policy permits it. Do not
    bypass antivirus or enterprise policy on managed devices; record the exact
    blocker in an installation/startup issue instead.
@@ -167,72 +170,33 @@ Installation verification should not generate ElevenLabs audio or spend TTS
 credits. Use the dry-run audio audits when you need to inspect bundled audio
 coverage.
 
-## Current Internal-Test Status
+## v1.1.0 Desktop Preview status
 
-Current controlled-test track: Release Candidate evidence audit, documented in
-`docs/archive/2026-06-desktop-release/RC_EVIDENCE_AUDIT.md`. Use that audit for the latest command
-results, Release EXE smoke coverage, and known blockers before treating a
-downloaded installer as the latest validated RC.
+`v1.1.0-desktop-preview.1` is an unsigned community-preview track, not Desktop
+Stable. The release workflow may publish only:
 
-- Recommended launch path: `npm run desktop:launch-release`.
-- Build shape: Tauri static bundle, not `localhost`.
-- Bundled audio/video and multilingual parity counts are validated in
-  `docs/archive/2026-06-desktop-release/RC_EVIDENCE_AUDIT.md`; keep that audit as the source of truth
-  instead of copying exact asset totals into the installation guide.
-- Multilingual audio parity remains a zero-generation audit for current local
-  coverage across Spanish, French, and Russian.
-- Secondary voices selected for the experimental packs: Spanish `Lydia`, French
-  `Rachel`, Russian `Sergey`; the original primary voices remain bundled.
-- Azure live validation: `220/220` sampled pronunciation assessments passed.
-- ElevenLabs validation usage: usage query only, `0` generated TTS characters.
-  The approved one-time secondary-voice expansion is separate from routine
-  validation and is not rerun during installer testing.
-- Release UI smoke: Settings, English, Spanish, French, Russian, drill, free
-  practice, diagnosis, and direct progress-archive access opened from the
-  Release EXE; runtime was not
-  `localhost`. The current smoke also checks detail task text readability,
-  centered reading targets, expected header-audio visibility, no
-  practice-button overlap, wrapping video selector labels, Settings/usage
-  long-text wrapping, scoring-breakdown smoke hooks, exact scoring-tile audio
-  policy, narrow-window layout, and low-height layout.
-- Local word and language-pack A/B audio now uses playback-layer, peak-safe Web
-  Audio gain for loudness matching with teaching videos. IPA chart normal/slow
-  word audio also uses a shared playback boost, and bundled language-pack
-  read-along playback keeps that boost on replay; online fallback audio is
-  unchanged and routine validation still does not generate ElevenLabs audio.
-- Latest settled-main validation results are centralized in
-  `docs/archive/2026-06-desktop-release/RC_EVIDENCE_AUDIT.md`. The current RC gate covers full tests,
-  typecheck, lint, static desktop frontend build, Release EXE preflight,
-  Release EXE UI smoke, and Release EXE launch from the static Tauri bundle.
-- Non-English diagnosis keeps scoring experimental: omission/insertion evidence
-  blocks trusted overall scores and asks for retest instead of implying mastery.
-- AI coach feedback keeps Spanish, French, and Russian full-score recordings
-  conservative: it may report that no obvious issue was found in the recording,
-  but it must not call the result perfect or mastered.
-- Spanish, French, and Russian advanced training remains feedback-only for
-  formal mastery; direct English pack-runner routes and direct progress-archive
-  access show experimental blockers for these languages, and HVPT perception
-  plus formal mastery writes stay gated by the English-only formal mastery
-  policy.
-- Public-release blocker: Windows EXE/MSI/NSIS artifacts are still unsigned.
+- the bare Release EXE after the production-fixture guard and desktop smoke
+- the NSIS setup whose installed EXE matches that Release EXE by byte count and
+  SHA-256 and whose install/start/exit/uninstall round trip passes
+- checksums, SBOMs, the versioned validation report, and the NSIS round-trip
+  report
 
-For controlled internal-test passes, use the installed app or Release EXE first.
-Only rebuild if the executable is missing, stale after code changes, or manual
-QA finds a bug that needs a code fix.
+The locally generated MSI is still checked for metadata consistency, but it is
+not part of the v1.1.0 public report, checksum set, workflow artifact, or GitHub
+Pre-release. Do not imply that MSI completed the NSIS round trip.
 
-For the next Codex chat, first read:
+The final v1.1.0 result belongs in the current release-candidate validation
+record, not in the archived June audit. Files under
+`docs/archive/2026-06-desktop-release/` remain historical evidence only and
+must not be quoted as current test totals.
 
-```text
-docs/operations/NEXT_CHAT_HANDOFF.md
-docs/archive/2026-06-desktop-release/DESKTOP_STARTUP_RUNBOOK.md
-```
-
-That handoff records current RC notes, validation commands, and any local
-worktree caveats. A settled RC branch should have no uncommitted file edits
-before you start new changes.
-If `git status` still reports `main...origin/main [ahead N]` after recent
-GitHub API fallback pushes, verify the GitHub `main` ref and local-vs-remote
-tree SHA before treating the content as unpushed.
+Before publishing the preview, all source, dependency, asset-rights, desktop
+build, Release EXE smoke, NSIS round-trip, report, and preview-gate checks must
+pass from the same clean commit. The round-trip script refuses to mutate a
+machine that already has SpeakRight registration, shortcuts, startup entries,
+default install directories, or a running `speakright.exe`; it does not stop a
+user process for you. Test credentials, WebView data, logs, and settings are
+isolated under a one-run temporary sandbox and removed after the run.
 
 Recommended developer launch order for release-style testing:
 

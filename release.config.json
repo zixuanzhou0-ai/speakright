@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "productName": "SpeakRight",
+  "version": "1.1.0",
+  "repositoryUrl": "https://github.com/zixuanzhou0-ai/speakright",
+  "lastValidatedAt": "待 v1.1.0 完整验收",
+  "editions": {
+    "browser": {
+      "productName": "SpeakRight Browser Edition",
+      "edition": "browser",
+      "channel": "stable",
+      "channelLabel": "稳定版",
+      "releaseTag": "v1.1.0",
+      "framework": "Next.js 16 static export",
+      "target": "Windows / macOS / Linux browser",
+      "signed": false,
+      "signatureStatus": "NotApplicable",
+      "signatureLabel": "不适用"
+    },
+    "desktop": {
+      "productName": "SpeakRight Desktop",
+      "edition": "desktop",
+      "channel": "preview",
+      "channelLabel": "社区预览版",
+      "releaseTag": "v1.1.0-desktop-preview.1",
+      "framework": "Tauri 2 + Next.js 16 static export",
+      "target": "Windows x64",
+      "signed": false,
+      "signatureStatus": "NotSigned",
+      "signatureLabel": "未签名"
+    }
+  }
+}

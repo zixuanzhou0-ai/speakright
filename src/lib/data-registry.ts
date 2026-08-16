@@ -10,6 +10,7 @@ import {
   clearBenchmarkRecordings,
   exportBenchmarkRecordings,
 } from "@/lib/benchmark-archive";
+import { CLOUD_PROCESSING_NOTICE_KEY } from "@/lib/cloud-processing-consent";
 import { DESKTOP_MIC_CHECK_KEY } from "@/lib/desktop-readiness";
 import { clearAllLanguageAudioPacks } from "@/lib/language-audio-pack-cache";
 import {
@@ -63,7 +64,9 @@ const RESET_ONLY_STORAGE_KEYS = [
   LOCAL_DATA_MIGRATED_AT_KEY,
   ...LEGACY_APP_PREFERENCE_STORAGE_KEYS,
   "theme",
+  CLOUD_PROCESSING_NOTICE_KEY,
 ] as const;
+const APP_STORAGE_PREFIX = "speakright_";
 
 export interface LocalDataExport {
   schemaVersion: 4;
@@ -150,6 +153,24 @@ function removeLocalStorageKeys(keys: readonly string[]): void {
   }
 }
 
+function removeNamespacedStorageKeys(
+  storage: Storage,
+  preservedKeys: readonly string[] = [],
+): void {
+  const preserved = new Set(preservedKeys);
+  const keys: string[] = [];
+  for (let index = 0; index < storage.length; index += 1) {
+    const key = storage.key(index);
+    if (key?.startsWith(APP_STORAGE_PREFIX) && !preserved.has(key)) {
+      keys.push(key);
+    }
+  }
+  for (const key of keys) {
+    storage.removeItem(key);
+    window.dispatchEvent(new StorageEvent("storage", { key }));
+  }
+}
+
 async function removePersistentKeys(keys: readonly string[]): Promise<void> {
   if (typeof window === "undefined") return;
   await Promise.all(keys.map((key) => clearItem(key)));
@@ -194,7 +215,7 @@ export async function buildLocalDataExport(): Promise<LocalDataExport> {
     },
     excluded: [
       "API keys",
-      "ElevenLabs TTS audio cache",
+      "Standard demonstration TTS audio cache",
       "Legacy generated language audio cache",
       "Theme preference",
     ],
@@ -288,5 +309,10 @@ export async function deleteAllLocalData({
   ]);
   if (includeApiKeys) {
     await deleteApiKeys();
+  }
+  if (typeof window !== "undefined") {
+    const preservedKeys = includeApiKeys ? [] : [...API_KEY_STORAGE_KEYS];
+    removeNamespacedStorageKeys(window.localStorage, preservedKeys);
+    removeNamespacedStorageKeys(window.sessionStorage, preservedKeys);
   }
 }

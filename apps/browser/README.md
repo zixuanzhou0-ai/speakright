@@ -66,7 +66,7 @@ node scripts/serve-static.mjs
 
 1. 打开“设置”。
 2. 填写 Azure Speech，用于真实发音评分。
-3. 填写 ElevenLabs，用于标准示范音频。
+3. 在“标准示范 TTS”里选择 ElevenLabs、爱马仕 Grok 或 Vertex AI · Gemini 3.1 Flash TTS。后两者直接复用本机已有授权，无需把密钥再填进 SpeakRight。
 4. 填写 LLM，用于中文 AI 教练反馈。
 5. 允许浏览器使用麦克风。
 6. 在自由练习页选择正确麦克风，然后录一句话测试。
@@ -87,6 +87,9 @@ node scripts/serve-static.mjs
 - 分数来自 Azure Speech Pronunciation Assessment。
 - LLM 只根据 Azure 结果生成中文教练反馈，不负责编造分数。
 - API Key 由用户自己填写，默认保存在本机浏览器里。
+- 选择“爱马仕 Grok”时，本机启动器会同时启动带会话校验的回环桥接；练习文本经爱马仕发送给 xAI，Grok 凭据仍由爱马仕管理。设置页的“试听短句”会产生 Grok TTS 用量。
+- 选择“Vertex AI · Gemini 3.1”时，同一本机桥接会使用 gcloud 当前项目和 ADC 临时授权；项目名、账号和访问令牌不会返回网页。状态检测不会生成语音，设置页的“试听短句”和实际朗读会产生 Vertex AI 用量。
+- 爱马仕与 Vertex 选项只适用于通过本项目本机启动器运行的 Browser Edition；远程托管网页不会自动获得这些本机能力。
 - 不要把自己的 API Key 上传到 GitHub、截图或公开文档里。
 
 ## 开发者命令

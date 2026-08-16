@@ -1,40 +1,59 @@
-# Third-Party Notices
+# Browser Edition third-party notices
 
-This document separates API providers, bundled local assets, and reference
-sources for SpeakRight Browser Edition.
+This document applies the repository-wide media boundary in
+`THIRD_PARTY_NOTICES.md` to SpeakRight Browser Edition.
 
-## API Providers
+## Runtime providers
 
-| Provider | Role |
+| Provider | Browser role |
 | --- | --- |
-| Azure Speech | Pronunciation Assessment provider for all numeric scores. |
-| ElevenLabs | Optional TTS provider for generated demo/read-along audio. |
-| LLM providers | Chinese coaching feedback only; not a scoring source. |
-| Youdao | Online dictionary pronunciation fallback. |
+| Azure Speech | User-configured Pronunciation Assessment provider and the only source of numeric pronunciation scores. |
+| ElevenLabs | Optional user-configured standard-demonstration TTS provider. |
+| LLM providers | Optional Chinese coaching explanation generated from Azure evidence; not an independent scoring source. |
+| Youdao and Merriam-Webster | Optional dictionary-pronunciation sources where configured. |
+| Hermes and Vertex AI local bridges | Loopback-only development/local-browser integrations. They are not a capability of a remotely hosted static build. |
 
-Users bring their own provider keys. Keys must not be committed, logged, placed
-in URLs, or included in screenshots.
+Users bring their own provider credentials. Browser Edition has no SpeakRight
+first-party scoring or credential service. Keys must not be committed, logged,
+placed in URLs, or included in screenshots. Each provider remains governed by
+its own service terms and privacy policy.
 
-## Bundled Or Mirrored Assets
+## Generated packaged-asset mirror
 
-| Source family | Usage boundary |
-| --- | --- |
-| American IPA Chart / americanipachart.com | English IPA chart audio family where mirrored assets exist in the project. |
-| ElevenLabs generated audio | Local demo audio where project policy permits redistribution. |
-| Microsoft Fluent Emoji-style assets | English phoneme card illustrations where bundled. |
+The repository-root `public/` directory is the canonical asset tree.
+`apps/browser/public/` is generated from that tree by
+`scripts/sync-browser-assets.mjs`; it is not an independent source or rights
+record.
 
-Bundled assets must be reviewed before public release. If redistribution is not
-clear, Browser Edition should link out or show an honest missing-media state.
+The sync runs only after `scripts/asset-rights.mjs check` succeeds. A media
+family is eligible for Browser Edition only when its registry record:
 
-## Teaching And Phonetics References
+- matches the committed tree digest and file count;
+- names `browser` in `editions`; and
+- has `redistribution` set to `approved` or `restricted-bundle`.
 
-| Reference | Usage boundary |
-| --- | --- |
-| Rachel's English | English articulation teaching reference/source notes where local clips are used. |
-| University of Iowa Sounds of Speech | Spanish articulation reference and local asset source where exact assets are present. |
-| Seeing Speech / University of Glasgow | Phonetics reference context, especially for non-English articulation. |
-| EasyPronunciation | IPA and pronunciation reference for multilingual content. |
-| Wiktionary / Forvo / language-specific phonetics references | Reference-only support for IPA, example words, and source-ledger review. |
+A `reference-only` record is never copied. Missing, modified, unregistered, or
+multiply claimed media blocks the build instead of becoming a silent missing
+asset or an unsupported redistribution claim.
 
-Reference use is not the same as permission to bundle media. Release docs should
-avoid implying endorsement, partnership, or automatic redistribution rights.
+Current Browser asset families include the English IPA audio, generated word
+and multilingual audio, Fluent Emoji illustrations, approved articulation and
+lesson media, the provider-identification mark, and the SpeakRight-authored
+poster described in `docs/assets/asset-rights-registry.json`. Their MIT,
+Creative Commons, provider-output, written-permission, attribution, and
+trademark boundaries remain unchanged by being copied into Browser Edition.
+
+Private authorization documents are retained by the maintainer. Public files
+contain only opaque, non-sensitive `evidenceRef` identifiers; a source URL or
+platform link by itself is never treated as permission.
+
+## References are not bundled rights
+
+Rachel's English, American IPA Chart, University of Iowa Sounds of Speech,
+Seeing Speech, EasyPronunciation, Wiktionary, Forvo, and other phonetics
+resources may also be cited as teaching or verification references. Citation
+does not grant redistribution rights. Only the exact asset families mapped by
+the registry are packaged.
+
+No listed provider, creator, university, dictionary, or platform sponsors or
+endorses SpeakRight unless an explicit statement says otherwise.

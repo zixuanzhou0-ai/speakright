@@ -1,4 +1,6 @@
-# Browser Edition Release Notes
+# Browser Edition v1.1.0 release notes
+
+Status: release candidate; not yet published.
 
 ## Browser Edition
 
@@ -19,11 +21,20 @@
   `/phonemes/fr-*`, and `/phonemes/ru-*` resolve their route language before
   local browser language preferences.
 - Added Browser Edition screenshots under
-  `docs/assets/screenshots/browser/`, kept separate from desktop screenshots.
+  `docs/assets/screenshots/release/v1.1.0/browser/`, kept separate from desktop
+  screenshots and marked as deterministic example data where applicable.
 - Added a markdown relative-link checker for public README/docs assets.
 - Added an ignored live Azure validation log helper so final microphone checks
   can record sanitized locale/route/pass-fail evidence without storing provider
   keys, recordings, or raw Azure payloads.
+- Added ElevenLabs aligned playback and honest sentence-level playback feedback
+  for Hermes/xAI and Vertex AI when word timing is unavailable.
+- Added guided-repeat intensity selection, phase-safe controls, and an exit
+  summary without turning practice completion into a mastery claim.
+- Added stale-request/session guards for free practice and separated independent
+  diagnosis samples from prompted comparison samples.
+- Added the cloud-processing disclosure, local-data controls, release metadata,
+  and the public privacy/license/security links used by v1.1.0.
 
 ## Windows Desktop
 
@@ -33,9 +44,10 @@ tracked in `<repository-root>`. Windows installer/Release EXE
 validation, unsigned artifact warnings, and Tauri permissions belong to the
 desktop release flow.
 
-Current public Windows artifacts should not be described as signed. They remain
-controlled-test artifacts until code signing and public release gates are
-complete.
+The separate `v1.1.0-desktop-preview.1` track is unsigned and must not be called
+Desktop Stable. If its gates pass, it publishes only the bare Release EXE and
+the NSIS setup bound to install/start/exit/uninstall round-trip evidence. A
+locally generated MSI is metadata-smoke input, not a public preview asset.
 
 ## Validation
 
@@ -51,14 +63,10 @@ npm run docs:check-links
 npm run browser:azure-live-log
 ```
 
-See [Validation Log](../archive/2026-06-browser-edition/VALIDATION_LOG.md) for the current local run evidence.
-
-Real Azure scoring evidence is recorded in the private ignored validation log:
-`en-US` from the current Browser Edition page, plus `es-ES`, `fr-FR`, and
-`ru-RU` from low-cost ElevenLabs `eleven_flash_v2_5` synthetic audio scored by
-real Azure REST calls. The synthetic checks prove the provider, locale, and
-scoring path; they must not be described as a replacement for separate human
-microphone UX parity checks.
+The [June validation log](../archive/2026-06-browser-edition/VALIDATION_LOG.md)
+is historical. Current v1.1.0 results belong in the versioned release-candidate
+record and CI run. Automated fixtures and synthetic/provider checks must not be
+described as real learner microphone testing or learning-outcome evidence.
 
 ## Known Limitations
 
@@ -67,9 +75,8 @@ microphone UX parity checks.
 - Spanish, French, and Russian are experimental. They expose sound-unit and
   free-practice flows but should not be marketed as having the same formal
   mastery evidence as English unless separately validated.
-- Some teaching media has licensing/source-ledger risk. Unclear assets should be
-  removed, linked externally, or represented as unavailable before public
-  release.
+- Every bundled media family must pass the machine-readable rights registry and
+  SHA-256 gate. Reference-only or unmatched files are release failures.
 - Browser screenshots are captured, and Azure provider/locale scoring evidence
   is recorded for all supported language locales. Separate release notes should
   still be honest when a check used synthetic audio rather than a human

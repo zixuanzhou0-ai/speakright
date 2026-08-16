@@ -1,7 +1,8 @@
-import { createServer } from "node:http";
-import { createReadStream, existsSync, statSync, writeFileSync } from "node:fs";
-import { extname, join, normalize, resolve } from "node:path";
 import { spawn } from "node:child_process";
+import { createReadStream, existsSync, statSync, writeFileSync } from "node:fs";
+import { createServer } from "node:http";
+import { extname, join, normalize, resolve } from "node:path";
+import { startHermesXaiBridge } from "./hermes-xai-bridge.mjs";
 
 const appRoot = resolve(process.cwd());
 const root = resolve(appRoot, "out");
@@ -44,7 +45,8 @@ function createAppServer() {
     }
 
     response.writeHead(200, {
-      "Content-Type": contentTypes.get(extname(filePath)) ?? "application/octet-stream",
+      "Content-Type":
+        contentTypes.get(extname(filePath)) ?? "application/octet-stream",
     });
     createReadStream(filePath).pipe(response);
   });
@@ -100,12 +102,29 @@ for (const port of ports) {
 }
 
 if (!server || !selectedPort) {
-  console.error("Ports 4173-4178 are busy. Close other Speak Right windows and try again.");
+  console.error(
+    "Ports 4173-4178 are busy. Close other Speak Right windows and try again.",
+  );
   process.exit(1);
 }
 
 const url = `http://127.0.0.1:${selectedPort}/`;
-writeFileSync(resolve(appRoot, "02_打开网页端.url"), `[InternetShortcut]\r\nURL=${url}\r\n`, "utf8");
+const bridge = await startHermesXaiBridge({
+  additionalOrigins: [
+    `http://127.0.0.1:${selectedPort}`,
+    `http://localhost:${selectedPort}`,
+  ],
+});
+if (!bridge.compatible) {
+  console.warn(
+    "端口 17831 已被其他程序占用，爱马仕 Grok 与 Vertex Gemini 本机 TTS 桥接未启动。",
+  );
+}
+writeFileSync(
+  resolve(appRoot, "02_打开网页端.url"),
+  `[InternetShortcut]\r\nURL=${url}\r\n`,
+  "utf8",
+);
 
 console.log("");
 console.log("Speak Right Browser Edition is running.");
@@ -116,5 +135,9 @@ console.log("");
 
 if (process.env.SPEAKRIGHT_NO_OPEN !== "1") openBrowser(url);
 
-process.on("SIGINT", () => server.close(() => process.exit(0)));
-process.on("SIGTERM", () => server.close(() => process.exit(0)));
+async function close() {
+  await bridge.close();
+  server.close(() => process.exit(0));
+}
+process.on("SIGINT", () => void close());
+process.on("SIGTERM", () => void close());

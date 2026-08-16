@@ -8,14 +8,31 @@ import {
   getLanguageConfig,
   getLlmConfig,
   getPronunciationConfig,
+  getStandardTtsConfig,
+  getVertexGeminiTtsConfig,
   subscribeToStorage,
 } from "@/lib/api-keys";
 import { DEFAULT_LANGUAGE_CONFIG } from "@/lib/language-profiles";
-import type { PronunciationConfig } from "@/types/api-keys";
+import type {
+  PronunciationConfig,
+  StandardTtsConfig,
+  VertexGeminiTtsConfig,
+} from "@/types/api-keys";
 
 const emptySubscribe = () => () => {};
 const serverSnapshot = () => null;
-const pronunciationServerSnapshot = (): PronunciationConfig => ({ source: "youdao" });
+const pronunciationServerSnapshot = (): PronunciationConfig => ({
+  source: "youdao",
+});
+const STANDARD_TTS_SERVER_SNAPSHOT: StandardTtsConfig = {
+  provider: "elevenlabs",
+};
+const standardTtsServerSnapshot = () => STANDARD_TTS_SERVER_SNAPSHOT;
+const VERTEX_GEMINI_TTS_SERVER_SNAPSHOT: VertexGeminiTtsConfig = {
+  voiceName: "Kore",
+};
+const vertexGeminiTtsServerSnapshot = () =>
+  VERTEX_GEMINI_TTS_SERVER_SNAPSHOT;
 const languageServerSnapshot = () => DEFAULT_LANGUAGE_CONFIG;
 const coachModeServerSnapshot = () => "normal" as const;
 
@@ -32,6 +49,22 @@ export function useElevenLabsConfig() {
     typeof window !== "undefined" ? subscribeToStorage : emptySubscribe,
     getElevenLabsConfig,
     () => serverSnapshot(),
+  );
+}
+
+export function useStandardTtsConfig() {
+  return useSyncExternalStore(
+    typeof window !== "undefined" ? subscribeToStorage : emptySubscribe,
+    getStandardTtsConfig,
+    standardTtsServerSnapshot,
+  );
+}
+
+export function useVertexGeminiTtsConfig() {
+  return useSyncExternalStore(
+    typeof window !== "undefined" ? subscribeToStorage : emptySubscribe,
+    getVertexGeminiTtsConfig,
+    vertexGeminiTtsServerSnapshot,
   );
 }
 

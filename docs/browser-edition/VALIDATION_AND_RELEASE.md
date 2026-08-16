@@ -189,9 +189,11 @@ Known Limitations
 Credits
 ```
 
-Windows Desktop notes must not call unsigned EXE/MSI/NSIS artifacts stable or
-signed. Browser Edition notes must not imply users can open `file://` and expect
-microphone access to work. Recommend localhost or HTTPS.
+Windows Desktop notes must not call unsigned artifacts stable or signed. For
+v1.1.0 they must name the bare EXE and round-trip-validated NSIS as the only
+published desktop binaries and state that MSI is not a release asset. Browser
+Edition notes must not imply users can open `file://` and expect microphone
+access to work. Recommend localhost or HTTPS.
 
 ## Cleanup Gate
 

@@ -5,6 +5,9 @@
 模型：`gemini-3.1-flash-tts-preview`（TTS）＋ `gemini-3.1-pro-preview`（第三路无答案听写）
 正式状态：`machine-replaced-pending-human`
 
+> 历史批次记录：本文的测试数量、签名状态和发布判断只对应上述提交，
+> 不代表 v1.1.0 当前发布策略。当前边界见根 README 与 `docs/INSTALLATION.md`。
+
 ## 结论
 
 - ElevenLabs 暂不可用后，使用 Vertex Gemini 3.1 Flash TTS 为剩余 352 条高风险源资产生成候选。

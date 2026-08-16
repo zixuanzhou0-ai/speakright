@@ -158,11 +158,12 @@ journey is intentionally not counted as evidence for the corrected sequence.
 
 ## Known blockers and residual risk
 
-### Public release blocker
+### Signed Desktop Stable blocker
 
 EXE, MSI, and NSIS artifacts are not code signed. `desktop:release-gate`
-correctly fails for this reason. These artifacts are suitable only for controlled
-internal testing.
+correctly fails for the signed Stable channel. They may be distributed only by
+the separate preview gate as a clearly labelled unsigned community pre-release,
+with SHA-256 checksums, SBOM, SmartScreen warning, and validation evidence.
 
 ### Native UI automation limitation
 
@@ -184,6 +185,6 @@ No known feature P0 or P1 defect remains in the corrected shared code, asset
 gate, builds, or automated browser journeys. The previous English normal/slow
 semantic defect, the detached A/B layout, and the too-short first anchor gap are
 fixed and protected by contract, layout, timestamp, and E2E assertions. The
-feature is ready for controlled user testing, but it is not declared
-public-release-ready until code signing and the remaining human native acceptance
-steps are completed.
+feature is ready for controlled user testing. It may enter the explicitly
+unsigned community-preview channel after the remaining native acceptance steps;
+code signing remains required before it can be called Desktop Stable.

@@ -1,14 +1,41 @@
 import { execFile, spawn } from "node:child_process";
+import { randomUUID } from "node:crypto";
 import { existsSync } from "node:fs";
-import { mkdtemp, rm } from "node:fs/promises";
+import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import net from "node:net";
 import os from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
+import {
+  findConflictingSpeakRightProcesses,
+  formatSpeakRightProcessConflicts,
+} from "./lib/windows-process-boundary.mjs";
 
 const execFileAsync = promisify(execFile);
 const root = process.cwd();
+const desktopSmokeExecutableOverride =
+  process.env.SPEAKRIGHT_UI_SMOKE_EXECUTABLE?.trim() || null;
+const desktopSmokeDebuggingPortOverride = Number(
+  process.env.SPEAKRIGHT_UI_SMOKE_DEBUGGING_PORT ?? 0,
+);
+const desktopTtsOnly = process.env.SPEAKRIGHT_UI_SMOKE_TTS_ONLY?.trim() === "1";
+const desktopSmokeSecureStoreService = `com.speakright.desktop.ui-smoke-${randomUUID()}`;
 const timeoutMs = Number(process.env.SPEAKRIGHT_UI_SMOKE_TIMEOUT_MS ?? 20_000);
+const desktopTtsScreenshotDir =
+  process.env.SPEAKRIGHT_DESKTOP_TTS_SCREENSHOT_DIR?.trim()
+    ? path.resolve(
+        root,
+        process.env.SPEAKRIGHT_DESKTOP_TTS_SCREENSHOT_DIR.trim(),
+      )
+    : null;
+const desktopTtsScreenshotText =
+  "Mi perro corre por la plaza. La niña compra pan, queso y zumo por la mañana.";
+const desktopTtsScreenshotAudioSrc =
+  "/audio/language-packs/es-ES/mi-perro-corre-por-la-plaza-la-nina-compra-4d4bed99c7.mp3";
+const desktopTtsScreenshotViewports = [
+  { width: 1280, height: 920 },
+  { width: 1024, height: 800 },
+];
 const smokeSummaryRoutes = [
   "/drill",
   "/drill/word",
@@ -146,6 +173,11 @@ const phonemePracticeSidebarChecks = [
 ];
 
 function executablePath() {
+  if (desktopSmokeExecutableOverride) {
+    return path.isAbsolute(desktopSmokeExecutableOverride)
+      ? desktopSmokeExecutableOverride
+      : path.resolve(root, desktopSmokeExecutableOverride);
+  }
   if (process.platform === "win32") {
     return path.join(root, "src-tauri", "target", "release", "speakright.exe");
   }
@@ -170,32 +202,11 @@ function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-async function runningSpeakRightProcesses() {
-  if (process.platform !== "win32") return [];
-  try {
-    const { stdout } = await execFileAsync("tasklist.exe", [
-      "/FI",
-      "IMAGENAME eq speakright.exe",
-      "/FO",
-      "CSV",
-      "/NH",
-    ]);
-    return stdout
-      .split(/\r?\n/)
-      .map((line) => line.trim())
-      .filter(Boolean)
-      .filter((line) => !line.includes("INFO:"))
-      .filter((line) => line.toLowerCase().includes("speakright.exe"));
-  } catch {
-    return [];
-  }
-}
-
-function getOpenPort() {
+function getOpenPort(preferredPort = 0) {
   return new Promise((resolve, reject) => {
     const server = net.createServer();
     server.once("error", reject);
-    server.listen(0, "127.0.0.1", () => {
+    server.listen(preferredPort, "127.0.0.1", () => {
       const address = server.address();
       server.close(() => {
         if (!address || typeof address === "string") {
@@ -209,7 +220,15 @@ function getOpenPort() {
 }
 
 async function createSmokeProfileRoot() {
-  return mkdtemp(path.join(os.tmpdir(), "speakright-desktop-ui-smoke-"));
+  const profileRoot = await mkdtemp(
+    path.join(os.tmpdir(), "speakright-desktop-ui-smoke-"),
+  );
+  await Promise.all([
+    mkdir(path.join(profileRoot, "WebView2"), { recursive: true }),
+    mkdir(path.join(profileRoot, "logs"), { recursive: true }),
+    mkdir(path.join(profileRoot, "settings"), { recursive: true }),
+  ]);
+  return profileRoot;
 }
 
 function buildSmokeEnv(debuggingPort, smokeProfileRoot) {
@@ -221,6 +240,13 @@ function buildSmokeEnv(debuggingPort, smokeProfileRoot) {
   ].join(" ");
   return {
     ...process.env,
+    SPEAKRIGHT_LOG_DIR: path.join(smokeProfileRoot, "logs"),
+    SPEAKRIGHT_SECURE_STORE_SERVICE: desktopSmokeSecureStoreService,
+    SPEAKRIGHT_SETTINGS_STORE_PATH: path.join(
+      smokeProfileRoot,
+      "settings",
+      "speakright-settings.json",
+    ),
     WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS: [existingArgs, smokeArgs]
       .filter(Boolean)
       .join(" "),
@@ -383,6 +409,20 @@ async function clearViewport(cdp) {
   await delay(250);
 }
 
+async function captureViewportPng(cdp, outputPath) {
+  const screenshot = await cdp.send("Page.captureScreenshot", {
+    format: "png",
+    fromSurface: true,
+    captureBeyondViewport: false,
+  });
+  if (!screenshot?.data) {
+    throw new Error(
+      `Desktop screenshot did not return PNG data: ${outputPath}`,
+    );
+  }
+  await writeFile(outputPath, Buffer.from(screenshot.data, "base64"));
+}
+
 async function currentPathname(cdp) {
   return evaluate(cdp, "window.location.pathname");
 }
@@ -503,7 +543,8 @@ async function navigate(cdp, pathname, expectedSelector, options = {}) {
   ok:
     window.location.pathname.startsWith("/phonemes") &&
     document.readyState !== "loading" &&
-    !!document.querySelector('[data-smoke="phoneme-detail-page"]'),
+    (!!document.querySelector('[data-smoke="phoneme-directory"]') ||
+      !!document.querySelector('[data-smoke="phoneme-detail-page"]')),
   href: window.location.href,
   bodyText: (document.body?.innerText ?? "").slice(0, 500)
 }))()
@@ -838,6 +879,60 @@ async function assertEnglishProgressArchive(cdp) {
   );
 }
 
+async function assertSettingsWheelScroll(cdp) {
+  await navigate(cdp, "/settings", '[data-smoke="settings-page"]');
+  const target = await evaluate(
+    cdp,
+    `
+(() => {
+  const tabs = [...document.querySelectorAll('[role="tab"]')];
+  const servicesTab = tabs[1];
+  if (!servicesTab) {
+    return { ok: false, reason: "missing-services-tab" };
+  }
+  servicesTab.dispatchEvent(
+    new MouseEvent("click", { bubbles: true, cancelable: true, view: window })
+  );
+  const main = document.querySelector("#main-content");
+  if (!main) {
+    return { ok: false, reason: "missing-main-content" };
+  }
+  main.scrollTop = 0;
+  const rect = main.getBoundingClientRect();
+  return {
+    ok: main.scrollHeight > main.clientHeight,
+    clientHeight: main.clientHeight,
+    scrollHeight: main.scrollHeight,
+    x: rect.left + rect.width / 2,
+    y: rect.top + rect.height / 2
+  };
+})()
+`,
+  );
+  if (!target?.ok) {
+    throw new Error(
+      `Settings wheel target is not scrollable: ${JSON.stringify(target)}`,
+    );
+  }
+  await cdp.send("Input.dispatchMouseEvent", {
+    type: "mouseMoved",
+    x: target.x,
+    y: target.y,
+  });
+  await cdp.send("Input.dispatchMouseEvent", {
+    type: "mouseWheel",
+    x: target.x,
+    y: target.y,
+    deltaX: 0,
+    deltaY: 600,
+  });
+  await waitForCondition(
+    cdp,
+    `(() => ({ ok: (document.querySelector("#main-content")?.scrollTop ?? 0) > 0 }))()`,
+    "settings page to respond to a mouse-wheel event",
+  );
+}
+
 async function assertSettings(cdp) {
   await navigate(cdp, "/settings", '[data-smoke="settings-page"]');
   await seedSettingsSmokeData(cdp);
@@ -845,6 +940,12 @@ async function assertSettings(cdp) {
     cdp,
     `
 (() => {
+  // Settings are rendered as four tab panels now. Expose every mounted panel
+  // for this aggregate geometry audit; tab interaction and wheel scrolling are
+  // exercised separately by assertSettingsWheelScroll.
+  for (const panel of document.querySelectorAll('[role="tabpanel"]')) {
+    panel.hidden = false;
+  }
   const bodyText = document.body?.innerText ?? "";
   const hasVisibleRect = (element) => {
     const rect = element.getBoundingClientRect();
@@ -867,12 +968,21 @@ async function assertSettings(cdp) {
     .filter((element) => hasVisibleRect(element) && element.innerText.trim().length > 0);
   const ttsSelects = [
     ...document.querySelectorAll(
-      '[data-smoke="tts-voice-select"], [data-smoke="tts-model-select"]'
+      '[data-smoke="tts-voice-select"], [data-smoke="tts-model-select"], [data-smoke="vertex-gemini-voice-select"]'
     ),
   ];
+  const activeTtsProvider = [...document.querySelectorAll('[data-smoke^="tts-provider-"]')]
+    .find((element) => element.getAttribute("aria-pressed") === "true")
+    ?.getAttribute("data-smoke") ?? "";
+  const expectedTtsSelectCount =
+    activeTtsProvider === "tts-provider-elevenlabs"
+      ? 2
+      : activeTtsProvider === "tts-provider-vertex-gemini"
+        ? 1
+        : 0;
   const settingsActionRows = [
     ...document.querySelectorAll(
-      '[data-smoke="azure-config-actions"], [data-smoke="tts-config-actions"], [data-smoke="llm-config-actions"]'
+      '[data-smoke="azure-config-actions"], [data-smoke="tts-config-actions"], [data-smoke="hermes-grok-config-actions"], [data-smoke="vertex-gemini-config-actions"], [data-smoke="llm-config-actions"]'
     ),
   ];
   const corruptWarning = document.querySelector('[data-smoke="data-control-corrupt-data-warning"]');
@@ -910,16 +1020,17 @@ async function assertSettings(cdp) {
   const settingsTextButtonsWrap =
     settingsTextButtons.length >= 8 && settingsTextButtons.every(wraps);
   const ttsSelectsWrap =
-    ttsSelects.length === 2 &&
+    ttsSelects.length === expectedTtsSelectCount &&
     ttsSelects.every((element) => {
       const value = element.querySelector('[data-slot="select-value"]');
       const valueStyle = value ? window.getComputedStyle(value) : null;
       return (
-        wraps(element) &&
-        Boolean(value) &&
-        valueStyle?.whiteSpace !== "nowrap" &&
-        valueStyle?.webkitLineClamp !== "1" &&
-        element.scrollWidth <= element.clientWidth + 2
+        element.scrollWidth <= element.clientWidth + 2 &&
+        (activeTtsProvider !== "tts-provider-elevenlabs" ||
+          (wraps(element) &&
+            Boolean(value) &&
+            valueStyle?.whiteSpace !== "nowrap" &&
+            valueStyle?.webkitLineClamp !== "1"))
       );
     });
   const settingsActionRowsWrap =
@@ -974,6 +1085,8 @@ async function assertSettings(cdp) {
     settingsTextButtonCount: settingsTextButtons.length,
     settingsTextButtonsWrap,
     ttsSelectCount: ttsSelects.length,
+    activeTtsProvider,
+    expectedTtsSelectCount,
     ttsSelectsWrap,
     settingsActionRowCount: settingsActionRows.length,
     settingsActionRowsWrap,
@@ -1453,7 +1566,7 @@ async function assertPhonemePracticeSidebarPurity(cdp, check) {
   return { languageId: check.languageId };
 }
 
-async function assertScoringTileAudioPolicy(cdp) {
+async function _assertScoringTileAudioPolicy(cdp) {
   await clickLanguage(cdp, "es-ES");
   await forceNavigate(cdp, "/phonemes/es-a?smokeAssessmentTiles=1");
   await waitForCondition(
@@ -1836,11 +1949,17 @@ async function assertMainRoutes(cdp) {
   const bodyText = document.body?.innerText ?? "";
   const routePath = ${JSON.stringify(route.path)};
   const expectsBoundary = ${JSON.stringify(Boolean(route.boundary))};
+  const sentenceCard = document.querySelector('[data-smoke="sentence-input-card"]');
+  const sentenceColumn = document.querySelector('[data-smoke="free-practice-left-column"]');
   const sentenceHooksReady =
     routePath !== "/sentences" ||
     (Boolean(document.querySelector('[data-smoke="sentences-page"]')) &&
-      Boolean(document.querySelector('[data-smoke="sentence-input-card"]')) &&
-      Boolean(document.querySelector('[data-smoke="sentence-recording-card"]')));
+      Boolean(sentenceCard) &&
+      Boolean(sentenceColumn) &&
+      Boolean(document.querySelector('[data-smoke="sentence-recording-card"]')) &&
+      window.getComputedStyle(sentenceCard).flexShrink === "0" &&
+      window.getComputedStyle(sentenceCard).overflow !== "hidden" &&
+      (window.innerWidth < 1024 || window.getComputedStyle(sentenceColumn).overflowY === "auto"));
   const assessmentHooksReady =
     expectsBoundary ||
     routePath !== "/assessment" ||
@@ -2110,15 +2229,27 @@ async function assertAdvancedDirectRoutes(cdp) {
   const experimentalRoutes = [
     {
       path: "/assessment/passage",
-      selector: '[data-smoke="non-english-core-only-boundary"]',
+      selector: '[data-smoke="assessment-passage-experimental-blocker"]',
+      requiredText: [
+        "暂不开放英语覆盖文章诊断",
+        "返回当前语言诊断",
+        "切换语言",
+      ],
     },
     {
       path: "/drill/evidence",
-      selector: '[data-smoke="non-english-core-only-boundary"]',
+      selector: '[data-smoke="evidence-experimental-blocker"]',
+      requiredText: ["暂不生成正式错题证据库", "返回当前语言训练", "切换语言"],
     },
     {
       path: "/drill/pack/ee-ih",
-      selector: '[data-smoke="non-english-core-only-boundary"]',
+      selector: '[data-smoke="pack-runner-experimental-blocker"]',
+      requiredText: [
+        "Labs 暂不使用英语训练包",
+        "当前语言单词训练",
+        "当前语言对比训练",
+        "返回训练首页",
+      ],
     },
   ];
 
@@ -2128,7 +2259,8 @@ async function assertAdvancedDirectRoutes(cdp) {
       cdp,
       `
 (() => {
-  const blocker = document.querySelector('[data-smoke="non-english-core-only-boundary"]');
+  const blocker = document.querySelector(${JSON.stringify(route.selector)});
+  const requiredText = ${JSON.stringify(route.requiredText)};
   const bodyText = document.body?.innerText ?? "";
   const readableText = [...document.querySelectorAll("h1,h2,p")].every((element) => {
     const rect = element.getBoundingClientRect();
@@ -2143,9 +2275,7 @@ async function assertAdvancedDirectRoutes(cdp) {
   return {
     ok:
       Boolean(blocker) &&
-      bodyText.includes("公开版只开放音标") &&
-      bodyText.includes("去音标练习") &&
-      bodyText.includes("去自由练习") &&
+      requiredText.every((text) => bodyText.includes(text)) &&
       !bodyText.includes("训练证据库\\n汇总训练中的错题") &&
       !bodyText.includes("完整朗读稿") &&
       !bodyText.includes("词尾别吞") &&
@@ -2423,11 +2553,17 @@ async function assertNarrowViewportRoutes(cdp) {
   const bodyText = document.body?.innerText ?? "";
   const routePath = ${JSON.stringify(route.path)};
   const expectsBoundary = ${JSON.stringify(Boolean(route.boundary))};
+  const sentenceCard = document.querySelector('[data-smoke="sentence-input-card"]');
+  const sentenceColumn = document.querySelector('[data-smoke="free-practice-left-column"]');
   const sentenceHooksReady =
     routePath !== "/sentences" ||
     (Boolean(document.querySelector('[data-smoke="sentences-page"]')) &&
-      Boolean(document.querySelector('[data-smoke="sentence-input-card"]')) &&
-      Boolean(document.querySelector('[data-smoke="sentence-recording-card"]')));
+      Boolean(sentenceCard) &&
+      Boolean(sentenceColumn) &&
+      Boolean(document.querySelector('[data-smoke="sentence-recording-card"]')) &&
+      window.getComputedStyle(sentenceCard).flexShrink === "0" &&
+      window.getComputedStyle(sentenceCard).overflow !== "hidden" &&
+      (window.innerWidth < 1024 || window.getComputedStyle(sentenceColumn).overflowY === "auto"));
   const assessmentHooksReady =
     expectsBoundary ||
     routePath !== "/assessment" ||
@@ -2648,11 +2784,17 @@ async function assertLowHeightViewportRoutes(cdp) {
   const bodyText = document.body?.innerText ?? "";
   const routePath = ${JSON.stringify(route.path)};
   const expectsBoundary = ${JSON.stringify(Boolean(route.boundary))};
+  const sentenceCard = document.querySelector('[data-smoke="sentence-input-card"]');
+  const sentenceColumn = document.querySelector('[data-smoke="free-practice-left-column"]');
   const sentenceHooksReady =
     routePath !== "/sentences" ||
     (Boolean(document.querySelector('[data-smoke="sentences-page"]')) &&
-      Boolean(document.querySelector('[data-smoke="sentence-input-card"]')) &&
-      Boolean(document.querySelector('[data-smoke="sentence-recording-card"]')));
+      Boolean(sentenceCard) &&
+      Boolean(sentenceColumn) &&
+      Boolean(document.querySelector('[data-smoke="sentence-recording-card"]')) &&
+      window.getComputedStyle(sentenceCard).flexShrink === "0" &&
+      window.getComputedStyle(sentenceCard).overflow !== "hidden" &&
+      (window.innerWidth < 1024 || window.getComputedStyle(sentenceColumn).overflowY === "auto"));
   const assessmentHooksReady =
     expectsBoundary ||
     routePath !== "/assessment" ||
@@ -2722,6 +2864,348 @@ async function assertLowHeightViewportRoutes(cdp) {
   }
 }
 
+async function assertLabsScoringTileBoundary(cdp) {
+  for (const fixture of [
+    { languageId: "es-ES", route: "/phonemes/es-a" },
+    { languageId: "ru-RU", route: "/phonemes/ru-a" },
+  ]) {
+    await clickLanguage(cdp, fixture.languageId);
+    await forceNavigate(cdp, `${fixture.route}?smokeAssessmentTiles=1`);
+    const result = await waitForCondition(
+      cdp,
+      `
+(() => {
+  const placeholder = document.querySelector('[data-smoke="assessment-breakdown-placeholder"]');
+  const bodyText = document.body?.innerText ?? "";
+  return {
+    ok:
+      window.location.pathname === ${JSON.stringify(fixture.route)} &&
+      window.location.search.includes("smokeAssessmentTiles=1") &&
+      document.readyState !== "loading" &&
+      Boolean(placeholder) &&
+      bodyText.includes("Labs 仅显示整体与词级观测，不展示未校准的音素细分") &&
+      !document.querySelector('[data-smoke="assessment-phoneme-tile-fixture"]') &&
+      document.querySelectorAll('[data-smoke="assessment-phoneme-tile"]').length === 0,
+    placeholder: placeholder?.textContent ?? "",
+    tileCount: document.querySelectorAll('[data-smoke="assessment-phoneme-tile"]').length,
+    bodyText: bodyText.slice(0, 800)
+  };
+})()
+`,
+      `${fixture.languageId} calibrated scoring-detail boundary`,
+    );
+    if (!result?.ok) {
+      throw new Error(
+        `${fixture.languageId} scoring-detail boundary failed: ${JSON.stringify(
+          result,
+        )}`,
+      );
+    }
+  }
+}
+
+async function assertDesktopTtsScreenshotLayout(cdp, requireReplay) {
+  const result = await evaluate(
+    cdp,
+    `
+(() => {
+  const requireReplay = ${JSON.stringify(requireReplay)};
+  const inputCard = document.querySelector('[data-smoke="sentence-input-card"]');
+  const recordingCard = document.querySelector('[data-smoke="sentence-recording-card"]');
+  const leftColumn = document.querySelector('[data-smoke="free-practice-left-column"]');
+  const output = document.querySelector('[data-smoke="free-practice-tts-output"]');
+  const replay = document.querySelector('[data-smoke="free-practice-tts-replay"]');
+  const readAlong = document.querySelector('[data-smoke="read-along-text"]');
+  if (!inputCard || !recordingCard || !leftColumn || !output || !readAlong) {
+    return {
+      ok: false,
+      reason: "missing-free-practice-elements",
+      hasInputCard: Boolean(inputCard),
+      hasRecordingCard: Boolean(recordingCard),
+      hasLeftColumn: Boolean(leftColumn),
+      hasOutput: Boolean(output),
+      hasReadAlong: Boolean(readAlong)
+    };
+  }
+
+  const intersects = (first, second) =>
+    Math.max(first.left, second.left) < Math.min(first.right, second.right) - 0.5 &&
+    Math.max(first.top, second.top) < Math.min(first.bottom, second.bottom) - 0.5;
+  const inputRect = inputCard.getBoundingClientRect();
+  const recordingRect = recordingCard.getBoundingClientRect();
+  const cardsDoNotOverlap = !intersects(inputRect, recordingRect);
+  const wordRects = [...output.querySelectorAll('[data-word-index]')].map((word) =>
+    word.getBoundingClientRect()
+  );
+  const replayRect = replay?.getBoundingClientRect() ?? null;
+  const replayDoesNotCoverText =
+    !requireReplay ||
+    (Boolean(replayRect) && wordRects.every((wordRect) => !intersects(replayRect, wordRect)));
+
+  const previousScrollTop = leftColumn.scrollTop;
+  leftColumn.scrollTop = leftColumn.scrollHeight;
+  const maxScrollTop = leftColumn.scrollTop;
+  const scrolledRecordingRect = recordingCard.getBoundingClientRect();
+  const leftRect = leftColumn.getBoundingClientRect();
+  const visibleRecordingHeight = Math.max(
+    0,
+    Math.min(scrolledRecordingRect.bottom, leftRect.bottom) -
+      Math.max(scrolledRecordingRect.top, leftRect.top)
+  );
+  leftColumn.scrollTop = previousScrollTop;
+
+  const scrollRange = leftColumn.scrollHeight - leftColumn.clientHeight;
+  const leftColumnStyle = window.getComputedStyle(leftColumn);
+  const leftColumnCanReachRecording =
+    (scrollRange <= 1 || maxScrollTop > 0) && visibleRecordingHeight > 20;
+  const inputCardStyle = window.getComputedStyle(inputCard);
+  const noHorizontalOverflow =
+    document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1;
+
+  return {
+    ok:
+      cardsDoNotOverlap &&
+      replayDoesNotCoverText &&
+      noHorizontalOverflow &&
+      leftColumnCanReachRecording &&
+      inputCardStyle.flexShrink === "0" &&
+      inputCardStyle.overflow !== "hidden" &&
+      (scrollRange <= 1 || leftColumnStyle.overflowY === "auto"),
+    cardsDoNotOverlap,
+    replayDoesNotCoverText,
+    replayFound: Boolean(replay),
+    wordCount: wordRects.length,
+    noHorizontalOverflow,
+    leftColumnCanReachRecording,
+    visibleRecordingHeight,
+    scrollRange,
+    maxScrollTop,
+    leftColumnOverflowY: leftColumnStyle.overflowY,
+    inputCardFlexShrink: inputCardStyle.flexShrink,
+    inputCardOverflow: inputCardStyle.overflow,
+    clientWidth: document.documentElement.clientWidth,
+    scrollWidth: document.documentElement.scrollWidth
+  };
+})()
+`,
+  );
+  if (!result?.ok) {
+    throw new Error(
+      `Desktop free-practice TTS layout failed: ${JSON.stringify(result)}`,
+    );
+  }
+}
+
+async function startDesktopTtsScreenshotPlayback(cdp, width, height) {
+  await setViewport(cdp, width, height);
+  await forceNavigate(cdp, "/sentences");
+  await waitForCondition(
+    cdp,
+    `
+(() => ({
+  ok:
+    window.location.pathname === "/sentences" &&
+    window.innerWidth === ${width} &&
+    window.innerHeight === ${height} &&
+    !!document.querySelector('[data-smoke="sentences-page"]') &&
+    !!document.querySelector('[data-smoke="sentence-input-card"]') &&
+    !!document.querySelector('[data-smoke="sentence-recording-card"]'),
+  pathname: window.location.pathname,
+  innerWidth: window.innerWidth,
+  innerHeight: window.innerHeight,
+  bodyText: (document.body?.innerText ?? "").slice(0, 500)
+}))()
+`,
+    `desktop TTS screenshot page at ${width}x${height}`,
+  );
+
+  const prepared = await evaluate(
+    cdp,
+    `
+(async () => {
+  const text = ${JSON.stringify(desktopTtsScreenshotText)};
+  const expectedAudioSrc = ${JSON.stringify(desktopTtsScreenshotAudioSrc)};
+  const manifestResponse = await fetch("/audio/language-packs/es-ES/manifest.json");
+  if (!manifestResponse.ok) {
+    return { ok: false, reason: "manifest-unavailable", status: manifestResponse.status };
+  }
+  const manifest = await manifestResponse.json();
+  const item = Array.isArray(manifest.items)
+    ? manifest.items.find((entry) => entry.text === text && entry.audioSrc === expectedAudioSrc)
+    : null;
+  if (!item) {
+    return { ok: false, reason: "fixture-not-in-manifest" };
+  }
+  const audioResponse = await fetch(expectedAudioSrc);
+  const audioBlob = audioResponse.ok ? await audioResponse.blob() : null;
+  if (!audioResponse.ok || !audioBlob || audioBlob.size < 1000) {
+    return {
+      ok: false,
+      reason: "fixture-audio-unavailable",
+      status: audioResponse.status,
+      bytes: audioBlob?.size ?? 0
+    };
+  }
+
+  const textarea = document.querySelector('textarea[placeholder="输入单词或句子"]');
+  if (!textarea) return { ok: false, reason: "missing-textarea" };
+  const valueSetter = Object.getOwnPropertyDescriptor(
+    HTMLTextAreaElement.prototype,
+    "value"
+  )?.set;
+  if (!valueSetter) return { ok: false, reason: "missing-value-setter" };
+  valueSetter.call(textarea, text);
+  textarea.dispatchEvent(new Event("input", { bubbles: true }));
+  textarea.dispatchEvent(new Event("change", { bubbles: true }));
+  return { ok: true, bytes: audioBlob.size };
+})()
+`,
+  );
+  if (!prepared?.ok) {
+    throw new Error(
+      `Desktop TTS screenshot fixture was not ready: ${JSON.stringify(prepared)}`,
+    );
+  }
+
+  const listenTarget = await waitForCondition(
+    cdp,
+    `
+(() => {
+  const textarea = document.querySelector('textarea[placeholder="输入单词或句子"]');
+  const button = document.querySelector('[data-smoke="free-practice-listen-control"]');
+  const rect = button?.getBoundingClientRect();
+  const ok =
+    textarea?.value === ${JSON.stringify(desktopTtsScreenshotText)} &&
+    Boolean(button) &&
+    !button.disabled &&
+    Boolean(rect && rect.width > 0 && rect.height > 0);
+  return {
+    ok,
+    value: textarea?.value ?? "",
+    disabled: button?.disabled ?? null,
+    x: rect ? rect.left + rect.width / 2 : 0,
+    y: rect ? rect.top + rect.height / 2 : 0
+  };
+})()
+`,
+    "desktop TTS listen control to become ready",
+  );
+  await cdp.send("Input.dispatchMouseEvent", {
+    type: "mouseMoved",
+    x: listenTarget.x,
+    y: listenTarget.y,
+  });
+  await cdp.send("Input.dispatchMouseEvent", {
+    type: "mousePressed",
+    x: listenTarget.x,
+    y: listenTarget.y,
+    button: "left",
+    clickCount: 1,
+  });
+  await cdp.send("Input.dispatchMouseEvent", {
+    type: "mouseReleased",
+    x: listenTarget.x,
+    y: listenTarget.y,
+    button: "left",
+    clickCount: 1,
+  });
+
+  await waitForCondition(
+    cdp,
+    `
+(() => {
+  const card = document.querySelector('[data-smoke="sentence-input-card"]');
+  const readAlong = document.querySelector('[data-smoke="read-along-text"]');
+  const status = document.querySelector('[data-smoke="read-along-untimed-status"]');
+  return {
+    ok:
+      card?.getAttribute("data-tts-state") === "playing" &&
+      readAlong?.getAttribute("data-playback-mode") === "sentence-untimed" &&
+      readAlong?.getAttribute("data-playing") === "true" &&
+      status?.textContent?.includes("整句播放中"),
+    state: card?.getAttribute("data-tts-state"),
+    playbackMode: readAlong?.getAttribute("data-playback-mode"),
+    playing: readAlong?.getAttribute("data-playing"),
+    status: status?.textContent ?? "",
+    error: document.querySelector('[data-smoke="free-practice-tts-error"]')?.textContent ?? ""
+  };
+})()
+`,
+    "desktop untimed TTS playback to start",
+  );
+  await delay(350);
+}
+
+async function captureDesktopTtsScreenshots(cdp, outputDir) {
+  const fixturePath = path.join(
+    root,
+    "public",
+    desktopTtsScreenshotAudioSrc.replace(/^\//, "").replaceAll("/", path.sep),
+  );
+  if (!existsSync(fixturePath)) {
+    throw new Error(
+      `Desktop TTS screenshot fixture is missing: ${fixturePath}`,
+    );
+  }
+
+  await mkdir(outputDir, { recursive: true });
+  await clickLanguage(cdp, "es-ES");
+  await cdp.send("Emulation.setEmulatedMedia", {
+    features: [{ name: "prefers-reduced-motion", value: "no-preference" }],
+  });
+  const files = [];
+  try {
+    for (const { width, height } of desktopTtsScreenshotViewports) {
+      await startDesktopTtsScreenshotPlayback(cdp, width, height);
+      await assertDesktopTtsScreenshotLayout(cdp, false);
+
+      const playingFile = path.join(
+        outputDir,
+        `desktop-free-practice-tts-playing-${width}x${height}.png`,
+      );
+      await captureViewportPng(cdp, playingFile);
+      files.push(playingFile);
+
+      await waitForCondition(
+        cdp,
+        `
+(() => {
+  const card = document.querySelector('[data-smoke="sentence-input-card"]');
+  const readAlong = document.querySelector('[data-smoke="read-along-text"]');
+  const replay = document.querySelector('[data-smoke="free-practice-tts-replay"]');
+  return {
+    ok:
+      card?.getAttribute("data-tts-state") === "ready" &&
+      readAlong?.getAttribute("data-playing") === "false" &&
+      Boolean(replay),
+    state: card?.getAttribute("data-tts-state"),
+    playing: readAlong?.getAttribute("data-playing"),
+    replayFound: Boolean(replay),
+    error: document.querySelector('[data-smoke="free-practice-tts-error"]')?.textContent ?? ""
+  };
+})()
+`,
+        "desktop untimed TTS playback to finish",
+      );
+      await delay(300);
+      await assertDesktopTtsScreenshotLayout(cdp, true);
+
+      const completedFile = path.join(
+        outputDir,
+        `desktop-free-practice-tts-complete-${width}x${height}.png`,
+      );
+      await captureViewportPng(cdp, completedFile);
+      files.push(completedFile);
+    }
+  } finally {
+    await cdp
+      .send("Emulation.setEmulatedMedia", { features: [] })
+      .catch(() => {});
+    await clearViewport(cdp).catch(() => {});
+  }
+  return files;
+}
+
 async function isRunning(pid) {
   try {
     process.kill(pid, 0);
@@ -2758,15 +3242,23 @@ async function smoke() {
   if (!existsSync(exe)) {
     throw new Error(`Desktop release executable is missing: ${exe}`);
   }
-  const alreadyRunning = await runningSpeakRightProcesses();
+  const alreadyRunning = await findConflictingSpeakRightProcesses(exe);
   if (alreadyRunning.length > 0) {
     throw new Error(
-      "speakright.exe is already running. Close it before desktop:ui-smoke.",
+      `The desktop UI smoke executable is already running. Close only that test instance before retrying: ${formatSpeakRightProcessConflicts(alreadyRunning)}`,
     );
   }
 
   const debuggingPort =
-    process.platform === "win32" ? await getOpenPort() : null;
+    process.platform === "win32"
+      ? await getOpenPort(
+          Number.isInteger(desktopSmokeDebuggingPortOverride) &&
+            desktopSmokeDebuggingPortOverride > 0 &&
+            desktopSmokeDebuggingPortOverride <= 65_535
+            ? desktopSmokeDebuggingPortOverride
+            : 0,
+        )
+      : null;
   const smokeProfileRoot =
     process.platform === "win32" ? await createSmokeProfileRoot() : null;
   const child = spawn(exe, [], {
@@ -2809,6 +3301,31 @@ async function smoke() {
     if (!cdp) throw new Error("Could not connect to desktop WebView.");
 
     originalLanguageId = await selectedLanguage(cdp);
+    if (desktopTtsOnly) {
+      if (!desktopTtsScreenshotDir) {
+        throw new Error(
+          "SPEAKRIGHT_DESKTOP_TTS_SCREENSHOT_DIR is required in TTS-only smoke mode.",
+        );
+      }
+      const ttsScreenshots = await captureDesktopTtsScreenshots(
+        cdp,
+        desktopTtsScreenshotDir,
+      );
+      console.log(
+        [
+          "Desktop free-practice TTS smoke passed:",
+          `pid=${child.pid}`,
+          "geometry=ok",
+          "untimedPlayback=ok",
+          `screenshots=${ttsScreenshots
+            .map((file) => path.basename(file))
+            .join(",")}`,
+          "paidTtsRequests=0",
+        ].join(" "),
+      );
+      return;
+    }
+    await assertSettingsWheelScroll(cdp);
     await assertSettings(cdp);
 
     const details = [];
@@ -2824,7 +3341,7 @@ async function smoke() {
     for (const check of phonemePracticeSidebarChecks) {
       sidebarPurity.push(await assertPhonemePracticeSidebarPurity(cdp, check));
     }
-    await assertScoringTileAudioPolicy(cdp);
+    await assertLabsScoringTileBoundary(cdp);
     await assertEnglishProgressArchive(cdp);
     await assertEnglishTransferRoutes(cdp);
     await assertEnglishCoreDrillRoutes(cdp);
@@ -2834,6 +3351,9 @@ async function smoke() {
     await assertNarrowViewportRoutes(cdp);
     await assertLowHeightViewportRoutes(cdp);
     await assertCorruptLocalDataWarnings(cdp);
+    const ttsScreenshots = desktopTtsScreenshotDir
+      ? await captureDesktopTtsScreenshots(cdp, desktopTtsScreenshotDir)
+      : [];
     await clickLanguage(cdp, originalLanguageId);
 
     console.log(
@@ -2841,6 +3361,7 @@ async function smoke() {
         "Desktop UI smoke passed:",
         `pid=${child.pid}`,
         `settings=ok`,
+        "settingsWheel=ok",
         `details=${details
           .map((item) => `${item.languageId}:${item.slug}`)
           .join(",")}`,
@@ -2852,7 +3373,7 @@ async function smoke() {
           .map((item) => item.languageId)
           .join(",")})`,
         `routes=${smokeSummaryRoutes.join(",")}`,
-        "scoringTileAudioPolicy=ok",
+        "labsScoringTileBoundary=ok",
         "englishTransferRoutes=ok",
         "englishCoreDrillRoutes=ok",
         "advancedDirectRoutes=ok",
@@ -2862,6 +3383,13 @@ async function smoke() {
         "assessmentSmoke=ok",
         "narrowViewport=ok",
         "lowHeightViewport=ok",
+        ...(ttsScreenshots.length > 0
+          ? [
+              `desktopTtsScreenshots=${ttsScreenshots
+                .map((file) => path.basename(file))
+                .join(",")}`,
+            ]
+          : []),
         "releaseServedFromDevServer=false",
       ].join(" "),
     );

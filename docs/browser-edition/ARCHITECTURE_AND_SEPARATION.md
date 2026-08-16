@@ -7,7 +7,7 @@ parts of the current Windows Desktop app.
 
 | Folder | Owner | Allowed platform APIs | Release output |
 | --- | --- | --- | --- |
-| repository root / `src` / `src-tauri` | Windows Desktop today | Tauri, Rust commands, Tauri store, Tauri HTTP/plugin APIs, Windows installer scripts. | EXE/MSI/NSIS and Release EXE validation. |
+| repository root / `src` / `src-tauri` | Windows Desktop today | Tauri, Rust commands, Tauri store, Tauri HTTP/plugin APIs, Windows installer scripts. | Local builds may produce EXE/MSI/NSIS; v1.1.0 Desktop Preview publishes the bare EXE and round-trip-validated NSIS only. |
 | `apps/desktop` | Future desktop folder target | Same desktop-only APIs after a validated physical move. | Not the current public entry until migrated. |
 | `apps/browser` | Browser Edition | Web APIs only: MediaRecorder, Web Audio, IndexedDB/localStorage, fetch, optional Azure Speech browser SDK. | Static export or browser dev/build output. |
 | `packages/shared` | Shared pure code | No Tauri, no browser globals at module load, no process/env secrets. | Imported by both apps. |
@@ -98,8 +98,13 @@ Recommended browser storage policy:
 - No API keys in URL query strings.
 - No keys in screenshots, smoke logs, GitHub issues, or release notes.
 
-If a future optional local proxy is added, it must be a separate documented
-mode, not the default static Browser Edition.
+The optional Hermes/xAI and Vertex AI Gemini TTS integrations use an
+authenticated loopback adapter started by the local Browser Edition launcher.
+They are activated by choosing the corresponding provider in Settings. The
+adapter never returns Hermes credentials, Google Cloud project identifiers,
+accounts, or ADC access tokens to browser code, and is not available to
+remotely hosted pages. Core Browser Edition features and the static export
+remain usable without this adapter.
 
 ## Static Export Constraint
 

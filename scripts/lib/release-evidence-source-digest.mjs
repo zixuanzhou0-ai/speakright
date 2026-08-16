@@ -1,0 +1,173 @@
+import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
+import { readdir, readFile } from "node:fs/promises";
+import path from "node:path";
+
+export const RELEASE_EVIDENCE_SOURCE_DIGEST_SCHEMA = 1;
+
+const EXCLUDED_DIRECTORIES = new Set([
+  ".next",
+  ".turbo",
+  "gen",
+  "node_modules",
+  "out",
+  "playwright-report",
+  "public",
+  "target",
+  "test-results",
+]);
+
+const INPUTS = {
+  browser: [
+    "apps/browser",
+    "packages/core",
+    "package.json",
+    "package-lock.json",
+  ],
+  desktop: [
+    "src",
+    "src-tauri",
+    "packages/core",
+    "scripts/desktop-installer-roundtrip-core.mjs",
+    "scripts/lib/desktop-preview-release-gate-core.mjs",
+    "next-env.d.ts",
+    "next.config.ts",
+    "package.json",
+    "package-lock.json",
+    "postcss.config.mjs",
+    "tsconfig.json",
+  ],
+};
+
+function inputsForEdition(edition) {
+  const inputs = INPUTS[edition];
+  if (!inputs) throw new Error(`Unknown release evidence edition: ${edition}`);
+  return inputs;
+}
+
+function runGit(baseRoot, args, label) {
+  const result = spawnSync("git", args, {
+    cwd: baseRoot,
+    encoding: "utf8",
+    maxBuffer: 4 * 1024 * 1024,
+  });
+  if (result.status !== 0) {
+    throw new Error(`Could not ${label} for release evidence.`);
+  }
+  return result.stdout.trim();
+}
+
+function assertCleanInputs(baseRoot, inputs, edition) {
+  const status = runGit(
+    baseRoot,
+    ["status", "--porcelain=v1", "--untracked-files=all", "--", ...inputs],
+    `verify the ${edition} source worktree`,
+  );
+  if (status) {
+    throw new Error(
+      `Release evidence ${edition} source inputs must be committed and clean.`,
+    );
+  }
+}
+
+export function releaseEvidenceGitProvenance(
+  baseRoot,
+  edition,
+  expectedCommit,
+) {
+  const inputs = inputsForEdition(edition);
+  const head = runGit(baseRoot, ["rev-parse", "HEAD"], "resolve HEAD");
+  if (!/^[0-9a-f]{40}$/.test(head)) {
+    throw new Error("Release evidence requires a concrete Git source commit.");
+  }
+  assertCleanInputs(baseRoot, inputs, edition);
+
+  if (expectedCommit === undefined) {
+    return { commit: head, sourceWorktreeClean: true };
+  }
+  if (!/^[0-9a-f]{40}$/.test(expectedCommit)) {
+    throw new Error("Release evidence sourceCommit must be a full commit SHA.");
+  }
+  const resolved = runGit(
+    baseRoot,
+    ["rev-parse", "--verify", `${expectedCommit}^{commit}`],
+    "resolve sourceCommit",
+  );
+  if (resolved !== expectedCommit) {
+    throw new Error("Release evidence sourceCommit did not resolve exactly.");
+  }
+  const treeDiff = spawnSync(
+    "git",
+    ["diff", "--quiet", "--no-ext-diff", expectedCommit, head, "--", ...inputs],
+    { cwd: baseRoot, encoding: "utf8" },
+  );
+  if (treeDiff.status === 1) {
+    throw new Error(
+      `Current ${edition} source inputs differ from sourceCommit.`,
+    );
+  }
+  if (treeDiff.status !== 0) {
+    throw new Error(
+      `Could not compare ${edition} sourceCommit inputs for release evidence.`,
+    );
+  }
+  return { commit: expectedCommit, sourceWorktreeClean: true };
+}
+
+function shouldExclude(relativePath) {
+  const segments = relativePath.split(/[\\/]/);
+  return (
+    segments.some((segment) => EXCLUDED_DIRECTORIES.has(segment)) ||
+    segments.some((segment) => segment.startsWith(".env")) ||
+    segments.at(-1)?.endsWith(".tsbuildinfo") === true
+  );
+}
+
+async function collectFiles(baseRoot, relativePath, files) {
+  if (shouldExclude(relativePath)) return;
+  const absolutePath = path.join(baseRoot, relativePath);
+  const entries = await readdir(absolutePath, { withFileTypes: true }).catch(
+    () => null,
+  );
+  if (!entries) {
+    files.push(relativePath);
+    return;
+  }
+  for (const entry of entries.sort((left, right) =>
+    left.name.localeCompare(right.name, "en"),
+  )) {
+    if (entry.isSymbolicLink()) {
+      throw new Error(
+        `Release evidence source digest refuses symlinks: ${relativePath}/${entry.name}`,
+      );
+    }
+    await collectFiles(baseRoot, path.join(relativePath, entry.name), files);
+  }
+}
+
+export async function releaseEvidenceSourceDigest(baseRoot, edition) {
+  const inputs = inputsForEdition(edition);
+  const files = [];
+  for (const input of inputs) await collectFiles(baseRoot, input, files);
+  files.sort((left, right) => left.localeCompare(right, "en"));
+
+  const hash = createHash("sha256");
+  hash.update(
+    `speakright-release-evidence-source-v${RELEASE_EVIDENCE_SOURCE_DIGEST_SCHEMA}\0`,
+  );
+  for (const relativePath of files) {
+    const normalizedPath = relativePath.replaceAll("\\", "/");
+    const contents = await readFile(path.join(baseRoot, relativePath));
+    hash.update(normalizedPath);
+    hash.update("\0");
+    hash.update(String(contents.length));
+    hash.update("\0");
+    hash.update(contents);
+    hash.update("\0");
+  }
+  return {
+    schemaVersion: RELEASE_EVIDENCE_SOURCE_DIGEST_SCHEMA,
+    sha256: hash.digest("hex"),
+    fileCount: files.length,
+  };
+}

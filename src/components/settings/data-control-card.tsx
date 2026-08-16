@@ -4,6 +4,7 @@ import {
   Bug,
   Database,
   Download,
+  ExternalLink,
   KeyRound,
   RotateCcw,
   Trash2,
@@ -286,13 +287,28 @@ export function DataControlCard() {
           )}
 
           <div className="rounded-lg bg-muted/35 p-4 text-sm text-muted-foreground">
-            录音评分会发送音频与参考文本到 Azure
-            Speech；标准示范会把练习文本发送到 ElevenLabs；AI
-            教练会把文本、分数和错误摘要发送到你配置的 LLM provider。
-            原始训练录音默认不长期保存，benchmark
-            录音只保存在本机并会随学习数据导出。
-            诊断包只包含版本信息、数据摘要和桌面运行日志尾部，不包含 API keys
-            或原始录音。
+            <div id="privacy-details" className="space-y-2">
+              <p>
+                录音评分会发送音频与参考文本到 Azure
+                Speech；标准示范会把练习文本发送到你选择的 ElevenLabs，或经本机桥接交给爱马仕
+                Grok TTS / Vertex AI Gemini TTS；AI
+                教练会把文本、分数和错误摘要发送到你配置的 LLM provider。
+              </p>
+              <p>
+                SpeakRight 不运营第一方录音收集服务器。原始训练录音默认不长期保存，benchmark
+                录音只保存在本机并会随学习数据导出。诊断包只包含版本信息、数据摘要和经过脱敏的运行日志，不包含
+                API keys 或原始录音。
+              </p>
+              <a
+                href="https://github.com/zixuanzhou0-ai/speakright/blob/main/PRIVACY.md"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1 font-medium text-primary underline-offset-4 hover:underline"
+              >
+                查看完整隐私说明
+                <ExternalLink className="h-3.5 w-3.5" />
+              </a>
+            </div>
           </div>
 
           {status && (

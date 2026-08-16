@@ -10,6 +10,24 @@ export interface ElevenLabsConfig {
   modelId: string;
 }
 
+export type StandardTtsProvider =
+  | "elevenlabs"
+  | "hermes-grok"
+  | "vertex-gemini";
+
+/**
+ * Non-sensitive preference that selects the standard demonstration voice
+ * backend. Provider credentials remain in their own secure/local owner.
+ */
+export interface StandardTtsConfig {
+  provider: StandardTtsProvider;
+}
+
+/** Non-sensitive local Vertex Gemini TTS preferences. */
+export interface VertexGeminiTtsConfig {
+  voiceName: string;
+}
+
 export interface LLMConfig {
   provider: string;
   apiKey: string;
