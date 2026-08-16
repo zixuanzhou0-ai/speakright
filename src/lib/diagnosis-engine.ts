@@ -9,6 +9,7 @@ import { buildTrainingPrescription } from "@/lib/training-prescription";
 import type { AssessmentWord } from "@/types/assessment";
 import type { AzureAssessmentResult } from "@/types/azure";
 import type {
+  AssessmentSupportLevel,
   CoveragePassageBuildInput,
   DiagnosisBuildInput,
   DiagnosisEvidence,
@@ -165,6 +166,7 @@ function collectPhonemes(
   languageId: LanguageId,
   referenceText = label,
   recordingQuality?: RecordingQualitySnapshot,
+  supportLevel: AssessmentSupportLevel = "independent",
 ): AssessmentEvidenceAnalysis {
   const analysis = analyzeAssessmentEvidence({
     result,
@@ -186,6 +188,21 @@ function collectPhonemes(
       evidenceStrength: "invalid",
       recommendedAction: "request-retry",
       invalidationReason: analysis.invalidationReason,
+      supportLevel,
+    });
+    return analysis;
+  }
+
+  if (supportLevel === "preview-assisted") {
+    rawEvidence.push({
+      text: label,
+      score: Math.round(result.accuracyScore),
+      detail:
+        "该次录音在播放标准示范后完成，仅作提示后对比，不计入独立诊断基线。",
+      source,
+      evidenceStrength: "thin",
+      recommendedAction: "request-more-samples",
+      supportLevel,
     });
     return analysis;
   }
@@ -634,6 +651,7 @@ export function buildDiagnosisReport({
   const usableWordRecordings: typeof wordRecordings = [];
 
   for (const recording of wordRecordings) {
+    const supportLevel = recording.supportLevel ?? "independent";
     const analysis = collectPhonemes(
       recording.result,
       recording.prompt.word,
@@ -643,9 +661,12 @@ export function buildDiagnosisReport({
       languageId,
       recording.prompt.word,
       recording.recordingQuality,
+      supportLevel,
     );
-    analyses.push(analysis);
-    if (analysis.usable) usableWordRecordings.push(recording);
+    if (supportLevel === "independent") {
+      analyses.push(analysis);
+      if (analysis.usable) usableWordRecordings.push(recording);
+    }
   }
   const paragraphAnalysis = collectPhonemes(
     paragraphResult,
@@ -711,7 +732,24 @@ export function buildDiagnosisReport({
   const allPhonemeScores = Object.values(phonemeScores).map(
     (item) => item.score,
   );
-  const evidenceSummary = summarizeAssessmentAnalyses(analyses);
+  const summarizedEvidence = summarizeAssessmentAnalyses(analyses);
+  const previewAssistedWordRecordings = wordRecordings.filter(
+    (recording) => recording.supportLevel === "preview-assisted",
+  ).length;
+  const independentWordRecordings =
+    wordRecordings.length - previewAssistedWordRecordings;
+  const evidenceSummary = {
+    ...summarizedEvidence,
+    independentWordRecordings,
+    previewAssistedWordRecordings,
+    notes:
+      previewAssistedWordRecordings > 0
+        ? [
+            ...summarizedEvidence.notes,
+            `${previewAssistedWordRecordings} 个筛查词在听过示范后完成，已保留作对比但未计入独立诊断基线。`,
+          ]
+        : summarizedEvidence.notes,
+  };
   const scoreStatus = scoreStatusForReport(
     languageId,
     evidenceSummary,

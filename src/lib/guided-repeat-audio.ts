@@ -13,9 +13,13 @@ export interface PlaybackPosition {
 
 export interface GuidedRepeatAudioAdapter {
   preload(src: string): Promise<AudioMetadata>;
-  play(src: string, seekMs?: number): Promise<void>;
+  play(
+    src: string,
+    seekMs?: number,
+    onPlaybackStart?: () => void,
+  ): Promise<void>;
   pause(): PlaybackPosition;
-  resume(): Promise<void>;
+  resume(onPlaybackStart?: () => void): Promise<void>;
   stop(): void;
   unload(src?: string): void;
   getDuration(src: string): number | undefined;
@@ -77,7 +81,11 @@ export class HowlerGuidedRepeatAudioAdapter
     });
   }
 
-  async play(src: string, seekMs = 0): Promise<void> {
+  async play(
+    src: string,
+    seekMs = 0,
+    onPlaybackStart?: () => void,
+  ): Promise<void> {
     this.stop();
     await this.preload(src);
     const ctx = Howler.ctx;
@@ -88,6 +96,7 @@ export class HowlerGuidedRepeatAudioAdapter
       const active: ActivePlayback = { src, howl, id, resolve, reject };
       this.active = active;
       if (seekMs > 0) howl.seek(seekMs / 1000, id);
+      if (onPlaybackStart) howl.once("play", onPlaybackStart, id);
       howl.once(
         "end",
         () => {
@@ -120,11 +129,14 @@ export class HowlerGuidedRepeatAudioAdapter
     };
   }
 
-  async resume(): Promise<void> {
+  async resume(onPlaybackStart?: () => void): Promise<void> {
     const active = this.active;
     if (!active) return;
     const ctx = Howler.ctx;
     if (ctx?.state === "suspended") await ctx.resume();
+    if (onPlaybackStart) {
+      active.howl.once("play", onPlaybackStart, active.id);
+    }
     active.howl.play(active.id);
   }
 
@@ -134,6 +146,7 @@ export class HowlerGuidedRepeatAudioAdapter
     this.active = null;
     active.howl.off("end", undefined, active.id);
     active.howl.off("playerror", undefined, active.id);
+    active.howl.off("play", undefined, active.id);
     active.howl.stop(active.id);
     active.resolve();
   }

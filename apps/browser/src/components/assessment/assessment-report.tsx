@@ -159,6 +159,25 @@ export function AssessmentReport({ result, onRetake }: AssessmentReportProps) {
                   <Badge variant="outline" className={WRAP_SAFE_BADGE_CLASS}>
                     可用录音 {result.evidenceSummary.usableRecordings}
                   </Badge>
+                  {typeof result.evidenceSummary.independentWordRecordings ===
+                    "number" && (
+                    <Badge variant="outline" className={WRAP_SAFE_BADGE_CLASS}>
+                      独立词样本{" "}
+                      {result.evidenceSummary.independentWordRecordings}
+                    </Badge>
+                  )}
+                  {(result.evidenceSummary.previewAssistedWordRecordings ?? 0) >
+                    0 && (
+                    <Badge
+                      variant="secondary"
+                      className={WRAP_SAFE_BADGE_CLASS}
+                      data-smoke="assessment-report-assisted-evidence"
+                    >
+                      提示后样本{" "}
+                      {result.evidenceSummary.previewAssistedWordRecordings}
+                      （未计入基线）
+                    </Badge>
+                  )}
                   {result.evidenceSummary.invalidRecordings > 0 && (
                     <Badge
                       variant="destructive"

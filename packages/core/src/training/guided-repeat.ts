@@ -1,5 +1,6 @@
 export type GuidedRepeatLanguageId = "en-US" | "es-ES" | "fr-FR" | "ru-RU";
 export type GuidedRepeatRhythm = "flow" | "standard" | "relaxed";
+export type GuidedRepeatMode = "quick" | "standard" | "intensive";
 export type GuidedRepeatStatus =
   | "idle"
   | "preloading"
@@ -36,9 +37,14 @@ export interface GuidedRepeatSessionPlan {
   languageId: GuidedRepeatLanguageId;
   soundUnitSlug: string;
   rhythm: GuidedRepeatRhythm;
+  mode: GuidedRepeatMode;
   anchorAudio: { single: string };
   queue: GuidedRepeatQueueItem[];
   totalWords: number;
+}
+
+export interface GuidedRepeatModePolicy {
+  wordRounds: 1 | 2 | 4;
 }
 
 export type GuidedRepeatStep =
@@ -47,7 +53,8 @@ export type GuidedRepeatStep =
       role: GuidedRepeatAudioRole;
       src: string;
       wordIndex: number;
-      turn?: 1 | 2;
+      turn: 1 | 2;
+      turnTotal: 1 | 2;
     }
   | { kind: "gap"; gapKind: GuidedRepeatGapKind; wordIndex: number }
   | { kind: "transition"; fromWordIndex: number; toWordIndex: number };
@@ -108,6 +115,12 @@ const RHYTHM_TIMING = {
   },
 } as const;
 
+const MODE_POLICIES: Record<GuidedRepeatMode, GuidedRepeatModePolicy> = {
+  quick: { wordRounds: 1 },
+  standard: { wordRounds: 2 },
+  intensive: { wordRounds: 4 },
+};
+
 function clamp(value: number, minimum: number, maximum: number): number {
   return Math.min(maximum, Math.max(minimum, value));
 }
@@ -120,6 +133,12 @@ export function resolveGuidedRepeatVoicePolicy(
   languageId: GuidedRepeatLanguageId,
 ): GuidedRepeatVoicePolicy {
   return VOICE_POLICIES[languageId];
+}
+
+export function getGuidedRepeatModePolicy(
+  mode: GuidedRepeatMode,
+): GuidedRepeatModePolicy {
+  return MODE_POLICIES[mode];
 }
 
 export function rotateGuidedRepeatQueue<T extends { materialId: string }>(
@@ -155,59 +174,104 @@ export function buildGuidedRepeatSessionPlan(input: {
   languageId: GuidedRepeatLanguageId;
   soundUnitSlug: string;
   rhythm?: GuidedRepeatRhythm;
+  mode?: GuidedRepeatMode;
   anchorAudio: GuidedRepeatSessionPlan["anchorAudio"];
   pool: readonly GuidedRepeatQueueItem[];
   currentMaterialId: string;
 }): GuidedRepeatSessionPlan {
+  const mode = input.mode ?? "standard";
   const queue = rotateGuidedRepeatQueue(input.pool, input.currentMaterialId);
   return {
     languageId: input.languageId,
     soundUnitSlug: input.soundUnitSlug,
     rhythm: input.rhythm ?? "standard",
+    mode,
     anchorAudio: { ...input.anchorAudio },
     queue,
     totalWords: queue.length,
   };
 }
 
+type GuidedRepeatWordRole = "word-masculine" | "word-feminine";
+
+function getAnchorRepeatCount(
+  mode: GuidedRepeatMode,
+  wordIndex: number,
+): 0 | 1 | 2 {
+  if (mode === "quick") return wordIndex === 0 ? 1 : 0;
+  if (mode === "intensive") return 1;
+  if (wordIndex === 0) return 2;
+  return wordIndex % 5 === 0 ? 1 : 0;
+}
+
+function getWordRoles(
+  mode: GuidedRepeatMode,
+  wordIndex: number,
+): GuidedRepeatWordRole[] {
+  if (mode === "quick") {
+    return [wordIndex % 2 === 0 ? "word-masculine" : "word-feminine"];
+  }
+  if (mode === "standard") {
+    return ["word-masculine", "word-feminine"];
+  }
+  return ["word-masculine", "word-feminine", "word-masculine", "word-feminine"];
+}
+
+function buildAnchorSteps(
+  plan: GuidedRepeatSessionPlan,
+  wordIndex: number,
+): GuidedRepeatStep[] {
+  const repeatCount = getAnchorRepeatCount(plan.mode, wordIndex);
+  const steps: GuidedRepeatStep[] = [];
+  for (let turn = 1; turn <= repeatCount; turn += 1) {
+    steps.push(
+      {
+        kind: "audio",
+        role: "anchor-single",
+        src: plan.anchorAudio.single,
+        wordIndex,
+        turn: turn as 1 | 2,
+        turnTotal: repeatCount as 1 | 2,
+      },
+      { kind: "gap", gapKind: "anchor-imitation", wordIndex },
+    );
+  }
+  return steps;
+}
+
 function buildWordAudioSteps(
+  mode: GuidedRepeatMode,
   item: GuidedRepeatQueueItem,
   wordIndex: number,
 ): GuidedRepeatStep[] {
-  return [
-    {
-      kind: "audio",
-      role: "word-masculine",
-      src: item.masculineAudioSrc,
-      wordIndex,
-      turn: 1,
-    },
-    { kind: "gap", gapKind: "imitation", wordIndex },
-    {
-      kind: "audio",
-      role: "word-feminine",
-      src: item.feminineAudioSrc,
-      wordIndex,
-      turn: 1,
-    },
-    { kind: "gap", gapKind: "imitation", wordIndex },
-    {
-      kind: "audio",
-      role: "word-masculine",
-      src: item.masculineAudioSrc,
-      wordIndex,
-      turn: 2,
-    },
-    { kind: "gap", gapKind: "imitation", wordIndex },
-    {
-      kind: "audio",
-      role: "word-feminine",
-      src: item.feminineAudioSrc,
-      wordIndex,
-      turn: 2,
-    },
-    { kind: "gap", gapKind: "imitation", wordIndex },
-  ];
+  const roles = getWordRoles(mode, wordIndex);
+  const totals = {
+    "word-masculine": roles.filter((role) => role === "word-masculine").length,
+    "word-feminine": roles.filter((role) => role === "word-feminine").length,
+  };
+  const turns: Record<GuidedRepeatWordRole, number> = {
+    "word-masculine": 0,
+    "word-feminine": 0,
+  };
+  const steps: GuidedRepeatStep[] = [];
+  for (const role of roles) {
+    turns[role] += 1;
+    steps.push(
+      {
+        kind: "audio",
+        role,
+        src:
+          role === "word-masculine"
+            ? item.masculineAudioSrc
+            : item.feminineAudioSrc,
+        wordIndex,
+        turn: turns[role] as 1 | 2,
+        turnTotal: totals[role] as 1 | 2,
+      },
+      { kind: "gap", gapKind: "imitation", wordIndex },
+    );
+  }
+  return steps;
 }
 
 export function buildGuidedRepeatSteps(
@@ -215,25 +279,8 @@ export function buildGuidedRepeatSteps(
 ): GuidedRepeatStep[] {
   const steps: GuidedRepeatStep[] = [];
   plan.queue.forEach((item, wordIndex) => {
-    steps.push(
-      {
-        kind: "audio",
-        role: "anchor-single",
-        src: plan.anchorAudio.single,
-        wordIndex,
-        turn: 1,
-      },
-      { kind: "gap", gapKind: "anchor-imitation", wordIndex },
-      {
-        kind: "audio",
-        role: "anchor-single",
-        src: plan.anchorAudio.single,
-        wordIndex,
-        turn: 2,
-      },
-      { kind: "gap", gapKind: "anchor-imitation", wordIndex },
-    );
-    steps.push(...buildWordAudioSteps(item, wordIndex));
+    steps.push(...buildAnchorSteps(plan, wordIndex));
+    steps.push(...buildWordAudioSteps(plan.mode, item, wordIndex));
     if (wordIndex < plan.queue.length - 1) {
       steps.push(
         { kind: "gap", gapKind: "transition", wordIndex },
@@ -257,6 +304,8 @@ export function validateGuidedRepeatSessionPlan(
   if (plan.totalWords !== plan.queue.length) {
     issues.push("totalWords does not match queue length");
   }
+  const modePolicy = MODE_POLICIES[plan.mode];
+  if (!modePolicy) issues.push("guided repeat mode is invalid");
   if (!isLocalAudioSrc(plan.anchorAudio.single)) {
     issues.push("sound-unit anchor must be local");
   }

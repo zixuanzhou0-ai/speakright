@@ -3,6 +3,7 @@
 import { normalizeTrainingMaterialContent } from "@speakright/core/training/exposure";
 import {
   buildGuidedRepeatSessionPlan,
+  type GuidedRepeatMode,
   type GuidedRepeatRhythm,
   type GuidedRepeatSessionPlan,
   resolveGuidedRepeatVoicePolicy,
@@ -20,6 +21,7 @@ export interface BuildGuidedRepeatPlanInput {
   wordPool: readonly KeywordEntry[];
   currentWord: KeywordEntry;
   rhythm: GuidedRepeatRhythm;
+  mode: GuidedRepeatMode;
 }
 
 export function isGuidedRepeatEligible(
@@ -48,8 +50,21 @@ export async function buildLocalGuidedRepeatPlan(
   }
 
   const voicePolicy = resolveGuidedRepeatVoicePolicy(input.languageId);
+  const currentMaterialId = guidedRepeatMaterialId(
+    input.languageId,
+    input.phoneme.slug,
+    input.currentWord.word,
+  );
+  const queueEntries = input.wordPool.map((entry) => ({
+    entry,
+    materialId: guidedRepeatMaterialId(
+      input.languageId,
+      input.phoneme.slug,
+      entry.word,
+    ),
+  }));
   const queue = await Promise.all(
-    input.wordPool.map(async (entry) => {
+    queueEntries.map(async ({ entry, materialId }) => {
       let masculineAudioSrc: string;
       let feminineAudioSrc: string;
       if (input.languageId === "en-US") {
@@ -83,11 +98,7 @@ export async function buildLocalGuidedRepeatPlan(
         feminineAudioSrc = feminine.audioSrc;
       }
       return {
-        materialId: guidedRepeatMaterialId(
-          input.languageId,
-          input.phoneme.slug,
-          entry.word,
-        ),
+        materialId,
         word: entry.word,
         ipa: entry.ipa,
         targetUnits: [input.phoneme.slug],
@@ -106,15 +117,11 @@ export async function buildLocalGuidedRepeatPlan(
     throw new Error(`音标 ${input.phoneme.ipa} 缺少本地音标本体音频。`);
   }
   const anchorAudio = { single: anchorSrc };
-  const currentMaterialId = guidedRepeatMaterialId(
-    input.languageId,
-    input.phoneme.slug,
-    input.currentWord.word,
-  );
   const plan = buildGuidedRepeatSessionPlan({
     languageId: input.languageId,
     soundUnitSlug: input.phoneme.slug,
     rhythm: input.rhythm,
+    mode: input.mode,
     anchorAudio,
     pool: queue,
     currentMaterialId,

@@ -11,6 +11,7 @@ interface SliderProps {
   step?: number;
   className?: string;
   disabled?: boolean;
+  ariaLabel?: string;
 }
 
 function Slider({
@@ -22,6 +23,7 @@ function Slider({
   step = 1,
   className,
   disabled = false,
+  ariaLabel = "滑块",
 }: SliderProps) {
   const currentValue = value?.[0] ?? defaultValue?.[0] ?? min;
   const percentage = ((currentValue - min) / (max - min)) * 100;
@@ -30,7 +32,7 @@ function Slider({
     <div
       data-slot="slider"
       className={cn(
-        "relative flex w-full touch-none items-center select-none",
+        "relative flex min-h-11 w-full touch-none items-center select-none",
         disabled && "opacity-50",
         className,
       )}
@@ -49,11 +51,11 @@ function Slider({
         value={currentValue}
         disabled={disabled}
         onChange={(e) => onValueChange?.([Number(e.target.value)])}
-        className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-        aria-label="slider"
+        className="peer absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0 focus-visible:outline-none disabled:cursor-not-allowed"
+        aria-label={ariaLabel}
       />
       <div
-        className="absolute size-3.5 rounded-full border border-ring bg-white shadow-sm ring-ring/50 transition-[left,box-shadow] hover:ring-3 focus:ring-3"
+        className="pointer-events-none absolute size-3.5 rounded-full border border-ring bg-white shadow-sm ring-ring/50 transition-[left,box-shadow] peer-hover:ring-3 peer-focus-visible:ring-4 peer-focus-visible:ring-primary/30"
         style={{ left: `calc(${percentage}% - 7px)` }}
       />
     </div>

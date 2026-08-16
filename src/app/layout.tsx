@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { CSSProperties, ReactNode } from "react";
+import { CloudProcessingDisclosure } from "@/components/common/cloud-processing-disclosure";
 import { ErrorBoundary } from "@/components/common/error-boundary";
 import { DevErrorOverlay } from "@/components/layout/dev-error-overlay";
 import { KeyHydrator } from "@/components/layout/key-hydrator";
@@ -44,6 +45,7 @@ export default function RootLayout({
         <ThemeProvider>
           <DevErrorOverlay />
           <KeyHydrator />
+          <CloudProcessingDisclosure />
           <TooltipProvider>
             <a
               href="#main-content"
@@ -58,7 +60,7 @@ export default function RootLayout({
               <main
                 id="main-content"
                 tabIndex={-1}
-                className="min-h-0 min-w-0 flex-1 overflow-y-auto lg:h-full lg:overflow-hidden"
+                className="min-h-0 min-w-0 flex-1 overflow-y-auto scrollbar-thin lg:h-full"
               >
                 <ErrorBoundary>{children}</ErrorBoundary>
               </main>

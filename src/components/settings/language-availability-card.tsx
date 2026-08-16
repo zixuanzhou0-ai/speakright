@@ -24,6 +24,7 @@ import {
   useElevenLabsConfig,
   useLanguageConfig,
   useLlmConfig,
+  useStandardTtsConfig,
 } from "@/hooks/use-api-keys";
 import { isAzureConfigReady } from "@/lib/azure-config";
 import {
@@ -93,6 +94,7 @@ export function LanguageAvailabilityCard() {
   const languageConfig = useLanguageConfig();
   const azureConfig = useAzureConfig();
   const elevenLabsConfig = useElevenLabsConfig();
+  const standardTtsConfig = useStandardTtsConfig();
   const llmConfig = useLlmConfig();
   const profile = getLanguageProfile(languageConfig.languageId);
   const [staticPackState, setStaticPackState] = useState<StaticPackState>({
@@ -161,7 +163,10 @@ export function LanguageAvailabilityCard() {
 
   const rows = useMemo<AvailabilityRow[]>(() => {
     const azureReady = isAzureConfigReady(azureConfig);
-    const ttsConfigured = hasSecret(elevenLabsConfig?.apiKey);
+    const usesHermes = standardTtsConfig.provider === "hermes-grok";
+    const usesVertex = standardTtsConfig.provider === "vertex-gemini";
+    const ttsConfigured =
+      usesHermes || usesVertex || hasSecret(elevenLabsConfig?.apiKey);
     const localPackReady =
       languageConfig.languageId === "en-US" ||
       effectiveStaticPack.status === "ready";
@@ -182,7 +187,11 @@ export function LanguageAvailabilityCard() {
         id: "demo-audio",
         label: "示范音频",
         status: ttsConfigured
-          ? "ElevenLabs 已配置"
+          ? usesHermes
+            ? "爱马仕 · Grok 已选择"
+            : usesVertex
+              ? "Vertex Gemini 已选择"
+              : "ElevenLabs 已配置"
           : localPackReady
             ? "内置资源可用"
             : packIsLoading
@@ -191,7 +200,11 @@ export function LanguageAvailabilityCard() {
         detail: packIsLoading
           ? "正在确认随应用提供的单词和短语示范音频。"
           : ttsConfigured
-            ? "可以播放随应用提供的示范音频；自定义长句也可使用在线 TTS。"
+            ? usesHermes
+              ? "自定义长句将通过本机爱马仕桥接朗读；Browser Edition 本机启动器会自动启动桥接。"
+              : usesVertex
+                ? "自定义长句将通过本机 Vertex AI 项目朗读；需要 gcloud 项目和 ADC 授权。"
+                : "可以播放随应用提供的示范音频；自定义长句也可使用在线 TTS。"
             : localPackReady
               ? languageConfig.languageId === "en-US"
                 ? "常用示范音频随桌面端提供；自定义长句可能需要在线 TTS。"
@@ -219,6 +232,7 @@ export function LanguageAvailabilityCard() {
   }, [
     azureConfig,
     elevenLabsConfig,
+    standardTtsConfig,
     effectiveStaticPack,
     languageConfig.languageId,
     llmConfig,

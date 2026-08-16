@@ -82,6 +82,8 @@ const SMOKE_SCORE_SUMMARY_RESULT: AzureAssessmentResult = {
   completenessScore: 91,
   words: [],
 };
+const TEST_FIXTURES_ENABLED =
+  process.env.NEXT_PUBLIC_SPEAKRIGHT_TEST_FIXTURES === "1";
 
 export function PhonemeDetailPage() {
   const params = useParams<{ phoneme: string }>();
@@ -223,6 +225,7 @@ export function PhonemeDetailPage() {
   );
 
   useEffect(() => {
+    if (!TEST_FIXTURES_ENABLED) return;
     const searchParams = new URLSearchParams(window.location.search);
     setShowSmokeAssessmentTiles(
       searchParams.get("smokeAssessmentTiles") === "1",
@@ -343,13 +346,25 @@ export function PhonemeDetailPage() {
   }, [phoneme, handleNext, handlePrevious]);
 
   const handleRecordStart = useCallback(() => {
+    playback.stop();
+    wordAudio.stop();
+    chartAudio.stop();
     // Clear previous results before new recording
     llm.reset();
     azure.reset();
     setSelectedWordPhonemes([]);
     setSelectedWordSyllables([]);
     recorder.startRecording();
-  }, [llm, azure, recorder, setSelectedWordPhonemes, setSelectedWordSyllables]);
+  }, [
+    playback,
+    wordAudio,
+    chartAudio,
+    llm,
+    azure,
+    recorder,
+    setSelectedWordPhonemes,
+    setSelectedWordSyllables,
+  ]);
 
   const handleRecordStop = useCallback(() => {
     recorder.stopRecording();

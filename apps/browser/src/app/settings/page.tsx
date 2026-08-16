@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { type KeyboardEvent, useEffect, useState } from "react";
 import { ApiKeyPersistenceCard } from "@/components/settings/api-key-persistence-card";
 import { AzureConfigCard } from "@/components/settings/azure-config-card";
 import { CoachModeCard } from "@/components/settings/coach-mode-card";
@@ -27,8 +27,61 @@ const SETTINGS_SECTIONS: Array<{
   { id: "labs", label: "高级 / Labs", description: "版本、实验能力与边界" },
 ];
 
+function isSettingsSection(value: string | null): value is SettingsSection {
+  return SETTINGS_SECTIONS.some((item) => item.id === value);
+}
+
 export default function SettingsPage() {
   const [section, setSection] = useState<SettingsSection>("basic");
+
+  useEffect(() => {
+    const requestedSection = new URLSearchParams(window.location.search).get(
+      "section",
+    );
+    if (isSettingsSection(requestedSection)) setSection(requestedSection);
+  }, []);
+
+  useEffect(() => {
+    const targetId =
+      section === "services" && window.location.hash === "#standard-tts"
+        ? "standard-tts"
+        : section === "data" && window.location.hash === "#privacy-details"
+          ? "privacy-details"
+          : null;
+    if (!targetId) return;
+    const frame = requestAnimationFrame(() => {
+      document
+        .getElementById(targetId)
+        ?.scrollIntoView({ block: "start", behavior: "smooth" });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [section]);
+
+  const handleTabKeyDown = (
+    event: KeyboardEvent<HTMLButtonElement>,
+    index: number,
+  ) => {
+    let nextIndex = index;
+    if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+      nextIndex = (index + 1) % SETTINGS_SECTIONS.length;
+    } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+      nextIndex =
+        (index - 1 + SETTINGS_SECTIONS.length) % SETTINGS_SECTIONS.length;
+    } else if (event.key === "Home") {
+      nextIndex = 0;
+    } else if (event.key === "End") {
+      nextIndex = SETTINGS_SECTIONS.length - 1;
+    } else {
+      return;
+    }
+    event.preventDefault();
+    const nextSection = SETTINGS_SECTIONS[nextIndex];
+    setSection(nextSection.id);
+    requestAnimationFrame(() =>
+      document.getElementById(`settings-tab-${nextSection.id}`)?.focus(),
+    );
+  };
+
   return (
     <div
       className="min-h-full overflow-y-auto scrollbar-thin"
@@ -46,13 +99,17 @@ export default function SettingsPage() {
           role="tablist"
           aria-label="设置分类"
         >
-          {SETTINGS_SECTIONS.map((item) => (
+          {SETTINGS_SECTIONS.map((item, index) => (
             <button
               key={item.id}
               type="button"
               role="tab"
               aria-selected={section === item.id}
+              aria-controls={`settings-panel-${item.id}`}
+              id={`settings-tab-${item.id}`}
+              tabIndex={section === item.id ? 0 : -1}
               onClick={() => setSection(item.id)}
+              onKeyDown={(event) => handleTabKeyDown(event, index)}
               className={
                 section === item.id
                   ? "min-h-11 rounded-xl border border-primary bg-primary/10 px-3 py-2 text-left text-primary"
@@ -66,30 +123,50 @@ export default function SettingsPage() {
             </button>
           ))}
         </div>
-        <div role="tabpanel" className="space-y-6">
-          {section === "basic" && (
-            <>
-              <LanguageConfigCard />
-              <PronunciationConfigCard />
-              <CoachModeCard />
-            </>
-          )}
-          {section === "services" && (
-            <>
-              <UsageMonitor />
-              <AzureConfigCard />
-              <ElevenLabsConfigCard />
-              <LlmConfigCard />
-            </>
-          )}
-          {section === "data" && <DataControlCard />}
-          {section === "labs" && (
-            <>
-              <ReleaseCard />
-              <LanguageAvailabilityCard />
-            </>
-          )}
-        </div>
+        <section
+          role="tabpanel"
+          id="settings-panel-basic"
+          aria-labelledby="settings-tab-basic"
+          hidden={section !== "basic"}
+          className="space-y-6"
+        >
+          <LanguageConfigCard />
+          <PronunciationConfigCard />
+          <CoachModeCard />
+        </section>
+        <section
+          role="tabpanel"
+          id="settings-panel-services"
+          aria-labelledby="settings-tab-services"
+          hidden={section !== "services"}
+          className="space-y-6"
+        >
+          <div id="standard-tts" className="scroll-mt-4">
+            <ElevenLabsConfigCard />
+          </div>
+          <AzureConfigCard />
+          <UsageMonitor />
+          <LlmConfigCard />
+        </section>
+        <section
+          role="tabpanel"
+          id="settings-panel-data"
+          aria-labelledby="settings-tab-data"
+          hidden={section !== "data"}
+          className="space-y-6"
+        >
+          <DataControlCard />
+        </section>
+        <section
+          role="tabpanel"
+          id="settings-panel-labs"
+          aria-labelledby="settings-tab-labs"
+          hidden={section !== "labs"}
+          className="space-y-6"
+        >
+          <ReleaseCard />
+          <LanguageAvailabilityCard />
+        </section>
       </div>
     </div>
   );

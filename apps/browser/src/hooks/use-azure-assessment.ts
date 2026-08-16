@@ -4,6 +4,7 @@ import { useCallback, useRef, useState } from "react";
 import { assessPronunciation } from "@/lib/api-client";
 import { getAzureConfig } from "@/lib/api-keys";
 import { normalizeAzureSpeechError } from "@/lib/azure-speech-errors";
+import { requestCloudProcessingConsent } from "@/lib/cloud-processing-consent";
 import { trackAzureUsage } from "@/lib/usage-tracker";
 import { isSentence } from "@/lib/utils";
 import type { AzureAssessmentResult } from "@/types/azure";
@@ -42,6 +43,14 @@ export function useAzureAssessment(): UseAzureAssessmentReturn {
     if (!config) {
       setAssessmentError(
         "请先到设置页配置 Azure Speech API 密钥和区域；配置后回到本页重新评分。",
+      );
+      return null;
+    }
+
+    const accepted = await requestCloudProcessingConsent("azure-assessment");
+    if (!accepted) {
+      setAssessmentError(
+        "你已暂缓云端评分；录音没有发送。可再次评分并同意提示，或在设置页查看数据与隐私说明。",
       );
       return null;
     }

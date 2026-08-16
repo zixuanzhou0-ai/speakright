@@ -1,8 +1,16 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { elevenLabsTts } from "@/lib/api-client";
-import { getElevenLabsConfig } from "@/lib/api-keys";
+import {
+  elevenLabsTts,
+  hermesXaiTts,
+  vertexGeminiTts,
+} from "@/lib/api-client";
+import {
+  getElevenLabsConfig,
+  getStandardTtsConfig,
+  getVertexGeminiTtsConfig,
+} from "@/lib/api-keys";
 import {
   normalizeStandardTtsError,
   STANDARD_TTS_UNAVAILABLE_MESSAGE,
@@ -23,8 +31,10 @@ export function useTts(): UseTtsReturn {
 
   const speak = useCallback(
     async (text: string) => {
-      const config = getElevenLabsConfig();
-      if (!config) {
+      const provider = getStandardTtsConfig().provider;
+      const elevenLabsConfig =
+        provider === "elevenlabs" ? getElevenLabsConfig() : null;
+      if (provider === "elevenlabs" && !elevenLabsConfig) {
         setError(STANDARD_TTS_UNAVAILABLE_MESSAGE);
         return;
       }
@@ -33,15 +43,32 @@ export function useTts(): UseTtsReturn {
       setIsLoading(true);
 
       try {
-        const blob = await elevenLabsTts(
-          config.apiKey,
-          config.voiceId,
-          text,
-          config.modelId || "eleven_flash_v2_5",
-        );
+        let blob: Blob;
+        if (provider === "hermes-grok") {
+          blob = await hermesXaiTts(text);
+        } else if (provider === "vertex-gemini") {
+          blob = await vertexGeminiTts(text, {
+            voiceName: getVertexGeminiTtsConfig().voiceName,
+          });
+        } else {
+          if (!elevenLabsConfig) {
+            throw new Error(STANDARD_TTS_UNAVAILABLE_MESSAGE);
+          }
+          blob = await elevenLabsTts(
+            elevenLabsConfig.apiKey,
+            elevenLabsConfig.voiceId,
+            text,
+            elevenLabsConfig.modelId || "eleven_flash_v2_5",
+          );
+        }
         player.playBlob(blob);
+        if (provider === "elevenlabs") {
+          window.dispatchEvent(
+            new CustomEvent("speakright:elevenlabs-usage-changed"),
+          );
+        }
       } catch (e) {
-        console.error("[ElevenLabs TTS]", e);
+        console.error("[Standard TTS]", e);
         setError(normalizeStandardTtsError(e));
       } finally {
         setIsLoading(false);

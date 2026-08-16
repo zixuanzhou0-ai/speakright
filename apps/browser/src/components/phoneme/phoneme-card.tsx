@@ -4,7 +4,7 @@ import { Play } from "lucide-react";
 import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
-import type { KeyboardEvent, MouseEvent } from "react";
+import type { MouseEvent } from "react";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -63,6 +63,7 @@ export function PhonemeCard({ phoneme, player }: PhonemeCardProps) {
   const displayWord = word ?? phoneme.example;
   const displayIpa = phoneme.chartIpa ?? phoneme.keywords[0]?.ipa;
   const image = phoneme.chartImage;
+  const wordAudioPlayable = isKnownEnglishChartAudioStem(word);
   const unitLabel = getSoundUnitCardLabel(phoneme);
   const languageId = phoneme.languageId ?? "en-US";
   const inventoryEntry =
@@ -113,45 +114,51 @@ export function PhonemeCard({ phoneme, player }: PhonemeCardProps) {
     playHeaderAudio();
   };
 
-  const handleHeaderAudioKeyDown = (e: KeyboardEvent) => {
-    if (e.key !== "Enter" && e.key !== " ") return;
-    e.preventDefault();
-    e.stopPropagation();
-    playHeaderAudio();
-  };
-
   const handlePlayWord = (e: MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!isKnownEnglishChartAudioStem(word)) return;
+    if (!wordAudioPlayable) return;
     const next = lastWordPlay === "slow" ? "normal" : "slow";
     setLastWordPlay(next);
     player.play(`/audio/ipa/${next}/${word}.mp3`, getChartWordPlaybackOptions());
   };
 
   return (
-    <Link href={`/phonemes/${phoneme.slug}`} className="block">
-      <Card className="relative h-full cursor-pointer p-5 transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+    <Card className="relative h-full cursor-pointer p-5 transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+      <Link
+        href={`/phonemes/${phoneme.slug}`}
+        className="absolute inset-0 z-0 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2"
+        aria-label={`学习音标 ${phoneme.ipa}，示例词 ${displayWord}`}
+      />
+      <div className="pointer-events-none relative z-10">
         {/* Top row: IPA + difficulty badge */}
         <div className="mb-4 flex flex-wrap items-start justify-center gap-2 text-center">
-          <motion.span
-            whileHover={headerAudioPlayable ? { scale: 1.08 } : undefined}
-            whileTap={headerAudioPlayable ? { scale: 0.95 } : undefined}
-            transition={springTransition}
-            onClick={handlePlayPhoneme}
-            className={`select-none font-mono text-4xl font-bold ${
-              headerAudioPlayable ? "cursor-pointer" : "cursor-default"
-            }`}
-            data-smoke="phoneme-card-ipa-audio"
-            role={headerAudioPlayable ? "button" : undefined}
-            tabIndex={headerAudioPlayable ? 0 : -1}
-            aria-label={headerAudioPlayable ? `播放音标 ${phoneme.ipa}` : undefined}
-            aria-disabled={!headerAudioPlayable}
-            onKeyDown={headerAudioPlayable ? handleHeaderAudioKeyDown : undefined}
-            {...headerAudioData}
-          >
-            {phoneme.ipa}
-          </motion.span>
+          {headerAudioPlayable ? (
+            <motion.button
+              type="button"
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.95 }}
+              transition={springTransition}
+              onClick={handlePlayPhoneme}
+              className="pointer-events-auto select-none font-mono text-4xl font-bold cursor-pointer"
+              data-smoke="phoneme-card-ipa-audio"
+          aria-label={`播放音标 ${phoneme.ipa}`}
+              aria-disabled={false}
+              {...headerAudioData}
+            >
+              {phoneme.ipa}
+            </motion.button>
+          ) : (
+            <span
+              className="select-none cursor-default font-mono text-4xl font-bold"
+              data-smoke="phoneme-card-ipa-audio"
+              aria-disabled={true}
+              tabIndex={-1}
+              {...headerAudioData}
+            >
+              {phoneme.ipa}
+            </span>
+          )}
           <Badge
             variant={DIFFICULTY_VARIANT[phoneme.difficulty]}
             className="text-xs"
@@ -197,14 +204,26 @@ export function PhonemeCard({ phoneme, player }: PhonemeCardProps) {
         {/* Bottom: image + word + play */}
         <div className="flex flex-wrap items-center justify-center gap-3">
           <div className="flex min-w-0 flex-wrap items-center justify-center gap-3">
-            {image && (
-              <motion.div
+            {image && wordAudioPlayable ? (
+              <motion.button
+                type="button"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 transition={springTransition}
                 onClick={handlePlayWord}
-                className="relative h-12 w-12 shrink-0 cursor-pointer"
+                className="pointer-events-auto relative h-12 w-12 shrink-0 cursor-pointer"
+                aria-label={`播放示例词 ${word}`}
               >
+                <Image
+                  src={`/images/ipa/${image}.png`}
+                  alt=""
+                  width={48}
+                  height={48}
+                  className="h-full w-full object-contain"
+                />
+              </motion.button>
+            ) : image ? (
+              <div className="relative h-12 w-12 shrink-0">
                 <Image
                   src={`/images/ipa/${image}.png`}
                   alt={word || ""}
@@ -212,8 +231,8 @@ export function PhonemeCard({ phoneme, player }: PhonemeCardProps) {
                   height={48}
                   className="h-full w-full object-contain"
                 />
-              </motion.div>
-            )}
+              </div>
+            ) : null}
             <div className="min-w-0 text-center">
               {displayWord && (
                 <p
@@ -236,25 +255,23 @@ export function PhonemeCard({ phoneme, player }: PhonemeCardProps) {
             </div>
           </div>
           {headerAudioPlayable && (
-            <motion.div
+            <motion.button
+              type="button"
               whileHover={{ scale: 1.15 }}
               whileTap={{ scale: 0.95 }}
               transition={springTransition}
               onClick={handlePlayPhoneme}
-              onKeyDown={handleHeaderAudioKeyDown}
-              className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-muted transition-colors hover:bg-primary hover:text-primary-foreground"
+              className="pointer-events-auto flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-muted transition-colors hover:bg-primary hover:text-primary-foreground"
               data-smoke="phoneme-card-header-audio-button"
-              role="button"
-              tabIndex={0}
-              aria-label={`播放音标 ${phoneme.ipa}`}
+              aria-label={`再次播放音标 ${phoneme.ipa}`}
               aria-disabled={false}
               {...headerAudioData}
             >
               <Play className="h-5 w-5" />
-            </motion.div>
+            </motion.button>
           )}
         </div>
-      </Card>
-    </Link>
+      </div>
+    </Card>
   );
 }
