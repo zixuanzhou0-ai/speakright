@@ -149,6 +149,28 @@ describe("desktop preflight and UI smoke", () => {
 
     expect(script).toContain("SPEAKRIGHT_SECURE_STORE_SERVICE");
     expect(script).toContain("findConflictingSpeakRightProcesses");
+    expect(script).toContain("packaged desktop shell to render");
+    expect(script).toContain('window.location.href !== "about:blank"');
+    expect(script).toContain("const matchingLinks = anchors.filter");
+    expect(script).toContain('? "responsive-navigation-closed"');
+    expect(script).toContain("error.code = target?.reason");
+    expect(script).toContain(
+      'button[aria-controls="mobile-navigation"][aria-expanded="false"]',
+    );
+    expect(script).toContain(
+      'target?.reason === "responsive-navigation-closed"',
+    );
+    expect(script).toMatch(
+      /new URL\(\$\{JSON\.stringify\(pathname\)\}, window\.location\.href\)\.href/,
+    );
+    expect(script).not.toMatch(/\$\{origin\}\$\{pathname\}/);
+    expect(script).not.toContain("const hiddenResponsiveLink");
+    expect(script).not.toMatch(
+      /pathname\.startsWith\("\/phonemes\/"\)[\s\S]{0,400}forceNavigate\(cdp, pathname\)/,
+    );
+    expect(script).toMatch(
+      /assertSettingsWheelScroll[\s\S]*?navigate\(cdp, "\/settings", '[^']+?', \{\s*direct: true,/,
+    );
 
     expect(script).toContain("/settings");
     expect(script).toContain("/phonemes/ee");

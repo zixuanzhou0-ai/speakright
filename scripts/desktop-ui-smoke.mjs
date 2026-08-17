@@ -485,7 +485,7 @@ async function clickRouteLink(cdp, pathname) {
 (() => {
   const pathname = ${JSON.stringify(pathname)};
   const anchors = [...document.querySelectorAll("a[href]")];
-  const link = anchors.find((anchor) => {
+  const matchingLinks = anchors.filter((anchor) => {
     const attr = anchor.getAttribute("href");
     let parsedPathname = attr ?? "";
     try {
@@ -495,14 +495,50 @@ async function clickRouteLink(cdp, pathname) {
     }
     return attr === pathname || parsedPathname === pathname;
   });
+  const link = matchingLinks.find((anchor) => {
+    const rect = anchor.getBoundingClientRect();
+    const style = window.getComputedStyle(anchor);
+    return (
+      rect.width > 0 &&
+      rect.height > 0 &&
+      style.display !== "none" &&
+      style.visibility !== "hidden"
+    );
+  });
   if (!link) {
+    const opener = document.querySelector(
+      'button[aria-controls="mobile-navigation"][aria-expanded="false"]'
+    );
+    const openerRect = opener?.getBoundingClientRect();
+    const openerStyle = opener ? window.getComputedStyle(opener) : null;
+    const visibleOpener = Boolean(
+      opener &&
+      openerRect &&
+      openerRect.width > 0 &&
+      openerRect.height > 0 &&
+      openerStyle?.display !== "none" &&
+      openerStyle?.visibility !== "hidden"
+    );
     return {
       ok: false,
-      reason: "missing-link",
-      links: anchors.slice(0, 20).map((anchor) => ({
+      reason:
+        matchingLinks.length > 0 && visibleOpener
+          ? "responsive-navigation-closed"
+          : matchingLinks.length > 0
+            ? "no-visible-link"
+            : "missing-link",
+      opener: visibleOpener
+        ? {
+            x: openerRect.left + openerRect.width / 2,
+            y: openerRect.top + openerRect.height / 2
+          }
+        : null,
+      links: matchingLinks.slice(0, 20).map((anchor) => ({
         text: anchor.innerText.trim(),
         attr: anchor.getAttribute("href"),
-        href: anchor.href
+        href: anchor.href,
+        width: anchor.getBoundingClientRect().width,
+        height: anchor.getBoundingClientRect().height
       }))
     };
   }
@@ -521,14 +557,38 @@ async function clickRouteLink(cdp, pathname) {
 `,
     );
     if (target?.ok) break;
+    if (
+      target?.reason === "responsive-navigation-closed" &&
+      Number.isFinite(target?.opener?.x) &&
+      Number.isFinite(target?.opener?.y)
+    ) {
+      await cdp.send("Input.dispatchMouseEvent", {
+        type: "mousePressed",
+        x: target.opener.x,
+        y: target.opener.y,
+        button: "left",
+        clickCount: 1,
+      });
+      await cdp.send("Input.dispatchMouseEvent", {
+        type: "mouseReleased",
+        x: target.opener.x,
+        y: target.opener.y,
+        button: "left",
+        clickCount: 1,
+      });
+      await delay(300);
+      continue;
+    }
     await delay(250);
   }
   if (!target?.ok) {
-    throw new Error(
+    const error = new Error(
       `Could not find visible route link for ${pathname}: ${JSON.stringify(
         target,
       )}`,
     );
+    error.code = target?.reason ?? "unknown-route-link-error";
+    throw error;
   }
   await cdp.send("Input.dispatchMouseEvent", {
     type: "mouseMoved",
@@ -573,8 +633,14 @@ async function expandPhonemeGroups(cdp) {
 }
 
 async function forceNavigate(cdp, pathname) {
-  const origin = await evaluate(cdp, "window.location.origin");
-  await cdp.send("Page.navigate", { url: `${origin}${pathname}` });
+  const targetUrl = await evaluate(
+    cdp,
+    `new URL(${JSON.stringify(pathname)}, window.location.href).href`,
+  );
+  if (typeof targetUrl !== "string" || targetUrl.length === 0) {
+    throw new Error(`Could not resolve desktop route: ${pathname}`);
+  }
+  await cdp.send("Page.navigate", { url: targetUrl });
   await delay(800);
 }
 
@@ -603,21 +669,10 @@ async function navigate(cdp, pathname, expectedSelector, options = {}) {
       await expandPhonemeGroups(cdp);
     }
     if ((await currentPathname(cdp)) !== pathname) {
-      try {
-        if (options.direct) {
-          await forceNavigate(cdp, pathname);
-        } else {
-          await clickRouteLink(cdp, pathname);
-        }
-      } catch (error) {
-        if (!pathname.startsWith("/phonemes/")) throw error;
+      if (options.direct) {
         await forceNavigate(cdp, pathname);
-      }
-      if (
-        pathname.startsWith("/phonemes/") &&
-        (await currentPathname(cdp)) !== pathname
-      ) {
-        await forceNavigate(cdp, pathname);
+      } else {
+        await clickRouteLink(cdp, pathname);
       }
     }
   }
@@ -648,7 +703,9 @@ async function navigate(cdp, pathname, expectedSelector, options = {}) {
 }
 
 async function clickLanguage(cdp, languageId) {
-  await navigate(cdp, "/settings", '[data-smoke="settings-page"]');
+  await navigate(cdp, "/settings", '[data-smoke="settings-page"]', {
+    direct: true,
+  });
   const clicked = await evaluate(
     cdp,
     `
@@ -686,7 +743,9 @@ async function clickLanguage(cdp, languageId) {
 }
 
 async function selectedLanguage(cdp) {
-  await navigate(cdp, "/settings", '[data-smoke="settings-page"]');
+  await navigate(cdp, "/settings", '[data-smoke="settings-page"]', {
+    direct: true,
+  });
   const result = await evaluate(
     cdp,
     `
@@ -928,7 +987,9 @@ async function assertEnglishProgressArchive(cdp) {
 }
 
 async function assertSettingsWheelScroll(cdp) {
-  await navigate(cdp, "/settings", '[data-smoke="settings-page"]');
+  await navigate(cdp, "/settings", '[data-smoke="settings-page"]', {
+    direct: true,
+  });
   const target = await evaluate(
     cdp,
     `
@@ -982,7 +1043,9 @@ async function assertSettingsWheelScroll(cdp) {
 }
 
 async function assertSettings(cdp) {
-  await navigate(cdp, "/settings", '[data-smoke="settings-page"]');
+  await navigate(cdp, "/settings", '[data-smoke="settings-page"]', {
+    direct: true,
+  });
   await seedSettingsSmokeData(cdp);
   const result = await evaluate(
     cdp,
@@ -3313,6 +3376,29 @@ async function smoke() {
       }
     }
     if (!cdp) throw new Error("Could not connect to desktop WebView.");
+
+    await waitForCondition(
+      cdp,
+      `
+(() => {
+  const bodyText = document.body?.innerText ?? "";
+  const releaseServedFromDevServer =
+    (window.location.protocol === "http:" || window.location.protocol === "https:") &&
+    ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname);
+  return {
+    ok:
+      window.location.href !== "about:blank" &&
+      document.readyState !== "loading" &&
+      bodyText.trim().length > 20 &&
+      !!document.querySelector('a[href="/settings"]') &&
+      !releaseServedFromDevServer,
+    href: window.location.href,
+    releaseServedFromDevServer
+  };
+})()
+`,
+      "packaged desktop shell to render",
+    );
 
     originalLanguageId = await selectedLanguage(cdp);
     if (desktopTtsOnly) {
