@@ -148,14 +148,19 @@ describe("ProgressPage language boundary", () => {
 
     render(<ProgressPage />);
 
-    expect(screen.getByText(/法语公开版先聚焦核心练习/)).toBeInTheDocument();
     expect(
-      screen.getByText(/公开版只开放音标\/发音单位练习和自由练习/),
+      document.querySelector('[data-smoke="progress-experimental-blocker"]'),
     ).toBeInTheDocument();
+    expect(screen.getByText("法语进步档案")).toBeInTheDocument();
+    expect(screen.getByText(/当前语言仍为 experimental/)).toBeInTheDocument();
     expect(
-      screen.getByText(/暂不展示未完成训练、诊断或 mastery 证据/),
+      screen.getByText(/不会把英语阶段记录或正式 mastery 结果混入当前语言/),
     ).toBeInTheDocument();
-    for (const buttonName of ["去音标练习", "去自由练习"]) {
+    for (const buttonName of [
+      "返回当前语言训练",
+      "做当前语言诊断",
+      "检查语言设置",
+    ]) {
       const button = screen.getByRole("button", { name: buttonName });
       expect(button).toHaveClass("max-w-full");
       expect(button).toHaveClass("whitespace-normal");

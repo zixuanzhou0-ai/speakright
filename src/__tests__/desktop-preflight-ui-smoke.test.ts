@@ -173,6 +173,7 @@ describe("desktop preflight and UI smoke", () => {
     expect(script).toContain("contrast-config-card");
     expect(script).toContain("/drill/prosody");
     expect(script).toContain("prosodyHooksReady");
+    expect(script).toContain("prosody-experimental-blocker");
     expect(script).toContain("prosody-exercise-header");
     expect(script).toContain("/drill/perception");
     expect(script).toContain("perceptionHooksReady");
@@ -186,7 +187,6 @@ describe("desktop preflight and UI smoke", () => {
     expect(script).toContain("/drill/evidence");
     expect(script).toContain("/drill/pack/ee-ih");
     expect(script).toContain("evidence-page");
-    expect(script).toContain("non-english-core-only-boundary");
     expect(script).toContain("pack-runner-page");
     expect(script).toContain("pack-runner-intro-card");
     expect(script).toContain("pack-runner-course-map");
@@ -224,11 +224,12 @@ describe("desktop preflight and UI smoke", () => {
     expect(script).toContain("assessment-intro-card");
     expect(script).toContain("assessment-start-button");
     expect(script).toContain("assessment-passage-link");
+    expect(script).toContain("assessment-labs-boundary");
     expect(script).toContain("/assessment/passage");
     expect(script).toContain("assessment-passage-page");
     expect(script).toContain("assessment-passage-intro-card");
-    expect(script).toContain("公开版只开放音标");
     expect(script).toContain("/progress");
+    expect(script).toContain("progress-experimental-blocker");
     expect(script).toContain("assertEnglishProgressArchive");
     expect(script).toContain("progress-benchmark-row");
     expect(script).toContain("progress-recent-session-row");
@@ -249,7 +250,9 @@ describe("desktop preflight and UI smoke", () => {
     expect(script).toContain("speakright_benchmark_recordings_v1");
     expect(script).toContain("progress missing benchmark audio warning");
     expect(script).toContain("direct: true");
-    expect(script).toContain("coreBoundaryReady");
+    expect(script).toContain("labsBoundaryReady");
+    expect(script).toContain("drill-experimental-boundary-warning");
+    expect(script).toContain("不生成正式 mastery");
     expect(script).toContain("routes=");
     expect(script).toContain("smokeSummaryRoutes.join");
     expect(script).toContain('"/drill/scenarios"');
@@ -260,7 +263,7 @@ describe("desktop preflight and UI smoke", () => {
     expect(script).toContain('textAlign === "center"');
     expect(script).toContain("assertNarrowViewportRoutes");
     expect(script).toContain("non-english-core-only-boundary");
-    expect(script).toContain("去自由练习");
+    expect(script).toContain("!document.querySelector");
     expect(script).toContain("narrowViewport=ok");
     expect(script).toContain("assertLowHeightViewportRoutes");
     expect(script).toContain("lowHeightViewport=ok");

@@ -1,6 +1,6 @@
-import { render, screen } from "@testing-library/react";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { LanguageCoreOnlyBoundary } from "@/components/common/language-core-only-boundary";
 
@@ -65,15 +65,17 @@ describe("LanguageCoreOnlyBoundary", () => {
     expect(screen.queryByText("去音标练习")).not.toBeInTheDocument();
   });
 
-  it("wires drill and assessment route layouts through the same boundary", () => {
+  it("wires Labs routes through policy-aware layouts and keeps formal progress isolated", () => {
     expect(readProjectFile("src/app/drill/layout.tsx")).toContain(
       "LanguageCoreOnlyBoundary",
     );
     expect(readProjectFile("src/app/assessment/layout.tsx")).toContain(
       "LanguageCoreOnlyBoundary",
     );
-    expect(readProjectFile("src/app/progress/page.tsx")).toContain(
-      "LanguageCoreOnlyBoundary",
+    const progressPage = readProjectFile("src/app/progress/page.tsx");
+    expect(progressPage).toContain(
+      'data-smoke="progress-experimental-blocker"',
     );
+    expect(progressPage).not.toContain("LanguageCoreOnlyBoundary");
   });
 });

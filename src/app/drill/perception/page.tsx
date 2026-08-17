@@ -252,7 +252,7 @@ export default function PerceptionDrillPage() {
             </h1>
             <p className="mt-2 break-words text-sm text-muted-foreground [overflow-wrap:anywhere]">
               当前高变异 ABX 听辨题库仍是英语专属。西语、法语、俄语保持
-              experimental，不混入英语听辨材料。
+              experimental，不混入英语听辨材料，也不生成正式 mastery。
             </p>
             <div className="mt-5 flex flex-wrap justify-center gap-2">
               <Link href="/drill/contrast" className="max-w-full">

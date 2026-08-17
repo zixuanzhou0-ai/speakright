@@ -57,6 +57,19 @@ describe("mastery language policy", () => {
     expect(source).toContain("saveMasteryProfile(nextProfile)");
   });
 
+  it("keeps English prosody exercises behind an experimental language blocker", () => {
+    const source = readFileSync(
+      join(process.cwd(), "src/app/drill/prosody/page.tsx"),
+      "utf8",
+    );
+
+    expect(source).toContain('languageId !== "en-US"');
+    expect(source).toContain('data-smoke="prosody-experimental-blocker"');
+    expect(source).toContain("不会混入英语训练材料");
+    expect(source).toContain("不生成正式");
+    expect(source).toContain("function EnglishProsodyPage()");
+  });
+
   it("keeps formal evidence archives behind the English-only policy", () => {
     const evidencePage = readFileSync(
       join(process.cwd(), "src/app/drill/evidence/page.tsx"),

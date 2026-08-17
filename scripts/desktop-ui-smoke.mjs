@@ -1953,40 +1953,37 @@ async function _assertScoringTileAudioPolicy(cdp) {
   }
 }
 
+const LABS_MAIN_ROUTES = [
+  { path: "/drill", selector: '[data-smoke="drill-page"]', direct: true },
+  {
+    path: "/drill/prosody",
+    selector: '[data-smoke="prosody-experimental-blocker"]',
+    direct: true,
+  },
+  {
+    path: "/drill/perception",
+    selector: '[data-smoke="perception-experimental-blocker"]',
+    direct: true,
+  },
+  {
+    path: "/sentences",
+    selector: '[data-smoke="sentences-page"]',
+    direct: true,
+  },
+  {
+    path: "/assessment",
+    selector: '[data-smoke="assessment-page"]',
+    direct: true,
+  },
+  {
+    path: "/progress",
+    selector: '[data-smoke="progress-experimental-blocker"]',
+    direct: true,
+  },
+];
+
 async function assertMainRoutes(cdp) {
-  const routes = [
-    {
-      path: "/drill",
-      selector: '[data-smoke="non-english-core-only-boundary"]',
-      direct: true,
-      boundary: true,
-    },
-    {
-      path: "/drill/prosody",
-      selector: '[data-smoke="non-english-core-only-boundary"]',
-      direct: true,
-      boundary: true,
-    },
-    {
-      path: "/drill/perception",
-      selector: '[data-smoke="non-english-core-only-boundary"]',
-      direct: true,
-      boundary: true,
-    },
-    { path: "/sentences", selector: '[data-smoke="sentences-page"]' },
-    {
-      path: "/assessment",
-      selector: '[data-smoke="non-english-core-only-boundary"]',
-      direct: true,
-      boundary: true,
-    },
-    {
-      path: "/progress",
-      selector: '[data-smoke="non-english-core-only-boundary"]',
-      direct: true,
-      boundary: true,
-    },
-  ];
+  const routes = LABS_MAIN_ROUTES;
 
   for (const route of routes) {
     await navigate(cdp, route.path, route.selector, route);
@@ -1996,7 +1993,6 @@ async function assertMainRoutes(cdp) {
 (() => {
   const bodyText = document.body?.innerText ?? "";
   const routePath = ${JSON.stringify(route.path)};
-  const expectsBoundary = ${JSON.stringify(Boolean(route.boundary))};
   const sentenceCard = document.querySelector('[data-smoke="sentence-input-card"]');
   const sentenceColumn = document.querySelector('[data-smoke="free-practice-left-column"]');
   const sentenceHooksReady =
@@ -2009,31 +2005,35 @@ async function assertMainRoutes(cdp) {
       window.getComputedStyle(sentenceCard).overflow !== "hidden" &&
       (window.innerWidth < 1024 || window.getComputedStyle(sentenceColumn).overflowY === "auto"));
   const assessmentHooksReady =
-    expectsBoundary ||
     routePath !== "/assessment" ||
     (Boolean(document.querySelector('[data-smoke="assessment-page"]')) &&
       Boolean(document.querySelector('[data-smoke="assessment-intro-card"]')) &&
       Boolean(document.querySelector('[data-smoke="assessment-start-button"]')) &&
-      Boolean(document.querySelector('[data-smoke="assessment-passage-link"]')));
+      Boolean(document.querySelector('[data-smoke="assessment-passage-link"]')) &&
+      Boolean(document.querySelector('[data-smoke="assessment-labs-boundary"]')));
   const prosodyHooksReady =
-    expectsBoundary ||
     routePath !== "/drill/prosody" ||
     (Boolean(document.querySelector('[data-smoke="prosody-page"]')) &&
-      Boolean(document.querySelector('[data-smoke="prosody-exercise-header"]')));
+      Boolean(document.querySelector('[data-smoke="prosody-experimental-blocker"]')) &&
+      !document.querySelector('[data-smoke="prosody-exercise-header"]'));
   const perceptionHooksReady =
-    expectsBoundary ||
     routePath !== "/drill/perception" ||
     (Boolean(document.querySelector('[data-smoke="perception-page"]')) &&
       Boolean(document.querySelector('[data-smoke="perception-experimental-blocker"]')));
-  const coreBoundaryReady =
-    !expectsBoundary ||
-    (Boolean(document.querySelector('[data-smoke="non-english-core-only-boundary"]')) &&
-      bodyText.includes("公开版只开放音标") &&
-      bodyText.includes("去音标练习") &&
-      bodyText.includes("去自由练习") &&
-      !bodyText.includes("实验训练") &&
-      !bodyText.includes("发音诊断\\n") &&
-      !bodyText.includes("今日学习计划"));
+  const drillHooksReady =
+    routePath !== "/drill" ||
+    (Boolean(document.querySelector('[data-smoke="drill-page"]')) &&
+      Boolean(document.querySelector('[data-smoke="drill-experimental-boundary-warning"]')));
+  const progressHooksReady =
+    routePath !== "/progress" ||
+    Boolean(document.querySelector('[data-smoke="progress-experimental-blocker"]'));
+  const requiresLabsBoundary = routePath !== "/sentences";
+  const labsBoundaryReady =
+    !document.querySelector('[data-smoke="non-english-core-only-boundary"]') &&
+    (!requiresLabsBoundary ||
+      ((bodyText.includes("Labs") || bodyText.includes("experimental")) &&
+        (bodyText.includes("不生成正式 mastery") ||
+          bodyText.includes("不显示正式英语 mastery"))));
   return {
     ok:
       bodyText.trim().length > 20 &&
@@ -2041,7 +2041,9 @@ async function assertMainRoutes(cdp) {
       assessmentHooksReady &&
       prosodyHooksReady &&
       perceptionHooksReady &&
-      coreBoundaryReady &&
+      drillHooksReady &&
+      progressHooksReady &&
+      labsBoundaryReady &&
       !bodyText.includes("Merriam-Webster") &&
       !bodyText.includes("多语言发音包") &&
       !bodyText.includes("无法访问此页面"),
@@ -2049,7 +2051,9 @@ async function assertMainRoutes(cdp) {
     assessmentHooksReady,
     prosodyHooksReady,
     perceptionHooksReady,
-    coreBoundaryReady,
+    drillHooksReady,
+    progressHooksReady,
+    labsBoundaryReady,
     bodyText: bodyText.slice(0, 800)
   };
 })()
@@ -2560,39 +2564,7 @@ async function assertNarrowViewportRoutes(cdp) {
     await assertEnglishProgressArchive(cdp);
     await clickLanguage(cdp, "fr-FR");
 
-    for (const route of [
-      {
-        path: "/drill",
-        selector: '[data-smoke="non-english-core-only-boundary"]',
-        direct: true,
-        boundary: true,
-      },
-      {
-        path: "/drill/prosody",
-        selector: '[data-smoke="non-english-core-only-boundary"]',
-        direct: true,
-        boundary: true,
-      },
-      {
-        path: "/drill/perception",
-        selector: '[data-smoke="non-english-core-only-boundary"]',
-        direct: true,
-        boundary: true,
-      },
-      { path: "/sentences", selector: '[data-smoke="sentences-page"]' },
-      {
-        path: "/assessment",
-        selector: '[data-smoke="non-english-core-only-boundary"]',
-        direct: true,
-        boundary: true,
-      },
-      {
-        path: "/progress",
-        selector: '[data-smoke="non-english-core-only-boundary"]',
-        direct: true,
-        boundary: true,
-      },
-    ]) {
+    for (const route of LABS_MAIN_ROUTES) {
       await navigate(cdp, route.path, route.selector, route);
       const result = await evaluate(
         cdp,
@@ -2600,7 +2572,6 @@ async function assertNarrowViewportRoutes(cdp) {
 (() => {
   const bodyText = document.body?.innerText ?? "";
   const routePath = ${JSON.stringify(route.path)};
-  const expectsBoundary = ${JSON.stringify(Boolean(route.boundary))};
   const sentenceCard = document.querySelector('[data-smoke="sentence-input-card"]');
   const sentenceColumn = document.querySelector('[data-smoke="free-practice-left-column"]');
   const sentenceHooksReady =
@@ -2613,29 +2584,35 @@ async function assertNarrowViewportRoutes(cdp) {
       window.getComputedStyle(sentenceCard).overflow !== "hidden" &&
       (window.innerWidth < 1024 || window.getComputedStyle(sentenceColumn).overflowY === "auto"));
   const assessmentHooksReady =
-    expectsBoundary ||
     routePath !== "/assessment" ||
     (Boolean(document.querySelector('[data-smoke="assessment-page"]')) &&
       Boolean(document.querySelector('[data-smoke="assessment-intro-card"]')) &&
       Boolean(document.querySelector('[data-smoke="assessment-start-button"]')) &&
-      Boolean(document.querySelector('[data-smoke="assessment-passage-link"]')));
+      Boolean(document.querySelector('[data-smoke="assessment-passage-link"]')) &&
+      Boolean(document.querySelector('[data-smoke="assessment-labs-boundary"]')));
   const prosodyHooksReady =
-    expectsBoundary ||
     routePath !== "/drill/prosody" ||
     (Boolean(document.querySelector('[data-smoke="prosody-page"]')) &&
-      Boolean(document.querySelector('[data-smoke="prosody-exercise-header"]')));
+      Boolean(document.querySelector('[data-smoke="prosody-experimental-blocker"]')) &&
+      !document.querySelector('[data-smoke="prosody-exercise-header"]'));
   const perceptionHooksReady =
-    expectsBoundary ||
     routePath !== "/drill/perception" ||
     (Boolean(document.querySelector('[data-smoke="perception-page"]')) &&
       Boolean(document.querySelector('[data-smoke="perception-experimental-blocker"]')));
-  const coreBoundaryReady =
-    !expectsBoundary ||
-    (Boolean(document.querySelector('[data-smoke="non-english-core-only-boundary"]')) &&
-      bodyText.includes("公开版只开放音标") &&
-      bodyText.includes("去音标练习") &&
-      bodyText.includes("去自由练习") &&
-      !bodyText.includes("实验训练"));
+  const drillHooksReady =
+    routePath !== "/drill" ||
+    (Boolean(document.querySelector('[data-smoke="drill-page"]')) &&
+      Boolean(document.querySelector('[data-smoke="drill-experimental-boundary-warning"]')));
+  const progressHooksReady =
+    routePath !== "/progress" ||
+    Boolean(document.querySelector('[data-smoke="progress-experimental-blocker"]'));
+  const requiresLabsBoundary = routePath !== "/sentences";
+  const labsBoundaryReady =
+    !document.querySelector('[data-smoke="non-english-core-only-boundary"]') &&
+    (!requiresLabsBoundary ||
+      ((bodyText.includes("Labs") || bodyText.includes("experimental")) &&
+        (bodyText.includes("不生成正式 mastery") ||
+          bodyText.includes("不显示正式英语 mastery"))));
   const visibleButtons = [...document.querySelectorAll("button,a")].filter((element) => {
     const rect = element.getBoundingClientRect();
     return rect.width > 0 && rect.height > 0;
@@ -2651,14 +2628,18 @@ async function assertNarrowViewportRoutes(cdp) {
       assessmentHooksReady &&
       prosodyHooksReady &&
       perceptionHooksReady &&
-      coreBoundaryReady &&
+      drillHooksReady &&
+      progressHooksReady &&
+      labsBoundaryReady &&
       buttonTextReadable &&
       document.documentElement.scrollWidth <= window.innerWidth + 24,
     sentenceHooksReady,
     assessmentHooksReady,
     prosodyHooksReady,
     perceptionHooksReady,
-    coreBoundaryReady,
+    drillHooksReady,
+    progressHooksReady,
+    labsBoundaryReady,
     buttonTextReadable,
     scrollWidth: document.documentElement.scrollWidth,
     innerWidth: window.innerWidth,
@@ -2791,39 +2772,7 @@ async function assertLowHeightViewportRoutes(cdp) {
     await assertEnglishProgressArchive(cdp);
     await clickLanguage(cdp, "fr-FR");
 
-    for (const route of [
-      {
-        path: "/drill",
-        selector: '[data-smoke="non-english-core-only-boundary"]',
-        direct: true,
-        boundary: true,
-      },
-      {
-        path: "/drill/prosody",
-        selector: '[data-smoke="non-english-core-only-boundary"]',
-        direct: true,
-        boundary: true,
-      },
-      {
-        path: "/drill/perception",
-        selector: '[data-smoke="non-english-core-only-boundary"]',
-        direct: true,
-        boundary: true,
-      },
-      { path: "/sentences", selector: '[data-smoke="sentences-page"]' },
-      {
-        path: "/assessment",
-        selector: '[data-smoke="non-english-core-only-boundary"]',
-        direct: true,
-        boundary: true,
-      },
-      {
-        path: "/progress",
-        selector: '[data-smoke="non-english-core-only-boundary"]',
-        direct: true,
-        boundary: true,
-      },
-    ]) {
+    for (const route of LABS_MAIN_ROUTES) {
       await navigate(cdp, route.path, route.selector, route);
       const result = await evaluate(
         cdp,
@@ -2831,7 +2780,6 @@ async function assertLowHeightViewportRoutes(cdp) {
 (() => {
   const bodyText = document.body?.innerText ?? "";
   const routePath = ${JSON.stringify(route.path)};
-  const expectsBoundary = ${JSON.stringify(Boolean(route.boundary))};
   const sentenceCard = document.querySelector('[data-smoke="sentence-input-card"]');
   const sentenceColumn = document.querySelector('[data-smoke="free-practice-left-column"]');
   const sentenceHooksReady =
@@ -2844,29 +2792,35 @@ async function assertLowHeightViewportRoutes(cdp) {
       window.getComputedStyle(sentenceCard).overflow !== "hidden" &&
       (window.innerWidth < 1024 || window.getComputedStyle(sentenceColumn).overflowY === "auto"));
   const assessmentHooksReady =
-    expectsBoundary ||
     routePath !== "/assessment" ||
     (Boolean(document.querySelector('[data-smoke="assessment-page"]')) &&
       Boolean(document.querySelector('[data-smoke="assessment-intro-card"]')) &&
       Boolean(document.querySelector('[data-smoke="assessment-start-button"]')) &&
-      Boolean(document.querySelector('[data-smoke="assessment-passage-link"]')));
+      Boolean(document.querySelector('[data-smoke="assessment-passage-link"]')) &&
+      Boolean(document.querySelector('[data-smoke="assessment-labs-boundary"]')));
   const prosodyHooksReady =
-    expectsBoundary ||
     routePath !== "/drill/prosody" ||
     (Boolean(document.querySelector('[data-smoke="prosody-page"]')) &&
-      Boolean(document.querySelector('[data-smoke="prosody-exercise-header"]')));
+      Boolean(document.querySelector('[data-smoke="prosody-experimental-blocker"]')) &&
+      !document.querySelector('[data-smoke="prosody-exercise-header"]'));
   const perceptionHooksReady =
-    expectsBoundary ||
     routePath !== "/drill/perception" ||
     (Boolean(document.querySelector('[data-smoke="perception-page"]')) &&
       Boolean(document.querySelector('[data-smoke="perception-experimental-blocker"]')));
-  const coreBoundaryReady =
-    !expectsBoundary ||
-    (Boolean(document.querySelector('[data-smoke="non-english-core-only-boundary"]')) &&
-      bodyText.includes("公开版只开放音标") &&
-      bodyText.includes("去音标练习") &&
-      bodyText.includes("去自由练习") &&
-      !bodyText.includes("实验训练"));
+  const drillHooksReady =
+    routePath !== "/drill" ||
+    (Boolean(document.querySelector('[data-smoke="drill-page"]')) &&
+      Boolean(document.querySelector('[data-smoke="drill-experimental-boundary-warning"]')));
+  const progressHooksReady =
+    routePath !== "/progress" ||
+    Boolean(document.querySelector('[data-smoke="progress-experimental-blocker"]'));
+  const requiresLabsBoundary = routePath !== "/sentences";
+  const labsBoundaryReady =
+    !document.querySelector('[data-smoke="non-english-core-only-boundary"]') &&
+    (!requiresLabsBoundary ||
+      ((bodyText.includes("Labs") || bodyText.includes("experimental")) &&
+        (bodyText.includes("不生成正式 mastery") ||
+          bodyText.includes("不显示正式英语 mastery"))));
   const visibleInteractive = [...document.querySelectorAll("button,a")].filter((element) => {
     const rect = element.getBoundingClientRect();
     return rect.width > 0 && rect.height > 0;
@@ -2883,14 +2837,18 @@ async function assertLowHeightViewportRoutes(cdp) {
       assessmentHooksReady &&
       prosodyHooksReady &&
       perceptionHooksReady &&
-      coreBoundaryReady &&
+      drillHooksReady &&
+      progressHooksReady &&
+      labsBoundaryReady &&
       interactiveTextReadable &&
       document.documentElement.scrollWidth <= window.innerWidth + 24,
     sentenceHooksReady,
     assessmentHooksReady,
     prosodyHooksReady,
     perceptionHooksReady,
-    coreBoundaryReady,
+    drillHooksReady,
+    progressHooksReady,
+    labsBoundaryReady,
     interactiveTextReadable,
     scrollWidth: document.documentElement.scrollWidth,
     innerWidth: window.innerWidth,

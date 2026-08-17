@@ -422,10 +422,11 @@ export default function AssessmentPage() {
             role="note"
           >
             <Badge variant="secondary" className="w-fit">
-              Labs
+              Labs · experimental
             </Badge>
             <p className="text-muted-foreground">
-              当前诊断只提供探索性的整体与词级观察；不生成与英语正式体系等价的音素诊断、证据阶段或掌握结论。
+              当前诊断只提供探索性的整体与词级观察，不生成正式
+              mastery；也不会把结果包装成与英语正式体系等价的音素证据或掌握结论。
             </p>
           </div>
         )}
