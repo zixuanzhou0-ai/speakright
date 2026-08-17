@@ -49,7 +49,7 @@ npm ci
 npm run desktop:dev
 ```
 
-Windows 安装、源码构建和 Release EXE 验收边界见 [`docs/INSTALLATION.md`](docs/INSTALLATION.md)。`v1.1.0-desktop-preview.1` 是有意保持未签名的社区预览版：本轮只公开裸 Release EXE 与已通过“安装、启动、退出、卸载”往返验收的 NSIS 安装包；MSI 可保留为本地构建和元数据冒烟输入，但不进入公开 Release。只有在校验和、SBOM、验收报告和 SmartScreen 风险提示齐全时才可作为 GitHub Pre-release 发布，且不得称为 Desktop Stable。不应为了安装而绕过 SmartScreen、杀毒软件或企业安全策略。
+Windows 安装、源码构建和 Release EXE 验收边界见 [`docs/INSTALLATION.md`](docs/INSTALLATION.md)。`v1.1.0-desktop-preview.1` 是有意保持未签名的社区预览版：本轮只公开裸 Release EXE 与已通过“安装、启动、退出、卸载”往返验收的 NSIS 安装包；MSI 可保留为本地构建和元数据冒烟输入，但不进入公开 Release。本地原生验收链已经通过，GitHub 发布仍须由仓库所有者明确执行。只有在校验和、SBOM、验收报告和 SmartScreen 风险提示齐全时才可作为 GitHub Pre-release 发布，且不得称为 Desktop Stable。不应为了安装而绕过 SmartScreen、杀毒软件或企业安全策略。
 
 ## 仓库结构
 

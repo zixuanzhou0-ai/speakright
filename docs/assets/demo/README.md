@@ -12,8 +12,13 @@ live provider results.
   available before writing evidence.
 - Browser capture blocks requests to every origin other than its loopback
   static server.
-- Desktop capture blocks all `http://` and `https://` traffic through WebView2
-  DevTools.
+- Desktop capture admits only the fixed Tauri internal application origins to
+  its internal-evidence allowlist. It records normalized internal responses
+  only from `Network.responseReceived`, records external attempts separately,
+  and fails capture if any external response succeeds.
+- HTTPS and loopback provider targets are actively blocked during capture;
+  fixture CSP, native HTTP, and Rust provider guards remain independent
+  fail-closed boundaries.
 - Example score views visibly show:
   `示例数据 / Example data — not a live Azure score`.
 - The demo has no audio stream or music. English captions are burned into each
@@ -53,10 +58,11 @@ node scripts/release-evidence.contract.mjs --artifacts
 
 ## Recommended public references
 
-These references become publishable only after
-`node scripts/release-evidence.contract.mjs --artifacts` passes against the
-current source snapshot and a maintainer completes the visual review. A link
-being present in this document is not a completed-evidence claim.
+These references passed
+`node scripts/release-evidence.contract.mjs --artifacts` against source commit
+`94e5bbdf1bacfeaaabdb48709e1d7eb748aaf577` and completed maintainer visual
+review on 2026-08-17. They remain candidate evidence; this statement does not
+mean the GitHub tags or Releases already exist.
 
 - [Key Browser screenshots](../screenshots/release/v1.1.0/browser/1280x800/)
 - [390 × 844 Browser screenshots](../screenshots/release/v1.1.0/browser/390x844/)

@@ -148,7 +148,7 @@ window; see the
 ### Desktop Product Boundary
 
 - Desktop release track. The installed app loads the static Tauri bundle, not a localhost dev server.
-- Public review, source builds, and a clearly labelled unsigned Desktop Preview are supported. The v1.1.0 preview publishes only the unsigned bare EXE and round-trip-validated NSIS setup; neither may be described as Desktop Stable. A locally generated MSI is metadata-smoke input, not a public preview asset.
+- Public review, source builds, and a clearly labelled unsigned Desktop Preview are supported. The v1.1.0 preview release scope is limited to the unsigned bare EXE and round-trip-validated NSIS setup; neither may be described as Desktop Stable. A locally generated MSI is metadata-smoke input, not a public preview asset.
 - The app defaults to a `1280 x 920` launch window with `800px` minimum height.
 - API keys are configured locally in Settings and must never be committed.
 - Spanish, French, and Russian word/phrase audio is bundled under `public/audio/language-packs/` with two local voice variants per item.
@@ -157,7 +157,7 @@ window; see the
 
 ### Desktop Distribution Status
 
-There is not yet a published `v1.1.0-desktop-preview.1` download in this repository snapshot. The release candidate is intentionally unsigned; after its native acceptance gates pass, the bare Release EXE and the NSIS setup may be published as a GitHub pre-release with checksums, an SBOM, an NSIS install/start/exit/uninstall report, and an explicit SmartScreen warning. MSI is not published in this preview.
+There is not yet a published `v1.1.0-desktop-preview.1` download in this repository snapshot. The release candidate is intentionally unsigned. Its native acceptance chain has passed locally; GitHub publication remains an owner-controlled step. The bare Release EXE and the NSIS setup may be published only as a GitHub pre-release with checksums, an SBOM, an NSIS install/start/exit/uninstall report, and an explicit SmartScreen warning. MSI is not published in this preview.
 
 Users should verify the published checksum and release provenance before evaluating the preview. Do not bypass SmartScreen, antivirus, or enterprise policy on a managed device only to try an unsigned artifact; build from source or wait for a future signed Desktop Stable release instead.
 

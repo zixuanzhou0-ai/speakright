@@ -49,9 +49,11 @@ GitHub Releases already exist; publication remains an explicit maintainer step.
 - Added an English-first README with a Simplified Chinese entry, five-minute
   Browser start, versioned Browser/Desktop screenshot and 60–90 second demo
   entry points, current governance/security/privacy documents,
-  application-readiness evidence, and an explicit placeholder rather than an
-  invented user-testing metric. Release-media links remain candidate evidence
-  until their artifact contract and human visual review pass.
+  application-readiness evidence, and a bounded maintainer-reported offline
+  testing attestation without participant data or audited adoption/outcome
+  claims. Current source-bound release media passed its artifact contract and
+  maintainer visual review; tags and GitHub Releases remain explicit owner
+  steps.
 
 ## Historical releases
 

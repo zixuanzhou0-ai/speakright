@@ -1,6 +1,6 @@
 # Codex For Open Source Readiness
 
-Updated: 2026-08-16
+Updated: 2026-08-17
 
 This is a public readiness record for a possible SpeakRight application. It is not an application, an acceptance notice, an eligibility determination, or evidence that OpenAI has endorsed SpeakRight.
 
@@ -8,7 +8,7 @@ This is a public readiness record for a possible SpeakRight application. It is n
 
 The current [OpenAI Codex for Open Source page](https://developers.openai.com/community/codex-for-oss) says open-source maintainers can apply for API credits, six months of ChatGPT Pro with Codex, and conditional Codex Security access. It invites core maintainers and maintainers of widely used public projects, while also allowing projects that play an important ecosystem role to explain that role.
 
-At the 2026-08-16 review, the official page did not state a 20-person user-testing minimum or require a detailed participant-evidence package. SpeakRight therefore does not treat either condition as a release or application prerequisite.
+At the 2026-08-17 review, the official page did not state a 20-person user-testing minimum or require a detailed participant-evidence package. SpeakRight therefore does not treat either condition as a release or application prerequisite.
 
 Program details and form fields can change. A maintainer should re-open the official page and the linked program terms immediately before submitting. This repository does not restate private form fields or assume acceptance.
 
@@ -50,9 +50,9 @@ These are intended workflows, not promises of a release date, a specific volume 
 - [x] Simplified Chinese README for the target learner/contributor community
 - [x] Public license plus an explicit third-party media boundary
 - [x] Contribution guide, code of conduct, support routing, and issue templates
-- [ ] Security and privacy reporting boundaries documented; the repository
-      owner must still enable and verify GitHub private vulnerability reporting
-      (or publish another verified private contact) before release
+- [x] Security and privacy reporting boundaries documented
+- [ ] Repository owner has enabled and verified GitHub private vulnerability
+      reporting, or published another verified private contact
 - [x] Public maintainer and CODEOWNERS routing
 - [x] Documented, versioned documentation, readiness, lint, test, and build commands
 - [x] Stable-versus-experimental language boundary
@@ -60,11 +60,12 @@ These are intended workflows, not promises of a release date, a specific volume 
 - [x] Maintainer-reported offline testing documented without participant-level
       proof, personal data, invented study details, or an independently audited
       outcome claim
+- [x] Current source-bound Browser/Desktop screenshot matrices and 74-second
+      overview demo passed the artifact contract and maintainer visual review
 - [ ] Public unsigned Desktop Preview containing only the bare EXE and
       round-trip-validated NSIS setup, with an explicit SmartScreen warning,
       checksum, SBOM, and validation report
-- [ ] Public Browser Stable release, current screenshot matrices, and the
-      validated 60–90 second overview demo
+- [ ] Public Browser Stable release
 - [ ] Public `main`, release tags, repository settings, and signed-out evidence
       links verified against the final release commit
 
