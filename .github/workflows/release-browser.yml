@@ -94,10 +94,10 @@ jobs:
           RELEASE_TAG: ${{ steps.release.outputs.release_tag }}
         run: npm run check:release-version -- --edition browser --tag "$env:RELEASE_TAG"
 
-      - name: Verify real user-testing publication evidence
+      - name: Verify user-testing claim and privacy boundaries
         run: |
-          npm run user-testing:evidence:test
-          npm run user-testing:evidence:check
+          npm run user-testing:claims:test
+          npm run user-testing:claims:check
 
       - name: Verify Desktop and Browser core parity
         run: npm run check:core-parity
@@ -145,6 +145,13 @@ jobs:
         env:
           NEXT_PUBLIC_SPEAKRIGHT_TEST_FIXTURES: "0"
 
+      - name: Snapshot validated Browser production output
+        id: browser_output_snapshot
+        shell: pwsh
+        env:
+          RELEASE_COMMIT_SHA: ${{ steps.release.outputs.commit_sha }}
+        run: node scripts/browser-production-output-snapshot.mjs write --commit "$env:RELEASE_COMMIT_SHA"
+
       - name: Generate npm CycloneDX SBOMs
         run: npm run security:sbom:npm
 
@@ -154,12 +161,30 @@ jobs:
           cargo install cargo-cyclonedx --locked --version 0.5.9
           npm run security:sbom:cargo
 
+      - name: Re-run static Browser smoke after SBOM generation
+        run: npm run browser:smoke:static
+
+      - name: Re-prove fixtures are unavailable after SBOM generation
+        run: npm run e2e:browser:production-fixture-guard
+        env:
+          NEXT_PUBLIC_SPEAKRIGHT_TEST_FIXTURES: "0"
+
+      - name: Verify Browser production output is unchanged
+        shell: pwsh
+        env:
+          RELEASE_COMMIT_SHA: ${{ steps.release.outputs.commit_sha }}
+          EXPECTED_OUTPUT_TREE_SHA256: ${{ steps.browser_output_snapshot.outputs.tree_sha256 }}
+        run: node scripts/browser-production-output-snapshot.mjs verify --commit "$env:RELEASE_COMMIT_SHA" --expected-tree-sha256 "$env:EXPECTED_OUTPUT_TREE_SHA256"
+
       - name: Package Browser Stable and validation evidence
         shell: pwsh
         env:
           RELEASE_VERSION: ${{ steps.release.outputs.version }}
           RELEASE_TAG: ${{ steps.release.outputs.release_tag }}
           RELEASE_COMMIT_SHA: ${{ steps.release.outputs.commit_sha }}
+          PRODUCTION_OUTPUT_TREE_SHA256: ${{ steps.browser_output_snapshot.outputs.tree_sha256 }}
+          PRODUCTION_OUTPUT_FILE_COUNT: ${{ steps.browser_output_snapshot.outputs.file_count }}
+          PRODUCTION_OUTPUT_TOTAL_BYTES: ${{ steps.browser_output_snapshot.outputs.total_bytes }}
         run: |
           $version = $env:RELEASE_VERSION
           $outputDir = "outputs/release/browser"
@@ -178,7 +203,13 @@ jobs:
             commitSha = $env:RELEASE_COMMIT_SHA
             generatedAt = [DateTime]::UtcNow.ToString("o")
             testFixtures = $false
-            checks = @("lint", "typecheck", "unit", "core-parity", "build", "static-smoke", "e2e", "production-fixture-guard", "npm-audit", "cargo-audit", "asset-rights", "docs-links", "release-evidence", "user-testing-evidence")
+            productionOutputTree = [ordered]@{
+              schemaVersion = 1
+              sha256 = $env:PRODUCTION_OUTPUT_TREE_SHA256
+              fileCount = [int]$env:PRODUCTION_OUTPUT_FILE_COUNT
+              totalBytes = [long]$env:PRODUCTION_OUTPUT_TOTAL_BYTES
+            }
+            checks = @("lint", "typecheck", "unit", "core-parity", "build", "static-smoke", "e2e", "production-fixture-guard", "npm-audit", "cargo-audit", "asset-rights", "docs-links", "release-evidence", "user-testing-claim-safety", "production-output-snapshot", "post-sbom-static-smoke", "post-sbom-production-fixture-guard")
           } | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath (Join-Path $outputDir "SpeakRight_Browser_${version}_validation-report.json") -Encoding utf8
 
       - name: Stage Browser release assets

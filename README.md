@@ -67,7 +67,7 @@ The Windows installer/Release EXE route is documented separately in the desktop 
 | repository root / `src` / `src-tauri` | Windows Desktop app. Tauri, Rust commands, Windows packaging, and desktop release gates belong here. |
 | `docs/browser-edition` | Browser architecture, implementation plan, validation checklist, release notes, and third-party notices. |
 | `docs/oss` | Public open-source readiness, scope, and application-evidence boundaries. |
-| `docs/validation` | Validation layers, claim-to-evidence mapping, and the user-testing publication template. |
+| `docs/validation` | Validation layers, claim-to-evidence mapping, and the privacy-safe user-testing attestation. |
 | `docs/assets/screenshots/release/v1.1.0/browser` | Versioned Browser screenshot matrix and manifest. |
 | `docs/assets/screenshots/release/v1.1.0/desktop` | Versioned Desktop screenshot matrix and manifest. |
 | `docs/assets/demo` | Versioned overview video, captions, frames, and media manifest. |
@@ -277,8 +277,8 @@ npm run phonology:audio-policy:check
 ## Project Health And Evidence
 
 - [`docs/oss/README.md`](docs/oss/README.md) indexes public OSS-readiness evidence, including the Codex for Open Source readiness note.
-- [`docs/validation/README.md`](docs/validation/README.md) separates repository checks, runtime/provider validation, and consented user testing.
-- [`docs/validation/USER_TESTING_SUMMARY.md`](docs/validation/USER_TESTING_SUMMARY.md) is intentionally unpopulated until maintainers provide real anonymized aggregates. The project does not publish an unsupported user count, download count, or learning-outcome claim.
+- [`docs/validation/README.md`](docs/validation/README.md) separates repository checks, runtime/provider validation, maintainer attestation, and any future consented user study.
+- [`docs/validation/USER_TESTING_SUMMARY.md`](docs/validation/USER_TESTING_SUMMARY.md) records the maintainer's report that 20 people tested SpeakRight offline. It is explicitly not independently audited, requests no participant-level proof, and supports no active-user, task-success, retention, satisfaction, or learning-outcome claim.
 - [`CHANGELOG.md`](CHANGELOG.md), [`ROADMAP.md`](ROADMAP.md), and [`MAINTAINERS.md`](MAINTAINERS.md) document change history, planned work, and public ownership without promising dates or response-time guarantees.
 
 ## Current Limitations

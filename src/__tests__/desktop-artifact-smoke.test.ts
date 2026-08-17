@@ -40,7 +40,11 @@ describe("desktop artifact smoke wiring", () => {
     expect(buildScript).toContain('env.CARGO_BUILD_JOBS = "1"');
     expect(buildScript).toContain('process.platform === "win32"');
     expect(buildScript).toContain("tauri.cmd");
-    expect(buildScript).toContain('["build", ...process.argv.slice(2)]');
+    expect(buildScript).toContain('["build", ...argumentsForTauri]');
+    expect(buildScript).toContain("rawArguments.filter");
+    expect(buildScript).toContain(
+      "argument !== uiSmokeFlag && argument !== productionSmokeFlag",
+    );
     expect(buildScript).not.toContain("audio:parity:generate");
     expect(buildScript).not.toContain("generate-word-audio");
   });
@@ -92,7 +96,7 @@ describe("desktop artifact smoke wiring", () => {
     expect(runbook).toContain("localhost");
   });
 
-  it("runs artifact smoke after desktop build and before launching the release exe", () => {
+  it("rebuilds and checks the publishable artifact after interactive validation", () => {
     const packageJson = JSON.parse(
       readFileSync(join(projectRoot, "package.json"), "utf8"),
     ) as { scripts: Record<string, string> };
@@ -101,13 +105,20 @@ describe("desktop artifact smoke wiring", () => {
       "desktop-artifact-smoke.mjs",
     );
     const desktopValidation = packageJson.scripts["validate:desktop"];
-    expect(desktopValidation).toContain("desktop:build");
-    expect(desktopValidation).toContain("desktop:artifact-smoke");
-    expect(desktopValidation.indexOf("desktop:build")).toBeLessThan(
-      desktopValidation.indexOf("desktop:artifact-smoke"),
+    const validationSteps = desktopValidation
+      .split("&&")
+      .map((step) => step.trim().replace(/^npm run\s+/u, ""));
+    expect(
+      validationSteps.indexOf("desktop:build:production-smoke"),
+    ).toBeLessThan(validationSteps.indexOf("desktop:smoke"));
+    expect(validationSteps.indexOf("desktop:smoke")).toBeLessThan(
+      validationSteps.indexOf("desktop:build"),
     );
-    expect(desktopValidation.indexOf("desktop:artifact-smoke")).toBeLessThan(
-      desktopValidation.indexOf("desktop:smoke"),
+    expect(validationSteps.indexOf("desktop:build")).toBeLessThan(
+      validationSteps.indexOf("desktop:artifact-smoke"),
+    );
+    expect(validationSteps.indexOf("desktop:artifact-smoke")).toBeLessThan(
+      validationSteps.indexOf("desktop:installer-roundtrip"),
     );
     expect(desktopValidation).toContain("desktop:release-report");
     expect(desktopValidation).toContain("desktop:installer-smoke");

@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
+  assertNoOwnedDebugTransport,
   assertRoundtripPathPolicy,
   buildNsisInstallArgs,
   buildNsisUninstallArgs,
@@ -9,6 +10,7 @@ import {
   createSanitizedSummary,
   hasExactPassingRoundtripChecks,
   InstallerRoundtripError,
+  matchesRoundtripArtifactIdentity,
   REQUIRED_ROUNDTRIP_CHECKS,
   runInstallerRoundtrip,
 } from "../../scripts/desktop-installer-roundtrip-core.mjs";
@@ -79,6 +81,9 @@ function fakeAdapter(overrides: Record<string, unknown> = {}) {
     },
     async assertIsolatedWebViewProfile() {
       calls.push("assertIsolatedWebViewProfile");
+    },
+    async assertReleaseDebugTransportDisabled(_plan: unknown, pid: unknown) {
+      calls.push(["assertReleaseDebugTransportDisabled", pid]);
     },
     async closeAndWait(_plan: unknown, pid: unknown) {
       calls.push(["closeAndWait", pid]);
@@ -261,6 +266,7 @@ describe("desktop installer round-trip safety", () => {
       ["assertOwnedProcess", 4242],
       ["waitForWindow", 4242],
       "assertIsolatedWebViewProfile",
+      ["assertReleaseDebugTransportDisabled", 4242],
       ["closeAndWait", 4242],
       ["runUninstaller", buildNsisUninstallArgs(plan().installDir)],
       "cleanupExpectedNativeResidue",
@@ -301,14 +307,115 @@ describe("desktop installer round-trip safety", () => {
       REQUIRED_ROUNDTRIP_CHECKS.map((key) => [key, true]),
     );
     expect(hasExactPassingRoundtripChecks(complete)).toBe(true);
-    const { cleanExit: _missing, ...missing } = complete;
+    const { releaseDebugTransportDisabled: _missing, ...missing } = complete;
     expect(hasExactPassingRoundtripChecks(missing)).toBe(false);
     expect(
       hasExactPassingRoundtripChecks({ ...complete, unknownCheck: true }),
     ).toBe(false);
     expect(
-      hasExactPassingRoundtripChecks({ ...complete, cleanExit: false }),
+      hasExactPassingRoundtripChecks({
+        ...complete,
+        releaseDebugTransportDisabled: false,
+      }),
     ).toBe(false);
+  });
+
+  it("rejects debug transports only in the installed app process tree", () => {
+    const safeTree = [
+      {
+        processId: 0,
+        parentProcessId: 0,
+        name: "System Idle Process",
+        commandLine: null,
+      },
+      {
+        processId: 100,
+        parentProcessId: 1,
+        name: "speakright.exe",
+        commandLine: '"C:\\Temp\\speakright.exe"',
+      },
+      {
+        processId: 101,
+        parentProcessId: 100,
+        name: "msedgewebview2.exe",
+        commandLine: '"C:\\WebView2\\msedgewebview2.exe" --type=browser',
+      },
+      {
+        processId: 999,
+        parentProcessId: 1,
+        name: "msedgewebview2.exe",
+        commandLine:
+          '"C:\\Other\\msedgewebview2.exe" --remote-debugging-port=9222',
+      },
+    ];
+
+    expect(() =>
+      assertNoOwnedDebugTransport({
+        processes: safeTree,
+        rootPid: 100,
+        devToolsActivePortPresent: false,
+      }),
+    ).not.toThrow();
+    expect(() =>
+      assertNoOwnedDebugTransport({
+        processes: safeTree.map((process) =>
+          process.processId === 101
+            ? {
+                ...process,
+                commandLine: `${process.commandLine} --remote-debugging-port=19337`,
+              }
+            : process,
+        ),
+        rootPid: 100,
+        devToolsActivePortPresent: false,
+      }),
+    ).toThrowError(/remote debugging transport/);
+    expect(() =>
+      assertNoOwnedDebugTransport({
+        processes: safeTree.map((process) =>
+          process.processId === 101
+            ? {
+                ...process,
+                commandLine: `${process.commandLine} "--remote-debugging-port=19337"`,
+              }
+            : process,
+        ),
+        rootPid: 100,
+        devToolsActivePortPresent: false,
+      }),
+    ).toThrowError(/remote debugging transport/);
+    expect(() =>
+      assertNoOwnedDebugTransport({
+        processes: safeTree.map((process) =>
+          process.processId === 101
+            ? {
+                ...process,
+                commandLine: `${process.commandLine} --remote-debugging-pipe`,
+              }
+            : process,
+        ),
+        rootPid: 100,
+        devToolsActivePortPresent: false,
+      }),
+    ).toThrowError(/remote debugging transport/);
+    expect(() =>
+      assertNoOwnedDebugTransport({
+        processes: safeTree,
+        rootPid: 100,
+        devToolsActivePortPresent: true,
+      }),
+    ).toThrowError(/remote debugging transport/);
+    expect(() =>
+      assertNoOwnedDebugTransport({
+        processes: safeTree.map((process) =>
+          process.processId === 101
+            ? { ...process, commandLine: null }
+            : process,
+        ),
+        rootPid: 100,
+        devToolsActivePortPresent: false,
+      }),
+    ).toThrowError(/command line could not be inspected/);
   });
 
   it("only asks the adapter to terminate the tracked child and still rolls back", async () => {
@@ -362,6 +469,11 @@ describe("desktop installer round-trip safety", () => {
         bytes: 123,
         sha256: "a".repeat(64),
       },
+      releaseExecutable: {
+        fileName: join(currentPlan.tempRoot, "speakright.exe"),
+        bytes: 456,
+        sha256: "b".repeat(64),
+      },
       outcome: {
         checks: Object.fromEntries(
           REQUIRED_ROUNDTRIP_CHECKS.map((key) => [key, true]),
@@ -375,6 +487,11 @@ describe("desktop installer round-trip safety", () => {
     expect(serialized).not.toContain(currentPlan.tempRoot);
     expect(serialized).not.toMatch(/[A-Za-z]:\\Users\\/i);
     expect(summary.installer.fileName).toBe("SpeakRight_1.1.0_x64-setup.exe");
+    expect(summary.releaseExecutable).toEqual({
+      fileName: "speakright.exe",
+      bytes: 456,
+      sha256: "b".repeat(64),
+    });
 
     const failed = createSanitizedFailureSummary({
       version: "1.1.0",
@@ -388,6 +505,39 @@ describe("desktop installer round-trip safety", () => {
     expect(JSON.stringify(failed)).not.toContain("Alice");
     expect(JSON.stringify(failed)).not.toContain("sk-test-not-for-logs");
     expect(failed.failure.code).toBe("fixture-failure");
+  });
+
+  it("binds round-trip evidence to the exact published bare EXE", () => {
+    const identity = {
+      fileName: "speakright.exe",
+      bytes: 456,
+      sha256: "b".repeat(64),
+    };
+    const artifact = {
+      path: "src-tauri/target/release/speakright.exe",
+      bytes: 456,
+      sha256: "b".repeat(64),
+    };
+
+    expect(matchesRoundtripArtifactIdentity(identity, artifact)).toBe(true);
+    expect(
+      matchesRoundtripArtifactIdentity(
+        { ...identity, fileName: "" },
+        artifact,
+      ),
+    ).toBe(false);
+    expect(
+      matchesRoundtripArtifactIdentity(identity, {
+        ...artifact,
+        bytes: 457,
+      }),
+    ).toBe(false);
+    expect(
+      matchesRoundtripArtifactIdentity(identity, {
+        ...artifact,
+        sha256: "c".repeat(64),
+      }),
+    ).toBe(false);
   });
 
   it("wires the real round-trip before report generation and preview gating", () => {
@@ -423,6 +573,7 @@ describe("desktop installer round-trip safety", () => {
     expect(report).toContain("installerRoundtrip");
     expect(report).toContain("does not match the current NSIS artifact");
     expect(report).toContain("hasExactPassingRoundtripChecks");
+    expect(report).toContain("matchesRoundtripArtifactIdentity");
 
     const previewGate = readFileSync(
       join(root, "scripts/desktop-preview-release-gate.mjs"),
@@ -451,6 +602,13 @@ describe("desktop installer round-trip safety", () => {
     expect(script).toContain('reviewedTauriCliVersion = "2.10.1"');
     expect(script).toContain("WriteUninstaller");
     expect(script).toContain("assertOwnedProcess(plan, pid)");
+    expect(script).toContain("ParentProcessId");
+    expect(script).toContain("DevToolsActivePort");
+    expect(script).toContain(
+      "delete isolatedEnvironment.WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS",
+    );
+    expect(core).toContain("releaseDebugTransportDisabled");
+    expect(core).toContain("remote-debugging-");
     expect(script).toContain("ExecutablePath");
     expect(script).toContain(
       "assertCleanPreflight(await inspectSystemState(plan))",

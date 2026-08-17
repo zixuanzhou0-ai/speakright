@@ -460,25 +460,23 @@ describe("open-source readiness files", () => {
     );
   });
 
-  it("keeps the approved real-user evidence thresholds explicit", () => {
+  it("keeps the maintainer-attested user-testing claim narrow and privacy-safe", () => {
     const summary = read("docs/validation/USER_TESTING_SUMMARY.md");
 
     expect(summary).toContain(
-      "Consented adult Chinese-speaking learners (age 18+)",
+      "The SpeakRight maintainer reports that 20 people tested SpeakRight offline.",
+    );
+    expect(summary).toContain("not an independently audited study result");
+    expect(summary).toContain(
+      "No participant names, raw recordings, contact details",
     );
     expect(summary).toContain(
-      "Device and microphone environment categories, with a count for each",
+      "No private source-evidence path or participant-level proof is required",
     );
-    expect(summary).toContain("Independent review 1");
-    expect(summary).toContain("Independent review 2");
-    expect(summary).toContain(
-      "At least 20 consented adult Chinese-speaking learners",
-    );
-    expect(summary).toContain(
-      "At least three distinct device or microphone environment categories",
-    );
-    expect(summary).toContain("Two independent reviews are documented");
-    expect(summary).toContain("application-readiness gate remains open");
+    expect(summary).toContain("optional, not a prerequisite");
+    expect(summary).not.toContain("Participants invited");
+    expect(summary).not.toContain("Independent review 1");
+    expect(summary).not.toContain("application-readiness gate remains open");
   });
 
   it("keeps public developer and release npm scripts explicit and zero-generation by default", () => {
@@ -509,6 +507,8 @@ describe("open-source readiness files", () => {
       "validate:public-release",
       "check:release-version",
       "release:evidence:check",
+      "user-testing:claims:check",
+      "user-testing:claims:test",
       "security:audit:npm",
       "security:sbom:cargo",
     ]) {
@@ -525,6 +525,10 @@ describe("open-source readiness files", () => {
     expect(scripts["audio:loudness:dry-run"]).toContain("--dry-run");
     expect(scripts["validate:public-release"]).toContain("validate:release");
     expect(scripts["validate:release"]).toContain("validate:desktop-preview");
+    expect(scripts["validate:release"]).toContain("user-testing:claims:check");
+    expect(scripts["validate:release"]).not.toContain(
+      "user-testing:evidence:check",
+    );
     expect(scripts["validate:signed-desktop-release"]).toContain(
       "desktop:release-gate",
     );

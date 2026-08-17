@@ -93,10 +93,10 @@ jobs:
           RELEASE_TAG: ${{ steps.release.outputs.release_tag }}
         run: npm run check:release-version -- --edition desktop --tag "$env:RELEASE_TAG"
 
-      - name: Verify real user-testing publication evidence
+      - name: Verify user-testing claim and privacy boundaries
         run: |
-          npm run user-testing:evidence:test
-          npm run user-testing:evidence:check
+          npm run user-testing:claims:test
+          npm run user-testing:claims:check
 
       - name: Verify Desktop and Browser core parity
         run: npm run check:core-parity
@@ -145,15 +145,22 @@ jobs:
         env:
           RELEASE_VERSION: ${{ steps.release.outputs.version }}
         run: |
+          npm run desktop:preview-release-gate
+          if ($LASTEXITCODE -ne 0) {
+            throw "Final Desktop Preview gate failed before staging."
+          }
           $stage = "outputs/release/staging"
           if (Test-Path -LiteralPath $stage) {
             Remove-Item -LiteralPath $stage -Recurse -Force
           }
           New-Item -ItemType Directory -Path $stage -Force | Out-Null
-          Copy-Item -LiteralPath src-tauri/target/release/speakright.exe -Destination $stage
+          $releaseExecutable = "src-tauri/target/release/speakright.exe"
           $releaseReport = "src-tauri/target/release/bundle/SpeakRight_$($env:RELEASE_VERSION)_release-report.json"
           $roundtripReport = "src-tauri/target/release/bundle/SpeakRight_$($env:RELEASE_VERSION)_installer-roundtrip.json"
           $nsisInstaller = "src-tauri/target/release/bundle/nsis/SpeakRight_$($env:RELEASE_VERSION)_x64-setup.exe"
+          $validatedReleaseReportHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $releaseReport).Hash.ToLower()
+          $report = Get-Content -LiteralPath $releaseReport -Raw | ConvertFrom-Json
+          Copy-Item -LiteralPath $releaseExecutable -Destination $stage
           Copy-Item -LiteralPath $releaseReport -Destination $stage
           Copy-Item -LiteralPath $roundtripReport -Destination $stage
           Copy-Item -LiteralPath $nsisInstaller -Destination $stage
@@ -166,7 +173,30 @@ jobs:
           Copy-Item -LiteralPath docs/assets/asset-rights-registry.json -Destination (Join-Path $stage "SpeakRight_v1.1.0_asset-rights-registry.json")
           Copy-Item -LiteralPath docs/validation/V1.1.0_RELEASE_CANDIDATE.md -Destination (Join-Path $stage "SpeakRight_v1.1.0_release-validation.md")
           Copy-Item -LiteralPath docs/validation/USER_TESTING_SUMMARY.md -Destination (Join-Path $stage "SpeakRight_v1.1.0_user-testing-summary.md")
-          $checksumLines = Get-ChildItem -LiteralPath $stage -File | ForEach-Object {
+          if ((Get-FileHash -Algorithm SHA256 -LiteralPath $releaseReport).Hash.ToLower() -ne $validatedReleaseReportHash) {
+            throw "Desktop release report changed after the final gate."
+          }
+          foreach ($artifactType in @("exe", "nsis")) {
+            $reported = @($report.artifacts | Where-Object { $_.type -eq $artifactType })
+            if ($reported.Count -ne 1) {
+              throw "Desktop release report must contain exactly one $artifactType artifact."
+            }
+            $stagedArtifact = Join-Path $stage ([IO.Path]::GetFileName([string]$reported[0].path))
+            if (-not (Test-Path -LiteralPath $stagedArtifact -PathType Leaf)) {
+              throw "Staged $artifactType artifact is missing."
+            }
+            $stagedInfo = Get-Item -LiteralPath $stagedArtifact
+            $stagedHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $stagedArtifact).Hash.ToLower()
+            if ($stagedInfo.Length -ne [long]$reported[0].bytes -or $stagedHash -ne [string]$reported[0].sha256) {
+              throw "Staged $artifactType artifact does not match the final release report."
+            }
+          }
+          $stagedRoundtripReport = Join-Path $stage ([IO.Path]::GetFileName($roundtripReport))
+          $stagedRoundtripHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $stagedRoundtripReport).Hash.ToLower()
+          if ($stagedRoundtripHash -ne [string]$report.installerRoundtrip.sha256) {
+            throw "Staged installer round-trip evidence does not match the final release report."
+          }
+          $checksumLines = Get-ChildItem -LiteralPath $stage -File | Sort-Object Name | ForEach-Object {
             $hash = Get-FileHash -Algorithm SHA256 -LiteralPath $_.FullName
             "$($hash.Hash.ToLower())  $($_.Name)"
           }

@@ -17,6 +17,7 @@ import path from "node:path";
 import { promisify } from "node:util";
 import {
   assertCleanPreflight,
+  assertNoOwnedDebugTransport,
   assertRoundtripPathPolicy,
   buildNsisUninstallArgs,
   createSanitizedFailureSummary,
@@ -299,6 +300,25 @@ async function getProcessState(pid) {
   return JSON.parse(output);
 }
 
+function processTreeScript() {
+  return `
+$ErrorActionPreference = "Stop"
+$records = @(Get-CimInstance Win32_Process -ErrorAction Stop | Where-Object { $_.ProcessId -gt 0 } | ForEach-Object {
+  [pscustomobject]@{
+    processId = [int]$_.ProcessId
+    parentProcessId = [int]$_.ParentProcessId
+    name = [string]$_.Name
+    commandLine = if ($null -eq $_.CommandLine) { $null } else { [string]$_.CommandLine }
+  }
+})
+ConvertTo-Json -Compress -InputObject $records
+`;
+}
+
+async function getProcessTree() {
+  return asArray(JSON.parse(await runPowerShell(processTreeScript())));
+}
+
 async function assertOwnedProcess(plan, pid) {
   if (!Number.isInteger(pid) || pid <= 0) {
     fail("invalid-process", "installed app did not return a valid process ID");
@@ -500,10 +520,12 @@ function createWindowsAdapter() {
 
     async launchInstalledApp(plan) {
       await assertMarker(plan);
+      const isolatedEnvironment = { ...process.env };
+      delete isolatedEnvironment.WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS;
       const child = spawn(plan.installedExe, [], {
         cwd: plan.installDir,
         env: {
-          ...process.env,
+          ...isolatedEnvironment,
           SPEAKRIGHT_LOG_DIR: plan.logDir,
           SPEAKRIGHT_SECURE_STORE_SERVICE: `com.speakright.desktop.installer-roundtrip-${randomUUID()}`,
           SPEAKRIGHT_SETTINGS_STORE_PATH: plan.settingsStorePath,
@@ -563,6 +585,22 @@ function createWindowsAdapter() {
         "isolated-log-missing",
         "installed app did not write its isolated runtime log",
       );
+    },
+
+    async assertReleaseDebugTransportDisabled(plan, pid) {
+      await assertMarker(plan);
+      await assertOwnedProcess(plan, pid);
+      const devToolsActivePort = path.join(
+        plan.webViewProfileDir,
+        "EBWebView",
+        "DevToolsActivePort",
+      );
+      assertNoOwnedDebugTransport({
+        processes: await getProcessTree(),
+        rootPid: pid,
+        devToolsActivePortPresent:
+          (await pathKind(devToolsActivePort)) !== "missing",
+      });
     },
 
     async closeAndWait(plan, pid) {
@@ -929,9 +967,15 @@ async function main() {
       plan,
       adapter: createWindowsAdapter(),
     });
+    await assertReleaseExecutableUnchanged(plan);
     const summary = createSanitizedSummary({
       version,
       installer,
+      releaseExecutable: {
+        fileName: path.basename(plan.releaseExe),
+        bytes: plan.releaseExeBytes,
+        sha256: plan.releaseExeSha256,
+      },
       outcome,
       completedAt: new Date().toISOString(),
     });

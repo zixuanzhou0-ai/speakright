@@ -31,4 +31,4 @@ This roadmap describes direction, not a release promise. Priorities may change a
 - No date is promised for code signing, hosted service, mobile apps, or promotion of experimental languages.
 - A passing automated test, synthetic-audio provider check, GitHub star, clone, or download is not a learner-success metric.
 
-See [`docs/validation/README.md`](docs/validation/README.md) for evidence classes and [`docs/validation/USER_TESTING_SUMMARY.md`](docs/validation/USER_TESTING_SUMMARY.md) for the user-testing publication gate.
+See [`docs/validation/README.md`](docs/validation/README.md) for evidence classes and [`docs/validation/USER_TESTING_SUMMARY.md`](docs/validation/USER_TESTING_SUMMARY.md) for the privacy-safe maintainer attestation and its claim limits.

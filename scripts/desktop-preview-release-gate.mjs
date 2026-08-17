@@ -3,7 +3,11 @@ import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
-import { hasExactPassingRoundtripChecks } from "./desktop-installer-roundtrip-core.mjs";
+import {
+  hasExactPassingRoundtripChecks,
+  matchesRoundtripArtifactIdentity,
+  ROUNDTRIP_SCHEMA_VERSION,
+} from "./desktop-installer-roundtrip-core.mjs";
 import { verifyReportedArtifacts } from "./lib/desktop-preview-release-gate-core.mjs";
 
 const root = process.cwd();
@@ -81,17 +85,22 @@ async function verifyInstallerRoundtrip(report, version) {
   const nsisArtifact = report.artifacts.find(
     (artifact) => artifact.type === "nsis",
   );
+  const exeArtifact = report.artifacts.find(
+    (artifact) => artifact.type === "exe",
+  );
   if (
+    summary.schemaVersion !== ROUNDTRIP_SCHEMA_VERSION ||
     summary.status !== "passed" ||
     summary.version !== version ||
     summary.platform !== "win32" ||
     !hasExactPassingRoundtripChecks(summary.checks) ||
     summary.cleanup?.sandboxRemoved !== true ||
     summary.installer?.sha256 !== nsisArtifact?.sha256 ||
-    summary.installer?.bytes !== nsisArtifact?.bytes
+    summary.installer?.bytes !== nsisArtifact?.bytes ||
+    !matchesRoundtripArtifactIdentity(summary.releaseExecutable, exeArtifact)
   ) {
     fail(
-      "installer round-trip evidence does not match the current NSIS artifact",
+      "installer round-trip evidence does not match the current bare EXE and NSIS artifacts",
     );
   }
 }

@@ -9,7 +9,15 @@ const edition = process.argv[2];
 
 const commands = {
   browser: ["--prefix", "apps/browser", "run", "build"],
-  desktop: ["run", "desktop:build"],
+  desktop: [
+    "run",
+    "desktop:build",
+    "--",
+    "--speakright-ui-smoke-artifact",
+    "--config",
+    "src-tauri/tauri.smoke.conf.json",
+    "--no-bundle",
+  ],
 };
 
 if (!(edition in commands)) {

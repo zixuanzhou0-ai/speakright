@@ -1,6 +1,6 @@
 import { execFile, spawn } from "node:child_process";
 import { randomUUID } from "node:crypto";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import net from "node:net";
 import os from "node:os";
@@ -13,11 +13,19 @@ import {
 
 const execFileAsync = promisify(execFile);
 const root = process.cwd();
+const desktopSmokeConfigPath = path.join(
+  root,
+  "src-tauri",
+  "tauri.smoke.conf.json",
+);
 const desktopSmokeExecutableOverride =
   process.env.SPEAKRIGHT_UI_SMOKE_EXECUTABLE?.trim() || null;
-const desktopSmokeDebuggingPortOverride = Number(
-  process.env.SPEAKRIGHT_UI_SMOKE_DEBUGGING_PORT ?? 0,
-);
+const desktopSmokeConfiguredDebuggingPort =
+  process.platform === "win32" ? readConfiguredDebuggingPort() : null;
+const desktopSmokeDebuggingPortOverride = process.env
+  .SPEAKRIGHT_UI_SMOKE_DEBUGGING_PORT
+  ? Number(process.env.SPEAKRIGHT_UI_SMOKE_DEBUGGING_PORT)
+  : desktopSmokeConfiguredDebuggingPort;
 const desktopTtsOnly = process.env.SPEAKRIGHT_UI_SMOKE_TTS_ONLY?.trim() === "1";
 const desktopSmokeSecureStoreService = `com.speakright.desktop.ui-smoke-${randomUUID()}`;
 const timeoutMs = Number(process.env.SPEAKRIGHT_UI_SMOKE_TIMEOUT_MS ?? 20_000);
@@ -172,6 +180,32 @@ const phonemePracticeSidebarChecks = [
   },
 ];
 
+function readConfiguredDebuggingPort() {
+  const config = JSON.parse(readFileSync(desktopSmokeConfigPath, "utf8"));
+  const mainWindow = config.app?.windows?.find(
+    (windowConfig) => windowConfig.label === "main",
+  );
+  const browserArgs = mainWindow?.additionalBrowserArgs;
+  if (typeof browserArgs !== "string") {
+    throw new Error(
+      "Desktop UI smoke config is missing reviewed additionalBrowserArgs.",
+    );
+  }
+  const matches = [
+    ...browserArgs.matchAll(/(?:^|\s)--remote-debugging-port=(\d+)(?=\s|$)/g),
+  ];
+  if (matches.length !== 1) {
+    throw new Error(
+      "Desktop UI smoke config must declare exactly one debugging port.",
+    );
+  }
+  const port = Number(matches[0][1]);
+  if (!Number.isInteger(port) || port < 1 || port > 65_535) {
+    throw new Error("Desktop UI smoke config has an invalid debugging port.");
+  }
+  return port;
+}
+
 function executablePath() {
   if (desktopSmokeExecutableOverride) {
     return path.isAbsolute(desktopSmokeExecutableOverride)
@@ -231,15 +265,32 @@ async function createSmokeProfileRoot() {
   return profileRoot;
 }
 
-function buildSmokeEnv(debuggingPort, smokeProfileRoot) {
+async function removeSmokeProfileRoot(smokeProfileRoot) {
+  const deadline = Date.now() + 10_000;
+  let lastError = null;
+  while (Date.now() < deadline) {
+    try {
+      await rm(smokeProfileRoot, { force: true, recursive: true });
+      if (!existsSync(smokeProfileRoot)) return;
+      lastError = new Error("temporary profile still exists");
+    } catch (error) {
+      lastError = error;
+    }
+    await delay(250);
+  }
+  throw new Error(
+    `Desktop UI smoke could not remove its temporary profile: ${
+      lastError instanceof Error ? lastError.message : String(lastError)
+    }`,
+  );
+}
+
+function buildSmokeEnv(smokeProfileRoot) {
   if (process.platform !== "win32") return process.env;
-  const existingArgs = process.env.WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS ?? "";
-  const smokeArgs = [
-    `--remote-debugging-port=${debuggingPort}`,
-    "--remote-allow-origins=*",
-  ].join(" ");
+  const isolatedEnvironment = { ...process.env };
+  delete isolatedEnvironment.WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS;
   return {
-    ...process.env,
+    ...isolatedEnvironment,
     SPEAKRIGHT_LOG_DIR: path.join(smokeProfileRoot, "logs"),
     SPEAKRIGHT_SECURE_STORE_SERVICE: desktopSmokeSecureStoreService,
     SPEAKRIGHT_SETTINGS_STORE_PATH: path.join(
@@ -247,9 +298,6 @@ function buildSmokeEnv(debuggingPort, smokeProfileRoot) {
       "settings",
       "speakright-settings.json",
     ),
-    WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS: [existingArgs, smokeArgs]
-      .filter(Boolean)
-      .join(" "),
     WEBVIEW2_USER_DATA_FOLDER: path.join(smokeProfileRoot, "WebView2"),
   };
 }
@@ -3259,11 +3307,19 @@ async function smoke() {
             : 0,
         )
       : null;
+  if (
+    process.platform === "win32" &&
+    debuggingPort !== desktopSmokeConfiguredDebuggingPort
+  ) {
+    throw new Error(
+      `SPEAKRIGHT_UI_SMOKE_DEBUGGING_PORT must match the reviewed test-artifact port ${desktopSmokeConfiguredDebuggingPort}.`,
+    );
+  }
   const smokeProfileRoot =
     process.platform === "win32" ? await createSmokeProfileRoot() : null;
   const child = spawn(exe, [], {
     detached: false,
-    env: buildSmokeEnv(debuggingPort, smokeProfileRoot),
+    env: buildSmokeEnv(smokeProfileRoot),
     stdio: "ignore",
     windowsHide: false,
   });
@@ -3404,9 +3460,7 @@ async function smoke() {
     }
     await stopProcess(child);
     if (smokeProfileRoot) {
-      await rm(smokeProfileRoot, { force: true, recursive: true }).catch(
-        () => {},
-      );
+      await removeSmokeProfileRoot(smokeProfileRoot);
     }
   }
 }

@@ -1,6 +1,6 @@
 import path from "node:path";
 
-export const ROUNDTRIP_SCHEMA_VERSION = 1;
+export const ROUNDTRIP_SCHEMA_VERSION = 2;
 export const REQUIRED_ROUNDTRIP_CHECKS = Object.freeze([
   "preflightClean",
   "targetWasEmpty",
@@ -9,6 +9,7 @@ export const REQUIRED_ROUNDTRIP_CHECKS = Object.freeze([
   "shortcutsOwned",
   "windowObserved",
   "isolatedWebViewProfile",
+  "releaseDebugTransportDisabled",
   "cleanExit",
   "nativeUninstallerCompleted",
   "installDirectoryRemoved",
@@ -176,6 +177,104 @@ export function assertNoResiduals(state) {
   }
 }
 
+export function assertNoOwnedDebugTransport({
+  processes,
+  rootPid,
+  devToolsActivePortPresent,
+}) {
+  if (!Array.isArray(processes) || !Number.isInteger(rootPid) || rootPid <= 0) {
+    fail(
+      "debug-transport-inspection",
+      "owned process-tree inspection is unavailable",
+    );
+  }
+  if (typeof devToolsActivePortPresent !== "boolean") {
+    fail(
+      "debug-transport-inspection",
+      "DevToolsActivePort inspection did not return a boolean",
+    );
+  }
+
+  const records = new Map();
+  for (const process of processes) {
+    const processId = Number(process?.processId);
+    const parentProcessId = Number(process?.parentProcessId);
+    if (processId === 0) continue;
+    if (
+      !Number.isInteger(processId) ||
+      processId <= 0 ||
+      !Number.isInteger(parentProcessId) ||
+      parentProcessId < 0 ||
+      records.has(processId)
+    ) {
+      fail(
+        "debug-transport-inspection",
+        "process-tree inspection returned an invalid or duplicate process",
+      );
+    }
+    records.set(processId, {
+      processId,
+      parentProcessId,
+      name: String(process?.name ?? ""),
+      commandLine: process?.commandLine,
+    });
+  }
+  if (!records.has(rootPid)) {
+    fail(
+      "debug-transport-inspection",
+      "installed app root process is missing from process-tree inspection",
+    );
+  }
+
+  const ownedProcessIds = new Set([rootPid]);
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const record of records.values()) {
+      if (
+        !ownedProcessIds.has(record.processId) &&
+        ownedProcessIds.has(record.parentProcessId)
+      ) {
+        ownedProcessIds.add(record.processId);
+        changed = true;
+      }
+    }
+  }
+  const ownedProcesses = [...ownedProcessIds].map((pid) => records.get(pid));
+  const webViewProcesses = ownedProcesses.filter(
+    (process) =>
+      process.name.toLocaleLowerCase("en-US") === "msedgewebview2.exe",
+  );
+  if (webViewProcesses.length === 0) {
+    fail(
+      "debug-transport-inspection",
+      "installed app did not expose an owned WebView2 process",
+    );
+  }
+  if (
+    webViewProcesses.some((process) => typeof process.commandLine !== "string")
+  ) {
+    fail(
+      "debug-transport-inspection",
+      "owned WebView2 command line could not be inspected",
+    );
+  }
+  const forbiddenArgument = /--remote-debugging-(?:port|pipe)(?:=|\s|"|$)/iu;
+  if (
+    ownedProcesses.some(
+      (process) =>
+        typeof process.commandLine === "string" &&
+        forbiddenArgument.test(process.commandLine),
+    ) ||
+    devToolsActivePortPresent
+  ) {
+    fail(
+      "release-debug-transport",
+      "publishable installed app exposed a remote debugging transport",
+    );
+  }
+}
+
 export async function runInstallerRoundtrip({
   plan,
   adapter,
@@ -233,6 +332,8 @@ export async function runInstallerRoundtrip({
     checks.windowObserved = true;
     await adapter.assertIsolatedWebViewProfile(plan);
     checks.isolatedWebViewProfile = true;
+    await adapter.assertReleaseDebugTransportDisabled(plan, launchedPid);
+    checks.releaseDebugTransportDisabled = true;
 
     const exitCode = await adapter.closeAndWait(plan, launchedPid);
     launchedPid = null;
@@ -326,9 +427,30 @@ export function hasExactPassingRoundtripChecks(checks) {
   );
 }
 
+export function matchesRoundtripArtifactIdentity(identity, artifact) {
+  return (
+    identity &&
+    typeof identity === "object" &&
+    artifact &&
+    typeof artifact === "object" &&
+    typeof identity.fileName === "string" &&
+    identity.fileName.length > 0 &&
+    path.basename(identity.fileName) === identity.fileName &&
+    identity.fileName ===
+      path.basename(artifact.path ?? artifact.fileName ?? "") &&
+    Number.isSafeInteger(identity.bytes) &&
+    identity.bytes >= 0 &&
+    identity.bytes === artifact.bytes &&
+    typeof identity.sha256 === "string" &&
+    /^[a-f0-9]{64}$/u.test(identity.sha256) &&
+    identity.sha256 === artifact.sha256
+  );
+}
+
 export function createSanitizedSummary({
   version,
   installer,
+  releaseExecutable,
   outcome,
   completedAt,
 }) {
@@ -340,6 +462,22 @@ export function createSanitizedSummary({
   }
   if (outcome?.cleanup?.sandboxRemoved !== true) {
     fail("invalid-cleanup", "round-trip sandbox cleanup is incomplete");
+  }
+  const sanitizedReleaseExecutable = {
+    fileName: path.basename(releaseExecutable?.fileName ?? ""),
+    bytes: releaseExecutable?.bytes,
+    sha256: releaseExecutable?.sha256,
+  };
+  if (
+    !matchesRoundtripArtifactIdentity(
+      sanitizedReleaseExecutable,
+      sanitizedReleaseExecutable,
+    )
+  ) {
+    fail(
+      "invalid-release-executable",
+      "round-trip summary requires a valid release executable identity",
+    );
   }
   return {
     schemaVersion: ROUNDTRIP_SCHEMA_VERSION,
@@ -353,6 +491,7 @@ export function createSanitizedSummary({
       bytes: installer.bytes,
       sha256: installer.sha256,
     },
+    releaseExecutable: sanitizedReleaseExecutable,
     checks: outcome.checks,
     cleanup: outcome.cleanup,
     durationMs: outcome.durationMs,

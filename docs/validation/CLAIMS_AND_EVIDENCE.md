@@ -16,7 +16,7 @@ This map keeps public descriptions tied to reviewable repository evidence. It is
 | Windows artifacts are currently unsigned | [`README.md`](../../README.md), [`SECURITY.md`](../../SECURITY.md), and [`docs/INSTALLATION.md`](../INSTALLATION.md) | Only the explicitly labelled community-preview channel may publish them; do not call it Desktop Stable. |
 | The project has public governance and support routes | [`CONTRIBUTING.md`](../../CONTRIBUTING.md), [`CODE_OF_CONDUCT.md`](../../CODE_OF_CONDUCT.md), [`SUPPORT.md`](../../SUPPORT.md), [`SECURITY.md`](../../SECURITY.md), and [`MAINTAINERS.md`](../../MAINTAINERS.md) | Private reports and learner data must not be redirected into public issues. |
 | Automated quality commands are available | [`package.json`](../../package.json) and [`.github/workflows`](../../.github/workflows) | Command availability or a test pass is not a user count, adoption metric, or learning outcome. |
-| Real user-testing results are not yet published | [`USER_TESTING_SUMMARY.md`](USER_TESTING_SUMMARY.md) | Keep quantitative user claims absent until real, consented, anonymized aggregates are supplied and the evidence gate passes. |
+| The maintainer reports that 20 people tested SpeakRight offline | [`USER_TESTING_SUMMARY.md`](USER_TESTING_SUMMARY.md) | This is a maintainer attestation, not an independently audited study. It does not support an active-user count, task-success rate, representative device claim, satisfaction, retention, or learning efficacy. |
 
 ## Unsupported claims at this snapshot
 
@@ -30,7 +30,7 @@ The public repository does not currently establish:
 - completion of a signed stable public Windows release
 - acceptance into the Codex for Open Source program
 
-Do not derive these from GitHub activity, automated fixtures, provider usage, local development sessions, or informal anecdotes.
+Do not derive these from the maintainer-reported offline count, GitHub activity, automated fixtures, provider usage, local development sessions, or informal anecdotes.
 
 ## Update rule
 

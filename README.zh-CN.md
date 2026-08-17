@@ -139,7 +139,7 @@ npm run desktop:preflight
 npm run desktop:ui-smoke
 ```
 
-自动化测试通过不等于真实用户采用或学习成效。证据分层和公开声明规则见 [`docs/validation/README.md`](docs/validation/README.md)。真实用户测试摘要目前只提供待填写模板，必须由维护者补充经同意、匿名化的真实聚合数据，见 [`docs/validation/USER_TESTING_SUMMARY.md`](docs/validation/USER_TESTING_SUMMARY.md)。
+自动化测试通过不等于真实用户采用或学习成效。证据分层和公开声明规则见 [`docs/validation/README.md`](docs/validation/README.md)。维护者确认已有 20 人在线下测试 SpeakRight；[`docs/validation/USER_TESTING_SUMMARY.md`](docs/validation/USER_TESTING_SUMMARY.md) 将其明确标注为未经独立审计的维护者声明，不索要参与者姓名、录音、联系方式或其他个人级证明，也不据此声称活跃用户数、完成率、满意度、留存率或学习效果。
 
 ## 隐私、安全与开源治理
 

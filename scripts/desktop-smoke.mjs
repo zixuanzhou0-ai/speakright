@@ -1,6 +1,6 @@
 import { execFile, spawn } from "node:child_process";
 import { randomUUID } from "node:crypto";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import {
   mkdir,
   mkdtemp,
@@ -21,6 +21,13 @@ import {
 const execFileAsync = promisify(execFile);
 
 const root = process.cwd();
+const desktopSmokeConfigPath = path.join(
+  root,
+  "src-tauri",
+  "tauri.smoke.conf.json",
+);
+const desktopSmokeConfiguredDebuggingPort =
+  process.platform === "win32" ? readConfiguredDebuggingPort() : null;
 const desktopSmokeExecutableOverride =
   process.env.SPEAKRIGHT_DESKTOP_SMOKE_EXECUTABLE?.trim()
     ? process.env.SPEAKRIGHT_DESKTOP_SMOKE_EXECUTABLE.trim()
@@ -29,6 +36,34 @@ const expectedTitle = "SpeakRight";
 const expectedRuntimeLogLine = "SpeakRight desktop runtime initialized";
 const timeoutMs = Number(process.env.SPEAKRIGHT_SMOKE_TIMEOUT_MS ?? 15_000);
 const desktopSmokeSecureStoreService = `com.speakright.desktop.release-smoke-${randomUUID()}`;
+
+function readConfiguredDebuggingPort() {
+  const config = JSON.parse(readFileSync(desktopSmokeConfigPath, "utf8"));
+  const mainWindow = config.app?.windows?.find(
+    (windowConfig) => windowConfig.label === "main",
+  );
+  const browserArgs = mainWindow?.additionalBrowserArgs;
+  if (typeof browserArgs !== "string") {
+    throw new Error(
+      "Desktop production-smoke config is missing reviewed additionalBrowserArgs.",
+    );
+  }
+  const matches = [
+    ...browserArgs.matchAll(/(?:^|\s)--remote-debugging-port=(\d+)(?=\s|$)/g),
+  ];
+  if (matches.length !== 1) {
+    throw new Error(
+      "Desktop production-smoke config must declare exactly one debugging port.",
+    );
+  }
+  const port = Number(matches[0][1]);
+  if (!Number.isInteger(port) || port < 1 || port > 65_535) {
+    throw new Error(
+      "Desktop production-smoke config has an invalid debugging port.",
+    );
+  }
+  return port;
+}
 
 function executablePath() {
   if (desktopSmokeExecutableOverride) {
@@ -60,11 +95,11 @@ function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function getOpenPort() {
+function getOpenPort(preferredPort) {
   return new Promise((resolve, reject) => {
     const server = net.createServer();
     server.once("error", reject);
-    server.listen(0, "127.0.0.1", () => {
+    server.listen(preferredPort, "127.0.0.1", () => {
       const address = server.address();
       server.close(() => {
         if (!address || typeof address === "string") {
@@ -87,19 +122,33 @@ async function createSmokeProfileRoot() {
   return rootDir;
 }
 
-function buildSmokeEnv(debuggingPort, smokeProfileRoot) {
+async function removeSmokeProfileRoot(smokeProfileRoot) {
+  const deadline = Date.now() + 10_000;
+  let lastError = null;
+  while (Date.now() < deadline) {
+    try {
+      await rm(smokeProfileRoot, { force: true, recursive: true });
+      if (!existsSync(smokeProfileRoot)) return;
+      lastError = new Error("temporary profile still exists");
+    } catch (error) {
+      lastError = error;
+    }
+    await delay(250);
+  }
+  throw new Error(
+    `Desktop production smoke could not remove its temporary profile: ${
+      lastError instanceof Error ? lastError.message : String(lastError)
+    }`,
+  );
+}
+
+function buildSmokeEnv(smokeProfileRoot) {
   if (process.platform !== "win32") return process.env;
-  const existingArgs = process.env.WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS ?? "";
-  const smokeArgs = [
-    `--remote-debugging-port=${debuggingPort}`,
-    "--remote-allow-origins=*",
-  ].join(" ");
+  const isolatedEnvironment = { ...process.env };
+  delete isolatedEnvironment.WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS;
   const env = {
-    ...process.env,
+    ...isolatedEnvironment,
     SPEAKRIGHT_SECURE_STORE_SERVICE: desktopSmokeSecureStoreService,
-    WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS: [existingArgs, smokeArgs]
-      .filter(Boolean)
-      .join(" "),
   };
   if (!smokeProfileRoot) return env;
   return {
@@ -1602,10 +1651,12 @@ async function smoke() {
   }
 
   const debuggingPort =
-    process.platform === "win32" ? await getOpenPort() : null;
+    process.platform === "win32"
+      ? await getOpenPort(desktopSmokeConfiguredDebuggingPort)
+      : null;
   const smokeProfileRoot =
     process.platform === "win32" ? await createSmokeProfileRoot() : null;
-  const smokeEnv = buildSmokeEnv(debuggingPort, smokeProfileRoot);
+  const smokeEnv = buildSmokeEnv(smokeProfileRoot);
   const smokeStartedAt = Date.now();
   const child = spawn(exe, [], {
     detached: false,
@@ -1666,9 +1717,7 @@ async function smoke() {
   } finally {
     await stopProcess(child);
     if (smokeProfileRoot) {
-      await rm(smokeProfileRoot, { force: true, recursive: true }).catch(
-        () => {},
-      );
+      await removeSmokeProfileRoot(smokeProfileRoot);
     }
   }
 }

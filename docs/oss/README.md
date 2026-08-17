@@ -18,7 +18,7 @@ This directory collects public, reviewable evidence about SpeakRight as an open-
 | Claims and validation | [`docs/validation/README.md`](../validation/README.md) and [`CLAIMS_AND_EVIDENCE.md`](../validation/CLAIMS_AND_EVIDENCE.md) |
 | v1.1.0 candidate gates | [`V1.1.0_RELEASE_CANDIDATE.md`](../validation/V1.1.0_RELEASE_CANDIDATE.md) |
 | Versioned screenshots and overview demo | [`docs/assets/demo/README.md`](../assets/demo/README.md) |
-| Real user-testing publication gate | [`USER_TESTING_SUMMARY.md`](../validation/USER_TESTING_SUMMARY.md) |
+| Privacy-safe user-testing attestation and claim boundary | [`USER_TESTING_SUMMARY.md`](../validation/USER_TESTING_SUMMARY.md) |
 | Codex program readiness | [`CODEX_FOR_OPEN_SOURCE_READINESS.md`](CODEX_FOR_OPEN_SOURCE_READINESS.md) |
 | GitHub publication settings | [`GITHUB_RELEASE_CHECKLIST.md`](GITHUB_RELEASE_CHECKLIST.md) |
 

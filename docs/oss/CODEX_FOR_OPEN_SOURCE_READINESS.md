@@ -8,6 +8,8 @@ This is a public readiness record for a possible SpeakRight application. It is n
 
 The current [OpenAI Codex for Open Source page](https://developers.openai.com/community/codex-for-oss) says open-source maintainers can apply for API credits, six months of ChatGPT Pro with Codex, and conditional Codex Security access. It invites core maintainers and maintainers of widely used public projects, while also allowing projects that play an important ecosystem role to explain that role.
 
+At the 2026-08-16 review, the official page did not state a 20-person user-testing minimum or require a detailed participant-evidence package. SpeakRight therefore does not treat either condition as a release or application prerequisite.
+
 Program details and form fields can change. A maintainer should re-open the official page and the linked program terms immediately before submitting. This repository does not restate private form fields or assume acceptance.
 
 ## SpeakRight public project facts
@@ -21,7 +23,7 @@ Program details and form fields can change. A maintainer should re-open the offi
 | Scoring boundary | Azure Speech supplies numeric pronunciation evidence; configured LLMs explain evidence downstream. |
 | Distribution boundary | Source builds and controlled testing are documented; Windows artifacts remain unsigned unless a later release explicitly says otherwise. |
 | Governance | Public contribution, conduct, support, maintainer, privacy, and security documents are linked from the README. |
-| User/adoption evidence | No supported public user count or outcome metric is currently available. The publication template remains pending real anonymized aggregates. |
+| User/adoption evidence | The maintainer reports that 20 people tested SpeakRight offline. This statement is not independently audited and does not establish active-user adoption, task success, retention, satisfaction, or learning efficacy. |
 | Current candidate | `v1.1.0` Browser Stable and `v1.1.0-desktop-preview.1` remain release candidates until their exact tags, gates, and public Releases exist. |
 
 The source for each product statement is mapped in [`docs/validation/CLAIMS_AND_EVIDENCE.md`](../validation/CLAIMS_AND_EVIDENCE.md).
@@ -54,8 +56,10 @@ These are intended workflows, not promises of a release date, a specific volume 
 - [x] Public maintainer and CODEOWNERS routing
 - [x] Documented, versioned documentation, readiness, lint, test, and build commands
 - [x] Stable-versus-experimental language boundary
-- [x] Claims/evidence map and a user-testing publication gate
-- [ ] Maintainer-provided real, consented, anonymized user-testing aggregates
+- [x] Claims/evidence map and a privacy-safe maintainer-attestation gate
+- [x] Maintainer-reported offline testing documented without participant-level
+      proof, personal data, invented study details, or an independently audited
+      outcome claim
 - [ ] Public unsigned Desktop Preview containing only the bare EXE and
       round-trip-validated NSIS setup, with an explicit SmartScreen warning,
       checksum, SBOM, and validation report
@@ -80,7 +84,9 @@ Keep the private draft in an ignored local location such as `outputs/private/cod
 
 1. Confirm the submitter has authority for the repository and any account named in the form.
 2. Recheck the official program page and terms.
-3. Verify every number against a dated primary source; otherwise omit it or state that no supported metric is available.
+3. Identify the source class for every number. The offline-testing count is a
+   maintainer attestation, not an independently audited metric; omit any detail
+   that was not actually supplied.
 4. Keep each form answer within the portal's current character limit.
 5. Do not include API keys, billing identifiers, private recordings, personal learner data, or confidential security findings.
 6. Run `git status --short` and `git check-ignore -v` so the private draft cannot be committed accidentally.

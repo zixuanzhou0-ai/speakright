@@ -130,6 +130,32 @@ describe("desktop release channels", () => {
     expect(validationWorkflow).not.toContain("    tags:");
     expect(releaseWorkflow).toContain('tags:\n      - "v*-desktop-preview.*"');
     expect(releaseWorkflow).toContain("npm run desktop:preview-release-gate");
+    const sbomGeneration = releaseWorkflow.indexOf(
+      "npm run security:sbom:cargo",
+    );
+    const finalPreviewGate = releaseWorkflow.lastIndexOf(
+      "npm run desktop:preview-release-gate",
+    );
+    const stagingCopy = releaseWorkflow.indexOf(
+      "Copy-Item -LiteralPath $releaseExecutable -Destination $stage",
+    );
+    const stagedIdentityCheck = releaseWorkflow.indexOf(
+      "Staged $artifactType artifact does not match the final release report.",
+    );
+    const checksumGeneration = releaseWorkflow.indexOf(
+      "$checksumLines = Get-ChildItem -LiteralPath $stage -File | Sort-Object Name",
+    );
+    expect(sbomGeneration).toBeGreaterThan(-1);
+    expect(finalPreviewGate).toBeGreaterThan(sbomGeneration);
+    expect(stagingCopy).toBeGreaterThan(finalPreviewGate);
+    expect(stagedIdentityCheck).toBeGreaterThan(stagingCopy);
+    expect(checksumGeneration).toBeGreaterThan(stagedIdentityCheck);
+    expect(releaseWorkflow).toContain(
+      "Staged $artifactType artifact does not match the final release report.",
+    );
+    expect(releaseWorkflow).toContain(
+      "Staged installer round-trip evidence does not match the final release report.",
+    );
     expect(releaseWorkflow).toContain("--prerelease");
     expect(releaseWorkflow).toContain("Unknown publisher");
     expect(releaseWorkflow).toContain(

@@ -44,7 +44,7 @@ Provider billing, logging, retention, region, model-training, and deletion behav
 
 The app can expose locally generated reports or exports when the user explicitly requests them. Review every export before sharing it. Remove API keys, bearer tokens, account identifiers, private practice text, recordings, local user-profile paths, and any other identifying details.
 
-The repository does not currently publish a supported user count or a user-testing result. Any future public testing summary must follow [`docs/validation/USER_TESTING_SUMMARY.md`](docs/validation/USER_TESTING_SUMMARY.md) and use consented, anonymized aggregates.
+The repository publishes only the narrow maintainer statement that 20 people tested SpeakRight offline. As documented in [`docs/validation/USER_TESTING_SUMMARY.md`](docs/validation/USER_TESTING_SUMMARY.md), that statement is not independently audited and includes no participant names, recordings, contact details, profile paths, task-result rates, or learning-outcome claims. Participant-level proof is not requested for release or application readiness. Any optional future aggregate publication must use real, appropriately consented, anonymized data and omit details that were not supplied.
 
 ## Retention and deletion
 

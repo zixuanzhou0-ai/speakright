@@ -4,7 +4,11 @@ import { existsSync } from "node:fs";
 import { mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { promisify } from "node:util";
-import { hasExactPassingRoundtripChecks } from "./desktop-installer-roundtrip-core.mjs";
+import {
+  hasExactPassingRoundtripChecks,
+  matchesRoundtripArtifactIdentity,
+  ROUNDTRIP_SCHEMA_VERSION,
+} from "./desktop-installer-roundtrip-core.mjs";
 
 const execFileAsync = promisify(execFile);
 
@@ -98,7 +102,7 @@ async function describeArtifact(artifact) {
   };
 }
 
-async function describeInstallerRoundtrip(version, nsisArtifact) {
+async function describeInstallerRoundtrip(version, nsisArtifact, exeArtifact) {
   const absolutePath = installerRoundtripPath(version);
   if (!existsSync(absolutePath)) {
     throw new Error(
@@ -107,7 +111,7 @@ async function describeInstallerRoundtrip(version, nsisArtifact) {
   }
   const summary = JSON.parse(await readFile(absolutePath, "utf8"));
   if (
-    summary.schemaVersion !== 1 ||
+    summary.schemaVersion !== ROUNDTRIP_SCHEMA_VERSION ||
     summary.productName !== productName ||
     summary.version !== version ||
     summary.platform !== "win32" ||
@@ -128,6 +132,13 @@ async function describeInstallerRoundtrip(version, nsisArtifact) {
       "Desktop installer round-trip report does not match the current NSIS artifact.",
     );
   }
+  if (
+    !matchesRoundtripArtifactIdentity(summary.releaseExecutable, exeArtifact)
+  ) {
+    throw new Error(
+      "Desktop installer round-trip report does not match the current release EXE artifact.",
+    );
+  }
   return {
     path: path.relative(root, absolutePath).replaceAll("\\", "/"),
     sha256: await sha256(absolutePath),
@@ -146,12 +157,17 @@ async function main() {
     ),
   );
   const nsisArtifact = artifacts.find((artifact) => artifact.type === "nsis");
+  const exeArtifact = artifacts.find((artifact) => artifact.type === "exe");
   if (!nsisArtifact) {
     throw new Error("Desktop release report is missing the NSIS artifact.");
+  }
+  if (!exeArtifact) {
+    throw new Error("Desktop release report is missing the bare EXE artifact.");
   }
   const installerRoundtrip = await describeInstallerRoundtrip(
     artifactVersion,
     nsisArtifact,
+    exeArtifact,
   );
   const report = {
     schemaVersion: 2,
