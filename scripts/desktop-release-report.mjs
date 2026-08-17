@@ -1,16 +1,13 @@
-import { execFile } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync } from "node:fs";
 import { mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { promisify } from "node:util";
 import {
   hasExactPassingRoundtripChecks,
   matchesRoundtripArtifactIdentity,
   ROUNDTRIP_SCHEMA_VERSION,
 } from "./desktop-installer-roundtrip-core.mjs";
-
-const execFileAsync = promisify(execFile);
+import { inspectAuthenticodeSignature } from "./windows-authenticode-status.mjs";
 
 const root = process.cwd();
 const productName = "SpeakRight";
@@ -56,34 +53,6 @@ async function sha256(filePath) {
   return createHash("sha256").update(buffer).digest("hex");
 }
 
-async function signatureStatus(filePath) {
-  if (process.platform !== "win32") return null;
-  const literalPath = filePath.replaceAll("'", "''");
-  const command = [
-    `$sig = Get-AuthenticodeSignature -LiteralPath '${literalPath}';`,
-    "[pscustomobject]@{",
-    "Status = [string]$sig.Status;",
-    "StatusMessage = [string]$sig.StatusMessage;",
-    "SignerCertificate = if ($sig.SignerCertificate) { $sig.SignerCertificate.Subject } else { $null }",
-    "} | ConvertTo-Json -Compress",
-  ].join(" ");
-  try {
-    const { stdout } = await execFileAsync("powershell.exe", [
-      "-NoProfile",
-      "-Command",
-      command,
-    ]);
-    return JSON.parse(stdout.trim());
-  } catch (error) {
-    return {
-      Status: "Unknown",
-      StatusMessage:
-        error instanceof Error ? error.message : "Signature inspection failed",
-      SignerCertificate: null,
-    };
-  }
-}
-
 async function describeArtifact(artifact) {
   const relativePath = artifact.path.replaceAll("\\", "/");
   const absolutePath = path.join(root, relativePath);
@@ -91,7 +60,7 @@ async function describeArtifact(artifact) {
     throw new Error(`Missing desktop release artifact: ${relativePath}`);
   }
   const info = await stat(absolutePath);
-  const signature = await signatureStatus(absolutePath);
+  const signature = await inspectAuthenticodeSignature(absolutePath);
   return {
     type: artifact.type,
     path: relativePath,

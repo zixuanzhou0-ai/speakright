@@ -10,6 +10,12 @@ import { tmpdir } from "node:os";
 import { join, relative, resolve } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { verifyReportedArtifacts } from "../../scripts/lib/desktop-preview-release-gate-core.mjs";
+import {
+  authenticodePowerShellCommand,
+  inspectAuthenticodeSignature,
+  parseAuthenticodeSignatureOutput,
+  windowsPowerShellRuntime,
+} from "../../scripts/windows-authenticode-status.mjs";
 
 const projectRoot = process.cwd();
 const temporaryRoots: string[] = [];
@@ -68,6 +74,54 @@ afterEach(() => {
 });
 
 describe("desktop release channels", () => {
+  it("isolates Authenticode inspection from incompatible inherited modules", async () => {
+    const environment = {
+      ...process.env,
+      SystemRoot: "C:\\Windows",
+      PSModulePath: "C:\\untrusted-powershell-modules",
+    };
+    expect(windowsPowerShellRuntime(environment)).toEqual({
+      executablePath:
+        "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      modulePath: "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\Modules",
+    });
+    const command = authenticodePowerShellCommand("C:\\build\\app.exe");
+    expect(command).toContain('$ErrorActionPreference = "Stop"');
+    expect(command).toContain(
+      "Import-Module Microsoft.PowerShell.Security -ErrorAction Stop",
+    );
+    expect(command).not.toContain(environment.PSModulePath);
+    expect(authenticodePowerShellCommand("C:\\build\\O'Brien.exe")).toContain(
+      "O''Brien.exe",
+    );
+    expect(
+      parseAuthenticodeSignatureOutput(
+        '{"Status":"NotSigned","SignerCertificate":null}\r\n',
+      ),
+    ).toEqual({
+      Status: "NotSigned",
+      SignerCertificate: null,
+    });
+    expect(
+      await inspectAuthenticodeSignature("not-used", { platform: "linux" }),
+    ).toBeNull();
+  });
+
+  it("rejects empty Authenticode output instead of classifying it as unsigned", async () => {
+    expect(() =>
+      parseAuthenticodeSignatureOutput(
+        '{"Status":"","SignerCertificate":null}',
+      ),
+    ).toThrow(/invalid status/);
+    expect(() =>
+      windowsPowerShellRuntime({
+        ...process.env,
+        SystemRoot: "",
+        WINDIR: "",
+      }),
+    ).toThrow(/system root/);
+  });
+
   it("keeps signed stable and unsigned preview validation separate", () => {
     const packageJson = JSON.parse(
       readFileSync(join(projectRoot, "package.json"), "utf8"),
@@ -170,6 +224,8 @@ describe("desktop release channels", () => {
       "utf8",
     );
     expect(releaseReport).not.toContain('type: "msi"');
+    expect(releaseReport).toContain("inspectAuthenticodeSignature");
+    expect(releaseReport).not.toContain("StatusMessage");
     expect(releaseReport).toContain('publishedArtifactTypes: ["exe", "nsis"]');
     expect(releaseReport).toContain('excludedArtifactTypes: ["msi"]');
   });
