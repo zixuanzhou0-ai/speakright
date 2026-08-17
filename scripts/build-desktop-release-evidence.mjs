@@ -21,6 +21,7 @@ import {
   RELEASE_EVIDENCE_VERSION,
 } from "./lib/release-evidence-fixtures.mjs";
 import {
+  DESKTOP_EVIDENCE_TEST_SUPPORT_FILES,
   releaseEvidenceGeneratorDigest,
   releaseEvidenceGeneratorGitProvenance,
   releaseEvidenceGitProvenance,
@@ -300,10 +301,7 @@ async function main() {
   ]) {
     await copyFile(path.join(root, file), path.join(workspace, file));
   }
-  for (const file of [
-    path.join("scripts", "desktop-installer-roundtrip-core.mjs"),
-    path.join("scripts", "lib", "desktop-preview-release-gate-core.mjs"),
-  ]) {
+  for (const file of DESKTOP_EVIDENCE_TEST_SUPPORT_FILES) {
     const destination = path.join(workspace, file);
     await mkdir(path.dirname(destination), { recursive: true });
     await copyFile(path.join(root, file), destination);

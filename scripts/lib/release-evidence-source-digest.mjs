@@ -25,6 +25,14 @@ export const RELEASE_EVIDENCE_GENERATOR_INPUTS = Object.freeze([
   "scripts/lib/windows-process-boundary.mjs",
 ]);
 
+export const DESKTOP_EVIDENCE_TEST_SUPPORT_FILES = Object.freeze([
+  "scripts/browser-production-output-snapshot.mjs",
+  "scripts/desktop-installer-roundtrip-core.mjs",
+  "scripts/lib/desktop-preview-release-gate-core.mjs",
+  "scripts/tauri-bundle-executable-identity.mjs",
+  "scripts/windows-authenticode-status.mjs",
+]);
+
 const EXCLUDED_DIRECTORIES = new Set([
   ".next",
   ".turbo",
@@ -50,8 +58,7 @@ const INPUTS = {
     "src",
     "src-tauri",
     "packages/core",
-    "scripts/desktop-installer-roundtrip-core.mjs",
-    "scripts/lib/desktop-preview-release-gate-core.mjs",
+    ...DESKTOP_EVIDENCE_TEST_SUPPORT_FILES,
     "next-env.d.ts",
     "next.config.ts",
     "package.json",

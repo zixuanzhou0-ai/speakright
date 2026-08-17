@@ -17,6 +17,7 @@ import {
   RELEASE_EVIDENCE_VERSION,
 } from "./lib/release-evidence-fixtures.mjs";
 import {
+  DESKTOP_EVIDENCE_TEST_SUPPORT_FILES,
   releaseEvidenceGeneratorDigest,
   releaseEvidenceGeneratorGitProvenance,
   releaseEvidenceGitProvenance,
@@ -114,6 +115,23 @@ for (const sourcePath of [
     `${sourcePath} must retain the compile-time fixture gate`,
   );
 }
+
+const desktopTestScriptImports = new Set();
+for (const sourcePath of await sourceFilesBelow(
+  path.join(root, "src", "__tests__"),
+)) {
+  const source = await readFile(sourcePath, "utf8");
+  for (const match of source.matchAll(
+    /["'](?:\.\.\/)+(scripts\/[^"']+)["']/g,
+  )) {
+    desktopTestScriptImports.add(match[1]);
+  }
+}
+assert.deepEqual(
+  [...desktopTestScriptImports].sort(),
+  [...DESKTOP_EVIDENCE_TEST_SUPPORT_FILES].sort(),
+  "Desktop evidence must copy every repository script imported by root tests",
+);
 
 for (const scriptPath of [
   "scripts/capture-browser-release-evidence.mjs",
@@ -239,6 +257,19 @@ async function pngFilesBelow(directory, prefix = "") {
       );
     } else if (entry.isFile() && entry.name.toLowerCase().endsWith(".png")) {
       files.push(relative);
+    }
+  }
+  return files.sort();
+}
+
+async function sourceFilesBelow(directory) {
+  const files = [];
+  for (const entry of await readdir(directory, { withFileTypes: true })) {
+    const absolute = path.join(directory, entry.name);
+    if (entry.isDirectory()) {
+      files.push(...(await sourceFilesBelow(absolute)));
+    } else if (entry.isFile() && /\.tsx?$/.test(entry.name)) {
+      files.push(absolute);
     }
   }
   return files.sort();
