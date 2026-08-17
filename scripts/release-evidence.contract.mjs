@@ -5,11 +5,16 @@ import { existsSync } from "node:fs";
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
-import { isExactWindowsSettingsStorePath } from "./capture-desktop-release-evidence.mjs";
+import {
+  classifyDesktopEvidenceNetworkUrl,
+  isExactWindowsSettingsStorePath,
+} from "./capture-desktop-release-evidence.mjs";
 import { releaseEvidenceAssetSet } from "./lib/release-evidence-assets.mjs";
 import {
   BROWSER_EVIDENCE_VIEWPORTS,
+  DESKTOP_EVIDENCE_APPLICATION_ORIGINS,
   DESKTOP_EVIDENCE_BROWSER_ARGUMENTS,
+  DESKTOP_EVIDENCE_INTERNAL_RESPONSE_ORIGINS,
   DESKTOP_EVIDENCE_VIEWPORTS,
   EXAMPLE_SCORE_DISCLOSURE,
   RELEASE_EVIDENCE_SHOTS,
@@ -177,6 +182,47 @@ for (const rejected of [
     `Expected the non-canonical settings identity to be rejected: ${rejected}`,
   );
 }
+
+assert.deepEqual(DESKTOP_EVIDENCE_APPLICATION_ORIGINS, [
+  "tauri://localhost",
+  "http://tauri.localhost",
+]);
+assert.deepEqual(DESKTOP_EVIDENCE_INTERNAL_RESPONSE_ORIGINS, [
+  "http://tauri.localhost",
+  "http://asset.localhost",
+  "http://ipc.localhost",
+]);
+const tauriConfig = JSON.parse(
+  await readFile(path.join(root, "src-tauri", "tauri.conf.json"), "utf8"),
+);
+assert.equal(
+  tauriConfig.app?.windows?.[0]?.useHttpsScheme ?? false,
+  false,
+  "Desktop evidence internal origins assume Tauri's default HTTP custom scheme",
+);
+for (const url of [
+  "http://tauri.localhost/phonemes/ee",
+  "http://asset.localhost/audio/demo.mp3",
+  "http://ipc.localhost/command",
+]) {
+  const classification = classifyDesktopEvidenceNetworkUrl(url);
+  assert.equal(classification?.internal, true, `${url} must be internal`);
+  assert.equal(
+    classification?.pathname,
+    new URL(url).pathname,
+    `${url} must retain its normalized path without query or fragment`,
+  );
+}
+for (const url of [
+  "https://tauri.localhost/",
+  "http://tauri.localhost.evil.example/",
+  "http://localhost:3002/",
+  "https://api.elevenlabs.io/v1/text-to-speech",
+]) {
+  const classification = classifyDesktopEvidenceNetworkUrl(url);
+  assert.equal(classification?.internal, false, `${url} must be external`);
+}
+assert.equal(classifyDesktopEvidenceNetworkUrl("not a URL"), null);
 
 function pngDimensions(buffer) {
   assert.deepEqual(
@@ -495,6 +541,65 @@ async function validateScreenshotManifest(edition, viewports) {
       "desktop Tauri HTTP guard",
     );
     assertSha256(manifest.networkGuard.rustGuardSha256, "desktop Rust guard");
+    assertRecord(manifest.networkPolicy, "desktop networkPolicy");
+    assertExactKeys(
+      manifest.networkPolicy,
+      [
+        "applicationOrigin",
+        "allowedApplicationOrigins",
+        "allowedInternalResponseOrigins",
+        "observedInternalResponses",
+        "externalResponsesRequired",
+      ],
+      "desktop networkPolicy",
+    );
+    assert.equal(
+      DESKTOP_EVIDENCE_APPLICATION_ORIGINS.includes(
+        manifest.networkPolicy.applicationOrigin,
+      ),
+      true,
+      "desktop application origin must be a reviewed Tauri origin",
+    );
+    assert.deepEqual(
+      manifest.networkPolicy.allowedApplicationOrigins,
+      DESKTOP_EVIDENCE_APPLICATION_ORIGINS,
+    );
+    assert.deepEqual(
+      manifest.networkPolicy.allowedInternalResponseOrigins,
+      DESKTOP_EVIDENCE_INTERNAL_RESPONSE_ORIGINS,
+    );
+    assert.equal(manifest.networkPolicy.externalResponsesRequired, 0);
+    assert.equal(
+      Array.isArray(manifest.networkPolicy.observedInternalResponses),
+      true,
+    );
+    assert.ok(manifest.networkPolicy.observedInternalResponses.length > 0);
+    for (const response of manifest.networkPolicy.observedInternalResponses) {
+      assertExactKeys(
+        response,
+        ["origin", "pathname", "resourceType"],
+        "desktop internal response",
+      );
+      assert.equal(
+        DESKTOP_EVIDENCE_INTERNAL_RESPONSE_ORIGINS.includes(response.origin),
+        true,
+      );
+      assert.equal(response.pathname.startsWith("/"), true);
+      assert.equal(
+        [...response.pathname].some(
+          (character) => character.charCodeAt(0) < 32,
+        ),
+        false,
+      );
+      assert.match(response.resourceType, /^[A-Za-z]+$/);
+    }
+    assert.equal(
+      manifest.networkPolicy.observedInternalResponses.some(
+        (response) => response.origin === "http://tauri.localhost",
+      ),
+      true,
+      "desktop evidence must observe the Tauri internal document origin",
+    );
     assert.deepEqual(manifest.successfulExternalOrigins, []);
     assertStringArray(
       manifest.attemptedExternalOrigins,

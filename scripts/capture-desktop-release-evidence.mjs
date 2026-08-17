@@ -15,7 +15,9 @@ import process from "node:process";
 import { pathToFileURL } from "node:url";
 import { releaseEvidenceAssetSet } from "./lib/release-evidence-assets.mjs";
 import {
+  DESKTOP_EVIDENCE_APPLICATION_ORIGINS,
   DESKTOP_EVIDENCE_BROWSER_ARGUMENTS,
+  DESKTOP_EVIDENCE_INTERNAL_RESPONSE_ORIGINS,
   DESKTOP_EVIDENCE_VIEWPORTS,
   EXAMPLE_SCORE_DISCLOSURE,
   evidenceBannerExpression,
@@ -51,6 +53,21 @@ const defaultOutputRoot = path.join(
   `v${RELEASE_EVIDENCE_VERSION}`,
   "desktop",
 );
+
+export function classifyDesktopEvidenceNetworkUrl(rawUrl) {
+  try {
+    const parsed = new URL(rawUrl);
+    const { origin, pathname } = parsed;
+    if (origin === "null") return null;
+    return {
+      internal: DESKTOP_EVIDENCE_INTERNAL_RESPONSE_ORIGINS.includes(origin),
+      origin,
+      pathname,
+    };
+  } catch {
+    return null;
+  }
+}
 
 function readArgument(name, fallback) {
   const index = process.argv.indexOf(name);
@@ -787,8 +804,10 @@ async function main() {
   const artifacts = [];
   const attemptedExternalOrigins = new Set();
   const successfulExternalOrigins = new Set();
+  const observedInternalResponses = new Set();
   let cdp = null;
   let runtimeLogInitialized = false;
+  let verifiedApplicationOrigin = null;
 
   try {
     const target = await waitForDevtoolsTarget(profileRoot, childState);
@@ -797,26 +816,34 @@ async function main() {
     await cdp.send("Page.enable");
     await cdp.send("Network.enable");
     runtimeLogInitialized = await waitForRuntimeLog(logDir);
-    const applicationOrigin = await evaluate(cdp, "window.location.origin");
-    const allowedOrigins = new Set([
-      applicationOrigin,
-      "http://asset.localhost",
-      "http://ipc.localhost",
-    ]);
-    const recordExternalOrigin = (target, event) => {
-      try {
-        const origin = new URL(event?.url ?? "").origin;
-        if (origin !== "null" && !allowedOrigins.has(origin))
-          target.add(origin);
-      } catch {
-        // Non-network URLs are outside this policy.
+    const recordExternalOrigin = (target, url) => {
+      const classification = classifyDesktopEvidenceNetworkUrl(url);
+      if (!classification) return;
+      if (!classification.internal) target.add(classification.origin);
+    };
+    const recordNetworkResponse = (url, resourceType) => {
+      const classification = classifyDesktopEvidenceNetworkUrl(url);
+      if (!classification) return;
+      if (!classification.internal) {
+        successfulExternalOrigins.add(classification.origin);
+        return;
       }
+      observedInternalResponses.add(
+        JSON.stringify({
+          origin: classification.origin,
+          pathname: classification.pathname,
+          resourceType:
+            typeof resourceType === "string" && /^[A-Za-z]+$/.test(resourceType)
+              ? resourceType
+              : "Unknown",
+        }),
+      );
     };
     cdp.on("Network.requestWillBeSent", (event) =>
-      recordExternalOrigin(attemptedExternalOrigins, event.request),
+      recordExternalOrigin(attemptedExternalOrigins, event.request?.url),
     );
     cdp.on("Network.responseReceived", (event) =>
-      recordExternalOrigin(successfulExternalOrigins, event.response),
+      recordNetworkResponse(event.response?.url, event.type),
     );
     await cdp.send("Network.setBlockedURLs", {
       urls: [
@@ -828,6 +855,14 @@ async function main() {
     });
     await setViewport(cdp, DESKTOP_EVIDENCE_VIEWPORTS[0]);
     await proveFixtureBuild(cdp);
+    verifiedApplicationOrigin = await evaluate(cdp, "window.location.origin");
+    if (
+      !DESKTOP_EVIDENCE_APPLICATION_ORIGINS.includes(verifiedApplicationOrigin)
+    ) {
+      throw new Error(
+        `Desktop evidence application origin is not a reviewed Tauri origin: ${verifiedApplicationOrigin}`,
+      );
+    }
     assertRuntimeBoundary(
       await inspectRuntimeBoundary(cdp, canonicalSettingsDirectory),
       "pre-capture verification",
@@ -946,8 +981,17 @@ async function main() {
           fileName: path.basename(executable),
           sha256: executableHash,
         },
-        networkPolicy:
-          "HTTPS and loopback provider requests blocked; isolated Tauri origins allowed; external responses must remain zero",
+        networkPolicy: {
+          applicationOrigin: verifiedApplicationOrigin,
+          allowedApplicationOrigins: [...DESKTOP_EVIDENCE_APPLICATION_ORIGINS],
+          allowedInternalResponseOrigins: [
+            ...DESKTOP_EVIDENCE_INTERNAL_RESPONSE_ORIGINS,
+          ],
+          observedInternalResponses: [...observedInternalResponses]
+            .sort()
+            .map((value) => JSON.parse(value)),
+          externalResponsesRequired: 0,
+        },
         attemptedExternalOrigins: [...attemptedExternalOrigins].sort(),
         successfulExternalOrigins: [],
         artifacts,

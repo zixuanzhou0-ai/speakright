@@ -62,6 +62,17 @@ export const DESKTOP_EVIDENCE_BROWSER_ARGUMENTS = [
   "--disable-background-networking",
 ].join(" ");
 
+export const DESKTOP_EVIDENCE_APPLICATION_ORIGINS = Object.freeze([
+  "tauri://localhost",
+  "http://tauri.localhost",
+]);
+
+export const DESKTOP_EVIDENCE_INTERNAL_RESPONSE_ORIGINS = Object.freeze([
+  "http://tauri.localhost",
+  "http://asset.localhost",
+  "http://ipc.localhost",
+]);
+
 const FIXED_TIMESTAMP = Date.UTC(2026, 7, 16, 12, 0, 0);
 
 const diagnosisReport = {
