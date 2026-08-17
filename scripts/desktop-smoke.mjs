@@ -21,6 +21,7 @@ import {
 const execFileAsync = promisify(execFile);
 
 const root = process.cwd();
+const desktopAppConfigPath = path.join(root, "src-tauri", "tauri.conf.json");
 const desktopSmokeConfigPath = path.join(
   root,
   "src-tauri",
@@ -35,7 +36,23 @@ const desktopSmokeExecutableOverride =
 const expectedTitle = "SpeakRight";
 const expectedRuntimeLogLine = "SpeakRight desktop runtime initialized";
 const timeoutMs = Number(process.env.SPEAKRIGHT_SMOKE_TIMEOUT_MS ?? 15_000);
-const desktopSmokeSecureStoreService = `com.speakright.desktop.release-smoke-${randomUUID()}`;
+const appIdentifier = readAppIdentifier();
+const desktopSmokeSecureStoreService = `${appIdentifier}.release-smoke-${randomUUID()}`;
+
+function readAppIdentifier() {
+  const config = JSON.parse(readFileSync(desktopAppConfigPath, "utf8"));
+  const identifier = config.identifier?.trim();
+  if (
+    typeof identifier !== "string" ||
+    identifier.length === 0 ||
+    !/^[a-z0-9.-]+$/iu.test(identifier)
+  ) {
+    throw new Error(
+      "Desktop app config is missing a valid application identifier.",
+    );
+  }
+  return identifier;
+}
 
 function readConfiguredDebuggingPort() {
   const config = JSON.parse(readFileSync(desktopSmokeConfigPath, "utf8"));
@@ -633,6 +650,107 @@ async function clickVisibleButtonByText(
   );
 }
 
+async function selectSettingsTab(cdp, tabId, label, expectedSelector) {
+  const deadline = Date.now() + 8_000;
+  let lastResult = null;
+  while (Date.now() < deadline) {
+    lastResult = await evaluate(
+      cdp,
+      `
+(async () => {
+  const tab = document.querySelector(${JSON.stringify(`#settings-tab-${tabId}`)});
+  const panel = document.querySelector(${JSON.stringify(`#settings-panel-${tabId}`)});
+  const target = document.querySelector(${JSON.stringify(expectedSelector)});
+  const tabStyle = tab ? window.getComputedStyle(tab) : null;
+  if (
+    !tab ||
+    tab.disabled === true ||
+    tabStyle?.display === "none" ||
+    tabStyle?.visibility === "hidden"
+  ) {
+    return {
+      ok: false,
+      reason: "tab missing, disabled, or hidden",
+      bodyText: document.body?.innerText?.slice(0, 1200) ?? ""
+    };
+  }
+  if (tab.getAttribute("aria-selected") !== "true") {
+    tab.scrollIntoView({ block: "center", inline: "center" });
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+    const tabRect = tab.getBoundingClientRect();
+    const x = tabRect.left + tabRect.width / 2;
+    const y = tabRect.top + tabRect.height / 2;
+    const hitTarget = document.elementFromPoint(x, y);
+    const hitButton = hitTarget?.closest?.("button");
+    if (tabRect.width <= 0 || tabRect.height <= 0 || hitButton !== tab) {
+      return {
+        ok: false,
+        reason: "tab center is covered or outside the viewport",
+        targetText: hitButton ? (hitButton.textContent || "").trim() : null,
+        x,
+        y,
+        bodyText: document.body?.innerText?.slice(0, 1200) ?? ""
+      };
+    }
+    return { ok: false, needsClick: true, x, y };
+  }
+  const rect = target?.getBoundingClientRect();
+  const style = target ? window.getComputedStyle(target) : null;
+  return {
+    ok:
+      tab.getAttribute("aria-selected") === "true" &&
+      panel?.hidden === false &&
+      !!target &&
+      !!rect &&
+      rect.width > 0 &&
+      rect.height > 0 &&
+      style?.display !== "none" &&
+      style?.visibility !== "hidden",
+    selected: tab?.getAttribute("aria-selected") ?? null,
+    panelHidden: panel?.hidden ?? null,
+    targetWidth: rect?.width ?? 0,
+    targetHeight: rect?.height ?? 0,
+    bodyText: document.body?.innerText?.slice(0, 1200) ?? ""
+  };
+})()
+`,
+    );
+    if (lastResult?.ok) return true;
+    if (
+      lastResult?.needsClick &&
+      Number.isFinite(lastResult.x) &&
+      Number.isFinite(lastResult.y)
+    ) {
+      await cdp.send("Input.dispatchMouseEvent", {
+        type: "mouseMoved",
+        x: lastResult.x,
+        y: lastResult.y,
+        buttons: 0,
+      });
+      await cdp.send("Input.dispatchMouseEvent", {
+        type: "mousePressed",
+        x: lastResult.x,
+        y: lastResult.y,
+        button: "left",
+        buttons: 1,
+        clickCount: 1,
+      });
+      await cdp.send("Input.dispatchMouseEvent", {
+        type: "mouseReleased",
+        x: lastResult.x,
+        y: lastResult.y,
+        button: "left",
+        buttons: 0,
+        clickCount: 1,
+      });
+    }
+    await delay(250);
+  }
+  throw new Error(
+    `Desktop settings tab "${label}" did not expose ${expectedSelector}: ${JSON.stringify(lastResult)}`,
+  );
+}
+
 async function assertProductionFixtureQueriesUnavailable(cdp) {
   const fixtureQuery =
     "/phonemes/ee?smokeScoreSummary=1&smokeAssessmentTiles=1&smokeGuidedRepeatSingleWord=1";
@@ -753,13 +871,12 @@ async function captureInteractiveEvidence(debuggingPort) {
       'window.location.assign(new URL("/settings", window.location.href).href); "navigating";',
     );
     await waitForSelector(cdp, '[data-smoke="settings-page"]');
-    await waitForSelector(cdp, '[data-smoke="data-privacy-center"]');
-    await waitForSelector(cdp, '[data-smoke="desktop-llm-policy"]');
-    await waitForSelector(
+    await selectSettingsTab(
       cdp,
-      '[data-smoke="release-status"][data-release-channel="preview"][data-signature-status="NotSigned"]',
+      "services",
+      "服务连接",
+      '[data-smoke="desktop-llm-policy"]',
     );
-    await waitForSelector(cdp, '[data-smoke="release-unsigned-warning"]');
 
     const llmPolicy = await evaluate(
       cdp,
@@ -781,6 +898,7 @@ async function captureInteractiveEvidence(debuggingPort) {
       );
     }
 
+    await selectSettingsTab(cdp, "basic", "基础设置", "#settings-panel-basic");
     const pronunciationSourcePolicy = await evaluate(
       cdp,
       `
@@ -822,6 +940,24 @@ async function captureInteractiveEvidence(debuggingPort) {
       );
     }
 
+    await selectSettingsTab(
+      cdp,
+      "labs",
+      "高级 / Labs",
+      '[data-smoke="release-status"]',
+    );
+    await waitForSelector(
+      cdp,
+      '[data-smoke="release-status"][data-release-channel="preview"][data-signature-status="NotSigned"]',
+    );
+    await waitForSelector(cdp, '[data-smoke="release-unsigned-warning"]');
+
+    await selectSettingsTab(
+      cdp,
+      "data",
+      "数据与隐私",
+      '[data-smoke="data-privacy-center"]',
+    );
     const diagnostics = await evaluate(
       cdp,
       `
@@ -926,9 +1062,9 @@ async function captureInteractiveEvidence(debuggingPort) {
         "Desktop diagnostics bundle product marker is incorrect.",
       );
     }
-    if (diagnostics.bundle?.appIdentifier !== appIdentifier) {
+    if (diagnostics.bundle?.appIdentifier !== desktopSmokeSecureStoreService) {
       throw new Error(
-        `Desktop diagnostics app identifier was ${diagnostics.bundle?.appIdentifier}, expected ${appIdentifier}.`,
+        `Desktop diagnostics app identifier was ${diagnostics.bundle?.appIdentifier}, expected the isolated smoke namespace.`,
       );
     }
     if (!diagnostics.bundle?.tailContainsStartup) {
@@ -936,12 +1072,9 @@ async function captureInteractiveEvidence(debuggingPort) {
         "Desktop diagnostics bundle did not include the runtime startup log line.",
       );
     }
-    if (
-      diagnostics.bundle?.logPath &&
-      !diagnostics.bundle.logPath.startsWith("<local-app-data>/")
-    ) {
+    if (diagnostics.bundle?.logPath !== "<redacted>/speakright.log") {
       throw new Error(
-        `Desktop diagnostics log path was not redacted: ${diagnostics.bundle.logPath}`,
+        `Desktop diagnostics isolated log path was not redacted: ${diagnostics.bundle?.logPath ?? "<missing>"}`,
       );
     }
     if (/Users[\\\\/][^\\\\/]+/i.test(diagnostics.bundle?.logPath ?? "")) {

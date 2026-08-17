@@ -229,9 +229,27 @@ describe("desktop artifact smoke wiring", () => {
     expect(smokeScript).toContain("benchmarkAudioCleared");
     expect(smokeScript).toContain("data-release-channel");
     expect(smokeScript).toContain("data-signature-status");
-    expect(smokeScript).toContain("<local-app-data>/");
+    expect(smokeScript).toContain("const appIdentifier = readAppIdentifier()");
+    expect(smokeScript).toContain("desktopAppConfigPath");
+    expect(smokeScript).toContain(
+      "diagnostics.bundle?.appIdentifier !== desktopSmokeSecureStoreService",
+    );
+    expect(smokeScript).toContain("async function selectSettingsTab");
+    expect(smokeScript).toContain('"服务连接"');
+    expect(smokeScript).toContain('"基础设置"');
+    expect(smokeScript).toContain('"高级 / Labs"');
+    expect(smokeScript).toContain('"数据与隐私"');
+    expect(smokeScript).toContain(
+      'tab.getAttribute("aria-selected") === "true"',
+    );
+    expect(smokeScript).toMatch(
+      /async function selectSettingsTab[\s\S]*?document\.elementFromPoint\(x, y\)[\s\S]*?Input\.dispatchMouseEvent/,
+    );
+    expect(smokeScript).toContain("<redacted>/speakright.log");
     expect(smokeScript).toContain("local user profile path");
-    expect(smokeScript).toContain("com.speakright.desktop");
+    expect(smokeScript).toMatch(
+      /\$\{appIdentifier\}\.release-smoke-\$\{randomUUID\(\)\}/,
+    );
     expect(smokeScript).toContain("speakright.log");
     expect(smokeScript).toContain("SpeakRight desktop runtime initialized");
   });
