@@ -341,11 +341,29 @@ test("mobile guided repeat is near-full-screen, keyboard operable and browser Ba
   await page.locator('[data-smoke="guided-repeat-trigger"]').click();
   const dialog = page.locator('[data-smoke="guided-repeat-dialog"]');
   await expect(dialog).toBeVisible();
+  await expect
+    .poll(() =>
+      dialog.evaluate((element) =>
+        element
+          .getAnimations()
+          .every((animation) => animation.playState === "finished"),
+      ),
+    )
+    .toBe(true);
   const box = await dialog.boundingBox();
   expect(box).not.toBeNull();
-  expect(box?.x ?? 99).toBeLessThanOrEqual(12);
-  expect(box?.width ?? 0).toBeGreaterThanOrEqual(368);
-  expect(box?.height ?? 0).toBeGreaterThanOrEqual(810);
+  const viewport = page.viewportSize();
+  expect(viewport).not.toBeNull();
+  const leftGap = box?.x ?? 99;
+  const topGap = box?.y ?? 99;
+  const rightGap = (viewport?.width ?? 0) - leftGap - (box?.width ?? 0);
+  const bottomGap = (viewport?.height ?? 0) - topGap - (box?.height ?? 0);
+  for (const gap of [leftGap, topGap, rightGap, bottomGap]) {
+    expect(gap).toBeGreaterThanOrEqual(0);
+    expect(gap).toBeLessThanOrEqual(12);
+  }
+  expect(box?.width ?? 0).toBeGreaterThanOrEqual((viewport?.width ?? 0) - 24);
+  expect(box?.height ?? 0).toBeGreaterThanOrEqual((viewport?.height ?? 0) - 24);
   await expect(dialog.locator('input[value="standard"]')).toBeFocused();
   await startGuidedRepeat(dialog);
   await expect(
