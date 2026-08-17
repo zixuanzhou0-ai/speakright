@@ -300,7 +300,7 @@ SpeakRight depends on careful third-party educational and provider ecosystems:
 - Seeing Speech / University of Glasgow and related phonetics references inform selected source-ledger decisions and some local articulation media.
 - EasyPronunciation and similar pronunciation resources are used as reference material or source-ledger context where noted; they are not automatically bundled or treated as a redistribution license.
 - Microsoft Fluent Emoji assets are used for English phoneme cards.
-- Azure Speech, ElevenLabs, Youdao or configured online dictionary sources, and user-configured LLM providers power optional online capabilities subject to their own terms.
+- Azure Speech, ElevenLabs, and user-configured LLM providers power optional credentialed capabilities. Youdao is the credential-free online fallback when requested English word playback has no eligible bundled recording. Each service remains subject to its own terms.
 
 See `THIRD_PARTY_NOTICES.md` and `docs/browser-edition/THIRD_PARTY_NOTICES.md` for the full media and provider boundary.
 

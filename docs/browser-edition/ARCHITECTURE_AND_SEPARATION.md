@@ -137,7 +137,8 @@ Required credits and source notes:
   bundled exact assets exist.
 - Seeing Speech / University of Glasgow and related phonetics references:
   source-ledger context where applicable.
-- Youdao and optional configured online dictionary sources: dictionary pronunciation fallback providers.
+- Youdao: credential-free online fallback when requested English word playback
+  has no eligible bundled recording.
 - Microsoft Fluent Emoji-style assets: English phoneme card images where used.
 
 The final release docs must distinguish "used as reference", "bundled locally",

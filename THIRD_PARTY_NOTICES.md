@@ -22,7 +22,6 @@ records are retained by the maintainer and are intentionally not committed.
 | University of Iowa Sounds of Speech Spanish | Spanish articulation and example clips | Bundled within the separately recorded written permission boundary. Preserve source attribution. |
 | Seeing Speech, University of Glasgow | French and Russian articulation media and extracted audio tracks | Preserve the original files and scholarly attribution. Any additional written redistribution permission is referenced privately by the registry. |
 | Maintainer-cleared lesson videos | Selected Spanish, French, and Russian teaching clips | Each bundled family is covered by the maintainer's written redistribution record. A source-platform link alone is never treated as permission. |
-| Merriam-Webster mark | Provider identification in settings | Restricted to nominative provider identification; no affiliation or endorsement is implied. |
 
 ## Exact Creative Commons derivatives
 
@@ -45,8 +44,11 @@ every listed Commons digest against the corresponding packaged audio file.
 
 ## API providers and references
 
-Azure Speech, ElevenLabs, Youdao, Merriam-Webster, Vertex AI, Hermes, and LLM
-providers are optional user-configured services governed by their own terms.
+Azure Speech, ElevenLabs, Vertex AI, Hermes, and LLM providers are optional
+user-configured services governed by their own terms. Youdao is an automatic,
+credential-free word-pronunciation fallback when a user requests playback and
+no eligible bundled English recording is available; it is also governed by its
+own terms.
 Reference pages used to check IPA or teaching content are not bundled merely
 because they are cited. A reference-only source must never match a packaged
 file in the asset-rights validator.

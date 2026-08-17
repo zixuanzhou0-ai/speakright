@@ -101,6 +101,47 @@ describe("open-source readiness files", () => {
     expect(notices).toContain("Add no third-party media");
   });
 
+  it("keeps the retired dictionary integration out of public release inputs", () => {
+    const registry = read("docs/assets/asset-rights-registry.json");
+    const retiredProviderName = ["Merriam", "Webster"].join("-");
+    const retiredProviderSlug = retiredProviderName.toLowerCase();
+    const retiredDictionaryHost = ["dictionaryapi", "com"].join(".");
+    const retiredLogoName = ["mw-logo", "svg"].join(".");
+    const retiredHookName = ["useMw", "Pronunciation"].join("");
+    const retiredChineseName = ["韦", "氏"].join("");
+    const publicStatements = [
+      read("AGENTS.md"),
+      read("NOTICE.md"),
+      read("THIRD_PARTY_NOTICES.md"),
+      read("PRIVACY.md"),
+      read("README.md"),
+      read("docs/browser-edition/ARCHITECTURE_AND_SEPARATION.md"),
+      read("docs/browser-edition/THIRD_PARTY_NOTICES.md"),
+    ].join("\n");
+
+    expect(
+      existsSync(join(projectRoot, "public/images", retiredLogoName)),
+    ).toBe(false);
+    for (const marker of [
+      `${retiredProviderSlug}-mark`,
+      retiredDictionaryHost,
+      retiredLogoName,
+    ]) {
+      expect(registry.toLowerCase()).not.toContain(marker.toLowerCase());
+    }
+    for (const marker of [
+      retiredProviderName,
+      retiredChineseName,
+      retiredDictionaryHost,
+      retiredLogoName,
+      retiredHookName,
+    ]) {
+      expect(publicStatements.toLowerCase()).not.toContain(
+        marker.toLowerCase(),
+      );
+    }
+  });
+
   it("keeps clean checkouts byte-stable across Windows and CI", () => {
     const attributes = read(".gitattributes");
 

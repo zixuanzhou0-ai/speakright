@@ -1,10 +1,10 @@
 # Privacy
 
-Last updated: 2026-08-16
+Last updated: 2026-08-17
 
-SpeakRight is a local-first, bring-your-own-key pronunciation practice project. The open-source editions documented in this repository do not include a SpeakRight-operated user account, cloud-sync, or analytics backend. Some learning features deliberately contact external providers selected and configured by the user.
+SpeakRight is a local-first, bring-your-own-key pronunciation practice project. The open-source editions documented in this repository do not include a SpeakRight-operated user account, cloud-sync, or analytics backend. Some learning features deliberately contact external providers when the user invokes a network-backed action. Credentialed routes are configured by the user; the credential-free Youdao fallback may be contacted after the user requests word playback and no eligible bundled English recording is available.
 
-This document describes the repository's current behavior. It is not a substitute for the privacy terms of Microsoft Azure, ElevenLabs, Google Cloud, xAI, a configured LLM provider, a dictionary provider, an operating system, or a browser.
+This document describes the repository's current behavior. It is not a substitute for the privacy terms of Microsoft Azure, ElevenLabs, Google Cloud, xAI, a configured LLM provider, Youdao, an operating system, or a browser.
 
 ## Data kept on the device
 
@@ -29,9 +29,9 @@ External requests occur only when a user invokes a network-backed feature or a m
 | Pronunciation assessment | Microsoft Azure Speech | target text, selected locale, and recorded audio |
 | Standard demonstration TTS | ElevenLabs, or a configured local bridge to xAI/Grok or Vertex AI Gemini TTS | text, voice/settings, and provider authentication handled by the selected route |
 | Chinese coaching feedback | the configured LLM provider | target text and structured pronunciation evidence needed to explain the result |
-| Dictionary pronunciation or lookup | the configured dictionary source | the word or lookup text |
+| Word-pronunciation fallback | Youdao, automatically after requested playback when eligible bundled English audio is unavailable | the requested word |
 
-Provider billing, logging, retention, region, model-training, and deletion behavior is controlled by that provider and the user's account configuration. SpeakRight maintainers cannot delete data from a provider account they do not control.
+Provider logging, retention, region, model-training, and deletion behavior is controlled by that provider. For account-backed services, billing and account configuration are also controlled by the provider and the user. SpeakRight maintainers cannot delete provider-side data or data in an account they do not control.
 
 ## Microphone recordings
 

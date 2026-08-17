@@ -16,7 +16,7 @@ speech-therapy, or certification tool. Numeric pronunciation scores come from
 the user's configured Azure Speech Pronunciation Assessment service. AI coach
 feedback explains that evidence and is not an independent scoring source.
 
-Microsoft Azure, ElevenLabs, Merriam-Webster, Youdao, Rachel's English,
+Microsoft Azure, ElevenLabs, Youdao, Rachel's English,
 American IPA Chart, University of Iowa, University of Glasgow, Wikimedia
 Commons, and other named products or organizations remain the property of
 their respective owners. Reference to them does not imply sponsorship,

@@ -2,7 +2,7 @@
   "$schema": "./asset-rights-registry.schema.json",
   "version": 1,
   "canonicalRoot": "public",
-  "generatedAt": "2026-08-16",
+  "generatedAt": "2026-08-17",
   "records": [
     {
       "id": "english-ipa-audio",
@@ -175,23 +175,6 @@
       "redistribution": "approved",
       "modifications": "Selected 3D PNG exports downloaded and mapped to example words.",
       "attribution": "Microsoft Fluent Emoji, MIT License.",
-      "editions": ["browser", "desktop"],
-      "reviewedAt": "2026-08-16"
-    },
-    {
-      "id": "merriam-webster-mark",
-      "path": "images/mw-logo.svg",
-      "sha256": "a2a4756bb968675b80e92d2ff3c96485453ae0a7be4ca60be4ba6cd1a7c94527",
-      "assetCount": 1,
-      "kind": "image",
-      "sourceName": "Merriam-Webster provider mark",
-      "sourceUrl": "https://www.dictionaryapi.com/",
-      "creator": "Merriam-Webster",
-      "licenseSpdx": "LicenseRef-Merriam-Webster-Provider-Mark",
-      "evidenceRef": "SR-EVIDENCE-2026-MW-MARK-001",
-      "redistribution": "restricted-bundle",
-      "modifications": "Packaged only for provider identification.",
-      "attribution": "Merriam-Webster is a trademark of its owner; no endorsement implied.",
       "editions": ["browser", "desktop"],
       "reviewedAt": "2026-08-16"
     },

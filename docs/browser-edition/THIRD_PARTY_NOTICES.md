@@ -10,13 +10,14 @@ This document applies the repository-wide media boundary in
 | Azure Speech | User-configured Pronunciation Assessment provider and the only source of numeric pronunciation scores. |
 | ElevenLabs | Optional user-configured standard-demonstration TTS provider. |
 | LLM providers | Optional Chinese coaching explanation generated from Azure evidence; not an independent scoring source. |
-| Youdao and Merriam-Webster | Optional dictionary-pronunciation sources where configured. |
+| Youdao | Dictionary-pronunciation fallback used when a bundled local word recording is unavailable. |
 | Hermes and Vertex AI local bridges | Loopback-only development/local-browser integrations. They are not a capability of a remotely hosted static build. |
 
-Users bring their own provider credentials. Browser Edition has no SpeakRight
-first-party scoring or credential service. Keys must not be committed, logged,
-placed in URLs, or included in screenshots. Each provider remains governed by
-its own service terms and privacy policy.
+Credentialed providers use credentials supplied by the user; Youdao's fallback
+does not require a key. Browser Edition has no SpeakRight first-party scoring or
+credential service. Keys must not be committed, logged, placed in URLs, or
+included in screenshots. Each provider remains governed by its own service
+terms and privacy policy.
 
 ## Generated packaged-asset mirror
 
@@ -44,10 +45,10 @@ uses the official-source fallback card instead of bundling them.
 
 Current Browser asset families include the English IPA audio, generated word
 and multilingual audio, Fluent Emoji illustrations, approved articulation and
-lesson media, the provider-identification mark, and the SpeakRight-authored
-poster described in `docs/assets/asset-rights-registry.json`. Their MIT,
-Creative Commons, provider-output, written-permission, attribution, and
-trademark boundaries remain unchanged by being copied into Browser Edition.
+lesson media, and the SpeakRight-authored poster described in
+`docs/assets/asset-rights-registry.json`. Their MIT, Creative Commons,
+provider-output, written-permission, and attribution boundaries remain
+unchanged by being copied into Browser Edition.
 
 Private authorization documents are retained by the maintainer. Public files
 contain only opaque, non-sensitive `evidenceRef` identifiers; a source URL or
