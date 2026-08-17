@@ -6,32 +6,32 @@
   "paidApiCalls": false,
   "assetSet": {
     "schemaVersion": 1,
-    "fileCount": 6590,
-    "totalBytes": 480736295,
-    "pathDigestSha256": "9676567a8125305c88210ad1597c17a272b64e06f792abab954f7fabff127e1f",
-    "pathHashDigestSha256": "b001504e759072f4411c0f44e7d1c93900b15def935c5c04bacbf5dc71bdf6d9",
-    "registrySha256": "211b7682fcfe9e93947f12e29d35e8f481699b68ac3dcbc55f6cd980bfe77aba"
+    "fileCount": 6589,
+    "totalBytes": 480736051,
+    "pathDigestSha256": "3e6debb84b1c7e3f2ceb01aa7645dc8847276f90cd590fe9a85bdcde43a448ed",
+    "pathHashDigestSha256": "628071c8db52e52ed4d89e08fa10752a8c60e3191804ef0a63b0d880fb3cf61b",
+    "registrySha256": "7865d97f5c94bd6ad309e1e78b657c82fc13c173b3803de2a991d6ea830b59b5"
   },
   "generatorSnapshot": {
     "schemaVersion": 1,
-    "sha256": "d7b0fc92cafe3449e690937a9f66e824dfc874c7e1989e44832b2d5322270047",
+    "sha256": "d437890db3f3d99df54090e27c5af16a2f3ab45cafbdaa8321c1ccc18d6e440b",
     "fileCount": 16,
-    "totalBytes": 214435
+    "totalBytes": 220817
   },
   "outputTree": {
     "schemaVersion": 1,
-    "sha256": "1eaefae8812eb535b3e8f45a0bda7fffce848712708ceeb14a8d38eab293a448",
-    "fileCount": 7652,
-    "totalBytes": 504297666
+    "sha256": "06dee4411e73ea81274b9e689c156044d91581ff39211d62fd219f853009ce46",
+    "fileCount": 7651,
+    "totalBytes": 504296604
   },
-  "sourceCommit": "eb9ed5e7ec4f4de5c7f8aa1e18fd4f36f0ecdef4",
+  "sourceCommit": "94e5bbdf1bacfeaaabdb48709e1d7eb748aaf577",
   "sourceWorktreeClean": true,
   "sourceSnapshot": {
     "schemaVersion": 1,
-    "sha256": "66143f3614361eb8c547636f50ebff9b7bd8ef838bea4edcf659a60f0edfe907",
-    "fileCount": 471
+    "sha256": "82211ea43c702527e86a2db2a002d35fbdabcadf496b2e7443b27b7b3e8a78dc",
+    "fileCount": 472
   },
-  "buildManifestSha256": "496d3437efd35d4aa2109c2a02019f09a28d983e6fa9e448cc604b0177f48f6d",
+  "buildManifestSha256": "eabd6f9be94127515eefe71c22030b6bba538500d8096637e90726082da8728b",
   "browserVersion": "151.0.4129.86",
   "blockedExternalOrigins": [],
   "artifacts": [
@@ -150,7 +150,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/1280x800/diagnosis-example.png",
       "width": 1280,
       "height": 800,
-      "sha256": "6a6dc65879d4d810cc2754167be90409ad593e3570beacf18ea41eff0c3e2103",
+      "sha256": "63860367b007b542e8b3b8986cd3c76a1113e81a92c17c8e9d863ab624258dce",
       "geometry": {
         "banner": {
           "left": 601.75,
@@ -204,7 +204,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/1280x800/settings.png",
       "width": 1280,
       "height": 800,
-      "sha256": "7867252c76f4844e471900888ee72a96c9aa4c74c43eca0d4574e5456491065b",
+      "sha256": "9221eaa768b7fb01f7d18a08f2c955dce82df5b470cf47c792542111773db184",
       "geometry": {
         "banner": {
           "left": 600.96875,
@@ -496,7 +496,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/390x844/diagnosis-example.png",
       "width": 390,
       "height": 844,
-      "sha256": "d9fe808fa121ef6ce7240cb816a6a3dddea9619dfb297ca79082fef2abc824ea",
+      "sha256": "bd109949f2a93767b3237c6a375f9bc506ac297303f0a1842d77d0c1bc0b7aee",
       "geometry": {
         "banner": {
           "left": 26.75,
