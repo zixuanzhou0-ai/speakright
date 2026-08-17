@@ -26,6 +26,7 @@ import {
   isStrictPathInside,
   runInstallerRoundtrip,
 } from "./desktop-installer-roundtrip-core.mjs";
+import { hashTauriNsisExecutableVariant } from "./tauri-bundle-executable-identity.mjs";
 
 const execFileAsync = promisify(execFile);
 const productName = "SpeakRight";
@@ -479,21 +480,36 @@ function createWindowsAdapter() {
     async verifyInstalled(plan) {
       await assertMarker(plan);
       await assertReleaseExecutableUnchanged(plan);
-      let payload =
-        (await pathKind(plan.installedExe)) === "file" &&
-        (await pathKind(plan.uninstallerPath)) === "file";
-      if (payload) {
+      const payloadChecks = {
+        installedExeFile: (await pathKind(plan.installedExe)) === "file",
+        uninstallerFile: (await pathKind(plan.uninstallerPath)) === "file",
+        directInstallChild: false,
+        bytesMatch: false,
+        nsisVariantSha256Match: false,
+      };
+      if (payloadChecks.installedExeFile) {
         const [resolvedInstallDir, resolvedInstalledExe, installedInfo] =
           await Promise.all([
             realpath(plan.installDir),
             realpath(plan.installedExe),
             stat(plan.installedExe),
           ]);
-        payload =
+        payloadChecks.directInstallChild =
           path.dirname(resolvedInstalledExe).toLocaleLowerCase("en-US") ===
-            resolvedInstallDir.toLocaleLowerCase("en-US") &&
-          installedInfo.size === plan.releaseExeBytes &&
-          (await sha256(resolvedInstalledExe)) === plan.releaseExeSha256;
+          resolvedInstallDir.toLocaleLowerCase("en-US");
+        payloadChecks.bytesMatch = installedInfo.size === plan.releaseExeBytes;
+        payloadChecks.nsisVariantSha256Match =
+          (await sha256(resolvedInstalledExe)) === plan.expectedNsisExeSha256;
+      }
+      const failedPayloadChecks = Object.entries(payloadChecks)
+        .filter(([, passed]) => !passed)
+        .map(([name]) => name)
+        .sort();
+      if (failedPayloadChecks.length > 0) {
+        fail(
+          "installed-payload-mismatch",
+          `installed payload checks failed: ${failedPayloadChecks.join(", ")}`,
+        );
       }
       const state = await inspectSystemState(plan);
       const registration = state.registrations.some(
@@ -515,7 +531,11 @@ function createWindowsAdapter() {
         ownedShortcuts.length === state.shortcuts.length &&
         shortcutKinds.has("desktop") &&
         shortcutKinds.has("start-menu");
-      return { payload, registration: registration && productKey, shortcuts };
+      return {
+        payload: true,
+        registration: registration && productKey,
+        shortcuts,
+      };
     },
 
     async launchInstalledApp(plan) {
@@ -865,7 +885,8 @@ async function buildPlan(root, version) {
       "release executable escaped its expected release directory",
     );
   }
-  const releaseExeInfo = await stat(resolvedReleaseExe);
+  const releaseExeIdentity =
+    await hashTauriNsisExecutableVariant(resolvedReleaseExe);
   const plan = {
     runId,
     tempRoot,
@@ -879,8 +900,9 @@ async function buildPlan(root, version) {
     markerPath: path.join(sandboxRoot, markerName),
     installerPath: resolvedInstaller,
     releaseExe: resolvedReleaseExe,
-    releaseExeBytes: releaseExeInfo.size,
-    releaseExeSha256: await sha256(resolvedReleaseExe),
+    releaseExeBytes: releaseExeIdentity.bytes,
+    releaseExeSha256: releaseExeIdentity.releaseSha256,
+    expectedNsisExeSha256: releaseExeIdentity.expectedNsisSha256,
     installedExe: path.join(installDir, mainBinaryName),
     uninstallerPath: path.join(installDir, uninstallerName),
   };

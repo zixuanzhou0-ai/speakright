@@ -319,10 +319,14 @@ export async function runInstallerRoundtrip({
     checks.installedPayloadVerified = installed.payload === true;
     checks.registrationOwned = installed.registration === true;
     checks.shortcutsOwned = installed.shortcuts === true;
-    if (!Object.values(installed).every((value) => value === true)) {
+    const failedInstalledChecks = Object.entries(installed)
+      .filter(([, value]) => value !== true)
+      .map(([key]) => key)
+      .sort();
+    if (failedInstalledChecks.length > 0) {
       fail(
         "install-verification",
-        "installed payload ownership checks did not all pass",
+        `installed payload ownership checks did not all pass: ${failedInstalledChecks.join(", ")}`,
       );
     }
 

@@ -1,4 +1,6 @@
-import { readFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
@@ -14,6 +16,11 @@ import {
   REQUIRED_ROUNDTRIP_CHECKS,
   runInstallerRoundtrip,
 } from "../../scripts/desktop-installer-roundtrip-core.mjs";
+import {
+  hashTauriNsisExecutableVariant,
+  TAURI_NSIS_BUNDLE_MARKER,
+  TAURI_UNKNOWN_BUNDLE_MARKER,
+} from "../../scripts/tauri-bundle-executable-identity.mjs";
 
 const root = process.cwd();
 
@@ -122,6 +129,67 @@ function fakeAdapter(overrides: Record<string, unknown> = {}) {
 }
 
 describe("desktop installer round-trip safety", () => {
+  it("binds an NSIS payload to the reviewed Tauri bundle-marker patch", async () => {
+    const directory = mkdtempSync(join(tmpdir(), "speakright-bundle-marker-"));
+    const executablePath = join(directory, "speakright.exe");
+    try {
+      const releaseBytes = Buffer.from(
+        `prefix:${TAURI_NSIS_BUNDLE_MARKER}:branch:${TAURI_UNKNOWN_BUNDLE_MARKER}:suffix`,
+        "ascii",
+      );
+      const expectedNsisBytes = Buffer.from(
+        releaseBytes
+          .toString("ascii")
+          .replace(TAURI_UNKNOWN_BUNDLE_MARKER, TAURI_NSIS_BUNDLE_MARKER),
+        "ascii",
+      );
+      writeFileSync(executablePath, releaseBytes);
+
+      const identity = await hashTauriNsisExecutableVariant(executablePath, {
+        highWaterMark: 7,
+      });
+
+      expect(identity).toEqual({
+        bytes: releaseBytes.length,
+        markerOffset: releaseBytes.indexOf(TAURI_UNKNOWN_BUNDLE_MARKER),
+        releaseSha256: createHash("sha256").update(releaseBytes).digest("hex"),
+        expectedNsisSha256: createHash("sha256")
+          .update(expectedNsisBytes)
+          .digest("hex"),
+      });
+
+      const alteredNsisBytes = Buffer.from(expectedNsisBytes);
+      alteredNsisBytes[0] ^= 0xff;
+      expect(
+        createHash("sha256").update(alteredNsisBytes).digest("hex"),
+      ).not.toBe(identity.expectedNsisSha256);
+    } finally {
+      rmSync(directory, { recursive: true, force: true });
+    }
+  });
+
+  it("rejects missing and duplicate Tauri unknown bundle markers", async () => {
+    const directory = mkdtempSync(join(tmpdir(), "speakright-bundle-marker-"));
+    const executablePath = join(directory, "speakright.exe");
+    try {
+      writeFileSync(executablePath, "no reviewed marker", "ascii");
+      await expect(
+        hashTauriNsisExecutableVariant(executablePath, { highWaterMark: 5 }),
+      ).rejects.toMatchObject({ code: "invalid-tauri-bundle-marker" });
+
+      writeFileSync(
+        executablePath,
+        `${TAURI_UNKNOWN_BUNDLE_MARKER}:${TAURI_UNKNOWN_BUNDLE_MARKER}`,
+        "ascii",
+      );
+      await expect(
+        hashTauriNsisExecutableVariant(executablePath, { highWaterMark: 5 }),
+      ).rejects.toMatchObject({ code: "invalid-tauri-bundle-marker" });
+    } finally {
+      rmSync(directory, { recursive: true, force: true });
+    }
+  });
+
   it("uses documented NSIS final-argument semantics", () => {
     const currentPlan = plan();
     expect(buildNsisInstallArgs(currentPlan.installDir)).toEqual([
@@ -297,7 +365,10 @@ describe("desktop installer round-trip safety", () => {
     });
     await expect(
       runInstallerRoundtrip({ plan: plan(), adapter }),
-    ).rejects.toMatchObject({ code: "install-verification" });
+    ).rejects.toMatchObject({
+      code: "install-verification",
+      message: "installed payload ownership checks did not all pass: payload",
+    });
     expect(calls).toContain("rollbackOwnedInstallation");
     expect(calls).not.toContain("launchInstalledApp");
   });
@@ -521,10 +592,7 @@ describe("desktop installer round-trip safety", () => {
 
     expect(matchesRoundtripArtifactIdentity(identity, artifact)).toBe(true);
     expect(
-      matchesRoundtripArtifactIdentity(
-        { ...identity, fileName: "" },
-        artifact,
-      ),
+      matchesRoundtripArtifactIdentity({ ...identity, fileName: "" }, artifact),
     ).toBe(false);
     expect(
       matchesRoundtripArtifactIdentity(identity, {
