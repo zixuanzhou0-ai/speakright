@@ -54,6 +54,7 @@ The v1.1.0 candidate lockfile has been advanced as defense in depth:
 | Dependency | Previous resolution | Candidate resolution | Rationale |
 | --- | --- | --- | --- |
 | Tauri | `2.10.3` | `2.11.1` | Includes the upstream fix for [GHSA-7gmj-67g7-phm9](https://github.com/advisories/GHSA-7gmj-67g7-phm9), an origin-confusion advisory affecting Windows/Android IPC boundaries. SpeakRight does not intentionally load remote pages in its WebView, uses the system opener for external links, and keeps `frame-src` disabled, but the boundary is upgraded rather than relying only on current reachability. |
+| `@tauri-apps/api` / CLI | `2.10.x` | API `2.11.1`; CLI `2.11.x` | Keeps the JavaScript API and build CLI on the same Tauri major/minor line as the fixed Rust runtime; the isolated Desktop evidence build rejects a mismatched line. |
 | `serde_with` | `3.18.x` | `3.22.0` | Removes [GHSA-7gcf-g7xr-8hxj](https://github.com/advisories/GHSA-7gcf-g7xr-8hxj) from the resolved candidate graph. SpeakRight does not use the affected `KeyValueMap` API directly. |
 | `rand` | `0.8.5`, `0.9.2` | `0.8.6`, `0.9.3` | Applies the available patch releases for [GHSA-cq8v-f236-94qc](https://github.com/advisories/GHSA-cq8v-f236-94qc) in the directly updatable branches. |
 
