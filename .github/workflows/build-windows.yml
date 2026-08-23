@@ -64,6 +64,9 @@ jobs:
         run: npm ci
         timeout-minutes: 10
 
+      - name: Validate release evidence with pinned media tooling
+        run: npm run release:evidence:check
+
       - name: Verify release manifest
         run: npm run check:release-version
 

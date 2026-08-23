@@ -10,13 +10,13 @@ const installer = readFileSync(path.join(root, installerRelativePath), "utf8");
 
 assert.match(
   installer,
-  /\$PinnedFfmpegVersion\s*=\s*"8\.1\.2"/,
-  "Release media tooling must pin FFmpeg 8.1.2.",
+  /\$PinnedFfmpegVersion\s*=\s*"9\.0\.1"/,
+  "Release media tooling must pin FFmpeg 9.0.1.",
 );
 assert.match(
   installer,
-  /\$PinnedPackageSha512\s*=\s*"637fd984d75a98e3c05926d00bde79afefdda30a4b95d052b362655762f4d99d336eba0ad7ded638e248bb1363f5cdaa4eb3040b1fb53c2bfec4553eabc9c593"/,
-  "Release media tooling must pin the approved FFmpeg 8.1.2 package SHA-512.",
+  /\$PinnedPackageSha512\s*=\s*"4c8d776cf72275684078234242be61a9c7639dd9c7c50fa2800a584fc0d290fcfc77a5b05ee8dacf3b85c9425ae9383ef7952f3e1f7862a921c2977ac8dffa1e"/,
+  "Release media tooling must pin the approved FFmpeg 9.0.1 package SHA-512.",
 );
 assert.match(
   installer,
@@ -59,6 +59,12 @@ for (const toolName of ["ffmpeg", "ffprobe"]) {
     `${toolName} must be checked against the pinned version.`,
   );
 }
+for (const capability of ["libx264", "loudnorm"]) {
+  assert.ok(
+    installer.includes(capability),
+    `Release media tooling must verify the ${capability} capability.`,
+  );
+}
 for (const environmentName of ["FFMPEG_PATH", "FFPROBE_PATH"]) {
   assert.match(
     installer,
@@ -93,6 +99,19 @@ for (const workflowRelativePath of workflows) {
     `${workflowRelativePath} must install pinned media tools after checking the contract.`,
   );
 }
+
+const windowsBuild = readFileSync(
+  path.join(root, ".github/workflows/build-windows.yml"),
+  "utf8",
+);
+const windowsInstallerIndex = windowsBuild.indexOf(
+  `pwsh -NoProfile -NonInteractive -File ${installerRelativePath}`,
+);
+const evidenceIndex = windowsBuild.indexOf("npm run release:evidence:check");
+assert.ok(
+  evidenceIndex > windowsInstallerIndex,
+  "Ordinary Windows CI must validate release evidence with the pinned media tools.",
+);
 
 console.log(
   "Release media tooling contract passed (pinned FFmpeg + Windows CI coverage).",

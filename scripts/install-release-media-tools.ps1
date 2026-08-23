@@ -1,8 +1,8 @@
 $ErrorActionPreference = "Stop"
 $ProgressPreference = "SilentlyContinue"
 
-$PinnedFfmpegVersion = "8.1.2"
-$PinnedPackageSha512 = "637fd984d75a98e3c05926d00bde79afefdda30a4b95d052b362655762f4d99d336eba0ad7ded638e248bb1363f5cdaa4eb3040b1fb53c2bfec4553eabc9c593"
+$PinnedFfmpegVersion = "9.0.1"
+$PinnedPackageSha512 = "4c8d776cf72275684078234242be61a9c7639dd9c7c50fa2800a584fc0d290fcfc77a5b05ee8dacf3b85c9425ae9383ef7952f3e1f7862a921c2977ac8dffa1e"
 $PackageUrl = "https://community.chocolatey.org/api/v2/package/ffmpeg/$PinnedFfmpegVersion"
 
 function Assert-NativeSuccess {
@@ -57,6 +57,29 @@ function Export-StepEnvironment {
   if (-not [string]::IsNullOrWhiteSpace($env:GITHUB_ENV)) {
     "$Name=$Value" | Out-File -LiteralPath $env:GITHUB_ENV -Encoding utf8 -Append
   }
+}
+
+function Assert-FfmpegCapabilities {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$ExecutablePath
+  )
+
+  $encoderLines = @(& $ExecutablePath -hide_banner -encoders 2>&1)
+  $encoderExitCode = $LASTEXITCODE
+  Assert-NativeSuccess -Label "ffmpeg encoder probe" -ExitCode $encoderExitCode
+  if (($encoderLines -join "`n") -notmatch "(?:^|\s)libx264(?:\s|$)") {
+    throw "The pinned FFmpeg build does not include the libx264 encoder required by the release demo."
+  }
+
+  $filterLines = @(& $ExecutablePath -hide_banner -filters 2>&1)
+  $filterExitCode = $LASTEXITCODE
+  Assert-NativeSuccess -Label "ffmpeg filter probe" -ExitCode $filterExitCode
+  if (($filterLines -join "`n") -notmatch "(?:^|\s)loudnorm(?:\s|$)") {
+    throw "The pinned FFmpeg build does not include the loudnorm filter required by media maintenance."
+  }
+
+  Write-Host "FFmpeg capabilities verified: libx264 encoder and loudnorm filter."
 }
 
 $chocoCommand = Get-Command choco.exe -ErrorAction Stop
@@ -117,6 +140,7 @@ $ffprobePath = Join-Path $chocolateyBin "ffprobe.exe"
 
 Assert-PinnedToolVersion -ToolName "ffmpeg" -ExecutablePath $ffmpegPath
 Assert-PinnedToolVersion -ToolName "ffprobe" -ExecutablePath $ffprobePath
+Assert-FfmpegCapabilities -ExecutablePath $ffmpegPath
 
 Export-StepEnvironment -Name "FFMPEG_PATH" -Value $ffmpegPath
 Export-StepEnvironment -Name "FFPROBE_PATH" -Value $ffprobePath
