@@ -69,6 +69,8 @@ assert.match(
   /informational_warnings\s*=\s*\["unmaintained", "unsound"\]/u,
 );
 assert.match(policy, /deny\s*=\s*\["warnings"\]/u);
+assert.match(policy, /format\s*=\s*"terminal"/u);
+assert.match(policy, /quiet\s*=\s*false/u);
 
 for (const id of expectedAllowedAdvisories) {
   assert.match(

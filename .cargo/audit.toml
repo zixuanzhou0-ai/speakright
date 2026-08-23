@@ -39,4 +39,6 @@ ignore = [
 
 [output]
 deny = ["warnings"]
+format = "terminal"
+quiet = false
 show_tree = true
