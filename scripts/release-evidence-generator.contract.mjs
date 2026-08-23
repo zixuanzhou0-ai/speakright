@@ -4,6 +4,8 @@ import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import {
+  canonicalizeReleaseEvidenceBytes,
+  RELEASE_EVIDENCE_GENERATOR_DIGEST_SCHEMA,
   RELEASE_EVIDENCE_GENERATOR_INPUTS,
   releaseEvidenceGeneratorDigest,
   releaseEvidenceGeneratorGitProvenance,
@@ -17,6 +19,18 @@ function git(projectRoot, arguments_) {
 }
 
 async function main() {
+  assert.deepEqual(
+    canonicalizeReleaseEvidenceBytes(Buffer.from("line one\r\nline two\r")),
+    Buffer.from("line one\nline two\n"),
+    "Text digests must be independent of checkout line endings.",
+  );
+  const binaryFixture = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x00, 0x0d, 0x0a]);
+  assert.deepEqual(
+    canonicalizeReleaseEvidenceBytes(binaryFixture),
+    binaryFixture,
+    "Binary evidence inputs must retain their exact bytes.",
+  );
+
   const projectRoot = await mkdtemp(
     path.join(os.tmpdir(), "speakright-release-evidence-generator-contract-"),
   );
@@ -41,6 +55,10 @@ async function main() {
       { commit: sourceCommit, sourceWorktreeClean: true },
     );
     const initial = await releaseEvidenceGeneratorDigest(projectRoot);
+    assert.equal(
+      initial.schemaVersion,
+      RELEASE_EVIDENCE_GENERATOR_DIGEST_SCHEMA,
+    );
     assert.equal(initial.fileCount, RELEASE_EVIDENCE_GENERATOR_INPUTS.length);
     assert.ok(initial.totalBytes > 0);
 

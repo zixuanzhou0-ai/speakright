@@ -1,10 +1,11 @@
+import { isUtf8 } from "node:buffer";
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { lstat, readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 
-export const RELEASE_EVIDENCE_SOURCE_DIGEST_SCHEMA = 1;
-export const RELEASE_EVIDENCE_GENERATOR_DIGEST_SCHEMA = 1;
+export const RELEASE_EVIDENCE_SOURCE_DIGEST_SCHEMA = 2;
+export const RELEASE_EVIDENCE_GENERATOR_DIGEST_SCHEMA = 2;
 
 export const RELEASE_EVIDENCE_GENERATOR_INPUTS = Object.freeze([
   "scripts/build-browser-release-evidence.mjs",
@@ -230,7 +231,8 @@ async function digestInputs({
   let totalBytes = 0;
   for (const relativePath of files) {
     const normalizedPath = relativePath.replaceAll("\\", "/");
-    const contents = await readFile(path.join(baseRoot, relativePath));
+    const rawContents = await readFile(path.join(baseRoot, relativePath));
+    const contents = canonicalizeReleaseEvidenceBytes(rawContents);
     totalBytes += contents.length;
     hash.update(normalizedPath);
     hash.update("\0");
@@ -245,6 +247,14 @@ async function digestInputs({
     fileCount: files.length,
     totalBytes,
   };
+}
+
+export function canonicalizeReleaseEvidenceBytes(contents) {
+  if (!Buffer.isBuffer(contents)) {
+    throw new TypeError("Release evidence canonicalization requires a Buffer.");
+  }
+  if (contents.includes(0) || !isUtf8(contents)) return contents;
+  return Buffer.from(contents.toString("utf8").replace(/\r\n?/g, "\n"), "utf8");
 }
 
 export async function releaseEvidenceSourceDigest(baseRoot, edition) {

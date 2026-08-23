@@ -23,6 +23,8 @@ import {
 } from "./lib/release-evidence-fixtures.mjs";
 import {
   DESKTOP_EVIDENCE_TEST_SUPPORT_FILES,
+  RELEASE_EVIDENCE_GENERATOR_DIGEST_SCHEMA,
+  RELEASE_EVIDENCE_SOURCE_DIGEST_SCHEMA,
   releaseEvidenceGeneratorDigest,
   releaseEvidenceGeneratorGitProvenance,
   releaseEvidenceGitProvenance,
@@ -425,7 +427,10 @@ async function validateScreenshotManifest(edition, viewports) {
     ["schemaVersion", "sha256", "fileCount"],
     `${edition} source snapshot`,
   );
-  assert.equal(manifest.sourceSnapshot.schemaVersion, 1);
+  assert.equal(
+    manifest.sourceSnapshot.schemaVersion,
+    RELEASE_EVIDENCE_SOURCE_DIGEST_SCHEMA,
+  );
   assertSha256(manifest.sourceSnapshot.sha256, `${edition} source snapshot`);
   assert.equal(Number.isInteger(manifest.sourceSnapshot.fileCount), true);
   assert.ok(manifest.sourceSnapshot.fileCount > 0);
@@ -439,7 +444,10 @@ async function validateScreenshotManifest(edition, viewports) {
     ["schemaVersion", "sha256", "fileCount", "totalBytes"],
     `${edition} generator snapshot`,
   );
-  assert.equal(manifest.generatorSnapshot.schemaVersion, 1);
+  assert.equal(
+    manifest.generatorSnapshot.schemaVersion,
+    RELEASE_EVIDENCE_GENERATOR_DIGEST_SCHEMA,
+  );
   assertSha256(manifest.generatorSnapshot.sha256, `${edition} generators`);
   assert.ok(manifest.generatorSnapshot.fileCount > 0);
   assert.ok(manifest.generatorSnapshot.totalBytes > 0);

@@ -27,6 +27,8 @@ import {
   storageSeedExpression,
 } from "./lib/release-evidence-fixtures.mjs";
 import {
+  RELEASE_EVIDENCE_GENERATOR_DIGEST_SCHEMA,
+  RELEASE_EVIDENCE_SOURCE_DIGEST_SCHEMA,
   releaseEvidenceGeneratorDigest,
   releaseEvidenceGeneratorGitProvenance,
   releaseEvidenceGitProvenance,
@@ -765,7 +767,8 @@ async function main() {
       buildManifest.assetSet?.pathHashDigestSha256 ?? "",
     ) ||
     !/^[a-f0-9]{64}$/.test(buildManifest.assetSet?.registrySha256 ?? "") ||
-    buildManifest.generatorSnapshot?.schemaVersion !== 1 ||
+    buildManifest.generatorSnapshot?.schemaVersion !==
+      RELEASE_EVIDENCE_GENERATOR_DIGEST_SCHEMA ||
     !/^[a-f0-9]{64}$/.test(buildManifest.generatorSnapshot?.sha256 ?? "") ||
     !Number.isInteger(buildManifest.generatorSnapshot?.fileCount) ||
     !Number.isSafeInteger(buildManifest.generatorSnapshot?.totalBytes) ||
@@ -785,7 +788,8 @@ async function main() {
     buildManifest.runtimeIsolation?.temporarySettingsStorePathRequired !==
       true ||
     buildManifest.runtimeIsolation?.temporaryWebViewProfileRequired !== true ||
-    buildManifest.sourceSnapshot?.schemaVersion !== 1 ||
+    buildManifest.sourceSnapshot?.schemaVersion !==
+      RELEASE_EVIDENCE_SOURCE_DIGEST_SCHEMA ||
     !/^[a-f0-9]{40}$/.test(buildManifest.sourceCommit ?? "") ||
     buildManifest.sourceWorktreeClean !== true ||
     !/^[a-f0-9]{64}$/.test(buildManifest.sourceSnapshot?.sha256 ?? "") ||
