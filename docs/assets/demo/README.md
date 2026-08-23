@@ -60,8 +60,8 @@ node scripts/release-evidence.contract.mjs --artifacts
 
 These references passed
 `node scripts/release-evidence.contract.mjs --artifacts` against source commit
-`94e5bbdf1bacfeaaabdb48709e1d7eb748aaf577` and completed maintainer visual
-review on 2026-08-17. They remain candidate evidence; this statement does not
+`5fd93297ddc55c97a6c78b4568d6435411be2369` and completed maintainer visual
+review on 2026-08-23. They remain candidate evidence; this statement does not
 mean the GitHub tags or Releases already exist.
 
 - [Key Browser screenshots](../screenshots/release/v1.1.0/browser/1280x800/)
@@ -70,4 +70,5 @@ mean the GitHub tags or Releases already exist.
 - [1280 × 920 Desktop screenshots](../screenshots/release/v1.1.0/desktop/1280x920/)
 - [1024 × 800 Desktop screenshots](../screenshots/release/v1.1.0/desktop/1024x800/)
 - [Silent overview video](speakright-v1.1.0-overview.mp4)
+- [English SRT captions](speakright-v1.1.0-overview.en.srt)
 - [English WebVTT captions](speakright-v1.1.0-overview.en.vtt)

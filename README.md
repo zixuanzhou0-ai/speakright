@@ -235,7 +235,12 @@ cd /d <repository-root>
 npm run desktop:dev
 ```
 
-For current development state, rollback information, and release work, see `docs/operations/NEXT_CHAT_HANDOFF.md`. Historical desktop startup and Release Candidate records are retained under `docs/archive/2026-06-desktop-release/`.
+For the current release state and application-readiness boundary, see
+[`docs/validation/V1.1.0_RELEASE_CANDIDATE.md`](docs/validation/V1.1.0_RELEASE_CANDIDATE.md)
+and
+[`docs/oss/CODEX_FOR_OPEN_SOURCE_READINESS.md`](docs/oss/CODEX_FOR_OPEN_SOURCE_READINESS.md).
+Historical desktop startup and Release Candidate records are retained under
+`docs/archive/2026-06-desktop-release/`.
 
 ## Desktop Validation
 

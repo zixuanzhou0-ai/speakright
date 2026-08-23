@@ -1,6 +1,6 @@
 # Codex For Open Source Readiness
 
-Updated: 2026-08-17
+Updated: 2026-08-23
 
 This is a public readiness record for a possible SpeakRight application. It is not an application, an acceptance notice, an eligibility determination, or evidence that OpenAI has endorsed SpeakRight.
 
@@ -8,7 +8,7 @@ This is a public readiness record for a possible SpeakRight application. It is n
 
 The current [OpenAI Codex for Open Source page](https://developers.openai.com/community/codex-for-oss) says open-source maintainers can apply for API credits, six months of ChatGPT Pro with Codex, and conditional Codex Security access. It invites core maintainers and maintainers of widely used public projects, while also allowing projects that play an important ecosystem role to explain that role.
 
-At the 2026-08-17 review, the official page did not state a 20-person user-testing minimum or require a detailed participant-evidence package. SpeakRight therefore does not treat either condition as a release or application prerequisite.
+At the 2026-08-23 review, the official page and [application form](https://openai.com/form/codex-for-oss/) did not state a 20-person user-testing minimum or require a detailed participant-evidence package. SpeakRight therefore does not treat either condition as a release or application prerequisite. Submission is governed by the linked [program terms](https://learn.chatgpt.com/docs/codex-for-oss-terms).
 
 Program details and form fields can change. A maintainer should re-open the official page and the linked program terms immediately before submitting. This repository does not restate private form fields or assume acceptance.
 
