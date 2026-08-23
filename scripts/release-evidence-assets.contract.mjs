@@ -185,6 +185,8 @@ async function main() {
     });
     assert.deepEqual(materialized.assetSet, initial.summary);
     assert.equal(materialized.canonicalized, 1);
+    assert.equal(materialized.copied, approvedFiles.length - 1);
+    assert.equal(materialized.hardlinked, 0);
     assert.deepEqual(
       (await walkFiles(destinationRoot)).sort(compareReleaseEvidencePaths),
       approvedFiles,

@@ -1,14 +1,6 @@
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import {
-  copyFile,
-  link,
-  lstat,
-  mkdir,
-  readFile,
-  rm,
-  writeFile,
-} from "node:fs/promises";
+import { mkdir, open, rm } from "node:fs/promises";
 import path from "node:path";
 import {
   analyzeAssetRights,
@@ -31,7 +23,6 @@ const ASSET_POLICY_PATHS = [
   "scripts/lib/release-evidence-assets.mjs",
   "scripts/lib/release-evidence-source-digest.mjs",
 ];
-const COPY_FALLBACK_CODES = new Set(["EACCES", "ENOTSUP", "EPERM", "EXDEV"]);
 
 export function compareReleaseEvidencePaths(left, right) {
   return left.localeCompare(right, "en");
@@ -101,6 +92,53 @@ function sha256(contents) {
   return createHash("sha256").update(contents).digest("hex");
 }
 
+async function readStableRegularFile(filePath, label) {
+  const handle = await open(filePath, "r");
+  try {
+    const before = await handle.stat({ bigint: true });
+    if (!before.isFile()) {
+      throw new Error(
+        `Release-evidence input is not a regular file: ${label}.`,
+      );
+    }
+    const contents = await handle.readFile();
+    const after = await handle.stat({ bigint: true });
+    const stableFields = [
+      "dev",
+      "ino",
+      "mode",
+      "nlink",
+      "size",
+      "mtimeNs",
+      "ctimeNs",
+    ];
+    if (
+      BigInt(contents.length) !== before.size ||
+      stableFields.some((field) => before[field] !== after[field])
+    ) {
+      throw new Error(`Release-evidence input changed while read: ${label}.`);
+    }
+    return contents;
+  } finally {
+    await handle.close();
+  }
+}
+
+async function writeExclusiveRegularFile(filePath, contents, label) {
+  const handle = await open(filePath, "wx");
+  try {
+    await handle.writeFile(contents);
+    const stats = await handle.stat({ bigint: true });
+    if (!stats.isFile() || stats.size !== BigInt(contents.length)) {
+      throw new Error(
+        `Materialized release-evidence asset is incomplete: ${label}.`,
+      );
+    }
+  } finally {
+    await handle.close();
+  }
+}
+
 export function canonicalizeReleaseEvidenceAssetBytes(relativePath, contents) {
   const extension = path.posix.extname(relativePath).toLowerCase();
   return CANONICAL_TEXT_ASSET_EXTENSIONS.has(extension)
@@ -128,7 +166,10 @@ export async function releaseEvidenceAssetSet(
     "asset-rights-registry.json",
   );
   const [rawRegistryBytes, packagedFiles] = await Promise.all([
-    readFile(registryPath),
+    readStableRegularFile(
+      registryPath,
+      "docs/assets/asset-rights-registry.json",
+    ),
     listGitTrackedPackagedFiles({ projectRoot, canonicalRoot }),
   ]);
   const registryBytes = canonicalizeReleaseEvidenceBytes(rawRegistryBytes);
@@ -163,13 +204,7 @@ export async function releaseEvidenceAssetSet(
       );
     }
     const sourcePath = path.join(canonicalRoot, ...relativePath.split("/"));
-    const stats = await lstat(sourcePath);
-    if (!stats.isFile() || stats.isSymbolicLink()) {
-      throw new Error(
-        `Release-evidence asset must be a regular tracked file: ${relativePath}.`,
-      );
-    }
-    const rawContents = await readFile(sourcePath);
+    const rawContents = await readStableRegularFile(sourcePath, relativePath);
     const contents = canonicalizeReleaseEvidenceAssetBytes(
       relativePath,
       rawContents,
@@ -214,7 +249,6 @@ export async function materializeReleaseEvidenceAssets({
   await mkdir(destinationRoot, { recursive: true });
   let canonicalized = 0;
   let copied = 0;
-  let hardlinked = 0;
   for (const entry of assetSet.files) {
     const sourcePath = path.join(canonicalRoot, ...entry.path.split("/"));
     const destinationPath = path.join(
@@ -222,7 +256,7 @@ export async function materializeReleaseEvidenceAssets({
       ...entry.path.split("/"),
     );
     await mkdir(path.dirname(destinationPath), { recursive: true });
-    const rawContents = await readFile(sourcePath);
+    const rawContents = await readStableRegularFile(sourcePath, entry.path);
     const contents = canonicalizeReleaseEvidenceAssetBytes(
       entry.path,
       rawContents,
@@ -232,29 +266,12 @@ export async function materializeReleaseEvidenceAssets({
         `Release-evidence asset changed before materialization: ${entry.path}.`,
       );
     }
+    await writeExclusiveRegularFile(destinationPath, contents, entry.path);
     if (!contents.equals(rawContents)) {
-      await writeFile(destinationPath, contents);
-      if (sha256(await readFile(destinationPath)) !== entry.sha256) {
-        throw new Error(
-          `Canonicalized release-evidence asset changed: ${entry.path}.`,
-        );
-      }
       canonicalized += 1;
       continue;
     }
-    try {
-      await link(sourcePath, destinationPath);
-      hardlinked += 1;
-    } catch (error) {
-      if (!COPY_FALLBACK_CODES.has(error?.code)) throw error;
-      await copyFile(sourcePath, destinationPath);
-      if (sha256(await readFile(destinationPath)) !== entry.sha256) {
-        throw new Error(
-          `Copied release-evidence asset changed: ${entry.path}.`,
-        );
-      }
-      copied += 1;
-    }
+    copied += 1;
   }
   const materializedFiles = (await walkFiles(destinationRoot)).sort(
     compareReleaseEvidencePaths,
@@ -276,6 +293,6 @@ export async function materializeReleaseEvidenceAssets({
     assetSet: assetSet.summary,
     canonicalized,
     copied,
-    hardlinked,
+    hardlinked: 0,
   };
 }
