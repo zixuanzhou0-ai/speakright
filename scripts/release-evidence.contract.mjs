@@ -155,6 +155,10 @@ const fixtureSource = await readFile(
 assert.match(fixtureSource, /closest\('\[data-smoke\$="-page"\]'\)/);
 assert.match(fixtureSource, /pageRoot\.prepend\(banner\)/);
 assert.match(fixtureSource, /collisionRoot = pageRoot/);
+assert.match(
+  fixtureSource,
+  /pageRoot\.prepend\(banner\);[\s\S]{0,160}flexShrink: '0'/,
+);
 
 const browserCaptureSource = await readFile(
   path.join(root, "scripts/capture-browser-release-evidence.mjs"),

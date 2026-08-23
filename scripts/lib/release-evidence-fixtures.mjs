@@ -383,7 +383,7 @@ export function evidenceBannerExpression(kind, shotId, readySelector) {
     }
     collisionRoot = pageRoot;
     pageRoot.prepend(banner);
-    Object.assign(banner.style, { margin: '10px auto 0' });
+    Object.assign(banner.style, { flexShrink: '0', margin: '10px auto 0' });
     pageRoot.scrollTop = 0;
     main.scrollTop = 0;
   }
