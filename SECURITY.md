@@ -47,6 +47,12 @@ The Tauri allowlist and CSP should remain narrow. Pull requests that add new
 network origins, file access, shell access, or plugin permissions must include
 a short justification and tests when possible.
 
+The public source-level disposition for the v1.1.0 CodeQL baseline and its
+time-bounded transitive dependency exceptions is recorded in
+[`docs/security/CODE_SCANNING_TRIAGE_V1.1.0.md`](docs/security/CODE_SCANNING_TRIAGE_V1.1.0.md).
+Scanner dismissal metadata is not treated as evidence by itself; release
+decisions use the source analysis and revalidation requirements in that record.
+
 Browser Edition changes that add a network destination, persistent credential
 path, local bridge, cross-origin permission, or recording/export behavior need
 the same review. See `PRIVACY.md` for the public data-flow boundary.

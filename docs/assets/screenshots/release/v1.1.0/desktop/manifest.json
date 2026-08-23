@@ -7,9 +7,9 @@
   "assetSet": {
     "schemaVersion": 1,
     "fileCount": 6589,
-    "totalBytes": 480736051,
+    "totalBytes": 480735062,
     "pathDigestSha256": "b217ea27660a3b5d243c408aece7e7c66a53fd392e355c35379479be561cf7d0",
-    "pathHashDigestSha256": "5cf7351051830e167be450131ddc786e01d8bd6fee9186f698a67aefbcee4986",
+    "pathHashDigestSha256": "aacf34d946ec65cbf3e47eff57f95d85c8c3bb375cde6fec52e86056acb6ef73",
     "registrySha256": "7865d97f5c94bd6ad309e1e78b657c82fc13c173b3803de2a991d6ea830b59b5"
   },
   "generatorSnapshot": {
@@ -23,14 +23,14 @@
     "mode": "ephemeral-loopback-cdp",
     "portFile": "WebView2/EBWebView/DevToolsActivePort"
   },
-  "credentialNamespace": "com.speakright.desktop.release-evidence-00b97968c07e5caa",
+  "credentialNamespace": "com.speakright.desktop.release-evidence-3cc05210a5bf80c1",
   "sourceSnapshot": {
     "schemaVersion": 1,
-    "sha256": "d177ff9888ee1a6fd908e19f2b59f79ebf078cc101b00bf50612dd0f75d32af4",
+    "sha256": "063b7693b8c968090a53b81a65afcd22d29c687c584452747e6fc415e82373a2",
     "fileCount": 488
   },
   "sourceWorktreeClean": true,
-  "buildManifestSha256": "1ca3c21648642b17a52bc49d9b713a7ae4affa9a17d51523f1a0708f4c2bd5a1",
+  "buildManifestSha256": "8d2a16172dd76db5d18f21ab2fbbe541ec1189c00f777eaf82aa428d93730095",
   "nativeHttpAttempts": 0,
   "secureStoreSlotsEmpty": true,
   "runtimeIsolation": {
@@ -50,10 +50,10 @@
     "tauriHttpGuardSha256": "912d4cf660188b58989b2422e9dc25ffef4d3bc8c6bae76630e67212392a5e49",
     "rustGuardSha256": "bd85a66a49776c70426ae485a8671f1388fa5649d810495547f344ad5b3fc38b"
   },
-  "sourceCommit": "5fd93297ddc55c97a6c78b4568d6435411be2369",
+  "sourceCommit": "2c63617f9f88df3db005b44a2d4b7b81edbee19a",
   "executable": {
     "fileName": "speakright.exe",
-    "sha256": "28d39b4473e91613ae5702e2d488264e9d1938a83c899323f95e4fbfb7a851d4"
+    "sha256": "10e1f2429510b0a1a72dbbbd927d4058c41e4d6f4e9072273b58e7ef999fcaa7"
   },
   "networkPolicy": {
     "applicationOrigin": "http://tauri.localhost",
@@ -149,12 +149,7 @@
       },
       {
         "origin": "http://tauri.localhost",
-        "pathname": "/_next/static/chunks/07og1sd-q8wwy.js",
-        "resourceType": "Script"
-      },
-      {
-        "origin": "http://tauri.localhost",
-        "pathname": "/_next/static/chunks/0drblcpoeqy90.js",
+        "pathname": "/_next/static/chunks/043_4h-x82iau.js",
         "resourceType": "Script"
       },
       {
@@ -189,12 +184,12 @@
       },
       {
         "origin": "http://tauri.localhost",
-        "pathname": "/_next/static/chunks/1cu2rkf6k23lo.js",
+        "pathname": "/_next/static/chunks/1ckcn5k7oigyg.js",
         "resourceType": "Script"
       },
       {
         "origin": "http://tauri.localhost",
-        "pathname": "/_next/static/chunks/1emgr2a9kk-82.js",
+        "pathname": "/_next/static/chunks/1cu2rkf6k23lo.js",
         "resourceType": "Script"
       },
       {
@@ -219,12 +214,22 @@
       },
       {
         "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/24phsfw2lj295.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
         "pathname": "/_next/static/chunks/252r8iou03npa.js",
         "resourceType": "Script"
       },
       {
         "origin": "http://tauri.localhost",
-        "pathname": "/_next/static/chunks/25en8913dh97-.js",
+        "pathname": "/_next/static/chunks/26j22f_u9hxn5.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/286stb_l4titg.js",
         "resourceType": "Script"
       },
       {
@@ -235,11 +240,6 @@
       {
         "origin": "http://tauri.localhost",
         "pathname": "/_next/static/chunks/2ag7f51m5ecig.js",
-        "resourceType": "Script"
-      },
-      {
-        "origin": "http://tauri.localhost",
-        "pathname": "/_next/static/chunks/2bqpos6601u-4.js",
         "resourceType": "Script"
       },
       {
@@ -274,17 +274,12 @@
       },
       {
         "origin": "http://tauri.localhost",
-        "pathname": "/_next/static/chunks/2sh-swr2muiv1.js",
+        "pathname": "/_next/static/chunks/2sw2u_r8cvmnn.js",
         "resourceType": "Script"
       },
       {
         "origin": "http://tauri.localhost",
         "pathname": "/_next/static/chunks/2tj9gz60pxx0x.js",
-        "resourceType": "Script"
-      },
-      {
-        "origin": "http://tauri.localhost",
-        "pathname": "/_next/static/chunks/2uh42quij5lvv.js",
         "resourceType": "Script"
       },
       {
@@ -300,6 +295,11 @@
       {
         "origin": "http://tauri.localhost",
         "pathname": "/_next/static/chunks/3_qbr84btzzhv.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/3_wxxm1elnz2n.js",
         "resourceType": "Script"
       },
       {
@@ -354,7 +354,7 @@
       },
       {
         "origin": "http://tauri.localhost",
-        "pathname": "/_next/static/chunks/42a8i1qp_lutg.js",
+        "pathname": "/_next/static/chunks/45atnhzbz5z94.js",
         "resourceType": "Script"
       },
       {
@@ -535,7 +535,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/desktop/1280x920/guided-repeat.png",
       "width": 1280,
       "height": 920,
-      "sha256": "c4838677f8de11f0e4151d1d82a70610a71a5cbb8ed35393c5e266c82b96cbf4",
+      "sha256": "21618680b1dbe2bc192bea12ab0f619bef3f095d7675d2947132a340438829a7",
       "geometry": {
         "banner": {
           "left": 471.1625061035156,
@@ -577,7 +577,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/desktop/1280x920/diagnosis-example.png",
       "width": 1280,
       "height": 920,
-      "sha256": "c08f1af3f3e86d3a56c8937468d85492b0ff67d73b37feb42f73c0bbc3ae091c",
+      "sha256": "07c74258808d6769a8123e84f2226795934fe710cb61a049251285babf3e1331",
       "geometry": {
         "banner": {
           "left": 596.75,
@@ -598,7 +598,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/desktop/1280x920/settings.png",
       "width": 1280,
       "height": 920,
-      "sha256": "85fcb5d6b2698d23deb4ae3f56602e44a17c2c7a61d058e501f8a4fb231d97ee",
+      "sha256": "cc60f068152f6113f6712d31cc34f3ca79d51a916db0a2cab829b79d8cca8572",
       "geometry": {
         "banner": {
           "left": 595.9625244140625,
@@ -661,7 +661,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/desktop/1024x800/guided-repeat.png",
       "width": 1024,
       "height": 800,
-      "sha256": "6c97d7d4a953c26d61ccdf0d6fc1132d95ef4fa322c61bf23bf50dd31bb57ad2",
+      "sha256": "3ccae61d1d2e6f6e6265503dd7671141fc1bae3345808d0c65781235a7f9986e",
       "geometry": {
         "banner": {
           "left": 343.1625061035156,
@@ -703,7 +703,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/desktop/1024x800/diagnosis-example.png",
       "width": 1024,
       "height": 800,
-      "sha256": "9fe04f51f2c71674e1a0f71626794d3625a5d3aa61b098fc81accf3b36ed682b",
+      "sha256": "fe78ebbb165364c2923cf0533f34d40aa7136fb9d36dfaf88c7f5e321f2ac111",
       "geometry": {
         "banner": {
           "left": 468.75,
@@ -724,7 +724,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/desktop/1024x800/settings.png",
       "width": 1024,
       "height": 800,
-      "sha256": "61aaea01f518b904e40c3fcebca05f66644076e9134946802ccf99be3780f32a",
+      "sha256": "f59e8849197a446a9cbd008a737209e99f7318890ae811dbc3e47c27dd513844",
       "geometry": {
         "banner": {
           "left": 467.9624938964844,
@@ -745,7 +745,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/desktop/1024x800/progress-example.png",
       "width": 1024,
       "height": 800,
-      "sha256": "7642d36f4b18e1d4490a81be2d8651bd08a84857eea7c51359c889f696e8c7c8",
+      "sha256": "5da481b49285a4f2363e67de5fc1804944902d6e7b7ae09e2c48fbfac634b2f2",
       "geometry": {
         "banner": {
           "left": 468.75,
@@ -766,7 +766,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/desktop/1024x800/no-key.png",
       "width": 1024,
       "height": 800,
-      "sha256": "5e181c7d4c8139063c81d7f5ba847ace7d7e32641939d5619d2cb9a32f8789dd",
+      "sha256": "c86d1a6a9bde5a0c4ae5328a9b1ddbcaefa776aaf6e5de35f9836bf2ad1b188a",
       "geometry": {
         "banner": {
           "left": 432.375,

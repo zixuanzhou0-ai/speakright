@@ -301,14 +301,17 @@ describe("useGuidedRepeatSession", () => {
     await waitFor(() => expect(adapter.play).toHaveBeenCalledTimes(1));
     act(() => adapter.finishPlayback());
     await waitFor(() => expect(result.current.step?.kind).toBe("gap"));
-    await waitFor(() => expect(adapter.play).toHaveBeenCalledTimes(2), {
-      timeout: 1_500,
-    });
-    expect(result.current.step).toMatchObject({
-      kind: "audio",
-      role: "anchor-single",
-      turn: 2,
-    });
+    await waitFor(
+      () => {
+        expect(adapter.play).toHaveBeenCalledTimes(2);
+        expect(result.current.step).toMatchObject({
+          kind: "audio",
+          role: "anchor-single",
+          turn: 2,
+        });
+      },
+      { timeout: 1_500 },
+    );
 
     act(() => adapter.finishPlayback());
     await waitFor(
@@ -322,12 +325,14 @@ describe("useGuidedRepeatSession", () => {
     expect(result.current.canOperateOnWord).toBe(true);
 
     act(() => result.current.repeatCurrent());
-    await waitFor(() => expect(adapter.play).toHaveBeenCalledTimes(4));
-    expect(result.current.completedWords).toBe(0);
-    expect(result.current.step).toMatchObject({
-      kind: "audio",
-      role: "anchor-single",
-      turn: 1,
+    await waitFor(() => {
+      expect(adapter.play).toHaveBeenCalledTimes(4);
+      expect(result.current.completedWords).toBe(0);
+      expect(result.current.step).toMatchObject({
+        kind: "audio",
+        role: "anchor-single",
+        turn: 1,
+      });
     });
   });
 

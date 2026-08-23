@@ -49,7 +49,7 @@ jobs:
         run: cargo install cargo-audit --locked --version 0.22.2
 
       - name: Audit Cargo.lock
-        run: cargo audit --file src-tauri/Cargo.lock
+        run: npm run security:audit:cargo
 
   secret-history:
     name: Secret history scan

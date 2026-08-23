@@ -1,0 +1,44 @@
+# SpeakRight v1.1.0 RustSec policy.
+#
+# cargo-audit treats informational advisories as allowed warnings by default.
+# We instead deny every warning except the exact, time-bounded set reviewed in
+# docs/security/CODE_SCANNING_TRIAGE_V1.1.0.md. Adding an advisory here requires
+# an owner, reachability analysis, review deadline, and a matching policy-test
+# update. Patched advisories must be removed rather than ignored.
+
+[advisories]
+informational_warnings = ["unmaintained", "unsound"]
+ignore = [
+  # Unsupported Linux GTK3 graph; expires before Linux Desktop support.
+  "RUSTSEC-2024-0411", # gdkwayland-sys
+  "RUSTSEC-2024-0412", # gdk
+  "RUSTSEC-2024-0413", # atk
+  "RUSTSEC-2024-0414", # gdkx11-sys
+  "RUSTSEC-2024-0415", # gtk
+  "RUSTSEC-2024-0416", # atk-sys
+  "RUSTSEC-2024-0417", # gdkx11
+  "RUSTSEC-2024-0418", # gdk-sys
+  "RUSTSEC-2024-0419", # gtk3-macros
+  "RUSTSEC-2024-0420", # gtk-sys
+  "RUSTSEC-2024-0429", # glib (unsound; absent from Windows target graph)
+
+  # Build-only macro chain; absent from the supported Windows target graph.
+  "RUSTSEC-2024-0370", # proc-macro-error
+
+  # Windows-reachable upstream Tauri parser chains; maintenance warnings only.
+  "RUSTSEC-2025-0057", # fxhash
+  "RUSTSEC-2025-0075", # unic-char-range
+  "RUSTSEC-2025-0080", # unic-common
+  "RUSTSEC-2025-0081", # unic-char-property
+  "RUSTSEC-2025-0098", # unic-ucd-version
+  "RUSTSEC-2025-0100", # unic-ucd-ident
+
+  # Build-only Tauri chain; not application runtime randomness.
+  "RUSTSEC-2026-0097", # rand 0.7.3 (unsound)
+]
+
+[output]
+deny = ["warnings"]
+format = "terminal"
+quiet = false
+show_tree = true

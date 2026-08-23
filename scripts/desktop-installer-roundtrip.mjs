@@ -36,9 +36,12 @@ const manufacturer = "speakright";
 const mainBinaryName = "speakright.exe";
 const uninstallerName = "uninstall.exe";
 const markerName = ".speakright-installer-roundtrip.json";
-// Reviewed against tauri-cli-v2.10.1's installer.nsi: WriteUninstaller,
-// currentUser registry keys, silent/passive shortcuts, and uninstall cleanup.
-const reviewedTauriCliVersion = "2.10.1";
+// Reviewed against tauri-cli-v2.11.4 (8909f221d1515955fc843808032bdc5d62209c96).
+// Relative to v2.10.1, installer.nsi only adds Tauri's verified signed-plugin
+// directory and optional uninstaller branding macros; WriteUninstaller,
+// currentUser registry keys, silent/passive shortcuts, process handling, and
+// uninstall cleanup are unchanged for SpeakRight's no-custom-template config.
+const reviewedTauriCliVersion = "2.11.4";
 const childProcesses = new Map();
 
 function fail(code, message) {

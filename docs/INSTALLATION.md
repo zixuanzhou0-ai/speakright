@@ -16,10 +16,11 @@ wait for a future signed Desktop Stable release if an unsigned executable is
 not acceptable. Published assets can lag behind `main`, so treat the release
 tag and release notes—not the working branch—as the artifact source of truth.
 
-The v1.1.0 preview publishes one installer: the versioned NSIS setup that passed
-the automated install/start/exit/uninstall round-trip. It also publishes the
-bare Release EXE for transparent inspection and portable evaluation. Exact
-checksums are populated by the release. Expected binary names are:
+The planned v1.1.0 preview asset set contains one installer: the versioned NSIS
+setup that passed the automated install/start/exit/uninstall round-trip. It also
+contains the bare Release EXE for transparent inspection and portable
+evaluation. Exact checksums are populated by the release. Expected binary names
+are:
 
 ```text
 SpeakRight_1.1.0_x64-setup.exe
@@ -37,7 +38,7 @@ it as an official v1.1.0 preview installer.
 
 ## Install on Windows
 
-1. Run the published `SpeakRight_1.1.0_x64-setup.exe` NSIS installer.
+1. Once published, run the `SpeakRight_1.1.0_x64-setup.exe` NSIS installer.
 2. If Windows SmartScreen appears, stop and confirm this is the expected
    unsigned community-preview build from the project GitHub pre-release before choosing any
    bypass option on a personal/test machine where policy permits it. Do not
