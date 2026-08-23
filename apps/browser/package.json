@@ -13,9 +13,10 @@
     "url": "https://github.com/zixuanzhou0-ai/speakright/issues"
   },
   "scripts": {
-    "predev": "node ../../scripts/sync-browser-assets.mjs --write --prune",
+    "assets:sync": "npm --prefix ../.. run assets:sync:browser",
+    "predev": "npm run assets:sync",
     "dev": "node scripts/dev-with-hermes.mjs",
-    "prebuild": "node ../../scripts/sync-browser-assets.mjs --write --prune && node ../../scripts/check-training-audio.mjs --target=browser && node ../../scripts/check-guided-repeat-audio.mjs",
+    "prebuild": "npm run assets:sync && node ../../scripts/check-training-audio.mjs --target=browser && node ../../scripts/check-guided-repeat-audio.mjs",
     "build": "next build",
     "build:static": "next build",
     "serve:static": "node scripts/serve-static.mjs",
@@ -30,6 +31,7 @@
     "browser:smoke:static": "node scripts/browser-smoke-static.mjs",
     "audio:training:check": "node scripts/check-training-audio.mjs",
     "azure:live-log": "node ../../scripts/browser-azure-live-log.mjs",
+    "prevalidate": "npm run assets:sync",
     "validate": "npm run lint && npm run typecheck && npm run test",
     "validate:browser": "npm run validate && npm run build && npm run browser:smoke:static"
   },

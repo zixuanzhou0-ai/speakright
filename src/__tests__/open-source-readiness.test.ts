@@ -552,6 +552,7 @@ describe("open-source readiness files", () => {
       "user-testing:claims:test",
       "security:audit:npm",
       "security:sbom:cargo",
+      "assets:sync:browser",
     ]) {
       expect(scripts[scriptName], scriptName).toEqual(expect.any(String));
     }
@@ -573,6 +574,24 @@ describe("open-source readiness files", () => {
     expect(scripts["validate:signed-desktop-release"]).toContain(
       "desktop:release-gate",
     );
+    expect(scripts["assets:sync:browser"]).toContain(
+      "sync-browser-assets.mjs --write --prune",
+    );
+    expect(scripts.prevalidate).toBe("npm run assets:sync:browser");
+    expect(scripts["validate:browser:e2e"]).toMatch(
+      /^npm --prefix apps\/browser run validate && /,
+    );
+
+    const browserPackageJson = JSON.parse(
+      read("apps/browser/package.json"),
+    ) as { scripts?: Record<string, string> };
+    const browserScripts = browserPackageJson.scripts ?? {};
+    expect(browserScripts["assets:sync"]).toBe(
+      "npm --prefix ../.. run assets:sync:browser",
+    );
+    expect(browserScripts.prevalidate).toBe("npm run assets:sync");
+    expect(browserScripts.predev).toBe("npm run assets:sync");
+    expect(browserScripts.prebuild).toMatch(/^npm run assets:sync && /);
 
     const routineValidationScripts = [
       scripts.validate,
