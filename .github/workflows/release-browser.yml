@@ -363,6 +363,35 @@ jobs:
             if ($LASTEXITCODE -ne 0) { throw "Release commit is not on origin/main." }
           }
 
+          function Send-ReleaseAssetsById {
+            param(
+              [Parameter(Mandatory = $true)] [long] $ReleaseId,
+              [Parameter(Mandatory = $true)] [string] $UploadTemplate,
+              [Parameter(Mandatory = $true)] [string] $Directory
+            )
+
+            $expectedTemplate = "https://uploads.github.com/repos/$env:GITHUB_REPOSITORY/releases/$ReleaseId/assets{?name,label}"
+            if ($UploadTemplate -cne $expectedTemplate) {
+              throw "GitHub returned an unexpected upload URL for Browser Release ID $ReleaseId."
+            }
+            $uploadBaseUrl = $UploadTemplate.Substring(0, $UploadTemplate.IndexOf("{"))
+            $assets = Get-ChildItem -LiteralPath $Directory -File | Sort-Object Name
+            foreach ($asset in $assets) {
+              $encodedName = [System.Uri]::EscapeDataString($asset.Name)
+              $endpoint = "${uploadBaseUrl}?name=$encodedName"
+              $uploadArgs = @(
+                "api", "--method", "POST",
+                "-H", "Content-Type: application/octet-stream",
+                "--input", $asset.FullName,
+                "--silent", $endpoint
+              )
+              gh @uploadArgs
+              if ($LASTEXITCODE -ne 0) {
+                throw "Could not upload Browser release asset $($asset.Name) to Release ID $ReleaseId."
+              }
+            }
+          }
+
           Assert-RemoteIdentity
           $createArgs = @(
             "api", "--method", "POST", "repos/$env:GITHUB_REPOSITORY/releases",
@@ -372,21 +401,24 @@ jobs:
             "-F", "draft=true",
             "-F", "prerelease=false",
             "-F", "generate_release_notes=true",
-            "-f", "make_latest=true",
-            "--jq", ".id"
+            "-f", "make_latest=true"
           )
-          $releaseIdText = gh @createArgs
+          $releaseJson = gh @createArgs
           if ($LASTEXITCODE -ne 0) { throw "Could not create the Browser draft Release." }
-          $releaseIdText = ($releaseIdText -join "").Trim()
+          try {
+            $release = ($releaseJson -join [Environment]::NewLine) | ConvertFrom-Json
+          } catch {
+            throw "GitHub returned invalid metadata for the Browser draft Release."
+          }
+          $releaseIdText = ([string]$release.id).Trim()
           if ($releaseIdText -cnotmatch "^[1-9][0-9]*$") {
             throw "GitHub did not return a valid Browser Release ID."
           }
           $releaseId = [long]$releaseIdText
+          $releaseUploadUrl = ([string]$release.upload_url).Trim()
           try {
             Assert-RemoteIdentity
-            $assets = Get-ChildItem -LiteralPath outputs/release/staging -File | ForEach-Object FullName
-            gh release upload "$env:RELEASE_TAG" @assets --repo "$env:GITHUB_REPOSITORY"
-            if ($LASTEXITCODE -ne 0) { throw "Could not upload every Browser release asset." }
+            Send-ReleaseAssetsById -ReleaseId $releaseId -UploadTemplate $releaseUploadUrl -Directory "outputs/release/staging"
             node scripts/verify-github-release.mjs --edition browser --version "$env:RELEASE_VERSION" --tag "$env:RELEASE_TAG" --release-id "$releaseId" --draft true --download true --stage outputs/release/staging
             if ($LASTEXITCODE -ne 0) { throw "Browser draft Release verification failed." }
             Assert-RemoteIdentity

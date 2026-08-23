@@ -323,7 +323,37 @@ jobs:
             if ($LASTEXITCODE -ne 0) { throw "Release commit is not on origin/main." }
           }
 
+          function Send-ReleaseAssetsById {
+            param(
+              [Parameter(Mandatory = $true)] [long] $ReleaseId,
+              [Parameter(Mandatory = $true)] [string] $UploadTemplate,
+              [Parameter(Mandatory = $true)] [string] $Directory
+            )
+
+            $expectedTemplate = "https://uploads.github.com/repos/$env:GITHUB_REPOSITORY/releases/$ReleaseId/assets{?name,label}"
+            if ($UploadTemplate -cne $expectedTemplate) {
+              throw "GitHub returned an unexpected upload URL for Desktop Release ID $ReleaseId."
+            }
+            $uploadBaseUrl = $UploadTemplate.Substring(0, $UploadTemplate.IndexOf("{"))
+            $assets = Get-ChildItem -LiteralPath $Directory -File | Sort-Object Name
+            foreach ($asset in $assets) {
+              $encodedName = [System.Uri]::EscapeDataString($asset.Name)
+              $endpoint = "${uploadBaseUrl}?name=$encodedName"
+              $uploadArgs = @(
+                "api", "--method", "POST",
+                "-H", "Content-Type: application/octet-stream",
+                "--input", $asset.FullName,
+                "--silent", $endpoint
+              )
+              gh @uploadArgs
+              if ($LASTEXITCODE -ne 0) {
+                throw "Could not upload Desktop Preview asset $($asset.Name) to Release ID $ReleaseId."
+              }
+            }
+          }
+
           Assert-RemoteIdentity
+          # REST equivalent of the legacy `gh release create --prerelease` channel flag.
           $releaseNotes = "Unsigned Windows community preview. The published installer is the NSIS setup that passed install/start/exit/uninstall round-trip validation; the bare Release EXE is also included. MSI is not published in v1.1.0. Windows SmartScreen may show Unknown publisher. Verify SHA256SUMS.txt before installation."
           $createArgs = @(
             "api", "--method", "POST", "repos/$env:GITHUB_REPOSITORY/releases",
@@ -333,21 +363,24 @@ jobs:
             "-f", "body=$releaseNotes",
             "-F", "draft=true",
             "-F", "prerelease=true",
-            "-f", "make_latest=false",
-            "--jq", ".id"
+            "-f", "make_latest=false"
           )
-          $releaseIdText = gh @createArgs
+          $releaseJson = gh @createArgs
           if ($LASTEXITCODE -ne 0) { throw "Could not create the Desktop Preview draft Release." }
-          $releaseIdText = ($releaseIdText -join "").Trim()
+          try {
+            $release = ($releaseJson -join [Environment]::NewLine) | ConvertFrom-Json
+          } catch {
+            throw "GitHub returned invalid metadata for the Desktop Preview draft Release."
+          }
+          $releaseIdText = ([string]$release.id).Trim()
           if ($releaseIdText -cnotmatch "^[1-9][0-9]*$") {
             throw "GitHub did not return a valid Desktop Preview Release ID."
           }
           $releaseId = [long]$releaseIdText
+          $releaseUploadUrl = ([string]$release.upload_url).Trim()
           try {
             Assert-RemoteIdentity
-            $assets = Get-ChildItem -LiteralPath outputs/release/staging -File | ForEach-Object FullName
-            gh release upload "$env:RELEASE_TAG" @assets --repo "$env:GITHUB_REPOSITORY"
-            if ($LASTEXITCODE -ne 0) { throw "Could not upload every Desktop Preview asset." }
+            Send-ReleaseAssetsById -ReleaseId $releaseId -UploadTemplate $releaseUploadUrl -Directory "outputs/release/staging"
             node scripts/verify-github-release.mjs --edition desktop --version "$env:RELEASE_VERSION" --tag "$env:RELEASE_TAG" --release-id "$releaseId" --draft true --download true --stage outputs/release/staging
             if ($LASTEXITCODE -ne 0) { throw "Desktop Preview draft verification failed." }
             Assert-RemoteIdentity

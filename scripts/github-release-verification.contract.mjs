@@ -144,7 +144,24 @@ for (const [workflowPath, edition] of [
   assert.match(publish, /"-f", "target_commitish=\$env:BUILT_COMMIT_SHA"/u);
   assert.match(publish, /"-F", "draft=true"/u);
   assert.match(publish, /\$releaseId = \[long\]\$releaseIdText/u);
-  assert.match(publish, /gh release upload /u);
+  assert.match(publish, /\$release = .*\| ConvertFrom-Json/u);
+  assert.match(publish, /\$release\.upload_url/u);
+  assert.doesNotMatch(publish, /gh release upload /u);
+  assert.match(publish, /function Send-ReleaseAssetsById/u);
+  assert.match(publish, /\[System\.Uri\]::EscapeDataString\(\$asset\.Name\)/u);
+  assert.doesNotMatch(publish, /"--hostname", "uploads\.github\.com"/u);
+  assert.match(
+    publish,
+    /https:\/\/uploads\.github\.com\/repos\/\$env:GITHUB_REPOSITORY\/releases\/\$ReleaseId\/assets\{\?name,label\}/u,
+  );
+  assert.match(
+    publish,
+    /\$endpoint = "\$\{uploadBaseUrl\}\?name=\$encodedName"/u,
+  );
+  assert.match(
+    publish,
+    /Send-ReleaseAssetsById -ReleaseId \$releaseId -UploadTemplate \$releaseUploadUrl -Directory "outputs\/release\/staging"/u,
+  );
   assert.match(
     publish,
     new RegExp(
