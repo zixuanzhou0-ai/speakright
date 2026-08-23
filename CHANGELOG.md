@@ -2,10 +2,11 @@
 
 This changelog records user- and contributor-visible changes from the point it was introduced. Earlier history is available through Git tags and commit history; it is not reconstructed here from memory.
 
-## 1.1.0 — release candidate
+## 1.1.0
 
-This entry describes the candidate source. It is not proof that the tags or
-GitHub Releases already exist; publication remains an explicit maintainer step.
+This entry records the source contents intended for the `v1.1.0` Browser Stable
+and `v1.1.0-desktop-preview.1` unsigned Desktop Preview tags. Publication status
+is authoritative only on the corresponding GitHub Release pages.
 
 ### Practice and feedback
 
@@ -52,8 +53,8 @@ GitHub Releases already exist; publication remains an explicit maintainer step.
   application-readiness evidence, and a bounded maintainer-reported offline
   testing attestation without participant data or audited adoption/outcome
   claims. Current source-bound release media passed its artifact contract and
-  maintainer visual review; tags and GitHub Releases remain explicit owner
-  steps.
+  maintainer visual review. The tag workflows independently verify the exact
+  commit, gates, and staged artifacts before creating a GitHub Release.
 
 ## Historical releases
 
