@@ -59,6 +59,11 @@ jobs:
       - name: Verify release manifest
         run: npm run check:release-version
 
+      - name: Verify release validation attachment contract
+        run: |
+          node scripts/release-validation-attachment.contract.mjs
+          node scripts/release-staging.contract.mjs
+
       - name: Validate publishable desktop build
         run: npm run validate:desktop-ci
         timeout-minutes: 60

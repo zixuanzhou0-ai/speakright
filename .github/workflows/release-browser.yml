@@ -214,7 +214,18 @@ jobs:
 
       - name: Stage Browser release assets
         shell: pwsh
+        env:
+          RELEASE_TAG: ${{ steps.release.outputs.release_tag }}
+          RELEASE_COMMIT_SHA: ${{ steps.release.outputs.commit_sha }}
         run: |
+          node scripts/release-validation-attachment.contract.mjs
+          if ($LASTEXITCODE -ne 0) {
+            throw "Release validation attachment contract failed."
+          }
+          node scripts/release-staging.contract.mjs
+          if ($LASTEXITCODE -ne 0) {
+            throw "Release staging contract failed."
+          }
           $stage = "outputs/release/staging"
           if (Test-Path -LiteralPath $stage) {
             Remove-Item -LiteralPath $stage -Recurse -Force
@@ -234,13 +245,21 @@ jobs:
           Copy-Item -LiteralPath PRIVACY.md -Destination $stage
           Copy-Item -LiteralPath THIRD_PARTY_NOTICES.md -Destination $stage
           Copy-Item -LiteralPath docs/assets/asset-rights-registry.json -Destination (Join-Path $stage "SpeakRight_v1.1.0_asset-rights-registry.json")
-          Copy-Item -LiteralPath docs/validation/V1.1.0_RELEASE_CANDIDATE.md -Destination (Join-Path $stage "SpeakRight_v1.1.0_release-validation.md")
           Copy-Item -LiteralPath docs/validation/USER_TESTING_SUMMARY.md -Destination (Join-Path $stage "SpeakRight_v1.1.0_user-testing-summary.md")
+          $releaseValidation = Join-Path $stage "SpeakRight_v1.1.0_release-validation.md"
+          node scripts/generate-release-validation-attachment.mjs --edition browser --tag $env:RELEASE_TAG --commit $env:RELEASE_COMMIT_SHA --output $releaseValidation
+          if ($LASTEXITCODE -ne 0) {
+            throw "Release validation attachment generation failed."
+          }
           $checksumLines = Get-ChildItem -LiteralPath $stage -File | Sort-Object Name | ForEach-Object {
             $hash = Get-FileHash -Algorithm SHA256 -LiteralPath $_.FullName
             "$($hash.Hash.ToLower())  $($_.Name)"
           }
           $checksumLines | Set-Content -LiteralPath (Join-Path $stage "SHA256SUMS.txt") -Encoding utf8
+          node scripts/verify-release-staging.mjs --edition browser --version 1.1.0 --stage $stage
+          if ($LASTEXITCODE -ne 0) {
+            throw "Browser release staging verification failed."
+          }
 
       - name: Upload verified Browser release assets
         if: github.event_name == 'push'
@@ -263,7 +282,7 @@ jobs:
             docs/assets/demo/manifest.json
             docs/assets/screenshots/release/v1.1.0/browser/manifest.json
             docs/assets/screenshots/release/v1.1.0/desktop/manifest.json
-            docs/validation/V1.1.0_RELEASE_CANDIDATE.md
+            outputs/release/staging/SpeakRight_v1.1.0_release-validation.md
             docs/validation/USER_TESTING_SUMMARY.md
           if-no-files-found: error
           compression-level: 0
@@ -287,7 +306,10 @@ jobs:
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: speakright-browser-stable-release-assets
-          path: release-assets
+          path: outputs/release/staging
+
+      - name: Re-verify downloaded Browser release assets
+        run: node scripts/verify-release-staging.mjs --edition browser --version 1.1.0 --stage outputs/release/staging
 
       - name: Create Browser Stable GitHub Release
         env:
@@ -322,5 +344,5 @@ jobs:
             throw "Release tag commit '$tagSha' is no longer an ancestor of origin/main."
           }
 
-          $assets = Get-ChildItem -LiteralPath release-assets -File | ForEach-Object FullName
+          $assets = Get-ChildItem -LiteralPath outputs/release/staging -File | ForEach-Object FullName
           gh release create "$env:RELEASE_TAG" @assets --repo "$env:GITHUB_REPOSITORY" --verify-tag --title "SpeakRight $env:RELEASE_VERSION — Browser Stable" --generate-notes
