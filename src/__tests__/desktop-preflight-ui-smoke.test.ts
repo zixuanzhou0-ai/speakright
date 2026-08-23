@@ -487,6 +487,15 @@ describe("desktop preflight and UI smoke", () => {
     expect(releaseSmoke).toContain("findConflictingSpeakRightProcesses");
     expect(evidenceCapture).toContain("SPEAKRIGHT_SECURE_STORE_SERVICE");
     expect(evidenceCapture).toContain("findConflictingSpeakRightProcesses");
+    expect(evidenceCapture).toContain(
+      "snapshotOwnedWebViewProcesses(child.pid)",
+    );
+    expect(evidenceCapture).toContain(
+      "waitForWindowsProcessSnapshotsToExit(ownedWebViewSnapshots)",
+    );
+    expect(evidenceCapture).toContain("waitForChildExit(childState");
+    expect(evidenceCapture).toContain("maxRetries: 10");
+    expect(evidenceCapture).toContain("retryDelay: 250");
     expect(uiSmoke).toContain("ui-smoke-$" + "{randomUUID()}");
     expect(uiSmoke).toContain("SPEAKRIGHT_LOG_DIR");
     expect(uiSmoke).toContain("SPEAKRIGHT_SETTINGS_STORE_PATH");
@@ -502,6 +511,8 @@ describe("desktop preflight and UI smoke", () => {
     expect(rustRuntime).toContain("validate_log_directory_override");
     expect(processBoundary).toContain("Get-CimInstance Win32_Process");
     expect(processBoundary).toContain("process-path-unavailable");
+    expect(processBoundary).toContain("findOwnedProcessSnapshots");
+    expect(processBoundary).toContain("waitForWindowsProcessSnapshotsToExit");
     expect(processBoundary).not.toContain("taskkill");
     expect(processBoundary).not.toContain("Stop-Process");
   });

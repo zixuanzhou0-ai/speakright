@@ -34,7 +34,10 @@ import {
 } from "./lib/release-evidence-source-digest.mjs";
 import {
   findConflictingSpeakRightProcesses,
+  findOwnedProcessSnapshots,
   formatSpeakRightProcessConflicts,
+  queryWindowsProcessTable,
+  waitForWindowsProcessSnapshotsToExit,
 } from "./lib/windows-process-boundary.mjs";
 
 const root = process.cwd();
@@ -244,6 +247,57 @@ async function waitForRuntimeLog(logDir) {
     await delay(200);
   }
   throw new Error("Desktop evidence did not initialize its isolated TEMP log.");
+}
+
+async function waitForChildExit(childState, label, waitMs = 10_000) {
+  const deadline = Date.now() + waitMs;
+  while (!childState.exited && Date.now() < deadline) {
+    await delay(100);
+  }
+  if (!childState.exited) {
+    throw new Error(`${label} did not exit within ${waitMs}ms.`);
+  }
+}
+
+async function snapshotOwnedWebViewProcesses(rootPid) {
+  const snapshots = findOwnedProcessSnapshots({
+    processes: await queryWindowsProcessTable(),
+    rootPid,
+    executableName: "msedgewebview2.exe",
+  });
+  if (snapshots.length === 0) {
+    throw new Error(
+      "Desktop evidence did not expose an owned WebView2 process.",
+    );
+  }
+  return snapshots;
+}
+
+function mergeProcessSnapshots(...snapshotGroups) {
+  const merged = new Map();
+  for (const snapshot of snapshotGroups.flat()) {
+    merged.set(
+      `${snapshot.processId}:${snapshot.name.toLowerCase()}`,
+      snapshot,
+    );
+  }
+  return [...merged.values()];
+}
+
+function cleanupFailureSummary(errors) {
+  return errors
+    .map((error) => {
+      const name =
+        error instanceof Error && /^[A-Za-z][A-Za-z0-9]*$/u.test(error.name)
+          ? error.name
+          : "Error";
+      const code =
+        typeof error?.code === "string" && /^[A-Z0-9_-]+$/u.test(error.code)
+          ? error.code
+          : null;
+      return code ? `${name}:${code}` : name;
+    })
+    .join(", ");
 }
 
 async function waitForDevtoolsTarget(profileRoot, childState) {
@@ -808,6 +862,8 @@ async function main() {
   let cdp = null;
   let runtimeLogInitialized = false;
   let verifiedApplicationOrigin = null;
+  let ownedWebViewSnapshots = [];
+  let captureError = null;
 
   try {
     const target = await waitForDevtoolsTarget(profileRoot, childState);
@@ -815,6 +871,7 @@ async function main() {
     await cdp.send("Runtime.enable");
     await cdp.send("Page.enable");
     await cdp.send("Network.enable");
+    ownedWebViewSnapshots = await snapshotOwnedWebViewProcesses(child.pid);
     runtimeLogInitialized = await waitForRuntimeLog(logDir);
     const recordExternalOrigin = (target, url) => {
       const classification = classifyDesktopEvidenceNetworkUrl(url);
@@ -925,12 +982,58 @@ async function main() {
       await inspectRuntimeBoundary(cdp, canonicalSettingsDirectory),
       "post-capture verification",
     );
+  } catch (error) {
+    captureError = error;
   } finally {
-    cdp?.close();
-    if (!child.killed) child.kill();
-    await delay(500);
-    await rm(profileRoot, { recursive: true, force: true });
+    const cleanupFailures = [];
+    if (!childState.exited) {
+      try {
+        ownedWebViewSnapshots = mergeProcessSnapshots(
+          ownedWebViewSnapshots,
+          await snapshotOwnedWebViewProcesses(child.pid),
+        );
+      } catch (error) {
+        cleanupFailures.push(error);
+      }
+    }
+    try {
+      cdp?.close();
+    } catch (error) {
+      cleanupFailures.push(error);
+    }
+    try {
+      if (!child.killed && !childState.exited) child.kill();
+      await waitForChildExit(childState, "Desktop evidence process");
+    } catch (error) {
+      cleanupFailures.push(error);
+    }
+    try {
+      await waitForWindowsProcessSnapshotsToExit(ownedWebViewSnapshots);
+    } catch (error) {
+      cleanupFailures.push(error);
+    }
+    try {
+      await rm(profileRoot, {
+        recursive: true,
+        force: true,
+        maxRetries: 10,
+        retryDelay: 250,
+      });
+    } catch (error) {
+      cleanupFailures.push(error);
+    }
+    if (cleanupFailures.length > 0) {
+      const summary = cleanupFailureSummary(cleanupFailures);
+      if (captureError instanceof Error) {
+        captureError.message = `${captureError.message} Cleanup also failed (${summary}).`;
+      } else {
+        captureError = new Error(
+          `Desktop evidence cleanup failed (${summary}).`,
+        );
+      }
+    }
   }
+  if (captureError) throw captureError;
   if (existsSync(profileRoot)) {
     throw new Error("Desktop evidence TEMP runtime directory was not removed.");
   }
