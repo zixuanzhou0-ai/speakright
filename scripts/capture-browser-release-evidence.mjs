@@ -4,7 +4,10 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 import { chromium } from "@playwright/test";
-import { releaseEvidenceAssetSet } from "./lib/release-evidence-assets.mjs";
+import {
+  RELEASE_EVIDENCE_ASSET_SET_SCHEMA,
+  releaseEvidenceAssetSet,
+} from "./lib/release-evidence-assets.mjs";
 import {
   BROWSER_EVIDENCE_VIEWPORTS,
   EXAMPLE_SCORE_DISCLOSURE,
@@ -123,7 +126,7 @@ function assertBuildManifest(manifest) {
     manifest.edition !== "browser" ||
     manifest.fixtureBuild !== true ||
     manifest.paidApiCalls !== false ||
-    manifest.assetSet?.schemaVersion !== 1 ||
+    manifest.assetSet?.schemaVersion !== RELEASE_EVIDENCE_ASSET_SET_SCHEMA ||
     !Number.isInteger(manifest.assetSet?.fileCount) ||
     manifest.assetSet.fileCount <= 0 ||
     !Number.isSafeInteger(manifest.assetSet?.totalBytes) ||

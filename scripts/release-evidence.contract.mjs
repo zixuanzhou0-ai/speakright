@@ -9,7 +9,10 @@ import {
   classifyDesktopEvidenceNetworkUrl,
   isExactWindowsSettingsStorePath,
 } from "./capture-desktop-release-evidence.mjs";
-import { releaseEvidenceAssetSet } from "./lib/release-evidence-assets.mjs";
+import {
+  RELEASE_EVIDENCE_ASSET_SET_SCHEMA,
+  releaseEvidenceAssetSet,
+} from "./lib/release-evidence-assets.mjs";
 import {
   BROWSER_EVIDENCE_VIEWPORTS,
   DESKTOP_EVIDENCE_APPLICATION_ORIGINS,
@@ -469,7 +472,10 @@ async function validateScreenshotManifest(edition, viewports) {
     ],
     `${edition} asset set`,
   );
-  assert.equal(manifest.assetSet.schemaVersion, 1);
+  assert.equal(
+    manifest.assetSet.schemaVersion,
+    RELEASE_EVIDENCE_ASSET_SET_SCHEMA,
+  );
   assert.equal(Number.isInteger(manifest.assetSet.fileCount), true);
   assert.ok(manifest.assetSet.fileCount > 0);
   assert.equal(Number.isSafeInteger(manifest.assetSet.totalBytes), true);

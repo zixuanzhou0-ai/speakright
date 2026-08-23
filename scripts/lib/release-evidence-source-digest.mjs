@@ -61,7 +61,6 @@ const INPUTS = {
     "src-tauri",
     "packages/core",
     ...DESKTOP_EVIDENCE_TEST_SUPPORT_FILES,
-    "next-env.d.ts",
     "next.config.ts",
     "package.json",
     "package-lock.json",

@@ -6,8 +6,10 @@ import os from "node:os";
 import path from "node:path";
 import { digestAssetFamily, walkFiles } from "./lib/asset-rights-core.mjs";
 import {
+  canonicalizeReleaseEvidenceAssetBytes,
   compareReleaseEvidencePaths,
   materializeReleaseEvidenceAssets,
+  RELEASE_EVIDENCE_ASSET_SET_SCHEMA,
   releaseEvidenceAssetSet,
 } from "./lib/release-evidence-assets.mjs";
 
@@ -38,12 +40,18 @@ async function writeFixture(projectRoot) {
     "audio/a_y0qGSC-ZY.mp3",
     "audio/demo.mp3",
   ].sort(compareReleaseEvidencePaths);
+  const metadataPath = "metadata.json";
+  const canonicalMetadata = Buffer.from('{\n  "fixture": true\n}\n');
+  const checkoutMetadata = Buffer.from(
+    canonicalMetadata.toString("utf8").replaceAll("\n", "\r\n"),
+  );
   for (const relativePath of approvedAudio) {
     await writeFile(
       path.join(publicRoot, ...relativePath.split("/")),
       `fixture:${relativePath}`,
     );
   }
+  await writeFile(path.join(publicRoot, metadataPath), checkoutMetadata);
   await writeFile(
     path.join(publicRoot, "videos", "phonemes", "ignored.mp4"),
     "ignored-local-video",
@@ -73,6 +81,15 @@ async function writeFixture(projectRoot) {
     path.join(projectRoot, "scripts", "lib", "release-evidence-assets.mjs"),
     "// fixture evidence policy input\n",
   );
+  await writeFile(
+    path.join(
+      projectRoot,
+      "scripts",
+      "lib",
+      "release-evidence-source-digest.mjs",
+    ),
+    "// fixture canonicalization policy input\n",
+  );
   const digest = await digestAssetFamily(publicRoot, approvedAudio);
   const registry = {
     $schema: "./asset-rights-registry.schema.json",
@@ -97,7 +114,16 @@ async function writeFixture(projectRoot) {
     ],
   };
   await writeFile(registryPath, `${JSON.stringify(registry, null, 2)}\n`);
-  return { approvedAudio, publicRoot, registryPath };
+  return {
+    approvedFiles: [...approvedAudio, metadataPath].sort(
+      compareReleaseEvidencePaths,
+    ),
+    canonicalMetadata,
+    checkoutMetadata,
+    metadataPath,
+    publicRoot,
+    registryPath,
+  };
 }
 
 async function main() {
@@ -105,8 +131,14 @@ async function main() {
     path.join(os.tmpdir(), "speakright-release-evidence-assets-contract-"),
   );
   try {
-    const { approvedAudio, publicRoot, registryPath } =
-      await writeFixture(projectRoot);
+    const {
+      approvedFiles,
+      canonicalMetadata,
+      checkoutMetadata,
+      metadataPath,
+      publicRoot,
+      registryPath,
+    } = await writeFixture(projectRoot);
     git(projectRoot, ["init", "--quiet"]);
     git(projectRoot, [
       "config",
@@ -123,10 +155,25 @@ async function main() {
       "browser",
       sourceCommit,
     );
-    assert.equal(initial.summary.fileCount, approvedAudio.length);
+    assert.equal(
+      initial.summary.schemaVersion,
+      RELEASE_EVIDENCE_ASSET_SET_SCHEMA,
+    );
+    assert.equal(initial.summary.fileCount, approvedFiles.length);
     assert.deepEqual(
       initial.files.map((entry) => entry.path),
-      approvedAudio,
+      approvedFiles,
+    );
+    assert.deepEqual(
+      canonicalizeReleaseEvidenceAssetBytes(metadataPath, checkoutMetadata),
+      canonicalMetadata,
+      "CRLF metadata must canonicalize to LF bytes",
+    );
+    const binaryFixture = Buffer.from("binary\r\nfixture\r");
+    assert.strictEqual(
+      canonicalizeReleaseEvidenceAssetBytes("audio/demo.mp3", binaryFixture),
+      binaryFixture,
+      "Binary asset extensions must never receive text conversion",
     );
 
     const destinationRoot = path.join(projectRoot, "staging-browser");
@@ -137,9 +184,15 @@ async function main() {
       projectRoot,
     });
     assert.deepEqual(materialized.assetSet, initial.summary);
+    assert.equal(materialized.canonicalized, 1);
     assert.deepEqual(
       (await walkFiles(destinationRoot)).sort(compareReleaseEvidencePaths),
-      approvedAudio,
+      approvedFiles,
+    );
+    assert.deepEqual(
+      await readFile(path.join(destinationRoot, metadataPath)),
+      canonicalMetadata,
+      "Evidence staging must contain canonical LF metadata bytes",
     );
     assert.equal(
       existsSync(

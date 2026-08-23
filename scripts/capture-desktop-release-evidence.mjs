@@ -13,7 +13,10 @@ import os from "node:os";
 import path from "node:path";
 import process from "node:process";
 import { pathToFileURL } from "node:url";
-import { releaseEvidenceAssetSet } from "./lib/release-evidence-assets.mjs";
+import {
+  RELEASE_EVIDENCE_ASSET_SET_SCHEMA,
+  releaseEvidenceAssetSet,
+} from "./lib/release-evidence-assets.mjs";
 import {
   DESKTOP_EVIDENCE_APPLICATION_ORIGINS,
   DESKTOP_EVIDENCE_BROWSER_ARGUMENTS,
@@ -757,7 +760,8 @@ async function main() {
     buildManifest.edition !== "desktop" ||
     buildManifest.fixtureBuild !== true ||
     buildManifest.paidApiCalls !== false ||
-    buildManifest.assetSet?.schemaVersion !== 1 ||
+    buildManifest.assetSet?.schemaVersion !==
+      RELEASE_EVIDENCE_ASSET_SET_SCHEMA ||
     !Number.isInteger(buildManifest.assetSet?.fileCount) ||
     buildManifest.assetSet.fileCount <= 0 ||
     !Number.isSafeInteger(buildManifest.assetSet?.totalBytes) ||
