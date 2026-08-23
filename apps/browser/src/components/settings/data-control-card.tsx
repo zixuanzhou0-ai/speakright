@@ -30,9 +30,11 @@ import {
   deleteBenchmarkAudioData,
   deleteLearningData,
   downloadLocalDataExport,
+  getInitialLocalDataSummary,
   getLocalDataSummary,
   LOCAL_DATA_SUMMARY_UNAVAILABLE_MESSAGE,
 } from "@/lib/data-registry";
+import { LOCAL_DATA_MIGRATION_EVENT } from "@/lib/local-data-migrations";
 import { downloadBrowserSupportBundle } from "@/lib/browser-diagnostics";
 
 type ConfirmAction =
@@ -125,13 +127,19 @@ export function DataControlCard() {
   const [busy, setBusy] = useState(false);
   const [resetIncludesApiKeys, setResetIncludesApiKeys] = useState(false);
   const [status, setStatus] = useState<DataControlStatus | null>(null);
-  const [summary, setSummary] = useState(() => getLocalDataSummary());
+  const [summary, setSummary] = useState(getInitialLocalDataSummary);
   const copy = confirmAction ? COPY[confirmAction] : null;
 
-  useEffect(
-    () => subscribeToStorage(() => setSummary(getLocalDataSummary())),
-    [],
-  );
+  useEffect(() => {
+    const refreshSummary = () => setSummary(getLocalDataSummary());
+    const unsubscribeFromStorage = subscribeToStorage(refreshSummary);
+    window.addEventListener(LOCAL_DATA_MIGRATION_EVENT, refreshSummary);
+    refreshSummary();
+    return () => {
+      unsubscribeFromStorage();
+      window.removeEventListener(LOCAL_DATA_MIGRATION_EVENT, refreshSummary);
+    };
+  }, []);
 
   const refresh = () => {
     setSummary(getLocalDataSummary());

@@ -82,10 +82,25 @@ test("microphone denial shows a recoverable Chinese error", async ({
 test("keyboard skip link and settings tabs keep visible focus", async ({
   page,
 }) => {
+  const hydrationErrors: string[] = [];
+  page.on("pageerror", (error) => {
+    if (/React error #418|Hydration failed|hydration mismatch/i.test(error.message)) {
+      hydrationErrors.push(error.message);
+    }
+  });
+
   await page.goto("/settings");
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        localStorage.getItem("speakright_local_data_schema_version"),
+      ),
+    )
+    .not.toBeNull();
   const skipLink = page.getByRole("link", { name: "跳转到主内容" });
-  await skipLink.focus();
+  await page.keyboard.press("Tab");
   await expect(skipLink).toBeFocused();
+  await expect(skipLink).toBeVisible();
   await page.keyboard.press("Enter");
   await expect(page.locator("#main-content")).toBeFocused();
 
@@ -100,6 +115,7 @@ test("keyboard skip link and settings tabs keep visible focus", async ({
     "aria-controls",
     "settings-panel-services",
   );
+  expect(hydrationErrors).toEqual([]);
 });
 
 test("free-practice TTS shortcut deep-links to the provider selector", async ({

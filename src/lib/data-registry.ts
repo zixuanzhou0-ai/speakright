@@ -18,6 +18,7 @@ import {
   clearCorruptLocalData,
   getLocalDataSchemaStatus,
   LOCAL_DATA_MIGRATED_AT_KEY,
+  LOCAL_DATA_SCHEMA_VERSION,
   LOCAL_DATA_SCHEMA_VERSION_KEY,
 } from "@/lib/local-data-migrations";
 import { storeGet } from "@/lib/tauri-store";
@@ -89,6 +90,17 @@ export interface LocalDataSummary {
   dataSchemaVersion: number;
   corruptItems: number;
   storageUnavailable?: boolean;
+}
+
+export function getInitialLocalDataSummary(): LocalDataSummary {
+  return {
+    learningKeys: 0,
+    cacheKeys: 0,
+    configuredApiKeys: 0,
+    apiKeySlots: API_KEY_STORAGE_KEYS.length,
+    dataSchemaVersion: LOCAL_DATA_SCHEMA_VERSION,
+    corruptItems: 0,
+  };
 }
 
 export interface DeleteAllLocalDataOptions {
