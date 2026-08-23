@@ -62,6 +62,25 @@ These lockfile updates are not considered release-validated until the final
 candidate passes locked Cargo check/test, RustSec audit, SBOM generation, the
 Windows Desktop build/smoke/installer chain, and hosted dependency review.
 
+### Tauri 2.11 NSIS template review
+
+The installer round-trip has an explicit Tauri CLI version guard. Before
+advancing it from `2.10.1` to `2.11.4`, the official templates at commits
+[`9b17a7ae`](https://github.com/tauri-apps/tauri/blob/9b17a7aeae9a83222ffe829aa4e2d8a5ba6bed8c/crates/tauri-bundler/src/bundle/windows/nsis/installer.nsi)
+and
+[`8909f221`](https://github.com/tauri-apps/tauri/blob/8909f221d1515955fc843808032bdc5d62209c96/crates/tauri-bundler/src/bundle/windows/nsis/installer.nsi)
+were compared using the
+[official repository diff](https://github.com/tauri-apps/tauri/compare/9b17a7aeae9a83222ffe829aa4e2d8a5ba6bed8c...8909f221d1515955fc843808032bdc5d62209c96).
+
+For SpeakRight's default `currentUser` install with no custom NSIS template,
+hooks, or start-menu folder, the changes are limited to a verified signed-plugin
+search directory, optional uninstaller branding, clearer build failures, and a
+minimum-WebView-version configuration fallback that SpeakRight does not set.
+The install scope, UAC level, same-user process handling, registry keys,
+shortcuts, silent arguments, `WriteUninstaller`, and uninstall cleanup remain
+unchanged. The guarded 18-test contract and a real NSIS install/start/exit/
+uninstall round trip both passed after the review.
+
 ## Time-bounded transitive exceptions
 
 No critical or high-severity dependency exception is accepted for v1.1.0. Two
