@@ -29,6 +29,7 @@ export const DESKTOP_EVIDENCE_TEST_SUPPORT_FILES = Object.freeze([
   "scripts/browser-production-output-snapshot.mjs",
   "scripts/desktop-installer-roundtrip-core.mjs",
   "scripts/lib/desktop-preview-release-gate-core.mjs",
+  "scripts/lib/windows-process-boundary.mjs",
   "scripts/tauri-bundle-executable-identity.mjs",
   "scripts/windows-authenticode-status.mjs",
 ]);
