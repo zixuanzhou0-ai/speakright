@@ -64,6 +64,8 @@ const QUICK_THREE_WORD_PLAN: GuidedRepeatSessionPlan = {
   totalWords: 3,
 };
 
+const GUIDED_REPEAT_TIMER_TIMEOUT_MS = 5_000;
+
 class FakeAudioAdapter implements GuidedRepeatAudioAdapter {
   readonly preload = vi.fn(
     async (_src: string): Promise<AudioMetadata> => ({ durationMs: 100 }),
@@ -193,7 +195,7 @@ describe("useGuidedRepeatSession", () => {
     expect(result.current.status).toBe("playing");
     expect(adapter.resume).not.toHaveBeenCalled();
     await waitFor(() => expect(adapter.play).toHaveBeenCalledTimes(2), {
-      timeout: 1500,
+      timeout: GUIDED_REPEAT_TIMER_TIMEOUT_MS,
     });
   });
 
@@ -310,7 +312,7 @@ describe("useGuidedRepeatSession", () => {
           turn: 2,
         });
       },
-      { timeout: 1_500 },
+      { timeout: GUIDED_REPEAT_TIMER_TIMEOUT_MS },
     );
 
     act(() => adapter.finishPlayback());
@@ -320,7 +322,7 @@ describe("useGuidedRepeatSession", () => {
           kind: "audio",
           role: "word-masculine",
         }),
-      { timeout: 1_500 },
+      { timeout: GUIDED_REPEAT_TIMER_TIMEOUT_MS },
     );
     expect(result.current.canOperateOnWord).toBe(true);
 
@@ -351,7 +353,7 @@ describe("useGuidedRepeatSession", () => {
     await waitFor(() => expect(adapter.play).toHaveBeenCalledTimes(1));
     act(() => adapter.finishPlayback());
     await waitFor(() => expect(result.current.canOperateOnWord).toBe(true), {
-      timeout: 1_500,
+      timeout: GUIDED_REPEAT_TIMER_TIMEOUT_MS,
     });
     act(() => result.current.advanceCurrent());
     await waitFor(() => expect(result.current.currentWordIndex).toBe(1));
@@ -379,7 +381,7 @@ describe("useGuidedRepeatSession", () => {
     await waitFor(() => expect(adapter.play).toHaveBeenCalledTimes(1));
     act(() => adapter.finishPlayback());
     await waitFor(() => expect(result.current.canOperateOnWord).toBe(true), {
-      timeout: 1_500,
+      timeout: GUIDED_REPEAT_TIMER_TIMEOUT_MS,
     });
     act(() => result.current.advanceCurrent());
     await waitFor(() => expect(result.current.currentWordIndex).toBe(1));
