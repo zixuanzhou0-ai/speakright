@@ -104,6 +104,11 @@ const windowsBuild = readFileSync(
   path.join(root, ".github/workflows/build-windows.yml"),
   "utf8",
 );
+assert.match(
+  windowsBuild,
+  /uses: actions\/checkout@[0-9a-f]{40}[\s\S]*?with:\s*\n\s+fetch-depth:\s+0\s*\n\s+persist-credentials:\s+false/,
+  "Ordinary Windows CI must fetch the evidence source commit without retaining push credentials.",
+);
 const windowsInstallerIndex = windowsBuild.indexOf(
   `pwsh -NoProfile -NonInteractive -File ${installerRelativePath}`,
 );
