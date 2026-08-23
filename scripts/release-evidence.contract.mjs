@@ -148,6 +148,14 @@ for (const scriptPath of [
   assert.match(source, /EXAMPLE_SCORE_DISCLOSURE/);
 }
 
+const fixtureSource = await readFile(
+  path.join(root, "scripts/lib/release-evidence-fixtures.mjs"),
+  "utf8",
+);
+assert.match(fixtureSource, /closest\('\[data-smoke\$="-page"\]'\)/);
+assert.match(fixtureSource, /pageRoot\.prepend\(banner\)/);
+assert.match(fixtureSource, /collisionRoot = pageRoot/);
+
 const browserCaptureSource = await readFile(
   path.join(root, "scripts/capture-browser-release-evidence.mjs"),
   "utf8",

@@ -377,9 +377,14 @@ export function evidenceBannerExpression(kind, shotId, readySelector) {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   } else {
     const main = document.querySelector('#main-content');
-    if (!main) return { ok: false, reason: 'main placement missing' };
-    main.prepend(banner);
+    const pageRoot = ready?.closest('[data-smoke$="-page"]');
+    if (!main || !(pageRoot instanceof HTMLElement)) {
+      return { ok: false, reason: 'page-root placement missing' };
+    }
+    collisionRoot = pageRoot;
+    pageRoot.prepend(banner);
     Object.assign(banner.style, { margin: '10px auto 0' });
+    pageRoot.scrollTop = 0;
     main.scrollTop = 0;
   }
 
