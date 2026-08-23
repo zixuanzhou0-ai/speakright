@@ -13,24 +13,24 @@
     "registrySha256": "7865d97f5c94bd6ad309e1e78b657c82fc13c173b3803de2a991d6ea830b59b5"
   },
   "generatorSnapshot": {
-    "schemaVersion": 1,
-    "sha256": "bca086571e2eb86a175622f7f13736e691890cce6146c62ca57f968cc175a2f4",
+    "schemaVersion": 2,
+    "sha256": "7d063f4e2d0c9b5183e6c45af69f27110ebd2a4d440a43d9c512eda1bee4264e",
     "fileCount": 16,
-    "totalBytes": 228976
+    "totalBytes": 230578
   },
   "captureTransport": {
     "additionalBrowserArgsSha256": "422deba0edb5bebce82abe55f41191198e210ee406b862753208667d52de6d0b",
     "mode": "ephemeral-loopback-cdp",
     "portFile": "WebView2/EBWebView/DevToolsActivePort"
   },
-  "credentialNamespace": "com.speakright.desktop.release-evidence-3cc05210a5bf80c1",
+  "credentialNamespace": "com.speakright.desktop.release-evidence-3362a905539767e4",
   "sourceSnapshot": {
-    "schemaVersion": 1,
-    "sha256": "063b7693b8c968090a53b81a65afcd22d29c687c584452747e6fc415e82373a2",
+    "schemaVersion": 2,
+    "sha256": "cc0fd8891167f51acb20867a8d519a28dc5f564db0ff847866d064c98cfb850b",
     "fileCount": 488
   },
   "sourceWorktreeClean": true,
-  "buildManifestSha256": "8d2a16172dd76db5d18f21ab2fbbe541ec1189c00f777eaf82aa428d93730095",
+  "buildManifestSha256": "4b796845e5892d2e6a2bdfd4fe72735b66e232a121eb7e4347f8562320d04982",
   "nativeHttpAttempts": 0,
   "secureStoreSlotsEmpty": true,
   "runtimeIsolation": {
@@ -50,10 +50,10 @@
     "tauriHttpGuardSha256": "912d4cf660188b58989b2422e9dc25ffef4d3bc8c6bae76630e67212392a5e49",
     "rustGuardSha256": "bd85a66a49776c70426ae485a8671f1388fa5649d810495547f344ad5b3fc38b"
   },
-  "sourceCommit": "2c63617f9f88df3db005b44a2d4b7b81edbee19a",
+  "sourceCommit": "086bfa15b5108dfcbeb1113bd943fb9a341ce56c",
   "executable": {
     "fileName": "speakright.exe",
-    "sha256": "10e1f2429510b0a1a72dbbbd927d4058c41e4d6f4e9072273b58e7ef999fcaa7"
+    "sha256": "7ced7d192e2b368472c45f19a1caf113a85bab71dd8c3dc5b56b317f3598ce02"
   },
   "networkPolicy": {
     "applicationOrigin": "http://tauri.localhost",
@@ -146,11 +146,6 @@
         "origin": "http://ipc.localhost",
         "pathname": "/secure_store_get",
         "resourceType": "Preflight"
-      },
-      {
-        "origin": "http://tauri.localhost",
-        "pathname": "/_next/static/chunks/043_4h-x82iau.js",
-        "resourceType": "Script"
       },
       {
         "origin": "http://tauri.localhost",
@@ -290,6 +285,11 @@
       {
         "origin": "http://tauri.localhost",
         "pathname": "/_next/static/chunks/32zoun16_x8r2.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/372k6e7z9kl08.js",
         "resourceType": "Script"
       },
       {
@@ -535,7 +535,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/desktop/1280x920/guided-repeat.png",
       "width": 1280,
       "height": 920,
-      "sha256": "21618680b1dbe2bc192bea12ab0f619bef3f095d7675d2947132a340438829a7",
+      "sha256": "922abe4634e62488a124337111d4d856e870475700b89ca8f54f7e5ede4b2bda",
       "geometry": {
         "banner": {
           "left": 471.1625061035156,
@@ -556,7 +556,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/desktop/1280x920/free-practice.png",
       "width": 1280,
       "height": 920,
-      "sha256": "79d7bd52dd686b0f828b5e16ed5a02588c59d4f70e4f1bc92381168e3dd15f87",
+      "sha256": "0973403c177d43a44f9b615c06fed75491c6a14b5fc4f7f0d52af01ecbf03941",
       "geometry": {
         "banner": {
           "left": 601.1625366210938,
@@ -577,7 +577,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/desktop/1280x920/diagnosis-example.png",
       "width": 1280,
       "height": 920,
-      "sha256": "07c74258808d6769a8123e84f2226795934fe710cb61a049251285babf3e1331",
+      "sha256": "c08f1af3f3e86d3a56c8937468d85492b0ff67d73b37feb42f73c0bbc3ae091c",
       "geometry": {
         "banner": {
           "left": 596.75,
@@ -598,7 +598,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/desktop/1280x920/settings.png",
       "width": 1280,
       "height": 920,
-      "sha256": "cc60f068152f6113f6712d31cc34f3ca79d51a916db0a2cab829b79d8cca8572",
+      "sha256": "030a75dc1b346040975edadf1ec2bce6b58e3c03bb093424ba00ab64f1e29891",
       "geometry": {
         "banner": {
           "left": 595.9625244140625,
@@ -619,7 +619,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/desktop/1280x920/progress-example.png",
       "width": 1280,
       "height": 920,
-      "sha256": "c76efe03ef46cfd637d1c8b63777386b03b151353139a68048eac689201ecc21",
+      "sha256": "129c96bace818b5367bbfaa44f485c7ca487c946e2a0eec10167566716e3b130",
       "geometry": {
         "banner": {
           "left": 596.75,
@@ -640,7 +640,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/desktop/1280x920/no-key.png",
       "width": 1280,
       "height": 920,
-      "sha256": "17ab8c1e812a2572cafc12d6533bbbe1b920c8dead7b563e0276098256afe023",
+      "sha256": "3257645e6e74823bb173cd942e845aee1e9d0add46e1aaefe2b08e81d5260280",
       "geometry": {
         "banner": {
           "left": 560.375,
@@ -661,7 +661,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/desktop/1024x800/guided-repeat.png",
       "width": 1024,
       "height": 800,
-      "sha256": "3ccae61d1d2e6f6e6265503dd7671141fc1bae3345808d0c65781235a7f9986e",
+      "sha256": "1575d7ad1a6178d3f6aac76d2682a1fbe09d57c0caee69233c0155293949727f",
       "geometry": {
         "banner": {
           "left": 343.1625061035156,
@@ -703,7 +703,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/desktop/1024x800/diagnosis-example.png",
       "width": 1024,
       "height": 800,
-      "sha256": "fe78ebbb165364c2923cf0533f34d40aa7136fb9d36dfaf88c7f5e321f2ac111",
+      "sha256": "9fe04f51f2c71674e1a0f71626794d3625a5d3aa61b098fc81accf3b36ed682b",
       "geometry": {
         "banner": {
           "left": 468.75,
@@ -724,7 +724,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/desktop/1024x800/settings.png",
       "width": 1024,
       "height": 800,
-      "sha256": "f59e8849197a446a9cbd008a737209e99f7318890ae811dbc3e47c27dd513844",
+      "sha256": "5d238618e0316d77abde884a2aec8fa6f5fcb5da18fc3a54d77d5ee4330812d4",
       "geometry": {
         "banner": {
           "left": 467.9624938964844,
@@ -745,7 +745,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/desktop/1024x800/progress-example.png",
       "width": 1024,
       "height": 800,
-      "sha256": "5da481b49285a4f2363e67de5fc1804944902d6e7b7ae09e2c48fbfac634b2f2",
+      "sha256": "7642d36f4b18e1d4490a81be2d8651bd08a84857eea7c51359c889f696e8c7c8",
       "geometry": {
         "banner": {
           "left": 468.75,
@@ -766,7 +766,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/desktop/1024x800/no-key.png",
       "width": 1024,
       "height": 800,
-      "sha256": "c86d1a6a9bde5a0c4ae5328a9b1ddbcaefa776aaf6e5de35f9836bf2ad1b188a",
+      "sha256": "5e181c7d4c8139063c81d7f5ba847ace7d7e32641939d5619d2cb9a32f8789dd",
       "geometry": {
         "banner": {
           "left": 432.375,

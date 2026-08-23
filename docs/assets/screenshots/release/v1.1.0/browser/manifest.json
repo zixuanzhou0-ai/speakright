@@ -13,25 +13,25 @@
     "registrySha256": "7865d97f5c94bd6ad309e1e78b657c82fc13c173b3803de2a991d6ea830b59b5"
   },
   "generatorSnapshot": {
-    "schemaVersion": 1,
-    "sha256": "bca086571e2eb86a175622f7f13736e691890cce6146c62ca57f968cc175a2f4",
+    "schemaVersion": 2,
+    "sha256": "7d063f4e2d0c9b5183e6c45af69f27110ebd2a4d440a43d9c512eda1bee4264e",
     "fileCount": 16,
-    "totalBytes": 228976
+    "totalBytes": 230578
   },
   "outputTree": {
     "schemaVersion": 1,
-    "sha256": "e1c8bfa12ca8e073d3653a45424353b44bb71de9191be5bdeac8c8c3f7c30bf9",
+    "sha256": "c0163e08a1b2a3048bcfa2d18b3809476291f1ef63cee07282f901c56be0ba27",
     "fileCount": 7651,
     "totalBytes": 504296235
   },
-  "sourceCommit": "2c63617f9f88df3db005b44a2d4b7b81edbee19a",
+  "sourceCommit": "086bfa15b5108dfcbeb1113bd943fb9a341ce56c",
   "sourceWorktreeClean": true,
   "sourceSnapshot": {
-    "schemaVersion": 1,
-    "sha256": "0fe756b3971e47bdf549901b8d157f4d4585a9331172ed082565d4f573e5dde5",
+    "schemaVersion": 2,
+    "sha256": "8fe15604849a04927e918e54d6d59d1c630a3006ea2c92c072a99f5143f34ee7",
     "fileCount": 473
   },
-  "buildManifestSha256": "c397a742ea6dbbd5633f971b4edd07a4426643402768533a48f535eec8ae418b",
+  "buildManifestSha256": "cb18c83b82445d20d0e51dbff56ba306799baeb6d5798f26492e49a9fc03d81b",
   "browserVersion": "151.0.4129.101",
   "blockedExternalOrigins": [],
   "artifacts": [
@@ -150,7 +150,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/1280x800/diagnosis-example.png",
       "width": 1280,
       "height": 800,
-      "sha256": "f81a544f838d1329d9e49ce53b7c2c3e36032ed043046a498c69fe0e356325bf",
+      "sha256": "91f092b14a77d9684be4faec2ba558258995d46fd9e75c08a777f9a1b19f17f1",
       "geometry": {
         "banner": {
           "left": 601.75,
@@ -204,7 +204,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/1280x800/settings.png",
       "width": 1280,
       "height": 800,
-      "sha256": "7a52195f94d126f14d731c9150904fd6532e6fc1bbd8e6512b9480b642861be3",
+      "sha256": "616b8e2f37a926875a0ea45d59e3d55abaf8128db21421c0fd638d724ab85953",
       "geometry": {
         "banner": {
           "left": 600.96875,
@@ -366,7 +366,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/390x844/guided-repeat.png",
       "width": 390,
       "height": 844,
-      "sha256": "e5be8291828cf4319298f73552ccf43ef81bddeb4b1dda2708dc830f51ee63ff",
+      "sha256": "02092f21d6a9da7e28f2445765746c49cd6441789c94e367b319ae6e01512121",
       "geometry": {
         "banner": {
           "left": 25.96875,
@@ -379,9 +379,9 @@
         "bannerOccludedPoints": 0,
         "heading": {
           "left": 29,
-          "top": 389.5,
+          "top": 312.25,
           "right": 94.984375,
-          "bottom": 425.5,
+          "bottom": 348.25,
           "width": 65.984375,
           "height": 36
         },
@@ -496,7 +496,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/390x844/diagnosis-example.png",
       "width": 390,
       "height": 844,
-      "sha256": "769e0fd5f36edfd4ed69a70d53791276c493096f6f7b5f3084dee42422082f2a",
+      "sha256": "de86591166ee7c60d4405be47ca8303b718c91e210e1ee6716815a11a74cd56c",
       "geometry": {
         "banner": {
           "left": 26.75,
@@ -842,7 +842,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/360x800/diagnosis-example.png",
       "width": 360,
       "height": 800,
-      "sha256": "2d4fa9bc0e0c900fc0c81a5c5b24b297420096649fc75905e264995cc0168497",
+      "sha256": "d77cbe90d87a685c507287089aaf488de2bcc28cce43105d9dd7dc4bd13abff2",
       "geometry": {
         "banner": {
           "left": 24,
