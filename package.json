@@ -192,7 +192,7 @@
     "wavesurfer.js": "^7.12.4"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.4.8",
+    "@biomejs/biome": "^2.5.9",
     "@playwright/test": "^1.61.1",
     "@tailwindcss/postcss": "^4",
     "@tauri-apps/cli": "^2.11.1",
