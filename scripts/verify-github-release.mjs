@@ -35,6 +35,17 @@ function requireBoolean(value, label) {
   throw new Error(`${label} must be true or false.`);
 }
 
+function requireReleaseId(value) {
+  if (!/^[1-9][0-9]*$/u.test(value)) {
+    throw new Error("--release-id must be a positive integer.");
+  }
+  const parsed = Number(value);
+  if (!Number.isSafeInteger(parsed)) {
+    throw new Error("--release-id exceeds the safe integer range.");
+  }
+  return parsed;
+}
+
 function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
 }
@@ -49,6 +60,7 @@ export function validateGithubReleaseMetadata({
   edition,
   version,
   tag,
+  releaseId,
   draft,
   release,
   localEntries,
@@ -57,8 +69,10 @@ export function validateGithubReleaseMetadata({
     ...expectedReleaseAssetNames(edition, version),
     "SHA256SUMS.txt",
   ].sort();
-  if (!release || !Number.isSafeInteger(release.id) || release.id <= 0) {
-    throw new Error("GitHub Release metadata has no valid release ID.");
+  if (!release || release.id !== releaseId) {
+    throw new Error(
+      `GitHub Release ID mismatch: expected ${releaseId}, received ${release?.id}.`,
+    );
   }
   if (release.tag_name !== tag) {
     throw new Error(`GitHub Release tag mismatch: ${release.tag_name}.`);
@@ -189,6 +203,7 @@ function main() {
   const edition = requireArgument(args, "--edition");
   const version = requireArgument(args, "--version");
   const tag = requireArgument(args, "--tag");
+  const releaseId = requireReleaseId(requireArgument(args, "--release-id"));
   const draft = requireBoolean(requireArgument(args, "--draft"), "--draft");
   const download = requireBoolean(
     requireArgument(args, "--download"),
@@ -208,12 +223,13 @@ function main() {
   const localEntries = readReleaseDirectoryEntries(stage);
   verifyReleaseStagingEntries({ edition, version, entries: localEntries });
   const release = JSON.parse(
-    runGh(["api", `repos/${repository}/releases/tags/${tag}`]),
+    runGh(["api", `repos/${repository}/releases/${releaseId}`]),
   );
   const result = validateGithubReleaseMetadata({
     edition,
     version,
     tag,
+    releaseId,
     draft,
     release,
     localEntries,

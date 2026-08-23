@@ -37,7 +37,15 @@ function fixture(edition, draft) {
       browser_download_url: `https://github.com/zixuanzhou0-ai/speakright/releases/download/${tag}/${encodeURIComponent(name)}`,
     })),
   };
-  return { edition, version, tag, draft, release, localEntries };
+  return {
+    edition,
+    version,
+    tag,
+    releaseId: release.id,
+    draft,
+    release,
+    localEntries,
+  };
 }
 
 for (const edition of ["browser", "desktop"]) {
@@ -94,6 +102,14 @@ assert.throws(
   () => validateGithubReleaseMetadata({ ...browser, release: wrongTag }),
   /tag mismatch/u,
 );
+assert.throws(
+  () =>
+    validateGithubReleaseMetadata({
+      ...browser,
+      releaseId: browser.releaseId + 1,
+    }),
+  /ID mismatch/u,
+);
 
 for (const [workflowPath, edition] of [
   [".github/workflows/release-browser.yml", "browser"],
@@ -123,26 +139,45 @@ for (const [workflowPath, edition] of [
     publish.indexOf("GH_TOKEN:") >
       publish.indexOf("Verify remote tag identity"),
   );
-  assert.match(publish, /gh release create .* --draft /u);
+  assert.match(publish, /\$createArgs = @\(/u);
+  assert.match(publish, /"api", "--method", "POST"/u);
+  assert.match(publish, /"-f", "target_commitish=\$env:BUILT_COMMIT_SHA"/u);
+  assert.match(publish, /"-F", "draft=true"/u);
+  assert.match(publish, /\$releaseId = \[long\]\$releaseIdText/u);
   assert.match(publish, /gh release upload /u);
   assert.match(
     publish,
     new RegExp(
-      `verify-github-release\\.mjs --edition ${edition} .*--draft true --download true`,
+      `verify-github-release\\.mjs --edition ${edition} .*--release-id "\\$releaseId" --draft true --download true`,
       "u",
     ),
   );
-  assert.match(publish, /gh release edit .* --draft=false /u);
+  assert.match(publish, /\$publishArgs = @\(/u);
+  assert.match(publish, /"api", "--method", "PATCH"/u);
+  assert.match(publish, /"-F", "draft=false"/u);
   assert.match(
     publish,
     new RegExp(
-      `verify-github-release\\.mjs --edition ${edition} .*--draft false --download false`,
+      `verify-github-release\\.mjs --edition ${edition} .*--release-id "\\$releaseId" --draft false --download false`,
       "u",
     ),
   );
-  assert.match(publish, /gh release delete .* --yes/u);
-  assert.doesNotMatch(publish, /gh release create .*@assets/u);
+  assert.match(
+    publish,
+    /gh api --method DELETE "repos\/\$env:GITHUB_REPOSITORY\/releases\/\$releaseId"/u,
+  );
+  assert.doesNotMatch(publish, /\$published/u);
 }
+
+const verifierSource = readFileSync(
+  "scripts/verify-github-release.mjs",
+  "utf8",
+);
+assert.match(
+  verifierSource,
+  /repos\/\$\{repository\}\/releases\/\$\{releaseId\}/u,
+);
+assert.doesNotMatch(verifierSource, /releases\/tags/u);
 
 console.log(
   "GitHub Release verification contract passed for draft and published Browser/Desktop releases.",

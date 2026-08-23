@@ -324,26 +324,47 @@ jobs:
           }
 
           Assert-RemoteIdentity
-          gh release create "$env:RELEASE_TAG" --repo "$env:GITHUB_REPOSITORY" --verify-tag --draft --prerelease --latest=false --title "SpeakRight $env:RELEASE_VERSION — Unsigned Desktop Preview" --notes "Unsigned Windows community preview. The published installer is the NSIS setup that passed install/start/exit/uninstall round-trip validation; the bare Release EXE is also included. MSI is not published in v1.1.0. Windows SmartScreen may show Unknown publisher. Verify SHA256SUMS.txt before installation."
+          $releaseNotes = "Unsigned Windows community preview. The published installer is the NSIS setup that passed install/start/exit/uninstall round-trip validation; the bare Release EXE is also included. MSI is not published in v1.1.0. Windows SmartScreen may show Unknown publisher. Verify SHA256SUMS.txt before installation."
+          $createArgs = @(
+            "api", "--method", "POST", "repos/$env:GITHUB_REPOSITORY/releases",
+            "-f", "tag_name=$env:RELEASE_TAG",
+            "-f", "target_commitish=$env:BUILT_COMMIT_SHA",
+            "-f", "name=SpeakRight $env:RELEASE_VERSION — Unsigned Desktop Preview",
+            "-f", "body=$releaseNotes",
+            "-F", "draft=true",
+            "-F", "prerelease=true",
+            "-f", "make_latest=false",
+            "--jq", ".id"
+          )
+          $releaseIdText = gh @createArgs
           if ($LASTEXITCODE -ne 0) { throw "Could not create the Desktop Preview draft Release." }
-          $published = $false
+          $releaseIdText = ($releaseIdText -join "").Trim()
+          if ($releaseIdText -cnotmatch "^[1-9][0-9]*$") {
+            throw "GitHub did not return a valid Desktop Preview Release ID."
+          }
+          $releaseId = [long]$releaseIdText
           try {
+            Assert-RemoteIdentity
             $assets = Get-ChildItem -LiteralPath outputs/release/staging -File | ForEach-Object FullName
             gh release upload "$env:RELEASE_TAG" @assets --repo "$env:GITHUB_REPOSITORY"
             if ($LASTEXITCODE -ne 0) { throw "Could not upload every Desktop Preview asset." }
-            node scripts/verify-github-release.mjs --edition desktop --version "$env:RELEASE_VERSION" --tag "$env:RELEASE_TAG" --draft true --download true --stage outputs/release/staging
+            node scripts/verify-github-release.mjs --edition desktop --version "$env:RELEASE_VERSION" --tag "$env:RELEASE_TAG" --release-id "$releaseId" --draft true --download true --stage outputs/release/staging
             if ($LASTEXITCODE -ne 0) { throw "Desktop Preview draft verification failed." }
             Assert-RemoteIdentity
-            gh release edit "$env:RELEASE_TAG" --repo "$env:GITHUB_REPOSITORY" --draft=false --prerelease=true --latest=false
+            $publishArgs = @(
+              "api", "--method", "PATCH", "repos/$env:GITHUB_REPOSITORY/releases/$releaseId",
+              "-F", "draft=false",
+              "-F", "prerelease=true",
+              "-f", "make_latest=false",
+              "--silent"
+            )
+            gh @publishArgs
             if ($LASTEXITCODE -ne 0) { throw "Could not publish the Desktop Preview Release." }
-            $published = $true
             Assert-RemoteIdentity
-            node scripts/verify-github-release.mjs --edition desktop --version "$env:RELEASE_VERSION" --tag "$env:RELEASE_TAG" --draft false --download false --stage outputs/release/staging
+            node scripts/verify-github-release.mjs --edition desktop --version "$env:RELEASE_VERSION" --tag "$env:RELEASE_TAG" --release-id "$releaseId" --draft false --download false --stage outputs/release/staging
             if ($LASTEXITCODE -ne 0) { throw "Published Desktop Preview verification failed." }
           } catch {
-            if ($published) {
-              gh release delete "$env:RELEASE_TAG" --repo "$env:GITHUB_REPOSITORY" --yes
-              if ($LASTEXITCODE -ne 0) { Write-Error "Failed to remove an unverified published Desktop Preview Release." }
-            }
+            gh api --method DELETE "repos/$env:GITHUB_REPOSITORY/releases/$releaseId" --silent
+            if ($LASTEXITCODE -ne 0) { Write-Error "Failed to remove an unverified Desktop Draft or Release." }
             throw
           }

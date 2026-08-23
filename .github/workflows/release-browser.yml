@@ -364,26 +364,46 @@ jobs:
           }
 
           Assert-RemoteIdentity
-          gh release create "$env:RELEASE_TAG" --repo "$env:GITHUB_REPOSITORY" --verify-tag --draft --title "SpeakRight $env:RELEASE_VERSION — Browser Stable" --generate-notes
+          $createArgs = @(
+            "api", "--method", "POST", "repos/$env:GITHUB_REPOSITORY/releases",
+            "-f", "tag_name=$env:RELEASE_TAG",
+            "-f", "target_commitish=$env:BUILT_COMMIT_SHA",
+            "-f", "name=SpeakRight $env:RELEASE_VERSION — Browser Stable",
+            "-F", "draft=true",
+            "-F", "prerelease=false",
+            "-F", "generate_release_notes=true",
+            "-f", "make_latest=true",
+            "--jq", ".id"
+          )
+          $releaseIdText = gh @createArgs
           if ($LASTEXITCODE -ne 0) { throw "Could not create the Browser draft Release." }
-          $published = $false
+          $releaseIdText = ($releaseIdText -join "").Trim()
+          if ($releaseIdText -cnotmatch "^[1-9][0-9]*$") {
+            throw "GitHub did not return a valid Browser Release ID."
+          }
+          $releaseId = [long]$releaseIdText
           try {
+            Assert-RemoteIdentity
             $assets = Get-ChildItem -LiteralPath outputs/release/staging -File | ForEach-Object FullName
             gh release upload "$env:RELEASE_TAG" @assets --repo "$env:GITHUB_REPOSITORY"
             if ($LASTEXITCODE -ne 0) { throw "Could not upload every Browser release asset." }
-            node scripts/verify-github-release.mjs --edition browser --version "$env:RELEASE_VERSION" --tag "$env:RELEASE_TAG" --draft true --download true --stage outputs/release/staging
+            node scripts/verify-github-release.mjs --edition browser --version "$env:RELEASE_VERSION" --tag "$env:RELEASE_TAG" --release-id "$releaseId" --draft true --download true --stage outputs/release/staging
             if ($LASTEXITCODE -ne 0) { throw "Browser draft Release verification failed." }
             Assert-RemoteIdentity
-            gh release edit "$env:RELEASE_TAG" --repo "$env:GITHUB_REPOSITORY" --draft=false --prerelease=false --latest=true
+            $publishArgs = @(
+              "api", "--method", "PATCH", "repos/$env:GITHUB_REPOSITORY/releases/$releaseId",
+              "-F", "draft=false",
+              "-F", "prerelease=false",
+              "-f", "make_latest=true",
+              "--silent"
+            )
+            gh @publishArgs
             if ($LASTEXITCODE -ne 0) { throw "Could not publish the Browser Release." }
-            $published = $true
             Assert-RemoteIdentity
-            node scripts/verify-github-release.mjs --edition browser --version "$env:RELEASE_VERSION" --tag "$env:RELEASE_TAG" --draft false --download false --stage outputs/release/staging
+            node scripts/verify-github-release.mjs --edition browser --version "$env:RELEASE_VERSION" --tag "$env:RELEASE_TAG" --release-id "$releaseId" --draft false --download false --stage outputs/release/staging
             if ($LASTEXITCODE -ne 0) { throw "Published Browser Release verification failed." }
           } catch {
-            if ($published) {
-              gh release delete "$env:RELEASE_TAG" --repo "$env:GITHUB_REPOSITORY" --yes
-              if ($LASTEXITCODE -ne 0) { Write-Error "Failed to remove an unverified published Browser Release." }
-            }
+            gh api --method DELETE "repos/$env:GITHUB_REPOSITORY/releases/$releaseId" --silent
+            if ($LASTEXITCODE -ne 0) { Write-Error "Failed to remove an unverified Browser Draft or Release." }
             throw
           }
