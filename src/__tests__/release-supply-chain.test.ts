@@ -126,9 +126,21 @@ describe("v1.1.0 release and supply-chain contracts", () => {
 
     const security = read(".github/workflows/security.yml");
     expect(security).toContain("npm run security:audit:npm");
-    expect(security).toContain("cargo audit --file src-tauri/Cargo.lock");
+    expect(security).toContain("npm run security:audit:cargo");
     expect(security).toContain("fetch-depth: 0");
     expect(security).toContain("gitleaks/gitleaks-action@");
+
+    const packageJson = read("package.json");
+    expect(packageJson).toContain("security:audit:cargo:policy:test");
+    expect(packageJson).toContain(
+      "cargo audit --deny warnings --file src-tauri/Cargo.lock",
+    );
+    const cargoAuditPolicy = read(".cargo/audit.toml");
+    expect(cargoAuditPolicy).toContain('deny = ["warnings"]');
+    expect(cargoAuditPolicy.match(/RUSTSEC-\d{4}-\d{4}/g)).toHaveLength(19);
+    expect(
+      existsSync(join(root, "scripts/cargo-audit-policy.contract.mjs")),
+    ).toBe(true);
 
     const codeql = read(".github/workflows/codeql.yml");
     expect(codeql).toContain("security-events: write");
@@ -285,7 +297,7 @@ describe("v1.1.0 release and supply-chain contracts", () => {
     }
 
     const browserRelease = read(".github/workflows/release-browser.yml");
-    expect(browserRelease).toContain("cargo audit --file src-tauri/Cargo.lock");
+    expect(browserRelease).toContain("npm run security:audit:cargo");
     expect(browserRelease).toContain(
       "Get-ChildItem -LiteralPath $stage -File | Sort-Object Name",
     );
