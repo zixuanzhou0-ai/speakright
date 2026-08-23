@@ -111,6 +111,22 @@ assert.throws(
   /ID mismatch/u,
 );
 
+const browserReleaseWorkflow = readFileSync(
+  ".github/workflows/release-browser.yml",
+  "utf8",
+);
+const browserTagTrigger = browserReleaseWorkflow.slice(
+  browserReleaseWorkflow.indexOf("  push:"),
+  browserReleaseWorkflow.indexOf("  workflow_dispatch:"),
+);
+assert.match(browserTagTrigger, /- "v\*"/u);
+assert.match(browserTagTrigger, /- "!v\*-desktop-preview\.\*"/u);
+assert.ok(
+  browserTagTrigger.indexOf('- "v*"') <
+    browserTagTrigger.indexOf('- "!v*-desktop-preview.*"'),
+  "The Browser Stable workflow must exclude Desktop Preview tags after its inclusive tag pattern.",
+);
+
 for (const [workflowPath, edition] of [
   [".github/workflows/release-browser.yml", "browser"],
   [".github/workflows/release-desktop-preview.yml", "desktop"],
