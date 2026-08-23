@@ -7,9 +7,9 @@
   "assetSet": {
     "schemaVersion": 1,
     "fileCount": 6589,
-    "totalBytes": 480736051,
+    "totalBytes": 480735062,
     "pathDigestSha256": "3e6debb84b1c7e3f2ceb01aa7645dc8847276f90cd590fe9a85bdcde43a448ed",
-    "pathHashDigestSha256": "628071c8db52e52ed4d89e08fa10752a8c60e3191804ef0a63b0d880fb3cf61b",
+    "pathHashDigestSha256": "dd65de83a10fd2d775dbdae6cf868169d55debee540c4bcc08a0f7d34cf4d083",
     "registrySha256": "7865d97f5c94bd6ad309e1e78b657c82fc13c173b3803de2a991d6ea830b59b5"
   },
   "generatorSnapshot": {
@@ -20,18 +20,18 @@
   },
   "outputTree": {
     "schemaVersion": 1,
-    "sha256": "6f5fddc5de5c40fcb1861b7ca44d9d931180ca8c1e13aa49b52571d79ea4490a",
+    "sha256": "949bd8854ba820a60d9786e3e944e5dcf3ebbe17ace8b81f03dfaf82807a7807",
     "fileCount": 7651,
-    "totalBytes": 504296990
+    "totalBytes": 504296235
   },
-  "sourceCommit": "5fd93297ddc55c97a6c78b4568d6435411be2369",
+  "sourceCommit": "3ac40c55215580cf1d9d51bb31994af6bd3ac67a",
   "sourceWorktreeClean": true,
   "sourceSnapshot": {
     "schemaVersion": 1,
-    "sha256": "47655ad22b640f54907410853e7cc8739b91372e982c9f82bf6a328d2dc2c3c0",
+    "sha256": "b1093cce76513b31b16f89539c96afdbb4cbc38408120cdad01497a3905fe618",
     "fileCount": 473
   },
-  "buildManifestSha256": "e3410ac62f6f9bfe71cebb32463ff5e2aea789e7f71f26542dd312b53325546d",
+  "buildManifestSha256": "4db80d4ac2c7f01448c45c1f540f757ff7953468b62b54b40bf90faf853dfc7a",
   "browserVersion": "151.0.4129.101",
   "blockedExternalOrigins": [],
   "artifacts": [
@@ -150,7 +150,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/1280x800/diagnosis-example.png",
       "width": 1280,
       "height": 800,
-      "sha256": "1b973280b1e31bae6764989ea8e94ee510e424d36f361a245561d6ebaf57c03f",
+      "sha256": "6254d2d213a21f4083c8e1fb49c636bcc9d5f37619536567b42f25438cb839e1",
       "geometry": {
         "banner": {
           "left": 601.75,
@@ -204,7 +204,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/1280x800/settings.png",
       "width": 1280,
       "height": 800,
-      "sha256": "cf8147ef2fa3b7ecdddfc4c14a58ee1128658d128317bdc803c2e56ff4f765c9",
+      "sha256": "4a88f03e90584eb8fef72f97a71350e0f3253873d89d641a58eed06b4a1326ac",
       "geometry": {
         "banner": {
           "left": 600.96875,
@@ -496,7 +496,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/390x844/diagnosis-example.png",
       "width": 390,
       "height": 844,
-      "sha256": "c781020c838d9bf47f226cf57f72d1405170f574b04625b1feb9d9b9f59dc63e",
+      "sha256": "a97fe59174f5df5d85bfae41e7362bc5d87cf4af8026e318605d919661cb3158",
       "geometry": {
         "banner": {
           "left": 26.75,
@@ -550,7 +550,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/390x844/settings.png",
       "width": 390,
       "height": 844,
-      "sha256": "079078ba11a2111e819d7aa2b430c26e4e6046644afc2580524d1aed3f94bd80",
+      "sha256": "b9e3007dcc496f17effa68828923bdf5002bfdcf6eaba6ca35062b480db0c522",
       "geometry": {
         "banner": {
           "left": 25.96875,
@@ -896,7 +896,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/360x800/settings.png",
       "width": 360,
       "height": 800,
-      "sha256": "1059244e1d3f336d72b3df4e6393db0d912666efafcffe2062389c3ce7d6022b",
+      "sha256": "5de4b4c6baa71204e12952843d93c2b540a02c382cf12cfa193e2877fd7635f9",
       "geometry": {
         "banner": {
           "left": 12,

@@ -27,7 +27,7 @@
   "scoreDisclosure": "示例数据 / Example data — not a live Azure score",
   "paidApiCalls": false,
   "userData": false,
-  "sourceCommit": "5fd93297ddc55c97a6c78b4568d6435411be2369",
+  "sourceCommit": "3ac40c55215580cf1d9d51bb31994af6bd3ac67a",
   "generatorSnapshot": {
     "schemaVersion": 1,
     "sha256": "bca086571e2eb86a175622f7f13736e691890cce6146c62ca57f968cc175a2f4",
@@ -35,7 +35,7 @@
     "totalBytes": 228976
   },
   "path": "docs/assets/demo/speakright-v1.1.0-overview.mp4",
-  "sha256": "b8ea64bbff1096bbaecdabb606ae71b8482be2dd7d2d9df5d9721882ae15ae96",
+  "sha256": "37989b7d17b908862249e373de90cf7f7a636112c97ce984c694d760c43669bb",
   "frames": [
     {
       "edition": "demo",
@@ -97,13 +97,13 @@
       "path": "docs/assets/demo/frames/04-browser-diagnosis.png",
       "width": 1280,
       "height": 720,
-      "sha256": "99f470815454f999cc5bcd7384ef67ea18947b99a43c252c37235874640bdd23",
+      "sha256": "ea69765a0cf0b7f7f62646041065de312698c66e9bb4afd3970a9ae572d614a7",
       "scoreDisclosureOverlay": true,
       "sourceEvidence": {
         "edition": "browser",
         "id": "diagnosis-example",
         "path": "docs/assets/screenshots/release/v1.1.0/browser/1280x800/diagnosis-example.png",
-        "sha256": "1b973280b1e31bae6764989ea8e94ee510e424d36f361a245561d6ebaf57c03f",
+        "sha256": "6254d2d213a21f4083c8e1fb49c636bcc9d5f37619536567b42f25438cb839e1",
         "viewport": "1280x800",
         "width": 1280,
         "height": 800
@@ -137,13 +137,13 @@
       "path": "docs/assets/demo/frames/06-browser-settings.png",
       "width": 1280,
       "height": 720,
-      "sha256": "8fc67cadbd7b094019c1052404a2869d898e4ebea717624b458dca6d3a3dbc1c",
+      "sha256": "1c0ec5960e81fa7ff9a677a4714d4acecf66bee1e2bcc50e546eb448bfe7bc4a",
       "scoreDisclosureOverlay": false,
       "sourceEvidence": {
         "edition": "browser",
         "id": "settings",
         "path": "docs/assets/screenshots/release/v1.1.0/browser/1280x800/settings.png",
-        "sha256": "cf8147ef2fa3b7ecdddfc4c14a58ee1128658d128317bdc803c2e56ff4f765c9",
+        "sha256": "4a88f03e90584eb8fef72f97a71350e0f3253873d89d641a58eed06b4a1326ac",
         "viewport": "1280x800",
         "width": 1280,
         "height": 800
@@ -157,13 +157,13 @@
       "path": "docs/assets/demo/frames/07-desktop-guided-repeat.png",
       "width": 1280,
       "height": 720,
-      "sha256": "7938fbf78871c3da77531bb43f3417de895aba2727d82e30bc95adda31b0dbe4",
+      "sha256": "e58aa23b03cf3283d8dddac4f5b6bdcd4e7439622a248f676b4e95ab0d155486",
       "scoreDisclosureOverlay": false,
       "sourceEvidence": {
         "edition": "desktop",
         "id": "guided-repeat",
         "path": "docs/assets/screenshots/release/v1.1.0/desktop/1280x920/guided-repeat.png",
-        "sha256": "c4838677f8de11f0e4151d1d82a70610a71a5cbb8ed35393c5e266c82b96cbf4",
+        "sha256": "75e92f5d6c2dd62436fb7f3eabad67a2b07913d29d8575ddb9ad70b17ae59f7a",
         "viewport": "1280x920",
         "width": 1280,
         "height": 920
@@ -177,13 +177,13 @@
       "path": "docs/assets/demo/frames/08-desktop-diagnosis.png",
       "width": 1280,
       "height": 720,
-      "sha256": "f70be6f23ba469a666b58358c50ad7e756aef71bda1c775a629c9420af873b3f",
+      "sha256": "11e36aa883ac1ff4cfbd07fabf3b7f11f78ec68c5a64dba75e5f93a4e631c918",
       "scoreDisclosureOverlay": true,
       "sourceEvidence": {
         "edition": "desktop",
         "id": "diagnosis-example",
         "path": "docs/assets/screenshots/release/v1.1.0/desktop/1280x920/diagnosis-example.png",
-        "sha256": "c08f1af3f3e86d3a56c8937468d85492b0ff67d73b37feb42f73c0bbc3ae091c",
+        "sha256": "07c74258808d6769a8123e84f2226795934fe710cb61a049251285babf3e1331",
         "viewport": "1280x920",
         "width": 1280,
         "height": 920
