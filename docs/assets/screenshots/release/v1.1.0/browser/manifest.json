@@ -5,33 +5,33 @@
   "fixtureBuildRequired": true,
   "paidApiCalls": false,
   "assetSet": {
-    "schemaVersion": 1,
+    "schemaVersion": 2,
     "fileCount": 6589,
-    "totalBytes": 480735062,
-    "pathDigestSha256": "3e6debb84b1c7e3f2ceb01aa7645dc8847276f90cd590fe9a85bdcde43a448ed",
-    "pathHashDigestSha256": "dd65de83a10fd2d775dbdae6cf868169d55debee540c4bcc08a0f7d34cf4d083",
+    "totalBytes": 480726939,
+    "pathDigestSha256": "b0d52fdcece834a18909b1ed3c02181682fc1aa14581a638c54c084ed28e2509",
+    "pathHashDigestSha256": "b59edcdf6cdde8d71d54c182c3219d58fa8a444a8de758cf2e73f880c827a7cd",
     "registrySha256": "7865d97f5c94bd6ad309e1e78b657c82fc13c173b3803de2a991d6ea830b59b5"
   },
   "generatorSnapshot": {
     "schemaVersion": 2,
-    "sha256": "7d063f4e2d0c9b5183e6c45af69f27110ebd2a4d440a43d9c512eda1bee4264e",
+    "sha256": "a8ec00f379477edfbccbafb98e70bc5a165d2a69e3101a62c1dfa5726fb3698d",
     "fileCount": 16,
-    "totalBytes": 230578
+    "totalBytes": 233732
   },
   "outputTree": {
     "schemaVersion": 1,
-    "sha256": "c0163e08a1b2a3048bcfa2d18b3809476291f1ef63cee07282f901c56be0ba27",
+    "sha256": "e8ee3cf0718315be210be34fc95b0ac70b1908b431b7589659415f308874157c",
     "fileCount": 7651,
-    "totalBytes": 504296235
+    "totalBytes": 504288112
   },
-  "sourceCommit": "086bfa15b5108dfcbeb1113bd943fb9a341ce56c",
+  "sourceCommit": "7bc0512f8bf71027eb3fa9221ac46e35fd865b1b",
   "sourceWorktreeClean": true,
   "sourceSnapshot": {
     "schemaVersion": 2,
     "sha256": "8fe15604849a04927e918e54d6d59d1c630a3006ea2c92c072a99f5143f34ee7",
     "fileCount": 473
   },
-  "buildManifestSha256": "cb18c83b82445d20d0e51dbff56ba306799baeb6d5798f26492e49a9fc03d81b",
+  "buildManifestSha256": "d47fa4ecc55969785f7758d6c7221e91b6aa0f1fd6331d115396f5733a385b43",
   "browserVersion": "151.0.4129.101",
   "blockedExternalOrigins": [],
   "artifacts": [
@@ -150,7 +150,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/1280x800/diagnosis-example.png",
       "width": 1280,
       "height": 800,
-      "sha256": "91f092b14a77d9684be4faec2ba558258995d46fd9e75c08a777f9a1b19f17f1",
+      "sha256": "9b538a69630deff6ae31e044094890aa839bb5c430924a37913bca12e09ca13c",
       "geometry": {
         "banner": {
           "left": 601.75,
@@ -204,7 +204,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/1280x800/settings.png",
       "width": 1280,
       "height": 800,
-      "sha256": "616b8e2f37a926875a0ea45d59e3d55abaf8128db21421c0fd638d724ab85953",
+      "sha256": "2b34e1651a88080b2994ffc85b2457cdab2f57dee65cd8743aa5bcccf4bbe3c3",
       "geometry": {
         "banner": {
           "left": 600.96875,
@@ -496,7 +496,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/390x844/diagnosis-example.png",
       "width": 390,
       "height": 844,
-      "sha256": "de86591166ee7c60d4405be47ca8303b718c91e210e1ee6716815a11a74cd56c",
+      "sha256": "109d216eadd2068b3e4b6277b36299e40a36e5a6080c460a0f505efde77c5bf6",
       "geometry": {
         "banner": {
           "left": 26.75,

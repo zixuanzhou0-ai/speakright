@@ -60,7 +60,7 @@ node scripts/release-evidence.contract.mjs --artifacts
 
 These references passed
 `node scripts/release-evidence.contract.mjs --artifacts` against source commit
-`086bfa15b5108dfcbeb1113bd943fb9a341ce56c` and completed maintainer visual
+`7bc0512f8bf71027eb3fa9221ac46e35fd865b1b` and completed maintainer visual
 review on 2026-08-23. They remain candidate evidence; this statement does not
 mean the GitHub tags or Releases already exist.
 
