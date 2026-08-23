@@ -57,6 +57,8 @@ The v1.1.0 candidate lockfile has been advanced as defense in depth:
 | `@tauri-apps/api` / CLI | `2.10.x` | API `2.11.1`; CLI `2.11.x` | Keeps the JavaScript API and build CLI on the same Tauri major/minor line as the fixed Rust runtime; the isolated Desktop evidence build rejects a mismatched line. |
 | `serde_with` | `3.18.x` | `3.22.0` | Removes [GHSA-7gcf-g7xr-8hxj](https://github.com/advisories/GHSA-7gcf-g7xr-8hxj) from the resolved candidate graph. SpeakRight does not use the affected `KeyValueMap` API directly. |
 | `rand` | `0.8.5`, `0.9.2` | `0.8.6`, `0.9.3` | Applies the available patch releases for [GHSA-cq8v-f236-94qc](https://github.com/advisories/GHSA-cq8v-f236-94qc) in the directly updatable branches. |
+| `anyhow` | `1.0.102` | `1.0.103` | Removes [`RUSTSEC-2026-0190`](https://rustsec.org/advisories/RUSTSEC-2026-0190), an unsound `Error::downcast_mut()` implementation. The warning was found during log-level review even though cargo-audit's default exit status was successful. |
+| `event-listener` | `5.4.1` | `5.4.2` | Removes [`RUSTSEC-2026-0221`](https://rustsec.org/advisories/RUSTSEC-2026-0221), which allowed a `!Send` tag to cross thread boundaries. The patched release is used rather than adding an exception. |
 
 These lockfile updates are not considered release-validated until the final
 candidate passes locked Cargo check/test, RustSec audit, SBOM generation, the
@@ -83,19 +85,35 @@ uninstall round trip both passed after the review.
 
 ## Time-bounded transitive exceptions
 
-No critical or high-severity dependency exception is accepted for v1.1.0. Two
-lower-severity transitive findings cannot be removed from the current Windows
-candidate without replacing or upgrading a wider build/platform chain:
+No vulnerability failure and no critical or high-severity dependency exception
+is accepted for v1.1.0. cargo-audit classifies some advisories as informational
+warnings, so a default successful exit is not sufficient evidence. After the
+two patchable unsound advisories above are removed, the reviewed lockfile has an
+explicit set of **19 allowed informational warnings**: 2 unsound and 17
+unmaintained. The exact set and its target boundary are:
 
-| Dependency | Reachability evidence | Narrow acceptance |
-| --- | --- | --- |
-| [`rand 0.7.3`](https://github.com/advisories/GHSA-cq8v-f236-94qc) | Build-only chain: `phf_generator 0.8` -> `phf_codegen` -> `selectors` -> `kuchikiki` -> `tauri-utils`. It is not SpeakRight runtime randomness or an authentication primitive. | Review by `@zixuanzhou0-ai` no later than **2026-11-30**, and earlier if Tauri removes the chain, the advisory severity changes, or the package becomes runtime-reachable. |
-| [`glib 0.18.5`](https://github.com/advisories/GHSA-wrw7-89jp-8q8g) | Linux-only GTK/WebKit dependency. `cargo tree --target x86_64-pc-windows-msvc -i glib@0.18.5` has no result; v1.1.0 publishes no Linux Desktop artifact. | Review by `@zixuanzhou0-ai` no later than **2026-11-30**, and before enabling any Linux Desktop build, support claim, CI target, or release artifact. |
+| Group | Advisory IDs | Reachability evidence | Narrow acceptance |
+| --- | --- | --- | --- |
+| `rand 0.7.3` (unsound) | [`RUSTSEC-2026-0097`](https://rustsec.org/advisories/RUSTSEC-2026-0097) | Build-only chain: `phf_generator 0.8` -> `phf_codegen` -> `selectors` -> `kuchikiki` -> `tauri-utils`. It is not SpeakRight runtime randomness or an authentication primitive. | Review by `@zixuanzhou0-ai` no later than **2026-11-30**, and earlier if Tauri removes the chain, the advisory classification changes, or the package becomes runtime-reachable. |
+| `glib 0.18.5` (unsound) | [`RUSTSEC-2024-0429`](https://rustsec.org/advisories/RUSTSEC-2024-0429) | Linux-only GTK/WebKit dependency. `cargo tree --target x86_64-pc-windows-msvc -i glib@0.18.5` has no result; v1.1.0 publishes no Linux Desktop artifact. | Review by `@zixuanzhou0-ai` no later than **2026-11-30**, and before enabling any Linux Desktop build, support claim, CI target, or release artifact. |
+| GTK3 bindings (unmaintained) | [`RUSTSEC-2024-0411`](https://rustsec.org/advisories/RUSTSEC-2024-0411), [`RUSTSEC-2024-0412`](https://rustsec.org/advisories/RUSTSEC-2024-0412), [`RUSTSEC-2024-0413`](https://rustsec.org/advisories/RUSTSEC-2024-0413), [`RUSTSEC-2024-0414`](https://rustsec.org/advisories/RUSTSEC-2024-0414), [`RUSTSEC-2024-0415`](https://rustsec.org/advisories/RUSTSEC-2024-0415), [`RUSTSEC-2024-0416`](https://rustsec.org/advisories/RUSTSEC-2024-0416), [`RUSTSEC-2024-0417`](https://rustsec.org/advisories/RUSTSEC-2024-0417), [`RUSTSEC-2024-0418`](https://rustsec.org/advisories/RUSTSEC-2024-0418), [`RUSTSEC-2024-0419`](https://rustsec.org/advisories/RUSTSEC-2024-0419), [`RUSTSEC-2024-0420`](https://rustsec.org/advisories/RUSTSEC-2024-0420) | `atk`, `atk-sys`, `gdk`, `gdk-sys`, `gdkwayland-sys`, `gdkx11`, `gdkx11-sys`, `gtk`, `gtk-sys`, and `gtk3-macros` belong to the unsupported Linux GTK3 graph and are absent from the Windows target graph. | Same owner and **2026-11-30** deadline; the exception expires before any Linux Desktop CI, support claim, or artifact is enabled. |
+| `proc-macro-error 1.0.4` (unmaintained) | [`RUSTSEC-2024-0370`](https://rustsec.org/advisories/RUSTSEC-2024-0370) | Transitive macro dependency absent from `cargo tree --target x86_64-pc-windows-msvc`; it is not included in the supported Windows artifact graph. | Same owner and **2026-11-30** deadline; re-review immediately if it enters a supported target graph. |
+| `fxhash 0.2.1` (unmaintained) | [`RUSTSEC-2025-0057`](https://rustsec.org/advisories/RUSTSEC-2025-0057) | Windows-reachable upstream chain: `fxhash` -> `selectors` -> `kuchikiki` -> `tauri-utils`. This is a maintenance-status warning, not a reported vulnerability or unsoundness advisory. | Same owner and **2026-11-30** deadline; track the upstream Tauri parser chain and re-review on any advisory-classification change. |
+| `unic-* 0.9` (unmaintained) | [`RUSTSEC-2025-0075`](https://rustsec.org/advisories/RUSTSEC-2025-0075), [`RUSTSEC-2025-0080`](https://rustsec.org/advisories/RUSTSEC-2025-0080), [`RUSTSEC-2025-0081`](https://rustsec.org/advisories/RUSTSEC-2025-0081), [`RUSTSEC-2025-0098`](https://rustsec.org/advisories/RUSTSEC-2025-0098), [`RUSTSEC-2025-0100`](https://rustsec.org/advisories/RUSTSEC-2025-0100) | Windows-reachable `urlpattern` -> `tauri-utils` chain. These five records report unmaintained crates, not a vulnerability or unsoundness finding. | Same owner and **2026-11-30** deadline; track replacement or removal in the upstream Tauri URL-pattern chain. |
+
+The project-level [`.cargo/audit.toml`](../../.cargo/audit.toml) names only
+these 19 advisories and sets `deny = ["warnings"]`. Therefore a new
+vulnerability, unsoundness advisory, unmaintained warning, or yanked dependency
+fails CI instead of being hidden behind cargo-audit's default allowed-warning
+exit status. [`scripts/cargo-audit-policy.contract.mjs`](../../scripts/cargo-audit-policy.contract.mjs)
+also verifies the exact set, patched versions, public record, owner, and review
+deadline before every audit.
 
 The final dependency-review record should link this section when applying a
-documented `tolerable_risk` disposition. If either package enters the supported
-Windows runtime graph, gains a high/critical advisory, or no longer satisfies
-the evidence above, the exception expires immediately and blocks release.
+documented `tolerable_risk` disposition. If any assumption above changes, an
+ignored advisory changes classification, or a reviewed package enters a wider
+supported runtime boundary, its exception expires immediately and blocks
+release.
 
 ## Final release requirements
 

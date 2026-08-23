@@ -129,7 +129,7 @@ jobs:
         shell: pwsh
         run: |
           cargo install cargo-audit --locked --version 0.22.2
-          cargo audit --file src-tauri/Cargo.lock
+          npm run security:audit:cargo
 
       - name: Generate npm CycloneDX SBOMs
         run: npm run security:sbom:npm
