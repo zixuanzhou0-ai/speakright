@@ -20,18 +20,18 @@
   },
   "outputTree": {
     "schemaVersion": 1,
-    "sha256": "f80076a822203bb871a8b8ad437518f1af650e7ff390271cb0215dd30b651d03",
+    "sha256": "e1c8bfa12ca8e073d3653a45424353b44bb71de9191be5bdeac8c8c3f7c30bf9",
     "fileCount": 7651,
     "totalBytes": 504296235
   },
-  "sourceCommit": "2bc856a0861376818fcaa4552d3525e9a53e2c54",
+  "sourceCommit": "2c63617f9f88df3db005b44a2d4b7b81edbee19a",
   "sourceWorktreeClean": true,
   "sourceSnapshot": {
     "schemaVersion": 1,
     "sha256": "0fe756b3971e47bdf549901b8d157f4d4585a9331172ed082565d4f573e5dde5",
     "fileCount": 473
   },
-  "buildManifestSha256": "7f86ebecbfe6c5e0616d74b5cd728d77cb860d3e3aa4c68e441291e0efa5d566",
+  "buildManifestSha256": "c397a742ea6dbbd5633f971b4edd07a4426643402768533a48f535eec8ae418b",
   "browserVersion": "151.0.4129.101",
   "blockedExternalOrigins": [],
   "artifacts": [
@@ -42,7 +42,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/1280x800/guided-repeat.png",
       "width": 1280,
       "height": 800,
-      "sha256": "92f715bb172bc81849d5f5536364330f71f6226ed8044ca12622015f350683d4",
+      "sha256": "59dadc17abeefaac6079d2a13d7f16bc5a707f51365d36cbae931e5564e63d24",
       "geometry": {
         "banner": {
           "left": 470.96875,
@@ -55,9 +55,9 @@
         "bannerOccludedPoints": 0,
         "heading": {
           "left": 297,
-          "top": 279.875,
+          "top": 202.625,
           "right": 362.984375,
-          "bottom": 315.875,
+          "bottom": 238.625,
           "width": 65.984375,
           "height": 36
         },
@@ -150,7 +150,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/1280x800/diagnosis-example.png",
       "width": 1280,
       "height": 800,
-      "sha256": "09d81b0d50a5360f1fe301476aeb3c89fa1f8110619426bd106c8649311d8001",
+      "sha256": "f81a544f838d1329d9e49ce53b7c2c3e36032ed043046a498c69fe0e356325bf",
       "geometry": {
         "banner": {
           "left": 601.75,
@@ -204,7 +204,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/1280x800/settings.png",
       "width": 1280,
       "height": 800,
-      "sha256": "ca86037d84a755446bfee54d247c9bf4d09e98d4b4c44c074f5c57b882bbbd2b",
+      "sha256": "7a52195f94d126f14d731c9150904fd6532e6fc1bbd8e6512b9480b642861be3",
       "geometry": {
         "banner": {
           "left": 600.96875,
@@ -496,7 +496,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/390x844/diagnosis-example.png",
       "width": 390,
       "height": 844,
-      "sha256": "10d318a1d030a414e13d3b4a50ac47d899240ecf4f2d28a638bf4aa09485fc08",
+      "sha256": "769e0fd5f36edfd4ed69a70d53791276c493096f6f7b5f3084dee42422082f2a",
       "geometry": {
         "banner": {
           "left": 26.75,
@@ -842,7 +842,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/360x800/diagnosis-example.png",
       "width": 360,
       "height": 800,
-      "sha256": "d77cbe90d87a685c507287089aaf488de2bcc28cce43105d9dd7dc4bd13abff2",
+      "sha256": "2d4fa9bc0e0c900fc0c81a5c5b24b297420096649fc75905e264995cc0168497",
       "geometry": {
         "banner": {
           "left": 24,
