@@ -159,6 +159,11 @@ assert.match(
   fixtureSource,
   /pageRoot\.prepend\(banner\);[\s\S]{0,160}flexShrink: '0'/,
 );
+assert.match(fixtureSource, /const collisionTolerance = 0\.5/);
+assert.match(
+  fixtureSource,
+  /Math\.max\(left\.top, right\.top\) \+ collisionTolerance/,
+);
 
 const browserCaptureSource = await readFile(
   path.join(root, "scripts/capture-browser-release-evidence.mjs"),

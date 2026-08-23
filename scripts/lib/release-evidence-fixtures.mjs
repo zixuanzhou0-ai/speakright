@@ -428,9 +428,12 @@ export function evidenceBannerExpression(kind, shotId, readySelector) {
       'a,button,input,textarea,select,h1,h2,h3,h4,p,label,[role="status"],[role="alert"],[data-smoke]',
     ),
   ];
+  const collisionTolerance = 0.5;
   const intersects = (left, right) =>
-    Math.max(left.left, right.left) < Math.min(left.right, right.right) &&
-    Math.max(left.top, right.top) < Math.min(left.bottom, right.bottom);
+    Math.max(left.left, right.left) + collisionTolerance <
+      Math.min(left.right, right.right) &&
+    Math.max(left.top, right.top) + collisionTolerance <
+      Math.min(left.bottom, right.bottom);
   const collisions = protectedElements
     .filter((element) => element !== banner)
     .filter((element) => !element.contains(banner) && !banner.contains(element))
