@@ -212,7 +212,8 @@ export function LlmConfigCard() {
             data-smoke="llm-missing-key-guidance"
             role="status"
           >
-            未配置 AI 教练 Key 时，Azure 数字评分仍可用；中文教练反馈会显示配置提示，不会卡住评分流程。
+            未配置 AI 教练 Key 时，Azure
+            数字评分仍可用；中文教练反馈会显示配置提示，不会卡住评分流程。
           </div>
         )}
 
@@ -272,8 +273,8 @@ export function LlmConfigCard() {
               </p>
               {isDesktop && (
                 <p>
-                  桌面版不会放开任意 LLM 域名；官方 endpoint 确认并加入
-                  Tauri allowlist/CSP 后才能测试连接。
+                  桌面版不会放开任意 LLM 域名；官方 endpoint 确认并加入 Tauri
+                  allowlist/CSP 后才能测试连接。
                 </p>
               )}
               {preset.docsUrl && (
@@ -334,6 +335,11 @@ export function LlmConfigCard() {
                 </button>
               ))}
             </div>
+          )}
+          {!isCustom && preset.lastVerifiedAt && (
+            <p className="text-xs leading-relaxed text-muted-foreground">
+              {`\u9884\u8bbe\u5feb\u6377\u9879\u6700\u540e\u6838\u9a8c\u4e8e ${preset.lastVerifiedAt}\uff1b\u6a21\u578b\u8f93\u5165\u6846\u4ecd\u53ef\u81ea\u7531\u586b\u5199\uff0c\u9884\u8bbe\u4e0d\u662f\u5b8c\u6574\u6a21\u578b\u5217\u8868\u3002`}
+            </p>
           )}
         </div>
 

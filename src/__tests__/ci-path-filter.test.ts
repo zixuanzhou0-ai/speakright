@@ -12,10 +12,11 @@ describe("GitHub Actions path filtering", () => {
     );
 
     expect(workflow).toContain("paths-ignore:");
-    expect(workflow).toContain('"README.md"');
+    expect(workflow).toContain('"*.md"');
     expect(workflow).toContain('"docs/**"');
     expect(workflow).toContain("npm run validate:desktop-ci");
-    expect(workflow).toContain("Enforce public release signing");
+    expect(workflow).toContain("NEXT_PUBLIC_SPEAKRIGHT_TEST_FIXTURES: \"0\"");
+    expect(workflow).not.toContain("    tags:");
   });
 
   it("runs a lightweight docs check for README and docs changes", () => {
@@ -26,8 +27,9 @@ describe("GitHub Actions path filtering", () => {
 
     expect(workflow).toContain("name: Docs Check");
     expect(workflow).toContain("paths:");
-    expect(workflow).toContain('"README.md"');
+    expect(workflow).toContain('"*.md"');
     expect(workflow).toContain('"docs/**"');
+    expect(workflow).toContain("npm run docs:check-links");
     expect(workflow).toContain("npm run lint");
     expect(workflow).toContain("skipped the full Tauri desktop build");
   });

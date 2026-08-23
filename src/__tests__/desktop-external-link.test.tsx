@@ -138,10 +138,13 @@ describe("DesktopExternalLink", () => {
     expect(screen.queryByRole("link", { name: /下载/ })).toBeNull();
     expect(screen.queryByText("Windows 安装程序")).toBeNull();
     expect(screen.queryByText("Windows MSI")).toBeNull();
-    expect(screen.getByText("可控测试")).toBeInTheDocument();
+    expect(screen.getByText("社区预览版")).toBeInTheDocument();
     expect(screen.getByText("未签名")).toBeInTheDocument();
-    expect(screen.getByText(/正式公开 Windows 发布前/)).toBeInTheDocument();
-    expect(screen.getByText(/GitHub Release 页面可能落后/)).toBeInTheDocument();
+    expect(screen.getByText(/Windows SmartScreen/)).toBeInTheDocument();
+    expect(screen.getByText(/独立的 Desktop Preview/)).toBeInTheDocument();
+    expect(DESKTOP_RELEASE_INFO.repositoryUrl).toBe(
+      "https://github.com/zixuanzhou0-ai/speakright",
+    );
     expect("installers" in DESKTOP_RELEASE_INFO).toBe(false);
     expect(
       document.querySelector('[data-smoke="release-version-badge"]'),
@@ -149,6 +152,9 @@ describe("DesktopExternalLink", () => {
     expect(
       document.querySelector('[data-smoke="release-channel-badge"]'),
     ).toHaveClass("whitespace-normal");
+    expect(
+      document.querySelector('[data-smoke="release-build-identity"]'),
+    ).not.toBeNull();
 
     const sourceLink = screen.getByRole("link", { name: /源码仓库/ });
     expect(sourceLink).toHaveClass("whitespace-normal");
@@ -181,5 +187,18 @@ describe("DesktopExternalLink", () => {
         DESKTOP_RELEASE_INFO.releaseUrl,
       );
     });
+
+    expect(screen.getByRole("link", { name: "问题反馈" })).toHaveAttribute(
+      "href",
+      DESKTOP_RELEASE_INFO.issuesUrl,
+    );
+    expect(screen.getByRole("link", { name: "隐私说明" })).toHaveAttribute(
+      "href",
+      DESKTOP_RELEASE_INFO.privacyUrl,
+    );
+    expect(screen.getByRole("link", { name: "开源许可证" })).toHaveAttribute(
+      "href",
+      DESKTOP_RELEASE_INFO.licenseUrl,
+    );
   });
 });

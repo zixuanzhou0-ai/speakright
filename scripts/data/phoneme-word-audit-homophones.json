@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "updatedAt": "2026-07-14",
+  "groups": [
+    { "languageId": "en-US", "members": ["meet", "meat"] },
+    { "languageId": "en-US", "members": ["high", "hi"] },
+    { "languageId": "en-US", "members": ["fill", "Phil"] },
+    { "languageId": "en-US", "members": ["gym", "Jim"] },
+    { "languageId": "en-US", "members": ["morning", "mourning"] },
+    { "languageId": "en-US", "members": ["see", "sea"] },
+    { "languageId": "en-US", "members": ["week", "weak"] },
+    { "languageId": "en-US", "members": ["right", "write", "rite"] },
+    { "languageId": "en-US", "members": ["red", "read"] },
+    { "languageId": "en-US", "members": ["seven", "7"] },
+    { "languageId": "es-ES", "members": ["uno", "1"] },
+    { "languageId": "es-ES", "members": ["baca", "vaca"] },
+    { "languageId": "fr-FR", "members": ["ver", "vert", "vers", "verre"] }
+  ],
+  "policy": "A homophone match prevents a false wrong-word alarm but never verifies the target spelling or phoneme-page relationship by itself."
+}

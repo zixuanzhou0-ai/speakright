@@ -100,7 +100,7 @@ export async function buildDesktopSupportBundle(): Promise<DesktopSupportBundle>
       "Full learning history",
       "Raw quarantined local data values",
       "Benchmark audio blobs",
-      "ElevenLabs TTS audio cache",
+      "Standard demonstration TTS audio cache",
     ],
   };
 }

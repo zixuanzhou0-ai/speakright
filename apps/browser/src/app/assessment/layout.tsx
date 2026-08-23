@@ -9,7 +9,7 @@ export default function AssessmentLayout({
   children: ReactNode;
 }>) {
   return (
-    <LanguageCoreOnlyBoundary moduleName="发音诊断">
+    <LanguageCoreOnlyBoundary moduleName="发音诊断" capabilityRoute="diagnosis">
       {children}
     </LanguageCoreOnlyBoundary>
   );

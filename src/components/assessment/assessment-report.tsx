@@ -17,11 +17,11 @@ import {
   buildDiagnosisReviewPackage,
   type DiagnosisReviewItem,
 } from "@/lib/diagnosis-review-package";
-import { loadMasteryProfile } from "@/lib/mastery-profile";
 import {
   canRecordFormalMastery,
   getExperimentalMasteryBlocker,
 } from "@/lib/mastery-language-policy";
+import { loadMasteryProfile } from "@/lib/mastery-profile";
 import { getScoreBg } from "@/lib/score-utils";
 import { getTrainingPack } from "@/lib/training-packs";
 import { buildTrainingPrescription } from "@/lib/training-prescription";
@@ -95,10 +95,10 @@ export function AssessmentReport({ result, onRetake }: AssessmentReportProps) {
   const primaryHref = !hasScore
     ? "/drill"
     : primaryPack
-    ? `/drill/pack/${primaryPack.id}${
-        primaryLevelId ? `?level=${encodeURIComponent(primaryLevelId)}` : ""
-      }`
-    : "/drill";
+      ? `/drill/pack/${primaryPack.id}${
+          primaryLevelId ? `?level=${encodeURIComponent(primaryLevelId)}` : ""
+        }`
+      : "/drill";
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto pb-6">
@@ -115,7 +115,9 @@ export function AssessmentReport({ result, onRetake }: AssessmentReportProps) {
             <div
               className={cn(
                 "flex h-24 w-24 items-center justify-center rounded-2xl text-white",
-                hasScore ? getScoreBg(result.overallScore) : "bg-muted text-muted-foreground",
+                hasScore
+                  ? getScoreBg(result.overallScore)
+                  : "bg-muted text-muted-foreground",
               )}
             >
               <span className="text-4xl font-bold tabular-nums">
@@ -157,6 +159,25 @@ export function AssessmentReport({ result, onRetake }: AssessmentReportProps) {
                   <Badge variant="outline" className={WRAP_SAFE_BADGE_CLASS}>
                     可用录音 {result.evidenceSummary.usableRecordings}
                   </Badge>
+                  {typeof result.evidenceSummary.independentWordRecordings ===
+                    "number" && (
+                    <Badge variant="outline" className={WRAP_SAFE_BADGE_CLASS}>
+                      独立词样本{" "}
+                      {result.evidenceSummary.independentWordRecordings}
+                    </Badge>
+                  )}
+                  {(result.evidenceSummary.previewAssistedWordRecordings ?? 0) >
+                    0 && (
+                    <Badge
+                      variant="secondary"
+                      className={WRAP_SAFE_BADGE_CLASS}
+                      data-smoke="assessment-report-assisted-evidence"
+                    >
+                      提示后样本{" "}
+                      {result.evidenceSummary.previewAssistedWordRecordings}
+                      （未计入基线）
+                    </Badge>
+                  )}
                   {result.evidenceSummary.invalidRecordings > 0 && (
                     <Badge
                       variant="destructive"
@@ -258,7 +279,9 @@ export function AssessmentReport({ result, onRetake }: AssessmentReportProps) {
               <div className="relative h-20 w-6 rounded-full bg-muted overflow-hidden">
                 <motion.div
                   initial={{ height: 0 }}
-                  animate={{ height: hasScore || d.value > 0 ? `${d.value}%` : "0%" }}
+                  animate={{
+                    height: hasScore || d.value > 0 ? `${d.value}%` : "0%",
+                  }}
                   transition={{
                     delay: 0.3,
                     type: "spring",
@@ -482,16 +505,24 @@ function IssueCard({
           {issue.severity}
         </Badge>
       </div>
-      {issue.suspectedSubstitution && (
-        <p className="mb-2 break-words font-mono text-xs text-muted-foreground [overflow-wrap:anywhere]">
-          {issue.suspectedSubstitution}
-        </p>
+      {(issue.possibleCauses?.length || issue.suspectedSubstitution) && (
+        <div className="mb-2 space-y-1 rounded-md border bg-muted/30 px-2.5 py-2 text-xs text-muted-foreground">
+          <p className="break-words [overflow-wrap:anywhere]">
+            {"\u5f85\u9a8c\u8bc1\u7684\u53ef\u80fd\u539f\u56e0\uff1a"}
+            {issue.possibleCauses?.join(" / ") ?? issue.suspectedSubstitution}
+          </p>
+          {issue.disambiguationTest && (
+            <p className="break-words [overflow-wrap:anywhere]">
+              {issue.disambiguationTest}
+            </p>
+          )}
+        </div>
       )}
       <p className="break-words text-sm text-muted-foreground [overflow-wrap:anywhere]">
         {issue.impact}
       </p>
       <p className="mt-3 break-words text-sm font-medium [overflow-wrap:anywhere]">
-        {issue.fixCue}
+        {issue.actionCue ?? issue.fixCue}
       </p>
       <div className="mt-3 flex flex-wrap gap-1.5">
         {canShowFormalMastery ? (

@@ -28,20 +28,20 @@ describe("mastery language policy", () => {
     }
   });
 
-  it("keeps advanced pack-runner mastery writes behind the formal policy", () => {
+  it("keeps guided V3 evidence formal and legacy mastery non-promoting", () => {
     const source = readFileSync(
-      join(
-        process.cwd(),
-        "src/app/drill/pack/[packId]/pack-runner-client.tsx",
-      ),
+      join(process.cwd(), "src/app/drill/pack/[packId]/pack-runner-client.tsx"),
       "utf8",
     );
 
     expect(source).toContain("canRecordFormalMastery(languageId)");
     expect(source).toContain("!canRecordFormalMastery(languageId)");
     expect(source).toContain("pack-runner-experimental-blocker");
-    expect(source).toContain("const mastered = canPromoteMastery &&");
-    expect(source).toContain("if (canPromoteMastery) {");
+    expect(source).toContain(
+      "const completedSummary = { ...summary, mastered: false };",
+    );
+    expect(source).toContain("appendLearningEvidence");
+    expect(source).toContain("buildGuidedTrainingEvidence");
     expect(source).toContain("saveMasteryProfile(profile)");
   });
 
@@ -55,6 +55,19 @@ describe("mastery language policy", () => {
     expect(source).toContain("const canRecordHvptMastery =");
     expect(source).toContain("!canRecordHvptMastery");
     expect(source).toContain("saveMasteryProfile(nextProfile)");
+  });
+
+  it("keeps English prosody exercises behind an experimental language blocker", () => {
+    const source = readFileSync(
+      join(process.cwd(), "src/app/drill/prosody/page.tsx"),
+      "utf8",
+    );
+
+    expect(source).toContain('languageId !== "en-US"');
+    expect(source).toContain('data-smoke="prosody-experimental-blocker"');
+    expect(source).toContain("不会混入英语训练材料");
+    expect(source).toContain("不生成正式");
+    expect(source).toContain("function EnglishProsodyPage()");
   });
 
   it("keeps formal evidence archives behind the English-only policy", () => {

@@ -6,9 +6,9 @@ const mocks = vi.hoisted(() => ({
   languageId: "en-US",
   pronunciationError: null as string | null,
   clearError: vi.fn(),
+  playLocalAsset: vi.fn(),
   playWord: vi.fn(),
 }));
-
 vi.mock("@/hooks/use-api-keys", () => ({
   useLanguageConfig: () => ({ languageId: mocks.languageId }),
 }));
@@ -20,6 +20,7 @@ vi.mock("@/hooks/use-word-pronunciation", () => ({
     isLoading: false,
     isPlaying: false,
     playWord: mocks.playWord,
+    playLocalAsset: mocks.playLocalAsset,
     stop: vi.fn(),
   }),
 }));
@@ -39,25 +40,21 @@ describe("PerceptionDrillPage", () => {
     const { rerender } = render(<PerceptionDrillPage />);
 
     fireEvent.click(
-      screen.getAllByRole("button", { name: /\/i:\/ vs \/I\// })[0],
+      screen.getAllByRole("button", { name: /\/iː\/ vs \/ɪ\// })[0],
     );
 
     mocks.pronunciationError = "在线发音兜底失败，请检查网络后重试。";
     rerender(<PerceptionDrillPage />);
 
-    expect(screen.getByRole("alert")).toHaveTextContent(
-      "在线发音兜底失败",
-    );
+    expect(screen.getByRole("alert")).toHaveTextContent("在线发音兜底失败");
 
     fireEvent.click(screen.getByRole("button", { name: "X = A" }));
-    expect(screen.getByRole("alert")).toHaveTextContent(
-      "在线发音兜底失败",
-    );
+    expect(screen.getByRole("alert")).toHaveTextContent("在线发音兜底失败");
 
     fireEvent.click(screen.getByRole("button", { name: "下一题" }));
 
     expect(mocks.clearError).toHaveBeenCalled();
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
-    expect(screen.getByText(/第 2 \/ 12 题/)).toBeInTheDocument();
+    expect(screen.getByText(/第 2 \/ 8 题/)).toBeInTheDocument();
   });
 });

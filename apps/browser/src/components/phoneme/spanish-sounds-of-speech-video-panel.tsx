@@ -13,6 +13,7 @@ interface SpanishSoundsOfSpeechVideoPanelProps {
   className?: string;
   teachingVideos?: LanguageTeachingVideoAsset[];
   compact?: boolean;
+  onPlaybackError?: () => void;
 }
 
 interface SpanishPanelClip {
@@ -52,6 +53,7 @@ export function SpanishSoundsOfSpeechVideoPanel({
   className,
   teachingVideos = [],
   compact = false,
+  onPlaybackError,
 }: SpanishSoundsOfSpeechVideoPanelProps) {
   const [selection, setSelection] = useState({
     slug: videoSet.slug,
@@ -128,7 +130,7 @@ export function SpanishSoundsOfSpeechVideoPanel({
           type="button"
           aria-label="上一个西语视频"
           onClick={() => moveSelection(-1)}
-          className="flex h-8 w-8 items-center justify-center rounded-full border bg-background/95 text-muted-foreground shadow-sm transition-colors hover:border-primary/40 hover:text-primary"
+          className="flex h-11 w-11 items-center justify-center rounded-full border bg-background/95 text-muted-foreground shadow-sm transition-colors hover:border-primary/40 hover:text-primary sm:h-8 sm:w-8"
         >
           <ChevronLeft className="h-4 w-4" />
         </button>
@@ -139,6 +141,7 @@ export function SpanishSoundsOfSpeechVideoPanel({
             src={selectedClip.localSrc}
             controls
             preload="metadata"
+            onError={onPlaybackError}
             className={`block h-auto ${maxHeightClass} max-w-full rounded-md border bg-black shadow-sm ${videoWidthClassForClip(selectedClip)}`}
           >
             <track kind="captions" />
@@ -149,7 +152,7 @@ export function SpanishSoundsOfSpeechVideoPanel({
           type="button"
           aria-label="下一个西语视频"
           onClick={() => moveSelection(1)}
-          className="flex h-8 w-8 items-center justify-center rounded-full border bg-background/95 text-muted-foreground shadow-sm transition-colors hover:border-primary/40 hover:text-primary"
+          className="flex h-11 w-11 items-center justify-center rounded-full border bg-background/95 text-muted-foreground shadow-sm transition-colors hover:border-primary/40 hover:text-primary sm:h-8 sm:w-8"
         >
           <ChevronRight className="h-4 w-4" />
         </button>
@@ -162,14 +165,20 @@ export function SpanishSoundsOfSpeechVideoPanel({
         {clips.map((clip) => {
           const isSelected = clip.id === selectedClip.id;
           const Icon =
-            clip.kind === "lesson" ? BookOpen : clip.kind === "animation" ? Film : Video;
+            clip.kind === "lesson"
+              ? BookOpen
+              : clip.kind === "animation"
+                ? Film
+                : Video;
 
           return (
             <button
               key={clip.id}
               type="button"
               aria-pressed={isSelected}
-              onClick={() => selectClip(clips.findIndex((item) => item.id === clip.id))}
+              onClick={() =>
+                selectClip(clips.findIndex((item) => item.id === clip.id))
+              }
               className={chipClassName(isSelected)}
             >
               <Icon className="h-3.5 w-3.5" />

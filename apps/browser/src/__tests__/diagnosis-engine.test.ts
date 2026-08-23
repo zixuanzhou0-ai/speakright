@@ -103,7 +103,74 @@ describe("buildDiagnosisReport", () => {
     expect(report.issues[0].recommendedPackIds).toContain("s-th");
     expect(report.issues[0].errorPatternIds).toContain("tongue-between-teeth");
     expect(report.issues[0].confidence).toBe("medium");
+    expect(report.issues[0].suspectedSubstitution).toBeUndefined();
+    expect(report.issues[0].possibleCauses).toEqual(["/\u03b8/ \u2192 /s/"]);
+    expect(report.issues[0].disambiguationTest).toBeTruthy();
     expect(report.issues[0].nextLesson?.levelId).toBe("perception-abx");
+  });
+
+  it("keeps preview-assisted word recordings out of the independent baseline", () => {
+    const report = buildDiagnosisReport({
+      wordRecordings: [
+        {
+          prompt: {
+            word: "think",
+            ipa: "/θɪŋk/",
+            targetPhonemes: ["th"],
+          },
+          source: "word",
+          supportLevel: "independent",
+          result: resultForWord("think", [
+            { phoneme: "th", accuracyScore: 40 },
+          ]),
+        },
+        {
+          prompt: {
+            word: "three",
+            ipa: "/θriː/",
+            targetPhonemes: ["th"],
+          },
+          source: "word",
+          supportLevel: "preview-assisted",
+          result: resultForWord("three", [{ phoneme: "th", accuracyScore: 5 }]),
+        },
+      ],
+      paragraphText: "paragraph",
+      paragraphResult: resultForWord("paragraph", [
+        { phoneme: "th", accuracyScore: 80 },
+      ]),
+    });
+
+    expect(report.phonemeScores.th).toEqual({ score: 60, sampleCount: 2 });
+    expect(report.evidenceSummary?.independentWordRecordings).toBe(1);
+    expect(report.evidenceSummary?.previewAssistedWordRecordings).toBe(1);
+    expect(report.evidenceSummary?.notes.join(" ")).toContain(
+      "未计入独立诊断基线",
+    );
+    expect(
+      report.rawEvidence.find(
+        (entry) => entry.supportLevel === "preview-assisted",
+      ),
+    ).toMatchObject({
+      text: "three",
+      recommendedAction: "request-more-samples",
+    });
+  });
+
+  it("keeps weak fluency visible when prosody is strong", () => {
+    const report = buildDiagnosisReport({
+      wordRecordings: [],
+      paragraphText: "paragraph",
+      paragraphResult: resultForWord(
+        "paragraph",
+        [{ phoneme: "ax", accuracyScore: 80 }],
+        { prosodyScore: 90, fluencyScore: 55 },
+      ),
+    });
+
+    expect(report.issues.some((issue) => issue.id === "stress-rhythm")).toBe(
+      true,
+    );
   });
 
   it("creates a rhythm issue when paragraph prosody is weak", () => {
@@ -354,19 +421,12 @@ describe("buildDiagnosisReport", () => {
       paragraphText:
         "Un étudiant prend un bon café. Les amis parlent dans une petite rue.",
       paragraphResult: resultForWords(
-        [
-          "un",
-          "étudiant",
-          "prend",
-          "un",
-          "bon",
-          "café",
-          "les",
-          "amis",
-        ].map((word) => ({
-          word,
-          phonemes: [{ phoneme: "unknown", accuracyScore: 100 }],
-        })),
+        ["un", "étudiant", "prend", "un", "bon", "café", "les", "amis"].map(
+          (word) => ({
+            word,
+            phonemes: [{ phoneme: "unknown", accuracyScore: 100 }],
+          }),
+        ),
         {
           pronunciationScore: 100,
           accuracyScore: 100,

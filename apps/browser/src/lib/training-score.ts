@@ -10,13 +10,15 @@ export function getTargetPhonemeScore(
     .filter((score): score is number => score !== null);
 
   if (scores.length === 0) return null;
-  return Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length);
+  return Math.round(
+    scores.reduce((sum, score) => sum + score, 0) / scores.length,
+  );
 }
 
 export function getPassScore(
   result: AzureAssessmentResult,
   targetPhonemes: string[],
-  options: { allowFallback?: boolean } = { allowFallback: true },
+  options: { allowFallback?: boolean } = { allowFallback: false },
 ): {
   targetScore: number;
   overallScore: number;

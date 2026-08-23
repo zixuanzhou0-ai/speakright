@@ -2,18 +2,19 @@ import type {
   AttemptAnalysis,
   CourseRunnerState,
   LevelGateResult,
-  TrainingPackCourse,
   TrainingCourseItem,
   TrainingLevel,
   TrainingLevelProgress,
+  TrainingPackCourse,
 } from "@/types/training";
 import {
+  type CourseAttemptSnapshot,
   hasLevelPassed,
   levelBestScore,
   shouldEnterRemediation,
   shouldMarkStuck,
-  type CourseAttemptSnapshot,
 } from "./training-course-session";
+import { describeTrainingCriterion } from "./training-criteria";
 
 export function createCourseRunnerState(packId: string): CourseRunnerState {
   return {
@@ -55,7 +56,9 @@ export function createCourseStartPosition(
 }
 
 export function getCourseItemReference(item: TrainingCourseItem): string {
-  return item.referenceText ?? item.contrastText?.replace(" / ", " ") ?? item.text;
+  return (
+    item.referenceText ?? item.contrastText?.replace(" / ", " ") ?? item.text
+  );
 }
 
 export function getCourseItemPlaybackText(item: TrainingCourseItem): string {
@@ -129,7 +132,7 @@ export function recordRunnerPerceptionAnswer(
       ...state.levelProgress,
       [level.id]: {
         passed: correct || current?.passed === true,
-        bestScore: correct ? 100 : current?.bestScore ?? 0,
+        bestScore: correct ? 100 : (current?.bestScore ?? 0),
         attempts: (current?.attempts ?? 0) + 1,
       },
     },
@@ -143,14 +146,19 @@ export function buildFocusedReviewItems(
 ): TrainingCourseItem[] {
   const currentTargets = new Set(currentItem?.targetPhonemes ?? []);
   const candidates = level.items.filter((item) => {
-    if (!isRecordableCourseItem(item) && level.kind !== "perception") return false;
+    if (!isRecordableCourseItem(item) && level.kind !== "perception")
+      return false;
     if (item.id === currentItem?.id) return true;
     return item.targetPhonemes.some((phoneme) => currentTargets.has(phoneme));
   });
   const fallback = level.items.filter(
     (item) => isRecordableCourseItem(item) || level.kind === "perception",
   );
-  return Array.from(new Map([...candidates, ...fallback].map((item) => [item.id, item])).values())
+  return Array.from(
+    new Map(
+      [...candidates, ...fallback].map((item) => [item.id, item]),
+    ).values(),
+  )
     .slice(0, count)
     .map((item, index) => ({
       ...item,
@@ -171,17 +179,12 @@ export function evaluateLevelGate(
       focusedReviewItems: [],
     };
   }
-  const required =
-    level.passRule.requiredPasses ??
-    level.passRule.minCorrectRate ??
-    level.passRule.minAverageScore ??
-    level.passRule.minTargetScore ??
-    0;
+  const required = describeTrainingCriterion(level);
   return {
     passed: false,
-    reason: `${level.title} 还没有达到通过标准（当前 best ${levelBestScore(
+    reason: `${level.title} 还没有达到通过标准（当前最佳分 ${levelBestScore(
       snapshot.scores,
-    )}，标准 ${required}）。先补 3 题专项复练，再进入下一关。`,
+    )}，标准：${required}）。先继续专项复练，再进入下一关。`,
     focusedReviewItems: buildFocusedReviewItems(level, currentItem),
   };
 }

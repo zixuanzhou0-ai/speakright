@@ -61,7 +61,11 @@ export default function WordDrillPage() {
   }, [drill.config, handleStart]);
 
   return (
-    <LanguageModuleGate moduleName="单词训练" readinessKey="wordPractice">
+    <LanguageModuleGate
+      moduleName="单词训练"
+      readinessKey="wordPractice"
+      capabilityRoute="guidedTraining"
+    >
       <div
         data-smoke="word-drill-page"
         className="h-full flex flex-col px-6 py-4 overflow-y-auto scrollbar-thin"
@@ -70,7 +74,8 @@ export default function WordDrillPage() {
         <div className="mb-4 flex flex-wrap items-start gap-3 shrink-0">
           <Link
             href="/drill"
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full hover:bg-muted transition-colors cursor-pointer"
+            aria-label="返回训练首页"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full hover:bg-muted transition-colors cursor-pointer sm:h-8 sm:w-8"
           >
             <ArrowLeft className="h-4 w-4" />
           </Link>

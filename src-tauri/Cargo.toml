@@ -1,12 +1,12 @@
 [package]
 name = "speakright"
-version = "1.0.1"
-description = "AI-powered American English pronunciation coach"
+version = "1.1.0"
+description = "Evidence-aware multilingual pronunciation learning desktop app"
 authors = ["SpeakRight"]
-license = ""
-repository = ""
+license = "MIT"
+repository = "https://github.com/zixuanzhou0-ai/speakright"
 edition = "2021"
-rust-version = "1.77.2"
+rust-version = "1.88.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -20,10 +20,15 @@ tauri-build = { version = "2.5.6", features = [] }
 [dependencies]
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
+base64 = "0.22"
+getrandom = "0.3"
 log = "0.4"
+reqwest = { version = "0.12", default-features = false, features = ["blocking", "json", "rustls-tls"] }
 keyring = { version = "3.6.3", features = ["apple-native", "sync-secret-service", "windows-native"] }
 tauri = { version = "2.10.3", features = [] }
-tauri-plugin-log = "2"
+tauri-plugin-log = "2.9.0"
 tauri-plugin-http = "2.5.7"
 tauri-plugin-store = "2.4.2"
 tauri-plugin-opener = "2"
+tiny_http = "0.12"
+wait-timeout = "0.2"

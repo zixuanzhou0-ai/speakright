@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { LanguageCoreOnlyBoundary } from "@/components/common/language-core-only-boundary";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useLanguageConfig } from "@/hooks/use-api-keys";
@@ -28,6 +27,10 @@ import {
   summarizeBenchmarkTrend,
 } from "@/lib/benchmark-archive";
 import { getLanguageProfile } from "@/lib/language-profiles";
+import {
+  loadLearningEvidence,
+  summarizeLearningEvidence,
+} from "@/lib/learning-evidence";
 import { canRecordFormalMastery } from "@/lib/mastery-language-policy";
 import {
   getMasteryProfileStorageWarning,
@@ -44,6 +47,13 @@ type ProgressArchiveStatus = {
 const WRAP_SAFE_ACTION_BUTTON_CLASS =
   "max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]";
 
+const EVIDENCE_LADDER = [
+  { stage: "discriminated", label: "能听出", href: "/drill/perception" },
+  { stage: "controlled", label: "受控表达", href: "/drill" },
+  { stage: "varied", label: "多词境稳定", href: "/drill" },
+  { stage: "transfer_observed", label: "句子迁移", href: "/sentences" },
+  { stage: "retention_observed", label: "延迟保持", href: "/drill" },
+] as const;
 function getProgressArchiveErrorMessage(
   error: unknown,
   fallback: string,
@@ -73,6 +83,9 @@ export default function ProgressPage() {
   const canShowFormalProgress = canRecordFormalMastery(languageId);
   const [recordings, setRecordings] = useState<BenchmarkRecordingMeta[]>([]);
   const [profile, setProfile] = useState<MasteryProfile | null>(null);
+  const [learningEvidence, setLearningEvidence] = useState<
+    ReturnType<typeof loadLearningEvidence>["evidence"]
+  >([]);
   const [archiveStatus, setArchiveStatus] =
     useState<ProgressArchiveStatus | null>(null);
   const [profileStorageWarning, setProfileStorageWarning] = useState<
@@ -91,41 +104,55 @@ export default function ProgressPage() {
     [benchmarkGroups, canShowFormalProgress],
   );
 
+  const evidenceSummary = useMemo(
+    () => summarizeLearningEvidence(learningEvidence, languageId),
+    [languageId, learningEvidence],
+  );
   useEffect(() => {
     if (!canShowFormalProgress) {
       setRecordings([]);
       setProfile(null);
       setProfileStorageWarning(null);
+      setLearningEvidence([]);
       return;
     }
     setRecordings(listBenchmarkRecordings());
     setProfileStorageWarning(getMasteryProfileStorageWarning());
     setProfile(loadMasteryProfile());
+    setLearningEvidence(loadLearningEvidence().evidence);
   }, [canShowFormalProgress]);
-
-  if (!canShowFormalProgress) {
-    return (
-      <LanguageCoreOnlyBoundary moduleName="进步档案">
-        <div />
-      </LanguageCoreOnlyBoundary>
-    );
-  }
 
   const refreshRecordings = () => {
     if (!canShowFormalProgress) return;
     setRecordings(listBenchmarkRecordings());
   };
 
-  const mastered = profile
-    ? Object.values(profile.packs).filter((pack) => pack.status === "mastered")
-        .length
-    : 0;
-  const transferred = profile
-    ? Object.values(profile.packs).filter(
-        (pack) => pack.masteryState === "transferred",
-      ).length
-    : 0;
+  const currentLanguageEvidence = learningEvidence.filter(
+    (item) => item.languageId === languageId,
+  );
   const trainingSessions = profile?.sessions ?? [];
+
+  const evidenceSteps = EVIDENCE_LADDER.map((item) => ({
+    ...item,
+    count: evidenceSummary.stageCounts[item.stage],
+  }));
+  const highestEvidenceStep = [...evidenceSteps]
+    .reverse()
+    .find((step) => step.count > 0);
+  const latestEvidenceAt = currentLanguageEvidence.reduce(
+    (latest, item) => Math.max(latest, item.createdAt),
+    0,
+  );
+  const nextEvidenceStep =
+    evidenceSummary.totalTargets === 0
+      ? EVIDENCE_LADDER[0]
+      : (evidenceSteps.find(
+          (step) => step.count < evidenceSummary.totalTargets,
+        ) ?? EVIDENCE_LADDER[EVIDENCE_LADDER.length - 1]);
+  const nextEvidenceAction =
+    evidenceSummary.totalTargets === 0
+      ? "开始第一轮有效辨音"
+      : `下一步：补齐「${nextEvidenceStep.label}」证据`;
 
   const playRecording = async (item: BenchmarkRecordingMeta) => {
     setArchiveStatus(null);
@@ -154,13 +181,14 @@ export default function ProgressPage() {
   if (!canShowFormalProgress) {
     return (
       <div
-        className="h-full overflow-y-auto px-6 py-4 scrollbar-thin"
+        className="min-h-full overflow-y-auto px-4 py-4 scrollbar-thin sm:px-6"
         data-smoke="progress-experimental-blocker"
       >
         <div className="mb-5 flex items-center gap-3">
           <Link
             href="/drill"
-            className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-muted transition-colors cursor-pointer"
+            aria-label="返回训练首页"
+            className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-muted transition-colors cursor-pointer sm:h-8 sm:w-8"
           >
             <ArrowLeft className="h-4 w-4" />
           </Link>
@@ -261,13 +289,14 @@ export default function ProgressPage() {
 
   return (
     <div
-      className="h-full overflow-y-auto px-6 py-4 scrollbar-thin"
+      className="min-h-full overflow-y-auto px-4 py-4 scrollbar-thin sm:px-6"
       data-smoke="progress-page"
     >
       <div className="mb-5 flex items-center gap-3">
         <Link
           href="/drill"
-          className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-muted transition-colors cursor-pointer"
+          aria-label="返回训练首页"
+          className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-muted transition-colors cursor-pointer sm:h-8 sm:w-8"
         >
           <ArrowLeft className="h-4 w-4" />
         </Link>
@@ -302,15 +331,90 @@ export default function ProgressPage() {
         />
         <Metric
           icon={CheckCircle2}
-          label="已掌握包"
-          value={mastered.toString()}
+          label="V3 证据记录"
+          value={currentLanguageEvidence.length.toString()}
         />
         <Metric
           icon={CalendarClock}
-          label="已迁移"
-          value={transferred.toString()}
+          label="延迟保持"
+          value={evidenceSummary.stageCounts.retention_observed.toString()}
         />
       </div>
+
+      <section
+        className="mt-5 rounded-xl border bg-card p-5 shadow-sm"
+        data-smoke="learning-evidence-ladder"
+      >
+        <div className="mb-4">
+          <h2 className="text-lg font-bold">学习证据阶梯</h2>
+          <p className="text-sm text-muted-foreground">
+            这里只显示可追溯的学习证据，不把单次高分当作已经掌握。
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2 text-xs">
+            <Badge variant="secondary">
+              当前最高：{highestEvidenceStep?.label ?? "尚未形成阶段证据"}
+            </Badge>
+            <Badge variant="outline">
+              最近验证：
+              {latestEvidenceAt > 0
+                ? new Date(latestEvidenceAt).toLocaleDateString()
+                : "暂无"}
+            </Badge>
+          </div>
+        </div>
+        {evidenceSummary.totalTargets === 0 ? (
+          <div className="rounded-xl border border-dashed p-5 text-sm text-muted-foreground">
+            <p>还没有可用证据。先完成 2 分钟基线，或从第一轮辨音开始。</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Link
+                href="/assessment"
+                className="inline-flex min-h-11 items-center rounded-lg bg-primary px-4 font-medium text-primary-foreground"
+              >
+                完成 2 分钟基线
+              </Link>
+              <Link
+                href="/drill/perception"
+                className="inline-flex min-h-11 items-center rounded-lg border px-4 font-medium text-foreground"
+              >
+                开始第一轮辨音
+              </Link>
+            </div>
+          </div>
+        ) : (
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+            {evidenceSteps.map((step) => (
+              <div
+                key={step.stage}
+                className="rounded-xl border bg-muted/20 p-4"
+              >
+                <p className="text-sm font-semibold">{step.label}</p>
+                <p className="mt-2 text-2xl font-bold text-primary">
+                  {step.count}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  个目标具备此层或更高证据
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+        {evidenceSummary.totalTargets > 0 && (
+          <div className="mt-4 flex flex-col gap-3 rounded-xl border bg-muted/20 p-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="font-semibold">{nextEvidenceAction}</p>
+              <p className="text-xs text-muted-foreground">
+                系统按当前最薄弱的证据层推荐任务，不用自己猜该练哪个模块。
+              </p>
+            </div>
+            <Link
+              href={nextEvidenceStep.href}
+              className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-lg bg-primary px-4 font-medium text-primary-foreground"
+            >
+              继续训练
+            </Link>
+          </div>
+        )}
+      </section>
 
       <div className="mt-5 grid gap-5 xl:grid-cols-[1.1fr_0.9fr]">
         <section className="rounded-xl border bg-card p-5 shadow-sm">
@@ -461,21 +565,21 @@ export default function ProgressPage() {
 
         <section className="rounded-xl border bg-card p-5 shadow-sm">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <h2 className="text-lg font-bold">训练状态历史</h2>
+            <h2 className="text-lg font-bold">历史兼容记录（未校准）</h2>
             <Badge
               variant="secondary"
               className="w-fit max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]"
               data-smoke="progress-session-count"
             >
               {trainingSessions.length > 0
-                ? `本机保留 ${trainingSessions.length} 轮`
-                : "暂无本机训练记录"}
+                ? `仅用于复习调度 · ${trainingSessions.length} 轮`
+                : "暂无旧版训练记录"}
             </Badge>
           </div>
           <div className="mt-4 space-y-3">
             {trainingSessions.length === 0 ? (
               <p className="text-sm text-muted-foreground">
-                完成训练包或自由迁移后，这里会显示阶段变化。
+                新训练结论只显示在上方 V3 证据阶梯；这里不会生成“已掌握”结论。
               </p>
             ) : (
               trainingSessions.map((session) => {
@@ -496,25 +600,29 @@ export default function ProgressPage() {
                         {pack?.title ?? session.packId}
                       </p>
                       <Badge
-                        variant={session.mastered ? "default" : "secondary"}
+                        variant="outline"
                         className="max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]"
                       >
-                        {session.masteryStateAfter ?? "learning"}
+                        旧记录 · 不作掌握结论
                       </Badge>
                     </div>
                     <p
                       className="mt-2 break-words text-center text-xs text-muted-foreground [overflow-wrap:anywhere] sm:text-left"
                       data-smoke="progress-recent-session-meta"
                     >
-                      目标音平均{" "}
-                      {session.targetScores.length > 0
-                        ? Math.round(
+                      {session.targetScores.length > 0 ? (
+                        <>
+                          历史目标音均分{" "}
+                          {Math.round(
                             session.targetScores.reduce(
                               (sum, score) => sum + score,
                               0,
                             ) / session.targetScores.length,
-                          )
-                        : 0}
+                          )}
+                        </>
+                      ) : (
+                        "未保存正式目标音证据"
+                      )}
                       · {new Date(session.completedAt).toLocaleString()}
                     </p>
                   </div>

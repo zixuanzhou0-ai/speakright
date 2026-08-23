@@ -45,6 +45,7 @@ vi.mock("@/lib/tauri-store", () => ({
 describe("data registry", () => {
   beforeEach(() => {
     localStorage.clear();
+    sessionStorage.clear();
     vi.clearAllMocks();
     mocks.secureStoreDelete.mockImplementation(async (key: string) => {
       localStorage.removeItem(key);
@@ -275,6 +276,12 @@ describe("data registry", () => {
     localStorage.setItem("speakright_coach_mode", '"strict"');
     localStorage.setItem("speakright_azure_config", '{"subscriptionKey":"x"}');
     localStorage.setItem("theme", "dark");
+    localStorage.setItem("speakright_future_cache_v9", "temporary");
+    sessionStorage.setItem("speakright_free_practice_state", "temporary");
+    sessionStorage.setItem(
+      "speakright_azure_config",
+      '{"subscriptionKey":"session-key"}',
+    );
 
     await deleteAllLocalData({ includeApiKeys: false });
 
@@ -289,6 +296,11 @@ describe("data registry", () => {
     expect(localStorage.getItem("speakright_pronunciation_config")).toBeNull();
     expect(localStorage.getItem("speakright_coach_mode")).toBeNull();
     expect(localStorage.getItem("theme")).toBeNull();
+    expect(localStorage.getItem("speakright_future_cache_v9")).toBeNull();
+    expect(sessionStorage.getItem("speakright_free_practice_state")).toBeNull();
+    expect(sessionStorage.getItem("speakright_azure_config")).toBe(
+      '{"subscriptionKey":"session-key"}',
+    );
     expect(localStorage.getItem("speakright_azure_config")).toBe(
       '{"subscriptionKey":"x"}',
     );
@@ -317,11 +329,13 @@ describe("data registry", () => {
     const { deleteAllLocalData } = await import("@/lib/data-registry");
     localStorage.setItem("speakright_azure_config", '{"subscriptionKey":"x"}');
     localStorage.setItem("speakright_elevenlabs_config", '{"apiKey":"y"}');
+    sessionStorage.setItem("speakright_llm_config", '{"apiKey":"z"}');
 
     await deleteAllLocalData({ includeApiKeys: true });
 
     expect(localStorage.getItem("speakright_azure_config")).toBeNull();
     expect(localStorage.getItem("speakright_elevenlabs_config")).toBeNull();
+    expect(sessionStorage.getItem("speakright_llm_config")).toBeNull();
     expect(mocks.secureStoreDelete).toHaveBeenCalledWith(
       "speakright_azure_config",
     );

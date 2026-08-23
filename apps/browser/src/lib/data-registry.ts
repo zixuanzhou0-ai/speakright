@@ -10,6 +10,7 @@ import {
   clearBenchmarkRecordings,
   exportBenchmarkRecordings,
 } from "@/lib/benchmark-archive";
+import { CLOUD_PROCESSING_NOTICE_KEY } from "@/lib/cloud-processing-consent";
 import { BROWSER_MIC_CHECK_KEY } from "@/lib/browser-readiness";
 import { clearAllLanguageAudioPacks } from "@/lib/language-audio-pack-cache";
 import {
@@ -17,6 +18,7 @@ import {
   clearCorruptLocalData,
   getLocalDataSchemaStatus,
   LOCAL_DATA_MIGRATED_AT_KEY,
+  LOCAL_DATA_SCHEMA_VERSION,
   LOCAL_DATA_SCHEMA_VERSION_KEY,
 } from "@/lib/local-data-migrations";
 import { clearTtsCache } from "@/lib/tts-cache";
@@ -30,6 +32,9 @@ const ASSESSMENT_STORAGE_KEYS = [
 const LEARNING_STORAGE_KEYS = [
   ...ASSESSMENT_STORAGE_KEYS,
   "speakright_mastery_profile_v2",
+  "speakright_learning_evidence_v3",
+  "speakright_training_exposure_v1",
+  "speakright_retention_schedule_v1",
   "speakright_mastery_profile_v1",
   "speakright_training_sessions_v2",
   "speakright_practice_history",
@@ -44,6 +49,9 @@ const CACHE_STORAGE_KEYS = [
   "speakright_ipa_cache",
   "speakright_stress_cache",
 ] as const;
+const LEARNING_STORAGE_PREFIXES = [
+  "speakright_deep_training_session_v1:",
+] as const;
 
 const DEVICE_STORAGE_KEYS = [BROWSER_MIC_CHECK_KEY] as const;
 
@@ -57,7 +65,9 @@ const RESET_ONLY_STORAGE_KEYS = [
   LOCAL_DATA_MIGRATED_AT_KEY,
   ...LEGACY_APP_PREFERENCE_STORAGE_KEYS,
   "theme",
+  CLOUD_PROCESSING_NOTICE_KEY,
 ] as const;
+const APP_STORAGE_PREFIX = "speakright_";
 
 export interface LocalDataExport {
   schemaVersion: 4;
@@ -80,6 +90,17 @@ export interface LocalDataSummary {
   dataSchemaVersion: number;
   corruptItems: number;
   storageUnavailable?: boolean;
+}
+
+export function getInitialLocalDataSummary(): LocalDataSummary {
+  return {
+    learningKeys: 0,
+    cacheKeys: 0,
+    configuredApiKeys: 0,
+    apiKeySlots: API_KEY_STORAGE_KEYS.length,
+    dataSchemaVersion: LOCAL_DATA_SCHEMA_VERSION,
+    corruptItems: 0,
+  };
 }
 
 export interface DeleteAllLocalDataOptions {
@@ -144,6 +165,24 @@ function removeLocalStorageKeys(keys: readonly string[]): void {
   }
 }
 
+function removeNamespacedStorageKeys(
+  storage: Storage,
+  preservedKeys: readonly string[] = [],
+): void {
+  const preserved = new Set(preservedKeys);
+  const keys: string[] = [];
+  for (let index = 0; index < storage.length; index += 1) {
+    const key = storage.key(index);
+    if (key?.startsWith(APP_STORAGE_PREFIX) && !preserved.has(key)) {
+      keys.push(key);
+    }
+  }
+  for (const key of keys) {
+    storage.removeItem(key);
+    window.dispatchEvent(new StorageEvent("storage", { key }));
+  }
+}
+
 async function removePersistentKeys(keys: readonly string[]): Promise<void> {
   if (typeof window === "undefined") return;
   await Promise.all(keys.map((key) => clearItem(key)));
@@ -165,6 +204,7 @@ function safeApiKeySummary() {
 
 export async function buildLocalDataExport(): Promise<LocalDataExport> {
   const cacheKeys = prefixedLocalStorageKeys(CACHE_STORAGE_PREFIXES);
+  const learningKeys = prefixedLocalStorageKeys(LEARNING_STORAGE_PREFIXES);
   return {
     schemaVersion: 4,
     exportedAt: new Date().toISOString(),
@@ -172,6 +212,7 @@ export async function buildLocalDataExport(): Promise<LocalDataExport> {
     dataSchema: getLocalDataSchemaStatus(),
     localStorage: {
       ...collectKeys(LEARNING_STORAGE_KEYS),
+      ...collectKeys(learningKeys),
       ...collectKeys(CACHE_STORAGE_KEYS),
       ...collectKeys(DEVICE_STORAGE_KEYS),
       ...collectKeys(cacheKeys),
@@ -186,7 +227,7 @@ export async function buildLocalDataExport(): Promise<LocalDataExport> {
     },
     excluded: [
       "API keys",
-      "ElevenLabs TTS audio cache",
+      "Standard demonstration TTS audio cache",
       "Legacy generated language audio cache",
       "Theme preference",
     ],
@@ -202,7 +243,12 @@ export function getLocalDataSummary(): LocalDataSummary {
     ];
     const dataSchema = getLocalDataSchemaStatus();
     return {
-      learningKeys: Object.keys(collectKeys(LEARNING_STORAGE_KEYS)).length,
+      learningKeys: Object.keys(
+        collectKeys([
+          ...LEARNING_STORAGE_KEYS,
+          ...prefixedLocalStorageKeys(LEARNING_STORAGE_PREFIXES),
+        ]),
+      ).length,
       cacheKeys: Object.keys(collectKeys(cacheKeys)).length,
       configuredApiKeys: apiKeys.configured,
       apiKeySlots: apiKeys.totalSlots,
@@ -242,11 +288,13 @@ export async function downloadLocalDataExport(): Promise<void> {
 
 export async function deleteLearningData(): Promise<void> {
   const cacheKeys = prefixedLocalStorageKeys(CACHE_STORAGE_PREFIXES);
+  const learningKeys = prefixedLocalStorageKeys(LEARNING_STORAGE_PREFIXES);
   await clearBenchmarkRecordings();
   await clearTtsCache();
   await clearAllLanguageAudioPacks();
   removeLocalStorageKeys([
     ...LEARNING_STORAGE_KEYS,
+    ...learningKeys,
     ...CACHE_STORAGE_KEYS,
     ...cacheKeys,
   ]);
@@ -273,5 +321,10 @@ export async function deleteAllLocalData({
   ]);
   if (includeApiKeys) {
     await deleteApiKeys();
+  }
+  if (typeof window !== "undefined") {
+    const preservedKeys = includeApiKeys ? [] : [...API_KEY_STORAGE_KEYS];
+    removeNamespacedStorageKeys(window.localStorage, preservedKeys);
+    removeNamespacedStorageKeys(window.sessionStorage, preservedKeys);
   }
 }

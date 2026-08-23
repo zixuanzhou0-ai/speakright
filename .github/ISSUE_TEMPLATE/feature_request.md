@@ -1,6 +1,6 @@
 ---
 name: Feature request
-about: Suggest a product, language-learning, or desktop workflow improvement
+about: Suggest a product, language-learning, desktop, or browser workflow improvement
 title: "[Feature]: "
 labels: enhancement
 assignees: ""
@@ -18,6 +18,8 @@ What should SpeakRight do?
 
 Which language, page, or flow is affected?
 
+Which edition should change: Windows Desktop, Browser Edition, or shared logic?
+
 If this affects Spanish, French, or Russian, keep the proposal within the
 experimental-language boundary unless it includes a separate evidence plan.
 
@@ -29,7 +31,7 @@ experimental-language boundary unless it includes a separate evidence plan.
 
 ## Notes
 
-Mention any audio, video, scoring, or privacy implications.
+Mention any audio, video, scoring, storage, external-provider, or privacy implications.
 
 For release-facing desktop behavior, acceptance should be checked through the
 Release EXE, not a localhost/dev-server tab. Do not request new ElevenLabs

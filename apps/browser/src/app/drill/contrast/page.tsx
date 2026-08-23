@@ -15,26 +15,29 @@ import { RecordButton } from "@/components/audio/record-button";
 import { WaveformDisplay } from "@/components/audio/waveform-display";
 import { DrillSummaryCard } from "@/components/drill/drill-summary";
 import { Button } from "@/components/ui/button";
-import { useAzureAssessment } from "@/hooks/use-azure-assessment";
 import { useCoachMode, useLanguageConfig } from "@/hooks/use-api-keys";
-import { useWordPronunciation } from "@/hooks/use-word-pronunciation";
+import { useAzureAssessment } from "@/hooks/use-azure-assessment";
 import { useRecorder } from "@/hooks/use-recorder";
+import { useWordPronunciation } from "@/hooks/use-word-pronunciation";
+import { buildAzureAttemptEvidence } from "@/lib/azure-attempt-evidence";
 import { getPhonemeAccuracy } from "@/lib/azure-phoneme-map";
 import { computeDrillSummary, getPassThreshold } from "@/lib/drill-utils";
 import {
-  LANGUAGE_LEARNING_DECKS,
   type DeckLanguageId,
+  LANGUAGE_LEARNING_DECKS,
 } from "@/lib/language-learning-decks";
 import { getLanguagePhonemeBySlug } from "@/lib/language-phonemes";
 import { getLanguageProfile } from "@/lib/language-profiles";
+import { appendLearningEvidence } from "@/lib/learning-evidence";
+import { canRecordFormalMastery } from "@/lib/mastery-language-policy";
+import type { MinimalPairSet } from "@/lib/minimal-pairs";
+import { MINIMAL_PAIR_SETS } from "@/lib/minimal-pairs";
 import {
   getCenteredMonoTextClassName,
   getCenteredProminentTextClassName,
   getCenteredReadableTextClassName,
   getPracticeTextDensity,
 } from "@/lib/practice-text-presentation";
-import type { MinimalPairSet } from "@/lib/minimal-pairs";
-import { MINIMAL_PAIR_SETS } from "@/lib/minimal-pairs";
 import type {
   DrillProgressItem,
   DrillSessionConfig,
@@ -109,7 +112,8 @@ export default function ContrastDrillPage() {
   );
 
   const threshold = getPassThreshold(coachMode);
-  const assessmentErrorMessage = recorder.error ?? assessmentError ?? azure.error;
+  const assessmentErrorMessage =
+    recorder.error ?? assessmentError ?? azure.error;
   const canRetryAssessment =
     !recorder.error &&
     !!recorder.audioBlob &&
@@ -220,10 +224,33 @@ export default function ContrastDrillPage() {
         return;
       }
       const phonemeScore = getPhonemeAccuracy(result, targetPhoneme);
-      const scoreA =
-        phonemeScore ?? (languageId === "en-US" ? result.pronunciationScore : 0);
-      setPendingScoreA(scoreA);
-      setAssessmentError(null);
+      if (phonemeScore === null) {
+        setAssessmentError(
+          "\u672c\u6b21\u5f55\u97f3\u6ca1\u6709\u5bf9\u9f50\u5230\u76ee\u6807\u97f3\uff0c\u4e0d\u80fd\u7528\u6574\u8bcd\u5206\u66ff\u4ee3\u3002\u8bf7\u91cd\u5f55\uff0c\u5e76\u628a\u76ee\u6807\u8bcd\u8bf4\u6e05\u695a\u3002",
+        );
+        processedBlobRef.current = null;
+        return;
+      }
+      const evidenceSaved = canRecordFormalMastery(languageId)
+        ? appendLearningEvidence(
+            buildAzureAttemptEvidence({
+              id: `contrast-a-${targetWord}-${Date.now()}`,
+              sessionId: `contrast-${selectedSet.id}`,
+              languageId,
+              taskType: "minimal-pair",
+              targetUnits: [targetPhoneme],
+              materialIds: [targetWord],
+              levelId: selectedSet.id,
+              result,
+              targetScore: phonemeScore,
+              alignmentValid: true,
+            }),
+          )
+        : true;
+      setPendingScoreA(phonemeScore);
+      setAssessmentError(
+        evidenceSaved ? null : "评分已完成，但 V3 原始证据未能保存。",
+      );
       processedBlobRef.current = null;
       recorder.reset();
       azure.reset();
@@ -277,11 +304,35 @@ export default function ContrastDrillPage() {
         return;
       }
       const phonemeScore = getPhonemeAccuracy(result, targetPhoneme);
-      const scoreB =
-        phonemeScore ?? (languageId === "en-US" ? result.pronunciationScore : 0);
+      if (phonemeScore === null) {
+        setAssessmentError(
+          "\u672c\u6b21\u5f55\u97f3\u6ca1\u6709\u5bf9\u9f50\u5230\u76ee\u6807\u97f3\uff0c\u4e0d\u80fd\u7528\u6574\u8bcd\u5206\u66ff\u4ee3\u3002\u8bf7\u91cd\u5f55\uff0c\u5e76\u628a\u76ee\u6807\u8bcd\u8bf4\u6e05\u695a\u3002",
+        );
+        processedBlobRef.current = null;
+        return;
+      }
+      const evidenceSaved = canRecordFormalMastery(languageId)
+        ? appendLearningEvidence(
+            buildAzureAttemptEvidence({
+              id: `contrast-b-${targetWord}-${Date.now()}`,
+              sessionId: `contrast-${selectedSet.id}`,
+              languageId,
+              taskType: "minimal-pair",
+              targetUnits: [targetPhoneme],
+              materialIds: [targetWord],
+              levelId: selectedSet.id,
+              result,
+              targetScore: phonemeScore,
+              alignmentValid: true,
+            }),
+          )
+        : true;
+      const scoreB = phonemeScore;
       const passed =
         priorScoreA >= currentThreshold && scoreB >= currentThreshold;
-      setAssessmentError(null);
+      setAssessmentError(
+        evidenceSaved ? null : "评分已完成，但 V3 原始证据未能保存。",
+      );
       processedBlobRef.current = null;
       setPhase((prev) =>
         prev.type === "recordB"
@@ -371,7 +422,8 @@ export default function ContrastDrillPage() {
       <div className="mb-4 flex flex-wrap items-start gap-3 shrink-0">
         <Link
           href="/drill"
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full hover:bg-muted transition-colors cursor-pointer"
+          aria-label="返回训练首页"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full hover:bg-muted transition-colors cursor-pointer sm:h-8 sm:w-8"
         >
           <ArrowLeft className="h-4 w-4" />
         </Link>

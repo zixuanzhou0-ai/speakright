@@ -78,9 +78,9 @@ describe("PhonemeStudyCard non-English reading layout", () => {
     });
 
     expect(screen.getByText("请朗读")).toBeInTheDocument();
-    expect(screen.getAllByText("韵律/重音训练 · 音节节奏").length).toBeGreaterThan(
-      0,
-    );
+    expect(
+      screen.getAllByText("韵律/重音训练 · 音节节奏").length,
+    ).toBeGreaterThan(0);
     expect(screen.queryByText("syllable timing")).not.toBeInTheDocument();
     expect(
       screen.queryByRole("button", { name: "播放发音" }),
@@ -198,6 +198,41 @@ describe("PhonemeStudyCard non-English reading layout", () => {
     expect(alert).toHaveAttribute("data-smoke", "practice-word-audio-error");
     expect(alert).toHaveClass("break-words");
     expect(alert).toHaveClass("[overflow-wrap:anywhere]");
+  });
+
+  it("centers the English voice selector and playback as one visual control", () => {
+    renderCard({
+      phoneme: {
+        languageId: "en-US",
+        ipa: "/iː/",
+        symbol: "iː",
+        slug: "ee",
+        name: "EE",
+        category: "vowel",
+        example: "green",
+        chartWord: "green",
+        chartImage: "green",
+        keywords: [{ word: "tree", ipa: "/triː/" }],
+        difficulty: "easy",
+      },
+      currentWord: { word: "tree", ipa: "/triː/" },
+    });
+
+    const row = document.querySelector(
+      '[data-smoke="practice-voice-control-row"]',
+    );
+    expect(row).toBeInTheDocument();
+    expect(row).toHaveClass("col-start-2");
+    expect(row).toHaveClass("justify-self-center");
+    expect(
+      row?.querySelector('[data-smoke="practice-voice-playback-cluster"]'),
+    ).toBeInTheDocument();
+    expect(
+      row?.querySelector('[data-smoke="practice-voice-selector"]'),
+    ).toBeInTheDocument();
+    expect(
+      row?.querySelector('[data-smoke="practice-word-audio"]'),
+    ).toBeInTheDocument();
   });
 
   it("shows English dictionary fallback errors below the practice controls", () => {
@@ -392,9 +427,8 @@ describe("PhonemeStudyCard non-English reading layout", () => {
 
     fireEvent.click(screen.getByAltText("cat"));
 
-    expect(onPlayChartAudio).toHaveBeenCalledWith(
-      "/audio/ipa/slow/cat.mp3",
-      { volume: 1.6 },
-    );
+    expect(onPlayChartAudio).toHaveBeenCalledWith("/audio/ipa/slow/cat.mp3", {
+      volume: 1.6,
+    });
   });
 });

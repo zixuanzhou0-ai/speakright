@@ -16,8 +16,8 @@ async function windowToggleMaximize() {
 }
 
 async function windowClose() {
-  const { getCurrentWindow } = await import("@tauri-apps/api/window");
-  getCurrentWindow().close();
+  const { invoke } = await import("@tauri-apps/api/core");
+  await invoke("exit_app");
 }
 
 const btnClass =
@@ -74,6 +74,7 @@ export function Titlebar() {
             className={btnClass}
             onClick={windowMinimize}
             whileTap={{ scale: 0.9 }}
+            aria-label="最小化窗口"
             title="最小化"
           >
             <Minus className="h-3.5 w-3.5" />
@@ -83,6 +84,7 @@ export function Titlebar() {
             className={btnClass}
             onClick={windowToggleMaximize}
             whileTap={{ scale: 0.9 }}
+            aria-label={isMaximized ? "还原窗口" : "最大化窗口"}
             title={isMaximized ? "还原" : "最大化"}
           >
             {isMaximized ? (
@@ -96,6 +98,7 @@ export function Titlebar() {
             className={`${btnClass} hover:bg-red-500 hover:text-white`}
             onClick={windowClose}
             whileTap={{ scale: 0.9 }}
+            aria-label="关闭窗口"
             title="关闭"
           >
             <X className="h-3.5 w-3.5" />

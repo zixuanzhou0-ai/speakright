@@ -1,17 +1,20 @@
 "use client";
 
-import { Loader2, RotateCcw, Target, Volume2 } from "lucide-react";
+import { Loader2, RotateCcw, Settings2, Target, Volume2 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
+import Link from "next/link";
 import { ReadAlongText } from "@/components/audio/read-along-text";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
+import { useStandardTtsConfig } from "@/hooks/use-api-keys";
 import type { FreePracticeTargetPreview } from "@/lib/free-practice-transfer";
 import {
   getCenteredMonoTextClassName,
   getCenteredReadableTextClassName,
   getPracticeTextDensity,
 } from "@/lib/practice-text-presentation";
+import { formatTrainingTargetUnit } from "@/lib/training-criteria";
 import type { LanguageId } from "@/types/language";
 
 const MAX_CHARS = 150;
@@ -37,6 +40,7 @@ interface SentenceInputCardProps {
   // TTS
   ttsIsPlaying: boolean;
   ttsIsLoading: boolean;
+  ttsHasAudio?: boolean;
   ttsError: string | null;
   ttsWordTimings: { word: string; start: number; end: number }[];
   ttsCurrentTime: number;
@@ -62,6 +66,7 @@ export function SentenceInputCard({
   onWordAudioPlay,
   ttsIsPlaying,
   ttsIsLoading,
+  ttsHasAudio = false,
   ttsError,
   ttsWordTimings,
   ttsCurrentTime,
@@ -69,6 +74,14 @@ export function SentenceInputCard({
   targetPreview,
   onListen,
 }: SentenceInputCardProps) {
+  const standardTts = useStandardTtsConfig();
+  const ttsProviderLabel =
+    standardTts.provider === "hermes-grok"
+      ? "爱马仕 Grok TTS"
+      : standardTts.provider === "vertex-gemini"
+        ? "Vertex Gemini TTS"
+        : "ElevenLabs";
+
   const charCount = sentence.length;
   const trimmedTextDensity = getPracticeTextDensity(
     trimmedText,
@@ -79,20 +92,33 @@ export function SentenceInputCard({
     ? languageId === "en-US"
       ? "单词模式 · 本地音频优先，有道兜底"
       : "单词模式 · 本地语言包音频优先，无本地条目时不会用在线音频冒充"
-    : "句子模式 · 发音来自 ElevenLabs";
+    : `句子模式 · 发音来自 ${ttsProviderLabel}`;
 
   return (
     <div
-      className="rounded-xl border bg-card px-4 py-4 shadow-sm space-y-3 min-h-0 overflow-hidden"
+      className="shrink-0 space-y-3 rounded-xl border bg-card px-4 py-4 shadow-sm"
       data-smoke="sentence-input-card"
+      data-tts-provider={standardTts.provider}
+      data-tts-state={
+        ttsIsLoading
+          ? "loading"
+          : ttsIsPlaying
+            ? "playing"
+            : ttsError
+              ? "error"
+              : ttsHasAudio
+                ? "ready"
+                : "idle"
+      }
     >
       <div
         className="flex flex-wrap items-start justify-center gap-3"
         data-smoke="sentence-input-actions"
       >
-        <div className="relative min-w-[min(100%,16rem)] flex-1">
+        <div className="min-w-[min(100%,16rem)] flex-1">
           <Textarea
             suppressHydrationWarning
+            aria-label="练习文本"
             placeholder="输入单词或句子"
             value={sentence}
             onChange={(e) => {
@@ -102,20 +128,25 @@ export function SentenceInputCard({
             }}
             maxLength={MAX_CHARS}
             rows={4}
-            className="resize-none h-[100px] pb-7 text-lg"
+            className="h-[100px] resize-none text-lg"
           />
-          <span
-            suppressHydrationWarning
-            className={`absolute right-3 bottom-2 text-xs tabular-nums ${
-              charCount >= MAX_CHARS
-                ? "text-red-500 font-semibold"
-                : charCount >= WARN_CHARS
-                  ? "text-amber-500"
-                  : "text-muted-foreground"
-            }`}
+          <div
+            className="mt-1 flex min-h-4 justify-end px-1"
+            data-smoke="free-practice-character-count"
           >
-            {charCount}/{MAX_CHARS}
-          </span>
+            <span
+              suppressHydrationWarning
+              className={`text-xs tabular-nums ${
+                charCount >= MAX_CHARS
+                  ? "font-semibold text-red-500"
+                  : charCount >= WARN_CHARS
+                    ? "text-amber-500"
+                    : "text-muted-foreground"
+              }`}
+            >
+              {charCount}/{MAX_CHARS}
+            </span>
+          </div>
         </div>
         {isWordMode ? (
           <div className="relative flex h-[100px] w-[100px] shrink-0 items-center justify-center self-center sm:self-auto">
@@ -196,7 +227,26 @@ export function SentenceInputCard({
         )}
       </div>
 
-      {trimmedText && (
+      {!isWordMode && (
+        <div
+          className="flex flex-wrap items-center justify-between gap-2 rounded-lg border bg-muted/30 px-3 py-2"
+          data-smoke="free-practice-tts-provider-shortcut"
+        >
+          <span className="text-xs font-medium text-muted-foreground">
+            当前标准示范
+          </span>
+          <Link
+            href="/settings?section=services#standard-tts"
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-md border bg-background px-3 text-xs font-semibold text-primary transition-colors hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 sm:min-h-9"
+            aria-label={`当前标准示范为 ${ttsProviderLabel}，前往更换`}
+          >
+            {ttsProviderLabel}
+            <Settings2 className="h-3.5 w-3.5" />
+          </Link>
+        </div>
+      )}
+
+      {trimmedText && isWordMode && (
         <p className="text-xs text-muted-foreground/70">{modeHelpText}</p>
       )}
 
@@ -232,6 +282,7 @@ export function SentenceInputCard({
                 max={1.2}
                 step={0.05}
                 value={[speed]}
+                ariaLabel="语速"
                 onValueChange={(val) =>
                   onSpeedChange(Array.isArray(val) ? val[0] : val)
                 }
@@ -299,7 +350,9 @@ export function SentenceInputCard({
                     whileTap={{ scale: 0.9 }}
                     transition={{ type: "spring", stiffness: 400, damping: 15 }}
                     onClick={() => onWordAudioPlay(trimmedText)}
-                    className="absolute right-2 bottom-2 flex h-7 w-7 items-center justify-center rounded-full bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary cursor-pointer"
+                    aria-label="重听单词发音"
+                    data-smoke="free-practice-word-replay"
+                    className="absolute right-2 bottom-2 flex h-11 w-11 items-center justify-center rounded-full bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary cursor-pointer sm:h-7 sm:w-7"
                   >
                     <RotateCcw className="h-3.5 w-3.5" />
                   </motion.button>
@@ -307,35 +360,45 @@ export function SentenceInputCard({
               </motion.div>
             </motion.div>
           ) : (
-            (ttsIsPlaying || ttsWordTimings.length > 0) && (
+            (ttsIsPlaying || (!ttsIsLoading && ttsHasAudio)) && (
               <motion.div
                 key="sentence-karaoke"
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.2 }}
-                className="relative"
+                initial={{ height: 0, opacity: 0, y: 8 }}
+                animate={{ height: "auto", opacity: 1, y: 0 }}
+                exit={{ height: 0, opacity: 0, y: -8 }}
+                transition={{ duration: 0.24, ease: "easeOut" }}
+                className="overflow-hidden"
+                data-smoke="free-practice-tts-output"
               >
-                <ReadAlongText
-                  text={trimmedText}
-                  wordTimings={ttsWordTimings}
-                  isPlaying={ttsIsPlaying}
-                  currentTime={ttsCurrentTime}
-                />
-                {!ttsIsPlaying && ttsWordTimings.length > 0 && (
-                  <motion.button
-                    type="button"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 15 }}
-                    onClick={onTtsReplay}
-                    className="absolute right-2 bottom-2 flex h-7 w-7 items-center justify-center rounded-full bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary cursor-pointer"
-                  >
-                    <RotateCcw className="h-3.5 w-3.5" />
-                  </motion.button>
-                )}
+                <div className="relative">
+                  <ReadAlongText
+                    text={trimmedText}
+                    wordTimings={ttsWordTimings}
+                    isPlaying={ttsIsPlaying}
+                    currentTime={ttsCurrentTime}
+                    reserveReplaySpace={ttsHasAudio || ttsIsPlaying}
+                  />
+                  {!ttsIsPlaying && !ttsIsLoading && ttsHasAudio && (
+                    <motion.button
+                      type="button"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 15,
+                      }}
+                      onClick={onTtsReplay}
+                      aria-label="重听标准发音"
+                      data-smoke="free-practice-tts-replay"
+                      className="absolute right-2 bottom-2 flex h-11 w-11 items-center justify-center rounded-full bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary cursor-pointer sm:h-7 sm:w-7"
+                    >
+                      <RotateCcw className="h-3.5 w-3.5" />
+                    </motion.button>
+                  )}
+                </div>
               </motion.div>
             )
           )}
@@ -375,7 +438,10 @@ function TargetPreviewPanel({
                   {target.packTitle}
                 </Badge>
                 <span className="break-words text-center text-xs text-muted-foreground [overflow-wrap:anywhere]">
-                  目标音 {target.targetPhonemes.join(" / ")}
+                  目标音{" "}
+                  {target.targetPhonemes
+                    .map(formatTrainingTargetUnit)
+                    .join(" – ")}
                 </span>
               </div>
               <p className="mt-1 break-words text-center text-xs text-muted-foreground [overflow-wrap:anywhere]">

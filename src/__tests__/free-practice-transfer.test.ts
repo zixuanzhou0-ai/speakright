@@ -222,7 +222,8 @@ describe("free-practice transfer", () => {
       passed: true,
     });
     expect(mastery.transferEvidenceCount).toBe(1);
-    expect(mastery.masteryState).toBe("retained");
+    // ?????????????????????????????????
+    expect(mastery.masteryState).toBe("integrated");
   });
 
   it("keeps single-word spontaneous evidence non-promoting", () => {

@@ -1,6 +1,7 @@
-import { createServer } from "node:http";
 import { createReadStream, existsSync, statSync } from "node:fs";
+import { createServer } from "node:http";
 import { extname, join, normalize, resolve } from "node:path";
+import { startHermesXaiBridge } from "./hermes-xai-bridge.mjs";
 
 const root = resolve(process.cwd(), "out");
 const port = Number(process.env.PORT || 4173);
@@ -37,7 +38,7 @@ if (!existsSync(root)) {
   process.exit(1);
 }
 
-createServer((request, response) => {
+const server = createServer((request, response) => {
   const filePath = resolveRequestPath(request.url || "/");
   if (!filePath || !existsSync(filePath)) {
     response.writeHead(404);
@@ -50,6 +51,22 @@ createServer((request, response) => {
       contentTypes.get(extname(filePath)) ?? "application/octet-stream",
   });
   createReadStream(filePath).pipe(response);
-}).listen(port, "127.0.0.1", () => {
+});
+
+const bridge = await startHermesXaiBridge({
+  additionalOrigins: [`http://127.0.0.1:${port}`, `http://localhost:${port}`],
+});
+if (!bridge.compatible) {
+  console.warn("端口 17831 已被其他程序占用，爱马仕 Grok TTS 本机桥接未启动。");
+}
+
+server.listen(port, "127.0.0.1", () => {
   console.log(`SpeakRight Browser static server: http://127.0.0.1:${port}`);
 });
+
+async function close() {
+  server.close();
+  await bridge.close();
+}
+process.on("SIGINT", () => void close());
+process.on("SIGTERM", () => void close());

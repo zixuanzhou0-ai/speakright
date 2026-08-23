@@ -60,6 +60,7 @@ import type { AssessmentPhase, AssessmentWord } from "@/types/assessment";
 import type { AzureAssessmentResult } from "@/types/azure";
 import type {
   AssessmentRecording,
+  AssessmentSupportLevel,
   DiagnosisReport,
   RecordingQualitySnapshot,
 } from "@/types/diagnosis";
@@ -133,6 +134,8 @@ export default function AssessmentPage() {
   );
   const [localSaveWarning, setLocalSaveWarning] = useState<string | null>(null);
   const [phase, setPhase] = useState<AssessmentPhase>({ type: "intro" });
+  const [wordPreviewPlayed, setWordPreviewPlayed] = useState(false);
+  const [wordAttemptStarted, setWordAttemptStarted] = useState(false);
   const savedReport = savedReportLoad.report;
   const savedReportWarning = savedReportLoad.warning;
 
@@ -152,6 +155,15 @@ export default function AssessmentPage() {
   );
   const targetedRetestRef = useRef(false);
   const didAutostartRetestRef = useRef(false);
+  const wordPreviewPlayedRef = useRef(false);
+  const wordAttemptSupportRef = useRef<AssessmentSupportLevel>("independent");
+
+  const resetWordSupportState = useCallback(() => {
+    wordPreviewPlayedRef.current = false;
+    wordAttemptSupportRef.current = "independent";
+    setWordPreviewPlayed(false);
+    setWordAttemptStarted(false);
+  }, []);
 
   useEffect(() => {
     setRetestIssueId(new URLSearchParams(window.location.search).get("retest"));
@@ -160,8 +172,9 @@ export default function AssessmentPage() {
   useEffect(() => {
     setSavedReportLoad(loadAssessmentReportForLanguage(languageId));
     setLocalSaveWarning(null);
+    resetWordSupportState();
     setPhase({ type: "intro" });
-  }, [languageId]);
+  }, [languageId, resetWordSupportState]);
 
   const finalizeReport = useCallback(
     (paragraphResult: AzureAssessmentResult) => {
@@ -189,8 +202,9 @@ export default function AssessmentPage() {
     recorder.reset();
     recordingQuality.reset();
     azure.reset();
+    resetWordSupportState();
     setPhase({ type: "words", index: 0 });
-  }, [azure, recorder, recordingQuality]);
+  }, [azure, recorder, recordingQuality, resetWordSupportState]);
 
   const handleTargetedRetest = useCallback(
     (issueId: string) => {
@@ -211,9 +225,17 @@ export default function AssessmentPage() {
       recorder.reset();
       recordingQuality.reset();
       azure.reset();
+      resetWordSupportState();
       setPhase({ type: "adaptive", index: 0, words });
     },
-    [azure, handleStart, recorder, recordingQuality, languageId],
+    [
+      azure,
+      handleStart,
+      recorder,
+      recordingQuality,
+      languageId,
+      resetWordSupportState,
+    ],
   );
 
   useEffect(() => {
@@ -245,12 +267,14 @@ export default function AssessmentPage() {
       prompt: word,
       result,
       source: phase.type === "words" ? "word" : "adaptive",
+      supportLevel: wordAttemptSupportRef.current,
       recordingQuality: qualityReport,
     });
 
     recorder.reset();
     recordingQuality.reset();
     azure.reset();
+    resetWordSupportState();
 
     if (phase.type === "words") {
       const nextIndex = phase.index + 1;
@@ -280,6 +304,7 @@ export default function AssessmentPage() {
     finalizeReport,
     languageProfile.azureLocale,
     assessmentWords,
+    resetWordSupportState,
   ]);
 
   const handleParagraphRecorded = useCallback(async () => {
@@ -355,6 +380,7 @@ export default function AssessmentPage() {
     recorder.reset();
     recordingQuality.reset();
     azure.reset();
+    resetWordSupportState();
     setPhase({ type: "intro" });
   };
 
@@ -373,7 +399,11 @@ export default function AssessmentPage() {
   );
 
   return (
-    <LanguageModuleGate moduleName="发音诊断" readinessKey="diagnosis">
+    <LanguageModuleGate
+      moduleName="发音诊断"
+      readinessKey="diagnosis"
+      capabilityRoute="diagnosis"
+    >
       <div
         className="h-full flex flex-col px-6 py-4 overflow-y-auto scrollbar-thin"
         data-smoke="assessment-page"
@@ -385,6 +415,21 @@ export default function AssessmentPage() {
             ? "你的发音诊断报告和训练处方"
             : `快速诊断 3-4 分钟，找出最该训练的${languageProfile.displayName}发音问题`}
         </p>
+        {languageProfile.status === "experimental" && (
+          <div
+            className="mb-4 flex flex-col gap-2 rounded-xl border border-primary/25 bg-primary/5 p-4 text-sm sm:flex-row sm:items-start"
+            data-smoke="assessment-labs-boundary"
+            role="note"
+          >
+            <Badge variant="secondary" className="w-fit">
+              Labs · experimental
+            </Badge>
+            <p className="text-muted-foreground">
+              当前诊断只提供探索性的整体与词级观察，不生成正式
+              mastery；也不会把结果包装成与英语正式体系等价的音素证据或掌握结论。
+            </p>
+          </div>
+        )}
 
         {localSaveWarning && (
           <div
@@ -530,22 +575,55 @@ export default function AssessmentPage() {
                       </p>
                     )}
 
-                    <motion.button
-                      type="button"
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                      onClick={() =>
-                        wordAudio.playWord(currentWord.word, "blue", languageId)
-                      }
-                      disabled={wordAudio.isLoading}
-                      className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary cursor-pointer disabled:opacity-50"
-                    >
-                      {wordAudio.isLoading ? (
-                        <Loader2 className="h-5 w-5 animate-spin" />
-                      ) : (
-                        <Volume2 className="h-5 w-5" />
-                      )}
-                    </motion.button>
+                    <div className="flex flex-col items-center gap-2">
+                      <Button
+                        type="button"
+                        variant={recorder.audioBlob ? "outline" : "ghost"}
+                        size="sm"
+                        onClick={() => {
+                          wordPreviewPlayedRef.current = true;
+                          setWordPreviewPlayed(true);
+                          wordAudio.playWord(
+                            currentWord.word,
+                            "blue",
+                            languageId,
+                          );
+                        }}
+                        disabled={
+                          wordAudio.isLoading ||
+                          recorder.isRecording ||
+                          azure.isLoading
+                        }
+                        className="h-auto min-h-11 max-w-full gap-2 whitespace-normal break-words text-center cursor-pointer sm:min-h-9 [overflow-wrap:anywhere]"
+                        data-smoke="assessment-word-preview-control"
+                      >
+                        {wordAudio.isLoading ? (
+                          <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
+                        ) : (
+                          <Volume2 className="h-4 w-4 shrink-0" />
+                        )}
+                        {wordAudio.isPlaying
+                          ? "正在播放示范"
+                          : recorder.audioBlob
+                            ? "听示范做对比"
+                            : wordPreviewPlayed
+                              ? "再次听示范（本次为提示练习）"
+                              : "需要提示？听示范"}
+                      </Button>
+                      <p
+                        className="max-w-sm text-xs text-muted-foreground"
+                        data-smoke="assessment-word-support-state"
+                        role="status"
+                      >
+                        {wordAttemptStarted
+                          ? wordAttemptSupportRef.current === "independent"
+                            ? "本次为独立首答；录音后可以听示范做对比。"
+                            : "本次为提示后练习，仅作辅助对比，不计入独立诊断基线。"
+                          : wordPreviewPlayed
+                            ? "已听提示：下一次录音仅作辅助对比，不计入独立诊断基线。"
+                            : "建议先直接录音，首答会作为独立诊断基线。"}
+                      </p>
+                    </div>
                     {wordAudio.error && (
                       <p className="mx-auto max-w-md break-words text-center text-xs text-destructive [overflow-wrap:anywhere]">
                         {wordAudio.error}
@@ -555,6 +633,12 @@ export default function AssessmentPage() {
                     <RecordButton
                       isRecording={recorder.isRecording}
                       onStart={() => {
+                        wordAudio.stop();
+                        wordAttemptSupportRef.current =
+                          wordPreviewPlayedRef.current
+                            ? "preview-assisted"
+                            : "independent";
+                        setWordAttemptStarted(true);
                         recorder.reset();
                         azure.reset();
                         recorder.startRecording();

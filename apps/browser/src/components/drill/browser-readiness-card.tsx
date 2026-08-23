@@ -9,7 +9,6 @@ import {
   Mic2,
   PlayCircle,
 } from "lucide-react";
-import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -230,111 +229,132 @@ export function BrowserReadinessCard({
 
   return (
     <section
-      className="mb-5 rounded-xl border bg-card p-4 shadow-sm"
+      className="mb-5 overflow-hidden rounded-xl border bg-card shadow-sm"
       data-smoke="browser-readiness-checklist"
     >
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div>
-          <div className="mb-2 flex items-center gap-2">
-            <Badge variant="secondary">
-              {summary.readyCount}/{summary.totalCount}
-            </Badge>
-            <h2 className="text-base font-bold">开始前设置清单</h2>
-          </div>
-          <p className="mb-3 text-sm text-muted-foreground">
-            没有诊断前，今日训练会使用默认高频处方；完成诊断后才会变成你的个性化训练计划。
-          </p>
-          <div className="grid gap-2 md:grid-cols-4">
-            {summary.steps.map((step) => {
-              const Icon = STEP_ICONS[step.id];
-              const isMic = step.id === "microphone";
-              return (
-                <div
+      <details>
+        <summary
+          className="flex min-h-11 cursor-pointer list-none flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
+          data-smoke="browser-service-status"
+        >
+          <div className="flex min-w-0 flex-wrap items-center gap-2">
+            <Badge variant="secondary">离线学习可用</Badge>
+            {summary.steps
+              .filter((step) => step.id === "azure" || step.id === "microphone")
+              .map((step) => (
+                <span
                   key={step.id}
                   className={cn(
-                    "flex items-center gap-2 rounded-lg border px-3 py-2 text-sm",
+                    "rounded-full border px-2 py-1 text-xs",
                     step.ready
-                      ? "border-primary/30 bg-primary/5"
-                      : "bg-background",
+                      ? "border-primary/30 bg-primary/5 text-primary"
+                      : "text-muted-foreground",
                   )}
                 >
-                  {step.ready ? (
-                    <CheckCircle2 className="h-4 w-4 text-primary" />
-                  ) : (
-                    <Icon className="h-4 w-4 text-muted-foreground" />
-                  )}
-                  <span className="font-medium">{step.label}</span>
-                  <span className="ml-auto text-xs text-muted-foreground">
-                    {isMic
-                      ? micStatusText(micStatus, micCheck)
-                      : step.ready
-                        ? "已就绪"
-                        : "待完成"}
-                  </span>
-                </div>
-              );
-            })}
+                  {step.label} ·{" "}
+                  {step.ready
+                    ? "已就绪"
+                    : step.id === "azure"
+                      ? "可选"
+                      : "训练时检测"}
+                </span>
+              ))}
           </div>
-          {micHint && (
-            <div
-              className="mt-3 flex items-start gap-2 rounded-lg border border-destructive/25 bg-destructive/5 px-3 py-2 text-sm text-destructive"
-              data-smoke="microphone-readiness-error"
-              role="alert"
-            >
-              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
-              <span>{micHint}</span>
-            </div>
-          )}
-        </div>
-
-        <div className="flex shrink-0 flex-wrap gap-2">
-          {!azureReady && (
-            <Link data-smoke="configure-azure-scoring-key" href="/settings">
-              <Button variant="outline" className="gap-2">
-                <KeyRound className="h-4 w-4" />
-                配置 Azure Speech 评分密钥
-              </Button>
-            </Link>
-          )}
-          {!microphoneReady && (
-            <Button
-              type="button"
-              variant={
-                micStatus === "denied" ||
-                micStatus === "low-signal" ||
-                micStatus === "too-short" ||
-                micStatus === "error"
-                  ? "destructive"
-                  : "outline"
-              }
-              onClick={handleMicCheck}
-              disabled={micStatus === "checking" || micStatus === "unsupported"}
-              className="gap-2"
-              data-smoke="check-microphone"
-            >
-              {micStatus === "checking" ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : micStatus === "denied" ||
-                micStatus === "low-signal" ||
-                micStatus === "too-short" ||
-                micStatus === "error" ? (
-                <AlertTriangle className="h-4 w-4" />
-              ) : (
-                <Mic2 className="h-4 w-4" />
+          <span className="shrink-0 text-xs text-muted-foreground">
+            展开检查
+          </span>
+        </summary>
+        <div className="border-t p-4">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <div className="mb-2 flex items-center gap-2">
+                <Badge variant="secondary">
+                  {summary.readyCount}/{summary.totalCount}
+                </Badge>
+                <h2 className="text-base font-bold">开始前设置清单</h2>
+              </div>
+              <p className="mb-3 text-sm text-muted-foreground">
+                没有诊断前，今日训练会使用默认高频处方；完成诊断后才会变成你的个性化训练计划。
+              </p>
+              <div className="grid gap-2 md:grid-cols-4">
+                {summary.steps.map((step) => {
+                  const Icon = STEP_ICONS[step.id];
+                  const isMic = step.id === "microphone";
+                  return (
+                    <div
+                      key={step.id}
+                      className={cn(
+                        "flex items-center gap-2 rounded-lg border px-3 py-2 text-sm",
+                        step.ready
+                          ? "border-primary/30 bg-primary/5"
+                          : "bg-background",
+                      )}
+                    >
+                      {step.ready ? (
+                        <CheckCircle2 className="h-4 w-4 text-primary" />
+                      ) : (
+                        <Icon className="h-4 w-4 text-muted-foreground" />
+                      )}
+                      <span className="font-medium">{step.label}</span>
+                      <span className="ml-auto text-xs text-muted-foreground">
+                        {isMic
+                          ? micStatusText(micStatus, micCheck)
+                          : step.ready
+                            ? "已就绪"
+                            : "待完成"}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+              {micHint && (
+                <div
+                  className="mt-3 flex items-start gap-2 rounded-lg border border-destructive/25 bg-destructive/5 px-3 py-2 text-sm text-destructive"
+                  data-smoke="microphone-readiness-error"
+                  role="alert"
+                >
+                  <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+                  <span>{micHint}</span>
+                </div>
               )}
-              检测麦克风
-            </Button>
-          )}
-          {!hasDiagnosis && (
-            <Link data-smoke="start-three-minute-diagnosis" href="/assessment">
-              <Button className="gap-2">
-                <ClipboardList className="h-4 w-4" />
-                开始 3 分钟诊断
-              </Button>
-            </Link>
-          )}
+            </div>
+
+            <div className="flex shrink-0 flex-wrap gap-2">
+              {!microphoneReady && (
+                <Button
+                  type="button"
+                  variant={
+                    micStatus === "denied" ||
+                    micStatus === "low-signal" ||
+                    micStatus === "too-short" ||
+                    micStatus === "error"
+                      ? "destructive"
+                      : "outline"
+                  }
+                  onClick={handleMicCheck}
+                  disabled={
+                    micStatus === "checking" || micStatus === "unsupported"
+                  }
+                  className="gap-2"
+                  data-smoke="check-microphone"
+                >
+                  {micStatus === "checking" ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : micStatus === "denied" ||
+                    micStatus === "low-signal" ||
+                    micStatus === "too-short" ||
+                    micStatus === "error" ? (
+                    <AlertTriangle className="h-4 w-4" />
+                  ) : (
+                    <Mic2 className="h-4 w-4" />
+                  )}
+                  检测麦克风
+                </Button>
+              )}
+            </div>
+          </div>
         </div>
-      </div>
+      </details>
     </section>
   );
 }

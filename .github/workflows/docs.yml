@@ -3,15 +3,30 @@ name: Docs Check
 on:
   pull_request:
     paths:
-      - "README.md"
+      - "*.md"
       - "docs/**"
+      - ".github/**/*.md"
+      - ".github/CODEOWNERS"
+      - "LICENSE"
+      - "NOTICE.md"
+      - "THIRD_PARTY_NOTICES.md"
+      - "scripts/check-doc-links.mjs"
   push:
     branches:
       - main
     paths:
-      - "README.md"
+      - "*.md"
       - "docs/**"
+      - ".github/**/*.md"
+      - ".github/CODEOWNERS"
+      - "LICENSE"
+      - "NOTICE.md"
+      - "THIRD_PARTY_NOTICES.md"
+      - "scripts/check-doc-links.mjs"
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -20,25 +35,28 @@ concurrency:
 jobs:
   docs:
     runs-on: windows-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         timeout-minutes: 5
 
       - name: Setup Node
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         timeout-minutes: 5
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - name: Install dependencies
         run: npm ci
         timeout-minutes: 10
 
-      - name: Lightweight docs validation
+      - name: Validate documentation links
+        run: npm run docs:check-links
+
+      - name: Validate documentation source
         run: npm run lint
         timeout-minutes: 5
 
@@ -46,4 +64,4 @@ jobs:
         shell: pwsh
         run: |
           "Docs-only run: skipped the full Tauri desktop build." >> $env:GITHUB_STEP_SUMMARY
-          "Code, public assets, scripts, src-tauri, or package changes still trigger Build Windows Desktop." >> $env:GITHUB_STEP_SUMMARY
+          "Code, public assets, scripts, src-tauri, or package changes still trigger product validation." >> $env:GITHUB_STEP_SUMMARY

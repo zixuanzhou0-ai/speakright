@@ -10,12 +10,19 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useLanguageConfig } from "@/hooks/use-api-keys";
+import { getCapabilityNavigationLabel } from "@/lib/language-capability-policy";
 import { cn } from "@/lib/utils";
+import { ProjectFooter } from "./project-footer";
 import { SidebarPhonemeList } from "./sidebar-phoneme-list";
 import { ThemeToggle } from "./theme-toggle";
 
 const NAV_ITEMS = [
-  { href: "/phonemes", label: "音标练习", icon: AudioLines, englishOnly: false },
+  {
+    href: "/phonemes",
+    label: "音标练习",
+    icon: AudioLines,
+    englishOnly: false,
+  },
   { href: "/drill", label: "刻意练习", icon: Target, englishOnly: true },
   {
     href: "/sentences",
@@ -36,19 +43,23 @@ export function Sidebar() {
   const { languageId } = useLanguageConfig();
   const isPhonemes = pathname.startsWith("/phonemes");
   const isSettings = pathname === "/settings";
-  const visibleNavItems = NAV_ITEMS.filter(
-    (item) => !item.englishOnly || languageId === "en-US",
-  );
+  const visibleNavItems = NAV_ITEMS;
 
   // Extract current phoneme slug from path like /phonemes/ee
   const currentSlug = isPhonemes ? (pathname.split("/")[2] ?? null) : null;
 
   return (
-    <aside className="flex h-full w-[260px] shrink-0 flex-col border-r bg-sidebar text-sidebar-foreground">
+    <aside className="hidden h-full w-[260px] shrink-0 flex-col border-r bg-sidebar text-sidebar-foreground lg:flex">
       {/* Navigation */}
       <div className="flex flex-col gap-0.5 px-2 py-3">
         {visibleNavItems.map(({ href, label, icon: Icon }) => {
           const isActive = pathname.startsWith(href);
+          const displayLabel =
+            href === "/drill"
+              ? getCapabilityNavigationLabel("guidedTraining", languageId)
+              : href === "/assessment"
+                ? getCapabilityNavigationLabel("diagnosis", languageId)
+                : label;
           return (
             <Link
               key={href}
@@ -61,7 +72,7 @@ export function Sidebar() {
               )}
             >
               <Icon className="h-4 w-4" />
-              {label}
+              {displayLabel}
             </Link>
           );
         })}
@@ -79,6 +90,8 @@ export function Sidebar() {
 
       {/* Spacer when not on phonemes */}
       {!isPhonemes && <div className="flex-1" />}
+
+      <ProjectFooter />
 
       {/* Bottom bar */}
       <div className="flex h-11 shrink-0 items-center justify-between border-t px-3">

@@ -14,7 +14,7 @@
 - **Markdown**: react-markdown + remark-gfm (LLM feedback rendering) + @tailwindcss/typography (prose styles, headings with primary left border)
 - **Audio**: MediaRecorder API (recording), wavesurfer.js v7 (waveform), howler.js (playback)
 - **Theme**: Custom ThemeProvider (替换 next-themes，避免 React 19 script 警告) + anti-FOUC `<head>` script
-- **Backend**: 桌面端优先走 Tauri/本地安全存储 + 直接 API client；历史 `/api/*` proxy 仅保留给兼容和非桌面调试路径
+- **Backend**: 桌面端走 Tauri/本地安全存储与直接 API client；Browser 走浏览器平台适配器；当前源码不依赖 Next API proxy
 - **Storage**: 桌面端 API keys 使用 secure store/系统凭据，学习数据和偏好按 languageId 隔离保存
 - **Lint/Format**: Biome (replaces ESLint + Prettier)
 - **Language**: TypeScript strict mode, Chinese UI, en-US stable + es-ES/fr-FR/ru-RU experimental
@@ -38,10 +38,9 @@ External services are separated by purpose:
 1. **Azure Speech** → Pronunciation assessment (scoring + phoneme + syllable + prosody analysis，韵律仅句子模式启用)
 2. **ElevenLabs / 内置发音资源** → 标准示范 TTS、句子/短语朗读、逐词高亮、随桌面端发布的多语言音频
 3. **LLM (multi-provider)** → Chinese text feedback from Azure scores
-4. **单词词典发音** → 有道词典/韦氏词典仅负责单词复读，不负责标准示范 TTS
-5. **韦氏词典** → `/api/merriam-webster/` 下 `pronunciation/`、`stress/`、`test/` 三个子路由
+4. **单词发音** → 优先使用随发行包提供的本地音频，缺失时由有道词典在线兜底；不负责标准示范 TTS
 
-所有 API 路由使用 `src/lib/rate-limit.ts` 内存速率限制（60 次/分钟/IP）。
+当前双端不提供 Next API routes；外部服务调用由各自的平台适配器和客户端边界负责。
 
 LLM uses OpenAI-compatible format. Users configure their own API keys in settings page.
 Supported providers: Codex, GPT, Gemini, DeepSeek, Qwen, GLM, Kimi (原 Moonshot), Doubao, Custom.
@@ -60,7 +59,7 @@ LLM 设置页 Model 字段为自由输入框 + 预设 chips 快速选择。
 - Path: `public/audio/words/{blue,pink}/{word}.mp3`
 - 268 unique words × 2 voices = 536 files
 - voice_settings (word mode): stability 0.85, similarity 0.85, style 0, speed 0.9
-- voice_settings (sentence mode / API route): stability 0.65, similarity 0.85, style 0.35, speed 0.85
+- voice_settings (sentence mode / provider request): stability 0.65, similarity 0.85, style 0.35, speed 0.85
 
 ### ElevenLabs voices (fixed list in settings)
 
@@ -83,7 +82,6 @@ src/app/              — Pages (App Router)
   assessment/         — 发音诊断测试（10 词 + 1 段短文 → 音标健康图 + 五维雷达图 + 薄弱音标推荐）
   sentences/          — 自由练习页 (双栏布局, 150 字符限制 + 录音倒计时, 支持单词/句子模式自动检测)
   settings/           — API key configuration (Azure, ElevenLabs, 发音音源, LLM)
-  api/                — API route proxies (azure/, elevenlabs/{tts,tts-aligned,usage,test,voices}/, llm/, merriam-webster/{pronunciation,stress,test}/, pronunciation/)
 src/components/       — React components
   audio/              — record-button, recording-actions, waveform-display, audio-player, read-along-text
   assessment/         — assessment-report, phoneme-health-map（诊断结果可视化）
@@ -95,8 +93,8 @@ src/components/       — React components
   common/             — error-boundary（React Error Boundary）
   layout/             — sidebar, sidebar-phoneme-list, titlebar, theme-provider (custom, exports useTheme), theme-toggle
   ui/                 — shadcn/ui components
-src/lib/              — SDK wrappers + data (phoneme-data.ts, word-bank.ts, llm-providers.ts, usage-tracker.ts, score-utils.ts, score-history.ts, tts-cache.ts, word-pool.ts, word-selector.ts, practice-tracker.ts, rate-limit.ts, azure-phoneme-map.ts, syllable-stress.ts, static-ipa-map.ts, drill-utils.ts, sentence-bank.ts, minimal-pairs.ts, perception-pairs.ts, l1-error-patterns.ts, connected-speech.ts, assessment-texts.ts, etc.)
-src/hooks/            — Custom hooks (useRecorder, useAzureAssessment, useAudioPlayer, useTts, useTtsAligned, useLlmFeedback, useMwPronunciation, useSessionState, useSyllableStress, useWordIpa, useDrillSession)
+src/lib/              — SDK wrappers + data (phoneme-data.ts, word-bank.ts, llm-providers.ts, usage-tracker.ts, score-utils.ts, score-history.ts, tts-cache.ts, word-pool.ts, word-selector.ts, practice-tracker.ts, azure-phoneme-map.ts, syllable-stress.ts, static-ipa-map.ts, drill-utils.ts, sentence-bank.ts, minimal-pairs.ts, perception-pairs.ts, l1-error-patterns.ts, connected-speech.ts, assessment-texts.ts, etc.)
+src/hooks/            — Custom hooks (useRecorder, useAzureAssessment, useAudioPlayer, useTts, useTtsAligned, useLlmFeedback, useWordPronunciation, useSessionState, useSyllableStress, useWordIpa, useDrillSession)
 src/types/            — TypeScript interfaces (phoneme.ts, azure.ts, api-keys.ts, llm.ts, drill.ts, assessment.ts)
 src/__tests__/        — Unit tests (vitest: score-utils, word-selector, utils, tts-cache)
 public/audio/ipa/     — IPA chart audio (phoneme/normal/slow subdirs, from americanipachart.com)
@@ -109,13 +107,13 @@ docs/                 — PRD.md, api-reference.md
 
 ## Key conventions
 
-- Desktop code should use the local API client and secure store where available; legacy `/api/*` routes are compatibility/debug paths, not the primary desktop boundary
+- Desktop code should use the local API client and secure store; Browser code should use its explicit platform adapters, without adding hidden Next API proxy dependencies
 - Motion v12 components must use `"use client"` directive
 - AudioPlayerButton uses motion.div wrapper with spring animation (whileHover + whileTap), supports sizes: sm(h-5)/default(h-4)/icon(h-4)/lg(h-6), 所有按钮加 cursor-pointer
 - `PhonemeGrid` 共享单个 `useAudioPlayer` 实例传给所有 PhonemeCard（避免 N 个 Howl 实例）
 - 品牌色为 Teal（Light: oklch(0.55 0.15 175)，Dark: oklch(0.70 0.12 175)），通过 CSS 变量 `--primary` 全局生效
 - LLM API 凭证通过 HTTP headers 传输（x-llm-key/x-llm-provider/x-llm-base-url/x-llm-model），不放在 JSON body 中
-- ElevenLabs TTS 路由有 voice ID 允许列表校验 + 文本长度限制（500 字符）
+- ElevenLabs TTS 调用有 voice ID 允许列表校验 + 文本长度限制（500 字符）
 - Azure best input: PCM 16kHz 16bit mono WAV
 - LLM feedback uses streaming (SSE) with `stream_options: { include_usage: true }` for token tracking, rendered as Markdown (react-markdown + remark-gfm + prose styles)
 - LLM prompt 支持 4 档教练模式（简单/正常/略难/严师），通过 `CoachMode` 类型 + `COACH_PERSONAS` 映射表切换人设，详见 `src/lib/llm-prompt.ts`
@@ -124,8 +122,8 @@ docs/                 — PRD.md, api-reference.md
 - 教练模式存储在 `speakright_coach_mode`（localStorage），类型 `CoachMode`，默认 "normal"
 - 自由练习页 TTS 使用 `useTtsAligned` hook（IndexedDB 缓存 + 速度调节 + replay）+ `ReadAlongText` 组件（text-2xl 卡拉 OK 逐词高亮）
 - 音标详情页：音标+单词合并为一张卡片（IPA+PlayButton+emoji 上排，单词导航下排），WordCard 不再独立使用
-- 音频互斥播放：录音回放、示范发音（mw）、IPA 音频（chartAudio）三者同时只能播一个
-- 自由练习页逐词评分点击单词可播放该词发音（调用 `mw.playWord`）
+- 音频互斥播放：录音回放、单词示范发音（wordAudio）、IPA 音频（chartAudio）三者同时只能播一个
+- 自由练习页逐词评分点击单词可播放该词发音（调用 `wordAudio.playWord`）
 - 用量监控：ElevenLabs（API 查询，TTS 调用后自动刷新）、Azure（localStorage 按次追踪秒数）、LLM（localStorage 追踪 token 消耗）
 - 全局 cursor-pointer CSS 规则覆盖所有 button/a/[role="button"] 元素
 - 全站 motion 按钮统一 `whileTap: { scale: 0.95 }` Q 弹动画
@@ -141,9 +139,8 @@ docs/                 — PRD.md, api-reference.md
 - 自由练习页文本输入限制 150 字符，实时计数 + 接近上限警告色
 - Azure 音素编码使用 `azure-phoneme-map.ts` 转换为 IPA 显示（`toIpa()`, `syllableToIpa()`），音素方块点击可播放 IPA Chart 本地音频。该模块还提供 `getPhonemeAccuracy(result, slug)` 用于从 Azure 评分结果中抽取特定音素的平均 accuracyScore（对比训练达标判定的核心信号）
 - Phoneme slug 统一命名：40 个音素统一使用简写 slug（如 /θ/ 用 `"th"`、/ʃ/ 用 `"sh"`、/ʌ/ 用 `"uh2"`），全项目对齐 `phoneme-data.ts` 的 slug 字段
-- 音节重音标注：`useSyllableStress` hook 三层查找（静态词库 → localStorage → MW API），单音节词隐藏音节区域
+- 音节重音标注：`useSyllableStress` hook 两层查找（静态词库 → 旧版 localStorage 缓存），不请求外部词典；单音节词隐藏音节区域
 - 页面状态保持：`useSessionState` hook 将关键状态存入 sessionStorage，页面间切换不丢失评分和反馈数据
-- 所有 API 路由统一速率限制 60 次/分钟/IP（`src/lib/rate-limit.ts`，Edge + Node.js 兼容）
 
 ### 练习页双栏布局（/phonemes/[phoneme] 和 /sentences）
 
@@ -197,8 +194,8 @@ docs/                 — PRD.md, api-reference.md
 
 - 用量监控在 API 配置卡片**上方**（优先展示），ElevenLabs 用量在 TTS 调用后自动刷新
 - 五张配置卡片：Azure → ElevenLabs → **发音音源** → **AI 教练模式**（4 档：简单/正常/略难/严师）→ LLM
-- 发音音源卡片：有道词典（默认）/ 韦氏词典 单选，选韦氏时展开 API Key 输入框（复用 `MerriamWebsterConfig`），「测试发音」按钮播放 "hello" 验证音源
-- 音源配置存储在 `speakright_pronunciation_config`（localStorage），类型 `PronunciationConfig { source: "youdao" | "merriam-webster" }`
+- 发音音源卡片：说明“内置本地音频优先、有道词典在线兜底”，「测试有道发音」按钮播放 "hello" 验证兜底链路
+- 音源配置存储在 `speakright_pronunciation_config`（localStorage），类型 `PronunciationConfig { source: "youdao" }`
 - LLM 卡片有 LIVE 绿色脉冲 badge + 2x2 grid 统计布局
 - 页面宽度 max-w-5xl
 
@@ -208,9 +205,7 @@ docs/                 — PRD.md, api-reference.md
 - 加权随机选词：`selectNextWord()`（`word-selector.ts`），未练习 3x / 已练习 1x，排除当前词
 - 练习记录通过 `practice-tracker.ts` 追踪（localStorage `speakright_practice_history`），反馈给选词权重
 - 导航模型：右箭头 → 随机新词，左箭头 → 历史回退（`wordHistory` 栈），分页圆点改为进度计数器 `已练 X/Y`
-- 发音音源：设置页配置有道词典（默认）或韦氏词典，统一通过 `/api/pronunciation` 代理路由，hook 为 `useMwPronunciation`
-- fallback 到本地预生成音频 `/audio/words/blue/{word}.mp3`
-- 韦氏词典 API 配置后显示 "Powered by Merriam-Webster" 归属标识
+- 发音音源：优先使用本地预生成音频 `/audio/words/blue/{word}.mp3`，缺失时通过有道词典在线兜底，hook 为 `useWordPronunciation`
 
 ### 刻意练习模块（/drill）
 
@@ -226,7 +221,7 @@ docs/                 — PRD.md, api-reference.md
 - **三振跳过机制**：同一词 3 次未达标 → 可选"看发音要领"或"跳过此词"（标记为待加强）
 - **训练完成**：confetti 庆祝动画（motion 库粒子）+ 摘要卡片（总词数/一次通过率/平均分/薄弱词 Top 3）
 - **句子库**：`src/lib/sentence-bank.ts`，46 句预置内容（绕口令/最小对立句/日常场景/面试句），按音标 slug 分类
-- **最小对立对库**：`src/lib/minimal-pairs.ts`，10 音素组 × 5 对 = 50 对（ee/ih、eh/ae、s/th、l/r、v/w、n/l、oo/uh、sh/ch、f/th、z/dh）。⚠️ 本地音频仅覆盖约 24%，所有发音走 `/api/pronunciation` 代理（有道默认 / 韦氏可选），fallback 链路见 `useMwPronunciation` 的 `tryLocalFallback`——失败时 console.warn，不再 silent fail
+- **最小对立对库**：`src/lib/minimal-pairs.ts`，10 音素组 × 5 对 = 50 对（ee/ih、eh/ae、s/th、l/r、v/w、n/l、oo/uh、sh/ch、f/th、z/dh）。发音由 `useWordPronunciation` 统一处理：优先播放发行包内的本地音频，缺失时调用有道在线兜底；全部失败时显式显示播放错误
 - **类型定义**：`src/types/drill.ts`（DrillPhase/DrillItem/DrillAttempt/DrillSummary/DrillState/DrillEvent）
 - **侧边栏导航**：Target 图标 + "刻意练习" 标签，位于音标练习和自由练习之间
 - **复用组件**：RecordButton、WaveformDisplay、PhonemeHighlight 等全部复用，不重复实现

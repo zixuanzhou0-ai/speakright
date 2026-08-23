@@ -11,9 +11,7 @@ describe("desktop artifact smoke wiring", () => {
     ) as { scripts: Record<string, string> };
 
     expect(packageJson.scripts.build).toContain("desktop-build.mjs");
-    expect(packageJson.scripts["desktop:build"]).toContain(
-      "desktop-build.mjs",
-    );
+    expect(packageJson.scripts["desktop:build"]).toContain("desktop-build.mjs");
     expect(packageJson.scripts["desktop:launch-release"]).toContain(
       "desktop-launch-release.mjs",
     );
@@ -40,9 +38,13 @@ describe("desktop artifact smoke wiring", () => {
 
     expect(buildScript).toContain("CARGO_BUILD_JOBS");
     expect(buildScript).toContain('env.CARGO_BUILD_JOBS = "1"');
-    expect(buildScript).toContain("process.platform === \"win32\"");
+    expect(buildScript).toContain('process.platform === "win32"');
     expect(buildScript).toContain("tauri.cmd");
-    expect(buildScript).toContain('["build", ...process.argv.slice(2)]');
+    expect(buildScript).toContain('["build", ...argumentsForTauri]');
+    expect(buildScript).toContain("rawArguments.filter");
+    expect(buildScript).toContain(
+      "argument !== uiSmokeFlag && argument !== productionSmokeFlag",
+    );
     expect(buildScript).not.toContain("audio:parity:generate");
     expect(buildScript).not.toContain("generate-word-audio");
   });
@@ -82,19 +84,19 @@ describe("desktop artifact smoke wiring", () => {
 
   it("documents release exe startup as the manual QA path", () => {
     const runbook = readFileSync(
-      join(projectRoot, "docs/operations/DESKTOP_STARTUP_RUNBOOK.md"),
+      join(projectRoot, "DESKTOP_STARTUP_RUNBOOK.md"),
       "utf8",
     );
 
     expect(runbook).toContain("npm run desktop:launch-release");
-    expect(runbook).toContain("npm run desktop:run-release");
-    expect(runbook).toContain("Dev Mode Is Debug-Only");
-    expect(runbook).toContain("compiling...");
-    expect(runbook).toContain("validate:internal-release");
-    expect(runbook).toContain("validate:public-release");
+    expect(runbook).toContain("npm run desktop:preflight");
+    expect(runbook).toContain("desktop:dev");
+    expect(runbook).toContain("only for debugging");
+    expect(runbook).toContain("must not");
+    expect(runbook).toContain("localhost");
   });
 
-  it("runs artifact smoke after desktop build and before launching the release exe", () => {
+  it("rebuilds and checks the publishable artifact after interactive validation", () => {
     const packageJson = JSON.parse(
       readFileSync(join(projectRoot, "package.json"), "utf8"),
     ) as { scripts: Record<string, string> };
@@ -103,21 +105,33 @@ describe("desktop artifact smoke wiring", () => {
       "desktop-artifact-smoke.mjs",
     );
     const desktopValidation = packageJson.scripts["validate:desktop"];
-    expect(desktopValidation).toContain("desktop:build");
-    expect(desktopValidation).toContain("desktop:artifact-smoke");
-    expect(desktopValidation.indexOf("desktop:build")).toBeLessThan(
-      desktopValidation.indexOf("desktop:artifact-smoke"),
+    const validationSteps = desktopValidation
+      .split("&&")
+      .map((step) => step.trim().replace(/^npm run\s+/u, ""));
+    expect(
+      validationSteps.indexOf("desktop:build:production-smoke"),
+    ).toBeLessThan(validationSteps.indexOf("desktop:smoke"));
+    expect(validationSteps.indexOf("desktop:smoke")).toBeLessThan(
+      validationSteps.indexOf("desktop:build"),
     );
-    expect(desktopValidation.indexOf("desktop:artifact-smoke")).toBeLessThan(
-      desktopValidation.indexOf("desktop:smoke"),
+    expect(validationSteps.indexOf("desktop:build")).toBeLessThan(
+      validationSteps.indexOf("desktop:artifact-smoke"),
+    );
+    expect(validationSteps.indexOf("desktop:artifact-smoke")).toBeLessThan(
+      validationSteps.indexOf("desktop:installer-roundtrip"),
     );
     expect(desktopValidation).toContain("desktop:release-report");
     expect(desktopValidation).toContain("desktop:installer-smoke");
+    expect(desktopValidation).toContain("desktop:installer-roundtrip");
+    expect(
+      desktopValidation.indexOf("desktop:installer-roundtrip"),
+    ).toBeLessThan(desktopValidation.indexOf("desktop:release-report"));
     expect(desktopValidation.indexOf("desktop:release-report")).toBeLessThan(
       desktopValidation.indexOf("desktop:installer-smoke"),
     );
     const desktopCiValidation = packageJson.scripts["validate:desktop-ci"];
     expect(desktopCiValidation).toContain("desktop:installer-smoke");
+    expect(desktopCiValidation).toContain("desktop:installer-roundtrip");
   });
 
   it("checks the desktop static export and core local assets", () => {
@@ -166,6 +180,12 @@ describe("desktop artifact smoke wiring", () => {
     expect(installerSmokeScript).toContain("ProductCode");
     expect(installerSmokeScript).toContain("UpgradeCode");
     expect(installerSmokeScript).toContain("SHA-256");
+    expect(installerSmokeScript).toContain(
+      "local-only MSI metadata also passed",
+    );
+    expect(installerSmokeScript).toContain(
+      "release report must contain only the published EXE and NSIS artifacts",
+    );
   });
 
   it("checks the release executable writes runtime diagnostics during smoke", () => {
@@ -209,9 +229,27 @@ describe("desktop artifact smoke wiring", () => {
     expect(smokeScript).toContain("benchmarkAudioCleared");
     expect(smokeScript).toContain("data-release-channel");
     expect(smokeScript).toContain("data-signature-status");
-    expect(smokeScript).toContain("<local-app-data>/");
+    expect(smokeScript).toContain("const appIdentifier = readAppIdentifier()");
+    expect(smokeScript).toContain("desktopAppConfigPath");
+    expect(smokeScript).toContain(
+      "diagnostics.bundle?.appIdentifier !== desktopSmokeSecureStoreService",
+    );
+    expect(smokeScript).toContain("async function selectSettingsTab");
+    expect(smokeScript).toContain('"服务连接"');
+    expect(smokeScript).toContain('"基础设置"');
+    expect(smokeScript).toContain('"高级 / Labs"');
+    expect(smokeScript).toContain('"数据与隐私"');
+    expect(smokeScript).toContain(
+      'tab.getAttribute("aria-selected") === "true"',
+    );
+    expect(smokeScript).toMatch(
+      /async function selectSettingsTab[\s\S]*?document\.elementFromPoint\(x, y\)[\s\S]*?Input\.dispatchMouseEvent/,
+    );
+    expect(smokeScript).toContain("<redacted>/speakright.log");
     expect(smokeScript).toContain("local user profile path");
-    expect(smokeScript).toContain("com.speakright.desktop");
+    expect(smokeScript).toMatch(
+      /\$\{appIdentifier\}\.release-smoke-\$\{randomUUID\(\)\}/,
+    );
     expect(smokeScript).toContain("speakright.log");
     expect(smokeScript).toContain("SpeakRight desktop runtime initialized");
   });
@@ -229,9 +267,9 @@ describe("desktop artifact smoke wiring", () => {
     expect(workflow).toMatch(
       /cancel-in-progress:\s+\$\{\{\s*!startsWith\(github\.ref,\s*'refs\/tags\/v'\)\s*\}\}/,
     );
-    expect(workflow).toContain("timeout-minutes: 70");
-    expect(workflow).toContain("timeout-minutes: 55");
-    expect(workflow).toContain("Validate desktop build");
+    expect(workflow).toContain("timeout-minutes: 80");
+    expect(workflow).toContain("timeout-minutes: 60");
+    expect(workflow).toContain("Validate publishable desktop build");
     expect(workflow).toContain("npm run validate:desktop-ci");
   });
 });

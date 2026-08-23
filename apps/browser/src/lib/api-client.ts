@@ -394,6 +394,7 @@ export async function elevenLabsTtsAligned(
   text: string,
   modelId: string,
   speedOrOptions?: number | ElevenLabsTtsOptions,
+  signal?: AbortSignal,
 ): Promise<{ audio_base64: string; alignment: unknown }> {
   assertElevenLabsVoiceId(voiceId);
   if (text.length > 500) {
@@ -414,20 +415,587 @@ export async function elevenLabsTtsAligned(
           "xi-api-key": apiKey,
           "Content-Type": "application/json",
         },
+        signal,
         body: JSON.stringify(buildElevenLabsBody(text, modelId, options)),
       },
     );
   } catch (error) {
+    signal?.throwIfAborted();
     throw new Error(buildElevenLabsNetworkErrorMessage(error));
   }
 
   if (!res.ok) {
     const errText = await res.text();
+    signal?.throwIfAborted();
     throw new Error(
       buildElevenLabsHttpErrorMessage("tts", res.status, errText),
     );
   }
-  return res.json();
+  const responsePayload = (await res.json()) as {
+    audio_base64: string;
+    alignment: unknown;
+  };
+  signal?.throwIfAborted();
+  return responsePayload;
+}
+
+// ─── Hermes Grok TTS ───────────────────────────────────
+
+const HERMES_XAI_BRIDGE_URL = "http://127.0.0.1:17831";
+const HERMES_XAI_BRIDGE_PROTOCOL_VERSION = 1;
+const HERMES_XAI_STATUS_TIMEOUT_MS = 25_000;
+const HERMES_XAI_TTS_TIMEOUT_MS = 80_000;
+
+let hermesBridgeSessionToken: string | null = null;
+
+export interface HermesXaiStatus {
+  available: boolean;
+  provider: "xai";
+  voiceId?: string;
+  detail?: string;
+  message?: string;
+}
+
+export interface HermesXaiTtsOptions {
+  languageId?: LanguageId;
+  speed?: number;
+  signal?: AbortSignal;
+}
+
+function getRecordString(
+  value: Record<string, unknown>,
+  ...keys: string[]
+): string | undefined {
+  for (const key of keys) {
+    const candidate = value[key];
+    if (typeof candidate === "string" && candidate.trim()) {
+      return candidate.trim();
+    }
+  }
+  return undefined;
+}
+
+function normalizeHermesXaiStatus(value: unknown): HermesXaiStatus {
+  if (typeof value === "boolean") {
+    return { available: value, provider: "xai" };
+  }
+  if (!value || typeof value !== "object") {
+    return {
+      available: false,
+      provider: "xai",
+      detail: "本机爱马仕没有返回有效状态。",
+      message: "本机爱马仕没有返回有效状态。",
+    };
+  }
+
+  const record = value as Record<string, unknown>;
+  const availableValue = record.available ?? record.ready ?? record.ok;
+  const detail = getRecordString(record, "message", "detail", "error");
+  return {
+    available: availableValue === true,
+    provider: "xai",
+    voiceId: getRecordString(record, "voiceId", "voice_id", "voice"),
+    detail,
+    message: detail,
+  };
+}
+
+function decodeBase64Audio(base64: string, mimeType = "audio/mpeg"): Blob {
+  const normalized = base64.includes(",")
+    ? (base64.split(",").pop() ?? "")
+    : base64;
+  try {
+    const bytes = Uint8Array.from(atob(normalized), (character) =>
+      character.charCodeAt(0),
+    );
+    return new Blob([bytes], { type: mimeType });
+  } catch {
+    throw new Error("爱马仕 Grok TTS 返回了无效的音频数据，请重试。");
+  }
+}
+
+function hermesAudioBlobFromPayload(payload: unknown): Blob {
+  if (payload instanceof Blob) return payload;
+
+  if (typeof payload === "string") {
+    return decodeBase64Audio(payload);
+  }
+
+  if (
+    Array.isArray(payload) &&
+    payload.every((value) => typeof value === "number")
+  ) {
+    return new Blob([Uint8Array.from(payload)], { type: "audio/mpeg" });
+  }
+
+  if (payload && typeof payload === "object") {
+    const record = payload as Record<string, unknown>;
+    const base64 = getRecordString(
+      record,
+      "audioBase64",
+      "audio_base64",
+      "audio",
+      "data",
+    );
+    if (base64) {
+      return decodeBase64Audio(
+        base64,
+        getRecordString(record, "mimeType", "mime_type", "contentType") ??
+          "audio/mpeg",
+      );
+    }
+    const bytes = record.bytes;
+    if (
+      Array.isArray(bytes) &&
+      bytes.every((value) => typeof value === "number")
+    ) {
+      return new Blob([Uint8Array.from(bytes)], { type: "audio/mpeg" });
+    }
+  }
+
+  throw new Error("爱马仕 Grok TTS 没有返回可播放音频，请重试。");
+}
+
+async function fetchHermesBridge(
+  path: "/health" | "/tts" | "/vertex/health" | "/vertex/tts",
+  init: RequestInit,
+  timeoutMs: number,
+  externalSignal?: AbortSignal,
+): Promise<Response> {
+  const controller = new AbortController();
+  const sourceSignal = externalSignal ?? init.signal ?? undefined;
+  const abortFromSource = () => controller.abort(sourceSignal?.reason);
+  if (sourceSignal?.aborted) {
+    abortFromSource();
+  } else {
+    sourceSignal?.addEventListener("abort", abortFromSource, { once: true });
+  }
+  const timeout = setTimeout(
+    () =>
+      controller.abort(new DOMException("本机 TTS 请求超时。", "TimeoutError")),
+    timeoutMs,
+  );
+  try {
+    controller.signal.throwIfAborted();
+    return await fetch(`${HERMES_XAI_BRIDGE_URL}${path}`, {
+      ...init,
+      signal: controller.signal,
+    });
+  } finally {
+    clearTimeout(timeout);
+    sourceSignal?.removeEventListener("abort", abortFromSource);
+  }
+}
+
+function rememberHermesBridgeSession(value: unknown): boolean {
+  if (!value || typeof value !== "object") return false;
+  const record = value as Record<string, unknown>;
+  const protocolVersion = record.protocolVersion ?? record.protocol_version;
+  const sessionToken = getRecordString(record, "sessionToken", "session_token");
+  if (protocolVersion !== HERMES_XAI_BRIDGE_PROTOCOL_VERSION || !sessionToken) {
+    hermesBridgeSessionToken = null;
+    return false;
+  }
+  hermesBridgeSessionToken = sessionToken;
+  return true;
+}
+
+/** Check the local Hermes/xAI integration without exposing its OAuth token. */
+export async function hermesXaiStatus(
+  signal?: AbortSignal,
+): Promise<HermesXaiStatus> {
+  try {
+    const response = await fetchHermesBridge(
+      "/health",
+      { headers: { Accept: "application/json" } },
+      HERMES_XAI_STATUS_TIMEOUT_MS,
+      signal,
+    );
+    signal?.throwIfAborted();
+    const responsePayload = (await response.json()) as unknown;
+    signal?.throwIfAborted();
+    if (!rememberHermesBridgeSession(responsePayload)) {
+      return {
+        available: false,
+        provider: "xai",
+        detail:
+          "检测到的本机服务不是兼容的 SpeakRight 爱马仕桥接，请重新启动当前版本。",
+        message:
+          "检测到的本机服务不是兼容的 SpeakRight 爱马仕桥接，请重新启动当前版本。",
+      };
+    }
+    if (!response.ok) {
+      const status = normalizeHermesXaiStatus(responsePayload);
+      return {
+        ...status,
+        available: false,
+        detail:
+          status.detail ??
+          `本机爱马仕桥接服务不可用（HTTP ${response.status}）。`,
+        message:
+          status.message ??
+          `本机爱马仕桥接服务不可用（HTTP ${response.status}）。`,
+      };
+    }
+    return normalizeHermesXaiStatus(responsePayload);
+  } catch {
+    signal?.throwIfAborted();
+    return {
+      available: false,
+      provider: "xai",
+      detail:
+        "无法连接本机爱马仕 Grok TTS。请确认爱马仕已配置 xAI，并已启动 SpeakRight 本机桥接服务。",
+      message:
+        "无法连接本机爱马仕 Grok TTS。请确认爱马仕已配置 xAI，并已启动 SpeakRight 本机桥接服务。",
+    };
+  }
+}
+
+/** Generate audio through Hermes' existing xAI credentials. */
+export async function hermesXaiTts(
+  text: string,
+  options: HermesXaiTtsOptions = {},
+): Promise<Blob> {
+  const normalizedText = text.trim();
+  if (!normalizedText) {
+    throw new Error("请输入需要朗读的文字。");
+  }
+  if (normalizedText.length > 500) {
+    throw new Error("标准示范文本过长，请控制在 500 个字符以内。");
+  }
+
+  const speed = Math.min(1.5, Math.max(0.7, options.speed ?? 1));
+  const payload = {
+    text: normalizedText,
+    languageId: options.languageId ?? "en-US",
+    speed,
+  };
+
+  try {
+    if (!hermesBridgeSessionToken) {
+      const status = await hermesXaiStatus(options.signal);
+      if (!status.available || !hermesBridgeSessionToken) {
+        throw new Error(
+          status.detail ||
+            "本机爱马仕 Grok TTS 尚未就绪，请先在设置页检测状态。",
+        );
+      }
+    }
+
+    const response = await fetchHermesBridge(
+      "/tts",
+      {
+        method: "POST",
+        headers: {
+          Accept: "audio/mpeg, application/json",
+          "Content-Type": "application/json",
+          "X-SpeakRight-Bridge-Token": hermesBridgeSessionToken,
+        },
+        body: JSON.stringify(payload),
+      },
+      HERMES_XAI_TTS_TIMEOUT_MS,
+      options.signal,
+    );
+    options.signal?.throwIfAborted();
+    if (response.status === 401 || response.status === 403) {
+      hermesBridgeSessionToken = null;
+    }
+    if (!response.ok) {
+      const responseText = await response.text();
+      let detail = truncateServiceDetail(responseText);
+      try {
+        const parsed = JSON.parse(responseText) as Record<string, unknown>;
+        detail =
+          getRecordString(parsed, "error", "message", "detail") ?? detail;
+      } catch {
+        // Keep the plain response detail.
+      }
+      throw new Error(
+        `爱马仕 Grok TTS 生成失败（HTTP ${response.status}）${
+          detail ? `：${detail}` : "。"
+        }`,
+      );
+    }
+
+    const contentType =
+      response.headers.get("content-type")?.toLowerCase() ?? "";
+    if (
+      contentType.startsWith("audio/") ||
+      contentType.includes("application/octet-stream")
+    ) {
+      const audioBuffer = await response.arrayBuffer();
+      options.signal?.throwIfAborted();
+      return new Blob([audioBuffer], {
+        type: contentType.split(";")[0] || "audio/mpeg",
+      });
+    }
+    const responsePayload = await response.json();
+    options.signal?.throwIfAborted();
+    return hermesAudioBlobFromPayload(responsePayload);
+  } catch (error) {
+    options.signal?.throwIfAborted();
+    const message =
+      error instanceof Error
+        ? error.message
+        : typeof error === "string"
+          ? error
+          : "";
+    if (/[\u3400-\u9fff]/.test(message)) {
+      throw new Error(message);
+    }
+    throw new Error(
+      "无法连接本机爱马仕 Grok TTS。请确认爱马仕已配置 xAI，并已启动 SpeakRight 本机桥接服务。",
+    );
+  }
+}
+
+// ─── Vertex AI Gemini 3.1 Flash TTS ────────────────────
+
+const VERTEX_GEMINI_TTS_MODEL = "gemini-3.1-flash-tts-preview";
+const VERTEX_GEMINI_STATUS_TIMEOUT_MS = 25_000;
+const VERTEX_GEMINI_TTS_TIMEOUT_MS = 120_000;
+
+let vertexBridgeSessionToken: string | null = null;
+
+export interface VertexGeminiStatus {
+  available: boolean;
+  model: string;
+  authReady: boolean;
+  projectConfigured: boolean;
+  detail?: string;
+}
+
+export interface VertexGeminiTtsOptions {
+  languageId?: LanguageId;
+  speed?: number;
+  voiceName?: string;
+  signal?: AbortSignal;
+}
+
+function getRecordBoolean(
+  value: Record<string, unknown>,
+  ...keys: string[]
+): boolean {
+  for (const key of keys) {
+    if (typeof value[key] === "boolean") return value[key] === true;
+  }
+  return false;
+}
+
+function normalizeVertexGeminiStatus(value: unknown): VertexGeminiStatus {
+  if (!value || typeof value !== "object") {
+    return {
+      available: false,
+      model: VERTEX_GEMINI_TTS_MODEL,
+      authReady: false,
+      projectConfigured: false,
+      detail: "本机 Vertex AI 桥接没有返回有效状态。",
+    };
+  }
+
+  const record = value as Record<string, unknown>;
+  return {
+    available: getRecordBoolean(record, "available", "ready", "ok"),
+    model:
+      getRecordString(record, "model", "modelId", "model_id") ??
+      VERTEX_GEMINI_TTS_MODEL,
+    authReady: getRecordBoolean(record, "authReady", "auth_ready"),
+    projectConfigured: getRecordBoolean(
+      record,
+      "projectConfigured",
+      "project_configured",
+    ),
+    detail: getRecordString(record, "detail", "message", "error"),
+  };
+}
+
+function rememberVertexBridgeSession(value: unknown): boolean {
+  if (!value || typeof value !== "object") return false;
+  const record = value as Record<string, unknown>;
+  const protocolVersion = record.protocolVersion ?? record.protocol_version;
+  const sessionToken = getRecordString(record, "sessionToken", "session_token");
+  if (protocolVersion !== HERMES_XAI_BRIDGE_PROTOCOL_VERSION || !sessionToken) {
+    vertexBridgeSessionToken = null;
+    return false;
+  }
+  vertexBridgeSessionToken = sessionToken;
+  return true;
+}
+
+function vertexAudioBlobFromPayload(payload: unknown): Blob {
+  if (payload instanceof Blob) return payload;
+
+  if (payload && typeof payload === "object") {
+    const record = payload as Record<string, unknown>;
+    const base64 = getRecordString(
+      record,
+      "audioBase64",
+      "audio_base64",
+      "audio",
+      "data",
+    );
+    if (base64) {
+      const normalized = base64.includes(",")
+        ? (base64.split(",").pop() ?? "")
+        : base64;
+      try {
+        const bytes = Uint8Array.from(atob(normalized), (character) =>
+          character.charCodeAt(0),
+        );
+        return new Blob([bytes], {
+          type:
+            getRecordString(record, "mimeType", "mime_type", "contentType") ??
+            "audio/wav",
+        });
+      } catch {
+        throw new Error("Vertex Gemini TTS 返回了无效的音频数据，请重试。");
+      }
+    }
+  }
+
+  throw new Error("Vertex Gemini TTS 没有返回可播放音频，请重试。");
+}
+
+/** Check local gcloud project and Application Default Credentials only. */
+export async function vertexGeminiStatus(
+  signal?: AbortSignal,
+): Promise<VertexGeminiStatus> {
+  try {
+    const response = await fetchHermesBridge(
+      "/vertex/health",
+      { headers: { Accept: "application/json" } },
+      VERTEX_GEMINI_STATUS_TIMEOUT_MS,
+      signal,
+    );
+    signal?.throwIfAborted();
+    const responsePayload = (await response.json()) as unknown;
+    signal?.throwIfAborted();
+    if (!rememberVertexBridgeSession(responsePayload)) {
+      return {
+        available: false,
+        model: VERTEX_GEMINI_TTS_MODEL,
+        authReady: false,
+        projectConfigured: false,
+        detail:
+          "检测到的本机服务不是兼容的 SpeakRight Vertex AI 桥接，请重新启动当前版本。",
+      };
+    }
+    const status = normalizeVertexGeminiStatus(responsePayload);
+    if (!response.ok) {
+      return {
+        ...status,
+        available: false,
+        detail:
+          status.detail ??
+          `本机 Vertex AI 桥接服务不可用（HTTP ${response.status}）。`,
+      };
+    }
+    return status;
+  } catch {
+    signal?.throwIfAborted();
+    return {
+      available: false,
+      model: VERTEX_GEMINI_TTS_MODEL,
+      authReady: false,
+      projectConfigured: false,
+      detail:
+        "无法连接本机 Vertex AI TTS。请确认已安装 gcloud、已选择项目并完成 ADC 登录。",
+    };
+  }
+}
+
+/** Generate audio with the locally authenticated Vertex AI project. */
+export async function vertexGeminiTts(
+  text: string,
+  options: VertexGeminiTtsOptions = {},
+): Promise<Blob> {
+  const normalizedText = text.trim();
+  if (!normalizedText) throw new Error("请输入需要朗读的文字。");
+  if (normalizedText.length > 500) {
+    throw new Error("标准示范文本过长，请控制在 500 个字符以内。");
+  }
+
+  const payload = {
+    text: normalizedText,
+    languageId: options.languageId ?? "en-US",
+    speed: Math.min(1.5, Math.max(0.7, options.speed ?? 1)),
+    voiceName: options.voiceName?.trim() || "Kore",
+  };
+
+  try {
+    if (!vertexBridgeSessionToken) {
+      const status = await vertexGeminiStatus(options.signal);
+      if (!status.available || !vertexBridgeSessionToken) {
+        throw new Error(
+          status.detail ||
+            "本机 Vertex AI TTS 尚未就绪，请先在设置页检测状态。",
+        );
+      }
+    }
+
+    const response = await fetchHermesBridge(
+      "/vertex/tts",
+      {
+        method: "POST",
+        headers: {
+          Accept: "audio/wav, audio/mpeg, application/json",
+          "Content-Type": "application/json",
+          "X-SpeakRight-Bridge-Token": vertexBridgeSessionToken,
+        },
+        body: JSON.stringify(payload),
+      },
+      VERTEX_GEMINI_TTS_TIMEOUT_MS,
+      options.signal,
+    );
+    options.signal?.throwIfAborted();
+    if (response.status === 401 || response.status === 403) {
+      vertexBridgeSessionToken = null;
+    }
+    if (!response.ok) {
+      const responseText = await response.text();
+      let detail = truncateServiceDetail(responseText);
+      try {
+        const parsed = JSON.parse(responseText) as Record<string, unknown>;
+        detail =
+          getRecordString(parsed, "error", "message", "detail") ?? detail;
+      } catch {
+        // Keep the plain response detail.
+      }
+      throw new Error(
+        `Vertex Gemini TTS 生成失败（HTTP ${response.status}）${
+          detail ? `：${detail}` : "。"
+        }`,
+      );
+    }
+
+    const contentType =
+      response.headers.get("content-type")?.toLowerCase() ?? "";
+    if (
+      contentType.startsWith("audio/") ||
+      contentType.includes("application/octet-stream")
+    ) {
+      const audioBuffer = await response.arrayBuffer();
+      options.signal?.throwIfAborted();
+      return new Blob([audioBuffer], {
+        type: contentType.split(";")[0] || "audio/wav",
+      });
+    }
+    const responsePayload = await response.json();
+    options.signal?.throwIfAborted();
+    return vertexAudioBlobFromPayload(responsePayload);
+  } catch (error) {
+    options.signal?.throwIfAborted();
+    const message =
+      error instanceof Error
+        ? error.message
+        : typeof error === "string"
+          ? error
+          : "";
+    if (/[㐀-鿿]/.test(message)) throw new Error(message);
+    throw new Error(
+      "无法连接本机 Vertex AI TTS。请确认已安装 gcloud、已选择项目并完成 ADC 登录。",
+    );
+  }
 }
 
 // ─── LLM ────────────────────────────────────────────────

@@ -143,23 +143,25 @@ const RECIPES: Record<string, DeepPracticeRecipe> = {
     ],
   },
   "vowel-length-ee-ih": {
-    bodyCheck: "/iː/ 嘴角拉开并持续；/ɪ/ 放松、短促、立刻收住。",
-    listeningCheck: "ship 不能拖成 sheep；sheep 也不能短成 ship。",
+    bodyCheck:
+      "/iː/ 舌位高前、舌体较紧；/ɪ/ 略低略后、舌体放松。时长只作辅助检查。",
+    listeningCheck:
+      "换说话人和词后，仍应先靠音质与舌位对应的听感区分两类元音。",
     microDrill: [
       {
-        label: "长音",
-        instruction: "把 /iː/ 拉两拍。",
-        text: "sheep",
+        label: "高前紧音质",
+        instruction: "保持 /iː/ 的高前舌位和较紧舌体。",
+        text: "sleep",
       },
       {
-        label: "短音",
-        instruction: "把 /ɪ/ 控制在一拍内。",
+        label: "略低后松音质",
+        instruction: "让 /ɪ/ 的舌位略低后并放松，不只追求短。",
         text: "ship",
       },
       {
-        label: "长短对比",
-        instruction: "先夸张长短，再回到自然速度。",
-        text: "sheep ship",
+        label: "音质对比",
+        instruction: "先稳定舌位和音质，再回到自然语速检查时长。",
+        text: "sleep ship",
       },
     ],
   },
@@ -248,22 +250,24 @@ const RECIPES: Record<string, DeepPracticeRecipe> = {
     ],
   },
   "rounded-vowel-oo-uh": {
-    bodyCheck: "/uː/ 圆唇拉长；/ʊ/ 少圆唇、短促、放松。",
-    listeningCheck: "look 被拖长会像 Luke；pool 太短会像 pull。",
+    bodyCheck:
+      "/uː/ 舌位高后、圆唇充分；/ʊ/ 略低前、更放松少圆唇。时长只作辅助。",
+    listeningCheck:
+      "先听音质与圆唇差异，再观察重音和相邻音造成的自然时长变化。",
     microDrill: [
       {
-        label: "长圆唇",
-        instruction: "圆唇保持两拍。",
+        label: "高后圆唇",
+        instruction: "保持高后舌位和充分圆唇。",
         text: "pool",
       },
       {
-        label: "短放松",
-        instruction: "短促收住，别拖长。",
+        label: "略低前放松",
+        instruction: "舌位略低前、圆唇较少并放松。",
         text: "pull",
       },
       {
         label: "对比",
-        instruction: "长短和圆唇同时拉开。",
+        instruction: "先拉开音质、舌位和圆唇，再检查自然时长。",
         text: "pool pull",
       },
     ],
@@ -324,7 +328,9 @@ function diagnosisFor(
   analysis: AttemptAnalysis,
   patternId: string,
 ): string {
-  const pattern = TRAINING_ERROR_PATTERNS.find((entry) => entry.id === patternId);
+  const pattern = TRAINING_ERROR_PATTERNS.find(
+    (entry) => entry.id === patternId,
+  );
   const targetText = item.displayText ?? item.referenceText ?? item.text;
   if (analysis.passed) {
     return `${targetText} 的目标音已经过线。现在要记住刚才的动作，而不是立刻换速度。`;

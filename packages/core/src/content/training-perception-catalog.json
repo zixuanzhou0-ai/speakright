@@ -1,0 +1,152 @@
+[
+  {
+    "packId": "ee-ih",
+    "categoryA": { "targetUnit": "ee", "label": "/iː/" },
+    "categoryB": { "targetUnit": "ih", "label": "/ɪ/" },
+    "examples": [
+      { "id": "ee-ih-1", "wordA": "see", "wordB": "sit" },
+      { "id": "ee-ih-2", "wordA": "eat", "wordB": "big" },
+      { "id": "ee-ih-3", "wordA": "beach", "wordB": "ship" },
+      { "id": "ee-ih-4", "wordA": "sleep", "wordB": "swim" },
+      { "id": "ee-ih-5", "wordA": "green", "wordB": "give" },
+      { "id": "ee-ih-6", "wordA": "feel", "wordB": "fill" },
+      { "id": "ee-ih-7", "wordA": "leave", "wordB": "little" },
+      { "id": "ee-ih-8", "wordA": "team", "wordB": "still" }
+    ]
+  },
+  {
+    "packId": "eh-ae",
+    "categoryA": { "targetUnit": "eh", "label": "/e/" },
+    "categoryB": { "targetUnit": "ae", "label": "/æ/" },
+    "examples": [
+      { "id": "eh-ae-1", "wordA": "bed", "wordB": "bad" },
+      { "id": "eh-ae-2", "wordA": "pen", "wordB": "man" },
+      { "id": "eh-ae-3", "wordA": "best", "wordB": "back" },
+      { "id": "eh-ae-4", "wordA": "help", "wordB": "cat" },
+      { "id": "eh-ae-5", "wordA": "red", "wordB": "map" },
+      { "id": "eh-ae-6", "wordA": "head", "wordB": "hand" },
+      { "id": "eh-ae-7", "wordA": "step", "wordB": "stamp" },
+      { "id": "eh-ae-8", "wordA": "dress", "wordB": "drag" }
+    ]
+  },
+  {
+    "packId": "s-th",
+    "categoryA": { "targetUnit": "s", "label": "/s/" },
+    "categoryB": { "targetUnit": "th", "label": "/θ/" },
+    "examples": [
+      { "id": "s-th-1", "wordA": "see", "wordB": "think" },
+      { "id": "s-th-2", "wordA": "sun", "wordB": "three" },
+      { "id": "s-th-3", "wordA": "safe", "wordB": "bath" },
+      { "id": "s-th-4", "wordA": "slow", "wordB": "thought" },
+      { "id": "s-th-5", "wordA": "smile", "wordB": "health" },
+      { "id": "s-th-6", "wordA": "city", "wordB": "thick" },
+      { "id": "s-th-7", "wordA": "side", "wordB": "thumb" },
+      { "id": "s-th-8", "wordA": "class", "wordB": "math" }
+    ]
+  },
+  {
+    "packId": "z-dh",
+    "categoryA": { "targetUnit": "z", "label": "/z/" },
+    "categoryB": { "targetUnit": "dh", "label": "/ð/" },
+    "examples": [
+      { "id": "z-dh-1", "wordA": "zoo", "wordB": "then" },
+      { "id": "z-dh-2", "wordA": "zero", "wordB": "this" },
+      { "id": "z-dh-3", "wordA": "breeze", "wordB": "breathe" },
+      { "id": "z-dh-4", "wordA": "bays", "wordB": "bathe" },
+      { "id": "z-dh-5", "wordA": "easy", "wordB": "weather" },
+      { "id": "z-dh-6", "wordA": "buzz", "wordB": "that" },
+      { "id": "z-dh-7", "wordA": "size", "wordB": "these" },
+      { "id": "z-dh-8", "wordA": "prize", "wordB": "those" }
+    ]
+  },
+  {
+    "packId": "v-w",
+    "categoryA": { "targetUnit": "v", "label": "/v/" },
+    "categoryB": { "targetUnit": "w", "label": "/w/" },
+    "examples": [
+      { "id": "v-w-1", "wordA": "very", "wordB": "walk" },
+      { "id": "v-w-2", "wordA": "view", "wordB": "wash" },
+      { "id": "v-w-3", "wordA": "voice", "wordB": "water" },
+      { "id": "v-w-4", "wordA": "vision", "wordB": "warm" },
+      { "id": "v-w-5", "wordA": "give", "wordB": "swim" },
+      { "id": "v-w-6", "wordA": "vine", "wordB": "wait" },
+      { "id": "v-w-7", "wordA": "vivid", "wordB": "wish" },
+      { "id": "v-w-8", "wordA": "value", "wordB": "west" }
+    ]
+  },
+  {
+    "packId": "l-r",
+    "categoryA": { "targetUnit": "l", "label": "/l/" },
+    "categoryB": { "targetUnit": "r", "label": "/ɹ/" },
+    "examples": [
+      { "id": "l-r-1", "wordA": "light", "wordB": "right" },
+      { "id": "l-r-2", "wordA": "glass", "wordB": "green" },
+      { "id": "l-r-3", "wordA": "fly", "wordB": "free" },
+      { "id": "l-r-4", "wordA": "long", "wordB": "run" },
+      { "id": "l-r-5", "wordA": "love", "wordB": "rain" },
+      { "id": "l-r-6", "wordA": "lock", "wordB": "rock" },
+      { "id": "l-r-7", "wordA": "leaf", "wordB": "road" },
+      { "id": "l-r-8", "wordA": "list", "wordB": "ring" }
+    ]
+  },
+  {
+    "packId": "final-consonants",
+    "categoryA": { "targetUnit": "open-syllable", "label": "无目标词尾" },
+    "categoryB": { "targetUnit": "final-consonant", "label": "有词尾辅音" },
+    "examples": [
+      { "id": "final-1", "wordA": "say", "wordB": "safe" },
+      { "id": "final-2", "wordA": "go", "wordB": "light" },
+      { "id": "final-3", "wordA": "see", "wordB": "feel" },
+      { "id": "final-4", "wordA": "day", "wordB": "late" },
+      { "id": "final-5", "wordA": "he", "wordB": "heat" },
+      { "id": "final-6", "wordA": "we", "wordB": "week" },
+      { "id": "final-7", "wordA": "she", "wordB": "ship" },
+      { "id": "final-8", "wordA": "no", "wordB": "nose" }
+    ]
+  },
+  {
+    "packId": "stress-rhythm",
+    "categoryA": { "targetUnit": "initial-stress", "label": "首音节重读" },
+    "categoryB": { "targetUnit": "later-stress", "label": "后续音节重读" },
+    "examples": [
+      { "id": "stress-1", "wordA": "table", "wordB": "about" },
+      { "id": "stress-2", "wordA": "water", "wordB": "today" },
+      { "id": "stress-3", "wordA": "teacher", "wordB": "again" },
+      { "id": "stress-4", "wordA": "coffee", "wordB": "support" },
+      { "id": "stress-5", "wordA": "music", "wordB": "banana" },
+      { "id": "stress-6", "wordA": "family", "wordB": "behind" },
+      { "id": "stress-7", "wordA": "camera", "wordB": "allow" },
+      { "id": "stress-8", "wordA": "happy", "wordB": "arrive" }
+    ]
+  },
+  {
+    "packId": "oo-uh",
+    "categoryA": { "targetUnit": "oo", "label": "/uː/" },
+    "categoryB": { "targetUnit": "uh", "label": "/ʊ/" },
+    "examples": [
+      { "id": "oo-uh-1", "wordA": "pool", "wordB": "pull" },
+      { "id": "oo-uh-2", "wordA": "food", "wordB": "foot" },
+      { "id": "oo-uh-3", "wordA": "blue", "wordB": "book" },
+      { "id": "oo-uh-4", "wordA": "school", "wordB": "look" },
+      { "id": "oo-uh-5", "wordA": "move", "wordB": "good" },
+      { "id": "oo-uh-6", "wordA": "boot", "wordB": "bush" },
+      { "id": "oo-uh-7", "wordA": "goose", "wordB": "cook" },
+      { "id": "oo-uh-8", "wordA": "fool", "wordB": "full" }
+    ]
+  },
+  {
+    "packId": "n-ng",
+    "categoryA": { "targetUnit": "n", "label": "/n/" },
+    "categoryB": { "targetUnit": "ng", "label": "/ŋ/" },
+    "examples": [
+      { "id": "n-ng-1", "wordA": "thin", "wordB": "sing" },
+      { "id": "n-ng-2", "wordA": "sun", "wordB": "king" },
+      { "id": "n-ng-3", "wordA": "nine", "wordB": "long" },
+      { "id": "n-ng-4", "wordA": "pen", "wordB": "ring" },
+      { "id": "n-ng-5", "wordA": "name", "wordB": "song" },
+      { "id": "n-ng-6", "wordA": "done", "wordB": "swing" },
+      { "id": "n-ng-7", "wordA": "plan", "wordB": "strong" },
+      { "id": "n-ng-8", "wordA": "sense", "wordB": "string" }
+    ]
+  }
+]

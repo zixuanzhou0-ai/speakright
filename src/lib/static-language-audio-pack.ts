@@ -6,6 +6,13 @@ interface StaticLanguageAudioPackItem {
   text: string;
   ipa?: string;
   soundUnitSlugs: string[];
+  kinds?: string[];
+  sources?: string[];
+  relationshipKinds?: Array<{
+    soundUnitSlug: string;
+    relationshipKind: "target-example" | "contrast-member";
+  }>;
+  relationshipKind?: "target-example" | "contrast-member";
   audioSrc: string;
   audioByVoice?: Partial<Record<StaticLanguageAudioVoiceSlot, string>>;
   fileName?: string;

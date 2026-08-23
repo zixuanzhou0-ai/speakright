@@ -1,3 +1,4 @@
+import type { TrainingCriterion } from "@speakright/core/training/criteria";
 import type { AzureAssessmentResult } from "@/types/azure";
 import type {
   AttemptAnalysis,
@@ -13,6 +14,7 @@ export interface AttemptAnalysisInput {
   item: TrainingCourseItem;
   result: AzureAssessmentResult;
   levelKind?: TrainingLevelKind;
+  criterion?: TrainingCriterion;
 }
 
 function fallbackCue(item: TrainingCourseItem, passed: boolean): string {
@@ -46,15 +48,20 @@ export function analyzeAttempt({
   item,
   result,
   levelKind,
+  criterion,
 }: AttemptAnalysisInput): AttemptAnalysis {
   const score = getPassScore(result, item.targetPhonemes);
   const threshold =
-    levelKind === "syllable"
-      ? 78
-      : levelKind === "mixed-review"
-        ? (pack.masteryRule.mixedReviewAverage ??
-          pack.masteryRule.targetPassScore)
-        : pack.masteryRule.targetPassScore;
+    criterion &&
+    criterion.kind !== "perception" &&
+    criterion.kind !== "motor-formation"
+      ? criterion.minTargetScore
+      : levelKind === "syllable"
+        ? 78
+        : levelKind === "mixed-review"
+          ? (pack.masteryRule.mixedReviewAverage ??
+            pack.masteryRule.targetPassScore)
+          : pack.masteryRule.targetPassScore;
   const passed = !score.usedFallback && score.targetScore >= threshold;
   const patterns = score.usedFallback
     ? []

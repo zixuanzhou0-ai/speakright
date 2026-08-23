@@ -1,0 +1,4155 @@
+{
+  "version": 1,
+  "revision": "reference-decisions-b38ea0520a0e-e308489f305b",
+  "warning": "Only add a confirmed entry after checking two independent pronunciation references. Non-English conflicts also require native-speaker review before release.",
+  "entries": [
+    {
+      "languageId": "en-US",
+      "text": "bays",
+      "canonicalIpa": "beɪz",
+      "acceptedVariants": [],
+      "homophones": [],
+      "primaryStress": 0,
+      "syllableCount": 1,
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "CMUdict",
+          "publisherId": "cmudict",
+          "independenceGroup": "cmudict",
+          "revisionOrDate": "74790861f652b15e4ac49015a90074ad62a27690",
+          "value": "beɪz",
+          "arpabet": "B EY1 Z",
+          "sha256": "286782f036cd341701058943e0615475c8d543ff1ead5b9ddaafd095a352d66a"
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "kaikki-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/beɪz/",
+          "sourceUrl": "https://kaikki.org/dictionary/English/meaning/b/ba/bays.html",
+          "htmlSha256": "a374828589f5bb2be1a8000aca0dfac7c773dd3a33cfd08e48ab7f5b58826092",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd"
+        }
+      ],
+      "notes": "Conservative machine reference decision: the existing project IPA exactly normalizes to both CMUdict (en-US) and a Kaikki/Wiktionary observation, and every page target remains present. This confirms the reference used for candidate generation; it is not human verification of the audio."
+    },
+    {
+      "languageId": "en-US",
+      "text": "clothe",
+      "canonicalIpa": "kloʊð",
+      "acceptedVariants": [],
+      "homophones": [],
+      "primaryStress": 0,
+      "syllableCount": 1,
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "CMUdict",
+          "publisherId": "cmudict",
+          "independenceGroup": "cmudict",
+          "revisionOrDate": "74790861f652b15e4ac49015a90074ad62a27690",
+          "value": "kloʊð",
+          "arpabet": "K L OW1 DH",
+          "sha256": "286782f036cd341701058943e0615475c8d543ff1ead5b9ddaafd095a352d66a"
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "kaikki-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/ˈkloʊð/",
+          "sourceUrl": "https://kaikki.org/dictionary/English/meaning/c/cl/clothe.html",
+          "htmlSha256": "98db89e07e2b62d989ef322f953e05e19c6b3e6047a295b627605339d07498f2",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd"
+        }
+      ],
+      "notes": "Conservative machine reference decision: the existing project IPA exactly normalizes to both CMUdict (en-US) and a Kaikki/Wiktionary observation, and every page target remains present. This confirms the reference used for candidate generation; it is not human verification of the audio."
+    },
+    {
+      "languageId": "en-US",
+      "text": "month",
+      "canonicalIpa": "mʌnθ",
+      "acceptedVariants": [],
+      "homophones": [],
+      "primaryStress": 0,
+      "syllableCount": 1,
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "CMUdict",
+          "publisherId": "cmudict",
+          "independenceGroup": "cmudict",
+          "revisionOrDate": "74790861f652b15e4ac49015a90074ad62a27690",
+          "value": "mʌnθ",
+          "arpabet": "M AH1 N TH",
+          "sha256": "286782f036cd341701058943e0615475c8d543ff1ead5b9ddaafd095a352d66a"
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "kaikki-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/mʌnθ/",
+          "sourceUrl": "https://kaikki.org/dictionary/English/meaning/m/mo/month.html",
+          "htmlSha256": "9478b9d6351eee293ef99af1bee55115674cf6492de59eaef10ca0ab47f46fd7",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd"
+        }
+      ],
+      "notes": "Conservative machine reference decision: the existing project IPA exactly normalizes to both CMUdict (en-US) and a Kaikki/Wiktionary observation, and every page target remains present. This confirms the reference used for candidate generation; it is not human verification of the audio."
+    },
+    {
+      "languageId": "en-US",
+      "text": "nine",
+      "canonicalIpa": "naɪn",
+      "acceptedVariants": [],
+      "homophones": [],
+      "primaryStress": 0,
+      "syllableCount": 1,
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "CMUdict",
+          "publisherId": "cmudict",
+          "independenceGroup": "cmudict",
+          "revisionOrDate": "74790861f652b15e4ac49015a90074ad62a27690",
+          "value": "naɪn",
+          "arpabet": "N AY1 N",
+          "sha256": "286782f036cd341701058943e0615475c8d543ff1ead5b9ddaafd095a352d66a"
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "kaikki-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "[naɪ̯n] | /naɪn/",
+          "sourceUrl": "https://kaikki.org/dictionary/English/meaning/n/ni/nine.html",
+          "htmlSha256": "332edef1cdc81c08fc794a16e891d382432a8661f62db96e7ac6f96838a040d4",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd"
+        }
+      ],
+      "notes": "Conservative machine reference decision: the existing project IPA exactly normalizes to both CMUdict (en-US) and a Kaikki/Wiktionary observation, and every page target remains present. This confirms the reference used for candidate generation; it is not human verification of the audio."
+    },
+    {
+      "languageId": "en-US",
+      "text": "sense",
+      "canonicalIpa": "sens",
+      "acceptedVariants": [],
+      "homophones": [],
+      "primaryStress": 0,
+      "syllableCount": 1,
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "CMUdict",
+          "publisherId": "cmudict",
+          "independenceGroup": "cmudict",
+          "revisionOrDate": "74790861f652b15e4ac49015a90074ad62a27690",
+          "value": "sens",
+          "arpabet": "S EH1 N S",
+          "sha256": "286782f036cd341701058943e0615475c8d543ff1ead5b9ddaafd095a352d66a"
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "kaikki-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/sɛns/",
+          "sourceUrl": "https://kaikki.org/dictionary/English/meaning/s/se/sense.html",
+          "htmlSha256": "993e616cb9f7fa518ce4788bdf569a75a152f5a72a1ba0ee3c1f9facc85e18f3",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd"
+        }
+      ],
+      "notes": "Conservative machine reference decision: the existing project IPA exactly normalizes to both CMUdict (en-US) and a Kaikki/Wiktionary observation, and every page target remains present. This confirms the reference used for candidate generation; it is not human verification of the audio."
+    },
+    {
+      "languageId": "en-US",
+      "text": "seven",
+      "canonicalIpa": "sevən",
+      "acceptedVariants": [],
+      "homophones": [],
+      "primaryStress": 0,
+      "syllableCount": 2,
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "CMUdict",
+          "publisherId": "cmudict",
+          "independenceGroup": "cmudict",
+          "revisionOrDate": "74790861f652b15e4ac49015a90074ad62a27690",
+          "value": "sevən",
+          "arpabet": "S EH1 V AH0 N",
+          "sha256": "286782f036cd341701058943e0615475c8d543ff1ead5b9ddaafd095a352d66a"
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "kaikki-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/ˈsɛvən/",
+          "sourceUrl": "https://kaikki.org/dictionary/English/meaning/s/se/seven.html",
+          "htmlSha256": "4098dabd834d9e16c0628f463a48d44a1b22d5fe32246065b1a5ec26ddc44cc2",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd"
+        }
+      ],
+      "notes": "Conservative machine reference decision: the existing project IPA exactly normalizes to both CMUdict (en-US) and a Kaikki/Wiktionary observation, and every page target remains present. This confirms the reference used for candidate generation; it is not human verification of the audio."
+    },
+    {
+      "languageId": "en-US",
+      "text": "shut",
+      "canonicalIpa": "ʃʌt",
+      "acceptedVariants": [],
+      "homophones": [],
+      "primaryStress": 0,
+      "syllableCount": 1,
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "CMUdict",
+          "publisherId": "cmudict",
+          "independenceGroup": "cmudict",
+          "revisionOrDate": "74790861f652b15e4ac49015a90074ad62a27690",
+          "value": "ʃʌt",
+          "arpabet": "SH AH1 T",
+          "sha256": "286782f036cd341701058943e0615475c8d543ff1ead5b9ddaafd095a352d66a"
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "kaikki-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/ʃʌt/",
+          "sourceUrl": "https://kaikki.org/dictionary/English/meaning/s/sh/shut.html",
+          "htmlSha256": "b6bca26e615a4bd012c76c979ed1e2101975ac9e734931cfb722aba4486b177d",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd"
+        }
+      ],
+      "notes": "Conservative machine reference decision: the existing project IPA exactly normalizes to both CMUdict (en-US) and a Kaikki/Wiktionary observation, and every page target remains present. This confirms the reference used for candidate generation; it is not human verification of the audio."
+    },
+    {
+      "languageId": "en-US",
+      "text": "ten",
+      "canonicalIpa": "ten",
+      "acceptedVariants": [],
+      "homophones": [],
+      "primaryStress": 0,
+      "syllableCount": 1,
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "CMUdict",
+          "publisherId": "cmudict",
+          "independenceGroup": "cmudict",
+          "revisionOrDate": "74790861f652b15e4ac49015a90074ad62a27690",
+          "value": "ten",
+          "arpabet": "T EH1 N",
+          "sha256": "286782f036cd341701058943e0615475c8d543ff1ead5b9ddaafd095a352d66a"
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "kaikki-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/ten/ | /tɛn/",
+          "sourceUrl": "https://kaikki.org/dictionary/English/meaning/t/te/ten.html",
+          "htmlSha256": "a34bdd3321e7b70486a7d3e45d414b1e95076e0d927cb714c411fcd5ab0470c5",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd"
+        }
+      ],
+      "notes": "Conservative machine reference decision: the existing project IPA exactly normalizes to both CMUdict (en-US) and a Kaikki/Wiktionary observation, and every page target remains present. This confirms the reference used for candidate generation; it is not human verification of the audio."
+    },
+    {
+      "languageId": "en-US",
+      "text": "three",
+      "canonicalIpa": "θri",
+      "acceptedVariants": [],
+      "homophones": [],
+      "primaryStress": 0,
+      "syllableCount": 1,
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "CMUdict",
+          "publisherId": "cmudict",
+          "independenceGroup": "cmudict",
+          "revisionOrDate": "74790861f652b15e4ac49015a90074ad62a27690",
+          "value": "θri",
+          "arpabet": "TH R IY1",
+          "sha256": "286782f036cd341701058943e0615475c8d543ff1ead5b9ddaafd095a352d66a"
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "kaikki-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "[θɹi] | [θɹ̥i] | /θɹiː/",
+          "sourceUrl": "https://kaikki.org/dictionary/English/meaning/t/th/three.html",
+          "htmlSha256": "221685b24d1e74018e28dc3f8291335fe149660f4fff1d7b537a8baa5d88221b",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd"
+        }
+      ],
+      "notes": "Conservative machine reference decision: the existing project IPA exactly normalizes to both CMUdict (en-US) and a Kaikki/Wiktionary observation, and every page target remains present. This confirms the reference used for candidate generation; it is not human verification of the audio."
+    },
+    {
+      "languageId": "en-US",
+      "text": "too",
+      "canonicalIpa": "tu",
+      "acceptedVariants": [],
+      "homophones": [],
+      "primaryStress": 0,
+      "syllableCount": 1,
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "CMUdict",
+          "publisherId": "cmudict",
+          "independenceGroup": "cmudict",
+          "revisionOrDate": "74790861f652b15e4ac49015a90074ad62a27690",
+          "value": "tu",
+          "arpabet": "T UW1",
+          "sha256": "286782f036cd341701058943e0615475c8d543ff1ead5b9ddaafd095a352d66a"
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "kaikki-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/tu/ | /tuː/",
+          "sourceUrl": "https://kaikki.org/dictionary/English/meaning/t/to/too.html",
+          "htmlSha256": "5ecbf9d22fe7006610205ec4b6e93aba0c98e4fb8f3f55e64cbc5ee77df8671a",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd"
+        }
+      ],
+      "notes": "Conservative machine reference decision: the existing project IPA exactly normalizes to both CMUdict (en-US) and a Kaikki/Wiktionary observation, and every page target remains present. This confirms the reference used for candidate generation; it is not human verification of the audio."
+    },
+    {
+      "languageId": "en-US",
+      "text": "twenty",
+      "canonicalIpa": "twenti",
+      "acceptedVariants": [],
+      "homophones": [],
+      "primaryStress": 0,
+      "syllableCount": 2,
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "CMUdict",
+          "publisherId": "cmudict",
+          "independenceGroup": "cmudict",
+          "revisionOrDate": "74790861f652b15e4ac49015a90074ad62a27690",
+          "value": "twenti",
+          "arpabet": "T W EH1 N T IY0",
+          "sha256": "286782f036cd341701058943e0615475c8d543ff1ead5b9ddaafd095a352d66a"
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "kaikki-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/ˈtwenti/ | /ˈtwɛnti/",
+          "sourceUrl": "https://kaikki.org/dictionary/English/meaning/t/tw/twenty.html",
+          "htmlSha256": "2036efb72034a6aa98c64b3236198ed95ccebaa4a4c551639ebaa4a6a6236051",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd"
+        }
+      ],
+      "notes": "Conservative machine reference decision: the existing project IPA exactly normalizes to both CMUdict (en-US) and a Kaikki/Wiktionary observation, and every page target remains present. This confirms the reference used for candidate generation; it is not human verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "aime",
+      "canonicalIpa": "ɛm",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "ɛm",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            131448
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/ɛm/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/a/ai/aime.html",
+          "htmlSha256": "b17a933fffa58f2c6aebb7f64cf780f86e8e6e6da65113aa8399b147ed5610c3",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "arriver",
+      "canonicalIpa": "aʁive",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "aʁive",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            79076
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/a.ʁi.ve/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/a/ar/arriver.html",
+          "htmlSha256": "cbb0fe196236d001ba67b38dce7e60916c096cdfd63b12fd784561d197153a84",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "banque",
+      "canonicalIpa": "bɑ̃k",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "bɑ̃k",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            30914,
+            51738
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/bɑ̃k/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/b/ba/banque.html",
+          "htmlSha256": "d049345909bb0500253b2179a85cd4878c32d3cf14691571ec65e5f76e7e7d7c",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "beurre",
+      "canonicalIpa": "bœʁ",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "bœʁ",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            114891,
+            12618,
+            92750
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/bœʁ/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/b/be/beurre.html",
+          "htmlSha256": "4856b1c1b8c35f8393892b9cde99e1b9315c7b2a2db631df503c6ac89e86d2f1",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "bol",
+      "canonicalIpa": "bɔl",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "bɔl",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            44721
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/bɔl/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/b/bo/bol.html",
+          "htmlSha256": "26a6e06771dac1567b5e2db848890bfbd0116d7e0ef8701aaf02e6735c3bf2d3",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "bouche",
+      "canonicalIpa": "buʃ",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "buʃ",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            104390,
+            166608
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/buʃ/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/b/bo/bouche.html",
+          "htmlSha256": "1dade5fe2a1389dde88e1bebeedc111440a6238a34375ee56fdc567eb1dad2e8",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "brune",
+      "canonicalIpa": "bʁyn",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "bʁyn",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            30348,
+            46175
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/bʁyn/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/b/br/brune.html",
+          "htmlSha256": "edbbca04295180aa7e8e809605ff9448e7b5db2783703f1e0e29b5bd76b6bbb8",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "carte",
+      "canonicalIpa": "kaʁt",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "kaʁt",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            166194,
+            58919
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/kaʁt/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/c/ca/carte.html",
+          "htmlSha256": "4240fb5b82e8f919019a019395e4d6108ced4e923540e377cf763b22955d684f",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "ceux",
+      "canonicalIpa": "sø",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "sø",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            51909
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/sø/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/c/ce/ceux.html",
+          "htmlSha256": "2e04fd0d6a7c9cae6ad200d6f7162b630cc176cb60c3387faa1c6cf8910abfa3",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "cil",
+      "canonicalIpa": "sil",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "sil",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            18631
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/sil/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/c/ci/cil.html",
+          "htmlSha256": "4c2ab3f5401169d43a2eac494983181d671b41ab74df8a4a32f4b328aec3515d",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "clair",
+      "canonicalIpa": "klɛʁ",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "klɛʁ",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            64491,
+            91452
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/klɛʁ/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/c/cl/clair.html",
+          "htmlSha256": "fe38495519e4669d7fb930f7b494b1135d8b981da285f4fe8e882f19344046b8",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "colle",
+      "canonicalIpa": "kɔl",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "kɔl",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            167340,
+            83517
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/kɔl/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/c/co/colle.html",
+          "htmlSha256": "fe89a306a90131d6e581b9305094c9684ef6d4a5dce8f407a41c3f662b22b56c",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "corps",
+      "canonicalIpa": "kɔʁ",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "kɔʁ",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            121436
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/kɔʁ/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/c/co/corps.html",
+          "htmlSha256": "a6361705b94e77995c54215dadab8d35ee4fcef26a7205934968972637166932",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "cou",
+      "canonicalIpa": "ku",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "ku",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            17809
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/ku/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/c/co/cou.html",
+          "htmlSha256": "51e591713c58365af39249654c6994bbe61fe7350f8c0ee719ad585eac6991fb",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "coup",
+      "canonicalIpa": "ku",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "ku",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            121633
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/ku/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/c/co/coup.html",
+          "htmlSha256": "d09e28f62a03ec810015950d02fccc5c3766acadad01f004d65bd05bb2387995",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "défunt",
+      "canonicalIpa": "defœ̃",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "defœ̃",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            52442,
+            59952
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/de.fœ̃/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/d/d%C3%A9/d%C3%A9funt.html",
+          "htmlSha256": "479d7b0836d40fbdec61e3811367b2efb1487f8983db3bbb5e04f5231469821b",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "donne",
+      "canonicalIpa": "dɔn",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "dɔn",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            16596,
+            99986
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/dɔn/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/d/do/donne.html",
+          "htmlSha256": "7ecda8fe64df252d333485d05828e27eb58e731562172321f36ce310a82b3611",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "dos",
+      "canonicalIpa": "do",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "do",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            63087
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/do/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/d/do/dos.html",
+          "htmlSha256": "f752e0549aac634a9e56c069fcb2c0cc16f4298f606d952a38b1fa3927d1714e",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "doux",
+      "canonicalIpa": "du",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "du",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            12787,
+            30693,
+            80532
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/du/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/d/do/doux.html",
+          "htmlSha256": "0bc9a331a4292f4d6004b7d10534184f7287d8a73521a61a141f5c3949ea71f7",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "douze",
+      "canonicalIpa": "duz",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "duz",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            131991,
+            59501
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/duz/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/d/do/douze.html",
+          "htmlSha256": "11be3cbf12df2af5a2d158b5e41f7576fbd1cd63abba6ba98e8b5126b9b23f8a",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "eau",
+      "canonicalIpa": "o",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "o",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            124003
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/o/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/e/ea/eau.html",
+          "htmlSha256": "bc24fbb8a27cc6fd33963a7ea81d0baa4aa89f1ce9f66240ac97f06628cf7be8",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "écouter",
+      "canonicalIpa": "ekute",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "ekute",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            118839
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/e.ku.te/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/%C3%A9/%C3%A9c/%C3%A9couter.html",
+          "htmlSha256": "7450d661d0226778c7a14e4eff1d8ab3697e729f8bd5acf299c410df084f51f4",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "égal",
+      "canonicalIpa": "egal",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "egal",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            107224,
+            139302
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/e.ɡal/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/%C3%A9/%C3%A9g/%C3%A9gal.html",
+          "htmlSha256": "41300a2a2014b407954324ba8246449b8224e87496e9ed17e4c820db34b6bc82",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "emprunt",
+      "canonicalIpa": "ɑ̃pʁœ̃",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "ɑ̃pʁœ̃",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            9533
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/ɑ̃.pʁœ̃/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/e/em/emprunt.html",
+          "htmlSha256": "328a79dc68be03c0ce467496f50012e5fa2464003ab557a2bb9ab56dd939f5a3",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "été",
+      "canonicalIpa": "ete",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "ete",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            117616,
+            123872,
+            134554
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/e.te/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/%C3%A9/%C3%A9t/%C3%A9t%C3%A9.html",
+          "htmlSha256": "91b94391f1f3b096cca69e6dcf79f8a89284a84d300202aeb58d02af82d88caf",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "facile",
+      "canonicalIpa": "fasil",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "fasil",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            140274
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/fa.sil/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/f/fa/facile.html",
+          "htmlSha256": "4931f2f721a9b4956373c030c5a6708a906cbfe2cb59a8a6895084aa4a8f8228",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "fou",
+      "canonicalIpa": "fu",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "fu",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            145643,
+            63117
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/fu/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/f/fo/fou.html",
+          "htmlSha256": "8375c41a2056f7a2eff1e70df1f3607357efcb8ee3237d76b3cd7fc946d93fd4",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "gilet",
+      "canonicalIpa": "ʒilɛ",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "ʒilɛ",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            23036
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/ʒi.lɛ/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/g/gi/gilet.html",
+          "htmlSha256": "92e5c6acc818f5423f3b0e4ffb7388a8cfa87a19f5bcf1f00987acf129fa4518",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "glace",
+      "canonicalIpa": "glas",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "glas",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            137676,
+            30837
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/ɡlas/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/g/gl/glace.html",
+          "htmlSha256": "ce5ae5ae0617a62f70c04468bc840cbe35fc84b07a6da7ff046bc8ca842b1f1e",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "gomme",
+      "canonicalIpa": "gɔm",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "gɔm",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            100005,
+            16630
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/ɡɔm/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/g/go/gomme.html",
+          "htmlSha256": "0978b4ff31b54a122c49731fbf0a27cb0f22a75e0c6e776df2f3ef50f1b0317f",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "goût",
+      "canonicalIpa": "gu",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "gu",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            85067
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/ɡu/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/g/go/go%C3%BBt.html",
+          "htmlSha256": "3ba1bc902761de4239fa756b348b4ab2edf6e9372916ec4e459f068b27677180",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "grande",
+      "canonicalIpa": "gʁɑ̃d",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "gʁɑ̃d",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            114106,
+            670
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/ɡʁɑ̃d/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/g/gr/grande.html",
+          "htmlSha256": "c0959218aa6704a575d62823f7ee9167f43d3009b126966f56370a5e4d4e51ba",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "gris",
+      "canonicalIpa": "gʁi",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "gʁi",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            127968,
+            155369
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/ɡʁi/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/g/gr/gris.html",
+          "htmlSha256": "f91615969b5a0fe16265e2182c8913440c957f00cd1cee78ab8afc2c9e563b15",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "groupe",
+      "canonicalIpa": "gʁup",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "gʁup",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            174207,
+            99708
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/ɡʁup/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/g/gr/groupe.html",
+          "htmlSha256": "1fee037585abb272174f4c76ca5ee7a11a19d9c16156430dc3eb9dd16f012d84",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "guider",
+      "canonicalIpa": "gide",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "gide",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            98655
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/ɡi.de/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/g/gu/guider.html",
+          "htmlSha256": "81501e639e09a52863bd7d7794ed28ef400f55e5bb37a2e75e598fe7ca53e311",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "habite",
+      "canonicalIpa": "abit",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "abit",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            31228
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/a.bit/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/h/ha/habite.html",
+          "htmlSha256": "c0835eb9a6768b3e25d7c200ffe315fde99f910bdf362c3bf5e3065840aba302",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "huis",
+      "canonicalIpa": "ɥi",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "ɥi",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            5672
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/ɥi/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/h/hu/huis.html",
+          "htmlSha256": "6e19365259d192c97ffc49b778754539a9b692d3c89e477b305ff011062ceda0",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "idée",
+      "canonicalIpa": "ide",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "ide",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            170920
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/i.de/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/i/id/id%C3%A9e.html",
+          "htmlSha256": "30ed63551890139a88f665e58da3580b2b482ff19a688aa7852d7bb8fa2966b4",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "jeu",
+      "canonicalIpa": "ʒø",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "ʒø",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            5269
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/ʒø/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/j/je/jeu.html",
+          "htmlSha256": "247312a90e17feba1331b91512a91023b72d9c14fb38c940b7764aba5cfb9002",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "jeun",
+      "canonicalIpa": "ʒœ̃",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "ʒœ̃",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            4319
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/ʒœ̃/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/j/je/jeun.html",
+          "htmlSha256": "2b486f159d0e4a42a0d07bd07916f0a92ebbbd05d5929b3747f9e963a6734d16",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "jupe",
+      "canonicalIpa": "ʒyp",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "ʒyp",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            38477
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/ʒyp/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/j/ju/jupe.html",
+          "htmlSha256": "7c77f3331c15196097e245eb395d75103ccdbfea081a01a6dbd4d5a6eb9943ad",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "jus",
+      "canonicalIpa": "ʒy",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "ʒy",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            165413
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/ʒy/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/j/ju/jus.html",
+          "htmlSha256": "67d93e0d61e7f7570317a8a95fb0c5e132b2330d656a14a7cc54063d34115c48",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "lent",
+      "canonicalIpa": "lɑ̃",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "lɑ̃",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            18003
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/lɑ̃/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/l/le/lent.html",
+          "htmlSha256": "e523d45ff833a10f4b54911f6eccc147f0d6530a1827942d830a7b6a2f77b6d9",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "ligne",
+      "canonicalIpa": "liɲ",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "liɲ",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            154221,
+            70615
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/liɲ/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/l/li/ligne.html",
+          "htmlSha256": "90f1f48aab04c83e3667d212b787e3fe8d53b1b195755a372fe06408a4ba0125",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "loi",
+      "canonicalIpa": "lwa",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "lwa",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            34774
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/lwa/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/l/lo/loi.html",
+          "htmlSha256": "2d16ad7cab8a43be8853135baae2090cb7657aab302a7c81293e7b1cc2b5b585",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "lourd",
+      "canonicalIpa": "luʁ",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "luʁ",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            155846,
+            188942,
+            79552
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/luʁ/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/l/lo/lourd.html",
+          "htmlSha256": "d3871345937712ebf0c9dc7b636b4b412e2aed0d567eb0093fb69419cc243a9c",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "madame",
+      "canonicalIpa": "madam",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "madam",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            146120
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/ma.dam/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/m/ma/madame.html",
+          "htmlSha256": "463d55b71bdedd62e6a8756ebe377be85ebdedcf4feb1de6fcb4c75ee1392118",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "main",
+      "canonicalIpa": "mɛ̃",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "mɛ̃",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            72738
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/mɛ̃/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/m/ma/main.html",
+          "htmlSha256": "f32782aec93ea388f2eda34f477432f48216bdc0912a9c1b7d14a6168e9f4294",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "menu",
+      "canonicalIpa": "məny",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "məny",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            22805,
+            28849,
+            73513
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/mə.ny/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/m/me/menu.html",
+          "htmlSha256": "b20bbd89d56a06565297f35f3acc78dd53cc5256797ba8cef2f9325fae743222",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "mer",
+      "canonicalIpa": "mɛʁ",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "mɛʁ",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            107833
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/mɛʁ/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/m/me/mer.html",
+          "htmlSha256": "d469b139c34a972f008c741c918bd1e449be3016e4b2bf9ccba9b5ac733acac1",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "meuble",
+      "canonicalIpa": "mœbl",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "mœbl",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            102520,
+            170689,
+            81184
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/mœbl/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/m/me/meuble.html",
+          "htmlSha256": "e88363fda655e9c31cca751cc6f11af59ad67fea4886f4a4c4e5daaa67425e34",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "meute",
+      "canonicalIpa": "møt",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "møt",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            55102
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/møt/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/m/me/meute.html",
+          "htmlSha256": "15d00e403a755cbede0e101c8aece95a0b1efc04cb58df0cd39d21bec06381b6",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "neveu",
+      "canonicalIpa": "nəvø",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "nəvø",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            18831
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/nə.vø/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/n/ne/neveu.html",
+          "htmlSha256": "64e2d9ffcd5d37d14c3b33dbe4ff817f3549eaa47c0f8bcb5a9fca90a7e1f265",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "nez",
+      "canonicalIpa": "ne",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "ne",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            157026
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/ne/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/n/ne/nez.html",
+          "htmlSha256": "91e75184333f84f7f33697fd8edaacacdc98bf2c9abf8134b12a5f4afec22056",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "note",
+      "canonicalIpa": "nɔt",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "nɔt",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            158662,
+            38928
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/nɔt/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/n/no/note.html",
+          "htmlSha256": "3f95d127203fe8acb82d9c709e4d08f34aaf888a8cf7a9deda2c1021d5825020",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "nuire",
+      "canonicalIpa": "nɥiʁ",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "nɥiʁ",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            63143
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/nɥiʁ/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/n/nu/nuire.html",
+          "htmlSha256": "e2aa98d59942b46dd0da9a3838519d3cb90d1ad94bbee742e76728c43dae59da",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "onze",
+      "canonicalIpa": "ɔ̃z",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "ɔ̃z",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            182677,
+            59641
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/ɔ̃z/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/o/on/onze.html",
+          "htmlSha256": "edbf67fd6c2aac411fed21b70c4bc5cf591c55d8e8208f82f19f96244b46a2b6",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "ouest",
+      "canonicalIpa": "wɛst",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "wɛst",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            110660,
+            137615
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/wɛst/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/o/ou/ouest.html",
+          "htmlSha256": "a290bbfbb33eac527bc56b2047f2821f49216aa2612d7ac13026c3be584a827b",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "outil",
+      "canonicalIpa": "uti",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "uti",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            83996
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/u.ti/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/o/ou/outil.html",
+          "htmlSha256": "40e33d6c22b58037f8d60796761aa84790c31e61a383351677534aec76081a4a",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "Parisien",
+      "canonicalIpa": "paʁizjɛ̃",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "paʁizjɛ̃",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            121455,
+            19044
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/pa.ʁi.zjɛ̃/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/P/Pa/Parisien.html",
+          "htmlSha256": "32014b4ee02c71353283e8766763b4fd6005832305246f5894d4045f35cc2d31",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "peux",
+      "canonicalIpa": "pø",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "pø",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            16697
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/pø/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/p/pe/peux.html",
+          "htmlSha256": "6676685e4d96b13c1c30aba87b633bd7c904b6ae334b026d27eb043fa68e4a5e",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "pied",
+      "canonicalIpa": "pje",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "pje",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            82491
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/pje/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/p/pi/pied.html",
+          "htmlSha256": "3220d29ce26640a67efe53559f865c8d108f38a1e88e70433cccd8360bd4f5fd",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "poche",
+      "canonicalIpa": "pɔʃ",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "pɔʃ",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            128178,
+            45538
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/pɔʃ/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/p/po/poche.html",
+          "htmlSha256": "9995a0372a27436d864763ac99cab9c8452b1f15f89d31865e6b535eca2f504f",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "pomme",
+      "canonicalIpa": "pɔm",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "pɔm",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            140424,
+            34032
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/pɔm/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/p/po/pomme.html",
+          "htmlSha256": "a749227f18cec41883f2b68ebb67d2ed03655a2adbd3b72373f3935e17136b8c",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "poule",
+      "canonicalIpa": "pul",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "pul",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            49327
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/pul/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/p/po/poule.html",
+          "htmlSha256": "88f8b763926fdfbc85ee8eea4701834ff2c990b70d8d4aaea0ca0d5ea0ab3bb7",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "pur",
+      "canonicalIpa": "pyʁ",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "pyʁ",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            39463
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/pyʁ/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/p/pu/pur.html",
+          "htmlSha256": "a06d193445ae2084bdefb189e21433fff1561eb86ef89b3687bfc102abead65e",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "que",
+      "canonicalIpa": "kə",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "kə",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            13394,
+            146249,
+            161354,
+            174721
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/kə/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/q/qu/que.html",
+          "htmlSha256": "9bef6e10488fcd84bc25d9b00ab8a357d842833f2b4a6fcd463bab371d21f975",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "queue",
+      "canonicalIpa": "kø",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "kø",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            44626
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/kø/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/q/qu/queue.html",
+          "htmlSha256": "7d63bcdd533ed8569501bc35f3774535c296c06435bb70125157d87afd0a9840",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "quinze",
+      "canonicalIpa": "kɛ̃z",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "kɛ̃z",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            11860,
+            137854
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/kɛ̃z/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/q/qu/quinze.html",
+          "htmlSha256": "5d0c0de4461b5b873f62a5dc68981f4c42c16dd36e3de1aeaf792b48c0cfd921",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "regard",
+      "canonicalIpa": "ʁəgaʁ",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "ʁəgaʁ",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            125381
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/ʁə.ɡaʁ/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/r/re/regard.html",
+          "htmlSha256": "4e0617b02ddd493098a6fb7c003b840bbd0ba11e889d7caef00e702229161711",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "riz",
+      "canonicalIpa": "ʁi",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "ʁi",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            189122
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/ʁi/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/r/ri/riz.html",
+          "htmlSha256": "8f58252605a57cbeb5a8a2d1d36fc6bbca2ba3c0307f133d7dc953078d6b8560",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "robe",
+      "canonicalIpa": "ʁɔb",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "ʁɔb",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            150768,
+            31617
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/ʁɔb/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/r/ro/robe.html",
+          "htmlSha256": "a7bf61bff87dab1102e477ab6ae4e0b6655a9cd4d8872fa6bfd7f49ab731abf9",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "roue",
+      "canonicalIpa": "ʁu",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "ʁu",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            172942,
+            6394
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/ʁu/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/r/ro/roue.html",
+          "htmlSha256": "62c8acefdb786bf5bc732d847cdd85a6b3ff4397812662a4a2618128148e94d3",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "route",
+      "canonicalIpa": "ʁut",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "ʁut",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            142240,
+            59584
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/ʁut/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/r/ro/route.html",
+          "htmlSha256": "d6df0ecb81269324ae339e360b1176a0f97f6e8bcec45c9336c0c1edeb8dd081",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "sauce",
+      "canonicalIpa": "sos",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "sos",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            15714,
+            98681
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/sos/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/s/sa/sauce.html",
+          "htmlSha256": "5fdb274853adc5c35030aaae57ee52728ba267026d695b71f9775dcfdc2ea769",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "sel",
+      "canonicalIpa": "sɛl",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "sɛl",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            161641
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/sɛl/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/s/se/sel.html",
+          "htmlSha256": "175a9f39db063c6eae57e954b50f23c927480ca6b216f0ff8fa0783bd995c9b6",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "serein",
+      "canonicalIpa": "səʁɛ̃",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "səʁɛ̃",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            122944,
+            49096
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/sə.ʁɛ̃/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/s/se/serein.html",
+          "htmlSha256": "4f4b81be3398e708f31b946b1b0761519af72cd7b2cb19b2aa0c5d95c7ba3ba8",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "si",
+      "canonicalIpa": "si",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "si",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            119632,
+            127976,
+            62428
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/si/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/s/si/si.html",
+          "htmlSha256": "7b87133a3fd50efa6ab92a09b0e68424a14ab04b1e3250a9e1519ef6af82cbb7",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "sort",
+      "canonicalIpa": "sɔʁ",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "sɔʁ",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            37982,
+            86899
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/sɔʁ/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/s/so/sort.html",
+          "htmlSha256": "4f8f048c8bdab11f949ef10558b3a19a7b3675de9200f264d136eb9f9972c387",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "souci",
+      "canonicalIpa": "susi",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "susi",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            94680
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/su.si/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/s/so/souci.html",
+          "htmlSha256": "1e5534e9f9dd41f932ccc5030d4ef3bc4deb33430d4a3456376e0b8492120e55",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "soupe",
+      "canonicalIpa": "sup",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "sup",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            114303,
+            7644
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/sup/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/s/so/soupe.html",
+          "htmlSha256": "8d360490f4c01b3f6f495199ac473e606fc2a20c0a39392f853b18aa4250bd1b",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "télé",
+      "canonicalIpa": "tele",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "tele",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            46088
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/te.le/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/t/t%C3%A9/t%C3%A9l%C3%A9.html",
+          "htmlSha256": "67639e7430955f639c9fc24d4da38a81e4c038a70f82a6cac1ae81a22ac48f9c",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "thé",
+      "canonicalIpa": "te",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "te",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            48923
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/te/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/t/th/th%C3%A9.html",
+          "htmlSha256": "ef0d309504f197a6b8ee261c09328f4e13e05649ad2ab2dfc10f9aeedf51f31e",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "tort",
+      "canonicalIpa": "tɔʁ",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "tɔʁ",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            82444
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/tɔʁ/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/t/to/tort.html",
+          "htmlSha256": "1f2b21c8a2c5f4d25c199f9d3d801439a48d4c6f6b5c793a2aa965f810b47cc7",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "treize",
+      "canonicalIpa": "tʁɛz",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "tʁɛz",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            32883,
+            99485
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/tʁɛz/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/t/tr/treize.html",
+          "htmlSha256": "9c00fa38fef7c29f130bbb1bd879623028484842ddf2820276af6717c71152fa",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "trou",
+      "canonicalIpa": "tʁu",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "tʁu",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            68216
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/tʁu/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/t/tr/trou.html",
+          "htmlSha256": "91ff7b0ca4a5a13da55452b3c5dd6dfcfb890857d4842cd4a089e7e0eeca2b84",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "veau",
+      "canonicalIpa": "vo",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "vo",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            2465
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/vo/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/v/ve/veau.html",
+          "htmlSha256": "020d234b3a9ce27bc6a3ebdf8ed2b7e24e1812982ea814b079cdbbdcf37c6408",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "veut",
+      "canonicalIpa": "vø",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "vø",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            180433
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/vø/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/v/ve/veut.html",
+          "htmlSha256": "ea4aca0a9b969256a705baba1c4a497b4649339f0073a8d3f60f153d67dd421d",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "vie",
+      "canonicalIpa": "vi",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "vi",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            81089
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/vi/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/v/vi/vie.html",
+          "htmlSha256": "236219919d6b0a18875b12c9b5b9f73b2aeae3e7ad4c303e8517e67c234ed0c9",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "vigne",
+      "canonicalIpa": "viɲ",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "viɲ",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            162677
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/viɲ/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/v/vi/vigne.html",
+          "htmlSha256": "7ec68c4eaee7f8e39b806a0f4131cc7afade5dc1afc5cf0f62992473206317c0",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "vin",
+      "canonicalIpa": "vɛ̃",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "vɛ̃",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            102966
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/vɛ̃/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/v/vi/vin.html",
+          "htmlSha256": "88845032c5830888bab10f45368877be060d3c3a68e7629e041c5500167b8f54",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "vite",
+      "canonicalIpa": "vit",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "vit",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            92602
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/vit/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/v/vi/vite.html",
+          "htmlSha256": "faa6c578240594807c6c17dd52d68274e6d61b0f1d2aab53678863698cda59c9",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "voisin",
+      "canonicalIpa": "vwazɛ̃",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "vwazɛ̃",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            118701,
+            52939
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/vwa.zɛ̃/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/v/vo/voisin.html",
+          "htmlSha256": "904a55349020ec6cf455cc52296b55d9f44f0530c6c905c95db3850a8e225775",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "voiture",
+      "canonicalIpa": "vwatyʁ",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "vwatyʁ",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            129210,
+            21418
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/vwa.tyʁ/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/v/vo/voiture.html",
+          "htmlSha256": "67c21b7205afbfee78ed7bee29902a7dc648e435e5a29463b771717bfe4c5629",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "yeux",
+      "canonicalIpa": "jø",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "jø",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            124349
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/jø/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/y/ye/yeux.html",
+          "htmlSha256": "6bda0a33edcab0a24a371ee8f6c0eba0780c5a2e435ec0bb6d74008234ebb9e4",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    },
+    {
+      "languageId": "fr-FR",
+      "text": "zone",
+      "canonicalIpa": "zon",
+      "acceptedVariants": [],
+      "homophones": [],
+      "status": "two-source-confirmed",
+      "sources": [
+        {
+          "name": "Lexique 4.00",
+          "publisherId": "lexique",
+          "independenceGroup": "lexique",
+          "revisionOrDate": "4.00",
+          "value": "zon",
+          "sourceUrl": "https://lexique.org/databases/Lexique400/Lexique400.tsv",
+          "datasetSha256": "ee359156ef746e08ae6d2d401aff0a6b2ae6286e39f6d755c253078df63ed8aa",
+          "license": {
+            "id": "CC-BY-SA-4.0",
+            "name": "Creative Commons Attribution-ShareAlike 4.0 International",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+          },
+          "sourceRows": [
+            152549,
+            32652
+          ]
+        },
+        {
+          "name": "Kaikki.org structured Wiktionary extract",
+          "publisherId": "wikimedia-wiktionary",
+          "independenceGroup": "wiktionary",
+          "revisionOrDate": "2026-07-06",
+          "value": "/zon/",
+          "sourceUrl": "https://kaikki.org/dictionary/French/meaning/z/zo/zone.html",
+          "htmlSha256": "ad92a5373169161a27b4d5a7b0522879bf4dcf4233bf79aeab7935c8fb4c2c60",
+          "wiktextractRevision": "e62056b1f7954ce7b17730606bfa7707b63af3cd",
+          "extractedAt": "2026-07-09"
+        }
+      ],
+      "notes": "Conservative offline reference decision: the existing project IPA exactly normalizes to Lexique 4.00 and an independent Kaikki/Wiktionary observation, with a current target-example relationship. This confirms reference text only; it is not native-speaker verification of the audio."
+    }
+  ]
+}

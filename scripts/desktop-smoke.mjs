@@ -1,5 +1,6 @@
 import { execFile, spawn } from "node:child_process";
-import { existsSync } from "node:fs";
+import { randomUUID } from "node:crypto";
+import { existsSync, readFileSync } from "node:fs";
 import {
   mkdir,
   mkdtemp,
@@ -12,16 +13,81 @@ import net from "node:net";
 import os from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
+import {
+  findConflictingSpeakRightProcesses,
+  formatSpeakRightProcessConflicts,
+} from "./lib/windows-process-boundary.mjs";
 
 const execFileAsync = promisify(execFile);
 
 const root = process.cwd();
+const desktopAppConfigPath = path.join(root, "src-tauri", "tauri.conf.json");
+const desktopSmokeConfigPath = path.join(
+  root,
+  "src-tauri",
+  "tauri.smoke.conf.json",
+);
+const desktopSmokeConfiguredDebuggingPort =
+  process.platform === "win32" ? readConfiguredDebuggingPort() : null;
+const desktopSmokeExecutableOverride =
+  process.env.SPEAKRIGHT_DESKTOP_SMOKE_EXECUTABLE?.trim()
+    ? process.env.SPEAKRIGHT_DESKTOP_SMOKE_EXECUTABLE.trim()
+    : null;
 const expectedTitle = "SpeakRight";
-const appIdentifier = "com.speakright.desktop";
 const expectedRuntimeLogLine = "SpeakRight desktop runtime initialized";
 const timeoutMs = Number(process.env.SPEAKRIGHT_SMOKE_TIMEOUT_MS ?? 15_000);
+const appIdentifier = readAppIdentifier();
+const desktopSmokeSecureStoreService = `${appIdentifier}.release-smoke-${randomUUID()}`;
+
+function readAppIdentifier() {
+  const config = JSON.parse(readFileSync(desktopAppConfigPath, "utf8"));
+  const identifier = config.identifier?.trim();
+  if (
+    typeof identifier !== "string" ||
+    identifier.length === 0 ||
+    !/^[a-z0-9.-]+$/iu.test(identifier)
+  ) {
+    throw new Error(
+      "Desktop app config is missing a valid application identifier.",
+    );
+  }
+  return identifier;
+}
+
+function readConfiguredDebuggingPort() {
+  const config = JSON.parse(readFileSync(desktopSmokeConfigPath, "utf8"));
+  const mainWindow = config.app?.windows?.find(
+    (windowConfig) => windowConfig.label === "main",
+  );
+  const browserArgs = mainWindow?.additionalBrowserArgs;
+  if (typeof browserArgs !== "string") {
+    throw new Error(
+      "Desktop production-smoke config is missing reviewed additionalBrowserArgs.",
+    );
+  }
+  const matches = [
+    ...browserArgs.matchAll(/(?:^|\s)--remote-debugging-port=(\d+)(?=\s|$)/g),
+  ];
+  if (matches.length !== 1) {
+    throw new Error(
+      "Desktop production-smoke config must declare exactly one debugging port.",
+    );
+  }
+  const port = Number(matches[0][1]);
+  if (!Number.isInteger(port) || port < 1 || port > 65_535) {
+    throw new Error(
+      "Desktop production-smoke config has an invalid debugging port.",
+    );
+  }
+  return port;
+}
 
 function executablePath() {
+  if (desktopSmokeExecutableOverride) {
+    return path.isAbsolute(desktopSmokeExecutableOverride)
+      ? desktopSmokeExecutableOverride
+      : path.resolve(root, desktopSmokeExecutableOverride);
+  }
   if (process.platform === "win32") {
     return path.join(root, "src-tauri", "target", "release", "speakright.exe");
   }
@@ -46,11 +112,11 @@ function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function getOpenPort() {
+function getOpenPort(preferredPort) {
   return new Promise((resolve, reject) => {
     const server = net.createServer();
     server.once("error", reject);
-    server.listen(0, "127.0.0.1", () => {
+    server.listen(preferredPort, "127.0.0.1", () => {
       const address = server.address();
       server.close(() => {
         if (!address || typeof address === "string") {
@@ -68,42 +134,59 @@ async function createSmokeProfileRoot() {
     path.join(os.tmpdir(), "speakright-desktop-smoke-"),
   );
   await mkdir(path.join(rootDir, "WebView2"), { recursive: true });
+  await mkdir(path.join(rootDir, "logs"), { recursive: true });
+  await mkdir(path.join(rootDir, "settings"), { recursive: true });
   return rootDir;
 }
 
-function buildSmokeEnv(debuggingPort, smokeProfileRoot) {
+async function removeSmokeProfileRoot(smokeProfileRoot) {
+  const deadline = Date.now() + 10_000;
+  let lastError = null;
+  while (Date.now() < deadline) {
+    try {
+      await rm(smokeProfileRoot, { force: true, recursive: true });
+      if (!existsSync(smokeProfileRoot)) return;
+      lastError = new Error("temporary profile still exists");
+    } catch (error) {
+      lastError = error;
+    }
+    await delay(250);
+  }
+  throw new Error(
+    `Desktop production smoke could not remove its temporary profile: ${
+      lastError instanceof Error ? lastError.message : String(lastError)
+    }`,
+  );
+}
+
+function buildSmokeEnv(smokeProfileRoot) {
   if (process.platform !== "win32") return process.env;
-  const existingArgs = process.env.WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS ?? "";
-  const smokeArgs = [
-    `--remote-debugging-port=${debuggingPort}`,
-    "--remote-allow-origins=*",
-  ].join(" ");
+  const isolatedEnvironment = { ...process.env };
+  delete isolatedEnvironment.WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS;
   const env = {
-    ...process.env,
-    WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS: [existingArgs, smokeArgs]
-      .filter(Boolean)
-      .join(" "),
+    ...isolatedEnvironment,
+    SPEAKRIGHT_SECURE_STORE_SERVICE: desktopSmokeSecureStoreService,
   };
   if (!smokeProfileRoot) return env;
   return {
     ...env,
+    SPEAKRIGHT_LOG_DIR: path.join(smokeProfileRoot, "logs"),
+    SPEAKRIGHT_SETTINGS_STORE_PATH: path.join(
+      smokeProfileRoot,
+      "settings",
+      "speakright-settings.json",
+    ),
     WEBVIEW2_USER_DATA_FOLDER: path.join(smokeProfileRoot, "WebView2"),
   };
 }
 
-function runtimeLogPath() {
-  if (process.platform !== "win32") return null;
-  const localAppData = process.env.LOCALAPPDATA;
-  if (!localAppData) {
-    throw new Error(
-      "LOCALAPPDATA is not set; cannot locate desktop runtime logs.",
-    );
-  }
-  return path.join(localAppData, appIdentifier, "logs", "speakright.log");
+function runtimeLogPath(smokeProfileRoot) {
+  if (process.platform !== "win32" || !smokeProfileRoot) return null;
+  return path.join(smokeProfileRoot, "logs", "speakright.log");
 }
 
-async function captureRuntimeLogEvidence(smokeStartedAt) {
-  const logPath = runtimeLogPath();
+async function captureRuntimeLogEvidence(smokeStartedAt, smokeProfileRoot) {
+  const logPath = runtimeLogPath(smokeProfileRoot);
   if (!logPath) return null;
 
   const deadline = Date.now() + 5_000;
@@ -567,6 +650,176 @@ async function clickVisibleButtonByText(
   );
 }
 
+async function selectSettingsTab(cdp, tabId, label, expectedSelector) {
+  const deadline = Date.now() + 8_000;
+  let lastResult = null;
+  while (Date.now() < deadline) {
+    lastResult = await evaluate(
+      cdp,
+      `
+(async () => {
+  const tab = document.querySelector(${JSON.stringify(`#settings-tab-${tabId}`)});
+  const panel = document.querySelector(${JSON.stringify(`#settings-panel-${tabId}`)});
+  const target = document.querySelector(${JSON.stringify(expectedSelector)});
+  const tabStyle = tab ? window.getComputedStyle(tab) : null;
+  if (
+    !tab ||
+    tab.disabled === true ||
+    tabStyle?.display === "none" ||
+    tabStyle?.visibility === "hidden"
+  ) {
+    return {
+      ok: false,
+      reason: "tab missing, disabled, or hidden",
+      bodyText: document.body?.innerText?.slice(0, 1200) ?? ""
+    };
+  }
+  if (tab.getAttribute("aria-selected") !== "true") {
+    tab.scrollIntoView({ block: "center", inline: "center" });
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+    const tabRect = tab.getBoundingClientRect();
+    const x = tabRect.left + tabRect.width / 2;
+    const y = tabRect.top + tabRect.height / 2;
+    const hitTarget = document.elementFromPoint(x, y);
+    const hitButton = hitTarget?.closest?.("button");
+    if (tabRect.width <= 0 || tabRect.height <= 0 || hitButton !== tab) {
+      return {
+        ok: false,
+        reason: "tab center is covered or outside the viewport",
+        targetText: hitButton ? (hitButton.textContent || "").trim() : null,
+        x,
+        y,
+        bodyText: document.body?.innerText?.slice(0, 1200) ?? ""
+      };
+    }
+    return { ok: false, needsClick: true, x, y };
+  }
+  const rect = target?.getBoundingClientRect();
+  const style = target ? window.getComputedStyle(target) : null;
+  return {
+    ok:
+      tab.getAttribute("aria-selected") === "true" &&
+      panel?.hidden === false &&
+      !!target &&
+      !!rect &&
+      rect.width > 0 &&
+      rect.height > 0 &&
+      style?.display !== "none" &&
+      style?.visibility !== "hidden",
+    selected: tab?.getAttribute("aria-selected") ?? null,
+    panelHidden: panel?.hidden ?? null,
+    targetWidth: rect?.width ?? 0,
+    targetHeight: rect?.height ?? 0,
+    bodyText: document.body?.innerText?.slice(0, 1200) ?? ""
+  };
+})()
+`,
+    );
+    if (lastResult?.ok) return true;
+    if (
+      lastResult?.needsClick &&
+      Number.isFinite(lastResult.x) &&
+      Number.isFinite(lastResult.y)
+    ) {
+      await cdp.send("Input.dispatchMouseEvent", {
+        type: "mouseMoved",
+        x: lastResult.x,
+        y: lastResult.y,
+        buttons: 0,
+      });
+      await cdp.send("Input.dispatchMouseEvent", {
+        type: "mousePressed",
+        x: lastResult.x,
+        y: lastResult.y,
+        button: "left",
+        buttons: 1,
+        clickCount: 1,
+      });
+      await cdp.send("Input.dispatchMouseEvent", {
+        type: "mouseReleased",
+        x: lastResult.x,
+        y: lastResult.y,
+        button: "left",
+        buttons: 0,
+        clickCount: 1,
+      });
+    }
+    await delay(250);
+  }
+  throw new Error(
+    `Desktop settings tab "${label}" did not expose ${expectedSelector}: ${JSON.stringify(lastResult)}`,
+  );
+}
+
+async function assertProductionFixtureQueriesUnavailable(cdp) {
+  const fixtureQuery =
+    "/phonemes/ee?smokeScoreSummary=1&smokeAssessmentTiles=1&smokeGuidedRepeatSingleWord=1";
+  await evaluate(
+    cdp,
+    `window.location.assign(new URL(${JSON.stringify(fixtureQuery)}, window.location.href).href); "navigating";`,
+  );
+  await waitForSelector(cdp, '[data-smoke="phoneme-detail-page"]');
+  await delay(500);
+
+  const fixtureState = await evaluate(
+    cdp,
+    `
+(() => ({
+  pathname: window.location.pathname,
+  search: window.location.search,
+  scoreSummaryReachable: !!document.querySelector('[data-smoke="phoneme-score-summary"]'),
+  assessmentTilesReachable: !!document.querySelector('[data-smoke="assessment-phoneme-tile-fixture"]')
+}))()
+`,
+  );
+  if (
+    fixtureState?.pathname !== "/phonemes/ee" ||
+    !fixtureState?.search?.includes("smokeScoreSummary=1")
+  ) {
+    throw new Error(
+      `Desktop production fixture assertion did not reach the requested route: ${JSON.stringify(fixtureState)}`,
+    );
+  }
+  if (
+    fixtureState.scoreSummaryReachable ||
+    fixtureState.assessmentTilesReachable
+  ) {
+    throw new Error(
+      `Desktop production EXE exposed score fixtures: ${JSON.stringify(fixtureState)}`,
+    );
+  }
+
+  await clickVisibleButtonByText(cdp, "强化跟读");
+  await waitForSelector(cdp, '[data-smoke="guided-repeat-setup"]');
+  const guidedRepeatState = await evaluate(
+    cdp,
+    `
+(() => {
+  const setup = document.querySelector('[data-smoke="guided-repeat-setup"]');
+  const setupText = setup?.textContent || "";
+  const totalWords = Number(setupText.match(/全部\\s+(\\d+)\\s+个词/)?.[1] || 0);
+  return {
+    setupVisible: !!setup,
+    totalWords,
+    setupText: setupText.slice(0, 500)
+  };
+})()
+`,
+  );
+  if (!guidedRepeatState?.setupVisible || guidedRepeatState.totalWords <= 1) {
+    throw new Error(
+      `Desktop production EXE exposed smokeGuidedRepeatSingleWord or could not prove the full pool: ${JSON.stringify(guidedRepeatState)}`,
+    );
+  }
+
+  return {
+    scoreSummaryUnreachable: true,
+    assessmentTilesUnreachable: true,
+    guidedRepeatSingleWordUnreachable: true,
+    guidedRepeatTotalWords: guidedRepeatState.totalWords,
+  };
+}
+
 async function captureInteractiveEvidence(debuggingPort) {
   if (!debuggingPort || process.platform !== "win32") return null;
 
@@ -604,12 +857,8 @@ async function captureInteractiveEvidence(debuggingPort) {
       );
     }
     const screenshot = await captureWebviewEvidence(cdp);
-
-    await evaluate(
-      cdp,
-      'window.location.assign(new URL("/phonemes", window.location.href).href); "navigating";',
-    );
-    await waitForSelector(cdp, '[data-smoke="phoneme-detail-page"]');
+    const productionFixtureGuard =
+      await assertProductionFixtureQueriesUnavailable(cdp);
 
     await evaluate(
       cdp,
@@ -622,13 +871,12 @@ async function captureInteractiveEvidence(debuggingPort) {
       'window.location.assign(new URL("/settings", window.location.href).href); "navigating";',
     );
     await waitForSelector(cdp, '[data-smoke="settings-page"]');
-    await waitForSelector(cdp, '[data-smoke="data-privacy-center"]');
-    await waitForSelector(cdp, '[data-smoke="desktop-llm-policy"]');
-    await waitForSelector(
+    await selectSettingsTab(
       cdp,
-      '[data-smoke="release-status"][data-release-channel="controlled-test"][data-signature-status="NotSigned"]',
+      "services",
+      "服务连接",
+      '[data-smoke="desktop-llm-policy"]',
     );
-    await waitForSelector(cdp, '[data-smoke="release-unsigned-warning"]');
 
     const llmPolicy = await evaluate(
       cdp,
@@ -650,6 +898,7 @@ async function captureInteractiveEvidence(debuggingPort) {
       );
     }
 
+    await selectSettingsTab(cdp, "basic", "基础设置", "#settings-panel-basic");
     const pronunciationSourcePolicy = await evaluate(
       cdp,
       `
@@ -691,6 +940,24 @@ async function captureInteractiveEvidence(debuggingPort) {
       );
     }
 
+    await selectSettingsTab(
+      cdp,
+      "labs",
+      "高级 / Labs",
+      '[data-smoke="release-status"]',
+    );
+    await waitForSelector(
+      cdp,
+      '[data-smoke="release-status"][data-release-channel="preview"][data-signature-status="NotSigned"]',
+    );
+    await waitForSelector(cdp, '[data-smoke="release-unsigned-warning"]');
+
+    await selectSettingsTab(
+      cdp,
+      "data",
+      "数据与隐私",
+      '[data-smoke="data-privacy-center"]',
+    );
     const diagnostics = await evaluate(
       cdp,
       `
@@ -795,9 +1062,9 @@ async function captureInteractiveEvidence(debuggingPort) {
         "Desktop diagnostics bundle product marker is incorrect.",
       );
     }
-    if (diagnostics.bundle?.appIdentifier !== appIdentifier) {
+    if (diagnostics.bundle?.appIdentifier !== desktopSmokeSecureStoreService) {
       throw new Error(
-        `Desktop diagnostics app identifier was ${diagnostics.bundle?.appIdentifier}, expected ${appIdentifier}.`,
+        `Desktop diagnostics app identifier was ${diagnostics.bundle?.appIdentifier}, expected the isolated smoke namespace.`,
       );
     }
     if (!diagnostics.bundle?.tailContainsStartup) {
@@ -805,12 +1072,9 @@ async function captureInteractiveEvidence(debuggingPort) {
         "Desktop diagnostics bundle did not include the runtime startup log line.",
       );
     }
-    if (
-      diagnostics.bundle?.logPath &&
-      !diagnostics.bundle.logPath.startsWith("<local-app-data>/")
-    ) {
+    if (diagnostics.bundle?.logPath !== "<redacted>/speakright.log") {
       throw new Error(
-        `Desktop diagnostics log path was not redacted: ${diagnostics.bundle.logPath}`,
+        `Desktop diagnostics isolated log path was not redacted: ${diagnostics.bundle?.logPath ?? "<missing>"}`,
       );
     }
     if (/Users[\\\\/][^\\\\/]+/i.test(diagnostics.bundle?.logPath ?? "")) {
@@ -1464,6 +1728,7 @@ async function captureInteractiveEvidence(debuggingPort) {
       localResetPreservedKey: localReset.preservedApiKey,
       benchmarkAudioCleared:
         benchmarkAudioClear.clearedMeta && benchmarkAudioClear.clearedAudio,
+      productionFixtureGuard,
       logPath: diagnostics.bundle.logPath,
       logBytes: diagnostics.bundle.logBytes,
       screenshot,
@@ -1511,12 +1776,20 @@ async function smoke() {
       `Desktop release executable is missing. Build first: ${exe}`,
     );
   }
+  const alreadyRunning = await findConflictingSpeakRightProcesses(exe);
+  if (alreadyRunning.length > 0) {
+    throw new Error(
+      `The desktop smoke executable is already running. Close only that test instance before retrying: ${formatSpeakRightProcessConflicts(alreadyRunning)}`,
+    );
+  }
 
   const debuggingPort =
-    process.platform === "win32" ? await getOpenPort() : null;
+    process.platform === "win32"
+      ? await getOpenPort(desktopSmokeConfiguredDebuggingPort)
+      : null;
   const smokeProfileRoot =
     process.platform === "win32" ? await createSmokeProfileRoot() : null;
-  const smokeEnv = buildSmokeEnv(debuggingPort, smokeProfileRoot);
+  const smokeEnv = buildSmokeEnv(smokeProfileRoot);
   const smokeStartedAt = Date.now();
   const child = spawn(exe, [], {
     detached: false,
@@ -1547,7 +1820,7 @@ async function smoke() {
       if (process.platform !== "win32" || observedTitle === expectedTitle) {
         await delay(1_000);
         const [runtimeLog, interactiveEvidence] = await Promise.all([
-          captureRuntimeLogEvidence(smokeStartedAt),
+          captureRuntimeLogEvidence(smokeStartedAt, smokeProfileRoot),
           captureInteractiveEvidence(debuggingPort),
         ]);
         console.log(
@@ -1561,7 +1834,7 @@ async function smoke() {
               ? `runtimeLog="${runtimeLog.path}" bytes=${runtimeLog.bytes}`
               : "",
             interactiveEvidence
-              ? `diagnostics="${interactiveEvidence.diagnosticsDownload}" learningData="${interactiveEvidence.learningDataDownload}" learningDeletePreservedKey=${interactiveEvidence.learningDeletePreservedKey} apiKeysDeleted=${interactiveEvidence.apiKeysDeleted} localResetPreservedKey=${interactiveEvidence.localResetPreservedKey} benchmarkAudioCleared=${interactiveEvidence.benchmarkAudioCleared} retiredPronunciationSourceHidden=${interactiveEvidence.retiredPronunciationSourceHidden} route=${interactiveEvidence.route} appIdentifier=${interactiveEvidence.appIdentifier} llmCustomDisabled=${interactiveEvidence.llmCustomDisabled} tauriGlobalExposed=${interactiveEvidence.tauriGlobalExposed} tauriInvokeAvailable=${interactiveEvidence.tauriInvokeAvailable} location=${interactiveEvidence.locationProtocol}//${interactiveEvidence.locationHostname}${interactiveEvidence.locationPort ? `:${interactiveEvidence.locationPort}` : ""} releaseServedFromDevServer=${interactiveEvidence.releaseServedFromDevServer}`
+              ? `diagnostics="${interactiveEvidence.diagnosticsDownload}" learningData="${interactiveEvidence.learningDataDownload}" learningDeletePreservedKey=${interactiveEvidence.learningDeletePreservedKey} apiKeysDeleted=${interactiveEvidence.apiKeysDeleted} localResetPreservedKey=${interactiveEvidence.localResetPreservedKey} benchmarkAudioCleared=${interactiveEvidence.benchmarkAudioCleared} retiredPronunciationSourceHidden=${interactiveEvidence.retiredPronunciationSourceHidden} fixtureQueriesUnavailable=${interactiveEvidence.productionFixtureGuard.scoreSummaryUnreachable && interactiveEvidence.productionFixtureGuard.assessmentTilesUnreachable && interactiveEvidence.productionFixtureGuard.guidedRepeatSingleWordUnreachable} guidedRepeatTotalWords=${interactiveEvidence.productionFixtureGuard.guidedRepeatTotalWords} route=${interactiveEvidence.route} appIdentifier=${interactiveEvidence.appIdentifier} llmCustomDisabled=${interactiveEvidence.llmCustomDisabled} tauriGlobalExposed=${interactiveEvidence.tauriGlobalExposed} tauriInvokeAvailable=${interactiveEvidence.tauriInvokeAvailable} location=${interactiveEvidence.locationProtocol}//${interactiveEvidence.locationHostname}${interactiveEvidence.locationPort ? `:${interactiveEvidence.locationPort}` : ""} releaseServedFromDevServer=${interactiveEvidence.releaseServedFromDevServer}`
               : "",
           ]
             .filter(Boolean)
@@ -1577,9 +1850,7 @@ async function smoke() {
   } finally {
     await stopProcess(child);
     if (smokeProfileRoot) {
-      await rm(smokeProfileRoot, { force: true, recursive: true }).catch(
-        () => {},
-      );
+      await removeSmokeProfileRoot(smokeProfileRoot);
     }
   }
 }

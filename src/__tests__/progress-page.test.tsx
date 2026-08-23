@@ -77,7 +77,7 @@ vi.mock("@/lib/benchmark-archive", () => ({
   deleteBenchmarkRecording: mocks.deleteBenchmarkRecording,
   getBenchmarkAudioBlob: mocks.getBenchmarkAudioBlob,
   listBenchmarkRecordings: mocks.listBenchmarkRecordings,
-  summarizeBenchmarkGroups: (items: typeof benchmarkRecording[]) =>
+  summarizeBenchmarkGroups: (items: (typeof benchmarkRecording)[]) =>
     items.length === 0
       ? []
       : [
@@ -113,9 +113,11 @@ describe("ProgressPage language boundary", () => {
     mocks.languageId = "en-US";
     mocks.clearBenchmarkRecordings.mockReset().mockResolvedValue(undefined);
     mocks.deleteBenchmarkRecording.mockReset().mockResolvedValue(undefined);
-    mocks.getBenchmarkAudioBlob.mockReset().mockResolvedValue(
-      new Blob([new Uint8Array([1, 2, 3])], { type: "audio/webm" }),
-    );
+    mocks.getBenchmarkAudioBlob
+      .mockReset()
+      .mockResolvedValue(
+        new Blob([new Uint8Array([1, 2, 3])], { type: "audio/webm" }),
+      );
     mocks.listBenchmarkRecordings.mockReset().mockReturnValue([]);
     mocks.getMasteryProfileStorageWarning.mockReset().mockReturnValue(null);
     mocks.loadMasteryProfile.mockClear();
@@ -126,8 +128,13 @@ describe("ProgressPage language boundary", () => {
     render(<ProgressPage />);
 
     expect(screen.getByText("进步档案")).toBeInTheDocument();
-    expect(await screen.findByText("已掌握包")).toBeInTheDocument();
-    expect(await screen.findByText("已迁移")).toBeInTheDocument();
+    expect(await screen.findByText("学习证据阶梯")).toBeInTheDocument();
+    expect(
+      await screen.findByText(/当前最高：尚未形成阶段证据/),
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByText("历史兼容记录（未校准）"),
+    ).toBeInTheDocument();
     expect(mocks.listBenchmarkRecordings).toHaveBeenCalledTimes(1);
     expect(mocks.loadMasteryProfile).toHaveBeenCalledTimes(1);
     expect(mocks.getMasteryProfileStorageWarning).toHaveBeenCalledTimes(1);
@@ -141,12 +148,19 @@ describe("ProgressPage language boundary", () => {
 
     render(<ProgressPage />);
 
-    expect(screen.getByText(/法语公开版先聚焦核心练习/)).toBeInTheDocument();
-    expect(screen.getByText(/公开版只开放音标\/发音单位练习和自由练习/)).toBeInTheDocument();
     expect(
-      screen.getByText(/暂不展示未完成训练、诊断或 mastery 证据/),
+      document.querySelector('[data-smoke="progress-experimental-blocker"]'),
     ).toBeInTheDocument();
-    for (const buttonName of ["去音标练习", "去自由练习"]) {
+    expect(screen.getByText("法语进步档案")).toBeInTheDocument();
+    expect(screen.getByText(/当前语言仍为 experimental/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/不会把英语阶段记录或正式 mastery 结果混入当前语言/),
+    ).toBeInTheDocument();
+    for (const buttonName of [
+      "返回当前语言训练",
+      "做当前语言诊断",
+      "检查语言设置",
+    ]) {
       const button = screen.getByRole("button", { name: buttonName });
       expect(button).toHaveClass("max-w-full");
       expect(button).toHaveClass("whitespace-normal");
@@ -267,8 +281,9 @@ describe("ProgressPage language boundary", () => {
     expect(row).toHaveClass("rounded-lg");
     expect(title).toHaveClass("break-words");
     expect(meta).toHaveClass("break-words");
-    expect(screen.getByText("integrated")).toBeInTheDocument();
-    expect(screen.getByText(/目标音平均/)).toBeInTheDocument();
+    expect(screen.getByText("旧记录 · 不作掌握结论")).toBeInTheDocument();
+    expect(screen.getByText(/历史目标音均分/)).toBeInTheDocument();
+    expect(screen.queryByText("integrated")).not.toBeInTheDocument();
     expect(document.body.innerHTML).not.toContain("truncate");
     expect(document.body.innerHTML).not.toContain("line-clamp");
   });
@@ -311,8 +326,9 @@ describe("ProgressPage language boundary", () => {
     expect(
       document.querySelectorAll('[data-smoke="progress-recent-session-row"]'),
     ).toHaveLength(7);
-    expect(screen.getByText("本机保留 7 轮")).toBeInTheDocument();
-    expect(screen.getByText("retained")).toBeInTheDocument();
+    expect(screen.getByText("仅用于复习调度 · 7 轮")).toBeInTheDocument();
+    expect(screen.getAllByText("旧记录 · 不作掌握结论")).toHaveLength(7);
+    expect(screen.queryByText("retained")).not.toBeInTheDocument();
   });
 
   it("shows a visible error when benchmark deletion fails", async () => {

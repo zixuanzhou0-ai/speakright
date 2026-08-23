@@ -6,6 +6,7 @@ import type {
   TrainingSessionSummary,
 } from "@/types/training";
 import { resolveCourseStartGate } from "./course-gates";
+import { describeTrainingCriterion } from "./training-criteria";
 import { TRAINING_ERROR_PATTERNS } from "./training-error-patterns";
 
 export interface LessonRisk {
@@ -169,9 +170,14 @@ function successCriteria(
   pack: TrainingPack,
   startLevelTitle: string,
 ): string[] {
+  const startLevel = pack.course?.levels.find(
+    (level) => level.title === startLevelTitle,
+  );
   return [
     `本轮从「${startLevelTitle}」开始，不追求快，先追目标动作稳定。`,
-    `目标音素达到 ${pack.masteryRule.targetPassScore} 分以上才算过线，整词分只做辅助参考。`,
+    startLevel
+      ? `本关过线：${describeTrainingCriterion(startLevel)}。`
+      : "每类任务使用自己的证据标准，不用整体分替代目标能力。",
     "如果连续卡住，先做慢速拆解，再回到原题复测。",
   ];
 }

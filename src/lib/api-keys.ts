@@ -1,9 +1,10 @@
-import { isTauriEnvironment } from "@/lib/tauri-runtime";
+import { normalizeLanguageId } from "@/lib/language-profiles";
 import {
   secureStoreDelete,
   secureStoreGet,
   secureStoreSet,
 } from "@/lib/secure-store";
+import { isTauriEnvironment } from "@/lib/tauri-runtime";
 import { storeDelete, storeGet, storeSet } from "@/lib/tauri-store";
 import type {
   AzureConfig,
@@ -11,14 +12,17 @@ import type {
   LanguageConfig,
   LLMConfig,
   PronunciationConfig,
+  StandardTtsConfig,
+  VertexGeminiTtsConfig,
 } from "@/types/api-keys";
-import { normalizeLanguageId } from "@/lib/language-profiles";
 
 export type CoachMode = "easy" | "normal" | "hard" | "strict";
 
 const STORAGE_KEYS = {
   azure: "speakright_azure_config",
   elevenlabs: "speakright_elevenlabs_config",
+  standardTts: "speakright_standard_tts_config",
+  vertexGeminiTts: "speakright_vertex_gemini_tts_config",
   llm: "speakright_llm_config",
   pronunciation: "speakright_pronunciation_config",
   language: "speakright_language_config",
@@ -32,6 +36,8 @@ export const API_KEY_STORAGE_KEYS = [
   STORAGE_KEYS.llm,
 ] as const;
 export const APP_PREFERENCE_STORAGE_KEYS = [
+  STORAGE_KEYS.standardTts,
+  STORAGE_KEYS.vertexGeminiTts,
   STORAGE_KEYS.language,
   STORAGE_KEYS.coachMode,
 ] as const;
@@ -39,13 +45,22 @@ export const API_KEY_STORAGE_ERROR_EVENT = "speakright:api-key-storage-error";
 const runtimeCache = new Map<string, unknown>();
 const SECRET_STORAGE_KEYS = new Set<string>(API_KEY_STORAGE_KEYS);
 const DEFAULT_PRONUNCIATION_CONFIG: PronunciationConfig = { source: "youdao" };
-const LANGUAGE_CONFIG_SNAPSHOTS: Record<LanguageConfig["languageId"], LanguageConfig> =
-  {
-    "en-US": { languageId: "en-US" },
-    "es-ES": { languageId: "es-ES" },
-    "fr-FR": { languageId: "fr-FR" },
-    "ru-RU": { languageId: "ru-RU" },
-  };
+const DEFAULT_STANDARD_TTS_CONFIG: StandardTtsConfig = {
+  provider: "elevenlabs",
+};
+const DEFAULT_VERTEX_GEMINI_TTS_CONFIG: VertexGeminiTtsConfig = {
+  voiceName: "Kore",
+};
+let vertexGeminiTtsSnapshot = DEFAULT_VERTEX_GEMINI_TTS_CONFIG;
+const LANGUAGE_CONFIG_SNAPSHOTS: Record<
+  LanguageConfig["languageId"],
+  LanguageConfig
+> = {
+  "en-US": { languageId: "en-US" },
+  "es-ES": { languageId: "es-ES" },
+  "fr-FR": { languageId: "fr-FR" },
+  "ru-RU": { languageId: "ru-RU" },
+};
 
 export interface ApiKeyStorageErrorDetail {
   key: string;
@@ -267,6 +282,47 @@ export function setElevenLabsConfig(config: ElevenLabsConfig): void {
   setItem(STORAGE_KEYS.elevenlabs, config);
 }
 
+// Standard demonstration TTS provider (non-sensitive preference)
+export function getStandardTtsConfig(): StandardTtsConfig {
+  const saved = getItem<{ provider?: unknown }>(STORAGE_KEYS.standardTts);
+  if (
+    saved?.provider === "elevenlabs" ||
+    saved?.provider === "hermes-grok" ||
+    saved?.provider === "vertex-gemini"
+  ) {
+    return saved as StandardTtsConfig;
+  }
+  return DEFAULT_STANDARD_TTS_CONFIG;
+}
+
+export function setStandardTtsConfig(config: StandardTtsConfig): void {
+  setItem(STORAGE_KEYS.standardTts, {
+    provider:
+      config.provider === "hermes-grok" || config.provider === "vertex-gemini"
+        ? config.provider
+        : "elevenlabs",
+  });
+}
+
+export function getVertexGeminiTtsConfig(): VertexGeminiTtsConfig {
+  const saved = getItem<{ voiceName?: unknown }>(STORAGE_KEYS.vertexGeminiTts);
+  const voiceName =
+    typeof saved?.voiceName === "string" ? saved.voiceName.trim() : "";
+  if (!voiceName) return DEFAULT_VERTEX_GEMINI_TTS_CONFIG;
+  if (vertexGeminiTtsSnapshot.voiceName !== voiceName) {
+    vertexGeminiTtsSnapshot = { voiceName };
+  }
+  return vertexGeminiTtsSnapshot;
+}
+
+export function setVertexGeminiTtsConfig(
+  config: VertexGeminiTtsConfig,
+): void {
+  setItem(STORAGE_KEYS.vertexGeminiTts, {
+    voiceName: config.voiceName.trim() || DEFAULT_VERTEX_GEMINI_TTS_CONFIG.voiceName,
+  });
+}
+
 // LLM
 export function getLlmConfig(): LLMConfig | null {
   return getItem<LLMConfig>(STORAGE_KEYS.llm);
@@ -299,8 +355,9 @@ export function setPronunciationConfig(config: PronunciationConfig): void {
 
 // Learning language
 export function getLanguageConfig(): LanguageConfig {
-  const saved =
-    getItem<LanguageConfig & { targetLanguage?: unknown }>(STORAGE_KEYS.language);
+  const saved = getItem<LanguageConfig & { targetLanguage?: unknown }>(
+    STORAGE_KEYS.language,
+  );
   return LANGUAGE_CONFIG_SNAPSHOTS[
     normalizeLanguageId(saved?.languageId ?? saved?.targetLanguage)
   ];
@@ -328,6 +385,8 @@ export function subscribeToStorage(callback: () => void): () => void {
       e.key === null ||
       e.key === STORAGE_KEYS.azure ||
       e.key === STORAGE_KEYS.elevenlabs ||
+      e.key === STORAGE_KEYS.standardTts ||
+      e.key === STORAGE_KEYS.vertexGeminiTts ||
       e.key === STORAGE_KEYS.llm ||
       e.key === STORAGE_KEYS.pronunciation ||
       e.key === STORAGE_KEYS.language ||

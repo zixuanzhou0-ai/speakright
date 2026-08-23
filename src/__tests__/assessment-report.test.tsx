@@ -284,4 +284,35 @@ describe("AssessmentReport mastery display", () => {
       screen.getByText("third-pattern-must-stay-visible"),
     ).toBeInTheDocument();
   });
+
+  it("labels preview-assisted samples as excluded from the baseline", () => {
+    const result = reportFor("en-US");
+    result.evidenceSummary = {
+      overallStrength: "fair",
+      recommendedAction: "use-with-caution",
+      usableRecordings: 3,
+      invalidRecordings: 0,
+      totalExpectedWords: 3,
+      totalObservedWords: 3,
+      wordLevelEvidenceCount: 3,
+      matchedReferenceWords: 3,
+      referenceMatchRatio: 1,
+      omissionCount: 0,
+      insertionCount: 0,
+      mispronunciationCount: 0,
+      thinFeatureCount: 0,
+      lowConfidenceFeatures: [],
+      notes: [],
+      independentWordRecordings: 2,
+      previewAssistedWordRecordings: 1,
+    };
+
+    render(<AssessmentReport result={result} onRetake={vi.fn()} />);
+
+    expect(screen.getByText("独立词样本 2")).toBeInTheDocument();
+    expect(screen.getByText("提示后样本 1（未计入基线）")).toHaveAttribute(
+      "data-smoke",
+      "assessment-report-assisted-evidence",
+    );
+  });
 });

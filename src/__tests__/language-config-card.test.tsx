@@ -25,11 +25,13 @@ vi.mock("sonner", () => ({
 }));
 
 describe("language config card", () => {
-  it("keeps non-English modules labeled experimental instead of beta", () => {
+  it("derives non-English Labs boundaries from the shared capability policy", () => {
     render(<LanguageConfigCard />);
 
-    expect(screen.getByText(/西语、法语、俄语仍为实验板块/)).toBeInTheDocument();
-    expect(screen.getByText(/公开版先开放音标\/发音单位练习和自由练习/)).toBeInTheDocument();
+    expect(screen.getByText(/当前：法语 · Labs/)).toBeInTheDocument();
+    expect(screen.getAllByText(/核心公开：发音单位、自由练习/)).toHaveLength(4);
+    expect(screen.getAllByText(/Labs：引导训练、探索性诊断/)).toHaveLength(4);
+    expect(screen.getAllByText(/正式证据关闭/)).toHaveLength(4);
     expect(screen.queryByText(/开放 beta/)).not.toBeInTheDocument();
     expect(screen.queryByText(/exact/)).not.toBeInTheDocument();
     expect(screen.queryByText(/待补/)).not.toBeInTheDocument();

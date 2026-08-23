@@ -1,22 +1,16 @@
 # Desktop Startup Runbook
 
-The canonical startup runbook lives at:
+The previous 2026-06 runbook is archived at
+`docs/archive/2026-06-desktop-release/DESKTOP_STARTUP_RUNBOOK.md`.
 
-```text
-docs/operations/DESKTOP_STARTUP_RUNBOOK.md
-```
-
-Use that runbook for release-style startup checks, first-launch degraded-state
-QA, and recovery steps when `speakright.exe` is already running.
-
-Start from the current desktop repository and Release EXE:
+Current acceptance starts from the repository root:
 
 ```bat
-cd /d E:\SpeakRightDesktopRepo
 git status --short --branch
 npm run desktop:preflight
 npm run desktop:launch-release
 ```
 
-Do not use the older `E:\SpeakRight` workspace or a `localhost` browser tab for
-release acceptance.
+Use `npm run desktop:dev` only for debugging. The desktop release path must not
+depend on a localhost tab. Current branch and rollback details live in
+`docs/operations/NEXT_CHAT_HANDOFF.md`.

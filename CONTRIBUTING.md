@@ -1,19 +1,23 @@
-# Contributing To SpeakRight Desktop
+# Contributing To SpeakRight
 
-Thanks for helping tighten SpeakRight Desktop. This project is a desktop
-pronunciation-training app, so small correctness issues can directly affect a
-learner's trust. Please prefer small, well-evidenced changes over broad edits.
-All project participation follows `CODE_OF_CONDUCT.md`.
+Thanks for helping improve SpeakRight. The repository contains a Windows
+Desktop app and a deliberately separated Browser Edition. Small correctness
+issues in either surface can directly affect a learner's trust, so prefer
+focused, well-evidenced changes over broad edits. All project participation
+follows `CODE_OF_CONDUCT.md`.
 
 ## Repository
 
-Use the current desktop repository:
+Use the canonical repository root:
 
 ```bat
-cd /d E:\SpeakRightDesktopRepo
+cd /d <repository-root>
 ```
 
-Do not use the older browser workspace for desktop release work.
+Windows Desktop lives in the repository root under `src` and `src-tauri`.
+Browser Edition lives under `apps/browser`. Do not import Tauri or Windows
+release behavior into Browser Edition, and do not use a browser localhost tab
+as Release EXE evidence.
 Use `SUPPORT.md` when you are unsure whether a report belongs in a public issue,
 an IPA audit issue, or a private security report.
 
@@ -36,11 +40,23 @@ pass. If bundled audio is missing, document the gap first.
 
 ## Development Setup
 
+Install and validate the Windows Desktop workspace:
+
 ```bat
 npm ci
 npm run typecheck
 npm run lint
 npm run test
+```
+
+For Browser Edition work, also install and validate its isolated workspace:
+
+```bat
+npm --prefix apps/browser install
+npm run lint:browser
+npm run typecheck:browser
+npm run test:browser
+npm run build:browser
 ```
 
 For desktop release-style testing, use the Release EXE path:
@@ -71,6 +87,10 @@ npm run desktop:ui-smoke
 ```
 
 Run `npm run desktop:launch-release` for manual QA from the Release EXE.
+
+For Browser Edition changes, run the Browser commands above and the smallest
+relevant smoke check. Record the exact browser and localhost/static route used;
+do not report it as Desktop acceptance.
 
 ## Audio And TTS Boundary
 
@@ -116,11 +136,13 @@ recordings respectful, evidence-based, and scoped to the product issue.
 
 Do not post API keys, raw private recordings, private learning-data exports, or
 vulnerability details in public issues or pull requests. Use `SECURITY.md` for
-private vulnerability or credential reports.
+private vulnerability or credential reports. Review `PRIVACY.md` before adding
+a new provider, storage key, export field, or recording-retention path.
 
 ## Pull Request Checklist
 
 - Explain the user-facing issue and the fix.
+- Name the affected edition: Windows Desktop, Browser Edition, or shared logic.
 - Mention the languages and pages affected.
 - Include tests or explain why tests are not applicable.
 - Confirm whether Release EXE smoke was run.

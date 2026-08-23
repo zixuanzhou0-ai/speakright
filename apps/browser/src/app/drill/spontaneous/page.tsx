@@ -26,11 +26,13 @@ import {
   getBenchmarkArchiveSaveErrorMessage,
   saveBenchmarkRecording,
 } from "@/lib/benchmark-archive";
+import { buildFreePracticeAttemptEvidence } from "@/lib/free-practice-evidence";
 import {
   analyzeFreePracticeTransfer,
   type FreePracticeTransferSummary,
   recordFreePracticeTransfer,
 } from "@/lib/free-practice-transfer";
+import { appendLearningEvidence } from "@/lib/learning-evidence";
 import { LOCAL_MASTERY_SAVE_WARNING } from "@/lib/local-save-warning";
 import { canRecordFormalMastery } from "@/lib/mastery-language-policy";
 import { loadMasteryProfile, saveMasteryProfile } from "@/lib/mastery-profile";
@@ -99,8 +101,9 @@ export default function SpontaneousPage() {
 
   const targetPacks = useMemo(() => {
     if (!transferProfile) return [];
-    const reviewPackIds = buildReviewQueue(transferProfile)
-      .map((item) => item.packId);
+    const reviewPackIds = buildReviewQueue(transferProfile).map(
+      (item) => item.packId,
+    );
     const activePackIds = Object.values(transferProfile.packs)
       .filter((pack) => pack.status !== "mastered")
       .sort((a, b) => (b.failureStreak ?? 0) - (a.failureStreak ?? 0))
@@ -170,9 +173,20 @@ export default function SpontaneousPage() {
           transferSummary.evidences.length >= 2 ? "strong" : "fair",
         note:
           quality.report.issues.length === 0
-            ? "即兴表达转写后命中当前目标，可作为 spontaneous 迁移证据。"
-            : "即兴表达录音存在质量提示，本次只作为观察，不提升掌握度。",
+            ? "即兴表达转写后命中当前目标，可保存为原始观察。"
+            : "即兴表达录音存在质量提示，本次只作为观察，不提升正式证据阶段。",
       });
+      const reliableTransfer = {
+        ...transferSummary,
+        assessmentReliability: reliability,
+      };
+      const evidenceSaved = buildFreePracticeAttemptEvidence({
+        sessionId: `spontaneous-${transferSummary.generatedAt}`,
+        languageId,
+        summary: reliableTransfer,
+      })
+        .map((evidence) => appendLearningEvidence(evidence))
+        .every(Boolean);
       if (
         canUseMasteryTransfer &&
         profile &&
@@ -180,11 +194,13 @@ export default function SpontaneousPage() {
       ) {
         const recorded = recordFreePracticeTransfer(
           profile,
-          transferSummary,
+          reliableTransfer,
           reliability,
         );
         const profileSaved = saveMasteryProfile(recorded.profile);
-        setLocalSaveWarning(profileSaved ? null : LOCAL_MASTERY_SAVE_WARNING);
+        setLocalSaveWarning(
+          profileSaved && evidenceSaved ? null : LOCAL_MASTERY_SAVE_WARNING,
+        );
         setProfile(recorded.profile);
         setSummary(recorded.summary);
       } else {
@@ -226,7 +242,8 @@ export default function SpontaneousPage() {
       <div className="mb-5 flex flex-wrap items-start gap-3">
         <Link
           href="/drill"
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full hover:bg-muted transition-colors cursor-pointer"
+          aria-label="返回训练首页"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full hover:bg-muted transition-colors cursor-pointer sm:h-8 sm:w-8"
         >
           <ArrowLeft className="h-4 w-4" />
         </Link>

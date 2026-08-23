@@ -44,7 +44,10 @@ const SECRET_PATTERNS = [
   { name: "openai-key", regex: /sk-(?:proj-)?[A-Za-z0-9_-]{40,}/ },
   { name: "anthropic-key", regex: /sk-ant-[A-Za-z0-9_-]{40,}/ },
   { name: "elevenlabs-key", regex: /sk_[A-Za-z0-9]{32,}/ },
-  { name: "github-token", regex: /(?:github_pat_[A-Za-z0-9_]{20,}|gh[pousr]_[A-Za-z0-9_]{30,})/ },
+  {
+    name: "github-token",
+    regex: /(?:github_pat_[A-Za-z0-9_]{20,}|gh[pousr]_[A-Za-z0-9_]{30,})/,
+  },
   { name: "google-api-key", regex: /AIza[0-9A-Za-z_-]{35}/ },
   { name: "aws-access-key", regex: /AKIA[0-9A-Z]{16}/ },
   { name: "slack-token", regex: /xox[baprs]-[A-Za-z0-9-]{30,}/ },
@@ -71,6 +74,7 @@ describe("open-source readiness files", () => {
       "INSTALLATION.md",
       "DESKTOP_STARTUP_RUNBOOK.md",
       "NEXT_CHAT_HANDOFF.md",
+      ".gitattributes",
       ".env.example",
       ".github/ISSUE_TEMPLATE/installation_startup.md",
       ".github/ISSUE_TEMPLATE/bug_report.md",
@@ -86,13 +90,65 @@ describe("open-source readiness files", () => {
 
   it("keeps the asset license boundary explicit", () => {
     const license = read("LICENSE");
+    const notice = read("NOTICE.md");
     const notices = read("THIRD_PARTY_NOTICES.md");
 
-    expect(license).toContain("Bundled audio, video, image, voice");
-    expect(notices).toMatch(
-      /does not\s+automatically relicense bundled third-party media/,
-    );
-    expect(notices).toContain("Do not add new ElevenLabs-generated audio");
+    expect(license).toMatch(/^MIT License/);
+    expect(license).not.toContain("Additional project notice");
+    expect(notice).toContain("not automatically relicensed under MIT");
+    expect(notice).toContain("docs/assets/asset-rights-registry.json");
+    expect(notices).toContain("does not relicense bundled third-party");
+    expect(notices).toContain("Add no third-party media");
+  });
+
+  it("keeps the retired dictionary integration out of public release inputs", () => {
+    const registry = read("docs/assets/asset-rights-registry.json");
+    const retiredProviderName = ["Merriam", "Webster"].join("-");
+    const retiredProviderSlug = retiredProviderName.toLowerCase();
+    const retiredDictionaryHost = ["dictionaryapi", "com"].join(".");
+    const retiredLogoName = ["mw-logo", "svg"].join(".");
+    const retiredHookName = ["useMw", "Pronunciation"].join("");
+    const retiredChineseName = ["韦", "氏"].join("");
+    const publicStatements = [
+      read("AGENTS.md"),
+      read("NOTICE.md"),
+      read("THIRD_PARTY_NOTICES.md"),
+      read("PRIVACY.md"),
+      read("README.md"),
+      read("docs/browser-edition/ARCHITECTURE_AND_SEPARATION.md"),
+      read("docs/browser-edition/THIRD_PARTY_NOTICES.md"),
+    ].join("\n");
+
+    expect(
+      existsSync(join(projectRoot, "public/images", retiredLogoName)),
+    ).toBe(false);
+    for (const marker of [
+      `${retiredProviderSlug}-mark`,
+      retiredDictionaryHost,
+      retiredLogoName,
+    ]) {
+      expect(registry.toLowerCase()).not.toContain(marker.toLowerCase());
+    }
+    for (const marker of [
+      retiredProviderName,
+      retiredChineseName,
+      retiredDictionaryHost,
+      retiredLogoName,
+      retiredHookName,
+    ]) {
+      expect(publicStatements.toLowerCase()).not.toContain(
+        marker.toLowerCase(),
+      );
+    }
+  });
+
+  it("keeps clean checkouts byte-stable across Windows and CI", () => {
+    const attributes = read(".gitattributes");
+
+    expect(attributes).toContain("* text=auto eol=lf");
+    for (const extension of ["png", "mp3", "wav", "mp4", "zip", "exe", "msi"]) {
+      expect(attributes).toContain(`*.${extension} -text`);
+    }
   });
 
   it("keeps contribution rules aligned with release constraints", () => {
@@ -109,27 +165,41 @@ describe("open-source readiness files", () => {
     expect(contributing).toContain("Release EXE");
     expect(contributing).toContain("Do not generate ElevenLabs audio");
     expect(contributing).toContain("Triage Routing");
-    expect(contributing).toContain("`Installation or startup help` issue template");
+    expect(contributing).toContain(
+      "`Installation or startup help` issue template",
+    );
     expect(contributing).toContain("`Bug report` issue template");
-    expect(contributing).toContain("`IPA or pronunciation audit` issue template");
-    expect(contributing).toContain("`Audio gap or provider request` issue template");
+    expect(contributing).toContain(
+      "`IPA or pronunciation audit` issue template",
+    );
+    expect(contributing).toContain(
+      "`Audio gap or provider request` issue template",
+    );
     expect(contributing).toContain("`SECURITY.md` private report");
     expect(contributing).toContain("quota-impacting provider work");
     expect(contributing).toContain("latest dry-run result");
     expect(contributing).toContain("text/audio scope");
     expect(contributing).toContain("approval owner");
-    expect(contributing).toContain("Spanish, French, and Russian are experimental");
+    expect(contributing).toContain(
+      "Spanish, French, and Russian are experimental",
+    );
     expect(support).toContain("Release EXE");
     expect(support).toContain("installation/startup issue template");
     expect(support).toContain("SmartScreen");
     expect(support).toContain("SECURITY.md");
     expect(support).toContain("needs-review");
     expect(support).toContain("audio/provider issue template");
-    expect(support).toContain("Do not ask contributors to generate ElevenLabs audio");
-    expect(support).toContain("Provider-quota requests should include the dry-run result");
+    expect(support).toContain(
+      "Do not ask contributors to generate ElevenLabs audio",
+    );
+    expect(support).toContain(
+      "Provider-quota requests should include the dry-run result",
+    );
     expect(support).toContain("estimate the text/audio scope");
     expect(support).toContain("approval before anyone runs");
-    expect(support).toContain("Log excerpts only if they are short and redacted");
+    expect(support).toContain(
+      "Log excerpts only if they are short and redacted",
+    );
     expect(support).toContain("Full diagnostics bundles");
     expect(security).toContain("Windows artifacts are currently unsigned");
   });
@@ -142,7 +212,9 @@ describe("open-source readiness files", () => {
     const bugReport = read(".github/ISSUE_TEMPLATE/bug_report.md");
     const featureRequest = read(".github/ISSUE_TEMPLATE/feature_request.md");
     const ipaAudit = read(".github/ISSUE_TEMPLATE/ipa_audit.md");
-    const audioProvider = read(".github/ISSUE_TEMPLATE/audio_provider_request.md");
+    const audioProvider = read(
+      ".github/ISSUE_TEMPLATE/audio_provider_request.md",
+    );
     const issueRouting = read(".github/ISSUE_TEMPLATE/README.md");
     const pullRequest = read(".github/pull_request_template.md");
 
@@ -151,7 +223,9 @@ describe("open-source readiness files", () => {
     expect(issueConfig).toContain("SUPPORT.md");
     expect(issueConfig).toContain("Security report");
     expect(installationStartup).toContain("Installation or startup help");
-    expect(installationStartup).toContain("Downloaded installer or Release EXE");
+    expect(installationStartup).toContain(
+      "Downloaded installer or Release EXE",
+    );
     expect(installationStartup).toContain("Built from source");
     expect(installationStartup).toContain("npm run desktop:build");
     expect(installationStartup).toContain("speakright.exe");
@@ -167,7 +241,9 @@ describe("open-source readiness files", () => {
     expect(installationStartup).toContain("diagnostics bundles");
     expect(installationStartup).toContain("C:\\Users\\name");
     expect(installationStartup).toContain("ElevenLabs");
-    expect(installationStartup).toContain("Spanish, French, and Russian remain experimental");
+    expect(installationStartup).toContain(
+      "Spanish, French, and Russian remain experimental",
+    );
     expect(bugReport).toContain("Release EXE");
     expect(bugReport).toContain("Spanish, French, or Russian");
     expect(bugReport).toContain("Network state");
@@ -209,7 +285,9 @@ describe("open-source readiness files", () => {
     expect(audioProvider).toContain("without explicit maintainer approval");
     expect(audioProvider).toContain("included a dry-run result");
     expect(audioProvider).toContain("expected text/audio scope");
-    expect(audioProvider).toContain("Spanish, French, and Russian remain experimental");
+    expect(audioProvider).toContain(
+      "Spanish, French, and Russian remain experimental",
+    );
     expect(issueRouting).toContain("Issue Routing");
     expect(issueRouting).toContain("Installation or startup help");
     expect(issueRouting).toContain("unsigned Windows artifact");
@@ -225,18 +303,28 @@ describe("open-source readiness files", () => {
     expect(issueRouting).toContain("bearer tokens");
     expect(issueRouting).toContain("C:\\Users\\name");
     expect(issueRouting).toContain("Full diagnostics bundles");
-    expect(issueRouting).toContain("Do not ask contributors to generate ElevenLabs audio");
-    expect(issueRouting).toContain("include the dry-run result plus expected text/audio scope");
-    expect(issueRouting).toContain("Spanish, French, and Russian remain experimental");
+    expect(issueRouting).toContain(
+      "Do not ask contributors to generate ElevenLabs audio",
+    );
+    expect(issueRouting).toContain(
+      "include the dry-run result plus expected text/audio scope",
+    );
+    expect(issueRouting).toContain(
+      "Spanish, French, and Russian remain experimental",
+    );
     expect(issueRouting).toContain("evidenceMastery");
     expect(pullRequest).toContain("I did not use localhost/dev server");
     expect(pullRequest).toContain("I did not generate ElevenLabs audio");
-    expect(pullRequest).toContain("Spanish, French, and Russian remain experimental");
+    expect(pullRequest).toContain(
+      "Spanish, French, and Russian remain experimental",
+    );
     expect(pullRequest).toContain("`IPA or pronunciation audit`");
     expect(pullRequest).toContain("source evidence");
     expect(pullRequest).toContain("`Audio gap or provider");
     expect(pullRequest).toContain("paid-provider/quota request");
-    expect(pullRequest).toContain("Any provider-quota work includes a dry-run result");
+    expect(pullRequest).toContain(
+      "Any provider-quota work includes a dry-run result",
+    );
     expect(pullRequest).toContain("expected text/audio scope");
     expect(pullRequest).toContain("explicit maintainer approval");
     expect(pullRequest).toContain("private recording");
@@ -252,213 +340,184 @@ describe("open-source readiness files", () => {
     expect(pullRequest).toContain("I followed `CODE_OF_CONDUCT.md`");
   });
 
-  it("keeps Windows workflow artifacts separated by controlled-test and signed-release status", () => {
-    const workflow = read(".github/workflows/build-windows.yml");
+  it("keeps Browser Stable and unsigned Desktop Preview release channels separate", () => {
+    const validationWorkflow = read(".github/workflows/build-windows.yml");
+    const browserRelease = read(".github/workflows/release-browser.yml");
+    const desktopPreview = read(
+      ".github/workflows/release-desktop-preview.yml",
+    );
 
-    expect(workflow).toContain("Enforce public release signing");
-    expect(workflow).toContain("npm run desktop:release-gate");
-    expect(workflow).toContain("Upload controlled-test artifacts");
-    expect(workflow).toContain("github.event_name == 'workflow_dispatch'");
-    expect(workflow).toContain("speakright-windows-controlled-test-artifacts");
-    expect(workflow).toContain("Upload signed release artifacts");
-    expect(workflow).toContain("startsWith(github.ref, 'refs/tags/v')");
-    expect(workflow).toContain("speakright-windows-signed-release-artifacts");
-    expect(workflow).not.toContain("name: speakright-windows-installers");
+    expect(validationWorkflow).toContain("Upload desktop validation reports");
+    expect(validationWorkflow).toContain(
+      "speakright-windows-validation-reports",
+    );
+    expect(validationWorkflow).not.toContain("target/release/speakright.exe");
+    expect(validationWorkflow).not.toContain("bundle/nsis/*.exe");
+    expect(validationWorkflow).not.toContain("    tags:");
+    expect(browserRelease).toContain("Release Browser Stable");
+    expect(browserRelease).toContain("--edition browser");
+    expect(browserRelease).not.toContain("--prerelease --title");
+    expect(desktopPreview).toContain("Release Desktop Preview");
+    expect(desktopPreview).toContain("--edition desktop");
+    expect(desktopPreview).toContain("desktop:preview-release-gate");
+    expect(desktopPreview).toContain("--prerelease");
   });
 
-  it("keeps current handoff docs from claiming stale local dirty state", () => {
+  it("keeps the current handoff aligned with the evidence-first contract", () => {
     const handoff = read("docs/operations/NEXT_CHAT_HANDOFF.md");
-    const evidence = read("docs/operations/RC_EVIDENCE_AUDIT.md");
-    const readme = read("README.md");
-    const docs = [
-      readme,
-      read("docs/INSTALLATION.md"),
-      read("docs/operations/DESKTOP_STARTUP_RUNBOOK.md"),
-      handoff,
-      evidence,
-    ].join("\n");
+    const prd = read("docs/PRD.md");
+    const decision = read(
+      "docs/architecture/0001-evidence-first-learning-loop.md",
+    );
+    const docs = [handoff, prd, decision, read("README.md")].join("\n");
 
     expect(docs).not.toContain("known uncommitted work");
     expect(docs).not.toContain("ahead of `origin/main` by local commits");
-    expect(docs).not.toContain("main...origin/main [ahead 5]");
-    expect(docs).not.toContain("main...origin/main [ahead 17]");
-    expect(docs).not.toContain("documented uncommitted release-tightening");
-    expect(docs).not.toContain("A settled RC branch should show `main...origin/main`");
-    expect(docs).not.toContain("single-sound audio source-policy pass");
-    expect(docs).not.toContain("audio-policy pass");
-    expect(docs).not.toContain("NEXT_RC_AUDIO_SETTINGS");
-    expect(handoff).toContain("Numeric pronunciation scores must come from Azure Speech");
-    expect(handoff).toContain("LLM feedback is downstream");
-    expect(evidence).not.toContain("github.com:443");
-    expect(evidence).not.toContain("network timeouts");
-    expect(readme).toMatch(/LLM providers only generate coaching\s+explanations/);
+    expect(docs).not.toContain("E:\\SpeakRightDesktopRepo");
+    expect(handoff).toContain("Azure results are noisy observations");
+    expect(handoff).toContain("LLM coaching cannot invent or overwrite");
+    expect(prd).toContain("A single recording cannot establish mastery");
+    expect(decision).toContain("treated as fallible observations");
   });
 
-  it("keeps validation result counts centralized in the RC evidence audit", () => {
-    const readme = read("README.md");
-    const installation = read("docs/INSTALLATION.md");
-    const runbook = read("docs/operations/DESKTOP_STARTUP_RUNBOOK.md");
-    const evidence = read("docs/operations/RC_EVIDENCE_AUDIT.md");
-    const handoffDocs = [
-      readme,
-      installation,
-      runbook,
+  it("archives superseded release evidence instead of treating it as current", () => {
+    const archive = read(
+      "docs/archive/2026-06-desktop-release/RC_EVIDENCE_AUDIT.md",
+    );
+    const archiveIndex = read("docs/archive/README.md");
+    const currentDocs = [
+      read("README.md"),
+      read("docs/PRD.md"),
       read("docs/operations/NEXT_CHAT_HANDOFF.md"),
     ].join("\n");
 
-    expect(readme).toContain("docs/operations/RC_EVIDENCE_AUDIT.md");
-    expect(installation).toContain("docs/operations/RC_EVIDENCE_AUDIT.md");
-    expect(evidence).toContain("Latest local full gate");
-    expect(evidence).toContain("src/__tests__/azure-scoring-boundary.test.ts");
-    expect(evidence).toContain("Spanish 1094 existing / 0 missing");
-    expect(evidence).toContain("French 1482 existing / 0 missing");
-    expect(evidence).toContain("Russian 1640 existing / 0 missing");
-    expect(evidence).toContain("total missing 0");
-    expect(evidence).toContain("No ElevenLabs calls were made");
-    expect(evidence).toContain("phonemeLeftColumn=ok");
-    expect(readme).toContain("current release-hardening proof matrix");
-    expect(readme).toContain("older commit SHA");
-    expect(installation).toContain("Use that audit for the latest command");
-    expect(readme).toContain("source of truth");
-    expect(installation).toContain("source of truth");
-    expect(readme).not.toContain("English word audio `1464/1464`");
-    expect(readme).not.toContain("Russian language-pack files `920/920`");
-    expect(installation).not.toContain("English `1464/1464`");
-    expect(installation).not.toContain("Russian `920/920`");
-    expect(installation).not.toContain("Spanish `880`, French `1090`, Russian `918`");
-    expect(readme).not.toContain("Previous release-validation baseline");
-    expect(installation).not.toContain("Previous release-validation baseline");
-    expect(readme).not.toContain("94be1d4");
-    expect(installation).not.toContain("94be1d4");
-    expect(handoffDocs).not.toMatch(/89\s+(?:files|test files).*489\s+tests/);
-    expect(handoffDocs).not.toContain("72 test files and 363 tests");
-    expect(handoffDocs).not.toContain("74 files and 374 tests");
-    expect(handoffDocs).not.toContain("75` files and `380` tests");
-    expect(handoffDocs).not.toContain("119` files and `666` tests");
-    expect(handoffDocs).not.toContain("117` files and `646` tests");
-    expect(handoffDocs).not.toContain("Biome checked 308 files");
-    expect(handoffDocs).not.toContain("Biome checked 312 files");
-    expect(handoffDocs).not.toContain("Biome checked 341 files");
-    expect(handoffDocs).not.toContain("378` files checked");
-    expect(handoffDocs).toContain("Current Verification Notes");
-    expect(handoffDocs).toContain("Spanish `1094` existing / `0` missing");
-    expect(handoffDocs).toContain("French `1482` existing / `0` missing");
-    expect(handoffDocs).toContain("Russian `1640` existing / `0` missing");
-    expect(handoffDocs).not.toMatch(/\btomorrow(?:'s)?\b/i);
-    expect(evidence).not.toMatch(/\btomorrow(?:'s)?\b/i);
-    expect(handoffDocs).not.toContain("PID was `70112`");
+    expect(archive).toContain("Latest local full gate");
+    expect(archive).toContain("No ElevenLabs calls were made");
+    expect(archiveIndex).toMatch(
+      /must not be used\s+as current implementation/,
+    );
+    expect(currentDocs).not.toContain("current release-hardening proof matrix");
+    expect(currentDocs).not.toContain("docs/operations/RC_EVIDENCE_AUDIT.md");
+    expect(currentDocs).not.toMatch(/\btomorrow(?:'s)?\b/i);
   });
 
-  it("keeps README screenshot assets present", () => {
+  it("keeps README release evidence current and present", () => {
     const readme = read("README.md");
-    for (const screenshot of [
-      "settings.png",
-      "english-phoneme-score.png",
-      "free-practice.png",
-      "english-assessment.png",
-      "spanish-phoneme.png",
-      "french-phoneme.png",
-      "russian-phoneme.png",
-    ]) {
-      const markdownPath = `docs/assets/screenshots/${screenshot}`;
+    const representativeEvidence = [
+      "docs/assets/screenshots/release/v1.1.0/browser/1280x800/guided-repeat.png",
+      "docs/assets/screenshots/release/v1.1.0/browser/1280x800/free-practice.png",
+      "docs/assets/screenshots/release/v1.1.0/browser/1280x800/diagnosis-example.png",
+      "docs/assets/screenshots/release/v1.1.0/browser/1280x800/settings.png",
+      "docs/assets/screenshots/release/v1.1.0/desktop/1280x920/guided-repeat.png",
+      "docs/assets/screenshots/release/v1.1.0/desktop/1280x920/free-practice.png",
+      "docs/assets/screenshots/release/v1.1.0/desktop/1280x920/diagnosis-example.png",
+      "docs/assets/screenshots/release/v1.1.0/desktop/1280x920/settings.png",
+      "docs/assets/demo/speakright-v1.1.0-overview.mp4",
+      "docs/assets/demo/speakright-v1.1.0-overview.en.vtt",
+    ];
+
+    for (const markdownPath of representativeEvidence) {
       expect(readme).toContain(markdownPath);
       expect(existsSync(join(projectRoot, markdownPath)), markdownPath).toBe(
         true,
       );
     }
-    expect(readme).toMatch(/smoke-only demo\s+state/);
+
+    const matrices = [
+      {
+        edition: "browser",
+        viewports: ["1280x800", "390x844", "360x800"],
+      },
+      { edition: "desktop", viewports: ["1280x920", "1024x800"] },
+    ];
+    const shots = [
+      "guided-repeat",
+      "free-practice",
+      "diagnosis-example",
+      "settings",
+      "progress-example",
+      "no-key",
+    ];
+
+    for (const { edition, viewports } of matrices) {
+      for (const viewport of viewports) {
+        for (const shot of shots) {
+          const screenshotPath =
+            `docs/assets/screenshots/release/v1.1.0/${edition}/` +
+            `${viewport}/${shot}.png`;
+          expect(
+            existsSync(join(projectRoot, screenshotPath)),
+            screenshotPath,
+          ).toBe(true);
+        }
+      }
+    }
+
+    expect(readme).toContain("Example data — not a live Azure score");
     expect(readme).toContain("real user scores come from Azure");
   });
 
-  it("keeps install docs explicit about source builds and first-launch failure states", () => {
-    const readme = read("README.md");
+  it("keeps installation and startup docs portable and privacy-safe", () => {
     const rootInstallation = read("INSTALLATION.md");
     const rootRunbook = read("DESKTOP_STARTUP_RUNBOOK.md");
     const rootHandoff = read("NEXT_CHAT_HANDOFF.md");
     const installation = read("docs/INSTALLATION.md");
-    const runbook = read("docs/operations/DESKTOP_STARTUP_RUNBOOK.md");
-    const docs = [installation, runbook].join("\n");
+    const docs = [
+      rootInstallation,
+      rootRunbook,
+      rootHandoff,
+      installation,
+    ].join("\n");
 
     expect(rootInstallation).toContain("docs/INSTALLATION.md");
     expect(rootInstallation).toContain("npm run desktop:preflight");
     expect(rootInstallation).toContain("npm run desktop:launch-release");
-    expect(rootInstallation).toContain("localhost");
-    expect(rootInstallation).toContain(
-      "E:\\SpeakRightDesktopRepo\\src-tauri\\target\\release\\speakright.exe",
-    );
-    expect(rootRunbook).toContain(
-      "docs/operations/DESKTOP_STARTUP_RUNBOOK.md",
-    );
+    expect(rootInstallation).toContain("calibration data");
     expect(rootRunbook).toContain("git status --short --branch");
-    expect(rootRunbook).toContain("older `E:\\SpeakRight`");
     expect(rootRunbook).toContain("localhost");
     expect(rootHandoff).toContain("docs/operations/NEXT_CHAT_HANDOFF.md");
-    expect(rootHandoff).toContain("docs/operations/RC_EVIDENCE_AUDIT.md");
-    expect(rootHandoff).toContain("Spanish, French, and Russian");
-    expect(rootHandoff).toContain("ElevenLabs");
-    expect(rootHandoff).toContain("Release EXE");
-
-    expect(readme).toContain("Public review, source builds");
-    expect(readme).toContain("A signed public Windows release is not complete yet");
-    expect(readme).toContain("internal-test or controlled-test builds");
-    expect(readme).toContain("Public Download Status");
-    expect(readme).toContain("There is not yet a signed public Windows download");
-    expect(readme).toContain("must not describe an unsigned artifact as a stable public download");
-    expect(readme).toContain("current release-hardening proof matrix");
-    expect(readme).toContain("Release EXE smoke/launch outcome");
-    expect(readme).toContain("Screenshots below are captured");
-    expect(readme).toContain("docs/assets/screenshots/settings.png");
-    expect(readme).toContain("Real Scoring Boundary");
-    expect(readme).toContain("Azure Speech Pronunciation Assessment");
-    expect(readme).toContain("LLM layer is downstream only");
-    expect(readme).not.toContain("Last controlled-test verification");
-    expect(readme).not.toContain("guardrail pass and full Release EXE gate");
-    expect(installation).toContain("Controlled-Test Installer Boundary");
-    expect(installation).toContain(
-      "Do not treat GitHub Releases as a public signed download page yet",
-    );
-    expect(installation).toContain("controlled-test track");
-    expect(installation).toContain("installer filename");
-    expect(installation).toContain("not a general download recommendation");
-    expect(installation).toContain("current release notes");
-    expect(installation).not.toContain("Download the latest controlled-test installer");
-    expect(installation).toContain("prefer **Build From Source** below");
-    expect(installation).toContain("wait for a signed");
-    expect(installation).toContain("public Windows release");
-    expect(installation).toContain("Published GitHub Release assets can lag");
-    expect(installation).toContain("docs/operations/RC_EVIDENCE_AUDIT.md");
-    expect(installation).toContain("bypass antivirus or enterprise policy");
-    expect(installation).toContain("For controlled internal-test passes");
-    expect(installation).toContain("current RC notes");
-    expect(installation).not.toContain("For the 2026-06-16 internal-test pass");
-    expect(installation).not.toContain("latest local non-English layout fixes");
-    expect(runbook).toMatch(/Do not\s+publish workflow-dispatch artifacts/i);
-    expect(runbook).toContain("capture the exact");
-    expect(readme).toContain("source builds");
-    expect(readme).toContain("docs/INSTALLATION.md");
     expect(installation).toContain("Build From Source");
-    expect(installation).toContain("cd /d E:\\SpeakRightDesktopRepo");
-    expect(installation).toContain("npm ci");
-    expect(installation).toContain("npm run desktop:build");
-    expect(installation).toContain("npm run desktop:preflight");
-    expect(installation).toContain("npm run desktop:launch-release");
-    expect(installation).toContain(
-      "E:\\SpeakRightDesktopRepo\\src-tauri\\target\\release\\speakright.exe",
-    );
-    expect(installation).toContain("Do not use a browser `localhost` tab");
-    expect(installation).toContain("desktop:dev` is for code debugging only");
+    expect(docs).not.toContain("E:\\SpeakRightDesktopRepo");
+    expect(docs).not.toContain("C:\\Users\\Administrator");
+  });
 
-    expect(docs).toContain("First Launch Expectations");
-    expect(docs).toContain("open even when no API keys");
-    expect(docs).toContain("network is unavailable");
-    expect(docs).toContain("actionable Chinese network/provider messages");
-    expect(docs).toContain("microphone permission is denied");
-    expect(docs).toContain("recording controls should show an inline Chinese recovery");
-    expect(docs).toContain("缺失或不可读");
-    expect(docs).toContain("browser TTS");
-    expect(docs).toContain("teaching-video audio");
-    expect(docs).toContain("proxy rule audio");
-    expect(docs).toContain("Do not run ElevenLabs TTS smoke or audio generation");
+  it("does not imply that an ordinary desktop uninstall deletes user data", () => {
+    const privacy = read("PRIVACY.md");
+
+    expect(privacy).toContain(
+      "An ordinary uninstall may retain local learning data, preferences, and caches",
+    );
+    expect(privacy).toContain("Settings → Data & privacy → Reset local data");
+    expect(privacy).toContain("choose whether to also delete API keys");
+    expect(privacy).toContain("Delete app data");
+    expect(privacy).toContain(
+      "does not claim to validate deletion of user data",
+    );
+    expect(privacy).toContain(
+      "must be deleted separately in the relevant provider account",
+    );
+    expect(privacy).not.toMatch(
+      /uninstall(?:ing|s|ed)?[^.]{0,80}(?:deletes?|removes?) all local data/i,
+    );
+  });
+
+  it("keeps the maintainer-attested user-testing claim narrow and privacy-safe", () => {
+    const summary = read("docs/validation/USER_TESTING_SUMMARY.md");
+
+    expect(summary).toContain(
+      "The SpeakRight maintainer reports that 20 people tested SpeakRight offline.",
+    );
+    expect(summary).toContain("not an independently audited study result");
+    expect(summary).toContain(
+      "No participant names, raw recordings, contact details",
+    );
+    expect(summary).toContain(
+      "No private source-evidence path or participant-level proof is required",
+    );
+    expect(summary).toContain("optional, not a prerequisite");
+    expect(summary).not.toContain("Participants invited");
+    expect(summary).not.toContain("Independent review 1");
+    expect(summary).not.toContain("application-readiness gate remains open");
   });
 
   it("keeps public developer and release npm scripts explicit and zero-generation by default", () => {
@@ -477,6 +536,7 @@ describe("open-source readiness files", () => {
       "typecheck",
       "lint",
       "build:desktop-frontend",
+      "build:browser:production",
       "desktop:build",
       "desktop:preflight",
       "desktop:launch-release",
@@ -486,6 +546,13 @@ describe("open-source readiness files", () => {
       "ipa:audit:export",
       "validate:internal-release",
       "validate:public-release",
+      "check:release-version",
+      "release:evidence:check",
+      "user-testing:claims:check",
+      "user-testing:claims:test",
+      "security:audit:npm",
+      "security:sbom:cargo",
+      "assets:sync:browser",
     ]) {
       expect(scripts[scriptName], scriptName).toEqual(expect.any(String));
     }
@@ -499,7 +566,32 @@ describe("open-source readiness files", () => {
     expect(scripts["audio:parity:dry-run"]).toContain("--dry-run");
     expect(scripts["audio:loudness:dry-run"]).toContain("--dry-run");
     expect(scripts["validate:public-release"]).toContain("validate:release");
-    expect(scripts["validate:release"]).toContain("desktop:release-gate");
+    expect(scripts["validate:release"]).toContain("validate:desktop-preview");
+    expect(scripts["validate:release"]).toContain("user-testing:claims:check");
+    expect(scripts["validate:release"]).not.toContain(
+      "user-testing:evidence:check",
+    );
+    expect(scripts["validate:signed-desktop-release"]).toContain(
+      "desktop:release-gate",
+    );
+    expect(scripts["assets:sync:browser"]).toContain(
+      "sync-browser-assets.mjs --write --prune",
+    );
+    expect(scripts.prevalidate).toBe("npm run assets:sync:browser");
+    expect(scripts["validate:browser:e2e"]).toMatch(
+      /^npm --prefix apps\/browser run validate && /,
+    );
+
+    const browserPackageJson = JSON.parse(
+      read("apps/browser/package.json"),
+    ) as { scripts?: Record<string, string> };
+    const browserScripts = browserPackageJson.scripts ?? {};
+    expect(browserScripts["assets:sync"]).toBe(
+      "npm --prefix ../.. run assets:sync:browser",
+    );
+    expect(browserScripts.prevalidate).toBe("npm run assets:sync");
+    expect(browserScripts.predev).toBe("npm run assets:sync");
+    expect(browserScripts.prebuild).toMatch(/^npm run assets:sync && /);
 
     const routineValidationScripts = [
       scripts.validate,

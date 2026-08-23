@@ -13,6 +13,7 @@ interface SpanishSoundsOfSpeechVideoPanelProps {
   className?: string;
   teachingVideos?: LanguageTeachingVideoAsset[];
   compact?: boolean;
+  onPlaybackError?: () => void;
 }
 
 interface SpanishPanelClip {
@@ -52,6 +53,7 @@ export function SpanishSoundsOfSpeechVideoPanel({
   className,
   teachingVideos = [],
   compact = false,
+  onPlaybackError,
 }: SpanishSoundsOfSpeechVideoPanelProps) {
   const [selection, setSelection] = useState({
     slug: videoSet.slug,
@@ -139,6 +141,7 @@ export function SpanishSoundsOfSpeechVideoPanel({
             src={selectedClip.localSrc}
             controls
             preload="metadata"
+            onError={onPlaybackError}
             className={`block h-auto ${maxHeightClass} max-w-full rounded-md border bg-black shadow-sm ${videoWidthClassForClip(selectedClip)}`}
           >
             <track kind="captions" />
@@ -162,14 +165,20 @@ export function SpanishSoundsOfSpeechVideoPanel({
         {clips.map((clip) => {
           const isSelected = clip.id === selectedClip.id;
           const Icon =
-            clip.kind === "lesson" ? BookOpen : clip.kind === "animation" ? Film : Video;
+            clip.kind === "lesson"
+              ? BookOpen
+              : clip.kind === "animation"
+                ? Film
+                : Video;
 
           return (
             <button
               key={clip.id}
               type="button"
               aria-pressed={isSelected}
-              onClick={() => selectClip(clips.findIndex((item) => item.id === clip.id))}
+              onClick={() =>
+                selectClip(clips.findIndex((item) => item.id === clip.id))
+              }
               className={chipClassName(isSelected)}
             >
               <Icon className="h-3.5 w-3.5" />

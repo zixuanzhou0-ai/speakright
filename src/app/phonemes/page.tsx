@@ -1,5 +1,5 @@
-import { PhonemesRedirectClient } from "./phonemes-redirect-client";
+import { PhonemeDirectoryClient } from "./phoneme-directory-client";
 
 export default function PhonemesPage() {
-  return <PhonemesRedirectClient />;
+  return <PhonemeDirectoryClient />;
 }

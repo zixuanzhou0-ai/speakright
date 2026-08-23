@@ -121,8 +121,12 @@ describe("drill pack runner start flow", () => {
     fireEvent.click(screen.getByRole("button", { name: "从 听辨 ABX 开始" }));
 
     expect(screen.queryByText("课前任务单")).not.toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "先听准，再说准" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "听辨 ABX" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "先听准，再说准" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "听辨 ABX" }),
+    ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "X = A" })).toBeInTheDocument();
     expectBadgeWraps(
       document.querySelector('[data-smoke="pack-runner-course-header-badge"]'),
@@ -138,8 +142,12 @@ describe("drill pack runner start flow", () => {
     fireEvent.click(levelCards[0]);
 
     expect(screen.queryByText("课前任务单")).not.toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "先听准，再说准" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "听辨 ABX" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "先听准，再说准" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "听辨 ABX" }),
+    ).toBeInTheDocument();
   });
 
   it("blocks direct English pack routes for experimental languages", () => {
@@ -147,10 +155,14 @@ describe("drill pack runner start flow", () => {
 
     const { container } = render(<TrainingPackPage />);
 
-    expect(screen.getByText("西语暂不使用英语训练包")).toBeInTheDocument();
+    expect(
+      screen.getByText("西语 Labs 暂不使用英语训练包"),
+    ).toBeInTheDocument();
     expect(screen.getByText(/这里不会混入英语训练包/)).toBeInTheDocument();
     expect(
-      container.querySelector('[data-smoke="pack-runner-experimental-blocker"]'),
+      container.querySelector(
+        '[data-smoke="pack-runner-experimental-blocker"]',
+      ),
     ).toBeTruthy();
     expect(
       screen.getByRole("button", { name: "当前语言单词训练" }),

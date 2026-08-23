@@ -64,6 +64,13 @@ describe("desktop preflight and UI smoke", () => {
     );
   });
 
+  it("keeps the desktop app shell wheel-scrollable on long pages", () => {
+    const layout = readProjectFile("src/app/layout.tsx");
+
+    expect(layout).toContain("overflow-y-auto scrollbar-thin lg:h-full");
+    expect(layout).not.toContain("lg:h-full lg:overflow-hidden");
+  });
+
   it("fails preflight with a clear prompt when speakright.exe is running", () => {
     const script = readProjectFile("scripts/desktop-preflight.mjs");
 
@@ -78,7 +85,10 @@ describe("desktop preflight and UI smoke", () => {
   it("checks the release executable and static desktop configuration", () => {
     const script = readProjectFile("scripts/desktop-preflight.mjs");
 
-    expect(script).toContain("E:\\\\SpeakRightDesktopRepo");
+    expect(script).toContain("const root = process.cwd()");
+    expect(script).toContain("gitTopLevel");
+    expect(script).toContain(`safe.directory=\${root}`);
+    expect(script).not.toContain("SpeakRightDesktopRepo");
     expect(script).toContain("com.speakright.desktop");
     expect(script).toContain("../out");
     expect(script).toContain("release executable is missing");
@@ -121,15 +131,46 @@ describe("desktop preflight and UI smoke", () => {
     expect(packageJson.scripts["validate:desktop"]).toContain(
       "desktop:ui-smoke",
     );
-    expect(
-      packageJson.scripts["validate:desktop"].indexOf("desktop:artifact-smoke"),
-    ).toBeLessThan(
-      packageJson.scripts["validate:desktop"].indexOf("desktop:ui-smoke"),
+    const validation = packageJson.scripts["validate:desktop"];
+    expect(validation.indexOf("desktop:build:ui-smoke")).toBeLessThan(
+      validation.indexOf("desktop:ui-smoke"),
+    );
+    const productionBuild = validation.indexOf("npm run desktop:build &&");
+    expect(validation.indexOf("desktop:ui-smoke")).toBeLessThan(
+      productionBuild,
+    );
+    expect(productionBuild).toBeLessThan(
+      validation.indexOf("desktop:artifact-smoke"),
     );
   });
 
   it("opens key release routes without recording or ElevenLabs generation", () => {
     const script = readProjectFile("scripts/desktop-ui-smoke.mjs");
+
+    expect(script).toContain("SPEAKRIGHT_SECURE_STORE_SERVICE");
+    expect(script).toContain("findConflictingSpeakRightProcesses");
+    expect(script).toContain("packaged desktop shell to render");
+    expect(script).toContain('window.location.href !== "about:blank"');
+    expect(script).toContain("const matchingLinks = anchors.filter");
+    expect(script).toContain('? "responsive-navigation-closed"');
+    expect(script).toContain("error.code = target?.reason");
+    expect(script).toContain(
+      'button[aria-controls="mobile-navigation"][aria-expanded="false"]',
+    );
+    expect(script).toContain(
+      'target?.reason === "responsive-navigation-closed"',
+    );
+    expect(script).toMatch(
+      /new URL\(\$\{JSON\.stringify\(pathname\)\}, window\.location\.href\)\.href/,
+    );
+    expect(script).not.toMatch(/\$\{origin\}\$\{pathname\}/);
+    expect(script).not.toContain("const hiddenResponsiveLink");
+    expect(script).not.toMatch(
+      /pathname\.startsWith\("\/phonemes\/"\)[\s\S]{0,400}forceNavigate\(cdp, pathname\)/,
+    );
+    expect(script).toMatch(
+      /assertSettingsWheelScroll[\s\S]*?navigate\(cdp, "\/settings", '[^']+?', \{\s*direct: true,/,
+    );
 
     expect(script).toContain("/settings");
     expect(script).toContain("/phonemes/ee");
@@ -154,6 +195,7 @@ describe("desktop preflight and UI smoke", () => {
     expect(script).toContain("contrast-config-card");
     expect(script).toContain("/drill/prosody");
     expect(script).toContain("prosodyHooksReady");
+    expect(script).toContain("prosody-experimental-blocker");
     expect(script).toContain("prosody-exercise-header");
     expect(script).toContain("/drill/perception");
     expect(script).toContain("perceptionHooksReady");
@@ -167,7 +209,6 @@ describe("desktop preflight and UI smoke", () => {
     expect(script).toContain("/drill/evidence");
     expect(script).toContain("/drill/pack/ee-ih");
     expect(script).toContain("evidence-page");
-    expect(script).toContain("non-english-core-only-boundary");
     expect(script).toContain("pack-runner-page");
     expect(script).toContain("pack-runner-intro-card");
     expect(script).toContain("pack-runner-course-map");
@@ -181,16 +222,36 @@ describe("desktop preflight and UI smoke", () => {
     expect(script).toContain("sentenceHooksReady");
     expect(script).toContain("sentence-input-card");
     expect(script).toContain("sentence-recording-card");
+    expect(script).toContain("SPEAKRIGHT_DESKTOP_TTS_SCREENSHOT_DIR");
+    expect(script).toContain("SPEAKRIGHT_UI_SMOKE_EXECUTABLE");
+    expect(script).toContain("SPEAKRIGHT_UI_SMOKE_DEBUGGING_PORT");
+    expect(script).toContain("SPEAKRIGHT_UI_SMOKE_TTS_ONLY");
+    expect(script).toContain("captureDesktopTtsScreenshots");
+    expect(script).toContain("desktop-free-practice-tts-playing-");
+    expect(script).toContain("desktop-free-practice-tts-complete-");
+    expect(script).toContain("Page.captureScreenshot");
+    expect(script).toContain("width: 1280, height: 920");
+    expect(script).toContain("width: 1024, height: 800");
+    expect(script).toContain(
+      "Mi perro corre por la plaza. La niña compra pan, queso y zumo por la mañana.",
+    );
+    expect(script).toContain(
+      "/audio/language-packs/es-ES/mi-perro-corre-por-la-plaza-la-nina-compra-4d4bed99c7.mp3",
+    );
+    expect(script).toContain("read-along-untimed-status");
+    expect(script).toContain("replayDoesNotCoverText");
+    expect(script).toContain("leftColumnCanReachRecording");
     expect(script).toContain("/assessment");
     expect(script).toContain("assessmentHooksReady");
     expect(script).toContain("assessment-intro-card");
     expect(script).toContain("assessment-start-button");
     expect(script).toContain("assessment-passage-link");
+    expect(script).toContain("assessment-labs-boundary");
     expect(script).toContain("/assessment/passage");
     expect(script).toContain("assessment-passage-page");
     expect(script).toContain("assessment-passage-intro-card");
-    expect(script).toContain("公开版只开放音标");
     expect(script).toContain("/progress");
+    expect(script).toContain("progress-experimental-blocker");
     expect(script).toContain("assertEnglishProgressArchive");
     expect(script).toContain("progress-benchmark-row");
     expect(script).toContain("progress-recent-session-row");
@@ -211,7 +272,9 @@ describe("desktop preflight and UI smoke", () => {
     expect(script).toContain("speakright_benchmark_recordings_v1");
     expect(script).toContain("progress missing benchmark audio warning");
     expect(script).toContain("direct: true");
-    expect(script).toContain("coreBoundaryReady");
+    expect(script).toContain("labsBoundaryReady");
+    expect(script).toContain("drill-experimental-boundary-warning");
+    expect(script).toContain("不生成正式 mastery");
     expect(script).toContain("routes=");
     expect(script).toContain("smokeSummaryRoutes.join");
     expect(script).toContain('"/drill/scenarios"');
@@ -222,7 +285,7 @@ describe("desktop preflight and UI smoke", () => {
     expect(script).toContain('textAlign === "center"');
     expect(script).toContain("assertNarrowViewportRoutes");
     expect(script).toContain("non-english-core-only-boundary");
-    expect(script).toContain("去自由练习");
+    expect(script).toContain("!document.querySelector");
     expect(script).toContain("narrowViewport=ok");
     expect(script).toContain("assertLowHeightViewportRoutes");
     expect(script).toContain("lowHeightViewport=ok");
@@ -256,7 +319,7 @@ describe("desktop preflight and UI smoke", () => {
     expect(script).toContain('tile.tabIndex === "-1"');
     expect(script).toContain('tile.role === "button"');
     expect(script).toContain('tile.tabIndex === "0"');
-    expect(script).toContain("scoringTileAudioPolicy=ok");
+    expect(script).toContain("labsScoringTileBoundary=ok");
     expect(script).toContain("usage-history-target");
     expect(script).toContain("pronunciation-test-row");
     expect(script).toContain("data-control-api-key-toggle-row");
@@ -295,6 +358,8 @@ describe("desktop preflight and UI smoke", () => {
     const sentencesPage = readProjectFile("src/app/sentences/page.tsx");
     expect(sentencesPage).toContain('data-smoke="sentences-page"');
     expect(sentencesPage).toContain('data-smoke="free-practice-clear-session"');
+    expect(sentencesPage).toContain('data-smoke="free-practice-layout"');
+    expect(sentencesPage).toContain('data-smoke="free-practice-left-column"');
     expect(sentencesPage).toContain(
       "mb-2 flex shrink-0 flex-col gap-2 sm:flex-row sm:items-center sm:justify-between",
     );
@@ -313,6 +378,9 @@ describe("desktop preflight and UI smoke", () => {
     );
     expect(sentenceInputCard).toContain("free-practice-word-audio-error");
     expect(sentenceInputCard).toContain("free-practice-tts-error");
+    expect(sentenceInputCard).toContain("free-practice-tts-output");
+    expect(sentenceInputCard).toContain("free-practice-tts-replay");
+    expect(sentenceInputCard).toContain("shrink-0 space-y-3 rounded-xl border");
     expect(sentenceInputCard).toContain("free-practice-target-pack-badge");
     expect(sentenceInputCard).toContain("free-practice-suggestion-pack-badge");
     expect(sentenceInputCard).toContain("free-practice-suggestion-word");
@@ -356,8 +424,12 @@ describe("desktop preflight and UI smoke", () => {
     const freePracticeTransfer = readProjectFile(
       "src/lib/free-practice-transfer.ts",
     );
-    expect(freePracticeTransfer).toContain("const matchedWords = unique(targetWords);");
-    expect(freePracticeTransfer).not.toContain("unique(targetWords).slice(0, 6)");
+    expect(freePracticeTransfer).toContain(
+      "const matchedWords = unique(targetWords);",
+    );
+    expect(freePracticeTransfer).not.toContain(
+      "unique(targetWords).slice(0, 6)",
+    );
     expect(freePracticeTransfer).not.toContain(".slice(0, 4)");
     const drillPhonemeLesson = readProjectFile(
       "src/components/drill/drill-phoneme-lesson.tsx",
@@ -366,16 +438,14 @@ describe("desktop preflight and UI smoke", () => {
     expect(drillPhonemeLesson).toContain(
       'data-smoke="drill-lesson-example-list"',
     );
-    expect(drillPhonemeLesson).toContain(
-      'data-smoke="drill-lesson-example"',
-    );
+    expect(drillPhonemeLesson).toContain('data-smoke="drill-lesson-example"');
     expect(drillPhonemeLesson).toContain("phoneme.keywords.map");
     expect(drillPhonemeLesson).not.toContain("phoneme.keywords.slice(0, 6)");
     expect(drillPhonemeLesson).not.toContain("示例单词（点击听发音）");
     const videoPlayer = readProjectFile(
       "src/components/phoneme/video-player.tsx",
     );
-    expect(videoPlayer).toContain("resources.map");
+    expect(videoPlayer).toContain("fallbackResources.map");
     expect(videoPlayer).toContain('data-smoke="video-fallback-resource-card"');
     expect(videoPlayer).not.toContain("resources.slice(0, 3)");
     const wordPronunciationHook = readProjectFile(
@@ -393,8 +463,58 @@ describe("desktop preflight and UI smoke", () => {
     expect(script).toContain("headerAudioReady");
     expect(script).toContain('.includes("发音")');
     expect(script).not.toContain("MediaRecorder");
-    expect(script).not.toContain("elevenlabs");
+    expect(script).not.toContain("/api/elevenlabs");
+    expect(script).not.toContain("elevenLabsTts");
     expect(script).not.toContain("generate-word-audio");
+  });
+
+  it("isolates desktop smoke credentials and only blocks the same executable", () => {
+    const uiSmoke = readProjectFile("scripts/desktop-ui-smoke.mjs");
+    const releaseSmoke = readProjectFile("scripts/desktop-smoke.mjs");
+    const evidenceCapture = readProjectFile(
+      "scripts/capture-desktop-release-evidence.mjs",
+    );
+    const processBoundary = readProjectFile(
+      "scripts/lib/windows-process-boundary.mjs",
+    );
+    const rustRuntime = readProjectFile("src-tauri/src/lib.rs");
+
+    expect(releaseSmoke).toContain("SPEAKRIGHT_DESKTOP_SMOKE_EXECUTABLE");
+    expect(releaseSmoke).toContain("SPEAKRIGHT_SECURE_STORE_SERVICE");
+    expect(releaseSmoke).toContain("SPEAKRIGHT_LOG_DIR");
+    expect(releaseSmoke).toContain("SPEAKRIGHT_SETTINGS_STORE_PATH");
+    expect(releaseSmoke).toContain("release-smoke-$" + "{randomUUID()}");
+    expect(releaseSmoke).toContain("findConflictingSpeakRightProcesses");
+    expect(evidenceCapture).toContain("SPEAKRIGHT_SECURE_STORE_SERVICE");
+    expect(evidenceCapture).toContain("findConflictingSpeakRightProcesses");
+    expect(evidenceCapture).toContain(
+      "snapshotOwnedWebViewProcesses(child.pid)",
+    );
+    expect(evidenceCapture).toContain(
+      "waitForWindowsProcessSnapshotsToExit(ownedWebViewSnapshots)",
+    );
+    expect(evidenceCapture).toContain("waitForChildExit(childState");
+    expect(evidenceCapture).toContain("maxRetries: 10");
+    expect(evidenceCapture).toContain("retryDelay: 250");
+    expect(uiSmoke).toContain("ui-smoke-$" + "{randomUUID()}");
+    expect(uiSmoke).toContain("SPEAKRIGHT_LOG_DIR");
+    expect(uiSmoke).toContain("SPEAKRIGHT_SETTINGS_STORE_PATH");
+    expect(rustRuntime).toContain(
+      'const LOG_DIR_ENV: &str = "SPEAKRIGHT_LOG_DIR"',
+    );
+    expect(rustRuntime).toContain(
+      'const SETTINGS_STORE_PATH_ENV: &str = "SPEAKRIGHT_SETTINGS_STORE_PATH"',
+    );
+    expect(rustRuntime).toContain("desktop_settings_store_path");
+    expect(rustRuntime).toContain("validate_settings_store_path_override");
+    expect(rustRuntime).toContain("TargetKind::Folder");
+    expect(rustRuntime).toContain("validate_log_directory_override");
+    expect(processBoundary).toContain("Get-CimInstance Win32_Process");
+    expect(processBoundary).toContain("process-path-unavailable");
+    expect(processBoundary).toContain("findOwnedProcessSnapshots");
+    expect(processBoundary).toContain("waitForWindowsProcessSnapshotsToExit");
+    expect(processBoundary).not.toContain("taskkill");
+    expect(processBoundary).not.toContain("Stop-Process");
   });
 
   it("keeps Settings and usage text from falling back to ellipsis", () => {
@@ -435,7 +555,9 @@ describe("desktop preflight and UI smoke", () => {
     );
     expect(languageCard).toContain("getVisibleLanguagePhonologyGaps");
     expect(languageCard).toContain("overflow-wrap:anywhere");
-    expect(languageCard).toContain("建设中：训练进度和高级练习能力会逐步补齐。");
+    expect(languageCard).toContain(
+      "建设中：训练进度和高级练习能力会逐步补齐。",
+    );
     expect(languageCard).toContain("不会播放替代音频");
     expect(languageCard).not.toContain('audit.missingCapabilities.join("、")');
     expect(languageCard).not.toContain("missingPreview");
@@ -476,9 +598,7 @@ describe("desktop preflight and UI smoke", () => {
     expect(elevenLabsCard).toContain('data-smoke="tts-voice-select"');
     expect(elevenLabsCard).toContain('data-smoke="tts-model-select"');
     expect(elevenLabsCard).toContain("flex flex-wrap items-center gap-3");
-    expect(elevenLabsCard).toContain(
-      "WRAP_SAFE_SETTINGS_ACTION_BUTTON_CLASS",
-    );
+    expect(elevenLabsCard).toContain("WRAP_SAFE_SETTINGS_ACTION_BUTTON_CLASS");
     expect(elevenLabsCard).toContain(
       "h-auto min-h-8 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]",
     );
@@ -490,7 +610,9 @@ describe("desktop preflight and UI smoke", () => {
     expect(languageAvailabilityCard).toContain("重新安装最新版桌面端");
     expect(languageAvailabilityCard).not.toContain("缺失或不可读");
     expect(languageAvailabilityCard).toContain("overflow-wrap:anywhere");
-    expect(languageAvailabilityCard).toContain("WRAP_SAFE_LANGUAGE_BADGE_CLASS");
+    expect(languageAvailabilityCard).toContain(
+      "WRAP_SAFE_LANGUAGE_BADGE_CLASS",
+    );
     expect(languageAvailabilityCard).toContain(
       'data-smoke="language-availability-status-badge"',
     );
@@ -527,8 +649,8 @@ describe("desktop preflight and UI smoke", () => {
     expect(connectionStatus).toContain("aria-live");
     expect(connectionStatus).toContain("basis-48");
     expect(connectionStatus).toContain("overflow-wrap:anywhere");
-    expect(select).toContain("data-slot=\"select-trigger\"");
-    expect(select).toContain("data-slot=\"select-value\"");
+    expect(select).toContain('data-slot="select-trigger"');
+    expect(select).toContain('data-slot="select-value"');
     expect(select).toContain("min-h-8 w-full max-w-full");
     expect(select).toContain("whitespace-normal");
     expect(select).toContain("break-words");
@@ -544,7 +666,7 @@ describe("desktop preflight and UI smoke", () => {
     expect(badge).toContain("[overflow-wrap:anywhere]");
     expect(badge).not.toContain("overflow-hidden");
     expect(badge).not.toContain("whitespace-nowrap");
-    expect(button).toContain("data-slot=\"button\"");
+    expect(button).toContain('data-slot="button"');
     expect(button).toContain("text-center");
     expect(button).toContain("break-words");
     expect(button).toContain("whitespace-normal");
@@ -608,7 +730,7 @@ describe("desktop preflight and UI smoke", () => {
     expect(useTtsAligned).toContain("normalizeStandardTtsError");
     expect(useTts).not.toContain("e.message");
     expect(useTtsAligned).not.toContain("e.message");
-    expect(ttsErrors).toContain("无法连接 ElevenLabs");
+    expect(ttsErrors).toContain("无法连接当前标准示范服务");
     expect(ttsErrors).toContain("本地标准示范缓存不可用");
   });
 
@@ -701,7 +823,9 @@ describe("desktop preflight and UI smoke", () => {
     expect(passagePage).toContain(
       "h-auto min-h-5 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]",
     );
-    expect(passagePage).toContain('data-smoke="assessment-passage-prompt-text"');
+    expect(passagePage).toContain(
+      'data-smoke="assessment-passage-prompt-text"',
+    );
     expect(passagePage).toContain(
       "break-words rounded-xl bg-muted/35 p-5 text-xl leading-9 [overflow-wrap:anywhere]",
     );
@@ -884,7 +1008,7 @@ describe("desktop preflight and UI smoke", () => {
     );
     expect(drillPage).not.toContain(".slice(0, 2)");
     expect(drillPage).toContain(
-      "h-auto min-h-8 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]",
+      "h-auto min-h-11 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]",
     );
     expect(drillPage).toContain(
       "h-auto min-h-5 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]",
@@ -898,7 +1022,6 @@ describe("desktop preflight and UI smoke", () => {
       "drill-evidence-action",
       "drill-diagnosis-action",
       "drill-primary-action",
-      "drill-secondary-diagnosis-action",
     ]) {
       expectSmokeElementUsesWrapSafeClass(
         drillPage,
@@ -964,10 +1087,7 @@ describe("desktop preflight and UI smoke", () => {
     expect(scenariosPage).toContain('data-smoke="scenario-assessment-error"');
     expectSmokeAlertWraps(scenariosPage, "scenario-demo-audio-error");
     expectSmokeAlertWraps(scenariosPage, "scenario-assessment-error");
-    expectSmokeAlertWraps(
-      scenariosPage,
-      "scenario-benchmark-archive-warning",
-    );
+    expectSmokeAlertWraps(scenariosPage, "scenario-benchmark-archive-warning");
     expectSmokeAlertWraps(scenariosPage, "scenario-local-save-warning");
     expect(scenariosPage).toContain('data-smoke="scenario-page"');
     expect(scenariosPage).toContain('data-smoke="scenario-prompt-card"');
@@ -1056,7 +1176,9 @@ describe("desktop preflight and UI smoke", () => {
     expect(contrastPage).toContain("flex flex-wrap items-start gap-3");
     expect(contrastPage).toContain("grid grid-cols-1 gap-3 sm:grid-cols-2");
     expect(contrastPage).toContain("set.pairs.map((pair)");
-    expect(contrastPage).not.toContain("set.pairs[0].wordA} / {set.pairs[0].wordB} ...");
+    expect(contrastPage).not.toContain(
+      "set.pairs[0].wordA} / {set.pairs[0].wordB} ...",
+    );
     expect(contrastPage).toContain('data-smoke="contrast-assessment-error"');
     expect(contrastPage).toContain('data-smoke="contrast-assessment-retry"');
     expect(contrastPage).toContain("CONTRAST_ASSESSMENT_FALLBACK_MESSAGE");
@@ -1097,7 +1219,9 @@ describe("desktop preflight and UI smoke", () => {
     expect(packRunner).toContain('data-smoke="pack-runner-intro-card"');
     expect(packRunner).toContain('data-smoke="pack-runner-course-map"');
     expect(packRunner).toContain("WRAP_SAFE_BADGE_CLASS");
-    expect(packRunner).toContain('data-smoke="pack-runner-intro-phoneme-badge"');
+    expect(packRunner).toContain(
+      'data-smoke="pack-runner-intro-phoneme-badge"',
+    );
     expect(packRunner).toContain(
       'data-smoke="pack-runner-course-map-status-badge"',
     );
@@ -1160,7 +1284,9 @@ describe("desktop preflight and UI smoke", () => {
     expect(evidencePage).toContain("evidenceBook.remediations.map");
     expect(evidencePage).not.toContain("topCards");
     expect(evidencePage).not.toContain("topPatterns");
-    expect(evidencePage).not.toContain("remediations = evidenceBook.remediations.slice");
+    expect(evidencePage).not.toContain(
+      "remediations = evidenceBook.remediations.slice",
+    );
     expect(evidencePage).not.toContain("evidenceBook.cards.slice(0, 8)");
     expect(evidencePage).not.toContain("evidenceBook.patterns.slice(0, 6)");
     expect(evidencePage).toContain(

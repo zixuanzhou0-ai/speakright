@@ -31,11 +31,13 @@ function ActionButton({
   disabled,
   onClick,
   variant,
+  label,
   children,
 }: {
   disabled: boolean;
   onClick: () => void;
   variant: "primary" | "destructive";
+  label: string;
   children: React.ReactNode;
 }) {
   return (
@@ -45,6 +47,8 @@ function ActionButton({
       whileTap={disabled ? undefined : { scale: 0.95 }}
       transition={springTransition}
       onClick={disabled ? undefined : onClick}
+      disabled={disabled}
+      aria-label={label}
       className={cn(
         "flex h-12 w-12 items-center justify-center rounded-full transition-colors",
         disabled
@@ -77,6 +81,7 @@ export function RecordingActions({
       <ActionButton
         disabled={disabled || isAssessing}
         onClick={onReplay}
+        label="播放录音"
         variant="primary"
       >
         <Play className={cn("h-5 w-5", isPlaying && "animate-pulse")} />
@@ -84,6 +89,7 @@ export function RecordingActions({
       <ActionButton
         disabled={disabled || isAssessing}
         onClick={onClear}
+        label="删除录音"
         variant="destructive"
       >
         <Trash2 className="h-5 w-5" />
@@ -91,6 +97,7 @@ export function RecordingActions({
       <ActionButton
         disabled={scoreDisabled}
         onClick={onAssess}
+        label={isAssessing ? "正在评分" : "提交录音评分"}
         variant="primary"
       >
         {isAssessing ? (

@@ -20,4 +20,6 @@ export interface PresetProvider {
   status?: PresetProviderStatus;
   docsUrl?: string;
   baseUrlEditable?: boolean;
+  lastVerifiedAt?: string;
+  presetNote?: string;
 }

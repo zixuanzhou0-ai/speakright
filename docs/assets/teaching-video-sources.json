@@ -1,0 +1,103 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "path": "videos/language-assets/es-ES/youtube-lessons/hsLYD1Jyf3A.mp4",
+      "title": "Spanish letters and sounds",
+      "creator": "Butterfly Spanish",
+      "sourceUrl": "https://www.youtube.com/watch?v=hsLYD1Jyf3A",
+      "evidenceRef": "SR-EVIDENCE-2026-LESSON-VIDEOS-ES-001"
+    },
+    {
+      "path": "videos/language-assets/es-ES/youtube-lessons/orOW9eRQfpE.mp4",
+      "title": "Spanish vowel sounds A E I O U",
+      "creator": "Butterfly Spanish",
+      "sourceUrl": "https://www.youtube.com/watch?v=orOW9eRQfpE",
+      "evidenceRef": "SR-EVIDENCE-2026-LESSON-VIDEOS-ES-001"
+    },
+    {
+      "path": "videos/language-assets/es-ES/youtube-lessons/MqQWUsHbmdI.mp4",
+      "title": "Spanish syllable stress",
+      "creator": "Spanish Syllable Stress",
+      "sourceUrl": "https://www.youtube.com/watch?v=MqQWUsHbmdI",
+      "evidenceRef": "SR-EVIDENCE-2026-LESSON-VIDEOS-ES-001"
+    },
+    {
+      "path": "videos/language-assets/es-ES/youtube-lessons/a_y0qGSC-ZY.mp4",
+      "title": "Spanish rhythm and unreduced vowels",
+      "creator": "Ten Minute Spanish",
+      "sourceUrl": "https://www.youtube.com/watch?v=a_y0qGSC-ZY",
+      "evidenceRef": "SR-EVIDENCE-2026-LESSON-VIDEOS-ES-001"
+    },
+    {
+      "path": "videos/language-assets/fr-FR/youtube-lessons/hI2Pso1dDjM.mp4",
+      "title": "The sounds of French",
+      "creator": "Fluent Forever",
+      "sourceUrl": "https://www.youtube.com/watch?v=hI2Pso1dDjM",
+      "evidenceRef": "SR-EVIDENCE-2026-LESSON-VIDEOS-FR-001"
+    },
+    {
+      "path": "videos/language-assets/fr-FR/youtube-lessons/Ihh8xoLXrrU.mp4",
+      "title": "French vowel sounds",
+      "creator": "Learn French with Lexie",
+      "sourceUrl": "https://www.youtube.com/watch?v=Ihh8xoLXrrU",
+      "evidenceRef": "SR-EVIDENCE-2026-LESSON-VIDEOS-FR-001"
+    },
+    {
+      "path": "videos/language-assets/fr-FR/youtube-lessons/yRCD8vgohZo.mp4",
+      "title": "French liaisons",
+      "creator": "Learn French With Alexa",
+      "sourceUrl": "https://www.youtube.com/watch?v=yRCD8vgohZo",
+      "evidenceRef": "SR-EVIDENCE-2026-LESSON-VIDEOS-FR-001"
+    },
+    {
+      "path": "videos/language-assets/fr-FR/youtube-lessons/sSbOX4sMdLA.mp4",
+      "title": "Elision, enchainement and liaisons",
+      "creator": "French Simplified",
+      "sourceUrl": "https://www.youtube.com/watch?v=sSbOX4sMdLA",
+      "evidenceRef": "SR-EVIDENCE-2026-LESSON-VIDEOS-FR-001"
+    },
+    {
+      "path": "videos/language-assets/fr-FR/youtube-lessons/7bjno3LPyfA.mp4",
+      "title": "French silent letters",
+      "creator": "The perfect French with Dylane",
+      "sourceUrl": "https://www.youtube.com/watch?v=7bjno3LPyfA",
+      "evidenceRef": "SR-EVIDENCE-2026-LESSON-VIDEOS-FR-001"
+    },
+    {
+      "path": "videos/language-assets/ru-RU/youtube-lessons/yQ8jQ_Lr60M.mp4",
+      "title": "Russian pronunciation overview",
+      "creator": "Russian for Beginners",
+      "sourceUrl": "https://www.youtube.com/watch?v=yQ8jQ_Lr60M",
+      "evidenceRef": "SR-EVIDENCE-2026-LESSON-VIDEOS-RU-001"
+    },
+    {
+      "path": "videos/language-assets/ru-RU/youtube-lessons/YrOFy4u7cyM.mp4",
+      "title": "Russian hard vs soft consonants",
+      "creator": "Russian Comprehensive",
+      "sourceUrl": "https://www.youtube.com/watch?v=YrOFy4u7cyM",
+      "evidenceRef": "SR-EVIDENCE-2026-LESSON-VIDEOS-RU-001"
+    },
+    {
+      "path": "videos/language-assets/ru-RU/youtube-lessons/QWTQUD8wzyM.mp4",
+      "title": "Russian vowel reduction",
+      "creator": "Real Russian Club",
+      "sourceUrl": "https://www.youtube.com/watch?v=QWTQUD8wzyM",
+      "evidenceRef": "SR-EVIDENCE-2026-LESSON-VIDEOS-RU-001"
+    },
+    {
+      "path": "videos/language-assets/ru-RU/youtube-lessons/imiXGhO-Kc0.mp4",
+      "title": "Russian voicing assimilation",
+      "creator": "Russian Comprehensive",
+      "sourceUrl": "https://www.youtube.com/watch?v=imiXGhO-Kc0",
+      "evidenceRef": "SR-EVIDENCE-2026-LESSON-VIDEOS-RU-001"
+    },
+    {
+      "path": "videos/language-assets/ru-RU/youtube-lessons/XtRFEQfrQJw.mp4",
+      "title": "Russian consonant clusters",
+      "creator": "Connect with Russian",
+      "sourceUrl": "https://www.youtube.com/watch?v=XtRFEQfrQJw",
+      "evidenceRef": "SR-EVIDENCE-2026-LESSON-VIDEOS-RU-001"
+    }
+  ]
+}

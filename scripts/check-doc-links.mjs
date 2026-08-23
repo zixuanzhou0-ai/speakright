@@ -6,16 +6,35 @@ const markdownLinkPattern =
   /!?\[[^\]]*]\((?<target>[^)\s]+)(?:\s+"[^"]*")?\)/g;
 
 function listMarkdownFiles() {
-  const files = ["README.md", "START_HERE.md"];
-  for (const dir of ["docs", "docs/browser-edition"]) {
-    if (!fs.existsSync(dir)) continue;
+  const files = [
+    "README.md",
+    "README.zh-CN.md",
+    "START_HERE.md",
+    "CONTRIBUTING.md",
+    "SECURITY.md",
+    "SUPPORT.md",
+    "CODE_OF_CONDUCT.md",
+    "PRIVACY.md",
+    "CHANGELOG.md",
+    "ROADMAP.md",
+    "MAINTAINERS.md",
+    "NOTICE.md",
+    "THIRD_PARTY_NOTICES.md",
+  ];
+
+  const walk = (dir) => {
+    if (!fs.existsSync(dir)) return;
     for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-      if (entry.isFile() && entry.name.endsWith(".md")) {
-        files.push(path.join(dir, entry.name));
+      const entryPath = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        if (entry.name !== "archive") walk(entryPath);
+      } else if (entry.isFile() && entry.name.endsWith(".md")) {
+        files.push(entryPath);
       }
     }
   }
-  return files.filter((file) => fs.existsSync(file));
+  walk("docs");
+  return [...new Set(files.filter((file) => fs.existsSync(file)))];
 }
 
 function isExternalLink(target) {

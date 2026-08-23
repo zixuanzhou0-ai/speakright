@@ -1,0 +1,8 @@
+# Public repository owner and default reviewer.
+* @zixuanzhou0-ai
+
+# Evidence, governance, and release-facing documentation.
+/docs/ @zixuanzhou0-ai
+/.github/ @zixuanzhou0-ai
+/README.md @zixuanzhou0-ai
+/README.zh-CN.md @zixuanzhou0-ai

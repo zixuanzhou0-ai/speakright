@@ -31,7 +31,9 @@ import { isAzureConfigReady } from "@/lib/azure-config";
 import { loadDrillReportForLanguage } from "@/lib/drill-report-storage";
 import { getLanguageProfile } from "@/lib/language-profiles";
 import { isReviewDue, loadMasteryProfile } from "@/lib/mastery-profile";
+import { dueRetentionReviews } from "@/lib/retention-schedule";
 import { buildReviewQueue } from "@/lib/review-queue";
+import { formatTrainingTargetUnit } from "@/lib/training-criteria";
 import { buildTrainingMemory } from "@/lib/training-memory";
 import { TRAINING_PACKS } from "@/lib/training-packs";
 import {
@@ -112,7 +114,7 @@ const FREE_MODES = [
 ];
 
 const WRAP_SAFE_ACTION_BUTTON_CLASS =
-  "h-auto min-h-8 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]";
+  "h-auto min-h-11 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]";
 const WRAP_SAFE_BADGE_CLASS =
   "h-auto min-h-5 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]";
 
@@ -187,12 +189,14 @@ export default function DrillPage() {
   >(null);
   const [profile, setProfile] = useState<MasteryProfile | null>(null);
   const [azureReady, setAzureReady] = useState(false);
+  const [hasDueRetention, setHasDueRetention] = useState(false);
 
   useEffect(() => {
     const loadedReport = loadDrillReportForLanguage(languageId);
     setReport(loadedReport.report);
     setReportStorageWarning(loadedReport.warning);
     setProfile(loadMasteryProfile());
+    setHasDueRetention(dueRetentionReviews().length > 0);
     const refreshAzureState = () => {
       const config = getAzureConfig();
       setAzureReady(isAzureConfigReady(config));
@@ -240,15 +244,12 @@ export default function DrillPage() {
   const primaryPack = primaryItem
     ? TRAINING_PACKS.find((pack) => pack.id === primaryItem.packId)
     : null;
-  const primaryHref =
-    azureReady && primaryItem
-      ? packHref(primaryItem.packId, primaryItem.levelId)
-      : azureReady
-        ? "/drill/word"
-        : "/settings";
-  const primaryLabel = azureReady
-    ? "开始今天训练"
-    : "配置 Azure Speech 评分密钥";
+  const primaryPackId =
+    primaryItem?.packId ?? primaryPack?.id ?? TRAINING_PACKS[0].id;
+  const primaryHref = hasDueRetention
+    ? "/drill/retention"
+    : packHref(primaryPackId, azureReady ? primaryItem?.levelId : undefined);
+  const primaryLabel = hasDueRetention ? "开始到期复测" : "开始今天训练";
 
   if (languageId !== "en-US") {
     const betaModes = [
@@ -279,19 +280,22 @@ export default function DrillPage() {
     ];
 
     return (
-      <LanguageModuleGate moduleName="刻意练习" readinessKey="wordPractice">
+      <LanguageModuleGate
+        moduleName="刻意练习"
+        readinessKey="wordPractice"
+        capabilityRoute="guidedTraining"
+      >
         <div
-          className="h-full flex flex-col px-6 py-4 overflow-y-auto scrollbar-thin"
+          className="min-h-full flex flex-col overflow-y-auto px-4 py-4 scrollbar-thin sm:px-6"
           data-smoke="drill-page"
         >
           <div className="mb-5 flex flex-col gap-3 shrink-0 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
               <h1 className="break-words text-2xl font-bold [overflow-wrap:anywhere]">
-                {languageProfile.shortLabel}实验训练
+                {languageProfile.shortLabel}发音实验室 Labs
               </h1>
               <p className="mt-1 break-words text-muted-foreground [overflow-wrap:anywhere]">
-                当前语言为 experimental：可以练习和获取反馈，但不生成正式
-                mastery。
+                当前语言处于 Labs：可以练习和获取反馈，但不生成正式 mastery。
               </p>
             </div>
             <Link href="/settings">
@@ -315,14 +319,13 @@ export default function DrillPage() {
               <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
               <p className="min-w-0 break-words">
                 西语、法语、俄语仍处于内测阶段。系统会优先播放内置本地音频；
-                如果 Azure 没有返回可用发音单位证据，就不会用整词分冒充掌握证据。
+                如果 Azure
+                没有返回可用发音单位证据，就不会用整词分冒充掌握证据。
               </p>
             </div>
           </div>
 
           <DrillReportStorageWarning message={reportStorageWarning} />
-
-          <DesktopReadinessCard hasDiagnosis={!!report} />
 
           <div className="grid gap-3 md:grid-cols-2">
             {betaModes.map((mode) => (
@@ -346,62 +349,49 @@ export default function DrillPage() {
               </Link>
             ))}
           </div>
+          <DesktopReadinessCard hasDiagnosis={!!report} />
         </div>
       </LanguageModuleGate>
     );
   }
 
   return (
-    <LanguageModuleGate moduleName="刻意练习" readinessKey="wordPractice">
+    <LanguageModuleGate
+      moduleName="刻意练习"
+      readinessKey="wordPractice"
+      capabilityRoute="guidedTraining"
+    >
       <div
-        className="h-full flex flex-col px-6 py-4 overflow-y-auto scrollbar-thin"
+        className="min-h-full flex flex-col overflow-y-auto px-4 py-4 scrollbar-thin sm:px-6"
         data-smoke="drill-page"
       >
         <div className="mb-5 flex flex-col gap-3 shrink-0 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
             <h1 className="text-2xl font-bold">今日学习计划</h1>
             <p className="mt-1 text-muted-foreground">
-              今天建议完成 2 个任务：先做到期复习，再做一个主训练
+              {hasDueRetention
+                ? "先完成到期保持复测，再做一个主训练"
+                : "完成一个 10–15 分钟深度训练会话"}
             </p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Link href="/drill/evidence">
-              <Button
-                variant="outline"
-                className={`gap-2 cursor-pointer ${WRAP_SAFE_ACTION_BUTTON_CLASS}`}
-                data-smoke="drill-evidence-action"
-              >
-                <BookOpen className="h-4 w-4" />
-                错题本
-              </Button>
-            </Link>
-            <Link data-smoke="start-three-minute-diagnosis" href="/assessment">
-              <Button
-                variant="outline"
-                className={`gap-2 cursor-pointer ${WRAP_SAFE_ACTION_BUTTON_CLASS}`}
-                data-smoke="drill-diagnosis-action"
-              >
-                <ClipboardList className="h-4 w-4" />
-                {report ? "重新 3 分钟诊断" : "开始 3 分钟诊断"}
-              </Button>
-            </Link>
           </div>
         </div>
 
         <DrillReportStorageWarning message={reportStorageWarning} />
-
-        <DesktopReadinessCard hasDiagnosis={!!report} />
 
         <section className="mb-5 rounded-xl border bg-primary/5 p-5 shadow-sm">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div className="min-w-0">
               <div className="mb-2 flex flex-wrap items-center gap-2">
                 <Badge
-                  variant={azureReady ? "default" : "destructive"}
+                  variant={azureReady ? "default" : "secondary"}
                   className={WRAP_SAFE_BADGE_CLASS}
                   data-smoke="drill-readiness-badge"
                 >
-                  {azureReady ? "评分已就绪" : "需要配置"}
+                  {hasDueRetention
+                    ? "保持复测已到期"
+                    : azureReady
+                      ? "评分已就绪"
+                      : "离线辨音可开始"}
                 </Badge>
                 <Badge
                   variant="secondary"
@@ -421,15 +411,19 @@ export default function DrillPage() {
                 )}
               </div>
               <h2 className="text-xl font-bold">
-                {primaryPack?.title ?? "从一个高影响发音开始"}
+                {hasDueRetention
+                  ? "用新材料检查是否真正保持"
+                  : (primaryPack?.title ?? "从一个高影响发音开始")}
               </h2>
               <p className="mt-1 max-w-3xl text-sm text-muted-foreground">
-                {azureReady
-                  ? (primaryItem?.learningObjective ??
-                    primaryItem?.reason ??
-                    primaryPack?.focus ??
-                    "先完成一组目标音训练，再进入复习或自由专项。")
-                  : "Azure Speech 评分密钥配置完成后，桌面端才能进行录音评分和训练证据记录。"}
+                {hasDueRetention
+                  ? "复测前不播放示范；只有新材料、多样本、目标音对齐和实际延迟同时满足时，才会形成保持证据。"
+                  : azureReady
+                    ? (primaryItem?.learningObjective ??
+                      primaryItem?.reason ??
+                      primaryPack?.focus ??
+                      "先完成一组目标音训练，再进入复习或自由专项。")
+                    : "先从不需要密钥的跨说话人辨音开始；进入产出关卡时，再决定连接 Azure 评分或只做录音对比。"}
               </p>
             </div>
             <div className="flex shrink-0 flex-wrap gap-2">
@@ -439,30 +433,37 @@ export default function DrillPage() {
                   className={`gap-2 cursor-pointer ${WRAP_SAFE_ACTION_BUTTON_CLASS}`}
                   data-smoke="drill-primary-action"
                 >
-                  {azureReady ? (
-                    <PlayCircle className="h-5 w-5" />
-                  ) : (
-                    <Settings className="h-5 w-5" />
-                  )}
+                  <PlayCircle className="h-5 w-5" />
                   {primaryLabel}
                 </Button>
               </Link>
-              {!report && azureReady && (
-                <Link href="/assessment">
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className={`gap-2 cursor-pointer ${WRAP_SAFE_ACTION_BUTTON_CLASS}`}
-                    data-smoke="drill-secondary-diagnosis-action"
-                  >
-                    <ClipboardList className="h-5 w-5" />
-                    开始 3 分钟诊断
-                  </Button>
-                </Link>
-              )}
             </div>
           </div>
         </section>
+
+        <div className="mb-5 flex flex-wrap gap-2">
+          <Link href="/drill/evidence">
+            <Button
+              variant="outline"
+              className={`gap-2 cursor-pointer ${WRAP_SAFE_ACTION_BUTTON_CLASS}`}
+              data-smoke="drill-evidence-action"
+            >
+              <BookOpen className="h-4 w-4" />
+              错题本
+            </Button>
+          </Link>
+          <Link data-smoke="start-three-minute-diagnosis" href="/assessment">
+            <Button
+              variant="outline"
+              className={`gap-2 cursor-pointer ${WRAP_SAFE_ACTION_BUTTON_CLASS}`}
+              data-smoke="drill-diagnosis-action"
+            >
+              <ClipboardList className="h-4 w-4" />
+              {report ? "重新 3 分钟诊断" : "开始 3 分钟诊断"}
+            </Button>
+          </Link>
+        </div>
+        <DesktopReadinessCard hasDiagnosis={!!report} />
 
         <section className="mb-6 rounded-xl border bg-card p-5 shadow-sm">
           <div className="mb-4 flex items-center gap-2">
@@ -627,7 +628,7 @@ export default function DrillPage() {
                 </p>
               </div>
               <div className="rounded-lg border bg-background px-3 py-2">
-                <p className="text-xs text-muted-foreground">已掌握</p>
+                <p className="text-xs text-muted-foreground">旧版完成记录</p>
                 <p className="text-lg font-bold">
                   {trainingMemory.masteredPacks}
                 </p>
@@ -903,7 +904,7 @@ function PackCard({
               className={WRAP_SAFE_BADGE_CLASS}
               data-smoke="drill-pack-phoneme-badge"
             >
-              {phoneme}
+              {formatTrainingTargetUnit(phoneme)}
             </Badge>
           ))}
           <Badge

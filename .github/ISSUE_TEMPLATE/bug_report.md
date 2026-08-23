@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Report a user-visible SpeakRight Desktop problem
+about: Report a user-visible Windows Desktop or Browser Edition problem
 title: "[Bug]: "
 labels: bug
 assignees: ""
@@ -14,7 +14,9 @@ What happened?
 
 - OS:
 - SpeakRight version or commit:
-- Launch path: Release EXE / installer / dev mode
+- Edition: Windows Desktop / Browser Edition
+- Launch path: Release EXE / installer / Browser dev server / Browser static server / other
+- Browser and version, if applicable:
 - Language: English / Spanish / French / Russian
 - Network state: online / offline / proxy or VPN / unknown
 - API keys configured: none / partial / all required for this flow
@@ -62,6 +64,6 @@ issue involves accent, region, or learner recordings.
 
 ## Checks
 
-- [ ] I tested with the Release EXE when reporting a release/user issue.
+- [ ] I tested with the Release EXE for a Windows release issue, or named the exact Browser Edition route for a browser issue.
 - [ ] This does not require new ElevenLabs generation.
 - [ ] I did not include API keys, recordings, or private user data.

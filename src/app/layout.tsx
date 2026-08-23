@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import type { CSSProperties, ReactNode } from "react";
+import { CloudProcessingDisclosure } from "@/components/common/cloud-processing-disclosure";
 import { ErrorBoundary } from "@/components/common/error-boundary";
 import { DevErrorOverlay } from "@/components/layout/dev-error-overlay";
 import { KeyHydrator } from "@/components/layout/key-hydrator";
+import { MobileNavigation } from "@/components/layout/mobile-navigation";
 import { Sidebar } from "@/components/layout/sidebar";
 import { ThemeProvider } from "@/components/layout/theme-provider";
 import { Titlebar } from "@/components/layout/titlebar";
@@ -11,14 +13,17 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
 
 const fontVariables = {
-  "--font-manrope": '"Manrope", "Aptos Display", ui-sans-serif, system-ui, sans-serif',
-  "--font-inter": '"Inter", "Microsoft YaHei UI", ui-sans-serif, system-ui, sans-serif',
+  "--font-manrope":
+    '"Manrope", "Aptos Display", ui-sans-serif, system-ui, sans-serif',
+  "--font-inter":
+    '"Inter", "Microsoft YaHei UI", ui-sans-serif, system-ui, sans-serif',
   "--font-geist-mono": '"Geist Mono", "SFMono-Regular", Consolas, monospace',
 } as CSSProperties;
 
 export const metadata: Metadata = {
-  title: "SpeakRight - 发音练习",
-  description: "AI 驱动的美式英语发音矫正工具，帮助中国学生提升发音准确度",
+  title: "SpeakRight - 多语言发音学习",
+  description:
+    "面向中文学习者的多语言发音训练工具，以可懂度、可信证据和迁移保持为目标",
 };
 
 export default function RootLayout({
@@ -34,12 +39,13 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body
-        className="h-screen flex flex-col overflow-hidden"
+        className="flex h-dvh flex-col overflow-hidden"
         suppressHydrationWarning
       >
         <ThemeProvider>
           <DevErrorOverlay />
           <KeyHydrator />
+          <CloudProcessingDisclosure />
           <TooltipProvider>
             <a
               href="#main-content"
@@ -48,9 +54,14 @@ export default function RootLayout({
               跳转到主内容
             </a>
             <Titlebar />
-            <div className="flex flex-1 min-h-0 overflow-hidden">
+            <div className="flex min-h-0 flex-1 flex-col overflow-hidden lg:flex-row">
               <Sidebar />
-              <main id="main-content" className="flex-1 h-full overflow-hidden">
+              <MobileNavigation />
+              <main
+                id="main-content"
+                tabIndex={-1}
+                className="min-h-0 min-w-0 flex-1 overflow-y-auto scrollbar-thin lg:h-full"
+              >
                 <ErrorBoundary>{children}</ErrorBoundary>
               </main>
             </div>

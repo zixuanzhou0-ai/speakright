@@ -2,6 +2,7 @@
 
 import { useCallback, useRef, useState } from "react";
 import { convertToWav16kMono } from "@/lib/audio-utils";
+import { resolvePreferredMicrophoneDeviceId } from "@/lib/microphone-device";
 
 const DEFAULT_MAX_DURATION_MS = 30_000;
 
@@ -97,6 +98,8 @@ interface UseRecorderOptions {
    * sentence practice where users need time to read in full.
    */
   maxDurationMs?: number;
+  /** Preferred audio input device selected from the desktop device list. */
+  deviceId?: string | null;
 }
 
 interface UseRecorderReturn {
@@ -117,6 +120,7 @@ export function useRecorder(
   options: UseRecorderOptions = {},
 ): UseRecorderReturn {
   const maxDurationMs = options.maxDurationMs ?? DEFAULT_MAX_DURATION_MS;
+  const preferredDeviceId = options.deviceId;
   const maxDurationSeconds = Math.round(maxDurationMs / 1000);
   const [isRecording, setIsRecording] = useState(false);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
@@ -175,8 +179,15 @@ export function useRecorder(
     let mediaStream: MediaStream | null = null;
 
     try {
+      const resolvedDeviceId =
+        await resolvePreferredMicrophoneDeviceId(preferredDeviceId);
+      const audioConstraints: MediaTrackConstraints = {
+        sampleRate: 16000,
+        channelCount: 1,
+        ...(resolvedDeviceId ? { deviceId: { exact: resolvedDeviceId } } : {}),
+      };
       const openedStream = await navigator.mediaDevices.getUserMedia({
-        audio: { sampleRate: 16000, channelCount: 1 },
+        audio: audioConstraints,
       });
       mediaStream = openedStream;
       setStream(openedStream);
@@ -254,7 +265,13 @@ export function useRecorder(
       clearTimers();
       setError(getRecorderStartErrorMessage(error));
     }
-  }, [stopRecording, maxDurationMs, maxDurationSeconds, clearTimers]);
+  }, [
+    stopRecording,
+    maxDurationMs,
+    maxDurationSeconds,
+    clearTimers,
+    preferredDeviceId,
+  ]);
 
   const reset = useCallback(() => {
     setAudioBlob(null);

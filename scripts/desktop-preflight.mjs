@@ -1,5 +1,5 @@
 import { execFile } from "node:child_process";
-import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 import { promisify } from "node:util";
 
@@ -97,6 +97,8 @@ function assertReleaseExecutableFresh(executable) {
 async function gitStatus() {
   try {
     const { stdout } = await execFileAsync("git", [
+      "-c",
+      `safe.directory=${root}`,
       "status",
       "--short",
       "--branch",
@@ -105,6 +107,24 @@ async function gitStatus() {
   } catch (error) {
     fail(
       `cannot read git status from ${root}: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
+    );
+  }
+}
+
+async function gitTopLevel() {
+  try {
+    const { stdout } = await execFileAsync("git", [
+      "-c",
+      `safe.directory=${root}`,
+      "rev-parse",
+      "--show-toplevel",
+    ]);
+    return path.resolve(stdout.trim());
+  } catch (error) {
+    fail(
+      `cannot resolve repository root from ${root}: ${
         error instanceof Error ? error.message : String(error)
       }`,
     );
@@ -149,20 +169,18 @@ async function runningSpeakRightProcesses() {
 async function main() {
   const packageJsonPath = path.join(root, "package.json");
   if (!existsSync(packageJsonPath)) {
-    fail(`package.json is missing. Run this from E:\\SpeakRightDesktopRepo.`);
+    fail(
+      "package.json is missing. Run this from the SpeakRight repository root.",
+    );
   }
   const packageJson = readJson("package.json");
   if (packageJson.name !== "speakright-desktop") {
     fail(`unexpected package name "${packageJson.name}".`);
   }
 
-  if (
-    process.env.GITHUB_ACTIONS !== "true" &&
-    path.basename(root).toLowerCase() !== "speakrightdesktoprepo"
-  ) {
-    fail(
-      `wrong working tree: ${root}. Use E:\\SpeakRightDesktopRepo for release validation.`,
-    );
+  const repositoryRoot = await gitTopLevel();
+  if (repositoryRoot !== path.resolve(root)) {
+    fail(`wrong working directory: ${root}. Run from ${repositoryRoot}.`);
   }
 
   const tauriConfig = readJson("src-tauri/tauri.conf.json");
@@ -170,7 +188,9 @@ async function main() {
     fail(`unexpected Tauri identifier "${tauriConfig.identifier}".`);
   }
   if (tauriConfig.build?.frontendDist !== "../out") {
-    fail("Tauri release build is not configured to use the static export ../out.");
+    fail(
+      "Tauri release build is not configured to use the static export ../out.",
+    );
   }
 
   const running = await runningSpeakRightProcesses();
@@ -207,9 +227,13 @@ async function main() {
   console.log("Desktop preflight passed.");
   console.log(`Repository: ${root}`);
   console.log(`Git: ${isClean ? "clean" : "dirty; review before release"}`);
-  console.log(`Release EXE: ${existsSync(executable) ? executable : "missing allowed"}`);
+  console.log(
+    `Release EXE: ${existsSync(executable) ? executable : "missing allowed"}`,
+  );
   console.log("No running speakright.exe process was detected.");
-  console.log("Release launch remains static; this preflight does not start localhost.");
+  console.log(
+    "Release launch remains static; this preflight does not start localhost.",
+  );
 }
 
 main().catch((error) => {

@@ -331,7 +331,7 @@ export default function CoveragePassageAssessmentPage() {
         <div className="mb-5 flex flex-wrap items-start gap-3">
           <Link
             href="/assessment"
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground sm:h-8 sm:w-8"
             aria-label="返回发音诊断"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -394,7 +394,7 @@ export default function CoveragePassageAssessmentPage() {
           <div className="mb-2 flex flex-wrap items-start gap-2">
             <Link
               href="/assessment"
-              className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground sm:h-8 sm:w-8"
               aria-label="返回快速诊断"
             >
               <ArrowLeft className="h-4 w-4" />

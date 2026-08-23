@@ -1,7 +1,8 @@
-import type React from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
+import type React from "react";
 import { describe, expect, it, vi } from "vitest";
 import { VideoPlayer } from "@/components/phoneme/video-player";
+import { getLanguagePhonemeBySlug } from "@/lib/language-phonemes";
 import { getTeachingVideosForSoundUnit } from "@/lib/language-teaching-videos";
 import { getSpanishSoundVideoSet } from "@/lib/spanish-sounds-of-speech-videos";
 
@@ -49,9 +50,32 @@ describe("VideoPlayer", () => {
     expect(
       screen.queryByText(/University of Iowa Sounds of Speech Spanish/i),
     ).not.toBeInTheDocument();
-    expect(screen.queryByText(/User stated authorization/i)).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/User stated authorization/i),
+    ).not.toBeInTheDocument();
     expect(screen.queryByText(/Long attribution/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/CC test license/i)).not.toBeInTheDocument();
+  });
+
+  it("maps English theta to the local filename and falls back to the official source on media error", () => {
+    const phoneme = getLanguagePhonemeBySlug("en-US", "th");
+    expect(phoneme?.video?.localSrc).toBe("/videos/phonemes/th.mp4");
+
+    render(
+      <VideoPlayer slug="th" available localSrc={phoneme?.video?.localSrc} />,
+    );
+
+    const video = document.querySelector("video");
+    expect(video).toHaveAttribute("src", "/videos/phonemes/theta.mp4");
+    fireEvent.error(video as HTMLVideoElement);
+
+    expect(document.querySelector("video")).not.toBeInTheDocument();
+    expect(screen.getByText("本地教学视频不可用")).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", {
+        name: /Rachel's English：美式英语发音教学/,
+      }),
+    ).toHaveAttribute("href", "https://rachelsenglish.com/");
   });
 
   it("renders Spanish target sound video by default", () => {
@@ -119,6 +143,34 @@ describe("VideoPlayer", () => {
     );
   });
 
+  it("falls back to an existing external resource when a Spanish local clip fails", () => {
+    render(
+      <VideoPlayer
+        slug="es-a"
+        available
+        localSrc="/videos/language-assets/es-ES/animation/es-a.mp4"
+        spanishVideoSet={getSpanishSoundVideoSet("es-a")}
+        resources={[
+          {
+            title: "Official Spanish articulation resource",
+            url: "https://soundsofspeech.uiowa.edu/spanish",
+            kind: "articulation",
+          },
+        ]}
+      />,
+    );
+
+    fireEvent.error(document.querySelector("video") as HTMLVideoElement);
+
+    expect(document.querySelector("video")).not.toBeInTheDocument();
+    expect(screen.getByText("本地教学视频不可用")).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", {
+        name: "Official Spanish articulation resource",
+      }),
+    ).toHaveAttribute("href", "https://soundsofspeech.uiowa.edu/spanish");
+  });
+
   it("keeps every external fallback resource visible when no local video is available", () => {
     render(
       <VideoPlayer
@@ -159,7 +211,9 @@ describe("VideoPlayer", () => {
     expect(
       screen.getByText("External Spanish dictionary reference"),
     ).toBeInTheDocument();
-    expect(screen.getByText("External Spanish lecture notes")).toBeInTheDocument();
+    expect(
+      screen.getByText("External Spanish lecture notes"),
+    ).toBeInTheDocument();
     expect(
       document.querySelectorAll('[data-smoke="video-fallback-resource-card"]'),
     ).toHaveLength(4);
@@ -186,8 +240,12 @@ describe("VideoPlayer", () => {
       "/videos/language-assets/fr-FR/youtube-lessons/yRCD8vgohZo.mp4",
     );
     expect(screen.getByText("教学讲解")).toBeInTheDocument();
-    expect(screen.queryByText("外部 IPA / 发音教学资源")).not.toBeInTheDocument();
-    expect(screen.queryByText("External French resource")).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("外部 IPA / 发音教学资源"),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("External French resource"),
+    ).not.toBeInTheDocument();
   });
 
   it("lets non-Spanish local language videos switch to a local teaching lesson", () => {

@@ -65,6 +65,54 @@ describe("api key storage in Tauri", () => {
     });
   });
 
+  it("stores the standard TTS provider as a non-secret preference and rejects invalid values", async () => {
+    const { getStandardTtsConfig, setStandardTtsConfig } = await import(
+      "@/lib/api-keys"
+    );
+
+    expect(getStandardTtsConfig()).toEqual({ provider: "elevenlabs" });
+    setStandardTtsConfig({ provider: "hermes-grok" });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(getStandardTtsConfig()).toEqual({ provider: "hermes-grok" });
+    expect(mocks.store.get("speakright_standard_tts_config")).toEqual({
+      provider: "hermes-grok",
+    });
+    expect(
+      mocks.secureStore.get("speakright_standard_tts_config"),
+    ).toBeUndefined();
+    expect(localStorage.getItem("speakright_standard_tts_config")).toBeNull();
+
+    setStandardTtsConfig({ provider: "vertex-gemini" });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(getStandardTtsConfig()).toEqual({ provider: "vertex-gemini" });
+
+    mocks.store.set("speakright_standard_tts_config", { provider: "broken" });
+    vi.resetModules();
+    const reloaded = await import("@/lib/api-keys");
+    await reloaded.hydrateKeys();
+    expect(reloaded.getStandardTtsConfig()).toEqual({ provider: "elevenlabs" });
+  });
+
+  it("stores the Vertex voice as a non-secret preference", async () => {
+    const { getVertexGeminiTtsConfig, setVertexGeminiTtsConfig } = await import(
+      "@/lib/api-keys"
+    );
+
+    expect(getVertexGeminiTtsConfig()).toEqual({ voiceName: "Kore" });
+    setVertexGeminiTtsConfig({ voiceName: "Aoede" });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(getVertexGeminiTtsConfig()).toEqual({ voiceName: "Aoede" });
+    expect(getVertexGeminiTtsConfig()).toBe(getVertexGeminiTtsConfig());
+    expect(mocks.store.get("speakright_vertex_gemini_tts_config")).toEqual({
+      voiceName: "Aoede",
+    });
+    expect(
+      mocks.secureStore.get("speakright_vertex_gemini_tts_config"),
+    ).toBeUndefined();
+  });
+
   it("migrates legacy localStorage secrets to store and clears the local copy", async () => {
     localStorage.setItem(
       "speakright_elevenlabs_config",

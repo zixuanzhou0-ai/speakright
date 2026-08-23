@@ -9,7 +9,10 @@ export default function DrillLayout({
   children: ReactNode;
 }>) {
   return (
-    <LanguageCoreOnlyBoundary moduleName="刻意练习">
+    <LanguageCoreOnlyBoundary
+      moduleName="刻意练习"
+      capabilityRoute="guidedTraining"
+    >
       {children}
     </LanguageCoreOnlyBoundary>
   );

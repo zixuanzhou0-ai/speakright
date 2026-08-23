@@ -5,6 +5,10 @@ import { LanguageAvailabilityCard } from "@/components/settings/language-availab
 const mocks = vi.hoisted(() => ({
   azureConfig: null as { subscriptionKey: string; region: string } | null,
   elevenLabsConfig: null as { apiKey: string } | null,
+  standardTtsProvider: "elevenlabs" as
+    | "elevenlabs"
+    | "hermes-grok"
+    | "vertex-gemini",
   languageId: "fr-FR",
   llmConfig: null as { apiKey: string } | null,
   getStaticLanguageAudioPackSummary: vi.fn(),
@@ -13,6 +17,7 @@ const mocks = vi.hoisted(() => ({
 vi.mock("@/hooks/use-api-keys", () => ({
   useAzureConfig: () => mocks.azureConfig,
   useElevenLabsConfig: () => mocks.elevenLabsConfig,
+  useStandardTtsConfig: () => ({ provider: mocks.standardTtsProvider }),
   useLanguageConfig: () => ({ languageId: mocks.languageId }),
   useLlmConfig: () => mocks.llmConfig,
 }));
@@ -26,6 +31,7 @@ describe("language availability card", () => {
     vi.clearAllMocks();
     mocks.azureConfig = { subscriptionKey: "azure-key", region: "eastus" };
     mocks.elevenLabsConfig = null;
+    mocks.standardTtsProvider = "elevenlabs";
     mocks.languageId = "fr-FR";
     mocks.llmConfig = null;
   });

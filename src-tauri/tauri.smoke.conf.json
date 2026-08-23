@@ -1,0 +1,20 @@
+{
+  "$schema": "../../../node_modules/@tauri-apps/cli/config.schema.json",
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "SpeakRight",
+        "decorations": false,
+        "width": 1280,
+        "height": 920,
+        "minWidth": 1024,
+        "minHeight": 800,
+        "dragDropEnabled": false,
+        "resizable": true,
+        "fullscreen": false,
+        "additionalBrowserArgs": "--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection --remote-debugging-port=19337 --remote-allow-origins=* --autoplay-policy=no-user-gesture-required"
+      }
+    ]
+  }
+}

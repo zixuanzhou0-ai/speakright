@@ -20,6 +20,7 @@ export interface UseWordPronunciationReturn {
     fallbackVoice?: "blue" | "pink",
     languageId?: LanguageId,
   ) => void;
+  playLocalAsset: (src: string, label: string) => void;
   isLoading: boolean;
   isPlaying: boolean;
   error: string | null;
@@ -339,6 +340,23 @@ export function useWordPronunciation(): UseWordPronunciationReturn {
     ],
   );
 
+  const playLocalAsset = useCallback(
+    (src: string, label: string) => {
+      if (!src.trim()) return;
+      resumeHowlerAudioContext();
+      const requestId = playRequestIdRef.current + 1;
+      playRequestIdRef.current = requestId;
+      cleanup();
+      setSafeIsLoading(true);
+      setSafeError(null);
+      void playLocalWebAudio(src, {
+        requestId,
+        loadErrorMessage: getBundledAudioLoadErrorMessage(label),
+      });
+    },
+    [cleanup, playLocalWebAudio, setSafeError, setSafeIsLoading],
+  );
+
   const playWord = useCallback(
     async (
       word: string,
@@ -440,5 +458,13 @@ export function useWordPronunciation(): UseWordPronunciationReturn {
     };
   }, [cleanup]);
 
-  return { playWord, isLoading, isPlaying, error, stop, clearError };
+  return {
+    playWord,
+    playLocalAsset,
+    isLoading,
+    isPlaying,
+    error,
+    stop,
+    clearError,
+  };
 }

@@ -44,6 +44,21 @@ const RESOURCE_ICON = {
   audio: Headphones,
 } as const;
 
+const RACHELS_ENGLISH_FALLBACK_RESOURCE: PhonemeTeachingResource = {
+  title: "Rachel's English：美式英语发音教学",
+  url: "https://rachelsenglish.com/",
+  kind: "video",
+  source: "Rachel's English",
+  description: "本地教学视频不可用时，可前往官方网站继续查找发音讲解。",
+};
+
+function normalizedLocalVideoSrc(slug: string, source: string): string {
+  if (slug === "th" && source === "/videos/phonemes/th.mp4") {
+    return "/videos/phonemes/theta.mp4";
+  }
+  return source;
+}
+
 function localLanguageVideoWidthClass(src: string): string | null {
   if (src.includes("/youtube-lessons/")) {
     return "w-full";
@@ -86,11 +101,13 @@ function LocalVideoPanel({
   sources,
   className,
   compact = false,
+  onPlaybackError,
 }: {
   slug: string;
   sources: LocalVideoSource[];
   className?: string;
   compact?: boolean;
+  onPlaybackError: () => void;
 }) {
   const [selection, setSelection] = useState({ slug, index: 0 });
   const selectedIndex = selection.slug === slug ? selection.index : 0;
@@ -121,6 +138,8 @@ function LocalVideoPanel({
           src={selectedSource.localSrc}
           controls
           preload="metadata"
+          poster="/images/video-poster.svg"
+          onError={onPlaybackError}
           className={videoClass}
         >
           <track kind="captions" />
@@ -185,20 +204,31 @@ export function VideoPlayer({
   sourceAlignment,
   compact = false,
 }: VideoPlayerProps) {
-  const videoSrc = localSrc ?? `/videos/phonemes/${slug}.mp4`;
+  const videoSrc = normalizedLocalVideoSrc(
+    slug,
+    localSrc ?? `/videos/phonemes/${slug}.mp4`,
+  );
+  const [failedSlug, setFailedSlug] = useState<string | null>(null);
   const lessonSources = useMemo(
     () => lessonSourcesFromAssets(teachingVideos),
     [teachingVideos],
   );
+  const playbackFailed = failedSlug === slug;
+  const onPlaybackError = () => setFailedSlug(slug);
+  const fallbackResources =
+    resources.length > 0 || !videoSrc.startsWith("/videos/phonemes/")
+      ? resources
+      : [RACHELS_ENGLISH_FALLBACK_RESOURCE];
 
-  if (!available) {
-    if (lessonSources.length > 0) {
+  if (!available || playbackFailed) {
+    if (!playbackFailed && lessonSources.length > 0) {
       return (
         <LocalVideoPanel
           slug={slug}
           sources={lessonSources}
           className={className}
           compact={compact}
+          onPlaybackError={onPlaybackError}
         />
       );
     }
@@ -211,11 +241,13 @@ export function VideoPlayer({
       >
         <div className="mb-2 text-center">
           <p className="text-sm font-medium text-foreground">
-            {sourceAlignment
-              ? "暂无精准本地视频"
-              : resources.length > 0
-                ? "外部 IPA / 发音教学资源"
-                : "教学视频素材准备中"}
+            {playbackFailed
+              ? "本地教学视频不可用"
+              : sourceAlignment
+                ? "暂无精准本地视频"
+                : fallbackResources.length > 0
+                  ? "外部 IPA / 发音教学资源"
+                  : "教学视频素材准备中"}
           </p>
           <p className="mt-1 text-xs text-muted-foreground/80">
             {sourceAlignment?.note ?? label ?? "待补充授权教学视频"}
@@ -233,14 +265,14 @@ export function VideoPlayer({
           </div>
         )}
 
-        {resources.length > 0 ? (
+        {fallbackResources.length > 0 ? (
           <div className="grid gap-1.5">
             {sourceAlignment && (
               <p className="text-[11px] font-medium text-muted-foreground">
                 参考资料
               </p>
             )}
-            {resources.map((resource) => {
+            {fallbackResources.map((resource) => {
               const Icon = RESOURCE_ICON[resource.kind];
 
               return (
@@ -281,11 +313,12 @@ export function VideoPlayer({
     return (
       <SpanishSoundsOfSpeechVideoPanel
         videoSet={spanishVideoSet}
-          className={className}
-          teachingVideos={teachingVideos}
-          compact={compact}
-        />
-      );
+        className={className}
+        teachingVideos={teachingVideos}
+        compact={compact}
+        onPlaybackError={onPlaybackError}
+      />
+    );
   }
 
   if (lessonSources.length > 0) {
@@ -304,6 +337,7 @@ export function VideoPlayer({
         ]}
         className={className}
         compact={compact}
+        onPlaybackError={onPlaybackError}
       />
     );
   }
@@ -323,6 +357,8 @@ export function VideoPlayer({
           src={videoSrc}
           controls
           preload="metadata"
+          poster="/images/video-poster.svg"
+          onError={onPlaybackError}
           className={`block h-auto ${maxHeightClass} max-w-full rounded-lg border bg-black shadow-sm ${languageVideoWidthClass}`}
         >
           <track kind="captions" />
@@ -337,6 +373,8 @@ export function VideoPlayer({
       src={videoSrc}
       controls
       preload="metadata"
+      poster="/images/video-poster.svg"
+      onError={onPlaybackError}
       className={
         compact
           ? `h-[210px] w-full rounded-lg border bg-black object-contain ${className ?? ""}`

@@ -200,6 +200,41 @@ describe("PhonemeStudyCard non-English reading layout", () => {
     expect(alert).toHaveClass("[overflow-wrap:anywhere]");
   });
 
+  it("centers the English voice selector and playback as one visual control", () => {
+    renderCard({
+      phoneme: {
+        languageId: "en-US",
+        ipa: "/iː/",
+        symbol: "iː",
+        slug: "ee",
+        name: "EE",
+        category: "vowel",
+        example: "green",
+        chartWord: "green",
+        chartImage: "green",
+        keywords: [{ word: "tree", ipa: "/triː/" }],
+        difficulty: "easy",
+      },
+      currentWord: { word: "tree", ipa: "/triː/" },
+    });
+
+    const row = document.querySelector(
+      '[data-smoke="practice-voice-control-row"]',
+    );
+    expect(row).toBeInTheDocument();
+    expect(row).toHaveClass("col-start-2");
+    expect(row).toHaveClass("justify-self-center");
+    expect(
+      row?.querySelector('[data-smoke="practice-voice-playback-cluster"]'),
+    ).toBeInTheDocument();
+    expect(
+      row?.querySelector('[data-smoke="practice-voice-selector"]'),
+    ).toBeInTheDocument();
+    expect(
+      row?.querySelector('[data-smoke="practice-word-audio"]'),
+    ).toBeInTheDocument();
+  });
+
   it("shows English dictionary fallback errors below the practice controls", () => {
     renderCard({
       phoneme: {
@@ -243,7 +278,7 @@ describe("PhonemeStudyCard non-English reading layout", () => {
       },
       currentWord: { word: "cat", ipa: "/kaet/" },
       chartAudioError:
-        "本地音频加载失败：浏览器版静态音频可能缺失或被浏览器拦截。",
+        "本地音频加载失败：发布包音频可能缺失或被系统拦截，请重新安装应用。",
     });
 
     const alert = screen.getByRole("alert");

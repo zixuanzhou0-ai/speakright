@@ -6,6 +6,7 @@ import {
   screen,
   waitFor,
 } from "@testing-library/react";
+import { renderToString } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => {
@@ -313,7 +314,7 @@ describe("settings key hydration", () => {
 
     render(<CoachModeCard />);
 
-    expect(screen.getByRole("button", { name: /正常/ })).toHaveClass(
+    expect(screen.getByRole("button", { name: /平衡反馈/ })).toHaveClass(
       "border-primary",
     );
 
@@ -322,13 +323,13 @@ describe("settings key hydration", () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: /严师/ })).toHaveClass(
+      expect(screen.getByRole("button", { name: /技术审阅/ })).toHaveClass(
         "border-primary",
       );
     });
   });
 
-  it("updates drill config pass threshold after coach mode hydration", async () => {
+  it("keeps drill evidence threshold stable after coach mode hydration", async () => {
     const { DrillConfig } = await import("@/components/drill/drill-config");
     const { hydrateKeys } = await import("@/lib/api-keys");
     const onStart = vi.fn();
@@ -345,12 +346,12 @@ describe("settings key hydration", () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText(/达标分数：85 分/)).toBeInTheDocument();
+      expect(screen.getByText(/达标分数：70 分/)).toBeInTheDocument();
     });
 
     fireEvent.click(screen.getByRole("button", { name: "开始训练" }));
 
-    expect(onStart).toHaveBeenCalledWith("ee", 10, 85);
+    expect(onStart).toHaveBeenCalledWith("ee", 10, 70);
   });
 
   it("updates the data privacy summary after desktop key hydration", async () => {
@@ -380,6 +381,47 @@ describe("settings key hydration", () => {
 
     await waitFor(() => {
       expect(screen.getByText("2/3")).toBeInTheDocument();
+    });
+  });
+
+  it("keeps the first data privacy render independent of client storage", async () => {
+    const { DataControlCard } = await import(
+      "@/components/settings/data-control-card"
+    );
+    const { getInitialLocalDataSummary } = await import("@/lib/data-registry");
+    const initialSummary = getInitialLocalDataSummary();
+    const markup = renderToString(<DataControlCard />).replaceAll(
+      "<!-- -->",
+      "",
+    );
+
+    expect(markup).toContain(`>v${initialSummary.dataSchemaVersion}</p>`);
+    expect(initialSummary).toMatchObject({
+      learningKeys: 0,
+      cacheKeys: 0,
+      configuredApiKeys: 0,
+      apiKeySlots: 3,
+      corruptItems: 0,
+    });
+  });
+
+  it("refreshes the data privacy summary after local migration", async () => {
+    const { DataControlCard } = await import(
+      "@/components/settings/data-control-card"
+    );
+    const { LOCAL_DATA_SCHEMA_VERSION, runLocalDataMigrations } = await import(
+      "@/lib/local-data-migrations"
+    );
+
+    render(<DataControlCard />);
+    await waitFor(() => expect(screen.getByText("v0")).toBeInTheDocument());
+
+    act(() => runLocalDataMigrations());
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(`v${LOCAL_DATA_SCHEMA_VERSION}`),
+      ).toBeInTheDocument();
     });
   });
 

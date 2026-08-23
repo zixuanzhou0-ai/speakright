@@ -1,0 +1,31 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:05.000
+SpeakRight helps Chinese-speaking learners build repeatable pronunciation practice.
+
+00:00:05.000 --> 00:00:13.000
+Guided Repeat offers quick, standard, and intensive modes without imposing a fixed word limit.
+
+00:00:13.000 --> 00:00:21.000
+Free Practice keeps text, standard-demo TTS controls, recording, and feedback in one workspace.
+
+00:00:21.000 --> 00:00:29.000
+The diagnosis view connects evidence to a focused training prescription. Scores shown here are example data.
+
+00:00:29.000 --> 00:00:37.000
+Progress records evidence stages and retained practice history instead of claiming mastery from one score.
+
+00:00:37.000 --> 00:00:45.000
+Browser settings explain BYOK storage, provider boundaries, privacy controls, and release identity.
+
+00:00:45.000 --> 00:00:53.000
+The Windows Desktop preview follows the same learning flow while using local Tauri capabilities.
+
+00:00:53.000 --> 00:01:01.000
+Desktop evidence uses the same explicit example-data disclosure and never calls a paid API during capture.
+
+00:01:01.000 --> 00:01:09.000
+A no-key state remains usable for local learning content and clearly explains how cloud scoring is enabled.
+
+00:01:09.000 --> 00:01:14.000
+The repository publishes versioned, reviewable checks, privacy boundaries, and truthful release status.

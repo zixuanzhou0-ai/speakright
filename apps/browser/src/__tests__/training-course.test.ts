@@ -14,6 +14,7 @@ import {
   shouldEnterRemediation,
   shouldMarkStuck,
 } from "@/lib/training-course-session";
+import { describeTrainingCriterion } from "@/lib/training-criteria";
 import { detectErrorPatterns } from "@/lib/training-error-patterns";
 import { TRAINING_PACKS } from "@/lib/training-packs";
 import type { AzureAssessmentResult } from "@/types/azure";
@@ -25,6 +26,19 @@ import type {
 } from "@/types/training";
 
 describe("training course v2.5", () => {
+  it("describes the gold perception speaker coverage explicitly", () => {
+    const pack = TRAINING_PACKS.find((item) => item.id === "ee-ih");
+    const level = pack?.course?.levels.find(
+      (item) => item.kind === "perception",
+    );
+    expect(level).toBeTruthy();
+    if (!level) return;
+
+    expect(describeTrainingCriterion(level)).toContain(
+      "4 \u540d\u8bf4\u8bdd\u4eba\u30016 \u79cd\u7ec4\u5408",
+    );
+  });
+
   it("expands every core pack into a complete coaching course", () => {
     expect(TRAINING_PACKS).toHaveLength(10);
     for (const pack of TRAINING_PACKS) {
@@ -37,13 +51,32 @@ describe("training course v2.5", () => {
         "sentence",
         "shadowing",
         "mixed-review",
+        ...(pack.id === "ee-ih" ? (["transfer"] as const) : []),
       ]);
-      expect(
-        pack.course?.levels.find((level) => level.kind === "perception")?.items,
-      ).toHaveLength(8);
+      const perceptionLevel = pack.course?.levels.find(
+        (level) => level.kind === "perception",
+      );
+      expect(perceptionLevel?.items.length).toBeGreaterThanOrEqual(8);
+      expect(perceptionLevel?.criterion).toMatchObject(
+        pack.id === "ee-ih"
+          ? {
+              kind: "perception",
+              minTrials: 16,
+              minUniquePairs: 8,
+              minCorrectRate: 0.875,
+              minUniqueSpeakers: 4,
+              minSpeakerPairings: 6,
+            }
+          : {
+              kind: "perception",
+              minTrials: 8,
+              minUniquePairs: 4,
+              minCorrectRate: 0.85,
+            },
+      );
       expect(
         pack.course?.levels.find((level) => level.kind === "word")?.items,
-      ).toHaveLength(12);
+      ).toHaveLength(pack.id === "ee-ih" ? 16 : 12);
       expect(
         pack.course?.levels.find((level) => level.kind === "minimal-pair")
           ?.items,
@@ -53,11 +86,16 @@ describe("training course v2.5", () => {
       ).toHaveLength(8);
       expect(
         pack.course?.levels.find((level) => level.kind === "shadowing")?.items,
-      ).toHaveLength(3);
+      ).toHaveLength(pack.id === "ee-ih" ? 4 : 3);
       expect(
         pack.course?.levels.find((level) => level.kind === "mixed-review")
           ?.items,
       ).toHaveLength(6);
+      if (pack.id === "ee-ih") {
+        expect(
+          pack.course?.levels.find((level) => level.kind === "transfer")?.items,
+        ).toHaveLength(4);
+      }
     }
   });
 
@@ -263,7 +301,7 @@ describe("training course v2.6 quality gates", () => {
       }),
     });
 
-    expect(analysis.targetScore).toBe(96);
+    expect(analysis.targetScore).toBe(0);
     expect(analysis.usedFallback).toBe(true);
     expect(analysis.passed).toBe(false);
     expect(analysis.nextCue).toContain("没有对齐到目标音素");
@@ -359,9 +397,9 @@ describe("training course v2.6 quality gates", () => {
     expect(createCourseStartPosition(course, "missing-level").levelIndex).toBe(
       0,
     );
-    expect(createCourseStartPosition(course, "#shadowing-transfer").levelIndex).toBe(
-      position.levelIndex,
-    );
+    expect(
+      createCourseStartPosition(course, "#shadowing-transfer").levelIndex,
+    ).toBe(position.levelIndex);
   });
 
   it("keeps remediation steps scoreable with natural English text", () => {

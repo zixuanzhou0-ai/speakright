@@ -1,5 +1,5 @@
-import { describe, expect, it, vi, beforeEach } from "vitest";
-import { testLlm, streamLlmFeedback } from "@/lib/api-client";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { streamLlmFeedback, testLlm } from "@/lib/api-client";
 import {
   DESKTOP_LLM_POLICY_MESSAGE,
   getDesktopLlmPolicyError,
@@ -22,7 +22,9 @@ vi.mock("@/lib/tauri-runtime", () => ({
   isTauriEnvironment: mocks.isTauriEnvironment,
 }));
 
-async function drainStream(stream: ReadableStream<Uint8Array>): Promise<string> {
+async function drainStream(
+  stream: ReadableStream<Uint8Array>,
+): Promise<string> {
   const reader = stream.getReader();
   const decoder = new TextDecoder();
   let output = "";
@@ -104,10 +106,10 @@ describe("desktop LLM network policy", () => {
       "claude-haiku-4-5-20251001",
     ]);
     expect(PRESET_PROVIDERS.gpt.models).toEqual([
-      "gpt-5.5",
-      "gpt-5.4",
-      "gpt-5.4-mini",
-      "gpt-5.4-nano",
+      "gpt-5.6",
+      "gpt-5.6-sol",
+      "gpt-5.6-terra",
+      "gpt-5.6-luna",
     ]);
     expect(PRESET_PROVIDERS.gemini.models).toEqual([
       "gemini-3.5-flash",
@@ -205,7 +207,7 @@ describe("desktop LLM network policy", () => {
       apiKey: "secret",
       provider: "gpt",
       baseUrl: "https://api.openai.com/v1",
-      model: "gpt-5.4-mini",
+      model: "gpt-5.6-terra",
     });
 
     expect(result).toEqual({ success: true, reply: "你好" });
@@ -266,7 +268,7 @@ describe("desktop LLM network policy", () => {
         apiKey: "bad-key",
         provider: "gpt",
         baseUrl: "https://api.openai.com/v1",
-        model: "gpt-5.4-mini",
+        model: "gpt-5.6-terra",
       }),
     ).resolves.toMatchObject({
       success: false,
@@ -281,7 +283,7 @@ describe("desktop LLM network policy", () => {
         apiKey: "secret",
         provider: "gpt",
         baseUrl: "https://api.openai.com/v1",
-        model: "gpt-5.4-mini",
+        model: "gpt-5.6-terra",
       }),
     ).resolves.toMatchObject({
       success: false,
@@ -321,7 +323,7 @@ describe("desktop LLM network policy", () => {
         apiKey: "secret",
         provider: "gpt",
         baseUrl: "https://api.openai.com/v1",
-        model: "gpt-5.4-mini",
+        model: "gpt-5.6-terra",
       },
       "think",
       { words: [] } as unknown as AzureAssessmentResult,
@@ -341,7 +343,7 @@ describe("desktop LLM network policy", () => {
         apiKey: "secret",
         provider: "gpt",
         baseUrl: "https://api.openai.com/v1",
-        model: "gpt-5.4-mini",
+        model: "gpt-5.6-terra",
       },
       "think",
       { words: [] } as unknown as AzureAssessmentResult,
@@ -382,7 +384,7 @@ describe("desktop LLM network policy", () => {
           apiKey: "secret",
           provider: "gpt",
           baseUrl: "https://api.openai.com/v1",
-          model: "gpt-5.4-mini",
+          model: "gpt-5.6-terra",
         },
         "vous",
         lowVResult,
@@ -404,7 +406,7 @@ describe("desktop LLM network policy", () => {
           apiKey: "secret",
           provider: "gpt",
           baseUrl: "https://api.openai.com/v1",
-          model: "gpt-5.4-mini",
+          model: "gpt-5.6-terra",
         },
         "very",
         lowVResult,

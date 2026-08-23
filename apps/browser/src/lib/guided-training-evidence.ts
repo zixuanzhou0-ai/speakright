@@ -1,0 +1,191 @@
+import { buildTrainingAggregateEvidence } from "@speakright/core/evidence/training";
+import type {
+  EvidenceStage,
+  EvidenceTaskType,
+  LearningEvidenceV3,
+  LearningLanguageId,
+} from "@speakright/core/evidence/types";
+import type { TrainingLevel, TrainingPack } from "@/types/training";
+import { DEFAULT_CALIBRATION_VERSION } from "./learning-evidence";
+import type { CourseAttemptSnapshot } from "./training-course-session";
+
+interface GuidedLevelEvidenceInput {
+  level: TrainingLevel;
+  snapshot: CourseAttemptSnapshot;
+}
+
+interface GuidedTrainingEvidenceInput {
+  sessionId: string;
+  languageId: LearningLanguageId;
+  pack: TrainingPack;
+  levels: GuidedLevelEvidenceInput[];
+  createdAt: number;
+}
+
+function taskTypeFor(level: TrainingLevel): EvidenceTaskType {
+  switch (level.kind) {
+    case "perception":
+      return "perception";
+    case "articulation":
+      return "articulation";
+    case "minimal-pair":
+      return "minimal-pair";
+    case "sentence":
+      return "sentence";
+    case "shadowing":
+      return "connected-speech";
+    case "transfer":
+      return "guided-transfer";
+    case "mixed-review":
+      return "sentence";
+    default:
+      return "controlled-word";
+  }
+}
+
+function requestedStageFor(level: TrainingLevel): EvidenceStage {
+  if (level.kind === "perception") return "discriminated";
+  if (level.kind === "articulation") return "introduced";
+  if (level.kind === "transfer") return "transfer_observed";
+  if (
+    level.kind === "sentence" ||
+    level.kind === "shadowing" ||
+    level.kind === "mixed-review"
+  ) {
+    return "varied";
+  }
+  return "controlled";
+}
+
+function statusFromValidity(
+  value: boolean | undefined,
+  notApplicable: boolean,
+): "good" | "invalid" | "unknown" | "not-applicable" {
+  if (notApplicable) return "not-applicable";
+  if (value === true) return "good";
+  if (value === false) return "invalid";
+  return "unknown";
+}
+
+function average(values: number[]): number | undefined {
+  if (values.length === 0) return undefined;
+  return Math.round(
+    values.reduce((sum, value) => sum + value, 0) / values.length,
+  );
+}
+
+export function buildGuidedTrainingEvidence({
+  sessionId,
+  languageId,
+  pack,
+  levels,
+  createdAt,
+}: GuidedTrainingEvidenceInput): LearningEvidenceV3[] {
+  return levels
+    .filter(({ snapshot }) => snapshot.attempts > 0)
+    .map(({ level, snapshot }) => {
+      const notApplicable =
+        level.kind === "perception" || level.kind === "articulation";
+      const recordingStatus = statusFromValidity(
+        snapshot.recordingQualityValid,
+        notApplicable,
+      );
+      const alignmentStatus = statusFromValidity(
+        snapshot.alignmentValid,
+        notApplicable,
+      );
+      const materialIds =
+        snapshot.contextIds && snapshot.contextIds.length > 0
+          ? Array.from(new Set(snapshot.contextIds))
+          : level.items.slice(0, snapshot.attempts).map((item) => item.id);
+      const contextCount = materialIds.length;
+      const sampleCount =
+        level.kind === "articulation"
+          ? (snapshot.recordedSampleCount ?? 0)
+          : (snapshot.validSampleCount ??
+            (notApplicable ? snapshot.attempts : snapshot.scores.length));
+      const targetAverage = average(snapshot.scores);
+      const observations: LearningEvidenceV3["observations"] =
+        level.kind === "perception"
+          ? [
+              {
+                metric: "perception-rate",
+                score:
+                  snapshot.attempts > 0
+                    ? Math.round(
+                        (snapshot.passedCount / snapshot.attempts) * 100,
+                      )
+                    : 0,
+                source: "task",
+              },
+            ]
+          : targetAverage == null
+            ? [{ metric: "task-completion", source: "task" }]
+            : [
+                {
+                  metric: "target-unit",
+                  score: targetAverage,
+                  source: "azure",
+                },
+              ];
+
+      return buildTrainingAggregateEvidence({
+        id: `${sessionId}-${level.id}-aggregate`,
+        languageId,
+        taskType: taskTypeFor(level),
+        targetUnits: pack.targetPhonemes,
+        observations,
+        recordingQuality: {
+          status: recordingStatus,
+          reasons:
+            recordingStatus === "not-applicable"
+              ? ["This task does not use learner recording quality."]
+              : recordingStatus === "good"
+                ? ["All counted samples passed the recording-quality gate."]
+                : ["No valid recording-quality aggregate was available."],
+        },
+        alignmentQuality: {
+          status: alignmentStatus,
+          reasons:
+            alignmentStatus === "not-applicable"
+              ? ["This task does not use speech alignment."]
+              : alignmentStatus === "good"
+                ? ["All counted samples contained target-unit alignment."]
+                : ["No valid target-unit alignment aggregate was available."],
+        },
+        sampleCount,
+        contextCount,
+        calibrationVersion: DEFAULT_CALIBRATION_VERSION,
+        createdAt,
+        trace: {
+          sessionId,
+          levelId: level.id,
+          materialIds,
+          criterionKind: level.criterion.kind,
+          materialRole: level.kind === "transfer" ? "far-transfer" : undefined,
+          novelty: snapshot.novelty,
+        },
+        criterion: level.criterion,
+        criterionEvidence: {
+          correctCount: snapshot.passedCount,
+          totalCount: snapshot.attempts,
+          uniqueContextIds: snapshot.contextIds,
+          crossSpeakerValid: snapshot.crossSpeakerValid,
+          speakerIds: snapshot.speakerIds,
+          speakerPairings: snapshot.speakerPairings,
+          completedSelfChecks: snapshot.completedSelfChecks,
+          recordedSampleCount: snapshot.recordedSampleCount,
+          playbackComparisonCompleted: snapshot.playbackComparisonCompleted,
+          untrainedMaterial: snapshot.novelty === "confirmed-untrained",
+          materialIds: snapshot.materialIds ?? materialIds,
+          positions: snapshot.positions,
+          passedCount: snapshot.passedCount,
+          validSampleCount: sampleCount,
+          contextCount,
+          recordingQualityValid: snapshot.recordingQualityValid,
+          alignmentValid: snapshot.alignmentValid,
+        },
+        requestedStage: requestedStageFor(level),
+      });
+    });
+}

@@ -5,6 +5,7 @@ import { useAzureAssessment } from "@/hooks/use-azure-assessment";
 const mocks = vi.hoisted(() => ({
   assessPronunciation: vi.fn(),
   getAzureConfig: vi.fn(),
+  requestCloudProcessingConsent: vi.fn(),
   trackAzureUsage: vi.fn(),
 }));
 
@@ -14,6 +15,10 @@ vi.mock("@/lib/api-client", () => ({
 
 vi.mock("@/lib/api-keys", () => ({
   getAzureConfig: mocks.getAzureConfig,
+}));
+
+vi.mock("@/lib/cloud-processing-consent", () => ({
+  requestCloudProcessingConsent: mocks.requestCloudProcessingConsent,
 }));
 
 vi.mock("@/lib/usage-tracker", () => ({
@@ -27,6 +32,7 @@ describe("useAzureAssessment", () => {
       subscriptionKey: "azure-key",
       region: "eastus",
     });
+    mocks.requestCloudProcessingConsent.mockResolvedValue(true);
     mocks.assessPronunciation.mockResolvedValue({
       pronunciationScore: 90,
       accuracyScore: 90,
@@ -121,5 +127,19 @@ describe("useAzureAssessment", () => {
       "请先到设置页配置 Azure Speech API 密钥和区域；配置后回到本页重新评分。",
     );
     expect(mocks.assessPronunciation).not.toHaveBeenCalled();
+  });
+
+  it("does not send learner audio when cloud processing is declined", async () => {
+    const { result } = renderHook(() => useAzureAssessment());
+    const audio = new Blob([new Uint8Array(32044)], { type: "audio/wav" });
+    mocks.requestCloudProcessingConsent.mockResolvedValueOnce(false);
+
+    await act(async () => {
+      await result.current.assess(audio, "hello");
+    });
+
+    expect(mocks.assessPronunciation).not.toHaveBeenCalled();
+    expect(result.current.error).toContain("录音没有发送");
+    expect(result.current.isLoading).toBe(false);
   });
 });

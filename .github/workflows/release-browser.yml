@@ -1,0 +1,326 @@
+name: Release Browser Stable
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing stable tag to validate without publishing
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    if: ${{ !contains(github.event_name == 'push' && github.ref_name || inputs.tag, '-') }}
+    runs-on: windows-latest
+    timeout-minutes: 150
+    outputs:
+      version: ${{ steps.release.outputs.version }}
+      release_tag: ${{ steps.release.outputs.release_tag }}
+      commit_sha: ${{ steps.release.outputs.commit_sha }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref }}
+
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@4360b52568e2003a75bf9bc1d59f33a8e3fc893c # stable
+
+      - name: Resolve release identity
+        id: release
+        shell: pwsh
+        env:
+          REQUESTED_TAG: ${{ github.event_name == 'push' && github.ref_name || inputs.tag }}
+          RELEASE_EDITION: browser
+        run: |
+          $ErrorActionPreference = "Stop"
+          $config = Get-Content -LiteralPath release.config.json -Raw | ConvertFrom-Json
+          $expectedTag = $config.editions.PSObject.Properties[$env:RELEASE_EDITION].Value.releaseTag
+          if ($env:REQUESTED_TAG -cne $expectedTag) {
+            throw "release.config.json expects tag '$expectedTag', received '$env:REQUESTED_TAG'."
+          }
+
+          $headSha = (git rev-parse HEAD).Trim()
+          if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($headSha)) {
+            throw "Could not resolve the checked-out HEAD commit."
+          }
+          $tagRef = "refs/tags/$env:REQUESTED_TAG"
+          $tagSha = (git rev-parse --verify "${tagRef}^{commit}").Trim()
+          if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($tagSha)) {
+            throw "Could not resolve requested tag '$env:REQUESTED_TAG' to a commit."
+          }
+          if ($headSha -cne $tagSha) {
+            throw "Checked-out HEAD '$headSha' does not equal tag '$env:REQUESTED_TAG' commit '$tagSha'."
+          }
+
+          git fetch --no-tags origin "+refs/heads/main:refs/remotes/origin/main"
+          if ($LASTEXITCODE -ne 0) {
+            throw "Could not fetch origin/main for ancestry verification."
+          }
+          git merge-base --is-ancestor $headSha refs/remotes/origin/main
+          if ($LASTEXITCODE -ne 0) {
+            throw "Release commit '$headSha' is not an ancestor of origin/main."
+          }
+
+          "version=$($config.version)" >> $env:GITHUB_OUTPUT
+          "release_tag=$env:REQUESTED_TAG" >> $env:GITHUB_OUTPUT
+          "commit_sha=$headSha" >> $env:GITHUB_OUTPUT
+          "NEXT_PUBLIC_SPEAKRIGHT_COMMIT_SHA=$headSha" >> $env:GITHUB_ENV
+          "NEXT_PUBLIC_SPEAKRIGHT_BUILD_TIMESTAMP=$([DateTime]::UtcNow.ToString('o'))" >> $env:GITHUB_ENV
+          "NEXT_PUBLIC_SPEAKRIGHT_VALIDATED_AT=$([DateTime]::UtcNow.ToString('yyyy-MM-dd'))" >> $env:GITHUB_ENV
+
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: Install Browser Edition dependencies
+        run: npm ci --prefix apps/browser
+
+      - name: Verify stable tag and release manifest
+        shell: pwsh
+        env:
+          RELEASE_TAG: ${{ steps.release.outputs.release_tag }}
+        run: npm run check:release-version -- --edition browser --tag "$env:RELEASE_TAG"
+
+      - name: Verify user-testing claim and privacy boundaries
+        run: |
+          npm run user-testing:claims:test
+          npm run user-testing:claims:check
+
+      - name: Verify Desktop and Browser core parity
+        run: npm run check:core-parity
+
+      - name: Reject production dependency advisories
+        run: npm run security:audit:npm
+
+      - name: Reject Cargo dependency advisories
+        shell: pwsh
+        run: |
+          cargo install cargo-audit --locked --version 0.22.2
+          cargo audit --file src-tauri/Cargo.lock
+
+      - name: Verify distributable asset rights and manifests
+        run: |
+          npm run assets:test
+          npm run assets:manifests:check
+          npm run assets:rights:check
+
+      - name: Verify release media tooling
+        run: ffprobe -version
+
+      - name: Validate public documentation and release evidence
+        run: |
+          npm run docs:check-links
+          npm run release:evidence:check
+
+      - name: Install Playwright Chromium
+        run: npx playwright install chromium
+
+      - name: Run Browser E2E against an explicitly gated test build
+        run: npm run validate:browser:e2e
+
+      - name: Rebuild publishable Browser Edition without test fixtures
+        run: npm run build:browser:production
+
+      - name: Verify generated Browser assets match the canonical source
+        run: npm run assets:sync:browser:check
+
+      - name: Run static Browser smoke against the publishable build
+        run: npm run browser:smoke:static
+
+      - name: Prove smoke query fixtures are unavailable
+        run: npm run e2e:browser:production-fixture-guard
+        env:
+          NEXT_PUBLIC_SPEAKRIGHT_TEST_FIXTURES: "0"
+
+      - name: Snapshot validated Browser production output
+        id: browser_output_snapshot
+        shell: pwsh
+        env:
+          RELEASE_COMMIT_SHA: ${{ steps.release.outputs.commit_sha }}
+        run: node scripts/browser-production-output-snapshot.mjs write --commit "$env:RELEASE_COMMIT_SHA"
+
+      - name: Generate npm CycloneDX SBOMs
+        run: npm run security:sbom:npm
+
+      - name: Generate Cargo CycloneDX SBOM
+        shell: pwsh
+        run: |
+          cargo install cargo-cyclonedx --locked --version 0.5.9
+          npm run security:sbom:cargo
+
+      - name: Re-run static Browser smoke after SBOM generation
+        run: npm run browser:smoke:static
+
+      - name: Re-prove fixtures are unavailable after SBOM generation
+        run: npm run e2e:browser:production-fixture-guard
+        env:
+          NEXT_PUBLIC_SPEAKRIGHT_TEST_FIXTURES: "0"
+
+      - name: Verify Browser production output is unchanged
+        shell: pwsh
+        env:
+          RELEASE_COMMIT_SHA: ${{ steps.release.outputs.commit_sha }}
+          EXPECTED_OUTPUT_TREE_SHA256: ${{ steps.browser_output_snapshot.outputs.tree_sha256 }}
+        run: node scripts/browser-production-output-snapshot.mjs verify --commit "$env:RELEASE_COMMIT_SHA" --expected-tree-sha256 "$env:EXPECTED_OUTPUT_TREE_SHA256"
+
+      - name: Package Browser Stable and validation evidence
+        shell: pwsh
+        env:
+          RELEASE_VERSION: ${{ steps.release.outputs.version }}
+          RELEASE_TAG: ${{ steps.release.outputs.release_tag }}
+          RELEASE_COMMIT_SHA: ${{ steps.release.outputs.commit_sha }}
+          PRODUCTION_OUTPUT_TREE_SHA256: ${{ steps.browser_output_snapshot.outputs.tree_sha256 }}
+          PRODUCTION_OUTPUT_FILE_COUNT: ${{ steps.browser_output_snapshot.outputs.file_count }}
+          PRODUCTION_OUTPUT_TOTAL_BYTES: ${{ steps.browser_output_snapshot.outputs.total_bytes }}
+        run: |
+          $version = $env:RELEASE_VERSION
+          $outputDir = "outputs/release/browser"
+          if (Test-Path -LiteralPath $outputDir) {
+            Remove-Item -LiteralPath $outputDir -Recurse -Force
+          }
+          New-Item -ItemType Directory -Path $outputDir -Force | Out-Null
+          $archive = Join-Path $outputDir "SpeakRight_Browser_$version.zip"
+          Compress-Archive -Path "apps/browser/out/*" -DestinationPath $archive -CompressionLevel Optimal -Force
+          [ordered]@{
+            schemaVersion = 1
+            edition = "browser"
+            channel = "stable"
+            version = $version
+            tag = $env:RELEASE_TAG
+            commitSha = $env:RELEASE_COMMIT_SHA
+            generatedAt = [DateTime]::UtcNow.ToString("o")
+            testFixtures = $false
+            productionOutputTree = [ordered]@{
+              schemaVersion = 1
+              sha256 = $env:PRODUCTION_OUTPUT_TREE_SHA256
+              fileCount = [int]$env:PRODUCTION_OUTPUT_FILE_COUNT
+              totalBytes = [long]$env:PRODUCTION_OUTPUT_TOTAL_BYTES
+            }
+            checks = @("lint", "typecheck", "unit", "core-parity", "build", "static-smoke", "e2e", "production-fixture-guard", "npm-audit", "cargo-audit", "asset-rights", "docs-links", "release-evidence", "user-testing-claim-safety", "production-output-snapshot", "post-sbom-static-smoke", "post-sbom-production-fixture-guard")
+          } | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath (Join-Path $outputDir "SpeakRight_Browser_${version}_validation-report.json") -Encoding utf8
+
+      - name: Stage Browser release assets
+        shell: pwsh
+        run: |
+          $stage = "outputs/release/staging"
+          if (Test-Path -LiteralPath $stage) {
+            Remove-Item -LiteralPath $stage -Recurse -Force
+          }
+          New-Item -ItemType Directory -Path $stage -Force | Out-Null
+          Copy-Item -Path outputs/release/browser/* -Destination $stage -Force
+          Copy-Item -Path outputs/release/sbom/*.json -Destination $stage -Force
+          Copy-Item -LiteralPath docs/assets/demo/speakright-v1.1.0-overview.mp4 -Destination $stage
+          Copy-Item -LiteralPath docs/assets/demo/speakright-v1.1.0-overview.en.srt -Destination $stage
+          Copy-Item -LiteralPath docs/assets/demo/speakright-v1.1.0-overview.en.vtt -Destination $stage
+          Copy-Item -LiteralPath docs/assets/demo/manifest.json -Destination (Join-Path $stage "SpeakRight_v1.1.0_demo-manifest.json")
+          Copy-Item -LiteralPath docs/assets/screenshots/release/v1.1.0/browser/manifest.json -Destination (Join-Path $stage "SpeakRight_v1.1.0_browser-screenshots.json")
+          Copy-Item -LiteralPath docs/assets/screenshots/release/v1.1.0/desktop/manifest.json -Destination (Join-Path $stage "SpeakRight_v1.1.0_desktop-screenshots.json")
+          Copy-Item -LiteralPath CHANGELOG.md -Destination $stage
+          Copy-Item -LiteralPath LICENSE -Destination $stage
+          Copy-Item -LiteralPath NOTICE.md -Destination $stage
+          Copy-Item -LiteralPath PRIVACY.md -Destination $stage
+          Copy-Item -LiteralPath THIRD_PARTY_NOTICES.md -Destination $stage
+          Copy-Item -LiteralPath docs/assets/asset-rights-registry.json -Destination (Join-Path $stage "SpeakRight_v1.1.0_asset-rights-registry.json")
+          Copy-Item -LiteralPath docs/validation/V1.1.0_RELEASE_CANDIDATE.md -Destination (Join-Path $stage "SpeakRight_v1.1.0_release-validation.md")
+          Copy-Item -LiteralPath docs/validation/USER_TESTING_SUMMARY.md -Destination (Join-Path $stage "SpeakRight_v1.1.0_user-testing-summary.md")
+          $checksumLines = Get-ChildItem -LiteralPath $stage -File | Sort-Object Name | ForEach-Object {
+            $hash = Get-FileHash -Algorithm SHA256 -LiteralPath $_.FullName
+            "$($hash.Hash.ToLower())  $($_.Name)"
+          }
+          $checksumLines | Set-Content -LiteralPath (Join-Path $stage "SHA256SUMS.txt") -Encoding utf8
+
+      - name: Upload verified Browser release assets
+        if: github.event_name == 'push'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: speakright-browser-stable-release-assets
+          path: outputs/release/staging/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
+
+      - name: Upload Browser validation reports
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: speakright-browser-validation-reports
+          path: |
+            outputs/release/browser/*_validation-report.json
+            outputs/release/sbom/*.json
+            docs/assets/demo/manifest.json
+            docs/assets/screenshots/release/v1.1.0/browser/manifest.json
+            docs/assets/screenshots/release/v1.1.0/desktop/manifest.json
+            docs/validation/V1.1.0_RELEASE_CANDIDATE.md
+            docs/validation/USER_TESTING_SUMMARY.md
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
+
+  publish:
+    if: ${{ github.event_name == 'push' && needs.build.result == 'success' }}
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout the release tag for publish verification
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+          ref: ${{ needs.build.outputs.release_tag }}
+
+      - name: Download verified Browser assets
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: speakright-browser-stable-release-assets
+          path: release-assets
+
+      - name: Create Browser Stable GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.build.outputs.release_tag }}
+          RELEASE_VERSION: ${{ needs.build.outputs.version }}
+          BUILT_COMMIT_SHA: ${{ needs.build.outputs.commit_sha }}
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          if ($env:BUILT_COMMIT_SHA -cnotmatch "^[0-9a-f]{40}$") {
+            throw "Build job did not provide a full commit SHA."
+          }
+          git fetch --force --no-tags origin "+refs/heads/main:refs/remotes/origin/main"
+          if ($LASTEXITCODE -ne 0) {
+            throw "Could not refresh origin/main before publishing."
+          }
+          git fetch --force --no-tags origin "+refs/tags/$env:RELEASE_TAG:refs/tags/$env:RELEASE_TAG"
+          if ($LASTEXITCODE -ne 0) {
+            throw "Could not refresh release tag '$env:RELEASE_TAG' before publishing."
+          }
+          $tagRef = "refs/tags/$env:RELEASE_TAG"
+          $tagSha = (git rev-parse --verify "${tagRef}^{commit}").Trim()
+          if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($tagSha)) {
+            throw "Could not peel release tag '$env:RELEASE_TAG' to a commit."
+          }
+          if ($tagSha -cne $env:BUILT_COMMIT_SHA) {
+            throw "Release tag moved after validation: built '$env:BUILT_COMMIT_SHA', current '$tagSha'."
+          }
+          git merge-base --is-ancestor $tagSha refs/remotes/origin/main
+          if ($LASTEXITCODE -ne 0) {
+            throw "Release tag commit '$tagSha' is no longer an ancestor of origin/main."
+          }
+
+          $assets = Get-ChildItem -LiteralPath release-assets -File | ForEach-Object FullName
+          gh release create "$env:RELEASE_TAG" @assets --repo "$env:GITHUB_REPOSITORY" --verify-tag --title "SpeakRight $env:RELEASE_VERSION — Browser Stable" --generate-notes

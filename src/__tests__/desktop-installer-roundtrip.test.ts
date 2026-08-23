@@ -1,0 +1,775 @@
+import { createHash } from "node:crypto";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { describe, expect, it } from "vitest";
+import {
+  assertNoOwnedDebugTransport,
+  assertOwnedWebViewProfile,
+  assertRoundtripPathPolicy,
+  buildNsisInstallArgs,
+  buildNsisUninstallArgs,
+  createSanitizedFailureSummary,
+  createSanitizedSummary,
+  hasExactPassingRoundtripChecks,
+  InstallerRoundtripError,
+  matchesRoundtripArtifactIdentity,
+  REQUIRED_ROUNDTRIP_CHECKS,
+  runInstallerRoundtrip,
+} from "../../scripts/desktop-installer-roundtrip-core.mjs";
+import {
+  hashTauriNsisExecutableVariant,
+  TAURI_NSIS_BUNDLE_MARKER,
+  TAURI_UNKNOWN_BUNDLE_MARKER,
+} from "../../scripts/tauri-bundle-executable-identity.mjs";
+
+const root = process.cwd();
+
+function plan() {
+  const tempRoot = join(root, ".roundtrip-test-temp");
+  const sandboxRoot = join(
+    tempRoot,
+    "speakright-installer-roundtrip",
+    "run-test",
+  );
+  const installDir = join(sandboxRoot, "install");
+  return {
+    runId: "test",
+    tempRoot,
+    sandboxRoot,
+    installDir,
+    webViewProfileDir: join(sandboxRoot, "webview2-profile"),
+    logDir: join(sandboxRoot, "logs"),
+    settingsStoreDir: join(sandboxRoot, "settings"),
+    settingsStorePath: join(
+      sandboxRoot,
+      "settings",
+      "speakright-settings.json",
+    ),
+    markerPath: join(sandboxRoot, ".speakright-installer-roundtrip.json"),
+    installedExe: join(installDir, "speakright.exe"),
+    uninstallerPath: join(installDir, "uninstall.exe"),
+  };
+}
+
+function fakeAdapter(overrides: Record<string, unknown> = {}) {
+  const calls: Array<string | [string, unknown]> = [];
+  const adapter = {
+    async inspectPreflight() {
+      calls.push("inspectPreflight");
+      return {
+        registrations: [],
+        productKeys: [],
+        shortcuts: [],
+        runEntries: [],
+        processes: [],
+        defaultInstallDirs: [],
+        targetEntries: [],
+      };
+    },
+    async prepareSandbox() {
+      calls.push("prepareSandbox");
+    },
+    async runInstaller(_plan: unknown, args: unknown) {
+      calls.push(["runInstaller", args]);
+    },
+    async verifyInstalled() {
+      calls.push("verifyInstalled");
+      return { payload: true, registration: true, shortcuts: true };
+    },
+    async launchInstalledApp() {
+      calls.push("launchInstalledApp");
+      return 4242;
+    },
+    async assertOwnedProcess(_plan: unknown, pid: unknown) {
+      calls.push(["assertOwnedProcess", pid]);
+    },
+    async waitForWindow(_plan: unknown, pid: unknown) {
+      calls.push(["waitForWindow", pid]);
+    },
+    async assertIsolatedWebViewProfile(_plan: unknown, pid: unknown) {
+      calls.push(["assertIsolatedWebViewProfile", pid]);
+    },
+    async assertReleaseDebugTransportDisabled(_plan: unknown, pid: unknown) {
+      calls.push(["assertReleaseDebugTransportDisabled", pid]);
+    },
+    async closeAndWait(_plan: unknown, pid: unknown) {
+      calls.push(["closeAndWait", pid]);
+      return 0;
+    },
+    async terminateOwnedProcess(_plan: unknown, pid: unknown) {
+      calls.push(["terminateOwnedProcess", pid]);
+    },
+    async runUninstaller(_plan: unknown, args: unknown) {
+      calls.push(["runUninstaller", args]);
+    },
+    async cleanupExpectedNativeResidue() {
+      calls.push("cleanupExpectedNativeResidue");
+      return { selfResidueRemoved: true, productKeyRemoved: true };
+    },
+    async inspectResiduals() {
+      calls.push("inspectResiduals");
+      return {
+        registrations: [],
+        productKeys: [],
+        shortcuts: [],
+        runEntries: [],
+        processes: [],
+        installEntries: [],
+      };
+    },
+    async rollbackOwnedInstallation() {
+      calls.push("rollbackOwnedInstallation");
+    },
+    async cleanupSandbox() {
+      calls.push("cleanupSandbox");
+    },
+    ...overrides,
+  };
+  return { adapter, calls };
+}
+
+describe("desktop installer round-trip safety", () => {
+  it("binds an NSIS payload to the reviewed Tauri bundle-marker patch", async () => {
+    const directory = mkdtempSync(join(tmpdir(), "speakright-bundle-marker-"));
+    const executablePath = join(directory, "speakright.exe");
+    try {
+      const releaseBytes = Buffer.from(
+        `prefix:${TAURI_NSIS_BUNDLE_MARKER}:branch:${TAURI_UNKNOWN_BUNDLE_MARKER}:suffix`,
+        "ascii",
+      );
+      const expectedNsisBytes = Buffer.from(
+        releaseBytes
+          .toString("ascii")
+          .replace(TAURI_UNKNOWN_BUNDLE_MARKER, TAURI_NSIS_BUNDLE_MARKER),
+        "ascii",
+      );
+      writeFileSync(executablePath, releaseBytes);
+
+      const identity = await hashTauriNsisExecutableVariant(executablePath, {
+        highWaterMark: 7,
+      });
+
+      expect(identity).toEqual({
+        bytes: releaseBytes.length,
+        markerOffset: releaseBytes.indexOf(TAURI_UNKNOWN_BUNDLE_MARKER),
+        releaseSha256: createHash("sha256").update(releaseBytes).digest("hex"),
+        expectedNsisSha256: createHash("sha256")
+          .update(expectedNsisBytes)
+          .digest("hex"),
+      });
+
+      const alteredNsisBytes = Buffer.from(expectedNsisBytes);
+      alteredNsisBytes[0] ^= 0xff;
+      expect(
+        createHash("sha256").update(alteredNsisBytes).digest("hex"),
+      ).not.toBe(identity.expectedNsisSha256);
+    } finally {
+      rmSync(directory, { recursive: true, force: true });
+    }
+  });
+
+  it("rejects missing and duplicate Tauri unknown bundle markers", async () => {
+    const directory = mkdtempSync(join(tmpdir(), "speakright-bundle-marker-"));
+    const executablePath = join(directory, "speakright.exe");
+    try {
+      writeFileSync(executablePath, "no reviewed marker", "ascii");
+      await expect(
+        hashTauriNsisExecutableVariant(executablePath, { highWaterMark: 5 }),
+      ).rejects.toMatchObject({ code: "invalid-tauri-bundle-marker" });
+
+      writeFileSync(
+        executablePath,
+        `${TAURI_UNKNOWN_BUNDLE_MARKER}:${TAURI_UNKNOWN_BUNDLE_MARKER}`,
+        "ascii",
+      );
+      await expect(
+        hashTauriNsisExecutableVariant(executablePath, { highWaterMark: 5 }),
+      ).rejects.toMatchObject({ code: "invalid-tauri-bundle-marker" });
+    } finally {
+      rmSync(directory, { recursive: true, force: true });
+    }
+  });
+
+  it("uses documented NSIS final-argument semantics", () => {
+    const currentPlan = plan();
+    expect(buildNsisInstallArgs(currentPlan.installDir)).toEqual([
+      "/S",
+      "/P",
+      `/D=${currentPlan.installDir}`,
+    ]);
+    expect(buildNsisUninstallArgs(currentPlan.installDir)).toEqual([
+      "/S",
+      "/P",
+      `_?=${currentPlan.installDir}`,
+    ]);
+
+    const spacedInstallDir = join(
+      currentPlan.sandboxRoot,
+      "install path with spaces",
+    );
+    expect(buildNsisInstallArgs(spacedInstallDir).at(-1)).toBe(
+      `/D=${spacedInstallDir}`,
+    );
+    expect(buildNsisUninstallArgs(spacedInstallDir).at(-1)).toBe(
+      `_?=${spacedInstallDir}`,
+    );
+    expect(() =>
+      buildNsisInstallArgs(`${currentPlan.installDir}\nunsafe`),
+    ).toThrowError(/line breaks/);
+  });
+
+  it("rejects traversal, sibling, and sandbox-equals-target paths", () => {
+    const safe = plan();
+    expect(() => assertRoundtripPathPolicy(safe)).not.toThrow();
+    expect(() =>
+      assertRoundtripPathPolicy({
+        ...safe,
+        installDir: join(safe.tempRoot, "outside-install"),
+      }),
+    ).toThrowError(/strict child of the sandbox/);
+    expect(() =>
+      assertRoundtripPathPolicy({
+        ...safe,
+        sandboxRoot: safe.tempRoot,
+      }),
+    ).toThrowError(/strict child of the resolved TEMP root/);
+    expect(() =>
+      assertRoundtripPathPolicy({
+        ...safe,
+        logDir: join(safe.tempRoot, "outside-logs"),
+      }),
+    ).toThrowError(/desktop log directory must be a strict child/);
+    expect(() =>
+      assertRoundtripPathPolicy({
+        ...safe,
+        settingsStorePath: join(safe.tempRoot, "speakright-settings.json"),
+      }),
+    ).toThrowError(/desktop settings store must be a strict child/);
+    expect(() =>
+      assertRoundtripPathPolicy({
+        ...safe,
+        settingsStorePath: join(safe.settingsStoreDir, "other.json"),
+      }),
+    ).toThrowError(/expected file name/);
+  });
+
+  it("fails closed before any mutation when an existing install is registered", async () => {
+    const { adapter, calls } = fakeAdapter({
+      async inspectPreflight() {
+        calls.push("inspectPreflight");
+        return {
+          registrations: [{ label: "hkcu:SpeakRight" }],
+          productKeys: [],
+          shortcuts: [],
+          runEntries: [],
+          processes: [],
+          defaultInstallDirs: [],
+          targetEntries: [],
+        };
+      },
+    });
+    await expect(
+      runInstallerRoundtrip({ plan: plan(), adapter }),
+    ).rejects.toMatchObject({ code: "existing-registration" });
+    expect(calls).toEqual(["inspectPreflight"]);
+  });
+
+  it("fails closed before any mutation when the target already exists", async () => {
+    const { adapter, calls } = fakeAdapter({
+      async inspectPreflight() {
+        calls.push("inspectPreflight");
+        return {
+          registrations: [],
+          productKeys: [],
+          shortcuts: [],
+          runEntries: [],
+          processes: [],
+          defaultInstallDirs: [],
+          targetEntries: ["unexpected.txt"],
+        };
+      },
+    });
+    await expect(
+      runInstallerRoundtrip({ plan: plan(), adapter }),
+    ).rejects.toMatchObject({ code: "target-not-empty" });
+    expect(calls).toEqual(["inspectPreflight"]);
+  });
+
+  it("fails closed before mutation when a SpeakRight startup value exists", async () => {
+    const { adapter, calls } = fakeAdapter({
+      async inspectPreflight() {
+        calls.push("inspectPreflight");
+        return {
+          registrations: [],
+          productKeys: [],
+          shortcuts: [],
+          runEntries: [{ name: "SpeakRight", value: "portable.exe" }],
+          processes: [],
+          defaultInstallDirs: [],
+          targetEntries: [],
+        };
+      },
+    });
+    await expect(
+      runInstallerRoundtrip({ plan: plan(), adapter }),
+    ).rejects.toMatchObject({ code: "existing-run-value" });
+    expect(calls).toEqual(["inspectPreflight"]);
+  });
+
+  it("performs install, launch, clean close, uninstall, and strict cleanup in order", async () => {
+    const { adapter, calls } = fakeAdapter();
+    const times = [1_000, 1_750];
+    const outcome = await runInstallerRoundtrip({
+      plan: plan(),
+      adapter,
+      now: () => times.shift() ?? 1_750,
+    });
+
+    expect(calls).toEqual([
+      "inspectPreflight",
+      "prepareSandbox",
+      ["runInstaller", buildNsisInstallArgs(plan().installDir)],
+      "verifyInstalled",
+      "launchInstalledApp",
+      ["assertOwnedProcess", 4242],
+      ["waitForWindow", 4242],
+      ["assertIsolatedWebViewProfile", 4242],
+      ["assertReleaseDebugTransportDisabled", 4242],
+      ["closeAndWait", 4242],
+      ["runUninstaller", buildNsisUninstallArgs(plan().installDir)],
+      "cleanupExpectedNativeResidue",
+      "inspectResiduals",
+      "cleanupSandbox",
+    ]);
+    expect(outcome.durationMs).toBe(750);
+    expect(outcome.checks).toBeDefined();
+    if (!outcome.checks) throw new Error("fixture outcome is missing checks");
+    expect(Object.values(outcome.checks)).toEqual(
+      expect.arrayContaining([true]),
+    );
+    expect(Object.values(outcome.checks).every(Boolean)).toBe(true);
+    expect(hasExactPassingRoundtripChecks(outcome.checks)).toBe(true);
+    expect(outcome.cleanup).toMatchObject({
+      nativeSelfResidueRemoved: true,
+      ownedProductKeyResidueRemoved: true,
+      sandboxRemoved: true,
+    });
+  });
+
+  it("rejects an installed payload that does not match the release executable", async () => {
+    const { adapter, calls } = fakeAdapter({
+      async verifyInstalled() {
+        calls.push("verifyInstalled");
+        return { payload: false, registration: true, shortcuts: true };
+      },
+    });
+    await expect(
+      runInstallerRoundtrip({ plan: plan(), adapter }),
+    ).rejects.toMatchObject({
+      code: "install-verification",
+      message: "installed payload ownership checks did not all pass: payload",
+    });
+    expect(calls).toContain("rollbackOwnedInstallation");
+    expect(calls).not.toContain("launchInstalledApp");
+  });
+
+  it("requires the exact fixed check set for public evidence", () => {
+    const complete = Object.fromEntries(
+      REQUIRED_ROUNDTRIP_CHECKS.map((key) => [key, true]),
+    );
+    expect(hasExactPassingRoundtripChecks(complete)).toBe(true);
+    const { releaseDebugTransportDisabled: _missing, ...missing } = complete;
+    expect(hasExactPassingRoundtripChecks(missing)).toBe(false);
+    expect(
+      hasExactPassingRoundtripChecks({ ...complete, unknownCheck: true }),
+    ).toBe(false);
+    expect(
+      hasExactPassingRoundtripChecks({
+        ...complete,
+        releaseDebugTransportDisabled: false,
+      }),
+    ).toBe(false);
+  });
+
+  it("rejects debug transports only in the installed app process tree", () => {
+    const safeTree = [
+      {
+        processId: 0,
+        parentProcessId: 0,
+        name: "System Idle Process",
+        commandLine: null,
+      },
+      {
+        processId: 100,
+        parentProcessId: 1,
+        name: "speakright.exe",
+        commandLine: '"C:\\Temp\\speakright.exe"',
+      },
+      {
+        processId: 101,
+        parentProcessId: 100,
+        name: "msedgewebview2.exe",
+        commandLine: '"C:\\WebView2\\msedgewebview2.exe" --type=browser',
+      },
+      {
+        processId: 999,
+        parentProcessId: 1,
+        name: "msedgewebview2.exe",
+        commandLine:
+          '"C:\\Other\\msedgewebview2.exe" --remote-debugging-port=9222',
+      },
+    ];
+
+    expect(() =>
+      assertNoOwnedDebugTransport({
+        processes: safeTree,
+        rootPid: 100,
+        devToolsActivePortPresent: false,
+      }),
+    ).not.toThrow();
+    expect(() =>
+      assertNoOwnedDebugTransport({
+        processes: safeTree.map((process) =>
+          process.processId === 101
+            ? {
+                ...process,
+                commandLine: `${process.commandLine} --remote-debugging-port=19337`,
+              }
+            : process,
+        ),
+        rootPid: 100,
+        devToolsActivePortPresent: false,
+      }),
+    ).toThrowError(/remote debugging transport/);
+    expect(() =>
+      assertNoOwnedDebugTransport({
+        processes: safeTree.map((process) =>
+          process.processId === 101
+            ? {
+                ...process,
+                commandLine: `${process.commandLine} "--remote-debugging-port=19337"`,
+              }
+            : process,
+        ),
+        rootPid: 100,
+        devToolsActivePortPresent: false,
+      }),
+    ).toThrowError(/remote debugging transport/);
+    expect(() =>
+      assertNoOwnedDebugTransport({
+        processes: safeTree.map((process) =>
+          process.processId === 101
+            ? {
+                ...process,
+                commandLine: `${process.commandLine} --remote-debugging-pipe`,
+              }
+            : process,
+        ),
+        rootPid: 100,
+        devToolsActivePortPresent: false,
+      }),
+    ).toThrowError(/remote debugging transport/);
+    expect(() =>
+      assertNoOwnedDebugTransport({
+        processes: safeTree,
+        rootPid: 100,
+        devToolsActivePortPresent: true,
+      }),
+    ).toThrowError(/remote debugging transport/);
+    expect(() =>
+      assertNoOwnedDebugTransport({
+        processes: safeTree.map((process) =>
+          process.processId === 101
+            ? { ...process, commandLine: null }
+            : process,
+        ),
+        rootPid: 100,
+        devToolsActivePortPresent: false,
+      }),
+    ).toThrowError(/command line could not be inspected/);
+  });
+
+  it("requires the owned WebView2 process to use a populated isolated profile", () => {
+    const expectedProfileDir = join(
+      root,
+      ".roundtrip-webview-profile",
+      "EBWebView",
+    );
+    const processTree = [
+      {
+        processId: 100,
+        parentProcessId: 1,
+        name: "speakright.exe",
+        commandLine: '"C:\\Temp\\speakright.exe"',
+      },
+      {
+        processId: 101,
+        parentProcessId: 100,
+        name: "msedgewebview2.exe",
+        commandLine: `"C:\\WebView2\\msedgewebview2.exe" --type=browser --user-data-dir="${expectedProfileDir}"`,
+      },
+      {
+        processId: 999,
+        parentProcessId: 1,
+        name: "msedgewebview2.exe",
+        commandLine:
+          '"C:\\Other\\msedgewebview2.exe" --user-data-dir="C:\\Other\\Profile"',
+      },
+    ];
+
+    expect(() =>
+      assertOwnedWebViewProfile({
+        processes: processTree,
+        rootPid: 100,
+        expectedProfileDir,
+        profilePopulated: true,
+      }),
+    ).not.toThrow();
+    expect(() =>
+      assertOwnedWebViewProfile({
+        processes: processTree,
+        rootPid: 100,
+        expectedProfileDir: join(root, ".different-profile"),
+        profilePopulated: true,
+      }),
+    ).toThrowError(/did not use the isolated profile/);
+    expect(() =>
+      assertOwnedWebViewProfile({
+        processes: processTree,
+        rootPid: 100,
+        expectedProfileDir,
+        profilePopulated: false,
+      }),
+    ).toThrowError(/was not populated/);
+  });
+
+  it("only asks the adapter to terminate the tracked child and still rolls back", async () => {
+    const { adapter, calls } = fakeAdapter({
+      async waitForWindow() {
+        calls.push(["waitForWindow", 4242]);
+        throw new InstallerRoundtripError("window-timeout", "fixture failure");
+      },
+    });
+    await expect(
+      runInstallerRoundtrip({ plan: plan(), adapter }),
+    ).rejects.toMatchObject({ code: "window-timeout" });
+    expect(calls).toContainEqual(["terminateOwnedProcess", 4242]);
+    expect(calls).toContain("rollbackOwnedInstallation");
+    expect(calls).toContain("cleanupSandbox");
+    expect(calls).not.toContainEqual(["terminateOwnedProcess", 1]);
+  });
+
+  it("preserves the primary failure when PID ownership blocks rollback termination", async () => {
+    const { adapter, calls } = fakeAdapter({
+      async waitForWindow() {
+        calls.push(["waitForWindow", 4242]);
+        throw new InstallerRoundtripError("window-timeout", "fixture failure");
+      },
+      async terminateOwnedProcess() {
+        calls.push(["terminateOwnedProcess", 4242]);
+        throw new InstallerRoundtripError(
+          "process-ownership",
+          "fixture ownership mismatch",
+        );
+      },
+    });
+    await expect(
+      runInstallerRoundtrip({ plan: plan(), adapter }),
+    ).rejects.toMatchObject({
+      code: "window-timeout",
+      rollbackErrors: expect.arrayContaining([
+        expect.objectContaining({
+          code: "process-ownership",
+          cleanupPhase: "terminate-owned-process",
+        }),
+      ]),
+      rollbackFailures: [
+        {
+          phase: "terminate-owned-process",
+          code: "process-ownership",
+        },
+      ],
+    });
+    expect(calls).toContain("rollbackOwnedInstallation");
+    expect(calls).toContain("cleanupSandbox");
+  });
+
+  it("emits a path-free summary suitable for public release evidence", () => {
+    const currentPlan = plan();
+    const summary = createSanitizedSummary({
+      version: "1.1.0",
+      installer: {
+        fileName: join(currentPlan.tempRoot, "SpeakRight_1.1.0_x64-setup.exe"),
+        bytes: 123,
+        sha256: "a".repeat(64),
+      },
+      releaseExecutable: {
+        fileName: join(currentPlan.tempRoot, "speakright.exe"),
+        bytes: 456,
+        sha256: "b".repeat(64),
+      },
+      outcome: {
+        checks: Object.fromEntries(
+          REQUIRED_ROUNDTRIP_CHECKS.map((key) => [key, true]),
+        ),
+        cleanup: { sandboxRemoved: true },
+        durationMs: 500,
+      },
+      completedAt: "2026-08-16T00:00:00.000Z",
+    });
+    const serialized = JSON.stringify(summary);
+    expect(serialized).not.toContain(currentPlan.tempRoot);
+    expect(serialized).not.toMatch(/[A-Za-z]:\\Users\\/i);
+    expect(summary.installer.fileName).toBe("SpeakRight_1.1.0_x64-setup.exe");
+    expect(summary.releaseExecutable).toEqual({
+      fileName: "speakright.exe",
+      bytes: 456,
+      sha256: "b".repeat(64),
+    });
+
+    const failed = createSanitizedFailureSummary({
+      version: "1.1.0",
+      installer: null,
+      error: Object.assign(
+        new Error("C:\\Users\\Alice\\secret sk-test-not-for-logs"),
+        {
+          code: "fixture-failure",
+          rollbackFailures: [
+            { phase: "sandbox-remove", code: "EPERM" },
+            {
+              phase: "C:\\Users\\Alice",
+              code: "sk-test-not-for-logs",
+            },
+          ],
+        },
+      ),
+      completedAt: "2026-08-16T00:00:00.000Z",
+    });
+    expect(JSON.stringify(failed)).not.toContain("Alice");
+    expect(JSON.stringify(failed)).not.toContain("sk-test-not-for-logs");
+    expect(failed.failure.code).toBe("fixture-failure");
+    expect(failed.failure.rollbackFailures).toEqual([
+      { phase: "sandbox-remove", code: "EPERM" },
+      { phase: "cleanup", code: "cleanup-error" },
+    ]);
+  });
+
+  it("binds round-trip evidence to the exact published bare EXE", () => {
+    const identity = {
+      fileName: "speakright.exe",
+      bytes: 456,
+      sha256: "b".repeat(64),
+    };
+    const artifact = {
+      path: "src-tauri/target/release/speakright.exe",
+      bytes: 456,
+      sha256: "b".repeat(64),
+    };
+
+    expect(matchesRoundtripArtifactIdentity(identity, artifact)).toBe(true);
+    expect(
+      matchesRoundtripArtifactIdentity({ ...identity, fileName: "" }, artifact),
+    ).toBe(false);
+    expect(
+      matchesRoundtripArtifactIdentity(identity, {
+        ...artifact,
+        bytes: 457,
+      }),
+    ).toBe(false);
+    expect(
+      matchesRoundtripArtifactIdentity(identity, {
+        ...artifact,
+        sha256: "c".repeat(64),
+      }),
+    ).toBe(false);
+  });
+
+  it("wires the real round-trip before report generation and preview gating", () => {
+    const packageJson = JSON.parse(
+      readFileSync(join(root, "package.json"), "utf8"),
+    ) as { scripts: Record<string, string> };
+    for (const scriptName of ["validate:desktop", "validate:desktop-ci"]) {
+      const script = packageJson.scripts[scriptName];
+      expect(script).toContain("desktop:installer-roundtrip");
+      expect(script.indexOf("desktop:installer-roundtrip")).toBeLessThan(
+        script.indexOf("desktop:release-report"),
+      );
+    }
+
+    const workflow = readFileSync(
+      join(root, ".github/workflows/release-desktop-preview.yml"),
+      "utf8",
+    );
+    expect(workflow).toContain("isolated installer round-trip");
+    expect(workflow).toContain("RELEASE_VERSION: $");
+    expect(workflow).toContain(
+      "$($env:RELEASE_VERSION)_installer-roundtrip.json",
+    );
+    expect(workflow).toContain("Copy-Item -LiteralPath $roundtripReport");
+    expect(workflow.indexOf("npm run validate:desktop")).toBeLessThan(
+      workflow.indexOf("npm run desktop:preview-release-gate"),
+    );
+
+    const report = readFileSync(
+      join(root, "scripts/desktop-release-report.mjs"),
+      "utf8",
+    );
+    expect(report).toContain("installerRoundtrip");
+    expect(report).toContain("does not match the current NSIS artifact");
+    expect(report).toContain("hasExactPassingRoundtripChecks");
+    expect(report).toContain("matchesRoundtripArtifactIdentity");
+
+    const previewGate = readFileSync(
+      join(root, "scripts/desktop-preview-release-gate.mjs"),
+      "utf8",
+    );
+    expect(previewGate).toContain("hasExactPassingRoundtripChecks");
+  });
+
+  it("keeps process termination and recursive cleanup behind ownership checks", () => {
+    const script = readFileSync(
+      join(root, "scripts/desktop-installer-roundtrip.mjs"),
+      "utf8",
+    );
+    const core = readFileSync(
+      join(root, "scripts/desktop-installer-roundtrip-core.mjs"),
+      "utf8",
+    );
+    expect(script).toContain("WEBVIEW2_USER_DATA_FOLDER");
+    expect(script).toContain("assertOwnedWebViewProfile");
+    expect(script).toContain('path.join(plan.webViewProfileDir, "EBWebView")');
+    expect(script).toContain("SPEAKRIGHT_LOG_DIR");
+    expect(script).toContain("SPEAKRIGHT_SETTINGS_STORE_PATH");
+    expect(script).toContain("isolated runtime log");
+    expect(script).toContain("releaseExeSha256");
+    expect(script).toContain("releaseExeBytes");
+    expect(script).toContain("assertReleaseExecutableUnchanged");
+    expect(script).toContain("installer-roundtrip-$" + "{randomUUID()}");
+    expect(script).toContain('reviewedTauriCliVersion = "2.10.1"');
+    expect(script).toContain("WriteUninstaller");
+    expect(script).toContain("assertOwnedProcess(plan, pid)");
+    expect(script).toContain("ParentProcessId");
+    expect(script).toContain("DevToolsActivePort");
+    expect(script).toContain(
+      "delete isolatedEnvironment.WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS",
+    );
+    expect(core).toContain("releaseDebugTransportDisabled");
+    expect(core).toContain("remote-debugging-");
+    expect(script).toContain("ExecutablePath");
+    expect(script).toContain(
+      "assertCleanPreflight(await inspectSystemState(plan))",
+    );
+    expect(script).toContain("foreign-process-before-uninstall");
+    expect(script).toContain("foreign-process-before-rollback");
+    expect(script).toContain("CurrentVersion\\Run");
+    expect(core).toContain("existing-run-value");
+    expect(script.match(/windowsVerbatimArguments: true/g)).toHaveLength(3);
+    expect(script).toContain("Stop-Process -Id $processId -Force");
+    expect(script).toContain("await assertMarker(plan)");
+    expect(script).toContain("maxRetries: 10");
+    expect(script).toContain("retryDelay: 250");
+    expect(script).not.toContain("taskkill");
+    expect(script).not.toContain("Remove-Item -Recurse");
+  });
+});

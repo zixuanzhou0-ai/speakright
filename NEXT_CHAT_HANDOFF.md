@@ -1,20 +1,14 @@
 # Next Chat Handoff
 
-The canonical handoff lives at:
+The canonical handoff is `docs/operations/NEXT_CHAT_HANDOFF.md`.
 
-```text
-docs/operations/NEXT_CHAT_HANDOFF.md
-```
+Read it with the current product and evidence documents:
 
-Read it together with:
+- `docs/PRD.md`
+- `docs/architecture/0001-evidence-first-learning-loop.md`
+- `docs/pronunciation-content-policy.md`
+- `docs/calibration-protocol.md`
 
-```text
-docs/operations/RC_EVIDENCE_AUDIT.md
-docs/operations/DESKTOP_STARTUP_RUNBOOK.md
-```
-
-The handoff records the current Release EXE path, experimental-language
-boundaries, validation evidence, GitHub API fallback notes, and next manual QA
-focus. Keep Spanish, French, and Russian marked experimental, do not generate
-ElevenLabs audio without explicit approval, and use the Release EXE rather than
-localhost for acceptance.
+Earlier release and browser-edition plans are historical records. They do not
+override the current branch, rollback tag, capability policy, or evidence
+contract recorded in the canonical handoff.

@@ -11,6 +11,8 @@ export type EvidenceRecommendedAction =
   | "request-more-samples"
   | "request-retry";
 
+export type AssessmentSupportLevel = "independent" | "preview-assisted";
+
 export type DiagnosisIssueType =
   | "phoneme"
   | "contrast"
@@ -30,6 +32,7 @@ export interface DiagnosisEvidence {
   evidenceStrength?: EvidenceStrength;
   recommendedAction?: EvidenceRecommendedAction;
   invalidationReason?: string;
+  supportLevel?: AssessmentSupportLevel;
   source:
     | "word"
     | "paragraph"
@@ -54,6 +57,10 @@ export interface DiagnosisEvidenceSummary {
   thinFeatureCount: number;
   lowConfidenceFeatures: string[];
   notes: string[];
+  /** Optional for backwards compatibility with reports created before support tracking. */
+  independentWordRecordings?: number;
+  /** Preview-assisted samples are retained for comparison but excluded from the baseline. */
+  previewAssistedWordRecordings?: number;
 }
 
 export interface RecordingQualitySnapshot {
@@ -73,6 +80,11 @@ export interface DiagnosisIssue {
   type: DiagnosisIssueType;
   title: string;
   targetPhonemes: string[];
+  observedWeakness?: string;
+  possibleCauses?: string[];
+  disambiguationTest?: string;
+  actionCue?: string;
+  /** @deprecated Read-only compatibility for legacy reports. */
   suspectedSubstitution?: string;
   evidence: Array<{ text: string; score: number; detail: string }>;
   impact: string;
@@ -115,6 +127,8 @@ export interface AssessmentRecording {
   prompt: AssessmentWord;
   result: AzureAssessmentResult;
   source: "word" | "adaptive";
+  /** Missing on legacy callers and therefore treated as an independent attempt. */
+  supportLevel?: AssessmentSupportLevel;
   recordingQuality?: RecordingQualitySnapshot;
 }
 

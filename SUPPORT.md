@@ -1,8 +1,8 @@
 # Support
 
-This repository is public source code for the SpeakRight Desktop release
-candidate. Please choose the right support path so user data, security reports,
-and pronunciation evidence do not end up in the wrong place.
+This repository contains the public source for SpeakRight Windows Desktop and
+Browser Edition. Please choose the right support path so user data, security
+reports, and pronunciation evidence do not end up in the wrong place.
 
 ## Before Opening A Public Issue
 
@@ -10,8 +10,12 @@ and pronunciation evidence do not end up in the wrong place.
   at `localhost` is not the release app.
 - Check `docs/INSTALLATION.md` for Windows installation and unsigned-artifact
   warnings.
-- Check `docs/operations/DESKTOP_STARTUP_RUNBOOK.md` when the desktop window
-  does not open or an existing `speakright.exe` process blocks a build.
+- Check `apps/browser/README.md` for Browser Edition startup, supported local
+  routes, and browser-specific provider configuration.
+- Run the non-destructive `npm run desktop:preflight` and follow
+  `docs/INSTALLATION.md` when the desktop window does not open or an existing
+  `speakright.exe` process blocks a build. The June startup runbook is retained
+  only as historical evidence.
 - Check `docs/operations/IPA_DISPLAY_AUDIT_STRATEGY.md` before proposing
   Spanish, French, or Russian IPA changes.
 
@@ -23,6 +27,8 @@ Use GitHub issues for:
   launch, or first-launch degraded-state problems; use the
   installation/startup issue template.
 - Release EXE bugs that do not expose private data.
+- Browser Edition bugs that can be reproduced from its documented localhost or
+  static-server route without exposing private data.
 - UI layout, text wrapping, audio playback, or scoring behavior that can be
   described without attaching private recordings.
 - Missing bundled audio, wrong clickable audio sources, loudness mismatches, or
@@ -36,6 +42,8 @@ Use GitHub issues for:
 When reporting a user-visible bug, include:
 
 - OS and SpeakRight version or commit.
+- Edition: Windows Desktop or Browser Edition; for Browser Edition also include
+  browser name/version and whether the dev or static route was used.
 - Launch path, ideally Release EXE or installer.
 - For install/startup reports, include the artifact name or path, whether
   `speakright.exe` was already running, and whether SmartScreen, antivirus, or
@@ -64,6 +72,9 @@ Do not open a public issue for:
   permissions.
 
 Follow `SECURITY.md` for these reports.
+
+For non-security questions about local storage, external providers, recordings,
+exports, or deletion, review `PRIVACY.md` before opening a public issue.
 
 ## IPA And Pronunciation Disputes
 

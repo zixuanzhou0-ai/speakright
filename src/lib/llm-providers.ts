@@ -15,9 +15,12 @@ export const PRESET_PROVIDERS: Record<ProviderName, PresetProvider> = {
   gpt: {
     label: "GPT",
     baseUrl: "https://api.openai.com/v1",
-    models: ["gpt-5.5", "gpt-5.4", "gpt-5.4-mini", "gpt-5.4-nano"],
+    models: ["gpt-5.6", "gpt-5.6-sol", "gpt-5.6-terra", "gpt-5.6-luna"],
     status: "ready",
-    docsUrl: "https://developers.openai.com/api/docs/models",
+    docsUrl: "https://developers.openai.com/api/docs/guides/latest-model",
+    lastVerifiedAt: "2026-07-13",
+    presetNote:
+      "Recommended presets only; the model field accepts other supported model IDs.",
   },
   gemini: {
     label: "Gemini",
@@ -103,22 +106,20 @@ export function normalizeStoredProvider(
   return isDesktop && value === "custom" ? "claude" : value;
 }
 
-const DESKTOP_ALLOWED_LLM_ORIGINS = new Set(
-  [
-    ...Object.entries(PRESET_PROVIDERS)
-      .filter(
-        ([provider, preset]) =>
-          provider !== "custom" &&
-          preset.status !== "needsManualConfig" &&
-          preset.baseUrl,
-      )
-      .map(([, preset]) => new URL(preset.baseUrl).origin),
-    // Keep previously saved Kimi/GLM configs working while new presets move
-    // to the current official endpoints.
-    "https://api.moonshot.cn",
-    "https://open.bigmodel.cn",
-  ],
-);
+const DESKTOP_ALLOWED_LLM_ORIGINS = new Set([
+  ...Object.entries(PRESET_PROVIDERS)
+    .filter(
+      ([provider, preset]) =>
+        provider !== "custom" &&
+        preset.status !== "needsManualConfig" &&
+        preset.baseUrl,
+    )
+    .map(([, preset]) => new URL(preset.baseUrl).origin),
+  // Keep previously saved Kimi/GLM configs working while new presets move
+  // to the current official endpoints.
+  "https://api.moonshot.cn",
+  "https://open.bigmodel.cn",
+]);
 
 export const DESKTOP_LLM_POLICY_MESSAGE =
   "桌面版出于安全只允许预设 LLM provider；Custom endpoint 需要先加入 Tauri allowlist 和 CSP 后才能启用。";

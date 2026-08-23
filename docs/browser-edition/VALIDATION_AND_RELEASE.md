@@ -7,7 +7,7 @@ documentation update.
 
 The Browser Edition must be validated as a browser app, not as a desktop app in
 a browser-shaped window. The Windows Desktop app remains validated through the
-Release EXE gate in `E:\SpeakRightDesktopRepo`. Browser Edition needs its own
+Release EXE gate in `<repository-root>`. Browser Edition needs its own
 browser gate.
 
 ## Required Command Gates
@@ -18,7 +18,7 @@ must expose equivalent commands from the root or document app-local commands.
 Browser Edition:
 
 ```bat
-cd /d E:\SpeakRight
+cd /d <repository-root>
 npm run validate:browser
 npm run docs:check-links
 ```
@@ -30,7 +30,7 @@ public README/docs relative links and screenshot paths.
 Desktop comparison gate:
 
 ```bat
-cd /d E:\SpeakRightDesktopRepo
+cd /d <repository-root>
 npm run validate:desktop
 ```
 
@@ -97,7 +97,7 @@ run a clearly labeled synthetic-audio Azure gate:
 Use the local ignored log helper for this private evidence:
 
 ```bat
-cd /d E:\SpeakRight
+cd /d <repository-root>
 npm run browser:azure-live-log
 npm run browser:azure-live-log -- --record --locale en-US --route /phonemes/ee --status pass --score 86 --notes "fresh browser microphone recording rendered Azure scores"
 ```
@@ -189,9 +189,11 @@ Known Limitations
 Credits
 ```
 
-Windows Desktop notes must not call unsigned EXE/MSI/NSIS artifacts stable or
-signed. Browser Edition notes must not imply users can open `file://` and expect
-microphone access to work. Recommend localhost or HTTPS.
+Windows Desktop notes must not call unsigned artifacts stable or signed. For
+v1.1.0 they must name the bare EXE and round-trip-validated NSIS as the only
+published desktop binaries and state that MSI is not a release asset. Browser
+Edition notes must not imply users can open `file://` and expect microphone
+access to work. Recommend localhost or HTTPS.
 
 ## Cleanup Gate
 

@@ -1,0 +1,784 @@
+{
+  "schemaVersion": 1,
+  "version": "1.1.0",
+  "edition": "desktop",
+  "fixtureBuildRequired": true,
+  "paidApiCalls": false,
+  "assetSet": {
+    "schemaVersion": 1,
+    "fileCount": 6589,
+    "totalBytes": 480736051,
+    "pathDigestSha256": "b217ea27660a3b5d243c408aece7e7c66a53fd392e355c35379479be561cf7d0",
+    "pathHashDigestSha256": "5cf7351051830e167be450131ddc786e01d8bd6fee9186f698a67aefbcee4986",
+    "registrySha256": "7865d97f5c94bd6ad309e1e78b657c82fc13c173b3803de2a991d6ea830b59b5"
+  },
+  "generatorSnapshot": {
+    "schemaVersion": 1,
+    "sha256": "bca086571e2eb86a175622f7f13736e691890cce6146c62ca57f968cc175a2f4",
+    "fileCount": 16,
+    "totalBytes": 228976
+  },
+  "captureTransport": {
+    "additionalBrowserArgsSha256": "422deba0edb5bebce82abe55f41191198e210ee406b862753208667d52de6d0b",
+    "mode": "ephemeral-loopback-cdp",
+    "portFile": "WebView2/EBWebView/DevToolsActivePort"
+  },
+  "credentialNamespace": "com.speakright.desktop.release-evidence-00b97968c07e5caa",
+  "sourceSnapshot": {
+    "schemaVersion": 1,
+    "sha256": "d177ff9888ee1a6fd908e19f2b59f79ebf078cc101b00bf50612dd0f75d32af4",
+    "fileCount": 488
+  },
+  "sourceWorktreeClean": true,
+  "buildManifestSha256": "1ca3c21648642b17a52bc49d9b713a7ae4affa9a17d51523f1a0708f4c2bd5a1",
+  "nativeHttpAttempts": 0,
+  "secureStoreSlotsEmpty": true,
+  "runtimeIsolation": {
+    "logDirectory": "os-temp-child",
+    "logInitialized": true,
+    "logRetained": false,
+    "settingsStorePath": "os-temp-child",
+    "settingsStoreRetained": false,
+    "webViewProfile": "os-temp-child",
+    "profileRetained": false
+  },
+  "networkGuard": {
+    "nativeHttp": "fail-closed",
+    "nativeHttpCapability": false,
+    "externalConnectCsp": false,
+    "rustExternalProviders": "fail-closed",
+    "tauriHttpGuardSha256": "912d4cf660188b58989b2422e9dc25ffef4d3bc8c6bae76630e67212392a5e49",
+    "rustGuardSha256": "bd85a66a49776c70426ae485a8671f1388fa5649d810495547f344ad5b3fc38b"
+  },
+  "sourceCommit": "5fd93297ddc55c97a6c78b4568d6435411be2369",
+  "executable": {
+    "fileName": "speakright.exe",
+    "sha256": "28d39b4473e91613ae5702e2d488264e9d1938a83c899323f95e4fbfb7a851d4"
+  },
+  "networkPolicy": {
+    "applicationOrigin": "http://tauri.localhost",
+    "allowedApplicationOrigins": [
+      "tauri://localhost",
+      "http://tauri.localhost"
+    ],
+    "allowedInternalResponseOrigins": [
+      "http://tauri.localhost",
+      "http://asset.localhost",
+      "http://ipc.localhost"
+    ],
+    "observedInternalResponses": [
+      {
+        "origin": "http://ipc.localhost",
+        "pathname": "/desktop_settings_store_path",
+        "resourceType": "Fetch"
+      },
+      {
+        "origin": "http://ipc.localhost",
+        "pathname": "/desktop_settings_store_path",
+        "resourceType": "Preflight"
+      },
+      {
+        "origin": "http://ipc.localhost",
+        "pathname": "/plugin%3Aevent%7Clisten",
+        "resourceType": "Fetch"
+      },
+      {
+        "origin": "http://ipc.localhost",
+        "pathname": "/plugin%3Aevent%7Clisten",
+        "resourceType": "Preflight"
+      },
+      {
+        "origin": "http://ipc.localhost",
+        "pathname": "/plugin%3Astore%7Cget",
+        "resourceType": "Fetch"
+      },
+      {
+        "origin": "http://ipc.localhost",
+        "pathname": "/plugin%3Astore%7Cget",
+        "resourceType": "Preflight"
+      },
+      {
+        "origin": "http://ipc.localhost",
+        "pathname": "/plugin%3Astore%7Cload",
+        "resourceType": "Fetch"
+      },
+      {
+        "origin": "http://ipc.localhost",
+        "pathname": "/plugin%3Astore%7Cload",
+        "resourceType": "Preflight"
+      },
+      {
+        "origin": "http://ipc.localhost",
+        "pathname": "/plugin%3Astore%7Csave",
+        "resourceType": "Fetch"
+      },
+      {
+        "origin": "http://ipc.localhost",
+        "pathname": "/plugin%3Astore%7Csave",
+        "resourceType": "Preflight"
+      },
+      {
+        "origin": "http://ipc.localhost",
+        "pathname": "/plugin%3Astore%7Cset",
+        "resourceType": "Fetch"
+      },
+      {
+        "origin": "http://ipc.localhost",
+        "pathname": "/plugin%3Astore%7Cset",
+        "resourceType": "Preflight"
+      },
+      {
+        "origin": "http://ipc.localhost",
+        "pathname": "/plugin%3Awindow%7Cis_maximized",
+        "resourceType": "Fetch"
+      },
+      {
+        "origin": "http://ipc.localhost",
+        "pathname": "/plugin%3Awindow%7Cis_maximized",
+        "resourceType": "Preflight"
+      },
+      {
+        "origin": "http://ipc.localhost",
+        "pathname": "/secure_store_get",
+        "resourceType": "Fetch"
+      },
+      {
+        "origin": "http://ipc.localhost",
+        "pathname": "/secure_store_get",
+        "resourceType": "Preflight"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/07og1sd-q8wwy.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/0drblcpoeqy90.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/0fafnyeixyfkd.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/0fsmuix9-wlt6.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/0no3iceex0hmo.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/0q-0sw6fw25dk.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/0ywefqs40cnxl.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/182s8xdqf2u03.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/1cu2rkf6k23lo.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/1emgr2a9kk-82.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/1pa2xgfodc627.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/1yafvq7bn-xww.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/2-cjah879e-qx.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/24-o7l98l0vaw.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/252r8iou03npa.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/25en8913dh97-.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/28sehdxhcajw6.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/2ag7f51m5ecig.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/2bqpos6601u-4.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/2c7qh7qxiuvm0.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/2dzq6atj2pqvi.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/2ee1qvbf9-a56.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/2kxl9t1x22lcg.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/2lpnrt5g-c0z9.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/2mctr6uzt3xo8.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/2sh-swr2muiv1.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/2tj9gz60pxx0x.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/2uh42quij5lvv.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/2zilxjmr-sv6j.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/32zoun16_x8r2.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/3_qbr84btzzhv.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/3cs53nf4yopz2.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/3g4bf0n4gi5k0.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/3ig9pyb6skyig.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/3q-h9ybtf1fly.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/3qqvwsjfxulac.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/3vde98qmzji1a.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/3ypf6yrkbq75v.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/3z6fdgqgwiylu.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/40wc9rfv_-upb.css",
+        "resourceType": "Stylesheet"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/41mplg3aiiv4i.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/42a8i1qp_lutg.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/turbopack-3c4wykkhuwu60.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/assessment",
+        "resourceType": "Document"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/assessment",
+        "resourceType": "Fetch"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/assessment/__next._tree.txt",
+        "resourceType": "Fetch"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/assessment/__next.assessment.__PAGE__.txt",
+        "resourceType": "Fetch"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/assessment/passage",
+        "resourceType": "Fetch"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/assessment/passage/__next._tree.txt",
+        "resourceType": "Fetch"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/drill",
+        "resourceType": "Fetch"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/drill/__next._tree.txt",
+        "resourceType": "Fetch"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/drill/__next.drill.__PAGE__.txt",
+        "resourceType": "Fetch"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/images/ipa/green.png",
+        "resourceType": "Image"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/images/video-poster.svg",
+        "resourceType": "Image"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/phonemes",
+        "resourceType": "Fetch"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/phonemes/__next._tree.txt",
+        "resourceType": "Fetch"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/phonemes/__next.phonemes.__PAGE__.txt",
+        "resourceType": "Fetch"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/phonemes/ee",
+        "resourceType": "Document"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/phonemes/ee",
+        "resourceType": "Fetch"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/phonemes/ee/__next._tree.txt",
+        "resourceType": "Fetch"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/phonemes/eh",
+        "resourceType": "Fetch"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/phonemes/eh/__next._tree.txt",
+        "resourceType": "Fetch"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/phonemes/ey",
+        "resourceType": "Fetch"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/phonemes/ey/__next._tree.txt",
+        "resourceType": "Fetch"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/phonemes/ih",
+        "resourceType": "Fetch"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/phonemes/ih/__next._tree.txt",
+        "resourceType": "Fetch"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/progress",
+        "resourceType": "Document"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/sentences",
+        "resourceType": "Document"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/sentences",
+        "resourceType": "Fetch"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/sentences/__next._tree.txt",
+        "resourceType": "Fetch"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/sentences/__next.sentences.__PAGE__.txt",
+        "resourceType": "Fetch"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/settings",
+        "resourceType": "Document"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/settings",
+        "resourceType": "Fetch"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/settings/__next._tree.txt",
+        "resourceType": "Fetch"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/videos/phonemes/ee.mp4",
+        "resourceType": "Media"
+      }
+    ],
+    "externalResponsesRequired": 0
+  },
+  "attemptedExternalOrigins": [],
+  "successfulExternalOrigins": [],
+  "artifacts": [
+    {
+      "edition": "desktop",
+      "viewport": "1280x920",
+      "id": "guided-repeat",
+      "path": "docs/assets/screenshots/release/v1.1.0/desktop/1280x920/guided-repeat.png",
+      "width": 1280,
+      "height": 920,
+      "sha256": "c4838677f8de11f0e4151d1d82a70610a71a5cbb8ed35393c5e266c82b96cbf4",
+      "geometry": {
+        "banner": {
+          "left": 471.1625061035156,
+          "top": 228.3874969482422,
+          "right": 808.8250122070312,
+          "bottom": 262.23749923706055
+        },
+        "bannerCollisions": 0,
+        "bannerWithinViewport": true,
+        "bannerOccludedPoints": 0
+      },
+      "scoreDisclosure": null
+    },
+    {
+      "edition": "desktop",
+      "viewport": "1280x920",
+      "id": "free-practice",
+      "path": "docs/assets/screenshots/release/v1.1.0/desktop/1280x920/free-practice.png",
+      "width": 1280,
+      "height": 920,
+      "sha256": "79d7bd52dd686b0f828b5e16ed5a02588c59d4f70e4f1bc92381168e3dd15f87",
+      "geometry": {
+        "banner": {
+          "left": 601.1625366210938,
+          "top": 62,
+          "right": 938.8250427246094,
+          "bottom": 95.85000228881836
+        },
+        "bannerCollisions": 0,
+        "bannerWithinViewport": true,
+        "bannerOccludedPoints": 0
+      },
+      "scoreDisclosure": null
+    },
+    {
+      "edition": "desktop",
+      "viewport": "1280x920",
+      "id": "diagnosis-example",
+      "path": "docs/assets/screenshots/release/v1.1.0/desktop/1280x920/diagnosis-example.png",
+      "width": 1280,
+      "height": 920,
+      "sha256": "c08f1af3f3e86d3a56c8937468d85492b0ff67d73b37feb42f73c0bbc3ae091c",
+      "geometry": {
+        "banner": {
+          "left": 596.75,
+          "top": 62,
+          "right": 932.8500061035156,
+          "bottom": 95.85000228881836
+        },
+        "bannerCollisions": 0,
+        "bannerWithinViewport": true,
+        "bannerOccludedPoints": 0
+      },
+      "scoreDisclosure": "示例数据 / Example data — not a live Azure score"
+    },
+    {
+      "edition": "desktop",
+      "viewport": "1280x920",
+      "id": "settings",
+      "path": "docs/assets/screenshots/release/v1.1.0/desktop/1280x920/settings.png",
+      "width": 1280,
+      "height": 920,
+      "sha256": "85fcb5d6b2698d23deb4ae3f56602e44a17c2c7a61d058e501f8a4fb231d97ee",
+      "geometry": {
+        "banner": {
+          "left": 595.9625244140625,
+          "top": 46,
+          "right": 933.6250305175781,
+          "bottom": 79.85000228881836
+        },
+        "bannerCollisions": 0,
+        "bannerWithinViewport": true,
+        "bannerOccludedPoints": 0
+      },
+      "scoreDisclosure": null
+    },
+    {
+      "edition": "desktop",
+      "viewport": "1280x920",
+      "id": "progress-example",
+      "path": "docs/assets/screenshots/release/v1.1.0/desktop/1280x920/progress-example.png",
+      "width": 1280,
+      "height": 920,
+      "sha256": "c76efe03ef46cfd637d1c8b63777386b03b151353139a68048eac689201ecc21",
+      "geometry": {
+        "banner": {
+          "left": 596.75,
+          "top": 62,
+          "right": 932.8500061035156,
+          "bottom": 95.85000228881836
+        },
+        "bannerCollisions": 0,
+        "bannerWithinViewport": true,
+        "bannerOccludedPoints": 0
+      },
+      "scoreDisclosure": "示例数据 / Example data — not a live Azure score"
+    },
+    {
+      "edition": "desktop",
+      "viewport": "1280x920",
+      "id": "no-key",
+      "path": "docs/assets/screenshots/release/v1.1.0/desktop/1280x920/no-key.png",
+      "width": 1280,
+      "height": 920,
+      "sha256": "17ab8c1e812a2572cafc12d6533bbbe1b920c8dead7b563e0276098256afe023",
+      "geometry": {
+        "banner": {
+          "left": 560.375,
+          "top": 369.2875061035156,
+          "right": 969.2124938964844,
+          "bottom": 403.137508392334
+        },
+        "bannerCollisions": 0,
+        "bannerWithinViewport": true,
+        "bannerOccludedPoints": 0
+      },
+      "scoreDisclosure": null
+    },
+    {
+      "edition": "desktop",
+      "viewport": "1024x800",
+      "id": "guided-repeat",
+      "path": "docs/assets/screenshots/release/v1.1.0/desktop/1024x800/guided-repeat.png",
+      "width": 1024,
+      "height": 800,
+      "sha256": "6c97d7d4a953c26d61ccdf0d6fc1132d95ef4fa322c61bf23bf50dd31bb57ad2",
+      "geometry": {
+        "banner": {
+          "left": 343.1625061035156,
+          "top": 168.3874969482422,
+          "right": 680.8250122070312,
+          "bottom": 202.23749923706055
+        },
+        "bannerCollisions": 0,
+        "bannerWithinViewport": true,
+        "bannerOccludedPoints": 0
+      },
+      "scoreDisclosure": null
+    },
+    {
+      "edition": "desktop",
+      "viewport": "1024x800",
+      "id": "free-practice",
+      "path": "docs/assets/screenshots/release/v1.1.0/desktop/1024x800/free-practice.png",
+      "width": 1024,
+      "height": 800,
+      "sha256": "2b51b1756bc4f49d6590df1e787f6fc5fd8e3fececf78f79c11dd31a35283868",
+      "geometry": {
+        "banner": {
+          "left": 473.1625061035156,
+          "top": 62,
+          "right": 810.8250122070312,
+          "bottom": 95.85000228881836
+        },
+        "bannerCollisions": 0,
+        "bannerWithinViewport": true,
+        "bannerOccludedPoints": 0
+      },
+      "scoreDisclosure": null
+    },
+    {
+      "edition": "desktop",
+      "viewport": "1024x800",
+      "id": "diagnosis-example",
+      "path": "docs/assets/screenshots/release/v1.1.0/desktop/1024x800/diagnosis-example.png",
+      "width": 1024,
+      "height": 800,
+      "sha256": "9fe04f51f2c71674e1a0f71626794d3625a5d3aa61b098fc81accf3b36ed682b",
+      "geometry": {
+        "banner": {
+          "left": 468.75,
+          "top": 62,
+          "right": 804.8500061035156,
+          "bottom": 95.85000228881836
+        },
+        "bannerCollisions": 0,
+        "bannerWithinViewport": true,
+        "bannerOccludedPoints": 0
+      },
+      "scoreDisclosure": "示例数据 / Example data — not a live Azure score"
+    },
+    {
+      "edition": "desktop",
+      "viewport": "1024x800",
+      "id": "settings",
+      "path": "docs/assets/screenshots/release/v1.1.0/desktop/1024x800/settings.png",
+      "width": 1024,
+      "height": 800,
+      "sha256": "61aaea01f518b904e40c3fcebca05f66644076e9134946802ccf99be3780f32a",
+      "geometry": {
+        "banner": {
+          "left": 467.9624938964844,
+          "top": 46,
+          "right": 805.625,
+          "bottom": 79.85000228881836
+        },
+        "bannerCollisions": 0,
+        "bannerWithinViewport": true,
+        "bannerOccludedPoints": 0
+      },
+      "scoreDisclosure": null
+    },
+    {
+      "edition": "desktop",
+      "viewport": "1024x800",
+      "id": "progress-example",
+      "path": "docs/assets/screenshots/release/v1.1.0/desktop/1024x800/progress-example.png",
+      "width": 1024,
+      "height": 800,
+      "sha256": "7642d36f4b18e1d4490a81be2d8651bd08a84857eea7c51359c889f696e8c7c8",
+      "geometry": {
+        "banner": {
+          "left": 468.75,
+          "top": 62,
+          "right": 804.8500061035156,
+          "bottom": 95.85000228881836
+        },
+        "bannerCollisions": 0,
+        "bannerWithinViewport": true,
+        "bannerOccludedPoints": 0
+      },
+      "scoreDisclosure": "示例数据 / Example data — not a live Azure score"
+    },
+    {
+      "edition": "desktop",
+      "viewport": "1024x800",
+      "id": "no-key",
+      "path": "docs/assets/screenshots/release/v1.1.0/desktop/1024x800/no-key.png",
+      "width": 1024,
+      "height": 800,
+      "sha256": "5e181c7d4c8139063c81d7f5ba847ace7d7e32641939d5619d2cb9a32f8789dd",
+      "geometry": {
+        "banner": {
+          "left": 432.375,
+          "top": 298.88751220703125,
+          "right": 841.2124938964844,
+          "bottom": 332.7375144958496
+        },
+        "bannerCollisions": 0,
+        "bannerWithinViewport": true,
+        "bannerOccludedPoints": 0
+      },
+      "scoreDisclosure": null
+    }
+  ]
+}

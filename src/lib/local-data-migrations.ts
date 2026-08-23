@@ -1,20 +1,22 @@
 "use client";
 
+import {
+  LEARNING_EVIDENCE_STORAGE_KEY,
+  migrateLegacyMasteryEvidence,
+} from "@/lib/learning-evidence";
 import type {
   MasteryProfile,
   PackMastery,
   PhonemeMastery,
   TrainingSessionSummary,
 } from "@/types/training";
-
-export const LOCAL_DATA_SCHEMA_VERSION = 2;
+export const LOCAL_DATA_SCHEMA_VERSION = 3;
 export const LOCAL_DATA_SCHEMA_VERSION_KEY =
   "speakright_local_data_schema_version";
 export const LOCAL_DATA_MIGRATED_AT_KEY = "speakright_local_data_migrated_at";
 export const CORRUPT_LOCAL_DATA_KEY = "speakright_corrupt_data_v1";
 
-export const LOCAL_DATA_MIGRATION_EVENT =
-  "speakright:local-data-migration";
+export const LOCAL_DATA_MIGRATION_EVENT = "speakright:local-data-migration";
 
 const MASTERY_V2_KEY = "speakright_mastery_profile_v2";
 const MASTERY_V1_KEY = "speakright_mastery_profile_v1";
@@ -25,6 +27,9 @@ const KNOWN_JSON_STORAGE_KEYS = [
   "speakright_assessment_result",
   MASTERY_V2_KEY,
   MASTERY_V1_KEY,
+  LEARNING_EVIDENCE_STORAGE_KEY,
+  "speakright_training_exposure_v1",
+  "speakright_retention_schedule_v1",
   TRAINING_SESSIONS_V2_KEY,
   "speakright_practice_history",
   "speakright_score_history",
@@ -35,7 +40,10 @@ const KNOWN_JSON_STORAGE_KEYS = [
   "speakright_stress_cache",
 ] as const;
 
-const KNOWN_JSON_STORAGE_PREFIXES = ["speakright_mw_words_"] as const;
+const KNOWN_JSON_STORAGE_PREFIXES = [
+  "speakright_mw_words_",
+  "speakright_deep_training_session_v1:",
+] as const;
 
 export interface CorruptLocalDataItem {
   key: string;
@@ -120,6 +128,28 @@ function writeCorruptLocalData(items: CorruptLocalDataItem[]): void {
     CORRUPT_LOCAL_DATA_KEY,
     JSON.stringify(items.slice(0, 50)),
   );
+}
+
+export function quarantineLocalDataValue(key: string, reason: string): boolean {
+  if (!hasStorage()) return false;
+  const raw = localStorage.getItem(key);
+  if (raw === null) return false;
+  const existing = readCorruptLocalData().filter(
+    (item) => !(item.key === key && item.raw === raw),
+  );
+  writeCorruptLocalData([
+    {
+      key,
+      raw,
+      reason,
+      detectedAt: new Date().toISOString(),
+      schemaVersion: LOCAL_DATA_SCHEMA_VERSION,
+    },
+    ...existing,
+  ]);
+  localStorage.removeItem(key);
+  window.dispatchEvent(new StorageEvent("storage", { key }));
+  return true;
 }
 
 function quarantineMalformedJson(key: string, reason: string): boolean {
@@ -268,6 +298,7 @@ export function runLocalDataMigrations(): LocalDataMigrationResult {
   const migratedKeys = [
     ...migrateLegacyMasteryProfile(),
     ...backfillTrainingSessionsFromMastery(),
+    ...(migrateLegacyMasteryEvidence() ? [LEARNING_EVIDENCE_STORAGE_KEY] : []),
   ];
 
   localStorage.setItem(

@@ -23,11 +23,13 @@ import { useAzureAssessment } from "@/hooks/use-azure-assessment";
 import { useRecorder } from "@/hooks/use-recorder";
 import { useRecordingQuality } from "@/hooks/use-recording-quality";
 import { useTtsAligned } from "@/hooks/use-tts-aligned";
+import { buildAzureAttemptEvidence } from "@/lib/azure-attempt-evidence";
 import {
   getBenchmarkArchiveSaveErrorMessage,
   saveBenchmarkRecording,
 } from "@/lib/benchmark-archive";
 import { getLanguageProfile } from "@/lib/language-profiles";
+import { appendLearningEvidence } from "@/lib/learning-evidence";
 import { LOCAL_MASTERY_SAVE_WARNING } from "@/lib/local-save-warning";
 import { canRecordFormalMastery } from "@/lib/mastery-language-policy";
 import {
@@ -51,6 +53,56 @@ const WRAP_SAFE_BADGE_CLASS =
 
 export default function ProsodyPage() {
   const { languageId } = useLanguageConfig();
+  const languageProfile = getLanguageProfile(languageId);
+
+  if (languageId !== "en-US") {
+    return (
+      <div
+        className="h-full overflow-y-auto px-6 py-4 scrollbar-thin"
+        data-smoke="prosody-page"
+      >
+        <div className="mx-auto flex min-h-full w-full max-w-2xl flex-col justify-center">
+          <div
+            className="rounded-xl border bg-card p-6 text-center shadow-sm"
+            data-smoke="prosody-experimental-blocker"
+          >
+            <AudioLines className="mx-auto h-10 w-10 text-primary" />
+            <Badge variant="secondary" className="mt-3">
+              Labs · experimental
+            </Badge>
+            <h1 className="mt-3 break-words text-2xl font-bold [overflow-wrap:anywhere]">
+              {languageProfile.shortLabel}韵律训练开发中
+            </h1>
+            <p className="mt-2 break-words text-sm text-muted-foreground [overflow-wrap:anywhere]">
+              当前韵律与重音题库仍是英语专属。本页不会混入英语训练材料，也不生成正式
+              mastery。
+            </p>
+            <div className="mt-5 flex flex-wrap justify-center gap-2">
+              <Link href="/drill/contrast" className="max-w-full">
+                <Button className="h-auto min-h-8 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]">
+                  练当前语言对比
+                </Button>
+              </Link>
+              <Link href="/drill" className="max-w-full">
+                <Button
+                  variant="outline"
+                  className="h-auto min-h-8 max-w-full whitespace-normal break-words text-center [overflow-wrap:anywhere]"
+                >
+                  返回发音实验室
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return <EnglishProsodyPage />;
+}
+
+function EnglishProsodyPage() {
+  const languageId = "en-US" as const;
   const languageProfile = getLanguageProfile(languageId);
   const [selectedId, setSelectedId] = useState(PROSODY_EXERCISES[0].id);
   const [analysis, setAnalysis] = useState<ProsodyAnalysis | null>(null);
@@ -111,7 +163,30 @@ export default function ProsodyPage() {
         buildProsodyTrainingSession(exercise, nextAnalysis),
       );
       const profileSaved = saveMasteryProfile(profile);
-      setLocalSaveWarning(profileSaved ? null : LOCAL_MASTERY_SAVE_WARNING);
+      const createdAt = Date.now();
+      const evidenceSaved = appendLearningEvidence(
+        buildAzureAttemptEvidence({
+          id: `prosody-${exercise.id}-${createdAt}`,
+          sessionId: `prosody-${exercise.id}-${createdAt}`,
+          languageId,
+          taskType: "sentence",
+          targetUnits: ["prosody"],
+          materialIds: [exercise.id],
+          levelId: exercise.id,
+          result,
+          targetScore: Math.round(nextAnalysis.prosodyScore),
+          recordingQuality: {
+            valid: quality.report.canSubmit,
+            score: quality.report.score,
+            reasons: quality.report.issues.map((issue) => issue.detail),
+          },
+          alignmentValid: true,
+          createdAt,
+        }),
+      );
+      setLocalSaveWarning(
+        profileSaved && evidenceSaved ? null : LOCAL_MASTERY_SAVE_WARNING,
+      );
     } else {
       setLocalSaveWarning(null);
     }
@@ -141,7 +216,8 @@ export default function ProsodyPage() {
       <div className="mb-5 flex items-center gap-3">
         <Link
           href="/drill"
-          className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-muted transition-colors cursor-pointer"
+          aria-label="返回训练首页"
+          className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-muted transition-colors cursor-pointer sm:h-8 sm:w-8"
         >
           <ArrowLeft className="h-4 w-4" />
         </Link>

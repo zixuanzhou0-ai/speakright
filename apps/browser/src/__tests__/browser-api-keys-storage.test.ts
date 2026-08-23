@@ -1,18 +1,23 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   API_KEY_STORAGE_ERROR_EVENT,
+  APP_PREFERENCE_STORAGE_KEYS,
   clearItem,
-  getAzureConfig,
   getApiKeyPersistence,
+  getAzureConfig,
   getElevenLabsConfig,
   getLlmConfig,
   getPronunciationConfig,
+  getStandardTtsConfig,
+  getVertexGeminiTtsConfig,
   hydrateKeys,
   setApiKeyPersistence,
   setAzureConfig,
   setElevenLabsConfig,
   setLlmConfig,
   setPronunciationConfig,
+  setStandardTtsConfig,
+  setVertexGeminiTtsConfig,
   subscribeToStorage,
 } from "@/lib/api-keys";
 
@@ -157,6 +162,45 @@ describe("browser API key storage", () => {
       "youdao",
     );
     expect(getPronunciationConfig()).toEqual({ source: "youdao" });
+  });
+
+  it("stores the standard TTS provider locally and falls back from invalid values", () => {
+    expect(getStandardTtsConfig()).toEqual({ provider: "elevenlabs" });
+
+    setStandardTtsConfig({ provider: "hermes-grok" });
+
+    expect(localStorage.getItem("speakright_standard_tts_config")).toContain(
+      "hermes-grok",
+    );
+    expect(sessionStorage.getItem("speakright_standard_tts_config")).toBeNull();
+    expect(getStandardTtsConfig()).toEqual({ provider: "hermes-grok" });
+    expect(APP_PREFERENCE_STORAGE_KEYS).toContain(
+      "speakright_standard_tts_config",
+    );
+
+    setStandardTtsConfig({ provider: "vertex-gemini" });
+    expect(getStandardTtsConfig()).toEqual({ provider: "vertex-gemini" });
+
+    localStorage.setItem(
+      "speakright_standard_tts_config",
+      JSON.stringify({ provider: "broken" }),
+    );
+    expect(getStandardTtsConfig()).toEqual({ provider: "elevenlabs" });
+  });
+
+  it("stores the Vertex voice as a local non-secret preference", () => {
+    expect(getVertexGeminiTtsConfig()).toEqual({ voiceName: "Kore" });
+
+    setVertexGeminiTtsConfig({ voiceName: "Callirrhoe" });
+
+    expect(getVertexGeminiTtsConfig()).toEqual({ voiceName: "Callirrhoe" });
+    expect(getVertexGeminiTtsConfig()).toBe(getVertexGeminiTtsConfig());
+    expect(
+      localStorage.getItem("speakright_vertex_gemini_tts_config"),
+    ).toContain("Callirrhoe");
+    expect(APP_PREFERENCE_STORAGE_KEYS).toContain(
+      "speakright_vertex_gemini_tts_config",
+    );
   });
 
   it("emits storage events for browser settings readers", () => {

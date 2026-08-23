@@ -1,7 +1,8 @@
+import { isFormalEvidenceEnabled } from "@/lib/language-capability-policy";
 import type { LanguageId } from "@/types/language";
 
 export function canRecordFormalMastery(languageId: LanguageId): boolean {
-  return languageId === "en-US";
+  return isFormalEvidenceEnabled(languageId);
 }
 
 export function getExperimentalMasteryBlocker(

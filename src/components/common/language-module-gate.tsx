@@ -6,12 +6,18 @@ import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { useLanguageConfig } from "@/hooks/use-api-keys";
 import { auditLanguageCoverage } from "@/lib/language-content-audit";
+import {
+  getLanguageCapabilityPolicy,
+  getRouteCapability,
+  type LanguageCapabilityRoute,
+} from "@/lib/language-capability-policy";
 import { getLanguageProfile } from "@/lib/language-profiles";
 import type { LanguageReadiness } from "@/types/language";
 
 interface LanguageModuleGateProps {
   moduleName: string;
   readinessKey: keyof LanguageReadiness;
+  capabilityRoute?: LanguageCapabilityRoute;
   children: ReactNode;
 }
 
@@ -21,12 +27,22 @@ const WRAP_SAFE_ACTION_BUTTON_CLASS =
 export function LanguageModuleGate({
   moduleName,
   readinessKey,
+  capabilityRoute,
   children,
 }: LanguageModuleGateProps) {
   const { languageId } = useLanguageConfig();
   const profile = getLanguageProfile(languageId);
   const audit = auditLanguageCoverage(languageId);
-  const ready = profile.readiness[readinessKey];
+  const profileReady = profile.readiness[readinessKey];
+  const routeCapability = capabilityRoute
+    ? getRouteCapability(
+        getLanguageCapabilityPolicy(languageId),
+        capabilityRoute,
+      )
+    : null;
+  const ready = routeCapability
+    ? routeCapability !== "unavailable"
+    : profileReady;
 
   if (ready) return <>{children}</>;
 
@@ -39,7 +55,8 @@ export function LanguageModuleGate({
           </div>
           <div className="min-w-0 flex-1">
             <h1 className="break-words text-xl font-semibold [overflow-wrap:anywhere]">
-              {profile.displayName}{moduleName}暂未开放完整训练
+              {profile.displayName}
+              {moduleName}暂未开放完整训练
             </h1>
             <p
               className="mt-2 break-words text-sm text-muted-foreground [overflow-wrap:anywhere]"
@@ -71,10 +88,7 @@ export function LanguageModuleGate({
             </Button>
           </Link>
           <Link href="/settings" className="max-w-full">
-            <Button
-              variant="outline"
-              className={WRAP_SAFE_ACTION_BUTTON_CLASS}
-            >
+            <Button variant="outline" className={WRAP_SAFE_ACTION_BUTTON_CLASS}>
               配置语言/音频包
             </Button>
           </Link>

@@ -1,22 +1,31 @@
 "use client";
 
+import { MicrophoneDeviceSelect } from "@/components/audio/microphone-device-select";
 import { RecordButton } from "@/components/audio/record-button";
 import { RecordingActions } from "@/components/audio/recording-actions";
 import { RecordingQualityPanel } from "@/components/audio/recording-quality-panel";
 import { WaveformDisplay } from "@/components/audio/waveform-display";
 import { ScoreSummary } from "@/components/scoring/score-summary";
+import type { MicrophoneDeviceOption } from "@/lib/microphone-device";
 import type { RecordingQualityReport } from "@/lib/recording-quality";
 import { isSentence } from "@/lib/utils";
 import type { AzureAssessmentResult } from "@/types/azure";
+import type { LanguageId } from "@/types/language";
 
 interface SentenceRecordingCardProps {
   sentence: string;
+  languageId?: LanguageId;
   // Recorder
   isRecording: boolean;
   elapsedSeconds: number;
   maxDurationSeconds: number;
   audioBlob: Blob | null;
   stream: MediaStream | null;
+  microphoneDevices?: MicrophoneDeviceOption[];
+  selectedMicrophoneDeviceId?: string | null;
+  isLoadingMicrophones?: boolean;
+  onMicrophoneChange?: (deviceId: string | null) => void;
+  onMicrophoneRefresh?: () => void;
   qualityReport: RecordingQualityReport | null;
   isAnalyzingQuality?: boolean;
   recorderError: string | null;
@@ -36,11 +45,17 @@ interface SentenceRecordingCardProps {
 
 export function SentenceRecordingCard({
   sentence,
+  languageId = "en-US",
   isRecording,
   elapsedSeconds,
   maxDurationSeconds,
   audioBlob,
   stream,
+  microphoneDevices = [],
+  selectedMicrophoneDeviceId = null,
+  isLoadingMicrophones = false,
+  onMicrophoneChange,
+  onMicrophoneRefresh,
   qualityReport,
   isAnalyzingQuality = false,
   recorderError,
@@ -70,6 +85,17 @@ export function SentenceRecordingCard({
       data-smoke="sentence-recording-card"
     >
       <div className="flex flex-col items-center gap-2">
+        {onMicrophoneChange && onMicrophoneRefresh && (
+          <MicrophoneDeviceSelect
+            devices={microphoneDevices}
+            selectedDeviceId={selectedMicrophoneDeviceId}
+            isLoading={isLoadingMicrophones}
+            disabled={isRecording || isAssessing}
+            onDeviceChange={onMicrophoneChange}
+            onRefresh={onMicrophoneRefresh}
+          />
+        )}
+
         <RecordButton
           isRecording={isRecording}
           onStart={onRecordStart}
@@ -151,7 +177,7 @@ export function SentenceRecordingCard({
         <div className="mt-3 border-t pt-3">
           <ScoreSummary
             result={result}
-            showProsody={isSentence(sentence)}
+            showProsody={languageId === "en-US" && isSentence(sentence)}
             historyKey={`${trimmed.slice(0, 50)}:${trimmed.length}`}
           />
         </div>

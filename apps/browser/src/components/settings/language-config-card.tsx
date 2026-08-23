@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLanguageConfig } from "@/hooks/use-api-keys";
 import { setLanguageConfig } from "@/lib/api-keys";
+import { getLanguageCapabilityPolicy } from "@/lib/language-capability-policy";
 import { auditLanguageCoverage } from "@/lib/language-content-audit";
 import { getVisibleLanguagePhonologyGaps } from "@/lib/language-phonology-inventory";
 import {
@@ -14,14 +15,17 @@ import {
 import { cn } from "@/lib/utils";
 import type { LanguageId } from "@/types/language";
 
-function statusLabel(status: string) {
-  if (status === "stable") return "基线";
-  if (status === "experimental") return "实验";
-  return "草案";
+function capabilityOverview(languageId: LanguageId): string {
+  const policy = getLanguageCapabilityPolicy(languageId);
+  if (policy.productStatus === "stable") {
+    return "稳定：发音单位、自由练习、引导训练、诊断与正式证据";
+  }
+  return "核心公开：发音单位、自由练习；Labs：引导训练、探索性诊断；正式证据关闭";
 }
 
 export function LanguageConfigCard() {
   const config = useLanguageConfig();
+  const activePolicy = getLanguageCapabilityPolicy(config.languageId);
   const activeProfile = getLanguageProfile(config.languageId);
   const profiles = getEnabledLanguageProfiles();
 
@@ -39,12 +43,15 @@ export function LanguageConfigCard() {
           <CardTitle className="text-base">学习语言</CardTitle>
         </div>
         <p className="text-sm text-muted-foreground">
-          当前：{activeProfile.displayName}。英语包含完整训练流；西语、法语、俄语仍为实验板块，公开版先开放音标/发音单位练习和自由练习。
+          当前：{activeProfile.displayName} ·{" "}
+          {activePolicy.productStatus === "stable" ? "稳定基线" : "Labs"}。
+          {capabilityOverview(config.languageId)}
         </p>
       </CardHeader>
       <CardContent className="grid gap-3 md:grid-cols-2">
         {profiles.map((profile) => {
           const selected = profile.id === config.languageId;
+          const policy = getLanguageCapabilityPolicy(profile.id);
           const audit = auditLanguageCoverage(profile.id);
           const phonologyGaps = getVisibleLanguagePhonologyGaps(profile.id);
           return (
@@ -56,7 +63,7 @@ export function LanguageConfigCard() {
               data-selected={selected ? "true" : "false"}
               onClick={() => handleSelect(profile.id)}
               className={cn(
-                "rounded-lg border p-4 text-center transition-colors",
+                "min-h-11 rounded-lg border p-4 text-center transition-colors",
                 selected
                   ? "border-primary bg-primary/5"
                   : "border-border hover:border-primary/40",
@@ -69,7 +76,7 @@ export function LanguageConfigCard() {
                       {profile.displayName}
                     </span>
                     <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">
-                      {statusLabel(profile.status)}
+                      {policy.productStatus === "stable" ? "稳定基线" : "Labs"}
                     </span>
                   </div>
                   <p className="mt-0.5 break-words text-center text-xs text-muted-foreground [overflow-wrap:anywhere]">
@@ -97,6 +104,9 @@ export function LanguageConfigCard() {
                   <p className="font-semibold">{audit.coverageScore}%</p>
                 </div>
               </div>
+              <p className="mt-3 text-xs text-muted-foreground">
+                {capabilityOverview(profile.id)}
+              </p>
 
               {audit.missingCapabilities.length > 0 && (
                 <p

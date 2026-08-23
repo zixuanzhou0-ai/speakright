@@ -1,7 +1,7 @@
+import { execFile } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync } from "node:fs";
 import { readFile, stat } from "node:fs/promises";
-import { execFile } from "node:child_process";
 import path from "node:path";
 import { promisify } from "node:util";
 
@@ -152,7 +152,9 @@ function assertVersionInfo(info, expectedVersion) {
     );
   }
   if (info.FileDescription !== productName) {
-    fail(`${path.basename(info.Path)} FileDescription is "${info.FileDescription}"`);
+    fail(
+      `${path.basename(info.Path)} FileDescription is "${info.FileDescription}"`,
+    );
   }
 }
 
@@ -161,7 +163,9 @@ function assertMsiProperties(msi, expectedVersion) {
     fail(`MSI ProductName is "${msi.ProductName}"`);
   }
   if (msi.ProductVersion !== expectedVersion) {
-    fail(`MSI ProductVersion is "${msi.ProductVersion}", expected "${expectedVersion}"`);
+    fail(
+      `MSI ProductVersion is "${msi.ProductVersion}", expected "${expectedVersion}"`,
+    );
   }
   if (msi.Manufacturer !== manufacturer) {
     fail(`MSI Manufacturer is "${msi.Manufacturer}"`);
@@ -182,12 +186,33 @@ async function assertReleaseReport(version, paths) {
   if (report.productName !== productName || report.version !== version) {
     fail("release report product/version does not match package metadata");
   }
-  for (const [type, filePathForType] of Object.entries(paths)) {
+  const publishedPaths = { exe: paths.exe, nsis: paths.nsis };
+  const reportedTypes = Array.isArray(report.artifacts)
+    ? report.artifacts.map((item) => item.type)
+    : [];
+  if (
+    JSON.stringify(reportedTypes) !==
+    JSON.stringify(Object.keys(publishedPaths))
+  ) {
+    fail(
+      "release report must contain only the published EXE and NSIS artifacts",
+    );
+  }
+  if (
+    report.distribution?.installerType !== "nsis" ||
+    !report.distribution?.excludedArtifactTypes?.includes("msi")
+  ) {
+    fail("release report does not mark MSI as local-validation-only");
+  }
+  for (const [type, filePathForType] of Object.entries(publishedPaths)) {
     const artifact = report.artifacts?.find((item) => item.type === type);
     if (!artifact) {
       fail(`release report is missing ${type} artifact`);
     }
-    if (path.resolve(artifact.path) !== path.resolve(filePathForType)) {
+    const reportedPath = path.isAbsolute(artifact.path)
+      ? artifact.path
+      : path.join(root, artifact.path);
+    if (path.resolve(reportedPath) !== path.resolve(filePathForType)) {
       fail(`release report ${type} path does not match expected artifact path`);
     }
     if (artifact.sha256 !== (await sha256(filePathForType))) {
@@ -205,7 +230,9 @@ async function main() {
   await assertReleaseReport(version, paths);
 
   if (process.platform !== "win32") {
-    console.log("Desktop installer smoke skipped Windows metadata checks on non-Windows platform.");
+    console.log(
+      "Desktop installer smoke skipped Windows metadata checks on non-Windows platform.",
+    );
     return;
   }
 
@@ -216,7 +243,7 @@ async function main() {
   const msiProperties = await inspectMsi(paths.msi);
   assertMsiProperties(msiProperties, version);
   console.log(
-    `Desktop installer smoke passed: ${productName} ${version} EXE/MSI/NSIS metadata and release report are consistent.`,
+    `Desktop installer smoke passed: ${productName} ${version} published EXE/NSIS report is consistent; local-only MSI metadata also passed.`,
   );
 }
 

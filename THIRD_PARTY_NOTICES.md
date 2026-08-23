@@ -1,71 +1,71 @@
-# Third-Party Notices And Asset Boundary
+# Third-party notices and media boundary
 
-SpeakRight Desktop includes source code, documentation, local audio assets, and
-local teaching media. The MIT license in `LICENSE` applies to source code and
-source-code documentation unless a file says otherwise. It does not
-automatically relicense bundled third-party media.
+The MIT License in `LICENSE` covers SpeakRight source code and source-code
+documentation. It does not relicense bundled third-party audio, images, video,
+provider output, trademarks, or educational media.
 
-Before redistributing packaged builds publicly, review the origin, license,
-attribution, and redistribution rights for each bundled media source. When a
-source or license is uncertain, document it as a release blocker or an asset
-gap instead of presenting it as a final public redistribution grant.
+The release source of truth is
+`docs/assets/asset-rights-registry.json`. Each packaged media family has a
+deterministic SHA-256 tree digest, attribution, redistribution status, and a
+non-sensitive `evidenceRef`. Private emails, contracts, receipts, and account
+records are retained by the maintainer and are intentionally not committed.
 
-## Bundled Or Referenced Media
+## Bundled media
 
-The repository may include or reference:
+| Source family | Bundled use | Rights boundary / attribution |
+| --- | --- | --- |
+| American IPA Chart / americanipachart.com | English IPA chart sounds | Bundled under the maintainer's recorded redistribution permission. The three `cup` replacements are separately attributed below. |
+| Wikimedia Commons | Selected English and Russian IPA recordings | Distributed under the per-file Creative Commons terms and attribution recorded in the source manifests and registry. |
+| ElevenLabs generated output | English word audio and Spanish, French, and Russian language packs | Generated through the maintainer's account. Redistribution authority is recorded by the non-public evidence referenced in the registry; the audio is not MIT-licensed. |
+| Microsoft Fluent Emoji | IPA and example-word illustrations | Microsoft Fluent Emoji assets are licensed under MIT; source: https://github.com/microsoft/fluentui-emoji. The required copyright and license notice is included at `LICENSES/MICROSOFT-FLUENT-EMOJI-MIT.txt`. |
+| Rachel's English | Optional maintainer-local English pronunciation teaching videos and public source reference | The 40 local clips are excluded from tracked Browser and Desktop release assets. When a local clip is unavailable, SpeakRight links to the official Rachel's English site; the videos are not MIT-licensed. |
+| University of Iowa Sounds of Speech Spanish | Spanish articulation and example clips | Bundled within the separately recorded written permission boundary. Preserve source attribution. |
+| Seeing Speech, University of Glasgow | French and Russian articulation media and extracted audio tracks | Preserve the original files and scholarly attribution. Any additional written redistribution permission is referenced privately by the registry. |
+| Maintainer-cleared lesson videos | Selected Spanish, French, and Russian teaching clips | Each bundled family is covered by the maintainer's written redistribution record. A source-platform link alone is never treated as permission. |
 
-- English IPA chart audio and images.
-- English word-card audio in `public/audio/words/`.
-- Spanish, French, and Russian local language-pack audio in
-  `public/audio/language-packs/`.
-- Local sound-unit header clips in `public/audio/language-assets/`.
-- Pronunciation teaching videos and articulation assets in `public/videos/`.
-- Generated, downloaded, or source-ledger images used by the UI.
+## Exact Creative Commons derivatives
 
-These assets are included for the current desktop learning experience and
-release-candidate validation. They are not automatically covered by the MIT
-source-code license.
+The following English `cup` files are derived from Wikimedia Commons sources.
+Exact source hashes, modifications, and final hashes are documented in
+`docs/operations/GUIDED_REPEAT_AUDIO_SOURCES.md`.
 
-## Source Notes And Credits
+- `public/audio/ipa/normal/cup.mp3` and
+  `public/audio/ipa/slow/cup.mp3`: `En-us-cup.ogg` by Dvortygirl,
+  CC BY-SA 3.0.
+- `public/audio/ipa/phoneme/cup.mp3`:
+  `PR-open-mid back unrounded vowel2.ogg` by RoachPeter,
+  CC BY-SA 4.0.
 
-- **Rachel's English**: English pronunciation teaching videos and source-ledger
-  references are credited where used. Keep bundled or mirrored usage within the
-  verified rights boundary before public redistribution.
-- **American IPA Chart / americanipachart.com**: English IPA chart audio/source
-  references inform the local IPA chart clips. Treat these media files as
-  third-party educational assets, not MIT-licensed source code.
-- **University of Iowa Sounds of Speech Spanish**: Spanish articulation assets
-  and references are used where exact local Spanish mouth/tongue animations are
-  available.
-- **Seeing Speech / University of Glasgow**: Selected phonetics and articulation
-  references, including IPA-chart style media, inform some local source-ledger
-  entries and pronunciation guidance.
-- **EasyPronunciation and similar pronunciation resources**: Used as reference
-  or source-verification context where noted. Do not describe reference-only
-  pages as bundled assets or redistribution licenses.
-- **Microsoft Fluent Emoji-style images**: English phoneme-card images are
-  treated as third-party visual assets with their own licensing boundary.
-- **Azure Speech, ElevenLabs, Youdao, Merriam-Webster, and LLM providers**:
-  Online capabilities depend on user-configured provider accounts and the
-  providers' own terms. Azure Speech is the source of numeric pronunciation
-  scoring; LLM providers only generate coaching explanations from that evidence.
+Russian Commons recordings retain their per-file source page, creator or
+source attribution, SPDX-style license label, and SHA-256 in
+`public/videos/language-assets/ru-RU/russian-local-pronunciation-assets.manifest.json`.
+The registry commits that manifest's SHA-256, and the release validator checks
+every listed Commons digest against the corresponding packaged audio file.
 
-## Contributor Rules
+## API providers and references
 
-- Do not add paid, generated, downloaded, or third-party media without recording
-  its source and usage constraints.
-- Do not add new ElevenLabs-generated audio without explicit maintainer
-  approval.
-- Do not replace an exact pronunciation asset with proxy video, unrelated word
-  audio, browser TTS, or rule explanation audio.
-- Do not make a speaker button clickable unless the target has a verified local
-  short audio source.
-- If an asset is uncertain, document it as a gap instead of presenting it as an
-  exact pronunciation reference.
+Azure Speech, ElevenLabs, Vertex AI, Hermes, and LLM providers are optional
+user-configured services governed by their own terms. Youdao is an automatic,
+credential-free word-pronunciation fallback when a user requests playback and
+no eligible bundled English recording is available; it is also governed by its
+own terms.
+Reference pages used to check IPA or teaching content are not bundled merely
+because they are cited. A reference-only source must never match a packaged
+file in the asset-rights validator.
 
-## Current Release Note
+## Contributor and release rules
 
-Spanish, French, and Russian are experimental modules. Their bundled audio and
-IPA data are under active audit and should not be described as final mastery
-evidence. Controlled-test artifacts may include third-party media for validation;
-public redistribution still requires a rights review and Windows code signing.
+- Add no third-party media without a source, attribution, redistribution
+  decision, SHA-256 digest, and evidence reference.
+- Keep private authorization evidence outside the repository. Commit only its
+  opaque evidence reference.
+- Do not present a whole word, phrase, teaching track, or generated proxy as an
+  isolated phoneme.
+- Do not expose a speaker control unless its local or online source is
+  accurately described.
+- Run the rights validator before release. Missing files, changed bytes,
+  unregistered media, overlapping claims, and locally bundled
+  `reference-only` material are release failures.
+
+Spanish, French, and Russian remain experimental learning modules. This status
+describes pedagogical validation, not the recorded redistribution boundary.

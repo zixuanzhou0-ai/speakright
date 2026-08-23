@@ -3,7 +3,7 @@
 import { ChevronLeft, ChevronRight, Loader2, Volume2 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
 import { PhonemePlayButton } from "@/components/phoneme/phoneme-play-button";
 import { VideoPlayer } from "@/components/phoneme/video-player";
 import { Button } from "@/components/ui/button";
@@ -11,12 +11,12 @@ import {
   type AudioPlaybackOptions,
   getChartWordPlaybackOptions,
 } from "@/lib/audio-playback-policy";
-import { getExactTeachingVideosForSoundUnit } from "@/lib/language-teaching-videos";
 import {
   getSoundUnitSourceAlignment,
   shouldShowLocalVideoAsPrimary,
   shouldShowSoundUnitHeaderAudio,
 } from "@/lib/language-source-alignment";
+import { getExactTeachingVideosForSoundUnit } from "@/lib/language-teaching-videos";
 import {
   getCenteredMonoTextClassName,
   getCenteredReadableTextClassName,
@@ -49,6 +49,7 @@ interface PhonemeStudyCardProps {
   onStopChartAudio: () => void;
   wordHistoryLength: number;
   canGoPrevious?: boolean;
+  guidedRepeatAction?: ReactNode;
 }
 
 interface NonEnglishPracticeTaskProps {
@@ -67,6 +68,74 @@ interface NonEnglishPracticeTaskProps {
   onPlayWord: (word: string, voice?: "blue" | "pink") => void;
   onStopPlayback: () => void;
   onStopChartAudio: () => void;
+}
+
+interface VoicePlaybackControlProps {
+  selectedVoice: "blue" | "pink";
+  isLoading: boolean;
+  audioLabel: string;
+  voiceTitlePrefix: string;
+  onSelectVoice: (voice: "blue" | "pink") => void;
+  onPlay: () => void;
+}
+
+function VoicePlaybackControl({
+  selectedVoice,
+  isLoading,
+  audioLabel,
+  voiceTitlePrefix,
+  onSelectVoice,
+  onPlay,
+}: VoicePlaybackControlProps) {
+  return (
+    <div
+      className="inline-flex shrink-0 items-center rounded-full border bg-muted/30 p-0.5 shadow-xs"
+      data-smoke="practice-voice-playback-cluster"
+    >
+      <div
+        className="flex shrink-0 overflow-hidden rounded-full"
+        data-smoke="practice-voice-selector"
+      >
+        {(["blue", "pink"] as const).map((voice) => (
+          <button
+            type="button"
+            key={voice}
+            data-smoke={`practice-voice-${voice === "blue" ? "a" : "b"}`}
+            aria-label={`使用${voice === "blue" ? "A" : "B"}声线`}
+            title={`${voiceTitlePrefix} ${voice === "blue" ? "A" : "B"}`}
+            onClick={() => onSelectVoice(voice)}
+            className={`h-11 w-11 rounded-full text-[11px] font-semibold transition-colors ${
+              selectedVoice === voice
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "text-muted-foreground hover:bg-background"
+            }`}
+          >
+            {voice === "blue" ? "A" : "B"}
+          </button>
+        ))}
+      </div>
+
+      <span aria-hidden="true" className="mx-0.5 h-5 w-px bg-border" />
+
+      <motion.button
+        type="button"
+        data-smoke="practice-word-audio"
+        aria-label={audioLabel}
+        title={audioLabel}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
+        onClick={onPlay}
+        disabled={isLoading}
+        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full cursor-pointer text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary disabled:opacity-50"
+      >
+        {isLoading ? (
+          <Loader2 className="h-5 w-5 animate-spin" />
+        ) : (
+          <Volume2 className="h-5 w-5" />
+        )}
+      </motion.button>
+    </div>
+  );
 }
 
 function NonEnglishPracticeTask({
@@ -164,56 +233,25 @@ function NonEnglishPracticeTask({
               onPrevious();
             }}
             disabled={!previousEnabled}
-            className="h-8 w-8 shrink-0 rounded-full cursor-pointer disabled:opacity-30"
+            aria-label="上一个示例词"
+            className="min-h-11 min-w-11 shrink-0 rounded-full cursor-pointer disabled:opacity-30"
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
         </motion.div>
 
-        <div
-          className="flex shrink-0 overflow-hidden rounded-full border bg-background/70 p-0.5"
-          data-smoke="practice-voice-selector"
-        >
-          {(["blue", "pink"] as const).map((voice) => (
-            <button
-              type="button"
-              key={voice}
-              data-smoke={`practice-voice-${voice === "blue" ? "a" : "b"}`}
-              aria-label={`使用${voice === "blue" ? "A" : "B"}声线`}
-              title={`练习示范 ${voice === "blue" ? "A" : "B"}`}
-              onClick={() => onSetSelectedVoice(voice)}
-              className={`h-7 w-7 rounded-full text-[11px] font-semibold transition-colors ${
-                selectedVoice === voice
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:bg-background"
-              }`}
-            >
-              {voice === "blue" ? "A" : "B"}
-            </button>
-          ))}
-        </div>
-
-        <motion.button
-          type="button"
-          data-smoke="practice-word-audio"
-          aria-label={audioLabel}
-          title={audioLabel}
-          whileHover={{ scale: 1.12 }}
-          whileTap={{ scale: 0.9 }}
-          onClick={() => {
+        <VoicePlaybackControl
+          selectedVoice={selectedVoice}
+          isLoading={wordIsLoading}
+          audioLabel={audioLabel}
+          voiceTitlePrefix="练习示范"
+          onSelectVoice={onSetSelectedVoice}
+          onPlay={() => {
             onStopPlayback();
             onStopChartAudio();
             onPlayWord(currentWord.word, selectedVoice);
           }}
-          disabled={wordIsLoading}
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full cursor-pointer text-muted-foreground hover:bg-primary/10 hover:text-primary disabled:opacity-50"
-        >
-          {wordIsLoading ? (
-            <Loader2 className="h-5 w-5 animate-spin" />
-          ) : (
-            <Volume2 className="h-5 w-5" />
-          )}
-        </motion.button>
+        />
 
         <motion.div whileTap={{ scale: 0.9 }}>
           <Button
@@ -223,7 +261,9 @@ function NonEnglishPracticeTask({
               onSetWordDirection(1);
               onNext();
             }}
-            className="h-8 w-8 shrink-0 rounded-full cursor-pointer"
+            aria-label="下一个示例词"
+            data-smoke="phoneme-next-word"
+            className="min-h-11 min-w-11 shrink-0 rounded-full cursor-pointer"
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
@@ -265,6 +305,7 @@ export function PhonemeStudyCard({
   onStopChartAudio,
   wordHistoryLength,
   canGoPrevious,
+  guidedRepeatAction,
 }: PhonemeStudyCardProps) {
   const hasLocalPhonemeAssets = phoneme.languageId === "en-US";
   const displayWord = currentWord?.stressText ?? currentWord?.word;
@@ -341,7 +382,9 @@ export function PhonemeStudyCard({
               data-smoke="sound-unit-header-audio"
             >
               <PhonemePlayButton
-                chartWord={hasLocalPhonemeAssets ? phoneme.chartWord : undefined}
+                chartWord={
+                  hasLocalPhonemeAssets ? phoneme.chartWord : undefined
+                }
                 phonemeAudio={
                   hasLocalPhonemeAssets ? undefined : phoneme.phonemeAudio
                 }
@@ -418,8 +461,11 @@ export function PhonemeStudyCard({
             />
           ) : (
             <>
-              <div className="mt-2 flex items-center gap-2">
-                <motion.div whileTap={{ scale: 0.9 }}>
+              <div className="mt-2 grid grid-cols-[2.75rem_minmax(0,1fr)_2.75rem] items-center gap-x-2 gap-y-1.5">
+                <motion.div
+                  className="col-start-1 row-start-1"
+                  whileTap={{ scale: 0.9 }}
+                >
                   <Button
                     variant="ghost"
                     size="icon"
@@ -428,13 +474,14 @@ export function PhonemeStudyCard({
                       onPrevious();
                     }}
                     disabled={!previousEnabled}
-                    className="h-7 w-7 shrink-0 rounded-full cursor-pointer disabled:opacity-30"
+                    aria-label="上一个示例词"
+                    className="min-h-11 min-w-11 shrink-0 rounded-full cursor-pointer disabled:opacity-30"
                   >
                     <ChevronLeft className="h-4 w-4" />
                   </Button>
                 </motion.div>
 
-                <div className="relative flex-1 overflow-hidden">
+                <div className="relative col-start-2 row-start-1 min-w-0 overflow-hidden">
                   <AnimatePresence mode="wait" initial={false}>
                     <motion.div
                       key={currentWord.word}
@@ -456,7 +503,8 @@ export function PhonemeStudyCard({
                     >
                       <motion.span
                         animate={{ scale: isWordActive ? 1.05 : 1 }}
-                        className={`font-bold transition-colors ${getCenteredReadableTextClassName(practiceText.density)} ${isWordActive ? "text-primary" : ""}`}
+                        className={`whitespace-nowrap font-bold transition-colors ${getCenteredReadableTextClassName(practiceText.density)} ${isWordActive ? "text-primary" : ""}`}
+                        data-smoke="phoneme-current-word"
                       >
                         {displayWord}
                       </motion.span>
@@ -470,50 +518,27 @@ export function PhonemeStudyCard({
                 </div>
 
                 <div
-                  className="flex shrink-0 overflow-hidden rounded-full border bg-muted/30 p-0.5"
-                  data-smoke="practice-voice-selector"
+                  className="col-start-2 row-start-2 justify-self-center"
+                  data-smoke="practice-voice-control-row"
                 >
-                  {(["blue", "pink"] as const).map((voice) => (
-                    <button
-                      type="button"
-                      key={voice}
-                      data-smoke={`practice-voice-${voice === "blue" ? "a" : "b"}`}
-                      aria-label={`使用${voice === "blue" ? "A" : "B"}声线`}
-                      title={`标准发音 ${voice === "blue" ? "A" : "B"}`}
-                      onClick={() => setSelectedVoice(voice)}
-                      className={`h-6 w-6 rounded-full text-[11px] font-semibold transition-colors ${
-                        selectedVoice === voice
-                          ? "bg-primary text-primary-foreground"
-                          : "text-muted-foreground hover:bg-background"
-                      }`}
-                    >
-                      {voice === "blue" ? "A" : "B"}
-                    </button>
-                  ))}
+                  <VoicePlaybackControl
+                    selectedVoice={selectedVoice}
+                    isLoading={wordIsLoading}
+                    audioLabel="播放单词发音"
+                    voiceTitlePrefix="标准发音"
+                    onSelectVoice={setSelectedVoice}
+                    onPlay={() => {
+                      onStopPlayback();
+                      onStopChartAudio();
+                      onPlayWord(currentWord.word, selectedVoice);
+                    }}
+                  />
                 </div>
 
-                <motion.button
-                  type="button"
-                  data-smoke="practice-word-audio"
-                  aria-label="播放单词发音"
-                  whileHover={{ scale: 1.15 }}
+                <motion.div
+                  className="col-start-3 row-start-1"
                   whileTap={{ scale: 0.9 }}
-                  onClick={() => {
-                    onStopPlayback();
-                    onStopChartAudio();
-                    onPlayWord(currentWord.word, selectedVoice);
-                  }}
-                  disabled={wordIsLoading}
-                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full cursor-pointer hover:bg-primary/10 hover:text-primary text-muted-foreground disabled:opacity-50"
                 >
-                  {wordIsLoading ? (
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                  ) : (
-                    <Volume2 className="h-5 w-5" />
-                  )}
-                </motion.button>
-
-                <motion.div whileTap={{ scale: 0.9 }}>
                   <Button
                     variant="ghost"
                     size="icon"
@@ -521,7 +546,9 @@ export function PhonemeStudyCard({
                       onSetWordDirection(1);
                       onNext();
                     }}
-                    className="h-7 w-7 shrink-0 rounded-full cursor-pointer"
+                    aria-label="下一个示例词"
+                    data-smoke="phoneme-next-word"
+                    className="min-h-11 min-w-11 shrink-0 rounded-full cursor-pointer"
                   >
                     <ChevronRight className="h-4 w-4" />
                   </Button>
@@ -552,6 +579,9 @@ export function PhonemeStudyCard({
           <div className="mt-3 h-8" />
         )}
 
+        {guidedRepeatAction && (
+          <div className="mt-2 flex justify-center">{guidedRepeatAction}</div>
+        )}
         {/* Progress */}
         <div className="mt-1.5 flex items-center justify-center gap-2">
           <span className="text-xs text-muted-foreground">

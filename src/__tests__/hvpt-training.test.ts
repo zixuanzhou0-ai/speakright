@@ -14,13 +14,26 @@ import {
 import type { MasteryProfile } from "@/types/training";
 
 describe("hvpt training", () => {
-  it("builds multi-speaker ABX trials", () => {
+  it("builds valid cross-speaker ABX trials without reusing the probe recording", () => {
     const trials = buildHvptSession("ee-ih", 12, 42);
 
     expect(trials).toHaveLength(12);
     expect(new Set(trials.map((trial) => trial.speakerX)).size).toBeGreaterThan(
       1,
     );
+    expect(
+      trials.every(
+        (trial) =>
+          trial.speakerA === trial.speakerB &&
+          trial.speakerA !== trial.speakerX &&
+          trial.audioUriA !== trial.audioUriX &&
+          trial.audioUriB !== trial.audioUriX,
+      ),
+    ).toBe(true);
+    expect(
+      new Set(trials.map((trial) => trial.pairId)).size,
+    ).toBeGreaterThanOrEqual(4);
+
     expect(trials.every((trial) => trial.xWord.length > 0)).toBe(true);
     expect(trials.every((trial) => trial.context.length > 0)).toBe(true);
   });
@@ -94,7 +107,7 @@ describe("hvpt training", () => {
     );
   });
 
-  it("turns HVPT summary into perception-layer mastery evidence", () => {
+  it("keeps the legacy session for scheduling without promoting mastery", () => {
     const contrast = getHvptContrast("ee-ih");
     if (!contrast) throw new Error("missing contrast");
     const trials = buildHvptSession("ee-ih", 10, 12);
@@ -115,7 +128,7 @@ describe("hvpt training", () => {
       passed: true,
       bestScore: 100,
     });
-    expect(session.assessmentReliability?.canPromoteMastery).toBe(true);
+    expect(session.assessmentReliability?.canPromoteMastery).toBe(false);
   });
 
   it("does not write HVPT perception accuracy into production phoneme mastery", () => {
@@ -134,8 +147,8 @@ describe("hvpt training", () => {
 
     expect(
       profile.packs["ee-ih"]?.levelProgress["perception-abx"]?.passed,
-    ).toBe(true);
-    expect(profile.packs["ee-ih"]?.perceptionBestRate).toBe(1);
+    ).toBeUndefined();
+    expect(profile.packs["ee-ih"]?.perceptionBestRate).toBe(0);
     expect(profile.phonemes.ee).toBeUndefined();
     expect(profile.phonemes.ih).toBeUndefined();
   });

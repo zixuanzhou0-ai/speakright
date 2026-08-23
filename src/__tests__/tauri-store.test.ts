@@ -34,6 +34,7 @@ const mocks = vi.hoisted(() => {
     state,
     isTauriEnvironment: vi.fn(() => true),
     LazyStore: vi.fn(MockLazyStore),
+    invoke: vi.fn(async () => null as string | null),
   };
 });
 
@@ -43,6 +44,10 @@ vi.mock("@/lib/tauri-runtime", () => ({
 
 vi.mock("@tauri-apps/plugin-store", () => ({
   LazyStore: mocks.LazyStore,
+}));
+
+vi.mock("@tauri-apps/api/core", () => ({
+  invoke: mocks.invoke,
 }));
 
 describe("tauri store wrapper", () => {
@@ -56,6 +61,7 @@ describe("tauri store wrapper", () => {
     mocks.state.setError = null;
     mocks.state.deleteError = null;
     mocks.state.saveError = null;
+    mocks.invoke.mockResolvedValue(null);
   });
 
   it("uses localStorage only outside Tauri", async () => {
@@ -69,6 +75,29 @@ describe("tauri store wrapper", () => {
     await storeDelete("speakright_coach_mode");
 
     expect(localStorage.getItem("speakright_coach_mode")).toBeNull();
+    expect(mocks.LazyStore).not.toHaveBeenCalled();
+    expect(mocks.invoke).not.toHaveBeenCalled();
+  });
+
+  it("uses the validated desktop settings store override", async () => {
+    const isolatedPath =
+      "C:\\Temp\\speakright-test\\settings\\speakright-settings.json";
+    mocks.invoke.mockResolvedValue(isolatedPath);
+    const { storeGet } = await import("@/lib/tauri-store");
+
+    await expect(storeGet("speakright_coach_mode")).resolves.toBeNull();
+
+    expect(mocks.invoke).toHaveBeenCalledWith("desktop_settings_store_path");
+    expect(mocks.LazyStore).toHaveBeenCalledWith(isolatedPath);
+  });
+
+  it("fails closed when the desktop settings store override is rejected", async () => {
+    mocks.invoke.mockRejectedValue(new Error("unsafe settings path"));
+    const { storeGet } = await import("@/lib/tauri-store");
+
+    await expect(storeGet("speakright_coach_mode")).rejects.toThrow(
+      "Tauri store read failed: unsafe settings path",
+    );
     expect(mocks.LazyStore).not.toHaveBeenCalled();
   });
 

@@ -26,7 +26,11 @@ export const TRAINING_ERROR_PATTERNS: ErrorPattern[] = [
       "oo-uh",
       "n-ng",
     ],
-    detection: { targetPhonemes: [], maxTargetScore: 74, minTargetScoreDrop: 12 },
+    detection: {
+      targetPhonemes: [],
+      maxTargetScore: 74,
+      minTargetScoreDrop: 12,
+    },
     coachExplanation:
       "整词分被上下文和其他音拉高了，但训练目标本身还没有稳定。下一轮只盯一个动作，不追求速度。",
     immediateCue: "先慢下来，把目标音单独做清楚，再放回词里。",
@@ -64,12 +68,13 @@ export const TRAINING_ERROR_PATTERNS: ErrorPattern[] = [
   },
   {
     id: "vowel-length-ee-ih",
-    title: "长短元音没有拉开",
+    title: "/iː/ 与 /ɪ/ 的音质边界不清",
     appliesToPackIds: ["ee-ih"],
     detection: { targetPhonemes: ["ee", "ih"], maxTargetScore: 76 },
     coachExplanation:
-      "/iː/ 要紧且长，/ɪ/ 要松且短。两者都读成中文“衣”时，ship/sheep 会靠上下文猜。",
-    immediateCue: "/iː/ 拉长，/ɪ/ 立刻收住。",
+      "/iː/ 通常舌位更高更前、舌体更紧；/ɪ/ 略低略后、更放松。时长受重音和相邻音影响，只能作为辅助线索。",
+    immediateCue:
+      "先改变舌位与音质：/iː/ 高前而紧，/ɪ/ 略低后而松；再检查自然时长。",
     remediationPathId: "length-rebuild",
   },
   {
@@ -88,7 +93,7 @@ export const TRAINING_ERROR_PATTERNS: ErrorPattern[] = [
     appliesToPackIds: ["l-r"],
     detection: { targetPhonemes: ["l", "r"], maxTargetScore: 76 },
     coachExplanation:
-      "/l/ 舌尖碰齿龈，/r/ 舌头悬空后卷。只要舌尖乱碰，就会不稳定。",
+      "/l/ 舌尖接触齿龈；/ɹ/ 可用舌身聚拢或舌尖上卷形成收缩，通常不接触上颚。两种 /ɹ/ 舌形都可接受。",
     immediateCue: "/l/ 明确碰一下；/r/ 悬空，不碰上颚。",
     remediationPathId: "lr-rebuild",
   },
@@ -97,7 +102,21 @@ export const TRAINING_ERROR_PATTERNS: ErrorPattern[] = [
     title: "词尾辅音丢失或加元音",
     appliesToPackIds: ["final-consonants"],
     detection: {
-      targetPhonemes: ["p", "b", "t", "d", "k", "g", "f", "v", "s", "z", "l", "n", "ng"],
+      targetPhonemes: [
+        "p",
+        "b",
+        "t",
+        "d",
+        "k",
+        "g",
+        "f",
+        "v",
+        "s",
+        "z",
+        "l",
+        "n",
+        "ng",
+      ],
       maxTargetScore: 76,
       requiresFinalPosition: true,
       issueTypes: ["final-consonant"],
@@ -123,12 +142,13 @@ export const TRAINING_ERROR_PATTERNS: ErrorPattern[] = [
   },
   {
     id: "rounded-vowel-oo-uh",
-    title: "/uː/ 和 /ʊ/ 时长、圆唇不清",
+    title: "/uː/ 和 /ʊ/ 的音质、舌位与圆唇不清",
     appliesToPackIds: ["oo-uh"],
     detection: { targetPhonemes: ["oo", "uh"], maxTargetScore: 76 },
     coachExplanation:
-      "/uː/ 更圆更长，/ʊ/ 更短更松。look 被拖长时会像 Luke。",
-    immediateCue: "/uː/ 圆唇拉长；/ʊ/ 少圆唇、短促收住。",
+      "/uː/ 通常舌位更高更后、圆唇更充分；/ʊ/ 略低略前且更放松。时长会随语境变化，不能单独决定类别。",
+    immediateCue:
+      "/uː/ 舌位高后并充分圆唇；/ʊ/ 略低前、放松少圆唇，再检查自然时长。",
     remediationPathId: "u-rebuild",
   },
   {
@@ -148,111 +168,336 @@ export const DEFAULT_REMEDIATION_PATHS: RemediationPath[] = [
     id: "rebuild-target",
     title: "关键音重建",
     steps: [
-      { kind: "listen", prompt: "只听目标词的关键音", text: "practice", targetPhonemes: [] },
-      { kind: "isolate", prompt: "慢速读关键词，先不追求速度", text: "practice", targetPhonemes: [] },
-      { kind: "slow-repeat", prompt: "把目标音放回短语里", text: "practice slowly", targetPhonemes: [] },
-      { kind: "retry", prompt: "恢复正常速度再录", text: "practice", targetPhonemes: [] },
+      {
+        kind: "listen",
+        prompt: "只听目标词的关键音",
+        text: "practice",
+        targetPhonemes: [],
+      },
+      {
+        kind: "isolate",
+        prompt: "慢速读关键词，先不追求速度",
+        text: "practice",
+        targetPhonemes: [],
+      },
+      {
+        kind: "slow-repeat",
+        prompt: "把目标音放回短语里",
+        text: "practice slowly",
+        targetPhonemes: [],
+      },
+      {
+        kind: "retry",
+        prompt: "恢复正常速度再录",
+        text: "practice",
+        targetPhonemes: [],
+      },
     ],
   },
   {
     id: "th-rebuild",
     title: "/θ/ 慢速拆解",
     steps: [
-      { kind: "listen", prompt: "听 think，只盯开头气流", text: "think", targetPhonemes: ["th"] },
-      { kind: "isolate", prompt: "舌尖轻露，只吹气", text: "thin", targetPhonemes: ["th"] },
-      { kind: "word-rebuild", prompt: "慢速拼回单词", text: "think", targetPhonemes: ["th"] },
-      { kind: "contrast", prompt: "和 sink 拉开", text: "sink think", targetPhonemes: ["s", "th"] },
-      { kind: "retry", prompt: "原速再录一次", text: "think", targetPhonemes: ["th"] },
+      {
+        kind: "listen",
+        prompt: "听 think，只盯开头气流",
+        text: "think",
+        targetPhonemes: ["th"],
+      },
+      {
+        kind: "isolate",
+        prompt: "舌尖轻露，只吹气",
+        text: "thin",
+        targetPhonemes: ["th"],
+      },
+      {
+        kind: "word-rebuild",
+        prompt: "慢速拼回单词",
+        text: "think",
+        targetPhonemes: ["th"],
+      },
+      {
+        kind: "contrast",
+        prompt: "和 sink 拉开",
+        text: "sink think",
+        targetPhonemes: ["s", "th"],
+      },
+      {
+        kind: "retry",
+        prompt: "原速再录一次",
+        text: "think",
+        targetPhonemes: ["th"],
+      },
     ],
   },
   {
     id: "dh-rebuild",
     title: "/ð/ 声带拆解",
     steps: [
-      { kind: "listen", prompt: "听 this 的开头震动", text: "this", targetPhonemes: ["dh"] },
-      { kind: "isolate", prompt: "舌尖齿间，手摸喉咙确认震动", text: "then", targetPhonemes: ["dh"] },
-      { kind: "word-rebuild", prompt: "慢速拼回 this", text: "this", targetPhonemes: ["dh"] },
-      { kind: "retry", prompt: "原速再录一次", text: "this", targetPhonemes: ["dh"] },
+      {
+        kind: "listen",
+        prompt: "听 this 的开头震动",
+        text: "this",
+        targetPhonemes: ["dh"],
+      },
+      {
+        kind: "isolate",
+        prompt: "舌尖齿间，手摸喉咙确认震动",
+        text: "then",
+        targetPhonemes: ["dh"],
+      },
+      {
+        kind: "word-rebuild",
+        prompt: "慢速拼回 this",
+        text: "this",
+        targetPhonemes: ["dh"],
+      },
+      {
+        kind: "retry",
+        prompt: "原速再录一次",
+        text: "this",
+        targetPhonemes: ["dh"],
+      },
     ],
   },
   {
     id: "vw-rebuild",
     title: "/v/ 与 /w/ 嘴型重建",
     steps: [
-      { kind: "isolate", prompt: "/v/ 上齿碰下唇", text: "very", targetPhonemes: ["v"] },
-      { kind: "isolate", prompt: "/w/ 双唇收圆向前推", text: "well", targetPhonemes: ["w"] },
-      { kind: "contrast", prompt: "嘴型切换要明显", text: "vest west", targetPhonemes: ["v", "w"] },
-      { kind: "retry", prompt: "原速再录一次", text: "very well", targetPhonemes: ["v", "w"] },
+      {
+        kind: "isolate",
+        prompt: "/v/ 上齿碰下唇",
+        text: "very",
+        targetPhonemes: ["v"],
+      },
+      {
+        kind: "isolate",
+        prompt: "/w/ 双唇收圆向前推",
+        text: "well",
+        targetPhonemes: ["w"],
+      },
+      {
+        kind: "contrast",
+        prompt: "嘴型切换要明显",
+        text: "vest west",
+        targetPhonemes: ["v", "w"],
+      },
+      {
+        kind: "retry",
+        prompt: "原速再录一次",
+        text: "very well",
+        targetPhonemes: ["v", "w"],
+      },
     ],
   },
   {
     id: "length-rebuild",
-    title: "长短元音重建",
+    title: "前元音音质边界重建",
     steps: [
-      { kind: "isolate", prompt: "/iː/ 拉长两拍", text: "sheep", targetPhonemes: ["ee"] },
-      { kind: "isolate", prompt: "/ɪ/ 一拍收住", text: "ship", targetPhonemes: ["ih"] },
-      { kind: "contrast", prompt: "长短对比", text: "sheep ship", targetPhonemes: ["ee", "ih"] },
-      { kind: "retry", prompt: "原速再录一次", text: "ship", targetPhonemes: ["ih"] },
+      {
+        kind: "isolate",
+        prompt: "/iː/ 舌位高前、舌体较紧",
+        text: "sleep",
+        targetPhonemes: ["ee"],
+      },
+      {
+        kind: "isolate",
+        prompt: "/ɪ/ 舌位略低后、舌体放松",
+        text: "ship",
+        targetPhonemes: ["ih"],
+      },
+      {
+        kind: "contrast",
+        prompt: "先听音质，再观察时长",
+        text: "sleep ship",
+        targetPhonemes: ["ee", "ih"],
+      },
+      {
+        kind: "retry",
+        prompt: "原速再录一次",
+        text: "ship",
+        targetPhonemes: ["ih"],
+      },
     ],
   },
   {
     id: "ae-rebuild",
     title: "/æ/ 开口重建",
     steps: [
-      { kind: "isolate", prompt: "下巴向下打开", text: "bad", targetPhonemes: ["ae"] },
-      { kind: "word-rebuild", prompt: "慢速拼回 bad", text: "bad", targetPhonemes: ["ae"] },
-      { kind: "contrast", prompt: "和 bed 拉开", text: "bed bad", targetPhonemes: ["eh", "ae"] },
-      { kind: "retry", prompt: "原速再录一次", text: "bad", targetPhonemes: ["ae"] },
+      {
+        kind: "isolate",
+        prompt: "下巴向下打开",
+        text: "bad",
+        targetPhonemes: ["ae"],
+      },
+      {
+        kind: "word-rebuild",
+        prompt: "慢速拼回 bad",
+        text: "bad",
+        targetPhonemes: ["ae"],
+      },
+      {
+        kind: "contrast",
+        prompt: "和 bed 拉开",
+        text: "bed bad",
+        targetPhonemes: ["eh", "ae"],
+      },
+      {
+        kind: "retry",
+        prompt: "原速再录一次",
+        text: "bad",
+        targetPhonemes: ["ae"],
+      },
     ],
   },
   {
     id: "lr-rebuild",
     title: "/l/ 与 /r/ 舌位重建",
     steps: [
-      { kind: "isolate", prompt: "/l/ 舌尖碰齿龈", text: "light", targetPhonemes: ["l"] },
-      { kind: "isolate", prompt: "/r/ 舌头悬空后卷", text: "right", targetPhonemes: ["r"] },
-      { kind: "contrast", prompt: "碰与不碰要清楚", text: "light right", targetPhonemes: ["l", "r"] },
-      { kind: "retry", prompt: "原速再录一次", text: "right", targetPhonemes: ["r"] },
+      {
+        kind: "isolate",
+        prompt: "/l/ 舌尖碰齿龈",
+        text: "light",
+        targetPhonemes: ["l"],
+      },
+      {
+        kind: "isolate",
+        prompt: "/r/ 舌头悬空后卷",
+        text: "right",
+        targetPhonemes: ["r"],
+      },
+      {
+        kind: "contrast",
+        prompt: "碰与不碰要清楚",
+        text: "light right",
+        targetPhonemes: ["l", "r"],
+      },
+      {
+        kind: "retry",
+        prompt: "原速再录一次",
+        text: "right",
+        targetPhonemes: ["r"],
+      },
     ],
   },
   {
     id: "final-rebuild",
     title: "词尾辅音重建",
     steps: [
-      { kind: "listen", prompt: "听结尾，只听收住", text: "back", targetPhonemes: ["k"] },
-      { kind: "slow-repeat", prompt: "慢速闭合，不加尾音", text: "back", targetPhonemes: ["k"] },
-      { kind: "contrast", prompt: "比较无尾和有尾", text: "bay bake", targetPhonemes: ["k"] },
-      { kind: "retry", prompt: "原速再录一次", text: "bake", targetPhonemes: ["k"] },
+      {
+        kind: "listen",
+        prompt: "听结尾，只听收住",
+        text: "back",
+        targetPhonemes: ["k"],
+      },
+      {
+        kind: "slow-repeat",
+        prompt: "慢速闭合，不加尾音",
+        text: "back",
+        targetPhonemes: ["k"],
+      },
+      {
+        kind: "contrast",
+        prompt: "比较无尾和有尾",
+        text: "bay bake",
+        targetPhonemes: ["k"],
+      },
+      {
+        kind: "retry",
+        prompt: "原速再录一次",
+        text: "bake",
+        targetPhonemes: ["k"],
+      },
     ],
   },
   {
     id: "rhythm-rebuild",
     title: "弱读节奏重建",
     steps: [
-      { kind: "listen", prompt: "听内容词重音", text: "I want to talk about it.", targetPhonemes: ["schwa"] },
-      { kind: "slow-repeat", prompt: "弱化 to/about 开头", text: "want to talk about it", targetPhonemes: ["schwa"] },
-      { kind: "contrast", prompt: "内容词重，虚词轻", text: "WANT to TALK about IT", targetPhonemes: ["schwa"] },
-      { kind: "retry", prompt: "自然速度再录", text: "I want to talk about it.", targetPhonemes: ["schwa"] },
+      {
+        kind: "listen",
+        prompt: "听内容词重音",
+        text: "I want to talk about it.",
+        targetPhonemes: ["schwa"],
+      },
+      {
+        kind: "slow-repeat",
+        prompt: "弱化 to/about 开头",
+        text: "want to talk about it",
+        targetPhonemes: ["schwa"],
+      },
+      {
+        kind: "contrast",
+        prompt: "内容词重，虚词轻",
+        text: "WANT to TALK about IT",
+        targetPhonemes: ["schwa"],
+      },
+      {
+        kind: "retry",
+        prompt: "自然速度再录",
+        text: "I want to talk about it.",
+        targetPhonemes: ["schwa"],
+      },
     ],
   },
   {
     id: "u-rebuild",
-    title: "/uː/ 与 /ʊ/ 重建",
+    title: "/uː/ 与 /ʊ/ 音质边界重建",
     steps: [
-      { kind: "isolate", prompt: "/uː/ 圆唇拉长", text: "pool", targetPhonemes: ["oo"] },
-      { kind: "isolate", prompt: "/ʊ/ 放松短促", text: "pull", targetPhonemes: ["uh"] },
-      { kind: "contrast", prompt: "长短对比", text: "pool pull", targetPhonemes: ["oo", "uh"] },
-      { kind: "retry", prompt: "原速再录一次", text: "look", targetPhonemes: ["uh"] },
+      {
+        kind: "isolate",
+        prompt: "/uː/ 舌位高后并充分圆唇",
+        text: "pool",
+        targetPhonemes: ["oo"],
+      },
+      {
+        kind: "isolate",
+        prompt: "/ʊ/ 略低前、放松少圆唇",
+        text: "pull",
+        targetPhonemes: ["uh"],
+      },
+      {
+        kind: "contrast",
+        prompt: "先听音质与圆唇，再观察时长",
+        text: "pool pull",
+        targetPhonemes: ["oo", "uh"],
+      },
+      {
+        kind: "retry",
+        prompt: "原速再录一次",
+        text: "look",
+        targetPhonemes: ["uh"],
+      },
     ],
   },
   {
     id: "ng-rebuild",
     title: "/n/ 与 /ŋ/ 重建",
     steps: [
-      { kind: "isolate", prompt: "/n/ 舌尖在前", text: "sin", targetPhonemes: ["n"] },
-      { kind: "isolate", prompt: "/ŋ/ 舌根在后", text: "sing", targetPhonemes: ["ng"] },
-      { kind: "contrast", prompt: "前后鼻音对比", text: "sin sing", targetPhonemes: ["n", "ng"] },
-      { kind: "retry", prompt: "原速再录一次", text: "sing", targetPhonemes: ["ng"] },
+      {
+        kind: "isolate",
+        prompt: "/n/ 舌尖在前",
+        text: "sin",
+        targetPhonemes: ["n"],
+      },
+      {
+        kind: "isolate",
+        prompt: "/ŋ/ 舌根在后",
+        text: "sing",
+        targetPhonemes: ["ng"],
+      },
+      {
+        kind: "contrast",
+        prompt: "前后鼻音对比",
+        text: "sin sing",
+        targetPhonemes: ["n", "ng"],
+      },
+      {
+        kind: "retry",
+        prompt: "原速再录一次",
+        text: "sing",
+        targetPhonemes: ["ng"],
+      },
     ],
   },
 ];
@@ -297,7 +542,11 @@ export function detectErrorPatterns(
 
 export function getErrorPatternIdsForIssue(issue: DiagnosisIssue): string[] {
   return TRAINING_ERROR_PATTERNS.filter((pattern) => {
-    if (!issue.recommendedPackIds.some((packId) => pattern.appliesToPackIds.includes(packId))) {
+    if (
+      !issue.recommendedPackIds.some((packId) =>
+        pattern.appliesToPackIds.includes(packId),
+      )
+    ) {
       return false;
     }
     if (

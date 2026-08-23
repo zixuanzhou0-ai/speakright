@@ -69,7 +69,13 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "agneau",
@@ -91,7 +97,26 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "contrast",
+        "diagnostic-word",
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "contrast",
+        "word"
+      ],
+      "relationshipKinds": [
+        {
+          "soundUnitSlug": "fr-ny",
+          "relationshipKind": "contrast-member"
+        },
+        {
+          "soundUnitSlug": "fr-ny",
+          "relationshipKind": "target-example"
+        }
+      ]
     },
     {
       "key": "aide",
@@ -127,7 +152,7 @@
       "text": "aigu",
       "ipa": "/egy/",
       "soundUnitSlugs": [
-        "fr-glide-hui"
+        "fr-y"
       ],
       "fileName": "aigu-b7961b83ee.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/aigu-b7961b83ee.mp3",
@@ -142,7 +167,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "aiguille",
@@ -164,7 +195,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "aime",
@@ -186,14 +223,21 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 14254
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "aller",
       "text": "aller",
       "ipa": "/ale/",
       "soundUnitSlugs": [
-        "fr-e"
+        "fr-e",
+        "fr-l"
       ],
       "fileName": "aller-3f7a5e6185.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/aller-3f7a5e6185.mp3",
@@ -208,15 +252,21 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 14254
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "ami",
       "text": "ami",
       "ipa": "/ami/",
       "soundUnitSlugs": [
-        "fr-i",
-        "fr-a"
+        "fr-a",
+        "fr-i"
       ],
       "fileName": "ami-519902d4d8.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/ami-519902d4d8.mp3",
@@ -231,7 +281,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 15090
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "ancien",
@@ -253,14 +309,22 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "animal",
       "text": "animal",
       "ipa": "/animal/",
       "soundUnitSlugs": [
-        "fr-a"
+        "fr-a",
+        "fr-l",
+        "fr-n"
       ],
       "fileName": "animal-3199ea0562.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/animal-3199ea0562.mp3",
@@ -275,12 +339,18 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "anneau",
       "text": "anneau",
-      "ipa": "/aɲo/ ~ /ano/",
+      "ipa": "/ano/",
       "soundUnitSlugs": [
         "fr-ny"
       ],
@@ -295,7 +365,20 @@
       "bytesByVoice": {
         "blue": 13836,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "contrast"
+      ],
+      "kinds": [
+        "contrast"
+      ],
+      "relationshipKinds": [
+        {
+          "soundUnitSlug": "fr-ny",
+          "relationshipKind": "contrast-member"
+        }
+      ],
+      "relationshipKind": "contrast-member"
     },
     {
       "key": "année",
@@ -375,7 +458,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "après",
@@ -397,7 +486,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "arrière",
@@ -419,7 +514,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "arrive",
@@ -441,7 +542,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "arriver",
@@ -521,7 +628,13 @@
       "bytesByVoice": {
         "blue": 13836,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "aucun emprunt",
@@ -543,7 +656,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 21777
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "aujourd'hui",
@@ -565,7 +684,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "aussi",
@@ -601,7 +726,9 @@
       "text": "avec",
       "ipa": "/avɛk/",
       "soundUnitSlugs": [
-        "fr-a"
+        "fr-a",
+        "fr-k",
+        "fr-v"
       ],
       "fileName": "avec-84c87a11e6.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/avec-84c87a11e6.mp3",
@@ -616,7 +743,13 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 13836
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "avec elle",
@@ -638,7 +771,14 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 19688
-      }
+      },
+      "sources": [
+        "diagnostic-word",
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "avec qui",
@@ -689,7 +829,13 @@
       "bytesByVoice": {
         "blue": 18852,
         "pink": 21777
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "avion",
@@ -770,7 +916,13 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "ballon",
@@ -792,7 +944,13 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "banque",
@@ -814,13 +972,20 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "bateau",
       "text": "bateau",
       "ipa": "/bato/",
       "soundUnitSlugs": [
+        "fr-b",
         "fr-o-close"
       ],
       "fileName": "bateau-8dc091bec6.mp3",
@@ -836,14 +1001,22 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "beau",
       "text": "beau",
       "ipa": "/bo/",
       "soundUnitSlugs": [
-        "fr-o-close"
+        "fr-b",
+        "fr-o-close",
+        "fr-o-open"
       ],
       "fileName": "beau-dafde1bc46.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/beau-dafde1bc46.mp3",
@@ -858,7 +1031,30 @@
       "bytesByVoice": {
         "blue": 12164,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "contrast",
+        "diagnostic-word",
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "contrast",
+        "word"
+      ],
+      "relationshipKinds": [
+        {
+          "soundUnitSlug": "fr-b",
+          "relationshipKind": "target-example"
+        },
+        {
+          "soundUnitSlug": "fr-o-close",
+          "relationshipKind": "target-example"
+        },
+        {
+          "soundUnitSlug": "fr-o-open",
+          "relationshipKind": "contrast-member"
+        }
+      ]
     },
     {
       "key": "beau bébé",
@@ -909,15 +1105,22 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 20942
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "beaucoup",
       "text": "beaucoup",
       "ipa": "/boku/",
       "soundUnitSlugs": [
-        "fr-u",
-        "fr-final-consonant-silence"
+        "fr-b",
+        "fr-final-consonant-silence",
+        "fr-u"
       ],
       "fileName": "beaucoup-87538fd454.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/beaucoup-87538fd454.mp3",
@@ -932,7 +1135,13 @@
       "bytesByVoice": {
         "blue": 13836,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "beaucoup trop",
@@ -976,13 +1185,20 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "bébé",
       "text": "bébé",
       "ipa": "/bebe/",
       "soundUnitSlugs": [
+        "fr-b",
         "fr-e"
       ],
       "fileName": "bebe-bf3ccfa170.mp3",
@@ -998,7 +1214,14 @@
       "bytesByVoice": {
         "blue": 13836,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "diagnostic-word",
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "bébé boit du bon lait",
@@ -1049,7 +1272,13 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "belle école",
@@ -1100,7 +1329,13 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "beurre",
@@ -1122,7 +1357,13 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "beurre seul",
@@ -1144,15 +1385,22 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 19688
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "bien",
       "text": "bien",
       "ipa": "/bjɛ̃/",
       "soundUnitSlugs": [
-        "fr-in",
-        "fr-glide-j"
+        "fr-b",
+        "fr-glide-j",
+        "fr-in"
       ],
       "fileName": "bien-d4e2f60841.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/bien-d4e2f60841.mp3",
@@ -1167,7 +1415,13 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "bien joué",
@@ -1189,7 +1443,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "bière",
@@ -1285,7 +1545,7 @@
       "ipa": "/blɑ̃/",
       "soundUnitSlugs": [
         "fr-an",
-        "fr-final-consonant-silence"
+        "fr-b"
       ],
       "fileName": "blanc-f03c555231.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/blanc-f03c555231.mp3",
@@ -1300,14 +1560,22 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "bleu",
       "text": "bleu",
       "ipa": "/blø/",
       "soundUnitSlugs": [
-        "fr-eu-close"
+        "fr-b",
+        "fr-eu-close",
+        "fr-l"
       ],
       "fileName": "bleu-2dae5f350d.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/bleu-2dae5f350d.mp3",
@@ -1322,7 +1590,13 @@
       "bytesByVoice": {
         "blue": 13000,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "bœuf",
@@ -1344,7 +1618,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 15090
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "boire",
@@ -1366,7 +1646,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "bol",
@@ -1388,13 +1674,20 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "bon",
       "text": "bon",
       "ipa": "/bɔ̃/",
       "soundUnitSlugs": [
+        "fr-b",
         "fr-on"
       ],
       "fileName": "bon-3b4f14403e.mp3",
@@ -1410,7 +1703,14 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "diagnostic-word",
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "bon appétit",
@@ -1432,7 +1732,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 21777
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "bon garçon",
@@ -1454,7 +1760,13 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "bonbon",
@@ -1490,7 +1802,8 @@
       "text": "bonjour",
       "ipa": "/bɔ̃ʒuʁ/",
       "soundUnitSlugs": [
-        "fr-on"
+        "fr-on",
+        "fr-phrase-final-prominence"
       ],
       "fileName": "bonjour-1f71e0f4ac.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/bonjour-1f71e0f4ac.mp3",
@@ -1505,13 +1818,23 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 20524
-      }
+      },
+      "sources": [
+        "diagnostic-word",
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "sentence",
+        "word"
+      ]
     },
     {
       "key": "bonne",
       "text": "bonne",
       "ipa": "/bɔn/",
       "soundUnitSlugs": [
+        "fr-b",
+        "fr-n",
         "fr-o-open"
       ],
       "fileName": "bonne-b7c4d36ecb.mp3",
@@ -1527,7 +1850,33 @@
       "bytesByVoice": {
         "blue": 13836,
         "pink": 14254
-      }
+      },
+      "sources": [
+        "contrast",
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "contrast",
+        "word"
+      ],
+      "relationshipKinds": [
+        {
+          "soundUnitSlug": "fr-b",
+          "relationshipKind": "target-example"
+        },
+        {
+          "soundUnitSlug": "fr-n",
+          "relationshipKind": "target-example"
+        },
+        {
+          "soundUnitSlug": "fr-o-open",
+          "relationshipKind": "contrast-member"
+        },
+        {
+          "soundUnitSlug": "fr-o-open",
+          "relationshipKind": "target-example"
+        }
+      ]
     },
     {
       "key": "bonne bouche",
@@ -1578,7 +1927,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "bonne nuit",
@@ -1629,15 +1984,22 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 20942
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "bouche",
       "text": "bouche",
       "ipa": "/buʃ/",
       "soundUnitSlugs": [
-        "fr-u",
-        "fr-sh"
+        "fr-b",
+        "fr-sh",
+        "fr-u"
       ],
       "fileName": "bouche-1af1b12c5e.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/bouche-1af1b12c5e.mp3",
@@ -1652,7 +2014,13 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "bretagne",
@@ -1674,7 +2042,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 20524
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "brun",
@@ -1696,7 +2070,13 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "brun parfum",
@@ -1718,7 +2098,13 @@
       "bytesByVoice": {
         "blue": 19688,
         "pink": 21777
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "brune",
@@ -1754,8 +2140,9 @@
       "text": "bureau",
       "ipa": "/byʁo/",
       "soundUnitSlugs": [
-        "fr-y",
-        "fr-o-close"
+        "fr-b",
+        "fr-o-close",
+        "fr-y"
       ],
       "fileName": "bureau-fe22b520f9.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/bureau-fe22b520f9.mp3",
@@ -1770,7 +2157,13 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 20524
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "bureau bleu",
@@ -1821,7 +2214,13 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 13836
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "c'est ici",
@@ -1872,7 +2271,13 @@
       "bytesByVoice": {
         "blue": 19688,
         "pink": 20524
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "c'était",
@@ -1894,7 +2299,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 15090
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "ça",
@@ -1930,6 +2341,8 @@
       "text": "cadeau",
       "ipa": "/kado/",
       "soundUnitSlugs": [
+        "fr-d",
+        "fr-k",
         "fr-o-close"
       ],
       "fileName": "cadeau-89be1a53b3.mp3",
@@ -1945,14 +2358,22 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "café",
       "text": "café",
       "ipa": "/kafe/",
       "soundUnitSlugs": [
-        "fr-e"
+        "fr-e",
+        "fr-f",
+        "fr-k"
       ],
       "fileName": "cafe-f424452a96.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/cafe-f424452a96.mp3",
@@ -1967,7 +2388,14 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "diagnostic-word",
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "café calme",
@@ -2018,7 +2446,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 20942
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "calme",
@@ -2098,7 +2532,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 19688
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "canal",
@@ -2178,7 +2618,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "ce que je veux",
@@ -2287,7 +2733,13 @@
       "bytesByVoice": {
         "blue": 13000,
         "pink": 14254
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "ceux heureux",
@@ -2331,7 +2783,13 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "chacun parle",
@@ -2353,7 +2811,13 @@
       "bytesByVoice": {
         "blue": 18852,
         "pink": 21777
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "chaise",
@@ -2361,7 +2825,8 @@
       "ipa": "/ʃɛz/",
       "soundUnitSlugs": [
         "fr-e-open",
-        "fr-sh"
+        "fr-sh",
+        "fr-z"
       ],
       "fileName": "chaise-c64ae5ee39.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/chaise-c64ae5ee39.mp3",
@@ -2376,7 +2841,13 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "chambre",
@@ -2398,7 +2869,13 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "chanson",
@@ -2421,7 +2898,13 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "chapeau",
@@ -2443,7 +2926,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "chaque",
@@ -2465,7 +2954,13 @@
       "bytesByVoice": {
         "blue": 13836,
         "pink": 15090
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "chat",
@@ -2488,7 +2983,30 @@
       "bytesByVoice": {
         "blue": 13836,
         "pink": 14254
-      }
+      },
+      "sources": [
+        "contrast",
+        "diagnostic-word",
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "contrast",
+        "word"
+      ],
+      "relationshipKinds": [
+        {
+          "soundUnitSlug": "fr-a",
+          "relationshipKind": "target-example"
+        },
+        {
+          "soundUnitSlug": "fr-sh",
+          "relationshipKind": "contrast-member"
+        },
+        {
+          "soundUnitSlug": "fr-sh",
+          "relationshipKind": "target-example"
+        }
+      ]
     },
     {
       "key": "chat chaud",
@@ -2510,16 +3028,22 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "chaud",
       "text": "chaud",
       "ipa": "/ʃo/",
       "soundUnitSlugs": [
+        "fr-final-consonant-silence",
         "fr-o-close",
-        "fr-sh",
-        "fr-final-consonant-silence"
+        "fr-sh"
       ],
       "fileName": "chaud-2750061861.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/chaud-2750061861.mp3",
@@ -2534,7 +3058,33 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 13836
-      }
+      },
+      "sources": [
+        "contrast",
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "contrast",
+        "word"
+      ],
+      "relationshipKinds": [
+        {
+          "soundUnitSlug": "fr-final-consonant-silence",
+          "relationshipKind": "target-example"
+        },
+        {
+          "soundUnitSlug": "fr-o-close",
+          "relationshipKind": "target-example"
+        },
+        {
+          "soundUnitSlug": "fr-sh",
+          "relationshipKind": "contrast-member"
+        },
+        {
+          "soundUnitSlug": "fr-sh",
+          "relationshipKind": "target-example"
+        }
+      ]
     },
     {
       "key": "chef",
@@ -2586,7 +3136,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "chemise",
@@ -2608,7 +3164,13 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "cher",
@@ -2630,7 +3192,13 @@
       "bytesByVoice": {
         "blue": 13836,
         "pink": 15090
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "chercher",
@@ -2652,7 +3220,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 19688
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "chercher chez nous",
@@ -2674,7 +3248,13 @@
       "bytesByVoice": {
         "blue": 18852,
         "pink": 23449
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "cheveux",
@@ -2697,7 +3277,13 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "chez",
@@ -2705,7 +3291,8 @@
       "ipa": "/ʃe/",
       "soundUnitSlugs": [
         "fr-e",
-        "fr-sh"
+        "fr-sh",
+        "fr-zh"
       ],
       "fileName": "chez-53cba4ca74.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/chez-53cba4ca74.mp3",
@@ -2720,16 +3307,38 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 13836
-      }
+      },
+      "sources": [
+        "contrast",
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "contrast",
+        "word"
+      ],
+      "relationshipKinds": [
+        {
+          "soundUnitSlug": "fr-e",
+          "relationshipKind": "target-example"
+        },
+        {
+          "soundUnitSlug": "fr-sh",
+          "relationshipKind": "target-example"
+        },
+        {
+          "soundUnitSlug": "fr-zh",
+          "relationshipKind": "contrast-member"
+        }
+      ]
     },
     {
       "key": "chez elle",
       "text": "chez elle",
       "ipa": "/ʃezɛl/",
       "soundUnitSlugs": [
+        "fr-enchainement",
         "fr-liaison",
-        "fr-sh",
-        "fr-enchainement"
+        "fr-sh"
       ],
       "fileName": "chez-elle-35c043ee57.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/chez-elle-35c043ee57.mp3",
@@ -2744,7 +3353,13 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "chez eux",
@@ -2766,7 +3381,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "choc",
@@ -2817,7 +3438,13 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "chose",
@@ -2839,7 +3466,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "cil",
@@ -2861,7 +3494,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "cinéma",
@@ -2912,7 +3551,13 @@
       "bytesByVoice": {
         "blue": 13000,
         "pink": 15090
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "clair",
@@ -2934,14 +3579,23 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "classe",
       "text": "classe",
       "ipa": "/klas/",
       "soundUnitSlugs": [
-        "fr-a"
+        "fr-a",
+        "fr-k",
+        "fr-l",
+        "fr-s"
       ],
       "fileName": "classe-7e7b33d679.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/classe-7e7b33d679.mp3",
@@ -2956,7 +3610,13 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "classe courte",
@@ -3036,14 +3696,21 @@
       "bytesByVoice": {
         "blue": 13836,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "cœur",
       "text": "cœur",
       "ipa": "/kœʁ/",
       "soundUnitSlugs": [
-        "fr-eu-open"
+        "fr-eu-open",
+        "fr-k"
       ],
       "fileName": "cur-ae2a3f7774.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/cur-ae2a3f7774.mp3",
@@ -3058,7 +3725,13 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 15090
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "cœur neuf",
@@ -3080,7 +3753,13 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "colle",
@@ -3102,13 +3781,20 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "comme",
       "text": "comme",
       "ipa": "/kɔm/",
       "soundUnitSlugs": [
+        "fr-m",
         "fr-o-open"
       ],
       "fileName": "comme-a1537b8da3.mp3",
@@ -3124,7 +3810,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 14254
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "comment",
@@ -3146,7 +3838,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "commun",
@@ -3168,7 +3866,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "conseil",
@@ -3190,7 +3894,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "copain",
@@ -3212,7 +3922,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "corps",
@@ -3234,7 +3950,13 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "cou",
@@ -3256,13 +3978,21 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 14254
-      }
+      },
+      "sources": [
+        "diagnostic-word",
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "couleur",
       "text": "couleur",
       "ipa": "/kulœʁ/",
       "soundUnitSlugs": [
+        "fr-k",
         "fr-u"
       ],
       "fileName": "couleur-cd2a0b77c0.mp3",
@@ -3278,7 +4008,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "coup",
@@ -3300,7 +4036,13 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "courir",
@@ -3322,7 +4064,13 @@
       "bytesByVoice": {
         "blue": 13836,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "crème",
@@ -3344,7 +4092,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "creuser",
@@ -3366,7 +4120,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "creux",
@@ -3388,15 +4148,21 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 15090
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "croire",
       "text": "croire",
       "ipa": "/kʁwaʁ/",
       "soundUnitSlugs": [
-        "fr-r",
-        "fr-glide-w"
+        "fr-glide-w",
+        "fr-r"
       ],
       "fileName": "croire-d3c2daa61c.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/croire-d3c2daa61c.mp3",
@@ -3411,13 +4177,20 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "cuisine",
       "text": "cuisine",
       "ipa": "/kɥizin/",
       "soundUnitSlugs": [
+        "fr-glide-hui",
         "fr-k",
         "fr-z"
       ],
@@ -3463,15 +4236,21 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "d'accord",
       "text": "d'accord",
       "ipa": "/dakɔʁ/",
       "soundUnitSlugs": [
-        "fr-o-open",
-        "fr-elision"
+        "fr-elision",
+        "fr-o-open"
       ],
       "fileName": "d-accord-8ca9661f3c.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/d-accord-8ca9661f3c.mp3",
@@ -3486,7 +4265,13 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "d'accord avec elle",
@@ -3508,7 +4293,13 @@
       "bytesByVoice": {
         "blue": 19688,
         "pink": 24703
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "d'ici",
@@ -3530,14 +4321,21 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "dans",
       "text": "dans",
       "ipa": "/dɑ̃/",
       "soundUnitSlugs": [
-        "fr-an"
+        "fr-an",
+        "fr-d"
       ],
       "fileName": "dans-d2c149c49f.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/dans-d2c149c49f.mp3",
@@ -3552,7 +4350,13 @@
       "bytesByVoice": {
         "blue": 13836,
         "pink": 14254
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "dans la france",
@@ -3574,7 +4378,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 20942
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "dans une",
@@ -3596,7 +4406,13 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "de",
@@ -3618,7 +4434,13 @@
       "bytesByVoice": {
         "blue": 13836,
         "pink": 12164
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "de demain",
@@ -3640,7 +4462,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "début",
@@ -3662,7 +4490,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "dedans",
@@ -3713,13 +4547,20 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "déjeuner",
       "text": "déjeuner",
       "ipa": "/deʒœne/",
       "soundUnitSlugs": [
+        "fr-d",
         "fr-e",
         "fr-zh"
       ],
@@ -3736,13 +4577,20 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "demain",
       "text": "demain",
       "ipa": "/dəmɛ̃/",
       "soundUnitSlugs": [
+        "fr-d",
         "fr-in",
         "fr-schwa"
       ],
@@ -3759,7 +4607,13 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "demander",
@@ -3782,7 +4636,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "depuis",
@@ -3804,7 +4664,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "depuis juin",
@@ -3826,7 +4692,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 20942
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "dessert",
@@ -3862,7 +4734,9 @@
       "text": "deux",
       "ipa": "/dø/",
       "soundUnitSlugs": [
-        "fr-eu-close"
+        "fr-d",
+        "fr-eu-close",
+        "fr-eu-open"
       ],
       "fileName": "deux-503c02f0c4.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/deux-503c02f0c4.mp3",
@@ -3877,7 +4751,30 @@
       "bytesByVoice": {
         "blue": 13000,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "contrast",
+        "diagnostic-word",
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "contrast",
+        "word"
+      ],
+      "relationshipKinds": [
+        {
+          "soundUnitSlug": "fr-d",
+          "relationshipKind": "target-example"
+        },
+        {
+          "soundUnitSlug": "fr-eu-close",
+          "relationshipKind": "target-example"
+        },
+        {
+          "soundUnitSlug": "fr-eu-open",
+          "relationshipKind": "contrast-member"
+        }
+      ]
     },
     {
       "key": "deux amis",
@@ -3899,7 +4796,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "deux cadeaux",
@@ -3950,7 +4853,13 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 19688
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "deuxième",
@@ -4060,13 +4969,20 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "dimanche",
       "text": "dimanche",
       "ipa": "/dimɑ̃ʃ/",
       "soundUnitSlugs": [
+        "fr-d",
         "fr-sh"
       ],
       "fileName": "dimanche-786dc31c2e.mp3",
@@ -4082,7 +4998,13 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "dimanche midi",
@@ -4147,6 +5069,7 @@
       "text": "dire",
       "ipa": "/diʁ/",
       "soundUnitSlugs": [
+        "fr-d",
         "fr-i"
       ],
       "fileName": "dire-2419cac36f.mp3",
@@ -4162,7 +5085,13 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 15090
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "dire demain",
@@ -4213,7 +5142,13 @@
       "bytesByVoice": {
         "blue": 13000,
         "pink": 14254
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "donne",
@@ -4307,8 +5242,8 @@
       "text": "dos",
       "ipa": "/do/",
       "soundUnitSlugs": [
-        "fr-o-close",
-        "fr-final-consonant-silence"
+        "fr-final-consonant-silence",
+        "fr-o-close"
       ],
       "fileName": "dos-e67f16d28a.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/dos-e67f16d28a.mp3",
@@ -4323,13 +5258,20 @@
       "bytesByVoice": {
         "blue": 13000,
         "pink": 15090
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "doux",
       "text": "doux",
       "ipa": "/du/",
       "soundUnitSlugs": [
+        "fr-d",
         "fr-u"
       ],
       "fileName": "doux-42313de724.mp3",
@@ -4345,14 +5287,21 @@
       "bytesByVoice": {
         "blue": 10911,
         "pink": 12164
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "douze",
       "text": "douze",
       "ipa": "/duz/",
       "soundUnitSlugs": [
-        "fr-u"
+        "fr-u",
+        "fr-z"
       ],
       "fileName": "douze-35d2dc35aa.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/douze-35d2dc35aa.mp3",
@@ -4367,7 +5316,13 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "douze amis",
@@ -4447,7 +5402,13 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "dû",
@@ -4469,7 +5430,13 @@
       "bytesByVoice": {
         "blue": 10911,
         "pink": 13000
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "dur",
@@ -4491,7 +5458,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 15090
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "eau",
@@ -4513,7 +5486,13 @@
       "bytesByVoice": {
         "blue": 13000,
         "pink": 13836
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "eau chaude",
@@ -4535,7 +5514,13 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "eau claire",
@@ -4572,6 +5557,8 @@
       "ipa": "/ekɔl/",
       "soundUnitSlugs": [
         "fr-e",
+        "fr-k",
+        "fr-l",
         "fr-o-open"
       ],
       "fileName": "ecole-cd843a96bf.mp3",
@@ -4587,14 +5574,21 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "écouter",
       "text": "écouter",
       "ipa": "/ekute/",
       "soundUnitSlugs": [
-        "fr-e"
+        "fr-e",
+        "fr-k"
       ],
       "fileName": "ecouter-447027217a.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/ecouter-447027217a.mp3",
@@ -4609,7 +5603,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "écrire",
@@ -4631,7 +5631,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "écrivain",
@@ -4653,7 +5659,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "égal",
@@ -4689,7 +5701,8 @@
       "text": "elle",
       "ipa": "/ɛl/",
       "soundUnitSlugs": [
-        "fr-e-open"
+        "fr-e-open",
+        "fr-l"
       ],
       "fileName": "elle-910a90401e.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/elle-910a90401e.mp3",
@@ -4704,7 +5717,13 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "elle aime",
@@ -4726,15 +5745,21 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "elle arrive",
       "text": "elle arrive",
       "ipa": "/ɛlaʁiv/",
       "soundUnitSlugs": [
-        "fr-liaison",
-        "fr-enchainement"
+        "fr-enchainement",
+        "fr-liaison"
       ],
       "fileName": "elle-arrive-adad8913c7.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/elle-arrive-adad8913c7.mp3",
@@ -4749,7 +5774,13 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "elle écoute",
@@ -4800,7 +5831,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "émotion",
@@ -4822,7 +5859,13 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "emprunt",
@@ -4844,7 +5887,13 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "encore",
@@ -4867,7 +5916,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "encore fort",
@@ -4889,7 +5944,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 20942
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "enfant",
@@ -4911,7 +5972,13 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "enseigner",
@@ -4933,7 +6000,13 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 19688
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "ensemble",
@@ -4955,7 +6028,13 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "entendre",
@@ -4977,7 +6056,13 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "entrée",
@@ -4999,7 +6084,13 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "espagne",
@@ -5021,7 +6112,13 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "et",
@@ -5043,7 +6140,13 @@
       "bytesByVoice": {
         "blue": 13836,
         "pink": 11328
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "été",
@@ -5065,7 +6168,14 @@
       "bytesByVoice": {
         "blue": 13836,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "diagnostic-word",
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "étudier",
@@ -5116,7 +6226,13 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 15090
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "eux",
@@ -5138,14 +6254,21 @@
       "bytesByVoice": {
         "blue": 11328,
         "pink": 11328
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "facile",
       "text": "facile",
       "ipa": "/fasil/",
       "soundUnitSlugs": [
-        "fr-a"
+        "fr-a",
+        "fr-f"
       ],
       "fileName": "facile-ad97b50553.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/facile-ad97b50553.mp3",
@@ -5160,7 +6283,13 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "façon",
@@ -5182,14 +6311,21 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "faire",
       "text": "faire",
       "ipa": "/fɛʁ/",
       "soundUnitSlugs": [
-        "fr-e-open"
+        "fr-e-open",
+        "fr-f"
       ],
       "fileName": "faire-9d62f39f91.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/faire-9d62f39f91.mp3",
@@ -5204,7 +6340,14 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "diagnostic-word",
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "faire facile",
@@ -5240,6 +6383,7 @@
       "text": "famille",
       "ipa": "/famij/",
       "soundUnitSlugs": [
+        "fr-f",
         "fr-glide-j"
       ],
       "fileName": "famille-6478d3b7c8.mp3",
@@ -5255,7 +6399,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "famille française",
@@ -5306,7 +6456,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "femme",
@@ -5343,6 +6499,8 @@
       "text": "fenêtre",
       "ipa": "/fənɛtʁ/",
       "soundUnitSlugs": [
+        "fr-f",
+        "fr-n",
         "fr-schwa"
       ],
       "fileName": "fenetre-a3acf8cda9.mp3",
@@ -5358,14 +6516,21 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "feu",
       "text": "feu",
       "ipa": "/fø/",
       "soundUnitSlugs": [
-        "fr-eu-close"
+        "fr-eu-close",
+        "fr-f"
       ],
       "fileName": "feu-29b2fbe127.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/feu-29b2fbe127.mp3",
@@ -5380,7 +6545,13 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 15090
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "février",
@@ -5403,7 +6574,13 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "figure",
@@ -5425,12 +6602,18 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "fil",
       "text": "fil",
-      "ipa": "/fij/ ~ /fil/",
+      "ipa": "/fil/",
       "soundUnitSlugs": [
         "fr-glide-j"
       ],
@@ -5445,15 +6628,29 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "contrast"
+      ],
+      "kinds": [
+        "contrast"
+      ],
+      "relationshipKinds": [
+        {
+          "soundUnitSlug": "fr-glide-j",
+          "relationshipKind": "contrast-member"
+        }
+      ],
+      "relationshipKind": "contrast-member"
     },
     {
       "key": "fille",
       "text": "fille",
       "ipa": "/fij/",
       "soundUnitSlugs": [
-        "fr-i",
-        "fr-glide-j"
+        "fr-f",
+        "fr-glide-j",
+        "fr-i"
       ],
       "fileName": "fille-b714ebb17d.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/fille-b714ebb17d.mp3",
@@ -5468,7 +6665,34 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "contrast",
+        "diagnostic-word",
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "contrast",
+        "word"
+      ],
+      "relationshipKinds": [
+        {
+          "soundUnitSlug": "fr-f",
+          "relationshipKind": "target-example"
+        },
+        {
+          "soundUnitSlug": "fr-glide-j",
+          "relationshipKind": "contrast-member"
+        },
+        {
+          "soundUnitSlug": "fr-glide-j",
+          "relationshipKind": "target-example"
+        },
+        {
+          "soundUnitSlug": "fr-i",
+          "relationshipKind": "target-example"
+        }
+      ]
     },
     {
       "key": "fin",
@@ -5512,14 +6736,22 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "fleur",
       "text": "fleur",
       "ipa": "/flœʁ/",
       "soundUnitSlugs": [
-        "fr-eu-open"
+        "fr-eu-open",
+        "fr-f",
+        "fr-l"
       ],
       "fileName": "fleur-71891a7c7c.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/fleur-71891a7c7c.mp3",
@@ -5534,7 +6766,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "fleur froide",
@@ -5585,7 +6823,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "forêt",
@@ -5621,6 +6865,7 @@
       "text": "fort",
       "ipa": "/fɔʁ/",
       "soundUnitSlugs": [
+        "fr-f",
         "fr-o-open"
       ],
       "fileName": "fort-2787a85eb2.mp3",
@@ -5636,13 +6881,20 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "fou",
       "text": "fou",
       "ipa": "/fu/",
       "soundUnitSlugs": [
+        "fr-f",
         "fr-u"
       ],
       "fileName": "fou-cc98dfae01.mp3",
@@ -5658,15 +6910,23 @@
       "bytesByVoice": {
         "blue": 13000,
         "pink": 14254
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "français",
       "text": "français",
       "ipa": "/fʁɑ̃sɛ/",
       "soundUnitSlugs": [
+        "fr-an",
         "fr-e-open",
-        "fr-an"
+        "fr-f",
+        "fr-s"
       ],
       "fileName": "francais-68437bf964.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/francais-68437bf964.mp3",
@@ -5681,7 +6941,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "france",
@@ -5703,7 +6969,13 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "frère",
@@ -5725,7 +6997,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "frère très rare",
@@ -5747,13 +7025,20 @@
       "bytesByVoice": {
         "blue": 20942,
         "pink": 24285
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "froid",
       "text": "froid",
       "ipa": "/fʁwa/",
       "soundUnitSlugs": [
+        "fr-f",
         "fr-final-consonant-silence"
       ],
       "fileName": "froid-889d38e3a0.mp3",
@@ -5769,7 +7054,13 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "fromage",
@@ -5792,13 +7083,20 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 20524
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "gagner",
       "text": "gagner",
       "ipa": "/gaɲe/",
       "soundUnitSlugs": [
+        "fr-g",
         "fr-ny"
       ],
       "fileName": "gagner-7c16949999.mp3",
@@ -5814,7 +7112,13 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "garage",
@@ -5836,14 +7140,22 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "garçon",
       "text": "garçon",
       "ipa": "/gaʁsɔ̃/",
       "soundUnitSlugs": [
-        "fr-on"
+        "fr-g",
+        "fr-on",
+        "fr-s"
       ],
       "fileName": "garcon-442edb21c4.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/garcon-442edb21c4.mp3",
@@ -5858,7 +7170,14 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 19688
-      }
+      },
+      "sources": [
+        "diagnostic-word",
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "gare",
@@ -5981,6 +7300,7 @@
       "text": "gauche",
       "ipa": "/goʃ/",
       "soundUnitSlugs": [
+        "fr-g",
         "fr-o-close",
         "fr-sh"
       ],
@@ -5997,7 +7317,13 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "gaz",
@@ -6048,7 +7374,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "gentil",
@@ -6070,7 +7402,13 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "gilet",
@@ -6092,7 +7430,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "glace",
@@ -6157,6 +7501,7 @@
       "text": "goût",
       "ipa": "/gu/",
       "soundUnitSlugs": [
+        "fr-g",
         "fr-u"
       ],
       "fileName": "gout-6401ccdf48.mp3",
@@ -6172,15 +7517,20 @@
       "bytesByVoice": {
         "blue": 13836,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "grand",
       "text": "grand",
       "ipa": "/gʁɑ̃/",
       "soundUnitSlugs": [
-        "fr-an",
-        "fr-final-consonant-silence"
+        "fr-an"
       ],
       "fileName": "grand-6d22906ec2.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/grand-6d22906ec2.mp3",
@@ -6195,7 +7545,13 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "grand arbre",
@@ -6217,7 +7573,13 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 20942
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "grand froid",
@@ -6239,7 +7601,13 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 20524
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "grand garçon",
@@ -6290,7 +7658,13 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 19688
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "grand tapis",
@@ -6370,7 +7744,13 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 19688
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "gris",
@@ -6567,7 +7947,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "heureux",
@@ -6589,7 +7975,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 15090
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "hier",
@@ -6612,7 +8004,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "hiver",
@@ -6634,13 +8032,20 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "homme",
       "text": "homme",
       "ipa": "/ɔm/",
       "soundUnitSlugs": [
+        "fr-m",
         "fr-o-open"
       ],
       "fileName": "homme-f008f75738.mp3",
@@ -6656,7 +8061,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 14254
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "hôtel",
@@ -6678,7 +8089,13 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "huile",
@@ -6700,7 +8117,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "huis",
@@ -6722,7 +8145,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "huit",
@@ -6744,7 +8173,26 @@
       "bytesByVoice": {
         "blue": 13836,
         "pink": 14254
-      }
+      },
+      "sources": [
+        "contrast",
+        "diagnostic-word",
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "contrast",
+        "word"
+      ],
+      "relationshipKinds": [
+        {
+          "soundUnitSlug": "fr-glide-hui",
+          "relationshipKind": "contrast-member"
+        },
+        {
+          "soundUnitSlug": "fr-glide-hui",
+          "relationshipKind": "target-example"
+        }
+      ]
     },
     {
       "key": "huit nuits",
@@ -6766,7 +8214,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "huître",
@@ -6788,7 +8242,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "humble",
@@ -6810,7 +8270,13 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "ici",
@@ -6832,7 +8298,13 @@
       "bytesByVoice": {
         "blue": 13000,
         "pink": 15090
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "ici vite",
@@ -6854,13 +8326,20 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "idée",
       "text": "idée",
       "ipa": "/ide/",
       "soundUnitSlugs": [
+        "fr-d",
         "fr-e"
       ],
       "fileName": "idee-dca1f42bf9.mp3",
@@ -6876,7 +8355,13 @@
       "bytesByVoice": {
         "blue": 13836,
         "pink": 15090
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "ignorer",
@@ -6898,7 +8383,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "il arrive",
@@ -6920,7 +8411,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "il est",
@@ -6942,7 +8439,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 14254
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "il est ici",
@@ -6964,7 +8467,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 20524
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "il habite",
@@ -6986,7 +8495,13 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 19688
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "il habite avec elle.",
@@ -7070,7 +8585,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "image",
@@ -7092,7 +8613,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "important",
@@ -7114,12 +8641,18 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 19688
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "in",
       "text": "in",
-      "ipa": "/œ̃/ ~ /ɛ̃/",
+      "ipa": "/ɛ̃/",
       "soundUnitSlugs": [
         "fr-un"
       ],
@@ -7134,7 +8667,20 @@
       "bytesByVoice": {
         "blue": 12164,
         "pink": 13000
-      }
+      },
+      "sources": [
+        "contrast"
+      ],
+      "kinds": [
+        "contrast"
+      ],
+      "relationshipKinds": [
+        {
+          "soundUnitSlug": "fr-un",
+          "relationshipKind": "contrast-member"
+        }
+      ],
+      "relationshipKind": "contrast-member"
     },
     {
       "key": "j'aime",
@@ -7156,7 +8702,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "diagnostic-word"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "j'aime encore",
@@ -7194,6 +8746,7 @@
       "soundUnitSlugs": [
         "fr-an",
         "fr-elision",
+        "fr-final-consonant-silence",
         "fr-in",
         "fr-on"
       ],
@@ -7240,7 +8793,13 @@
       "bytesByVoice": {
         "blue": 18852,
         "pink": 21777
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "j'arrive",
@@ -7262,7 +8821,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "j'écoute",
@@ -7284,7 +8849,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "j'habite",
@@ -7306,7 +8877,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "jamais",
@@ -7329,15 +8906,21 @@
       "bytesByVoice": {
         "blue": 13836,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "jardin",
       "text": "jardin",
       "ipa": "/ʒaʁdɛ̃/",
       "soundUnitSlugs": [
-        "fr-in",
         "fr-a",
+        "fr-in",
         "fr-zh"
       ],
       "fileName": "jardin-c006359ca3.mp3",
@@ -7353,7 +8936,13 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 19688
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "jardin joli",
@@ -7375,7 +8964,13 @@
       "bytesByVoice": {
         "blue": 18852,
         "pink": 21777
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "jaune",
@@ -7397,14 +8992,19 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "je",
       "text": "je",
       "ipa": "/ʒə/",
       "soundUnitSlugs": [
-        "fr-schwa",
         "fr-zh"
       ],
       "fileName": "je-68d2ad23b5.mp3",
@@ -7420,7 +9020,25 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 14254
-      }
+      },
+      "sources": [
+        "contrast",
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "contrast",
+        "word"
+      ],
+      "relationshipKinds": [
+        {
+          "soundUnitSlug": "fr-zh",
+          "relationshipKind": "contrast-member"
+        },
+        {
+          "soundUnitSlug": "fr-zh",
+          "relationshipKind": "target-example"
+        }
+      ]
     },
     {
       "key": "je joue",
@@ -7442,7 +9060,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "je le prends",
@@ -7553,7 +9177,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "jeu",
@@ -7575,7 +9205,13 @@
       "bytesByVoice": {
         "blue": 13836,
         "pink": 14254
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "jeudi",
@@ -7597,7 +9233,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "jeun",
@@ -7619,7 +9261,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 15090
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "jeune",
@@ -7641,7 +9289,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "jeûne",
@@ -7663,7 +9317,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "jeune sœur",
@@ -7685,7 +9345,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "jour",
@@ -7708,7 +9374,14 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "diagnostic-word",
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "jour rouge",
@@ -7730,13 +9403,20 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 19688
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "journal",
       "text": "journal",
       "ipa": "/ʒuʁnal/",
       "soundUnitSlugs": [
+        "fr-l",
         "fr-zh"
       ],
       "fileName": "journal-4954ccf587.mp3",
@@ -7752,7 +9432,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "journée",
@@ -7774,7 +9460,13 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "juillet",
@@ -7796,15 +9488,21 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "juin",
       "text": "juin",
       "ipa": "/ʒɥɛ̃/",
       "soundUnitSlugs": [
-        "fr-in",
-        "fr-glide-hui"
+        "fr-glide-hui",
+        "fr-in"
       ],
       "fileName": "juin-ea31a84e72.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/juin-ea31a84e72.mp3",
@@ -7819,7 +9517,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "jupe",
@@ -7842,7 +9546,13 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "jus",
@@ -7864,7 +9574,13 @@
       "bytesByVoice": {
         "blue": 13000,
         "pink": 15090
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "jusqu'à",
@@ -7886,7 +9602,13 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "juste",
@@ -7908,7 +9630,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "kilomètre",
@@ -7981,7 +9709,13 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 20942
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "l'ami arrive à huit heures.",
@@ -8035,7 +9769,13 @@
       "bytesByVoice": {
         "blue": 13000,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "l'école",
@@ -8057,7 +9797,13 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "l'école ouvre",
@@ -8144,7 +9890,8 @@
       "text": "la",
       "ipa": "/la/",
       "soundUnitSlugs": [
-        "fr-a"
+        "fr-a",
+        "fr-l"
       ],
       "fileName": "la-3efd4c0fe1.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/la-3efd4c0fe1.mp3",
@@ -8159,7 +9906,30 @@
       "bytesByVoice": {
         "blue": 13836,
         "pink": 14254
-      }
+      },
+      "sources": [
+        "contrast",
+        "diagnostic-word",
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "contrast",
+        "word"
+      ],
+      "relationshipKinds": [
+        {
+          "soundUnitSlug": "fr-a",
+          "relationshipKind": "contrast-member"
+        },
+        {
+          "soundUnitSlug": "fr-a",
+          "relationshipKind": "target-example"
+        },
+        {
+          "soundUnitSlug": "fr-l",
+          "relationshipKind": "target-example"
+        }
+      ]
     },
     {
       "key": "la famille fait une photo facile",
@@ -8268,7 +10038,13 @@
       "bytesByVoice": {
         "blue": 20524,
         "pink": 24285
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "la sœur de luc parle peu.",
@@ -8282,7 +10058,6 @@
         "sentence"
       ],
       "sources": [
-        "phoneme-keyword",
         "sentence"
       ],
       "fileName": "la-s-ur-de-luc-parle-peu-228f0b124e.mp3",
@@ -8321,7 +10096,13 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "la voiture arrive",
@@ -8357,6 +10138,7 @@
       "text": "lait",
       "ipa": "/lɛ/",
       "soundUnitSlugs": [
+        "fr-a",
         "fr-e-open"
       ],
       "fileName": "lait-906e82256a.mp3",
@@ -8372,7 +10154,26 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "contrast",
+        "diagnostic-word",
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "contrast",
+        "word"
+      ],
+      "relationshipKinds": [
+        {
+          "soundUnitSlug": "fr-a",
+          "relationshipKind": "contrast-member"
+        },
+        {
+          "soundUnitSlug": "fr-e-open",
+          "relationshipKind": "target-example"
+        }
+      ]
     },
     {
       "key": "langue",
@@ -8408,6 +10209,7 @@
       "text": "le",
       "ipa": "/lə/",
       "soundUnitSlugs": [
+        "fr-l",
         "fr-schwa"
       ],
       "fileName": "le-593b743b20.mp3",
@@ -8423,7 +10225,13 @@
       "bytesByVoice": {
         "blue": 13836,
         "pink": 14254
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "le café ferme",
@@ -8528,7 +10336,6 @@
         "sentence"
       ],
       "sources": [
-        "phoneme-keyword",
         "sentence"
       ],
       "fileName": "le-grand-homme-parle-encore-c9afe09e21.mp3",
@@ -8654,7 +10461,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 20942
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "le marché ouvre",
@@ -8763,7 +10576,13 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 19688
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "le prix bas",
@@ -8901,7 +10720,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "lent",
@@ -8923,7 +10748,13 @@
       "bytesByVoice": {
         "blue": 13836,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "les amis",
@@ -8945,7 +10776,26 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "contrast",
+        "diagnostic-word",
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "contrast",
+        "phrase"
+      ],
+      "relationshipKinds": [
+        {
+          "soundUnitSlug": "fr-liaison",
+          "relationshipKind": "contrast-member"
+        },
+        {
+          "soundUnitSlug": "fr-liaison",
+          "relationshipKind": "target-example"
+        }
+      ]
     },
     {
       "key": "les amis arrivent à paris.",
@@ -8959,7 +10809,6 @@
         "sentence"
       ],
       "sources": [
-        "phoneme-keyword",
         "sentence"
       ],
       "fileName": "les-amis-arrivent-a-paris-995a2cfe3d.mp3",
@@ -8981,8 +10830,9 @@
     {
       "key": "les livres",
       "text": "les livres",
-      "ipa": "/lez‿ami/ ~ /le livʁ/",
+      "ipa": "/le livʁ/",
       "soundUnitSlugs": [
+        "fr-final-consonant-silence",
         "fr-liaison"
       ],
       "audioSrc": "/audio/language-packs/fr-FR/les-livres-086a63f569.mp3",
@@ -8996,7 +10846,25 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "contrast",
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "contrast",
+        "phrase"
+      ],
+      "relationshipKinds": [
+        {
+          "soundUnitSlug": "fr-final-consonant-silence",
+          "relationshipKind": "target-example"
+        },
+        {
+          "soundUnitSlug": "fr-liaison",
+          "relationshipKind": "contrast-member"
+        }
+      ]
     },
     {
       "key": "les yeux",
@@ -9018,7 +10886,13 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "leur",
@@ -9040,7 +10914,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "ligne",
@@ -9062,7 +10942,13 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "ligne droite",
@@ -9084,14 +10970,21 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 21777
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "lit",
       "text": "lit",
       "ipa": "/li/",
       "soundUnitSlugs": [
-        "fr-i"
+        "fr-i",
+        "fr-l"
       ],
       "fileName": "lit-f12ecf748a.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/lit-f12ecf748a.mp3",
@@ -9106,7 +10999,13 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "livre",
@@ -9114,6 +11013,7 @@
       "ipa": "/livʁ/",
       "soundUnitSlugs": [
         "fr-i",
+        "fr-l",
         "fr-r"
       ],
       "fileName": "livre-c9904cff57.mp3",
@@ -9129,7 +11029,14 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "diagnostic-word",
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "loi",
@@ -9151,15 +11058,21 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "loin",
       "text": "loin",
       "ipa": "/lwɛ̃/",
       "soundUnitSlugs": [
-        "fr-in",
-        "fr-glide-w"
+        "fr-glide-w",
+        "fr-in"
       ],
       "fileName": "loin-1b1f310fb9.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/loin-1b1f310fb9.mp3",
@@ -9174,15 +11087,20 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "long",
       "text": "long",
       "ipa": "/lɔ̃/",
       "soundUnitSlugs": [
-        "fr-on",
-        "fr-final-consonant-silence"
+        "fr-on"
       ],
       "fileName": "long-bd3027fa56.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/long-bd3027fa56.mp3",
@@ -9197,7 +11115,13 @@
       "bytesByVoice": {
         "blue": 13836,
         "pink": 15090
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "longue",
@@ -9233,7 +11157,7 @@
       "text": "Louis",
       "ipa": "/lwi/",
       "soundUnitSlugs": [
-        "fr-glide-hui"
+        "fr-glide-w"
       ],
       "fileName": "louis-d82ece8d51.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/louis-d82ece8d51.mp3",
@@ -9248,7 +11172,13 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "louis voit",
@@ -9299,12 +11229,18 @@
       "bytesByVoice": {
         "blue": 13836,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "lu",
       "text": "lu",
-      "ipa": "/ʁy/ ~ /ly/",
+      "ipa": "/ly/",
       "soundUnitSlugs": [
         "fr-r"
       ],
@@ -9319,7 +11255,20 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 13836
-      }
+      },
+      "sources": [
+        "contrast"
+      ],
+      "kinds": [
+        "contrast"
+      ],
+      "relationshipKinds": [
+        {
+          "soundUnitSlug": "fr-r",
+          "relationshipKind": "contrast-member"
+        }
+      ],
+      "relationshipKind": "contrast-member"
     },
     {
       "key": "luc arrive",
@@ -9363,7 +11312,13 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "lui aussi",
@@ -9385,7 +11340,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 20942
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "lundi",
@@ -9407,7 +11368,13 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "lundi matin",
@@ -9429,13 +11396,21 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 20524
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "lune",
       "text": "lune",
       "ipa": "/lyn/",
       "soundUnitSlugs": [
+        "fr-l",
+        "fr-n",
         "fr-y"
       ],
       "fileName": "lune-2f7d415329.mp3",
@@ -9451,14 +11426,21 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "ma",
       "text": "ma",
       "ipa": "/ma/",
       "soundUnitSlugs": [
-        "fr-a"
+        "fr-a",
+        "fr-m"
       ],
       "fileName": "ma-1382244e17.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/ma-1382244e17.mp3",
@@ -9473,7 +11455,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "ma famille",
@@ -9495,7 +11483,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 20942
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "ma maison",
@@ -9576,14 +11570,21 @@
       "bytesByVoice": {
         "blue": 18852,
         "pink": 20524
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "madame",
       "text": "madame",
       "ipa": "/madam/",
       "soundUnitSlugs": [
-        "fr-a"
+        "fr-a",
+        "fr-d"
       ],
       "fileName": "madame-7867bbbe88.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/madame-7867bbbe88.mp3",
@@ -9598,7 +11599,13 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 20524
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "madame donne",
@@ -9649,7 +11656,13 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 20524
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "mais",
@@ -9671,14 +11684,22 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 14254
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "maison",
       "text": "maison",
       "ipa": "/mɛzɔ̃/",
       "soundUnitSlugs": [
-        "fr-on"
+        "fr-m",
+        "fr-on",
+        "fr-z"
       ],
       "fileName": "maison-996c8da3ca.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/maison-996c8da3ca.mp3",
@@ -9693,7 +11714,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 19688
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "maison ronde",
@@ -9715,7 +11742,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 21777
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "maison rose",
@@ -9782,7 +11815,8 @@
       "text": "maman",
       "ipa": "/mamɑ̃/",
       "soundUnitSlugs": [
-        "fr-an"
+        "fr-an",
+        "fr-m"
       ],
       "fileName": "maman-50d7436039.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/maman-50d7436039.mp3",
@@ -9797,7 +11831,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "manger",
@@ -9819,7 +11859,13 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 19688
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "manger du fromage",
@@ -9841,7 +11887,13 @@
       "bytesByVoice": {
         "blue": 20942,
         "pink": 24703
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "marché",
@@ -9864,7 +11916,13 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "marie travaille",
@@ -9900,8 +11958,9 @@
       "text": "matin",
       "ipa": "/matɛ̃/",
       "soundUnitSlugs": [
+        "fr-a",
         "fr-in",
-        "fr-a"
+        "fr-t"
       ],
       "fileName": "matin-b3fb555e1b.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/matin-b3fb555e1b.mp3",
@@ -9916,7 +11975,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "me",
@@ -9967,7 +12032,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 19688
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "même",
@@ -10032,8 +12103,9 @@
       "text": "menu",
       "ipa": "/məny/",
       "soundUnitSlugs": [
-        "fr-y",
-        "fr-schwa"
+        "fr-m",
+        "fr-schwa",
+        "fr-y"
       ],
       "fileName": "menu-252a25667d.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/menu-252a25667d.mp3",
@@ -10048,7 +12120,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "menu du jour",
@@ -10070,7 +12148,13 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 20942
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "menu moderne",
@@ -10121,14 +12205,22 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "merci",
       "text": "merci",
       "ipa": "/mɛʁsi/",
       "soundUnitSlugs": [
-        "fr-r"
+        "fr-m",
+        "fr-r",
+        "fr-s"
       ],
       "fileName": "merci-9f98291e44.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/merci-9f98291e44.mp3",
@@ -10143,7 +12235,14 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "diagnostic-word",
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "merci beaucoup",
@@ -10223,7 +12322,13 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "mère claire",
@@ -10245,7 +12350,13 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 19688
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "mes",
@@ -10267,7 +12378,13 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 14254
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "mettre",
@@ -10289,7 +12406,13 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "meuble",
@@ -10311,7 +12434,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 19688
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "meute",
@@ -10333,14 +12462,22 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "midi",
       "text": "midi",
       "ipa": "/midi/",
       "soundUnitSlugs": [
-        "fr-i"
+        "fr-d",
+        "fr-i",
+        "fr-m"
       ],
       "fileName": "midi-8a25185f3c.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/midi-8a25185f3c.mp3",
@@ -10355,7 +12492,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "miel",
@@ -10406,7 +12549,13 @@
       "bytesByVoice": {
         "blue": 13000,
         "pink": 14254
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "mignon",
@@ -10428,7 +12577,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "mignon agneau",
@@ -10450,7 +12605,13 @@
       "bytesByVoice": {
         "blue": 20942,
         "pink": 22613
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "mille",
@@ -10501,14 +12662,21 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "minute",
       "text": "minute",
       "ipa": "/minyt/",
       "soundUnitSlugs": [
-        "fr-i"
+        "fr-i",
+        "fr-m"
       ],
       "fileName": "minute-04987fcab7.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/minute-04987fcab7.mp3",
@@ -10523,7 +12691,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 20524
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "moderne",
@@ -10575,7 +12749,13 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "moi et toi",
@@ -10597,7 +12777,13 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 20942
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "moins",
@@ -10619,7 +12805,13 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 15090
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "mon",
@@ -10655,8 +12847,8 @@
       "text": "mon ami",
       "ipa": "/mɔnami/",
       "soundUnitSlugs": [
-        "fr-liaison",
-        "fr-enchainement"
+        "fr-enchainement",
+        "fr-liaison"
       ],
       "fileName": "mon-ami-a34505ca02.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/mon-ami-a34505ca02.mp3",
@@ -10671,13 +12863,20 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "monde",
       "text": "monde",
       "ipa": "/mɔ̃d/",
       "soundUnitSlugs": [
+        "fr-m",
         "fr-on"
       ],
       "fileName": "monde-e4e00d3dfe.mp3",
@@ -10693,7 +12892,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "montagne",
@@ -10715,7 +12920,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "montagne blanche",
@@ -10737,15 +12948,21 @@
       "bytesByVoice": {
         "blue": 19688,
         "pink": 24285
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "mot",
       "text": "mot",
       "ipa": "/mo/",
       "soundUnitSlugs": [
-        "fr-o-close",
-        "fr-final-consonant-silence"
+        "fr-m",
+        "fr-o-close"
       ],
       "fileName": "mot-984ac749fe.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/mot-984ac749fe.mp3",
@@ -10760,7 +12977,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "moyen",
@@ -10782,7 +13005,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "musée",
@@ -10804,14 +13033,23 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "musique",
       "text": "musique",
       "ipa": "/myzik/",
       "soundUnitSlugs": [
-        "fr-y"
+        "fr-k",
+        "fr-m",
+        "fr-y",
+        "fr-z"
       ],
       "fileName": "musique-d3177e8151.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/musique-d3177e8151.mp3",
@@ -10826,7 +13064,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "n'est-ce pas",
@@ -10848,7 +13092,13 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 22613
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "nation",
@@ -10870,7 +13120,13 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "nature",
@@ -10935,7 +13191,8 @@
       "text": "neuf",
       "ipa": "/nœf/",
       "soundUnitSlugs": [
-        "fr-eu-open"
+        "fr-eu-open",
+        "fr-f"
       ],
       "fileName": "neuf-1371484d6f.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/neuf-1371484d6f.mp3",
@@ -10950,7 +13207,13 @@
       "bytesByVoice": {
         "blue": 13000,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "neuf heures",
@@ -10972,14 +13235,21 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 20942
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "neveu",
       "text": "neveu",
       "ipa": "/nəvø/",
       "soundUnitSlugs": [
-        "fr-eu-close"
+        "fr-eu-close",
+        "fr-v"
       ],
       "fileName": "neveu-772f74eebf.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/neveu-772f74eebf.mp3",
@@ -10994,7 +13264,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 20524
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "nez",
@@ -11002,7 +13278,8 @@
       "ipa": "/ne/",
       "soundUnitSlugs": [
         "fr-e",
-        "fr-final-consonant-silence"
+        "fr-final-consonant-silence",
+        "fr-n"
       ],
       "fileName": "nez-953bd24ca8.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/nez-953bd24ca8.mp3",
@@ -11017,7 +13294,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "noir",
@@ -11039,7 +13322,13 @@
       "bytesByVoice": {
         "blue": 13000,
         "pink": 15090
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "nom",
@@ -11061,7 +13350,13 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "non",
@@ -11141,7 +13436,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 19688
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "notre",
@@ -11177,6 +13478,7 @@
       "text": "nous",
       "ipa": "/nu/",
       "soundUnitSlugs": [
+        "fr-n",
         "fr-u"
       ],
       "fileName": "nous-fd6392d045.mp3",
@@ -11192,7 +13494,14 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "diagnostic-word",
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "nous arrivons",
@@ -11243,7 +13552,13 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "nous venons",
@@ -11323,14 +13638,21 @@
       "bytesByVoice": {
         "blue": 13836,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "nuit",
       "text": "nuit",
       "ipa": "/nɥi/",
       "soundUnitSlugs": [
-        "fr-glide-hui"
+        "fr-glide-hui",
+        "fr-n"
       ],
       "fileName": "nuit-b4c676a043.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/nuit-b4c676a043.mp3",
@@ -11345,7 +13667,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 13836
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "numéro",
@@ -11396,7 +13724,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "œil",
@@ -11418,7 +13752,13 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 15090
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "œuf",
@@ -11469,7 +13809,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 13836
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "œuvre",
@@ -11491,7 +13837,13 @@
       "bytesByVoice": {
         "blue": 13836,
         "pink": 15090
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "oignon",
@@ -11513,7 +13865,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "oiseau",
@@ -11535,14 +13893,21 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "onze",
       "text": "onze",
       "ipa": "/ɔ̃z/",
       "soundUnitSlugs": [
-        "fr-on"
+        "fr-on",
+        "fr-z"
       ],
       "fileName": "onze-9fd8fa2d0e.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/onze-9fd8fa2d0e.mp3",
@@ -11557,7 +13922,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "ordinateur",
@@ -11579,7 +13950,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 21777
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "oreille",
@@ -11601,7 +13978,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 20524
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "où",
@@ -11623,7 +14006,13 @@
       "bytesByVoice": {
         "blue": 10075,
         "pink": 11328
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "ouest",
@@ -11645,13 +14034,20 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "oui",
       "text": "oui",
       "ipa": "/wi/",
       "soundUnitSlugs": [
+        "fr-glide-hui",
         "fr-glide-w"
       ],
       "fileName": "oui-5898fc8603.mp3",
@@ -11667,7 +14063,26 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 15090
-      }
+      },
+      "sources": [
+        "contrast",
+        "diagnostic-word",
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "contrast",
+        "word"
+      ],
+      "relationshipKinds": [
+        {
+          "soundUnitSlug": "fr-glide-hui",
+          "relationshipKind": "contrast-member"
+        },
+        {
+          "soundUnitSlug": "fr-glide-w",
+          "relationshipKind": "target-example"
+        }
+      ]
     },
     {
       "key": "oui encore",
@@ -11718,7 +14133,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "oui, nous allons au bureau.",
@@ -11772,7 +14193,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "ouvert",
@@ -11808,7 +14235,8 @@
       "text": "pain",
       "ipa": "/pɛ̃/",
       "soundUnitSlugs": [
-        "fr-in"
+        "fr-in",
+        "fr-p"
       ],
       "fileName": "pain-4582cd02ee.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/pain-4582cd02ee.mp3",
@@ -11823,7 +14251,14 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "diagnostic-word",
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "pain du matin",
@@ -11845,7 +14280,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 21777
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "pantalon",
@@ -11867,7 +14308,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 19688
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "papa prépare un petit pain",
@@ -11932,7 +14379,8 @@
       "text": "pardon",
       "ipa": "/paʁdɔ̃/",
       "soundUnitSlugs": [
-        "fr-on"
+        "fr-on",
+        "fr-p"
       ],
       "fileName": "pardon-00e1de3f52.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/pardon-00e1de3f52.mp3",
@@ -11947,7 +14395,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 19688
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "parfum",
@@ -11969,7 +14423,13 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "parfum brun",
@@ -11991,16 +14451,23 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 20942
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "paris",
       "text": "Paris",
       "ipa": "/paʁi/",
       "soundUnitSlugs": [
+        "fr-a",
         "fr-i",
-        "fr-r",
-        "fr-a"
+        "fr-p",
+        "fr-r"
       ],
       "fileName": "paris-3c4bd4d0d0.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/paris-3c4bd4d0d0.mp3",
@@ -12015,7 +14482,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "paris arrive",
@@ -12038,7 +14511,13 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 23449
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "paris midi",
@@ -12060,7 +14539,13 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 20524
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "paris parle",
@@ -12111,7 +14596,13 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 20942
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "parisien",
@@ -12133,7 +14624,13 @@
       "bytesByVoice": {
         "blue": 19688,
         "pink": 20942
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "parler",
@@ -12141,7 +14638,8 @@
       "ipa": "/paʁle/",
       "soundUnitSlugs": [
         "fr-e",
-        "fr-final-consonant-silence"
+        "fr-l",
+        "fr-p"
       ],
       "fileName": "parler-c1c0b23407.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/parler-c1c0b23407.mp3",
@@ -12156,7 +14654,13 @@
       "bytesByVoice": {
         "blue": 13836,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "parler été",
@@ -12178,7 +14682,13 @@
       "bytesByVoice": {
         "blue": 18852,
         "pink": 19688
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "partir",
@@ -12200,7 +14710,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "pas",
@@ -12280,7 +14796,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "payer hier",
@@ -12302,7 +14824,13 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 20524
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "peigne",
@@ -12324,7 +14852,13 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "pendant",
@@ -12346,7 +14880,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "perdu",
@@ -12368,14 +14908,21 @@
       "bytesByVoice": {
         "blue": 13836,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "père",
       "text": "père",
       "ipa": "/pɛʁ/",
       "soundUnitSlugs": [
-        "fr-e-open"
+        "fr-e-open",
+        "fr-p"
       ],
       "fileName": "pere-f7cb1f68a4.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/pere-f7cb1f68a4.mp3",
@@ -12390,7 +14937,13 @@
       "bytesByVoice": {
         "blue": 13836,
         "pink": 15090
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "personne",
@@ -12426,8 +14979,10 @@
       "text": "petit",
       "ipa": "/pəti/",
       "soundUnitSlugs": [
+        "fr-final-consonant-silence",
+        "fr-p",
         "fr-schwa",
-        "fr-final-consonant-silence"
+        "fr-t"
       ],
       "fileName": "petit-0f6878f15a.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/petit-0f6878f15a.mp3",
@@ -12442,7 +14997,42 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "contrast",
+        "diagnostic-word",
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "contrast",
+        "word"
+      ],
+      "relationshipKinds": [
+        {
+          "soundUnitSlug": "fr-final-consonant-silence",
+          "relationshipKind": "contrast-member"
+        },
+        {
+          "soundUnitSlug": "fr-final-consonant-silence",
+          "relationshipKind": "target-example"
+        },
+        {
+          "soundUnitSlug": "fr-p",
+          "relationshipKind": "target-example"
+        },
+        {
+          "soundUnitSlug": "fr-schwa",
+          "relationshipKind": "contrast-member"
+        },
+        {
+          "soundUnitSlug": "fr-schwa",
+          "relationshipKind": "target-example"
+        },
+        {
+          "soundUnitSlug": "fr-t",
+          "relationshipKind": "target-example"
+        }
+      ]
     },
     {
       "key": "petit à petit, elle écoute.",
@@ -12495,7 +15085,13 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 19688
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "petit chat",
@@ -12546,7 +15142,13 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 20942
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "petit pain",
@@ -12582,7 +15184,7 @@
       "text": "petite",
       "ipa": "/pətit/",
       "soundUnitSlugs": [
-        "fr-schwa"
+        "fr-final-consonant-silence"
       ],
       "fileName": "petite-c61410e31c.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/petite-c61410e31c.mp3",
@@ -12597,14 +15199,28 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "contrast"
+      ],
+      "kinds": [
+        "contrast"
+      ],
+      "relationshipKinds": [
+        {
+          "soundUnitSlug": "fr-final-consonant-silence",
+          "relationshipKind": "contrast-member"
+        }
+      ],
+      "relationshipKind": "contrast-member"
     },
     {
       "key": "petite école",
       "text": "petite école",
       "ipa": "/pətitekɔl/",
       "soundUnitSlugs": [
-        "fr-enchainement"
+        "fr-enchainement",
+        "fr-schwa"
       ],
       "fileName": "petite-ecole-f64027e2a5.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/petite-ecole-f64027e2a5.mp3",
@@ -12619,7 +15235,13 @@
       "bytesByVoice": {
         "blue": 19688,
         "pink": 21777
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "petite fenêtre",
@@ -12699,7 +15321,14 @@
       "bytesByVoice": {
         "blue": 12164,
         "pink": 14254
-      }
+      },
+      "sources": [
+        "diagnostic-word",
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "peu bleu",
@@ -12721,14 +15350,21 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 19688
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "peuple",
       "text": "peuple",
       "ipa": "/pœpl/",
       "soundUnitSlugs": [
-        "fr-eu-open"
+        "fr-eu-open",
+        "fr-p"
       ],
       "fileName": "peuple-05a1a8f068.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/peuple-05a1a8f068.mp3",
@@ -12743,7 +15379,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 19688
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "peur",
@@ -12765,7 +15407,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "peux",
@@ -12787,13 +15435,20 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 13000
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "photo",
       "text": "photo",
       "ipa": "/foto/",
       "soundUnitSlugs": [
+        "fr-f",
         "fr-o-close"
       ],
       "fileName": "photo-eeb35d331b.mp3",
@@ -12809,7 +15464,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "photo floue",
@@ -12874,8 +15535,7 @@
       "text": "pied",
       "ipa": "/pje/",
       "soundUnitSlugs": [
-        "fr-glide-j",
-        "fr-final-consonant-silence"
+        "fr-glide-j"
       ],
       "fileName": "pied-17715247c2.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/pied-17715247c2.mp3",
@@ -12890,7 +15550,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "place",
@@ -12941,7 +15607,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "pleure",
@@ -12963,14 +15635,21 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "pluie",
       "text": "pluie",
       "ipa": "/plɥi/",
       "soundUnitSlugs": [
-        "fr-glide-hui"
+        "fr-glide-hui",
+        "fr-p"
       ],
       "fileName": "pluie-622c995322.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/pluie-622c995322.mp3",
@@ -12985,7 +15664,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "pluie suisse",
@@ -13007,7 +15692,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 20942
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "poche",
@@ -13072,7 +15763,8 @@
       "text": "pomme",
       "ipa": "/pɔm/",
       "soundUnitSlugs": [
-        "fr-o-open"
+        "fr-o-open",
+        "fr-p"
       ],
       "fileName": "pomme-752c14ea19.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/pomme-752c14ea19.mp3",
@@ -13087,7 +15779,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "pomme comme ça",
@@ -13109,7 +15807,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 21777
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "pomme et pain",
@@ -13160,14 +15864,22 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "porte",
       "text": "porte",
       "ipa": "/pɔʁt/",
       "soundUnitSlugs": [
-        "fr-o-open"
+        "fr-o-open",
+        "fr-p",
+        "fr-t"
       ],
       "fileName": "porte-675c421010.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/porte-675c421010.mp3",
@@ -13182,7 +15894,14 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "diagnostic-word",
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "porte propre",
@@ -13262,7 +15981,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "pouvoir",
@@ -13284,7 +16009,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "premier",
@@ -13313,7 +16044,8 @@
       "text": "premier avril",
       "ipa": "/pʁəmjeʁavʁil/",
       "soundUnitSlugs": [
-        "fr-liaison"
+        "fr-liaison",
+        "fr-schwa"
       ],
       "fileName": "premier-avril-98e05a20f7.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/premier-avril-98e05a20f7.mp3",
@@ -13328,13 +16060,20 @@
       "bytesByVoice": {
         "blue": 18852,
         "pink": 22613
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "prendre",
       "text": "prendre",
       "ipa": "/pʁɑ̃dʁ/",
       "soundUnitSlugs": [
+        "fr-p",
         "fr-r"
       ],
       "fileName": "prendre-f5cf5e12c1.mp3",
@@ -13350,7 +16089,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "prénom",
@@ -13372,7 +16117,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 20524
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "propre",
@@ -13406,7 +16157,7 @@
     {
       "key": "ptit",
       "text": "ptit",
-      "ipa": "/pəti/ ~ /pti/",
+      "ipa": "/pti/",
       "soundUnitSlugs": [
         "fr-schwa"
       ],
@@ -13421,7 +16172,20 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "contrast"
+      ],
+      "kinds": [
+        "contrast"
+      ],
+      "relationshipKinds": [
+        {
+          "soundUnitSlug": "fr-schwa",
+          "relationshipKind": "contrast-member"
+        }
+      ],
+      "relationshipKind": "contrast-member"
     },
     {
       "key": "pur",
@@ -13443,7 +16207,13 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "qu'elle",
@@ -13487,7 +16257,13 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 15090
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "qu'il arrive",
@@ -13567,7 +16343,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "quatre",
@@ -13676,7 +16458,13 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "quelqu'un vient",
@@ -13698,13 +16486,20 @@
       "bytesByVoice": {
         "blue": 20524,
         "pink": 20524
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "question",
       "text": "question",
       "ipa": "/kɛstjɔ̃/",
       "soundUnitSlugs": [
+        "fr-k",
         "fr-on"
       ],
       "fileName": "question-3b2be2e263.mp3",
@@ -13720,7 +16515,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "queue",
@@ -13742,7 +16543,13 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 15090
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "qui",
@@ -13851,7 +16658,13 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "raison",
@@ -13873,7 +16686,13 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 19688
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "regard",
@@ -13895,7 +16714,13 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 20524
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "regarder",
@@ -13975,7 +16800,13 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "rêve",
@@ -14026,7 +16857,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 20524
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "revenez samedi",
@@ -14048,7 +16885,13 @@
       "bytesByVoice": {
         "blue": 18852,
         "pink": 22613
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "rien",
@@ -14070,7 +16913,13 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "rire",
@@ -14092,7 +16941,13 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 15090
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "riz",
@@ -14114,7 +16969,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "robe",
@@ -14194,15 +17055,22 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 20524
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "rose",
       "text": "rose",
       "ipa": "/ʁoz/",
       "soundUnitSlugs": [
+        "fr-o-close",
         "fr-r",
-        "fr-o-close"
+        "fr-z"
       ],
       "fileName": "rose-7b7074fca3.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/rose-7b7074fca3.mp3",
@@ -14217,7 +17085,13 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "rose rouge",
@@ -14268,15 +17142,21 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "rouge",
       "text": "rouge",
       "ipa": "/ʁuʒ/",
       "soundUnitSlugs": [
-        "fr-u",
         "fr-r",
+        "fr-u",
         "fr-zh"
       ],
       "fileName": "rouge-d1695e2cec.mp3",
@@ -14292,7 +17172,13 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "route",
@@ -14314,15 +17200,21 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 20524
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "rue",
       "text": "rue",
       "ipa": "/ʁy/",
       "soundUnitSlugs": [
-        "fr-y",
-        "fr-r"
+        "fr-r",
+        "fr-y"
       ],
       "fileName": "rue-5207bccad2.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/rue-5207bccad2.mp3",
@@ -14337,7 +17229,30 @@
       "bytesByVoice": {
         "blue": 13836,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "contrast",
+        "diagnostic-word",
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "contrast",
+        "word"
+      ],
+      "relationshipKinds": [
+        {
+          "soundUnitSlug": "fr-r",
+          "relationshipKind": "contrast-member"
+        },
+        {
+          "soundUnitSlug": "fr-r",
+          "relationshipKind": "target-example"
+        },
+        {
+          "soundUnitSlug": "fr-y",
+          "relationshipKind": "target-example"
+        }
+      ]
     },
     {
       "key": "rue du sud",
@@ -14381,7 +17296,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 19688
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "sa famille voyage",
@@ -14461,14 +17382,21 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 20524
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "salade",
       "text": "salade",
       "ipa": "/salad/",
       "soundUnitSlugs": [
-        "fr-a"
+        "fr-a",
+        "fr-s"
       ],
       "fileName": "salade-61c64adcb7.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/salade-61c64adcb7.mp3",
@@ -14483,7 +17411,13 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "salon",
@@ -14534,7 +17468,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 15090
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "samedi",
@@ -14542,6 +17482,7 @@
       "ipa": "/samdi/",
       "soundUnitSlugs": [
         "fr-a",
+        "fr-m",
         "fr-schwa"
       ],
       "fileName": "samedi-785ee49b7e.mp3",
@@ -14557,7 +17498,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "samedi matin",
@@ -14593,7 +17540,9 @@
       "text": "sans",
       "ipa": "/sɑ̃/",
       "soundUnitSlugs": [
-        "fr-an"
+        "fr-an",
+        "fr-on",
+        "fr-s"
       ],
       "fileName": "sans-1fc8536818.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/sans-1fc8536818.mp3",
@@ -14608,7 +17557,30 @@
       "bytesByVoice": {
         "blue": 13836,
         "pink": 13836
-      }
+      },
+      "sources": [
+        "contrast",
+        "diagnostic-word",
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "contrast",
+        "word"
+      ],
+      "relationshipKinds": [
+        {
+          "soundUnitSlug": "fr-an",
+          "relationshipKind": "target-example"
+        },
+        {
+          "soundUnitSlug": "fr-on",
+          "relationshipKind": "contrast-member"
+        },
+        {
+          "soundUnitSlug": "fr-s",
+          "relationshipKind": "target-example"
+        }
+      ]
     },
     {
       "key": "sans souci",
@@ -14731,7 +17703,8 @@
       "text": "savon",
       "ipa": "/savɔ̃/",
       "soundUnitSlugs": [
-        "fr-on"
+        "fr-on",
+        "fr-v"
       ],
       "fileName": "savon-3ff4930a25.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/savon-3ff4930a25.mp3",
@@ -14746,7 +17719,13 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 20524
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "seconde",
@@ -14782,7 +17761,8 @@
       "text": "sel",
       "ipa": "/sɛl/",
       "soundUnitSlugs": [
-        "fr-e-open"
+        "fr-e-open",
+        "fr-s"
       ],
       "fileName": "sel-c7c752379a.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/sel-c7c752379a.mp3",
@@ -14797,13 +17777,21 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 15090
-      }
+      },
+      "sources": [
+        "diagnostic-word",
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "semaine",
       "text": "semaine",
       "ipa": "/səmɛn/",
       "soundUnitSlugs": [
+        "fr-s",
         "fr-schwa"
       ],
       "fileName": "semaine-7676e7b98b.mp3",
@@ -14819,7 +17807,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "sept",
@@ -14841,7 +17835,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 13836
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "serein",
@@ -14863,7 +17863,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 19688
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "seul",
@@ -14885,7 +17891,13 @@
       "bytesByVoice": {
         "blue": 13000,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "seulement",
@@ -14907,14 +17919,22 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "si",
       "text": "si",
       "ipa": "/si/",
       "soundUnitSlugs": [
-        "fr-i"
+        "fr-i",
+        "fr-s",
+        "fr-y"
       ],
       "fileName": "si-7dd9b33881.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/si-7dd9b33881.mp3",
@@ -14929,7 +17949,30 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 13000
-      }
+      },
+      "sources": [
+        "contrast",
+        "diagnostic-word",
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "contrast",
+        "word"
+      ],
+      "relationshipKinds": [
+        {
+          "soundUnitSlug": "fr-i",
+          "relationshipKind": "target-example"
+        },
+        {
+          "soundUnitSlug": "fr-s",
+          "relationshipKind": "target-example"
+        },
+        {
+          "soundUnitSlug": "fr-y",
+          "relationshipKind": "contrast-member"
+        }
+      ]
     },
     {
       "key": "si simple",
@@ -14980,7 +18023,13 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "signe",
@@ -15002,7 +18051,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "six",
@@ -15053,7 +18108,26 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "contrast",
+        "diagnostic-word",
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "contrast",
+        "word"
+      ],
+      "relationshipKinds": [
+        {
+          "soundUnitSlug": "fr-eu-open",
+          "relationshipKind": "contrast-member"
+        },
+        {
+          "soundUnitSlug": "fr-eu-open",
+          "relationshipKind": "target-example"
+        }
+      ]
     },
     {
       "key": "soir",
@@ -15075,7 +18149,13 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 14254
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "soir noir",
@@ -15097,14 +18177,21 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 19688
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "soleil",
       "text": "soleil",
       "ipa": "/sɔlɛj/",
       "soundUnitSlugs": [
-        "fr-glide-j"
+        "fr-glide-j",
+        "fr-l"
       ],
       "fileName": "soleil-45c8586a62.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/soleil-45c8586a62.mp3",
@@ -15119,14 +18206,21 @@
       "bytesByVoice": {
         "blue": 18852,
         "pink": 20524
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "son",
       "text": "son",
       "ipa": "/sɔ̃/",
       "soundUnitSlugs": [
-        "fr-on"
+        "fr-on",
+        "fr-s"
       ],
       "fileName": "son-f0cbc0ee7d.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/son-f0cbc0ee7d.mp3",
@@ -15141,7 +18235,29 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "contrast",
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "contrast",
+        "word"
+      ],
+      "relationshipKinds": [
+        {
+          "soundUnitSlug": "fr-on",
+          "relationshipKind": "contrast-member"
+        },
+        {
+          "soundUnitSlug": "fr-on",
+          "relationshipKind": "target-example"
+        },
+        {
+          "soundUnitSlug": "fr-s",
+          "relationshipKind": "target-example"
+        }
+      ]
     },
     {
       "key": "sort",
@@ -15163,7 +18279,13 @@
       "bytesByVoice": {
         "blue": 13836,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "souci",
@@ -15243,13 +18365,20 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "sous",
       "text": "sous",
       "ipa": "/su/",
       "soundUnitSlugs": [
+        "fr-s",
         "fr-u"
       ],
       "fileName": "sous-c42f1b72ae.mp3",
@@ -15265,7 +18394,13 @@
       "bytesByVoice": {
         "blue": 13836,
         "pink": 13000
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "sous la roue",
@@ -15287,12 +18422,18 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "su",
       "text": "su",
-      "ipa": "/si/ ~ /sy/",
+      "ipa": "/sy/",
       "soundUnitSlugs": [
         "fr-y"
       ],
@@ -15307,7 +18448,20 @@
       "bytesByVoice": {
         "blue": 12164,
         "pink": 13836
-      }
+      },
+      "sources": [
+        "contrast"
+      ],
+      "kinds": [
+        "contrast"
+      ],
+      "relationshipKinds": [
+        {
+          "soundUnitSlug": "fr-y",
+          "relationshipKind": "contrast-member"
+        }
+      ],
+      "relationshipKind": "contrast-member"
     },
     {
       "key": "sucre",
@@ -15329,7 +18483,13 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "suisse",
@@ -15351,7 +18511,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "suivre",
@@ -15373,7 +18539,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "sur",
@@ -15395,7 +18567,13 @@
       "bytesByVoice": {
         "blue": 13000,
         "pink": 13836
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "sûr",
@@ -15431,7 +18609,10 @@
       "text": "table",
       "ipa": "/tabl/",
       "soundUnitSlugs": [
-        "fr-a"
+        "fr-a",
+        "fr-b",
+        "fr-l",
+        "fr-t"
       ],
       "fileName": "table-c3ee137d4f.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/table-c3ee137d4f.mp3",
@@ -15446,7 +18627,13 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "table bleue",
@@ -15527,7 +18714,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "téléphone",
@@ -15579,7 +18772,13 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 14254
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "temps chaud",
@@ -15601,14 +18800,21 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "tête",
       "text": "tête",
       "ipa": "/tɛt/",
       "soundUnitSlugs": [
-        "fr-e-open"
+        "fr-e-open",
+        "fr-t"
       ],
       "fileName": "tete-de49912208.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/tete-de49912208.mp3",
@@ -15623,7 +18829,14 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 14254
-      }
+      },
+      "sources": [
+        "diagnostic-word",
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "thé",
@@ -15703,7 +18916,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 14254
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "tomate",
@@ -15768,6 +18987,7 @@
       "text": "ton",
       "ipa": "/tɔ̃/",
       "soundUnitSlugs": [
+        "fr-n",
         "fr-on"
       ],
       "fileName": "ton-5e4b6ad299.mp3",
@@ -15783,7 +19003,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "ton ami chante",
@@ -15848,7 +19074,8 @@
       "text": "tôt",
       "ipa": "/to/",
       "soundUnitSlugs": [
-        "fr-o-close"
+        "fr-o-close",
+        "fr-t"
       ],
       "kinds": [
         "word"
@@ -15877,6 +19104,7 @@
       "text": "tout",
       "ipa": "/tu/",
       "soundUnitSlugs": [
+        "fr-t",
         "fr-u"
       ],
       "fileName": "tout-0450a82763.mp3",
@@ -15892,7 +19120,13 @@
       "bytesByVoice": {
         "blue": 13000,
         "pink": 14254
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "tout à coup",
@@ -15914,14 +19148,21 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 20524
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "train",
       "text": "train",
       "ipa": "/tʁɛ̃/",
       "soundUnitSlugs": [
-        "fr-in"
+        "fr-in",
+        "fr-t"
       ],
       "fileName": "train-94efdd6f62.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/train-94efdd6f62.mp3",
@@ -15936,7 +19177,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "travail",
@@ -15958,7 +19205,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "travailler",
@@ -15980,7 +19233,13 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 19688
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "treize",
@@ -16017,7 +19276,8 @@
       "ipa": "/tʁɛ/",
       "soundUnitSlugs": [
         "fr-e-open",
-        "fr-r"
+        "fr-r",
+        "fr-t"
       ],
       "fileName": "tres-48697b1ebf.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/tres-48697b1ebf.mp3",
@@ -16032,7 +19292,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "très belle",
@@ -16054,7 +19320,13 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 19688
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "très bien",
@@ -16119,7 +19391,8 @@
       "text": "trois",
       "ipa": "/tʁwa/",
       "soundUnitSlugs": [
-        "fr-glide-w"
+        "fr-glide-w",
+        "fr-t"
       ],
       "fileName": "trois-dff3ee8d74.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/trois-dff3ee8d74.mp3",
@@ -16134,7 +19407,13 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "trois amis",
@@ -16185,15 +19464,21 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 22613
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "trop",
       "text": "trop",
       "ipa": "/tʁo/",
       "soundUnitSlugs": [
-        "fr-o-close",
-        "fr-final-consonant-silence"
+        "fr-final-consonant-silence",
+        "fr-o-close"
       ],
       "fileName": "trop-687ccffb59.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/trop-687ccffb59.mp3",
@@ -16208,7 +19493,14 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "diagnostic-word",
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "trop grand, trop lent, trop fort.",
@@ -16223,7 +19515,6 @@
         "sentence"
       ],
       "sources": [
-        "phoneme-keyword",
         "sentence"
       ],
       "fileName": "trop-grand-trop-lent-trop-fort-1ae4d34ddd.mp3",
@@ -16262,13 +19553,20 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "tu",
       "text": "tu",
       "ipa": "/ty/",
       "soundUnitSlugs": [
+        "fr-t",
         "fr-y"
       ],
       "fileName": "tu-a3da4c6307.mp3",
@@ -16284,7 +19582,14 @@
       "bytesByVoice": {
         "blue": 13836,
         "pink": 14254
-      }
+      },
+      "sources": [
+        "diagnostic-word",
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "tu attends",
@@ -16364,13 +19669,20 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 15926
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "tu veux du café ?",
       "text": "Tu veux du café ?",
       "ipa": "/y ø/",
       "soundUnitSlugs": [
+        "fr-e",
         "fr-eu-close",
         "fr-y"
       ],
@@ -16378,7 +19690,6 @@
         "sentence"
       ],
       "sources": [
-        "phoneme-keyword",
         "sentence"
       ],
       "fileName": "tu-veux-du-cafe-bcd01aa2fb.mp3",
@@ -16417,7 +19728,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 14254
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "un",
@@ -16439,15 +19756,34 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 15090
-      }
+      },
+      "sources": [
+        "contrast",
+        "diagnostic-word",
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "contrast",
+        "word"
+      ],
+      "relationshipKinds": [
+        {
+          "soundUnitSlug": "fr-un",
+          "relationshipKind": "contrast-member"
+        },
+        {
+          "soundUnitSlug": "fr-un",
+          "relationshipKind": "target-example"
+        }
+      ]
     },
     {
       "key": "un ami",
       "text": "un ami",
       "ipa": "/œ̃nami/",
       "soundUnitSlugs": [
-        "fr-liaison",
-        "fr-a"
+        "fr-a",
+        "fr-liaison"
       ],
       "fileName": "un-ami-c50b3e1da8.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/un-ami-c50b3e1da8.mp3",
@@ -16462,7 +19798,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "un bon vin blanc.",
@@ -16470,6 +19812,7 @@
       "ipa": "/œ̃ ɔ̃ ɛ̃ ɑ̃/",
       "soundUnitSlugs": [
         "fr-an",
+        "fr-final-consonant-silence",
         "fr-in",
         "fr-on"
       ],
@@ -16516,7 +19859,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "un commun",
@@ -16538,7 +19887,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "un enfant",
@@ -16560,7 +19915,13 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "un enfant rit",
@@ -16600,14 +19961,14 @@
         "fr-in",
         "fr-liaison",
         "fr-on",
+        "fr-phrase-final-prominence",
         "fr-y"
       ],
       "kinds": [
         "sentence"
       ],
       "sources": [
-        "diagnostic-passage",
-        "phoneme-keyword"
+        "diagnostic-passage"
       ],
       "fileName": "un-etudiant-prend-un-bon-cafe-les-amis-par-6d1e6e0267.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/un-etudiant-prend-un-bon-cafe-les-amis-par-6d1e6e0267.mp3",
@@ -16659,8 +20020,8 @@
       "text": "un homme",
       "ipa": "/œ̃nɔm/",
       "soundUnitSlugs": [
-        "fr-liaison",
-        "fr-enchainement"
+        "fr-enchainement",
+        "fr-liaison"
       ],
       "fileName": "un-homme-352208fb7e.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/un-homme-352208fb7e.mp3",
@@ -16675,7 +20036,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "un lundi",
@@ -16697,7 +20064,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "un mot court",
@@ -16780,13 +20153,20 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 23449
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "une",
       "text": "une",
       "ipa": "/yn/",
       "soundUnitSlugs": [
+        "fr-n",
         "fr-y"
       ],
       "fileName": "une-e3bae98dee.mp3",
@@ -16802,7 +20182,13 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 15090
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "une année",
@@ -16839,7 +20225,9 @@
       "ipa": "/j a ɔ/",
       "soundUnitSlugs": [
         "fr-a",
+        "fr-e-open",
         "fr-glide-j",
+        "fr-i",
         "fr-o-open"
       ],
       "kinds": [
@@ -16914,7 +20302,13 @@
       "bytesByVoice": {
         "blue": 20524,
         "pink": 24285
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "utile",
@@ -16936,7 +20330,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "veau",
@@ -16972,7 +20372,8 @@
       "text": "vélo",
       "ipa": "/velo/",
       "soundUnitSlugs": [
-        "fr-o-close"
+        "fr-o-close",
+        "fr-v"
       ],
       "fileName": "velo-60d6c4b5bc.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/velo-60d6c4b5bc.mp3",
@@ -16987,7 +20388,13 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "vendredi",
@@ -17009,7 +20416,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "venir",
@@ -17044,7 +20457,7 @@
     {
       "key": "vent",
       "text": "vent",
-      "ipa": "/vɛ̃/ ~ /vɑ̃/",
+      "ipa": "/vɑ̃/",
       "soundUnitSlugs": [
         "fr-in"
       ],
@@ -17059,7 +20472,20 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "contrast"
+      ],
+      "kinds": [
+        "contrast"
+      ],
+      "relationshipKinds": [
+        {
+          "soundUnitSlug": "fr-in",
+          "relationshipKind": "contrast-member"
+        }
+      ],
+      "relationshipKind": "contrast-member"
     },
     {
       "key": "vert",
@@ -17103,7 +20529,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "veut",
@@ -17125,7 +20557,13 @@
       "bytesByVoice": {
         "blue": 13000,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "vie",
@@ -17147,7 +20585,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "vigne",
@@ -17169,7 +20613,13 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 19688
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "vigne rouge",
@@ -17191,14 +20641,22 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 20942
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "ville",
       "text": "ville",
       "ipa": "/vil/",
       "soundUnitSlugs": [
-        "fr-i"
+        "fr-i",
+        "fr-l",
+        "fr-v"
       ],
       "fileName": "ville-fc5c457b1c.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/ville-fc5c457b1c.mp3",
@@ -17213,7 +20671,13 @@
       "bytesByVoice": {
         "blue": 17598,
         "pink": 20524
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "ville vivante",
@@ -17249,7 +20713,8 @@
       "text": "vin",
       "ipa": "/vɛ̃/",
       "soundUnitSlugs": [
-        "fr-in"
+        "fr-in",
+        "fr-v"
       ],
       "fileName": "vin-bda1f7ce00.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/vin-bda1f7ce00.mp3",
@@ -17264,13 +20729,37 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "contrast",
+        "diagnostic-word",
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "contrast",
+        "word"
+      ],
+      "relationshipKinds": [
+        {
+          "soundUnitSlug": "fr-in",
+          "relationshipKind": "contrast-member"
+        },
+        {
+          "soundUnitSlug": "fr-in",
+          "relationshipKind": "target-example"
+        },
+        {
+          "soundUnitSlug": "fr-v",
+          "relationshipKind": "target-example"
+        }
+      ]
     },
     {
       "key": "vin blanc",
       "text": "vin blanc",
       "ipa": "/vɛ̃ blɑ̃/",
       "soundUnitSlugs": [
+        "fr-final-consonant-silence",
         "fr-in"
       ],
       "fileName": "vin-blanc-407e68ecdd.mp3",
@@ -17286,7 +20775,13 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 21777
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "vingt",
@@ -17337,7 +20832,13 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 18016
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "visiter",
@@ -17373,7 +20874,9 @@
       "text": "vite",
       "ipa": "/vit/",
       "soundUnitSlugs": [
-        "fr-i"
+        "fr-i",
+        "fr-t",
+        "fr-v"
       ],
       "fileName": "vite-9907d3c4bf.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/vite-9907d3c4bf.mp3",
@@ -17388,7 +20891,14 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "diagnostic-word",
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "vivre",
@@ -17439,14 +20949,21 @@
       "bytesByVoice": {
         "blue": 14254,
         "pink": 16762
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "voir",
       "text": "voir",
       "ipa": "/vwaʁ/",
       "soundUnitSlugs": [
-        "fr-glide-w"
+        "fr-glide-w",
+        "fr-v"
       ],
       "fileName": "voir-f61d9bebb3.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/voir-f61d9bebb3.mp3",
@@ -17461,7 +20978,13 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "voir l'oiseau",
@@ -17483,7 +21006,13 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 20942
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "voir le vélo",
@@ -17548,8 +21077,10 @@
       "text": "voiture",
       "ipa": "/vwatyʁ/",
       "soundUnitSlugs": [
+        "fr-glide-w",
         "fr-r",
-        "fr-glide-w"
+        "fr-t",
+        "fr-v"
       ],
       "fileName": "voiture-1012c9a47e.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/voiture-1012c9a47e.mp3",
@@ -17564,14 +21095,21 @@
       "bytesByVoice": {
         "blue": 18852,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "vous",
       "text": "vous",
       "ipa": "/vu/",
       "soundUnitSlugs": [
-        "fr-u"
+        "fr-u",
+        "fr-v"
       ],
       "fileName": "vous-e136abe34d.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/vous-e136abe34d.mp3",
@@ -17586,7 +21124,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 13000
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "vous avez",
@@ -17608,7 +21152,13 @@
       "bytesByVoice": {
         "blue": 18016,
         "pink": 17598
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "vous êtes",
@@ -17630,7 +21180,13 @@
       "bytesByVoice": {
         "blue": 16762,
         "pink": 19688
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "vous tous",
@@ -17652,7 +21208,13 @@
       "bytesByVoice": {
         "blue": 15090,
         "pink": 20524
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "vous venez",
@@ -17717,7 +21279,8 @@
       "text": "voyage",
       "ipa": "/vwajaʒ/",
       "soundUnitSlugs": [
-        "fr-glide-j"
+        "fr-glide-j",
+        "fr-v"
       ],
       "fileName": "voyage-af93462630.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/voyage-af93462630.mp3",
@@ -17732,7 +21295,13 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 18852
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "voyage au soleil",
@@ -17754,7 +21323,13 @@
       "bytesByVoice": {
         "blue": 20524,
         "pink": 24703
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "phrase"
+      ]
     },
     {
       "key": "voyage avec vous",
@@ -17834,7 +21409,13 @@
       "bytesByVoice": {
         "blue": 13000,
         "pink": 15090
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "yeux",
@@ -17856,7 +21437,13 @@
       "bytesByVoice": {
         "blue": 15926,
         "pink": 13836
-      }
+      },
+      "sources": [
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "zèbre",
@@ -17892,7 +21479,8 @@
       "text": "zéro",
       "ipa": "/zeʁo/",
       "soundUnitSlugs": [
-        "fr-o-close"
+        "fr-o-close",
+        "fr-z"
       ],
       "fileName": "zero-efc58ff149.mp3",
       "audioSrc": "/audio/language-packs/fr-FR/zero-efc58ff149.mp3",
@@ -17907,7 +21495,14 @@
       "bytesByVoice": {
         "blue": 13000,
         "pink": 15090
-      }
+      },
+      "sources": [
+        "diagnostic-word",
+        "phoneme-keyword"
+      ],
+      "kinds": [
+        "word"
+      ]
     },
     {
       "key": "zéro zone",

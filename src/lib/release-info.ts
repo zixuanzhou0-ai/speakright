@@ -1,32 +1,68 @@
-export const DESKTOP_RELEASE_VERSION = "1.0.1";
+// This file is generated from release.config.json by scripts/release-config.mjs.
+// Run `npm run release:config:generate` after changing the release manifest.
 
-const repositoryUrl = "https://github.com/zixuanzhou0-ai/speakright-desktop";
-const releaseTag = `v${DESKTOP_RELEASE_VERSION}`;
+export type ReleaseInfo = {
+  version: string;
+  edition: "browser" | "desktop";
+  channel: "stable" | "preview";
+  commitSha: string;
+  builtAt: string;
+  signed: boolean;
+  repositoryUrl: string;
+  issuesUrl: string;
+  privacyUrl: string;
+  licenseUrl: string;
+};
+
+export const DESKTOP_RELEASE_VERSION = "1.1.0";
+
+const commitSha =
+  process.env.NEXT_PUBLIC_SPEAKRIGHT_COMMIT_SHA?.trim() || "development";
+const builtAt =
+  process.env.NEXT_PUBLIC_SPEAKRIGHT_BUILD_TIMESTAMP?.trim() || "local build";
+const lastValidatedAt =
+  process.env.NEXT_PUBLIC_SPEAKRIGHT_VALIDATED_AT?.trim() ||
+  "待 v1.1.0 完整验收";
+const repositoryUrl = "https://github.com/zixuanzhou0-ai/speakright";
+const releaseTag = "v1.1.0-desktop-preview.1";
 const releaseUrl = `${repositoryUrl}/releases/tag/${releaseTag}`;
+const issuesUrl = `${repositoryUrl}/issues`;
+const privacyUrl = `${repositoryUrl}/blob/main/PRIVACY.md`;
+const licenseUrl = `${repositoryUrl}/blob/main/LICENSE`;
 
 export const DESKTOP_RELEASE_INFO = {
-  productName: "SpeakRight",
+  productName: "SpeakRight Desktop",
+  version: DESKTOP_RELEASE_VERSION,
   currentVersion: DESKTOP_RELEASE_VERSION,
-  channel: "controlled-test",
-  channelLabel: "可控测试",
-  lastValidatedAt: "2026-06-16",
+  edition: "desktop",
+  channel: "preview",
+  channelLabel: "社区预览版",
+  commitSha,
+  builtAt,
+  signed: false,
+  lastValidatedAt,
   repositoryUrl,
   releaseUrl,
+  issuesUrl,
+  privacyUrl,
+  licenseUrl,
   build: {
     framework: "Tauri 2 + Next.js 16 static export",
     target: "Windows x64",
     signed: false,
     signatureStatus: "NotSigned",
     signatureLabel: "未签名",
-    releaseReportFileName: `SpeakRight_${DESKTOP_RELEASE_VERSION}_release-report.json`,
+    distributionLabel: "未签名 Windows NSIS 安装包",
+    releaseReportFileName: "SpeakRight_1.1.0_release-report.json",
   },
   notes: {
-    artifacts: "安装包只作为 GitHub Release/CI 产物提供，不在已安装 App 内展示或下载。",
+    artifacts:
+      "GitHub Pre-release 仅发布裸 Release EXE 与通过安装、启动、退出、卸载往返验收的 NSIS 安装包；v1.1.0 不发布 MSI。已安装应用内不提供自动下载或静默更新。",
     releasePage:
-      "GitHub Release 页面可能落后于当前 main 分支；请结合 release notes 和 RC evidence audit 判断是否为最新验证状态。",
-    unsigned:
-      "当前 EXE/MSI/NSIS 暂未做代码签名，Windows 可能显示未知发布者提示；仅建议用于可控测试，正式公开 Windows 发布前必须完成代码签名。",
+      "此页面指向独立的 Desktop Preview 发行记录，不与 Browser Stable 混称为签名桌面稳定版。",
+    status:
+      "这是未签名的 Windows 社区预览版。Windows SmartScreen 可能显示“未知发布者”；请只从项目 Release 下载，并核对 SHA-256。",
     checksum:
-      "每次桌面构建都会生成 release report，记录 EXE/MSI/NSIS 的 SHA-256 digest 与签名状态。",
+      "发行报告记录公开裸 EXE 与 NSIS 的 SHA-256 和实际 Authenticode 状态；MSI 仅作本地构建元数据检查，不进入报告或公开附件。",
   },
-} as const;
+} as const satisfies ReleaseInfo & Record<string, unknown>;

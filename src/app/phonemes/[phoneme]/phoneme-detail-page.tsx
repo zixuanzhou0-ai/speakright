@@ -7,6 +7,7 @@ import { RecordButton } from "@/components/audio/record-button";
 import { RecordingActions } from "@/components/audio/recording-actions";
 import { WaveformDisplay } from "@/components/audio/waveform-display";
 import { FeedbackDisplay } from "@/components/feedback/feedback-display";
+import { GuidedRepeatExperience } from "@/components/phoneme/guided-repeat-experience";
 import { PhonemeStudyCard } from "@/components/phoneme/phoneme-study-card";
 import { PhonemeHighlight } from "@/components/scoring/phoneme-highlight";
 import { ScoreSummary } from "@/components/scoring/score-summary";
@@ -24,6 +25,9 @@ import {
 } from "@/hooks/use-session-state";
 import { useSyllableStress } from "@/hooks/use-syllable-stress";
 import { useWordPronunciation } from "@/hooks/use-word-pronunciation";
+import { setLanguageConfig } from "@/lib/api-keys";
+import { buildAzureAttemptEvidence } from "@/lib/azure-attempt-evidence";
+import { getPhonemeAccuracy } from "@/lib/azure-phoneme-map";
 import {
   collectDetailAssessmentPhonemes,
   collectDetailAssessmentSyllables,
@@ -38,6 +42,8 @@ import {
   isRuleLikeSoundUnit,
   isVisibleInPhonemePractice,
 } from "@/lib/language-sound-unit-groups";
+import { appendLearningEvidence } from "@/lib/learning-evidence";
+import { canRecordFormalMastery } from "@/lib/mastery-language-policy";
 import {
   getPracticedWordsForLanguage,
   markWordPracticedForLanguage,
@@ -75,18 +81,21 @@ const SMOKE_SCORE_SUMMARY_RESULT: AzureAssessmentResult = {
   completenessScore: 91,
   words: [],
 };
+const TEST_FIXTURES_ENABLED =
+  process.env.NEXT_PUBLIC_SPEAKRIGHT_TEST_FIXTURES === "1";
 
 export function PhonemeDetailPage() {
   const params = useParams<{ phoneme: string }>();
   const router = useRouter();
-  const { languageId } = useLanguageConfig();
+  const { languageId: configuredLanguageId } = useLanguageConfig();
+  const routeLanguagePhoneme = getAnyLanguagePhonemeBySlug(params.phoneme);
+  const languageId = routeLanguagePhoneme?.languageId ?? configuredLanguageId;
   const languageProfile = getLanguageProfile(languageId);
   const selectedLanguagePhoneme = getLanguagePhonemeBySlug(
     languageId,
     params.phoneme,
   );
-  const requestedPhoneme =
-    selectedLanguagePhoneme ?? getAnyLanguagePhonemeBySlug(params.phoneme);
+  const requestedPhoneme = selectedLanguagePhoneme ?? routeLanguagePhoneme;
   const requestedLanguageId = requestedPhoneme?.languageId ?? languageId;
   const isRequestedHiddenPracticeRule =
     requestedPhoneme &&
@@ -107,7 +116,18 @@ export function PhonemeDetailPage() {
   const [showSmokeAssessmentTiles, setShowSmokeAssessmentTiles] =
     useState(false);
   const [showSmokeScoreSummary, setShowSmokeScoreSummary] = useState(false);
+  const [showSmokeGuidedRepeatSingleWord, setShowSmokeGuidedRepeatSingleWord] =
+    useState(false);
   const autoAssessTriggered = useRef(false);
+
+  useEffect(() => {
+    if (
+      routeLanguagePhoneme?.languageId &&
+      routeLanguagePhoneme.languageId !== configuredLanguageId
+    ) {
+      setLanguageConfig({ languageId: routeLanguagePhoneme.languageId });
+    }
+  }, [configuredLanguageId, routeLanguagePhoneme?.languageId]);
 
   const sessionPrefix = `phonemes:${languageId}:${params.phoneme}`;
   const [sessionStorageWarning, setSessionStorageWarning] = useState<
@@ -204,9 +224,15 @@ export function PhonemeDetailPage() {
   );
 
   useEffect(() => {
+    if (!TEST_FIXTURES_ENABLED) return;
     const searchParams = new URLSearchParams(window.location.search);
-    setShowSmokeAssessmentTiles(searchParams.get("smokeAssessmentTiles") === "1");
+    setShowSmokeAssessmentTiles(
+      searchParams.get("smokeAssessmentTiles") === "1",
+    );
     setShowSmokeScoreSummary(searchParams.get("smokeScoreSummary") === "1");
+    setShowSmokeGuidedRepeatSingleWord(
+      searchParams.get("smokeGuidedRepeatSingleWord") === "1",
+    );
   }, []);
 
   useEffect(() => {
@@ -304,6 +330,13 @@ export function PhonemeDetailPage() {
   useEffect(() => {
     if (!phoneme) return;
     const handler = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (
+        document.querySelector("[data-guided-repeat-dialog]") ||
+        target?.closest("button, input, textarea, select, [role='dialog']")
+      ) {
+        return;
+      }
       if (e.key === "ArrowRight") handleNext();
       else if (e.key === "ArrowLeft") handlePrevious();
     };
@@ -312,13 +345,25 @@ export function PhonemeDetailPage() {
   }, [phoneme, handleNext, handlePrevious]);
 
   const handleRecordStart = useCallback(() => {
+    playback.stop();
+    wordAudio.stop();
+    chartAudio.stop();
     // Clear previous results before new recording
     llm.reset();
     azure.reset();
     setSelectedWordPhonemes([]);
     setSelectedWordSyllables([]);
     recorder.startRecording();
-  }, [llm, azure, recorder, setSelectedWordPhonemes, setSelectedWordSyllables]);
+  }, [
+    playback,
+    wordAudio,
+    chartAudio,
+    llm,
+    azure,
+    recorder,
+    setSelectedWordPhonemes,
+    setSelectedWordSyllables,
+  ]);
 
   const handleRecordStop = useCallback(() => {
     recorder.stopRecording();
@@ -339,6 +384,26 @@ export function PhonemeDetailPage() {
         collectDetailAssessmentPhonemes(result, currentWord?.ipa),
       );
       setSelectedWordSyllables(collectDetailAssessmentSyllables(result));
+      const targetScore = phoneme
+        ? getPhonemeAccuracy(result, phoneme.slug)
+        : null;
+      const evidenceSaved =
+        phoneme && canRecordFormalMastery(languageId)
+          ? appendLearningEvidence(
+              buildAzureAttemptEvidence({
+                id: `phoneme-${phoneme.slug}-${currentWordStr}-${Date.now()}`,
+                sessionId: `phoneme-${phoneme.slug}`,
+                languageId,
+                taskType: "controlled-word",
+                targetUnits: [phoneme.slug],
+                materialIds: [currentWordStr],
+                levelId: phoneme.slug,
+                result,
+                targetScore: targetScore ?? undefined,
+                alignmentValid: targetScore !== null,
+              }),
+            )
+          : true;
       const scoreSaved = addScore(
         scoreHistoryKey(languageId, phoneme?.slug ?? "", currentWordStr),
         result.pronunciationScore,
@@ -354,7 +419,7 @@ export function PhonemeDetailPage() {
           getPracticedWordsForLanguage(languageId, phoneme.slug).length,
         );
       }
-      if (!scoreSaved || !practiceSaved) {
+      if (!scoreSaved || !practiceSaved || !evidenceSaved) {
         setLocalSaveError(
           "本次评分已完成，但本机练习记录或趋势图未保存。可能是本机存储空间不足或系统限制了本地存储；你可以继续练习，稍后清理空间或在设置页导出/重置本机数据后重试。",
         );
@@ -469,7 +534,8 @@ export function PhonemeDetailPage() {
           <p className="text-lg font-semibold">这不是单音标练习</p>
           <p className="mt-2 break-words text-sm leading-6 text-muted-foreground [overflow-wrap:anywhere]">
             该内容属于规则/短语训练，不属于单音标练习。连读、静音、重音、
-            弱化和短语韵律会保留在句子训练、AI 反馈或后续规则训练中，不会作为单个音标播放或晋级。
+            弱化和短语韵律会保留在句子训练、AI
+            反馈或后续规则训练中，不会作为单个音标播放或晋级。
           </p>
           <Link
             href={`/phonemes/${getDefaultPhonemePracticeSlug(
@@ -484,7 +550,6 @@ export function PhonemeDetailPage() {
   }
 
   const isWordActive = wordAudio.isPlaying || wordAudio.isLoading;
-  const breakdownLabel = languageId === "en-US" ? "音标拆解" : "发音拆解";
   const showRuleEvidenceNote =
     languageId !== "en-US" && isRuleLikeSoundUnit(phoneme);
   const scoreSummaryResult =
@@ -492,13 +557,13 @@ export function PhonemeDetailPage() {
 
   return (
     <div
-      className="h-full flex flex-col px-6 py-3 overflow-hidden"
+      className="flex min-h-full flex-col overflow-visible px-4 py-3 sm:px-6 lg:h-full lg:overflow-hidden"
       data-smoke="phoneme-detail-page"
       data-language-id={languageId}
       data-sound-unit={phoneme.slug}
     >
       {/* Two-column layout */}
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_2fr] flex-1 min-h-0">
+      <div className="grid grid-cols-1 gap-5 lg:min-h-0 lg:flex-1 lg:grid-cols-[1fr_2fr]">
         {/* ====== LEFT COLUMN ====== */}
         <div
           className="flex flex-col gap-2 min-h-0 lg:overflow-y-auto scrollbar-thin"
@@ -529,6 +594,36 @@ export function PhonemeDetailPage() {
             onStopWordAudio={() => wordAudio.stop()}
             onStopChartAudio={() => chartAudio.stop()}
             wordHistoryLength={wordHistory.length}
+            guidedRepeatAction={
+              currentWord ? (
+                <GuidedRepeatExperience
+                  languageId={languageId}
+                  phoneme={phoneme}
+                  wordPool={
+                    showSmokeGuidedRepeatSingleWord ? [currentWord] : wordPool
+                  }
+                  currentWord={currentWord}
+                  disabled={recorder.isRecording || azure.isLoading}
+                  disabledReason={
+                    "\u8bf7\u5148\u7ed3\u675f\u5f53\u524d\u5f55\u97f3\u6216\u8bc4\u5206"
+                  }
+                  onBeforeOpen={() => {
+                    playback.stop();
+                    wordAudio.stop();
+                    chartAudio.stop();
+                  }}
+                  onWordChange={(nextWord) => {
+                    const resolved = wordPool.find(
+                      (entry) => entry.word === nextWord.word,
+                    );
+                    if (!resolved || resolved.word === currentWord.word) return;
+                    setWordDirection(1);
+                    setCurrentWord(resolved);
+                    resetState();
+                  }}
+                />
+              ) : null
+            }
             canGoPrevious={
               languageId === "es-ES"
                 ? wordPool.length > 1
@@ -620,7 +715,11 @@ export function PhonemeDetailPage() {
                   showProsody={false}
                   historyKey={
                     azure.result
-                      ? scoreHistoryKey(languageId, phoneme.slug, currentWordStr)
+                      ? scoreHistoryKey(
+                          languageId,
+                          phoneme.slug,
+                          currentWordStr,
+                        )
                       : undefined
                   }
                 />
@@ -633,7 +732,8 @@ export function PhonemeDetailPage() {
         <div className="flex flex-col gap-3 min-h-0 lg:overflow-y-auto scrollbar-thin lg:pb-4">
           {/* Phoneme details — wrapped in card */}
           <div className="shrink-0 rounded-xl border bg-card px-4 py-4 shadow-sm">
-            {azure.result &&
+            {languageId === "en-US" &&
+            azure.result &&
             (selectedWordPhonemes.length > 0 ||
               stressedSyllables.length > 0) ? (
               <PhonemeHighlight
@@ -643,7 +743,8 @@ export function PhonemeDetailPage() {
                 expectedText={currentWord?.word}
                 expectedIpa={currentWord?.ipa}
               />
-            ) : smokeAssessmentTilePhonemes.length > 0 ? (
+            ) : languageId === "en-US" &&
+              smokeAssessmentTilePhonemes.length > 0 ? (
               <div data-smoke="assessment-phoneme-tile-fixture">
                 <PhonemeHighlight
                   phonemes={smokeAssessmentTilePhonemes}
@@ -658,7 +759,9 @@ export function PhonemeDetailPage() {
                 data-smoke="assessment-breakdown-placeholder"
               >
                 <p className="text-center text-sm text-muted-foreground">
-                  录音并评分后将在此显示{breakdownLabel}
+                  {languageId === "en-US"
+                    ? "录音并评分后将在此显示音标拆解"
+                    : "Labs 仅显示整体与词级观测，不展示未校准的音素细分"}
                 </p>
               </div>
             )}

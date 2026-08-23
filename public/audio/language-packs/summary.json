@@ -20,8 +20,8 @@
       "skipped": 0,
       "failed": 0,
       "estimatedCredits": 2415,
-      "outputDir": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-packs\\es-ES",
-      "manifestPath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-packs\\es-ES\\manifest.json"
+      "outputDir": "public/audio/language-packs/es-ES",
+      "manifestPath": "public/audio/language-packs/es-ES/manifest.json"
     },
     {
       "languageId": "fr-FR",
@@ -30,8 +30,8 @@
       "skipped": 0,
       "failed": 0,
       "estimatedCredits": 3243,
-      "outputDir": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-packs\\fr-FR",
-      "manifestPath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-packs\\fr-FR\\manifest.json"
+      "outputDir": "public/audio/language-packs/fr-FR",
+      "manifestPath": "public/audio/language-packs/fr-FR/manifest.json"
     },
     {
       "languageId": "ru-RU",
@@ -40,8 +40,8 @@
       "skipped": 0,
       "failed": 0,
       "estimatedCredits": 2470,
-      "outputDir": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-packs\\ru-RU",
-      "manifestPath": "E:\\SpeakRight\\apps\\desktop\\public\\audio\\language-packs\\ru-RU\\manifest.json"
+      "outputDir": "public/audio/language-packs/ru-RU",
+      "manifestPath": "public/audio/language-packs/ru-RU/manifest.json"
     }
   ]
 }

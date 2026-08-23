@@ -24,7 +24,8 @@ export const PHONEMES: PhonemeData[] = [
       { word: "free", ipa: "/friː/" },
     ],
     difficulty: "easy",
-    description: "舌尖抵下齿，舌前部尽量抬高，嘴角向两侧微展，发长音",
+    description:
+      "舌前部高抬、舌体较紧，嘴角微展；与 /ɪ/ 的核心区别是音质和舌位，时长会随语境变化",
   },
   {
     ipa: "/ɪ/",
@@ -48,7 +49,8 @@ export const PHONEMES: PhonemeData[] = [
       { word: "gift", ipa: "/ɡɪft/" },
     ],
     difficulty: "medium",
-    description: "舌位比 /iː/ 略低略后，嘴巴微张，短促有力",
+    description:
+      "舌位比 /iː/ 略低略后，舌体较松，嘴巴微张；不要只靠缩短时长来区分",
   },
   {
     ipa: "/eɪ/",
@@ -144,7 +146,8 @@ export const PHONEMES: PhonemeData[] = [
       { word: "park", ipa: "/pɑːrk/" },
     ],
     difficulty: "easy",
-    description: "嘴巴张到最大，舌身后缩放平，发长音",
+    description:
+      "下颌自然打开，舌身偏低偏后；保持目标音质，时长随重音和语境变化",
   },
   {
     ipa: "/ɔː/",
@@ -216,7 +219,7 @@ export const PHONEMES: PhonemeData[] = [
       { word: "wood", ipa: "/wʊd/" },
     ],
     difficulty: "medium",
-    description: "双唇略收圆，舌后部抬高，发音短促",
+    description: "舌位较 /uː/ 略低略前，圆唇较松；核心是音质和舌位，不只是短",
   },
   {
     ipa: "/uː/",
@@ -240,7 +243,8 @@ export const PHONEMES: PhonemeData[] = [
       { word: "juice", ipa: "/dʒuːs/" },
     ],
     difficulty: "medium",
-    description: "双唇收成小圆形并前突，舌后部尽量抬高，发长音",
+    description:
+      "舌后部高抬，圆唇较集中；与 /ʊ/ 的核心区别是音质和舌位，时长是辅助线索",
   },
   {
     ipa: "/ʌ/",
@@ -264,7 +268,8 @@ export const PHONEMES: PhonemeData[] = [
       { word: "truck", ipa: "/trʌk/" },
     ],
     difficulty: "easy",
-    description: "嘴巴半开，舌身放平略后缩，类似中文啊但更短",
+    description:
+      "嘴巴自然半开，舌身处于中低、略偏后位置；避免直接套用普通话元音",
   },
   {
     ipa: "/ə/",
@@ -288,7 +293,8 @@ export const PHONEMES: PhonemeData[] = [
       { word: "camera", ipa: "/ˈkæmrə/" },
     ],
     difficulty: "easy",
-    description: "嘴巴自然微张，全身放松，最轻最短的元音",
+    description:
+      "嘴巴自然微张，舌身居中；它通常出现在非重读音节，具体时长由语流决定",
   },
   {
     ipa: "/ɜːr/",
@@ -312,7 +318,8 @@ export const PHONEMES: PhonemeData[] = [
       { word: "serve", ipa: "/sɜːrv/" },
     ],
     difficulty: "high",
-    description: "嘴巴半开，舌身中部抬起，舌尖卷起指向硬腭",
+    description:
+      "嘴巴半开并形成 r 化舌形；可用舌身聚拢或舌尖上卷，通常不接触上颚",
   },
   {
     ipa: "/aɪ/",
@@ -890,7 +897,8 @@ export const PHONEMES: PhonemeData[] = [
       { word: "price", ipa: "/praɪs/" },
     ],
     difficulty: "high",
-    description: "舌尖卷起指向硬腭但不接触，双唇略收圆，声带振动",
+    description:
+      "舌体形成收缩且通常不接触上颚；可用 bunched 或 retroflex 两种常见舌形，声带振动",
   },
   {
     ipa: "/w/",
@@ -938,7 +946,7 @@ export const PHONEMES: PhonemeData[] = [
       { word: "view", ipa: "/vjuː/" },
     ],
     difficulty: "easy",
-    description: "舌前部抬向硬腭，然后迅速滑向后续元音，类似中文一的起始",
+    description: "舌前部抬向硬腭但不形成摩擦，然后迅速滑向后续元音",
   },
   {
     ipa: "/h/",

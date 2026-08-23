@@ -2,6 +2,11 @@
 
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { computeDrillSummary } from "@/lib/drill-utils";
+import { normalizeLanguageId } from "@/lib/language-profiles";
+import {
+  appendLearningEvidence,
+  DEFAULT_CALIBRATION_VERSION,
+} from "@/lib/learning-evidence";
 import { addScore } from "@/lib/score-history";
 import { getPassScore } from "@/lib/training-score";
 import type {
@@ -321,15 +326,52 @@ export function useDrillSession(
     assessingRef.current = false;
 
     if (result) {
-      const target = getPassScore(result, [item.phoneme], {
-        allowFallback: (options.scoreHistoryPrefix ?? "en-US") === "en-US",
-      });
+      const target = getPassScore(result, [item.phoneme]);
+      if (target.usedFallback) {
+        dispatch({
+          type: "ASSESS_ERROR",
+          message:
+            "\u672c\u6b21\u5f55\u97f3\u6ca1\u6709\u5bf9\u9f50\u5230\u76ee\u6807\u97f3\uff0c\u4e0d\u80fd\u7528\u6574\u8bcd\u5206\u66ff\u4ee3\u3002\u8bf7\u91cd\u5f55\uff0c\u5e76\u628a\u76ee\u6807\u8bcd\u8bf4\u6e05\u695a\u3002",
+        });
+        return;
+      }
       // Save score to history
+      const evidenceSaved = appendLearningEvidence({
+        id: `training-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+        version: 3,
+        languageId: normalizeLanguageId(options.azureLocale),
+        taskType: "controlled-word",
+        targetUnits: [item.phoneme],
+        observations: [
+          {
+            metric: "target-unit",
+            score: target.targetScore,
+            text: item.text,
+            source: "azure",
+          },
+        ],
+        recordingQuality: {
+          status: "unknown",
+          reasons: ["No calibrated recording-quality measure was available."],
+        },
+        alignmentQuality: {
+          status: "good",
+          score: target.targetScore,
+          reasons: ["Azure returned target-unit alignment."],
+        },
+        sampleCount: 1,
+        contextCount: 1,
+        source: "training",
+        confidence: "low",
+        evidenceStage: "introduced",
+        calibrationVersion: DEFAULT_CALIBRATION_VERSION,
+        createdAt: Date.now(),
+      });
       const scoreSaved = addScore(
         `${options.scoreHistoryPrefix ?? "en-US"}:${item.phoneme}:${item.text}`,
         target.targetScore,
       );
-      if (!scoreSaved) {
+      if (!scoreSaved || !evidenceSaved) {
         setLocalSaveError(
           "本次评分已完成，但本机训练趋势记录未保存。可能是本机存储空间不足或系统限制了本地存储；你可以继续训练，稍后在设置页导出/重置本机数据后重试。",
         );

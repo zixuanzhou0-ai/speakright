@@ -38,6 +38,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+
+# consented, de-identified calibration recordings and reviewer data
+/calibration-data/
 # typescript
 *.tsbuildinfo
 next-env.d.ts
@@ -49,6 +52,9 @@ next-env.d.ts
 # playwright MCP artifacts
 .playwright-mcp/
 
+# generated reports, screenshots, and temporary audit artifacts
+/outputs/
+
 # root-level screenshots (dev debugging artifacts)
 /*.png
 /*.jpg
@@ -56,3 +62,12 @@ next-env.d.ts
 
 # phoneme teaching videos (Rachel's English, ~230MB)
 /public/videos/phonemes/
+
+# Playwright local reports and failure artifacts
+/playwright-report/
+/test-results/
+/blob-report/
+
+# Python audit bytecode
+__pycache__/
+*.pyc

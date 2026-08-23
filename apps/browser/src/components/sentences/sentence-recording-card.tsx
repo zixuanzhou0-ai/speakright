@@ -10,9 +10,11 @@ import type { MicrophoneDeviceOption } from "@/lib/microphone-device";
 import type { RecordingQualityReport } from "@/lib/recording-quality";
 import { isSentence } from "@/lib/utils";
 import type { AzureAssessmentResult } from "@/types/azure";
+import type { LanguageId } from "@/types/language";
 
 interface SentenceRecordingCardProps {
   sentence: string;
+  languageId?: LanguageId;
   // Recorder
   isRecording: boolean;
   elapsedSeconds: number;
@@ -43,6 +45,7 @@ interface SentenceRecordingCardProps {
 
 export function SentenceRecordingCard({
   sentence,
+  languageId = "en-US",
   isRecording,
   elapsedSeconds,
   maxDurationSeconds,
@@ -174,7 +177,7 @@ export function SentenceRecordingCard({
         <div className="mt-3 border-t pt-3">
           <ScoreSummary
             result={result}
-            showProsody={isSentence(sentence)}
+            showProsody={languageId === "en-US" && isSentence(sentence)}
             historyKey={`${trimmed.slice(0, 50)}:${trimmed.length}`}
           />
         </div>
