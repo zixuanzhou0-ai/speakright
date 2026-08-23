@@ -746,7 +746,8 @@ describe("desktop installer round-trip safety", () => {
     expect(script).toContain("releaseExeBytes");
     expect(script).toContain("assertReleaseExecutableUnchanged");
     expect(script).toContain("installer-roundtrip-$" + "{randomUUID()}");
-    expect(script).toContain('reviewedTauriCliVersion = "2.10.1"');
+    expect(script).toContain('reviewedTauriCliVersion = "2.11.4"');
+    expect(script).toContain("8909f221d1515955fc843808032bdc5d62209c96");
     expect(script).toContain("WriteUninstaller");
     expect(script).toContain("assertOwnedProcess(plan, pid)");
     expect(script).toContain("ParentProcessId");
