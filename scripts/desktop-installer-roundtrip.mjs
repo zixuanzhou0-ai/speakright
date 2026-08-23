@@ -18,10 +18,12 @@ import { promisify } from "node:util";
 import {
   assertCleanPreflight,
   assertNoOwnedDebugTransport,
+  assertOwnedWebViewProfile,
   assertRoundtripPathPolicy,
   buildNsisUninstallArgs,
   createSanitizedFailureSummary,
   createSanitizedSummary,
+  getOwnedWebViewProcesses,
   InstallerRoundtripError,
   isStrictPathInside,
   runInstallerRoundtrip,
@@ -320,6 +322,39 @@ async function getProcessTree() {
   return asArray(JSON.parse(await runPowerShell(processTreeScript())));
 }
 
+async function snapshotOwnedWebViewProcesses(pid) {
+  return getOwnedWebViewProcesses({
+    processes: await getProcessTree(),
+    rootPid: pid,
+  }).map((process) => ({
+    processId: process.processId,
+    name: process.name,
+  }));
+}
+
+async function waitForOwnedWebViewProcessesToExit(snapshots) {
+  if (snapshots.length === 0) return;
+  await waitForCondition(
+    async () => {
+      const currentByPid = new Map(
+        (await getProcessTree()).map((process) => [process.processId, process]),
+      );
+      return snapshots.every((snapshot) => {
+        const current = currentByPid.get(snapshot.processId);
+        return (
+          !current ||
+          current.name.toLocaleLowerCase("en-US") !==
+            snapshot.name.toLocaleLowerCase("en-US")
+        );
+      });
+    },
+    30_000,
+    250,
+    "webview-exit-timeout",
+    "owned WebView2 processes did not exit after the desktop host closed",
+  );
+}
+
 async function assertOwnedProcess(plan, pid) {
   if (!Number.isInteger(pid) || pid <= 0) {
     fail("invalid-process", "installed app did not return a valid process ID");
@@ -562,7 +597,7 @@ function createWindowsAdapter() {
         child.once("exit", (code, signal) => resolve({ code, signal }));
       });
       await spawned;
-      childProcesses.set(child.pid, { child, exited });
+      childProcesses.set(child.pid, { child, exited, ownedWebViews: [] });
       return child.pid;
     },
 
@@ -586,12 +621,8 @@ function createWindowsAdapter() {
       );
     },
 
-    async assertIsolatedWebViewProfile(plan) {
+    async assertIsolatedWebViewProfile(plan, pid) {
       await assertMarker(plan);
-      const entries = await readdir(plan.webViewProfileDir);
-      if (entries.length === 0) {
-        fail("webview-profile", "isolated WebView2 profile was not populated");
-      }
       const logPath = path.join(plan.logDir, "speakright.log");
       await waitForCondition(
         async () => {
@@ -600,10 +631,37 @@ function createWindowsAdapter() {
             "SpeakRight desktop runtime initialized",
           );
         },
-        10_000,
+        30_000,
         250,
         "isolated-log-missing",
         "installed app did not write its isolated runtime log",
+      );
+      const webViewDataDir = path.join(plan.webViewProfileDir, "EBWebView");
+      await waitForCondition(
+        async () => {
+          if ((await pathKind(webViewDataDir)) !== "directory") return false;
+          const profilePopulated = (await readdir(webViewDataDir)).length > 0;
+          if (!profilePopulated) return false;
+          const ownedWebViews = assertOwnedWebViewProfile({
+            processes: await getProcessTree(),
+            rootPid: pid,
+            expectedProfileDir: webViewDataDir,
+            profilePopulated,
+          });
+          const record = childProcesses.get(pid);
+          if (!record) {
+            fail("process-tracking", "installed app process was not tracked");
+          }
+          record.ownedWebViews = ownedWebViews.map((process) => ({
+            processId: process.processId,
+            name: process.name,
+          }));
+          return true;
+        },
+        30_000,
+        250,
+        "webview-profile",
+        "isolated WebView2 profile was not populated",
       );
     },
 
@@ -625,6 +683,10 @@ function createWindowsAdapter() {
 
     async closeAndWait(plan, pid) {
       await assertOwnedProcess(plan, pid);
+      const record = childProcesses.get(pid);
+      if (!record)
+        fail("process-tracking", "installed app process was not tracked");
+      record.ownedWebViews = await snapshotOwnedWebViewProcesses(pid);
       const closeScript = `
 $ErrorActionPreference = "Stop"
 $processId = [int]$env:SPEAKRIGHT_RT_PID
@@ -640,9 +702,6 @@ if (-not $process.CloseMainWindow()) { throw "Main window rejected the clean clo
         SPEAKRIGHT_RT_PID: String(pid),
         SPEAKRIGHT_RT_INSTALLED_EXE: plan.installedExe,
       });
-      const record = childProcesses.get(pid);
-      if (!record)
-        fail("process-tracking", "installed app process was not tracked");
       let timeoutId;
       const timeout = new Promise((_, reject) => {
         timeoutId = setTimeout(
@@ -662,21 +721,36 @@ if (-not $process.CloseMainWindow()) { throw "Main window rejected the clean clo
       } finally {
         clearTimeout(timeoutId);
       }
-      childProcesses.delete(pid);
       if (result.signal !== null) {
         fail("unclean-exit", "installed app exited due to a signal");
       }
+      await waitForOwnedWebViewProcessesToExit(record.ownedWebViews);
+      childProcesses.delete(pid);
       return result.code;
     },
 
     async terminateOwnedProcess(plan, pid) {
       const state = await getProcessState(pid);
-      if (!state.exists) return;
+      const record = childProcesses.get(pid);
+      let ownedWebViews = record?.ownedWebViews ?? [];
+      if (!state.exists) {
+        await waitForOwnedWebViewProcessesToExit(ownedWebViews);
+        childProcesses.delete(pid);
+        return;
+      }
       if (!sameWindowsPath(state.executablePath, plan.installedExe)) {
         fail(
           "process-ownership",
           "refusing to terminate a process whose executable path changed",
         );
+      }
+      if (ownedWebViews.length === 0) {
+        try {
+          ownedWebViews = await snapshotOwnedWebViewProcesses(pid);
+        } catch {
+          // The host can fail before WebView2 starts. Exact root-process
+          // ownership remains mandatory for the termination below.
+        }
       }
       const terminateScript = `
 $ErrorActionPreference = "Stop"
@@ -698,6 +772,7 @@ if ($process -and [string]::Equals([string]$process.ExecutablePath, $expectedExe
         "termination-timeout",
         "owned installed app process did not terminate",
       );
+      await waitForOwnedWebViewProcessesToExit(ownedWebViews);
       childProcesses.delete(pid);
     },
 
@@ -811,7 +886,12 @@ if ($process -and [string]::Equals([string]$process.ExecutablePath, $expectedExe
 
     async cleanupSandbox(plan) {
       await assertMarker(plan);
-      await rm(plan.sandboxRoot, { recursive: true, force: false });
+      await rm(plan.sandboxRoot, {
+        recursive: true,
+        force: false,
+        maxRetries: 10,
+        retryDelay: 250,
+      });
     },
   };
 }

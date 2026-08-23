@@ -5,6 +5,7 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   assertNoOwnedDebugTransport,
+  assertOwnedWebViewProfile,
   assertRoundtripPathPolicy,
   buildNsisInstallArgs,
   buildNsisUninstallArgs,
@@ -86,8 +87,8 @@ function fakeAdapter(overrides: Record<string, unknown> = {}) {
     async waitForWindow(_plan: unknown, pid: unknown) {
       calls.push(["waitForWindow", pid]);
     },
-    async assertIsolatedWebViewProfile() {
-      calls.push("assertIsolatedWebViewProfile");
+    async assertIsolatedWebViewProfile(_plan: unknown, pid: unknown) {
+      calls.push(["assertIsolatedWebViewProfile", pid]);
     },
     async assertReleaseDebugTransportDisabled(_plan: unknown, pid: unknown) {
       calls.push(["assertReleaseDebugTransportDisabled", pid]);
@@ -333,7 +334,7 @@ describe("desktop installer round-trip safety", () => {
       "launchInstalledApp",
       ["assertOwnedProcess", 4242],
       ["waitForWindow", 4242],
-      "assertIsolatedWebViewProfile",
+      ["assertIsolatedWebViewProfile", 4242],
       ["assertReleaseDebugTransportDisabled", 4242],
       ["closeAndWait", 4242],
       ["runUninstaller", buildNsisUninstallArgs(plan().installDir)],
@@ -489,6 +490,60 @@ describe("desktop installer round-trip safety", () => {
     ).toThrowError(/command line could not be inspected/);
   });
 
+  it("requires the owned WebView2 process to use a populated isolated profile", () => {
+    const expectedProfileDir = join(
+      root,
+      ".roundtrip-webview-profile",
+      "EBWebView",
+    );
+    const processTree = [
+      {
+        processId: 100,
+        parentProcessId: 1,
+        name: "speakright.exe",
+        commandLine: '"C:\\Temp\\speakright.exe"',
+      },
+      {
+        processId: 101,
+        parentProcessId: 100,
+        name: "msedgewebview2.exe",
+        commandLine: `"C:\\WebView2\\msedgewebview2.exe" --type=browser --user-data-dir="${expectedProfileDir}"`,
+      },
+      {
+        processId: 999,
+        parentProcessId: 1,
+        name: "msedgewebview2.exe",
+        commandLine:
+          '"C:\\Other\\msedgewebview2.exe" --user-data-dir="C:\\Other\\Profile"',
+      },
+    ];
+
+    expect(() =>
+      assertOwnedWebViewProfile({
+        processes: processTree,
+        rootPid: 100,
+        expectedProfileDir,
+        profilePopulated: true,
+      }),
+    ).not.toThrow();
+    expect(() =>
+      assertOwnedWebViewProfile({
+        processes: processTree,
+        rootPid: 100,
+        expectedProfileDir: join(root, ".different-profile"),
+        profilePopulated: true,
+      }),
+    ).toThrowError(/did not use the isolated profile/);
+    expect(() =>
+      assertOwnedWebViewProfile({
+        processes: processTree,
+        rootPid: 100,
+        expectedProfileDir,
+        profilePopulated: false,
+      }),
+    ).toThrowError(/was not populated/);
+  });
+
   it("only asks the adapter to terminate the tracked child and still rolls back", async () => {
     const { adapter, calls } = fakeAdapter({
       async waitForWindow() {
@@ -524,8 +579,17 @@ describe("desktop installer round-trip safety", () => {
     ).rejects.toMatchObject({
       code: "window-timeout",
       rollbackErrors: expect.arrayContaining([
-        expect.objectContaining({ code: "process-ownership" }),
+        expect.objectContaining({
+          code: "process-ownership",
+          cleanupPhase: "terminate-owned-process",
+        }),
       ]),
+      rollbackFailures: [
+        {
+          phase: "terminate-owned-process",
+          code: "process-ownership",
+        },
+      ],
     });
     expect(calls).toContain("rollbackOwnedInstallation");
     expect(calls).toContain("cleanupSandbox");
@@ -569,13 +633,26 @@ describe("desktop installer round-trip safety", () => {
       installer: null,
       error: Object.assign(
         new Error("C:\\Users\\Alice\\secret sk-test-not-for-logs"),
-        { code: "fixture-failure" },
+        {
+          code: "fixture-failure",
+          rollbackFailures: [
+            { phase: "sandbox-remove", code: "EPERM" },
+            {
+              phase: "C:\\Users\\Alice",
+              code: "sk-test-not-for-logs",
+            },
+          ],
+        },
       ),
       completedAt: "2026-08-16T00:00:00.000Z",
     });
     expect(JSON.stringify(failed)).not.toContain("Alice");
     expect(JSON.stringify(failed)).not.toContain("sk-test-not-for-logs");
     expect(failed.failure.code).toBe("fixture-failure");
+    expect(failed.failure.rollbackFailures).toEqual([
+      { phase: "sandbox-remove", code: "EPERM" },
+      { phase: "cleanup", code: "cleanup-error" },
+    ]);
   });
 
   it("binds round-trip evidence to the exact published bare EXE", () => {
@@ -660,6 +737,8 @@ describe("desktop installer round-trip safety", () => {
       "utf8",
     );
     expect(script).toContain("WEBVIEW2_USER_DATA_FOLDER");
+    expect(script).toContain("assertOwnedWebViewProfile");
+    expect(script).toContain('path.join(plan.webViewProfileDir, "EBWebView")');
     expect(script).toContain("SPEAKRIGHT_LOG_DIR");
     expect(script).toContain("SPEAKRIGHT_SETTINGS_STORE_PATH");
     expect(script).toContain("isolated runtime log");
@@ -688,9 +767,8 @@ describe("desktop installer round-trip safety", () => {
     expect(script.match(/windowsVerbatimArguments: true/g)).toHaveLength(3);
     expect(script).toContain("Stop-Process -Id $processId -Force");
     expect(script).toContain("await assertMarker(plan)");
-    expect(script).toContain(
-      "await rm(plan.sandboxRoot, { recursive: true, force: false })",
-    );
+    expect(script).toContain("maxRetries: 10");
+    expect(script).toContain("retryDelay: 250");
     expect(script).not.toContain("taskkill");
     expect(script).not.toContain("Remove-Item -Recurse");
   });

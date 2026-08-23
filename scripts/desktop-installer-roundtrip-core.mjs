@@ -1,6 +1,24 @@
 import path from "node:path";
 
 export const ROUNDTRIP_SCHEMA_VERSION = 2;
+const CLEANUP_PHASES = new Set([
+  "cleanup",
+  "terminate-owned-process",
+  "owned-installation-rollback",
+  "sandbox-remove",
+]);
+const CLEANUP_CODES = new Set([
+  "cleanup-error",
+  "process-ownership",
+  "termination-timeout",
+  "webview-exit-timeout",
+  "rollback-failed",
+  "unsafe-cleanup",
+  "EBUSY",
+  "ENOTEMPTY",
+  "EPERM",
+  "ETIMEDOUT",
+]);
 export const REQUIRED_ROUNDTRIP_CHECKS = Object.freeze([
   "preflightClean",
   "targetWasEmpty",
@@ -27,6 +45,32 @@ export class InstallerRoundtripError extends Error {
 
 function fail(code, message) {
   throw new InstallerRoundtripError(code, message);
+}
+
+function taggedCleanupError(error, phase) {
+  const tagged = new InstallerRoundtripError(
+    typeof error?.code === "string" ? error.code : "cleanup-error",
+    error instanceof Error ? error.message : String(error),
+  );
+  tagged.cleanupPhase = phase;
+  tagged.cause = error;
+  return tagged;
+}
+
+function sanitizedCleanupFailure({ phase, code }) {
+  return {
+    phase: CLEANUP_PHASES.has(phase) ? phase : "cleanup",
+    code: CLEANUP_CODES.has(code) ? code : "cleanup-error",
+  };
+}
+
+function cleanupFailureDescriptors(errors) {
+  return errors.map((error) =>
+    sanitizedCleanupFailure({
+      phase: error.cleanupPhase,
+      code: error.code,
+    }),
+  );
 }
 
 function normalized(value) {
@@ -177,22 +221,9 @@ export function assertNoResiduals(state) {
   }
 }
 
-export function assertNoOwnedDebugTransport({
-  processes,
-  rootPid,
-  devToolsActivePortPresent,
-}) {
+function ownedProcessesForRoot(processes, rootPid, failureCode) {
   if (!Array.isArray(processes) || !Number.isInteger(rootPid) || rootPid <= 0) {
-    fail(
-      "debug-transport-inspection",
-      "owned process-tree inspection is unavailable",
-    );
-  }
-  if (typeof devToolsActivePortPresent !== "boolean") {
-    fail(
-      "debug-transport-inspection",
-      "DevToolsActivePort inspection did not return a boolean",
-    );
+    fail(failureCode, "owned process-tree inspection is unavailable");
   }
 
   const records = new Map();
@@ -208,7 +239,7 @@ export function assertNoOwnedDebugTransport({
       records.has(processId)
     ) {
       fail(
-        "debug-transport-inspection",
+        failureCode,
         "process-tree inspection returned an invalid or duplicate process",
       );
     }
@@ -221,7 +252,7 @@ export function assertNoOwnedDebugTransport({
   }
   if (!records.has(rootPid)) {
     fail(
-      "debug-transport-inspection",
+      failureCode,
       "installed app root process is missing from process-tree inspection",
     );
   }
@@ -240,17 +271,93 @@ export function assertNoOwnedDebugTransport({
       }
     }
   }
-  const ownedProcesses = [...ownedProcessIds].map((pid) => records.get(pid));
+  return [...ownedProcessIds].map((pid) => records.get(pid));
+}
+
+function ownedWebViewProcesses(processes, rootPid, failureCode) {
+  const ownedProcesses = ownedProcessesForRoot(processes, rootPid, failureCode);
   const webViewProcesses = ownedProcesses.filter(
     (process) =>
       process.name.toLocaleLowerCase("en-US") === "msedgewebview2.exe",
   );
   if (webViewProcesses.length === 0) {
+    fail(failureCode, "installed app did not expose an owned WebView2 process");
+  }
+  return { ownedProcesses, webViewProcesses };
+}
+
+function chromiumSwitchValue(commandLine, switchName) {
+  const escapedSwitch = switchName.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
+  const match = new RegExp(
+    `(?:^|\\s)--${escapedSwitch}=(?:"([^"]+)"|([^\\s"]+))`,
+    "iu",
+  ).exec(commandLine);
+  return match?.[1] ?? match?.[2] ?? null;
+}
+
+export function getOwnedWebViewProcesses({ processes, rootPid }) {
+  return ownedWebViewProcesses(processes, rootPid, "owned-process-inspection")
+    .webViewProcesses;
+}
+
+export function assertOwnedWebViewProfile({
+  processes,
+  rootPid,
+  expectedProfileDir,
+  profilePopulated,
+}) {
+  if (
+    typeof expectedProfileDir !== "string" ||
+    !path.isAbsolute(expectedProfileDir) ||
+    typeof profilePopulated !== "boolean"
+  ) {
+    fail("webview-profile", "isolated WebView2 profile evidence is invalid");
+  }
+  const { webViewProcesses } = ownedWebViewProcesses(
+    processes,
+    rootPid,
+    "webview-profile",
+  );
+  for (const process of webViewProcesses) {
+    if (typeof process.commandLine !== "string") {
+      fail("webview-profile", "owned WebView2 command line is unavailable");
+    }
+    const actualProfileDir = chromiumSwitchValue(
+      process.commandLine,
+      "user-data-dir",
+    );
+    if (
+      !actualProfileDir ||
+      normalized(actualProfileDir) !== normalized(expectedProfileDir)
+    ) {
+      fail(
+        "webview-profile",
+        "owned WebView2 process did not use the isolated profile",
+      );
+    }
+  }
+  if (!profilePopulated) {
+    fail("webview-profile", "isolated WebView2 profile was not populated");
+  }
+  return webViewProcesses;
+}
+
+export function assertNoOwnedDebugTransport({
+  processes,
+  rootPid,
+  devToolsActivePortPresent,
+}) {
+  if (typeof devToolsActivePortPresent !== "boolean") {
     fail(
       "debug-transport-inspection",
-      "installed app did not expose an owned WebView2 process",
+      "DevToolsActivePort inspection did not return a boolean",
     );
   }
+  const { ownedProcesses, webViewProcesses } = ownedWebViewProcesses(
+    processes,
+    rootPid,
+    "debug-transport-inspection",
+  );
   if (
     webViewProcesses.some((process) => typeof process.commandLine !== "string")
   ) {
@@ -334,7 +441,7 @@ export async function runInstallerRoundtrip({
     await adapter.assertOwnedProcess(plan, launchedPid);
     await adapter.waitForWindow(plan, launchedPid);
     checks.windowObserved = true;
-    await adapter.assertIsolatedWebViewProfile(plan);
+    await adapter.assertIsolatedWebViewProfile(plan, launchedPid);
     checks.isolatedWebViewProfile = true;
     await adapter.assertReleaseDebugTransportDisabled(plan, launchedPid);
     checks.releaseDebugTransportDisabled = true;
@@ -369,7 +476,9 @@ export async function runInstallerRoundtrip({
         await adapter.terminateOwnedProcess(plan, launchedPid);
         cleanup.forcedOwnedProcessTermination = true;
       } catch (error) {
-        rollbackErrors.push(error);
+        rollbackErrors.push(
+          taggedCleanupError(error, "terminate-owned-process"),
+        );
       }
     }
     if (!completed && installStarted) {
@@ -377,7 +486,9 @@ export async function runInstallerRoundtrip({
       try {
         await adapter.rollbackOwnedInstallation(plan);
       } catch (error) {
-        rollbackErrors.push(error);
+        rollbackErrors.push(
+          taggedCleanupError(error, "owned-installation-rollback"),
+        );
       }
     }
     if (sandboxPrepared) {
@@ -385,28 +496,39 @@ export async function runInstallerRoundtrip({
         await adapter.cleanupSandbox(plan);
         cleanup.sandboxRemoved = true;
       } catch (error) {
-        rollbackErrors.push(error);
+        rollbackErrors.push(taggedCleanupError(error, "sandbox-remove"));
       }
     }
   }
 
   if (primaryError) {
     if (rollbackErrors.length > 0) {
+      const rollbackFailures = cleanupFailureDescriptors(rollbackErrors);
+      const rollbackLabel = rollbackFailures
+        .map(({ phase, code }) => `${phase}:${code}`)
+        .join(", ");
       const wrapped = new InstallerRoundtripError(
         primaryError.code ?? "roundtrip-failed",
-        `${primaryError.message}; ${rollbackErrors.length} rollback operation(s) also failed`,
+        `${primaryError.message}; rollback cleanup also failed [${rollbackLabel}]`,
       );
       wrapped.cause = primaryError;
       wrapped.rollbackErrors = rollbackErrors;
+      wrapped.rollbackFailures = rollbackFailures;
       throw wrapped;
     }
     throw primaryError;
   }
   if (rollbackErrors.length > 0) {
-    fail(
+    const rollbackFailures = cleanupFailureDescriptors(rollbackErrors);
+    const error = new InstallerRoundtripError(
       "cleanup-failed",
-      `${rollbackErrors.length} cleanup operation(s) failed`,
+      `cleanup failed [${rollbackFailures
+        .map(({ phase, code }) => `${phase}:${code}`)
+        .join(", ")}]`,
     );
+    error.rollbackErrors = rollbackErrors;
+    error.rollbackFailures = rollbackFailures;
+    throw error;
   }
   if (!result) {
     fail("result-missing", "round-trip completed without a result");
@@ -524,6 +646,9 @@ export function createSanitizedFailureSummary({
       : null,
     failure: {
       code: error?.code ?? "roundtrip-failed",
+      rollbackFailures: Array.isArray(error?.rollbackFailures)
+        ? error.rollbackFailures.map(sanitizedCleanupFailure)
+        : [],
     },
   };
 }
