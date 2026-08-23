@@ -1,5 +1,11 @@
 import { createHash } from "node:crypto";
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import {
+  closeSync,
+  fstatSync,
+  openSync,
+  readdirSync,
+  readFileSync,
+} from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
@@ -134,10 +140,15 @@ function main() {
   const entries = new Map();
   for (const name of readdirSync(stage)) {
     const assetPath = path.join(stage, name);
-    if (!statSync(assetPath).isFile()) {
-      throw new Error(`Release staging contains a non-file entry: ${name}.`);
+    const descriptor = openSync(assetPath, "r");
+    try {
+      if (!fstatSync(descriptor).isFile()) {
+        throw new Error(`Release staging contains a non-file entry: ${name}.`);
+      }
+      entries.set(name, readFileSync(descriptor));
+    } finally {
+      closeSync(descriptor);
     }
-    entries.set(name, readFileSync(assetPath));
   }
   const result = verifyReleaseStagingEntries({ edition, version, entries });
   console.log(
