@@ -21,8 +21,7 @@ const commitSha =
 const builtAt =
   process.env.NEXT_PUBLIC_SPEAKRIGHT_BUILD_TIMESTAMP?.trim() || "local build";
 const lastValidatedAt =
-  process.env.NEXT_PUBLIC_SPEAKRIGHT_VALIDATED_AT?.trim() ||
-  "待 v1.1.0 完整验收";
+  process.env.NEXT_PUBLIC_SPEAKRIGHT_VALIDATED_AT?.trim() || "2026-08-23";
 const repositoryUrl = "https://github.com/zixuanzhou0-ai/speakright";
 const releaseTag = "v1.1.0-desktop-preview.1";
 const releaseUrl = `${repositoryUrl}/releases/tag/${releaseTag}`;
