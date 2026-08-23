@@ -14,25 +14,25 @@
   },
   "generatorSnapshot": {
     "schemaVersion": 1,
-    "sha256": "d437890db3f3d99df54090e27c5af16a2f3ab45cafbdaa8321c1ccc18d6e440b",
+    "sha256": "bca086571e2eb86a175622f7f13736e691890cce6146c62ca57f968cc175a2f4",
     "fileCount": 16,
-    "totalBytes": 220817
+    "totalBytes": 228976
   },
   "outputTree": {
     "schemaVersion": 1,
-    "sha256": "06dee4411e73ea81274b9e689c156044d91581ff39211d62fd219f853009ce46",
+    "sha256": "6f5fddc5de5c40fcb1861b7ca44d9d931180ca8c1e13aa49b52571d79ea4490a",
     "fileCount": 7651,
-    "totalBytes": 504296604
+    "totalBytes": 504296990
   },
-  "sourceCommit": "94e5bbdf1bacfeaaabdb48709e1d7eb748aaf577",
+  "sourceCommit": "5fd93297ddc55c97a6c78b4568d6435411be2369",
   "sourceWorktreeClean": true,
   "sourceSnapshot": {
     "schemaVersion": 1,
-    "sha256": "82211ea43c702527e86a2db2a002d35fbdabcadf496b2e7443b27b7b3e8a78dc",
-    "fileCount": 472
+    "sha256": "47655ad22b640f54907410853e7cc8739b91372e982c9f82bf6a328d2dc2c3c0",
+    "fileCount": 473
   },
-  "buildManifestSha256": "eabd6f9be94127515eefe71c22030b6bba538500d8096637e90726082da8728b",
-  "browserVersion": "151.0.4129.86",
+  "buildManifestSha256": "e3410ac62f6f9bfe71cebb32463ff5e2aea789e7f71f26542dd312b53325546d",
+  "browserVersion": "151.0.4129.101",
   "blockedExternalOrigins": [],
   "artifacts": [
     {
@@ -96,13 +96,13 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/1280x800/free-practice.png",
       "width": 1280,
       "height": 800,
-      "sha256": "b0b53102f158d86666bcb863c5b1fdbef673e8215d4edf7f7e0929c6e44b4f81",
+      "sha256": "9835c05dd5ad828a46f5ec56a3a0ce2ea1191589dc2db6c88aee5def7f08036c",
       "geometry": {
         "banner": {
           "left": 600.96875,
-          "top": 46,
+          "top": 62,
           "right": 939.03125,
-          "bottom": 80.25
+          "bottom": 96.25
         },
         "bannerCollisions": 0,
         "bannerWithinViewport": true,
@@ -150,13 +150,13 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/1280x800/diagnosis-example.png",
       "width": 1280,
       "height": 800,
-      "sha256": "63860367b007b542e8b3b8986cd3c76a1113e81a92c17c8e9d863ab624258dce",
+      "sha256": "1b973280b1e31bae6764989ea8e94ee510e424d36f361a245561d6ebaf57c03f",
       "geometry": {
         "banner": {
           "left": 601.75,
-          "top": 46,
+          "top": 62,
           "right": 938.25,
-          "bottom": 80.25
+          "bottom": 96.25
         },
         "bannerCollisions": 0,
         "bannerWithinViewport": true,
@@ -204,7 +204,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/1280x800/settings.png",
       "width": 1280,
       "height": 800,
-      "sha256": "9221eaa768b7fb01f7d18a08f2c955dce82df5b470cf47c792542111773db184",
+      "sha256": "cf8147ef2fa3b7ecdddfc4c14a58ee1128658d128317bdc803c2e56ff4f765c9",
       "geometry": {
         "banner": {
           "left": 600.96875,
@@ -258,13 +258,13 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/1280x800/progress-example.png",
       "width": 1280,
       "height": 800,
-      "sha256": "9ce0fba67b19a0bdfb44cf47db3aa78f44fdddd3c7403a49e4287e7d6e96f8b0",
+      "sha256": "dec6c3aa8a776dbab3749f47754ada19b0ab78c450978954aa88a5eda2ddeacd",
       "geometry": {
         "banner": {
           "left": 601.75,
-          "top": 46,
+          "top": 62,
           "right": 938.25,
-          "bottom": 80.25
+          "bottom": 96.25
         },
         "bannerCollisions": 0,
         "bannerWithinViewport": true,
@@ -366,7 +366,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/390x844/guided-repeat.png",
       "width": 390,
       "height": 844,
-      "sha256": "e5be8291828cf4319298f73552ccf43ef81bddeb4b1dda2708dc830f51ee63ff",
+      "sha256": "02092f21d6a9da7e28f2445765746c49cd6441789c94e367b319ae6e01512121",
       "geometry": {
         "banner": {
           "left": 25.96875,
@@ -379,9 +379,9 @@
         "bannerOccludedPoints": 0,
         "heading": {
           "left": 29,
-          "top": 389.5,
+          "top": 312.25,
           "right": 94.984375,
-          "bottom": 425.5,
+          "bottom": 348.25,
           "width": 65.984375,
           "height": 36
         },
@@ -442,13 +442,13 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/390x844/free-practice.png",
       "width": 390,
       "height": 844,
-      "sha256": "d6b4467e961284a7d300eb1d8775caa934edc618d227a7da68f2df63890959d9",
+      "sha256": "7bb58e04350876775d872dabb727b2a9d81c9f92c0a4da7b59d2fd50e04ea643",
       "geometry": {
         "banner": {
           "left": 25.96875,
-          "top": 94,
+          "top": 110,
           "right": 364.03125,
-          "bottom": 128.25
+          "bottom": 144.25
         },
         "bannerCollisions": 0,
         "bannerWithinViewport": true,
@@ -496,13 +496,13 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/390x844/diagnosis-example.png",
       "width": 390,
       "height": 844,
-      "sha256": "bd109949f2a93767b3237c6a375f9bc506ac297303f0a1842d77d0c1bc0b7aee",
+      "sha256": "c781020c838d9bf47f226cf57f72d1405170f574b04625b1feb9d9b9f59dc63e",
       "geometry": {
         "banner": {
           "left": 26.75,
-          "top": 94,
+          "top": 110,
           "right": 363.25,
-          "bottom": 128.25
+          "bottom": 144.25
         },
         "bannerCollisions": 0,
         "bannerWithinViewport": true,
@@ -604,13 +604,13 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/390x844/progress-example.png",
       "width": 390,
       "height": 844,
-      "sha256": "bc4838e2e652ad7869759d0c0ef21d2e58d17ef547984051ac55d2c10b7d861d",
+      "sha256": "ce4b800e5a86fdab0f0d3659a4e776188a31cd79c78244d2c659356ddcc3437c",
       "geometry": {
         "banner": {
           "left": 26.75,
-          "top": 94,
+          "top": 110,
           "right": 363.25,
-          "bottom": 128.25
+          "bottom": 144.25
         },
         "bannerCollisions": 0,
         "bannerWithinViewport": true,
@@ -788,13 +788,13 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/360x800/free-practice.png",
       "width": 360,
       "height": 800,
-      "sha256": "7cdbf49449140047a40250512f7a72ab10d639cd815094f0896fba5d31c6bdfe",
+      "sha256": "e9c9b29b3b4813d313d64588dc2994be62b4ef88323ae036f5fdcfd2cbc2c1e7",
       "geometry": {
         "banner": {
-          "left": 12,
-          "top": 94,
-          "right": 348,
-          "bottom": 144.5
+          "left": 16,
+          "top": 110,
+          "right": 344,
+          "bottom": 160.5
         },
         "bannerCollisions": 0,
         "bannerWithinViewport": true,
@@ -842,13 +842,13 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/360x800/diagnosis-example.png",
       "width": 360,
       "height": 800,
-      "sha256": "49fee3f0d9b1d8434b60edd585b865ff026c406d37dd987f69ec1156c5c26c0f",
+      "sha256": "d77cbe90d87a685c507287089aaf488de2bcc28cce43105d9dd7dc4bd13abff2",
       "geometry": {
         "banner": {
-          "left": 12,
-          "top": 94,
-          "right": 348,
-          "bottom": 144.5
+          "left": 24,
+          "top": 110,
+          "right": 336,
+          "bottom": 160.5
         },
         "bannerCollisions": 0,
         "bannerWithinViewport": true,
@@ -950,13 +950,13 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/360x800/progress-example.png",
       "width": 360,
       "height": 800,
-      "sha256": "9168ead8ad5fb032517cf8a450ce927a190f5bdb8f30ff8eac480a42e38ab22c",
+      "sha256": "cae0979eafecfe5ad058ec4d2680bb209b6ac72b08d57334b0a8ce21245ab5fc",
       "geometry": {
         "banner": {
-          "left": 12,
-          "top": 94,
-          "right": 348,
-          "bottom": 144.5
+          "left": 16,
+          "top": 110,
+          "right": 344,
+          "bottom": 160.5
         },
         "bannerCollisions": 0,
         "bannerWithinViewport": true,
