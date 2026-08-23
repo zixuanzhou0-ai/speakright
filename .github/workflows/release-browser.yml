@@ -226,6 +226,10 @@ jobs:
           if ($LASTEXITCODE -ne 0) {
             throw "Release staging contract failed."
           }
+          node scripts/github-release-verification.contract.mjs
+          if ($LASTEXITCODE -ne 0) {
+            throw "GitHub Release verification contract failed."
+          }
           $stage = "outputs/release/staging"
           if (Test-Path -LiteralPath $stage) {
             Remove-Item -LiteralPath $stage -Recurse -Force
@@ -292,15 +296,42 @@ jobs:
     if: ${{ github.event_name == 'push' && needs.build.result == 'success' }}
     needs: build
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 45
     permissions:
       contents: write
     steps:
-      - name: Checkout the release tag for publish verification
+      - name: Checkout the exact built commit without persisting credentials
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
-          ref: ${{ needs.build.outputs.release_tag }}
+          ref: ${{ needs.build.outputs.commit_sha }}
+          persist-credentials: false
+
+      - name: Verify remote tag identity before running repository code
+        env:
+          RELEASE_TAG: ${{ needs.build.outputs.release_tag }}
+          BUILT_COMMIT_SHA: ${{ needs.build.outputs.commit_sha }}
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          if ($env:BUILT_COMMIT_SHA -cnotmatch "^[0-9a-f]{40}$") {
+            throw "Build job did not provide a full commit SHA."
+          }
+          $headSha = (git rev-parse HEAD).Trim()
+          if ($headSha -cne $env:BUILT_COMMIT_SHA) {
+            throw "Publish checkout does not equal the exact built commit."
+          }
+          git fetch --force --no-tags origin "+refs/heads/main:refs/remotes/origin/main"
+          if ($LASTEXITCODE -ne 0) { throw "Could not refresh origin/main." }
+          git fetch --force --no-tags origin "+refs/tags/$env:RELEASE_TAG:refs/tags/$env:RELEASE_TAG"
+          if ($LASTEXITCODE -ne 0) { throw "Could not refresh the release tag." }
+          $tagRef = "refs/tags/$env:RELEASE_TAG"
+          $tagSha = (git rev-parse --verify "${tagRef}^{commit}").Trim()
+          if ($tagSha -cne $env:BUILT_COMMIT_SHA) {
+            throw "Release tag does not equal the exact built commit."
+          }
+          git merge-base --is-ancestor $tagSha refs/remotes/origin/main
+          if ($LASTEXITCODE -ne 0) { throw "Release commit is not on origin/main." }
 
       - name: Download verified Browser assets
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
@@ -311,7 +342,7 @@ jobs:
       - name: Re-verify downloaded Browser release assets
         run: node scripts/verify-release-staging.mjs --edition browser --version 1.1.0 --stage outputs/release/staging
 
-      - name: Create Browser Stable GitHub Release
+      - name: Create, remotely verify, and publish Browser Stable
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ needs.build.outputs.release_tag }}
@@ -320,29 +351,39 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = "Stop"
-          if ($env:BUILT_COMMIT_SHA -cnotmatch "^[0-9a-f]{40}$") {
-            throw "Build job did not provide a full commit SHA."
-          }
-          git fetch --force --no-tags origin "+refs/heads/main:refs/remotes/origin/main"
-          if ($LASTEXITCODE -ne 0) {
-            throw "Could not refresh origin/main before publishing."
-          }
-          git fetch --force --no-tags origin "+refs/tags/$env:RELEASE_TAG:refs/tags/$env:RELEASE_TAG"
-          if ($LASTEXITCODE -ne 0) {
-            throw "Could not refresh release tag '$env:RELEASE_TAG' before publishing."
-          }
-          $tagRef = "refs/tags/$env:RELEASE_TAG"
-          $tagSha = (git rev-parse --verify "${tagRef}^{commit}").Trim()
-          if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($tagSha)) {
-            throw "Could not peel release tag '$env:RELEASE_TAG' to a commit."
-          }
-          if ($tagSha -cne $env:BUILT_COMMIT_SHA) {
-            throw "Release tag moved after validation: built '$env:BUILT_COMMIT_SHA', current '$tagSha'."
-          }
-          git merge-base --is-ancestor $tagSha refs/remotes/origin/main
-          if ($LASTEXITCODE -ne 0) {
-            throw "Release tag commit '$tagSha' is no longer an ancestor of origin/main."
+          function Assert-RemoteIdentity {
+            git fetch --force --no-tags origin "+refs/heads/main:refs/remotes/origin/main"
+            if ($LASTEXITCODE -ne 0) { throw "Could not refresh origin/main." }
+            git fetch --force --no-tags origin "+refs/tags/$env:RELEASE_TAG:refs/tags/$env:RELEASE_TAG"
+            if ($LASTEXITCODE -ne 0) { throw "Could not refresh the release tag." }
+            $tagRef = "refs/tags/$env:RELEASE_TAG"
+            $tagSha = (git rev-parse --verify "${tagRef}^{commit}").Trim()
+            if ($tagSha -cne $env:BUILT_COMMIT_SHA) { throw "Release tag moved after validation." }
+            git merge-base --is-ancestor $tagSha refs/remotes/origin/main
+            if ($LASTEXITCODE -ne 0) { throw "Release commit is not on origin/main." }
           }
 
-          $assets = Get-ChildItem -LiteralPath outputs/release/staging -File | ForEach-Object FullName
-          gh release create "$env:RELEASE_TAG" @assets --repo "$env:GITHUB_REPOSITORY" --verify-tag --title "SpeakRight $env:RELEASE_VERSION — Browser Stable" --generate-notes
+          Assert-RemoteIdentity
+          gh release create "$env:RELEASE_TAG" --repo "$env:GITHUB_REPOSITORY" --verify-tag --draft --title "SpeakRight $env:RELEASE_VERSION — Browser Stable" --generate-notes
+          if ($LASTEXITCODE -ne 0) { throw "Could not create the Browser draft Release." }
+          $published = $false
+          try {
+            $assets = Get-ChildItem -LiteralPath outputs/release/staging -File | ForEach-Object FullName
+            gh release upload "$env:RELEASE_TAG" @assets --repo "$env:GITHUB_REPOSITORY"
+            if ($LASTEXITCODE -ne 0) { throw "Could not upload every Browser release asset." }
+            node scripts/verify-github-release.mjs --edition browser --version "$env:RELEASE_VERSION" --tag "$env:RELEASE_TAG" --draft true --download true --stage outputs/release/staging
+            if ($LASTEXITCODE -ne 0) { throw "Browser draft Release verification failed." }
+            Assert-RemoteIdentity
+            gh release edit "$env:RELEASE_TAG" --repo "$env:GITHUB_REPOSITORY" --draft=false --prerelease=false --latest=true
+            if ($LASTEXITCODE -ne 0) { throw "Could not publish the Browser Release." }
+            $published = $true
+            Assert-RemoteIdentity
+            node scripts/verify-github-release.mjs --edition browser --version "$env:RELEASE_VERSION" --tag "$env:RELEASE_TAG" --draft false --download false --stage outputs/release/staging
+            if ($LASTEXITCODE -ne 0) { throw "Published Browser Release verification failed." }
+          } catch {
+            if ($published) {
+              gh release delete "$env:RELEASE_TAG" --repo "$env:GITHUB_REPOSITORY" --yes
+              if ($LASTEXITCODE -ne 0) { Write-Error "Failed to remove an unverified published Browser Release." }
+            }
+            throw
+          }

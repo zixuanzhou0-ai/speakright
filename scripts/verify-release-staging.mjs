@@ -132,24 +132,31 @@ export function resolveStagingDirectory(value) {
   return resolved;
 }
 
-function main() {
-  const args = process.argv.slice(2);
-  const edition = requireArgument(args, "--edition");
-  const version = requireArgument(args, "--version");
-  const stage = resolveStagingDirectory(requireArgument(args, "--stage"));
+export function readReleaseDirectoryEntries(directory) {
   const entries = new Map();
-  for (const name of readdirSync(stage)) {
-    const assetPath = path.join(stage, name);
+  for (const name of readdirSync(directory)) {
+    const assetPath = path.join(directory, name);
     const descriptor = openSync(assetPath, "r");
     try {
       if (!fstatSync(descriptor).isFile()) {
-        throw new Error(`Release staging contains a non-file entry: ${name}.`);
+        throw new Error(
+          `Release directory contains a non-file entry: ${name}.`,
+        );
       }
       entries.set(name, readFileSync(descriptor));
     } finally {
       closeSync(descriptor);
     }
   }
+  return entries;
+}
+
+function main() {
+  const args = process.argv.slice(2);
+  const edition = requireArgument(args, "--edition");
+  const version = requireArgument(args, "--version");
+  const stage = resolveStagingDirectory(requireArgument(args, "--stage"));
+  const entries = readReleaseDirectoryEntries(stage);
   const result = verifyReleaseStagingEntries({ edition, version, entries });
   console.log(
     `${edition} release staging verified: ${result.assetCount} assets, ${result.checksumEntryCount} checksum entries.`,
