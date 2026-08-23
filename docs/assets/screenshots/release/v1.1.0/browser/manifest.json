@@ -20,18 +20,18 @@
   },
   "outputTree": {
     "schemaVersion": 1,
-    "sha256": "949bd8854ba820a60d9786e3e944e5dcf3ebbe17ace8b81f03dfaf82807a7807",
+    "sha256": "58751597e057f4a1dee87590196e894dc9fea3c76e8d33b6299b499a023e55f9",
     "fileCount": 7651,
     "totalBytes": 504296235
   },
-  "sourceCommit": "3ac40c55215580cf1d9d51bb31994af6bd3ac67a",
+  "sourceCommit": "d953520cc90844b527d110a88866ea55950a82e5",
   "sourceWorktreeClean": true,
   "sourceSnapshot": {
     "schemaVersion": 1,
     "sha256": "b1093cce76513b31b16f89539c96afdbb4cbc38408120cdad01497a3905fe618",
     "fileCount": 473
   },
-  "buildManifestSha256": "4db80d4ac2c7f01448c45c1f540f757ff7953468b62b54b40bf90faf853dfc7a",
+  "buildManifestSha256": "540788277409e0fe93e4b2568a351f0c4a051f9a94db9d0fcf7a61dcf9153eeb",
   "browserVersion": "151.0.4129.101",
   "blockedExternalOrigins": [],
   "artifacts": [
@@ -204,7 +204,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/1280x800/settings.png",
       "width": 1280,
       "height": 800,
-      "sha256": "4a88f03e90584eb8fef72f97a71350e0f3253873d89d641a58eed06b4a1326ac",
+      "sha256": "201cad45e5dee613135bcd37481293961ad44b3007faf8cc3bd634baa5a1d461",
       "geometry": {
         "banner": {
           "left": 600.96875,

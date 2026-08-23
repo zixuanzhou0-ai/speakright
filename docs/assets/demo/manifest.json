@@ -27,7 +27,7 @@
   "scoreDisclosure": "示例数据 / Example data — not a live Azure score",
   "paidApiCalls": false,
   "userData": false,
-  "sourceCommit": "3ac40c55215580cf1d9d51bb31994af6bd3ac67a",
+  "sourceCommit": "d953520cc90844b527d110a88866ea55950a82e5",
   "generatorSnapshot": {
     "schemaVersion": 1,
     "sha256": "bca086571e2eb86a175622f7f13736e691890cce6146c62ca57f968cc175a2f4",
@@ -35,7 +35,7 @@
     "totalBytes": 228976
   },
   "path": "docs/assets/demo/speakright-v1.1.0-overview.mp4",
-  "sha256": "37989b7d17b908862249e373de90cf7f7a636112c97ce984c694d760c43669bb",
+  "sha256": "1bf88a734974fd1c7399955a0e49206e25578eb5c6b0a28c455bd0b8cb43c8bd",
   "frames": [
     {
       "edition": "demo",
@@ -137,13 +137,13 @@
       "path": "docs/assets/demo/frames/06-browser-settings.png",
       "width": 1280,
       "height": 720,
-      "sha256": "1c0ec5960e81fa7ff9a677a4714d4acecf66bee1e2bcc50e546eb448bfe7bc4a",
+      "sha256": "378c0a04a4d50c9af99be3e916ba9cfda55b1d817a73a49ad2022a763a8209c1",
       "scoreDisclosureOverlay": false,
       "sourceEvidence": {
         "edition": "browser",
         "id": "settings",
         "path": "docs/assets/screenshots/release/v1.1.0/browser/1280x800/settings.png",
-        "sha256": "4a88f03e90584eb8fef72f97a71350e0f3253873d89d641a58eed06b4a1326ac",
+        "sha256": "201cad45e5dee613135bcd37481293961ad44b3007faf8cc3bd634baa5a1d461",
         "viewport": "1280x800",
         "width": 1280,
         "height": 800
@@ -157,13 +157,13 @@
       "path": "docs/assets/demo/frames/07-desktop-guided-repeat.png",
       "width": 1280,
       "height": 720,
-      "sha256": "e58aa23b03cf3283d8dddac4f5b6bdcd4e7439622a248f676b4e95ab0d155486",
+      "sha256": "3db2ea16b6a63b91ca7db7d98f3842e6cf668436c720c102f6e34ad2c286a31f",
       "scoreDisclosureOverlay": false,
       "sourceEvidence": {
         "edition": "desktop",
         "id": "guided-repeat",
         "path": "docs/assets/screenshots/release/v1.1.0/desktop/1280x920/guided-repeat.png",
-        "sha256": "75e92f5d6c2dd62436fb7f3eabad67a2b07913d29d8575ddb9ad70b17ae59f7a",
+        "sha256": "966d2f8140fab29dba9dee536bee5106d7e71f307daed90ca97d64ee9274139d",
         "viewport": "1280x920",
         "width": 1280,
         "height": 920
