@@ -292,7 +292,6 @@ async function main() {
   }
   for (const file of [
     ".gitattributes",
-    "next-env.d.ts",
     "next.config.ts",
     "package-lock.json",
     "package.json",
@@ -438,7 +437,7 @@ async function main() {
   );
   console.log(`Isolated Desktop evidence build: ${workspace}`);
   console.log(
-    `Desktop evidence assets: ${assetMaterialization.assetSet.fileCount} files (${assetMaterialization.hardlinked} hardlinks, ${assetMaterialization.copied} copies).`,
+    `Desktop evidence assets: ${assetMaterialization.assetSet.fileCount} files (${assetMaterialization.hardlinked} hardlinks, ${assetMaterialization.copied} copies, ${assetMaterialization.canonicalized} canonicalized).`,
   );
   console.log(`Desktop fixture executable: ${executable}`);
   console.log(`Formal root out and Cargo target were not modified: ${root}`);

@@ -229,7 +229,7 @@ async function main() {
   );
   console.log(`Isolated Browser evidence build: ${browserRoot}`);
   console.log(
-    `Browser evidence assets: ${assetMaterialization.assetSet.fileCount} files (${assetMaterialization.hardlinked} hardlinks, ${assetMaterialization.copied} copies).`,
+    `Browser evidence assets: ${assetMaterialization.assetSet.fileCount} files (${assetMaterialization.hardlinked} hardlinks, ${assetMaterialization.copied} copies, ${assetMaterialization.canonicalized} canonicalized).`,
   );
   console.log(`Formal Browser output was not modified: ${sourceBrowserRoot}`);
 }

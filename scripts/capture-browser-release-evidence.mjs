@@ -4,7 +4,10 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 import { chromium } from "@playwright/test";
-import { releaseEvidenceAssetSet } from "./lib/release-evidence-assets.mjs";
+import {
+  RELEASE_EVIDENCE_ASSET_SET_SCHEMA,
+  releaseEvidenceAssetSet,
+} from "./lib/release-evidence-assets.mjs";
 import {
   BROWSER_EVIDENCE_VIEWPORTS,
   EXAMPLE_SCORE_DISCLOSURE,
@@ -16,6 +19,8 @@ import {
 } from "./lib/release-evidence-fixtures.mjs";
 import { releaseEvidenceOutputTree } from "./lib/release-evidence-output-tree.mjs";
 import {
+  RELEASE_EVIDENCE_GENERATOR_DIGEST_SCHEMA,
+  RELEASE_EVIDENCE_SOURCE_DIGEST_SCHEMA,
   releaseEvidenceGeneratorDigest,
   releaseEvidenceGeneratorGitProvenance,
   releaseEvidenceGitProvenance,
@@ -121,7 +126,7 @@ function assertBuildManifest(manifest) {
     manifest.edition !== "browser" ||
     manifest.fixtureBuild !== true ||
     manifest.paidApiCalls !== false ||
-    manifest.assetSet?.schemaVersion !== 1 ||
+    manifest.assetSet?.schemaVersion !== RELEASE_EVIDENCE_ASSET_SET_SCHEMA ||
     !Number.isInteger(manifest.assetSet?.fileCount) ||
     manifest.assetSet.fileCount <= 0 ||
     !Number.isSafeInteger(manifest.assetSet?.totalBytes) ||
@@ -129,7 +134,8 @@ function assertBuildManifest(manifest) {
     !/^[a-f0-9]{64}$/.test(manifest.assetSet?.pathDigestSha256 ?? "") ||
     !/^[a-f0-9]{64}$/.test(manifest.assetSet?.pathHashDigestSha256 ?? "") ||
     !/^[a-f0-9]{64}$/.test(manifest.assetSet?.registrySha256 ?? "") ||
-    manifest.generatorSnapshot?.schemaVersion !== 1 ||
+    manifest.generatorSnapshot?.schemaVersion !==
+      RELEASE_EVIDENCE_GENERATOR_DIGEST_SCHEMA ||
     !/^[a-f0-9]{64}$/.test(manifest.generatorSnapshot?.sha256 ?? "") ||
     !Number.isInteger(manifest.generatorSnapshot?.fileCount) ||
     !Number.isSafeInteger(manifest.generatorSnapshot?.totalBytes) ||
@@ -139,7 +145,8 @@ function assertBuildManifest(manifest) {
     !Number.isSafeInteger(manifest.outputTree?.totalBytes) ||
     !/^[a-f0-9]{40}$/.test(manifest.sourceCommit ?? "") ||
     manifest.sourceWorktreeClean !== true ||
-    manifest.sourceSnapshot?.schemaVersion !== 1 ||
+    manifest.sourceSnapshot?.schemaVersion !==
+      RELEASE_EVIDENCE_SOURCE_DIGEST_SCHEMA ||
     !/^[a-f0-9]{64}$/.test(manifest.sourceSnapshot?.sha256 ?? "") ||
     !Number.isInteger(manifest.sourceSnapshot?.fileCount) ||
     manifest.sourceSnapshot.fileCount <= 0 ||

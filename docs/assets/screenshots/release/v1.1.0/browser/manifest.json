@@ -5,33 +5,33 @@
   "fixtureBuildRequired": true,
   "paidApiCalls": false,
   "assetSet": {
-    "schemaVersion": 1,
+    "schemaVersion": 2,
     "fileCount": 6589,
-    "totalBytes": 480735062,
-    "pathDigestSha256": "3e6debb84b1c7e3f2ceb01aa7645dc8847276f90cd590fe9a85bdcde43a448ed",
-    "pathHashDigestSha256": "dd65de83a10fd2d775dbdae6cf868169d55debee540c4bcc08a0f7d34cf4d083",
+    "totalBytes": 480726939,
+    "pathDigestSha256": "b0d52fdcece834a18909b1ed3c02181682fc1aa14581a638c54c084ed28e2509",
+    "pathHashDigestSha256": "b59edcdf6cdde8d71d54c182c3219d58fa8a444a8de758cf2e73f880c827a7cd",
     "registrySha256": "7865d97f5c94bd6ad309e1e78b657c82fc13c173b3803de2a991d6ea830b59b5"
   },
   "generatorSnapshot": {
-    "schemaVersion": 1,
-    "sha256": "bca086571e2eb86a175622f7f13736e691890cce6146c62ca57f968cc175a2f4",
+    "schemaVersion": 2,
+    "sha256": "b2099e76a527e34c7221795f6bf0bbec29ebb5a802cde39de0bad5422078ea0e",
     "fileCount": 16,
-    "totalBytes": 228976
+    "totalBytes": 234299
   },
   "outputTree": {
     "schemaVersion": 1,
-    "sha256": "e1c8bfa12ca8e073d3653a45424353b44bb71de9191be5bdeac8c8c3f7c30bf9",
+    "sha256": "ed07947f952f38c6b5b13d5cbd51af04ac0cac7623b74944bf5fddfb138dcca8",
     "fileCount": 7651,
-    "totalBytes": 504296235
+    "totalBytes": 504288112
   },
-  "sourceCommit": "2c63617f9f88df3db005b44a2d4b7b81edbee19a",
+  "sourceCommit": "9ca0e0d9df48134969a7f2e2aac85975d943d298",
   "sourceWorktreeClean": true,
   "sourceSnapshot": {
-    "schemaVersion": 1,
-    "sha256": "0fe756b3971e47bdf549901b8d157f4d4585a9331172ed082565d4f573e5dde5",
+    "schemaVersion": 2,
+    "sha256": "f63cbe863519656001b1d7bc4b10158131a1d8dba8375d856afda9cd6ff28c7b",
     "fileCount": 473
   },
-  "buildManifestSha256": "c397a742ea6dbbd5633f971b4edd07a4426643402768533a48f535eec8ae418b",
+  "buildManifestSha256": "31a7d1e76b74722055dc69386ea9706f412f429ec3ac522e8f0dfcfe0839c621",
   "browserVersion": "151.0.4129.101",
   "blockedExternalOrigins": [],
   "artifacts": [
@@ -42,7 +42,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/1280x800/guided-repeat.png",
       "width": 1280,
       "height": 800,
-      "sha256": "59dadc17abeefaac6079d2a13d7f16bc5a707f51365d36cbae931e5564e63d24",
+      "sha256": "92f715bb172bc81849d5f5536364330f71f6226ed8044ca12622015f350683d4",
       "geometry": {
         "banner": {
           "left": 470.96875,
@@ -55,9 +55,9 @@
         "bannerOccludedPoints": 0,
         "heading": {
           "left": 297,
-          "top": 202.625,
+          "top": 279.875,
           "right": 362.984375,
-          "bottom": 238.625,
+          "bottom": 315.875,
           "width": 65.984375,
           "height": 36
         },
@@ -150,7 +150,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/1280x800/diagnosis-example.png",
       "width": 1280,
       "height": 800,
-      "sha256": "f81a544f838d1329d9e49ce53b7c2c3e36032ed043046a498c69fe0e356325bf",
+      "sha256": "9a597fca2d5b6bdc52af0cf09b04bfd431fd286df3d2b6b856460315302c825c",
       "geometry": {
         "banner": {
           "left": 601.75,
@@ -204,7 +204,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/1280x800/settings.png",
       "width": 1280,
       "height": 800,
-      "sha256": "7a52195f94d126f14d731c9150904fd6532e6fc1bbd8e6512b9480b642861be3",
+      "sha256": "7f0fde632ca80dd9149fccfc6f786bca1692f85314bf2214db626e76e7c05c3a",
       "geometry": {
         "banner": {
           "left": 600.96875,
@@ -496,7 +496,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/390x844/diagnosis-example.png",
       "width": 390,
       "height": 844,
-      "sha256": "769e0fd5f36edfd4ed69a70d53791276c493096f6f7b5f3084dee42422082f2a",
+      "sha256": "5647668cb9f296167c050518b533acc4f4862eb74e21c9559480f169db721e01",
       "geometry": {
         "banner": {
           "left": 26.75,
@@ -842,7 +842,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/360x800/diagnosis-example.png",
       "width": 360,
       "height": 800,
-      "sha256": "2d4fa9bc0e0c900fc0c81a5c5b24b297420096649fc75905e264995cc0168497",
+      "sha256": "d77cbe90d87a685c507287089aaf488de2bcc28cce43105d9dd7dc4bd13abff2",
       "geometry": {
         "banner": {
           "left": 24,

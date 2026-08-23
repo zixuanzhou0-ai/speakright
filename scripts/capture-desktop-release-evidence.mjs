@@ -13,7 +13,10 @@ import os from "node:os";
 import path from "node:path";
 import process from "node:process";
 import { pathToFileURL } from "node:url";
-import { releaseEvidenceAssetSet } from "./lib/release-evidence-assets.mjs";
+import {
+  RELEASE_EVIDENCE_ASSET_SET_SCHEMA,
+  releaseEvidenceAssetSet,
+} from "./lib/release-evidence-assets.mjs";
 import {
   DESKTOP_EVIDENCE_APPLICATION_ORIGINS,
   DESKTOP_EVIDENCE_BROWSER_ARGUMENTS,
@@ -27,6 +30,8 @@ import {
   storageSeedExpression,
 } from "./lib/release-evidence-fixtures.mjs";
 import {
+  RELEASE_EVIDENCE_GENERATOR_DIGEST_SCHEMA,
+  RELEASE_EVIDENCE_SOURCE_DIGEST_SCHEMA,
   releaseEvidenceGeneratorDigest,
   releaseEvidenceGeneratorGitProvenance,
   releaseEvidenceGitProvenance,
@@ -755,7 +760,8 @@ async function main() {
     buildManifest.edition !== "desktop" ||
     buildManifest.fixtureBuild !== true ||
     buildManifest.paidApiCalls !== false ||
-    buildManifest.assetSet?.schemaVersion !== 1 ||
+    buildManifest.assetSet?.schemaVersion !==
+      RELEASE_EVIDENCE_ASSET_SET_SCHEMA ||
     !Number.isInteger(buildManifest.assetSet?.fileCount) ||
     buildManifest.assetSet.fileCount <= 0 ||
     !Number.isSafeInteger(buildManifest.assetSet?.totalBytes) ||
@@ -765,7 +771,8 @@ async function main() {
       buildManifest.assetSet?.pathHashDigestSha256 ?? "",
     ) ||
     !/^[a-f0-9]{64}$/.test(buildManifest.assetSet?.registrySha256 ?? "") ||
-    buildManifest.generatorSnapshot?.schemaVersion !== 1 ||
+    buildManifest.generatorSnapshot?.schemaVersion !==
+      RELEASE_EVIDENCE_GENERATOR_DIGEST_SCHEMA ||
     !/^[a-f0-9]{64}$/.test(buildManifest.generatorSnapshot?.sha256 ?? "") ||
     !Number.isInteger(buildManifest.generatorSnapshot?.fileCount) ||
     !Number.isSafeInteger(buildManifest.generatorSnapshot?.totalBytes) ||
@@ -785,7 +792,8 @@ async function main() {
     buildManifest.runtimeIsolation?.temporarySettingsStorePathRequired !==
       true ||
     buildManifest.runtimeIsolation?.temporaryWebViewProfileRequired !== true ||
-    buildManifest.sourceSnapshot?.schemaVersion !== 1 ||
+    buildManifest.sourceSnapshot?.schemaVersion !==
+      RELEASE_EVIDENCE_SOURCE_DIGEST_SCHEMA ||
     !/^[a-f0-9]{40}$/.test(buildManifest.sourceCommit ?? "") ||
     buildManifest.sourceWorktreeClean !== true ||
     !/^[a-f0-9]{64}$/.test(buildManifest.sourceSnapshot?.sha256 ?? "") ||

@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: windows-2025
     timeout-minutes: 180
     outputs:
       version: ${{ steps.release.outputs.version }}
@@ -110,8 +110,13 @@ jobs:
           npm run assets:manifests:check
           npm run assets:rights:check
 
-      - name: Verify release media tooling
-        run: ffprobe -version
+      - name: Verify release media tooling contract
+        run: node scripts/release-media-tooling.contract.mjs
+
+      - name: Install pinned release media tooling
+        shell: pwsh
+        run: pwsh -NoProfile -NonInteractive -File scripts/install-release-media-tools.ps1
+        timeout-minutes: 10
 
       - name: Validate public documentation and release evidence
         run: |
