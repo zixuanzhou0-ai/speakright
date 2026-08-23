@@ -20,18 +20,18 @@
   },
   "outputTree": {
     "schemaVersion": 1,
-    "sha256": "45920e14b87a38fa6d01ecba649927cef67fb54df9abaeb6749bc8a47f6c3698",
+    "sha256": "ed07947f952f38c6b5b13d5cbd51af04ac0cac7623b74944bf5fddfb138dcca8",
     "fileCount": 7651,
     "totalBytes": 504288112
   },
-  "sourceCommit": "8adebca5a31bf9a78f1a7b1e1578c96c10337328",
+  "sourceCommit": "9ca0e0d9df48134969a7f2e2aac85975d943d298",
   "sourceWorktreeClean": true,
   "sourceSnapshot": {
     "schemaVersion": 2,
-    "sha256": "8fe15604849a04927e918e54d6d59d1c630a3006ea2c92c072a99f5143f34ee7",
+    "sha256": "f63cbe863519656001b1d7bc4b10158131a1d8dba8375d856afda9cd6ff28c7b",
     "fileCount": 473
   },
-  "buildManifestSha256": "422457701d40f898018920aaeca7350a3203159ac9c342e5a26626312269fb5c",
+  "buildManifestSha256": "31a7d1e76b74722055dc69386ea9706f412f429ec3ac522e8f0dfcfe0839c621",
   "browserVersion": "151.0.4129.101",
   "blockedExternalOrigins": [],
   "artifacts": [
@@ -42,7 +42,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/1280x800/guided-repeat.png",
       "width": 1280,
       "height": 800,
-      "sha256": "59dadc17abeefaac6079d2a13d7f16bc5a707f51365d36cbae931e5564e63d24",
+      "sha256": "92f715bb172bc81849d5f5536364330f71f6226ed8044ca12622015f350683d4",
       "geometry": {
         "banner": {
           "left": 470.96875,
@@ -55,9 +55,9 @@
         "bannerOccludedPoints": 0,
         "heading": {
           "left": 297,
-          "top": 202.625,
+          "top": 279.875,
           "right": 362.984375,
-          "bottom": 238.625,
+          "bottom": 315.875,
           "width": 65.984375,
           "height": 36
         },
@@ -150,7 +150,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/1280x800/diagnosis-example.png",
       "width": 1280,
       "height": 800,
-      "sha256": "a50404845407c9eed4d615188bce3ca71dcd9c9e72fd1d0950baa6ade52e934a",
+      "sha256": "9a597fca2d5b6bdc52af0cf09b04bfd431fd286df3d2b6b856460315302c825c",
       "geometry": {
         "banner": {
           "left": 601.75,
@@ -204,7 +204,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/1280x800/settings.png",
       "width": 1280,
       "height": 800,
-      "sha256": "d10d5b2da9c91d95f037299f3c8a50eb76a66883670f099fe472fa2cf5197271",
+      "sha256": "7f0fde632ca80dd9149fccfc6f786bca1692f85314bf2214db626e76e7c05c3a",
       "geometry": {
         "banner": {
           "left": 600.96875,
@@ -366,7 +366,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/390x844/guided-repeat.png",
       "width": 390,
       "height": 844,
-      "sha256": "02092f21d6a9da7e28f2445765746c49cd6441789c94e367b319ae6e01512121",
+      "sha256": "e5be8291828cf4319298f73552ccf43ef81bddeb4b1dda2708dc830f51ee63ff",
       "geometry": {
         "banner": {
           "left": 25.96875,
@@ -379,9 +379,9 @@
         "bannerOccludedPoints": 0,
         "heading": {
           "left": 29,
-          "top": 312.25,
+          "top": 389.5,
           "right": 94.984375,
-          "bottom": 348.25,
+          "bottom": 425.5,
           "width": 65.984375,
           "height": 36
         },
@@ -496,7 +496,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/390x844/diagnosis-example.png",
       "width": 390,
       "height": 844,
-      "sha256": "de86591166ee7c60d4405be47ca8303b718c91e210e1ee6716815a11a74cd56c",
+      "sha256": "5647668cb9f296167c050518b533acc4f4862eb74e21c9559480f169db721e01",
       "geometry": {
         "banner": {
           "left": 26.75,
@@ -712,7 +712,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/360x800/guided-repeat.png",
       "width": 360,
       "height": 800,
-      "sha256": "2606137f2ba1ae3e3cf8526c26d566612ebae83eda7aa9b254e8c331d17b1898",
+      "sha256": "3892f5ed8200ec98224bf6b66d6dd5795c53185f7134ca0a72c0c21c23669bab",
       "geometry": {
         "banner": {
           "left": 12,
@@ -725,9 +725,9 @@
         "bannerOccludedPoints": 0,
         "heading": {
           "left": 29,
-          "top": 389.5,
+          "top": 312.25,
           "right": 94.984375,
-          "bottom": 425.5,
+          "bottom": 348.25,
           "width": 65.984375,
           "height": 36
         },

@@ -23,14 +23,14 @@
     "mode": "ephemeral-loopback-cdp",
     "portFile": "WebView2/EBWebView/DevToolsActivePort"
   },
-  "credentialNamespace": "com.speakright.desktop.release-evidence-6183fbd760bec382",
+  "credentialNamespace": "com.speakright.desktop.release-evidence-a874187633ce243f",
   "sourceSnapshot": {
     "schemaVersion": 2,
-    "sha256": "25c2b9e15a2f10872c021734fd1cafe65998b067cfc101e8eb9b2643afab6f94",
+    "sha256": "826834c2aac2325216570acd656fa10201ac77c62877e2e2c1501c2c90d8f1bd",
     "fileCount": 487
   },
   "sourceWorktreeClean": true,
-  "buildManifestSha256": "a22ca701adf2c91e2794af4f4467b612a17b6ed8d342921ef2a1eeb4920bfeb8",
+  "buildManifestSha256": "341e5f6458a045b0815496efdf06c47265df04d21d734738aaf176855a0b92bc",
   "nativeHttpAttempts": 0,
   "secureStoreSlotsEmpty": true,
   "runtimeIsolation": {
@@ -50,10 +50,10 @@
     "tauriHttpGuardSha256": "912d4cf660188b58989b2422e9dc25ffef4d3bc8c6bae76630e67212392a5e49",
     "rustGuardSha256": "bd85a66a49776c70426ae485a8671f1388fa5649d810495547f344ad5b3fc38b"
   },
-  "sourceCommit": "8adebca5a31bf9a78f1a7b1e1578c96c10337328",
+  "sourceCommit": "9ca0e0d9df48134969a7f2e2aac85975d943d298",
   "executable": {
     "fileName": "speakright.exe",
-    "sha256": "eda9b763486ba6fc3031d2d97d87b730c3c4b4a55787716c2b73d19de8fbedce"
+    "sha256": "205a96527d713c1f827561da173d17e3b0fb0d1f5ae77ecadf945c45fe5efd2b"
   },
   "networkPolicy": {
     "applicationOrigin": "http://tauri.localhost",
@@ -159,11 +159,6 @@
       },
       {
         "origin": "http://tauri.localhost",
-        "pathname": "/_next/static/chunks/0j0_1_3xnfbub.js",
-        "resourceType": "Script"
-      },
-      {
-        "origin": "http://tauri.localhost",
         "pathname": "/_next/static/chunks/0no3iceex0hmo.js",
         "resourceType": "Script"
       },
@@ -255,6 +250,11 @@
       {
         "origin": "http://tauri.localhost",
         "pathname": "/_next/static/chunks/2ee1qvbf9-a56.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/2fu0x7iyyetdv.js",
         "resourceType": "Script"
       },
       {
@@ -535,7 +535,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/desktop/1280x920/guided-repeat.png",
       "width": 1280,
       "height": 920,
-      "sha256": "0ca7cef4926d2bbfc94f90e46960203a7052d53c1c63dd72cf510d89131569ba",
+      "sha256": "9c9ed1631b8297a38712e734675ba13caf4584232f32a37ce57f903fc97f1944",
       "geometry": {
         "banner": {
           "left": 471.1625061035156,
@@ -598,7 +598,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/desktop/1280x920/settings.png",
       "width": 1280,
       "height": 920,
-      "sha256": "ac1133c9de9eb56445f7b2f50a1296da2b5541fe9e9fdb2bff662f822243b12e",
+      "sha256": "ae00c6db0f5380bd56680b31a834b2187860cfeb9c6c4c3aa4c8832dcb9afbaf",
       "geometry": {
         "banner": {
           "left": 595.9625244140625,
@@ -661,7 +661,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/desktop/1024x800/guided-repeat.png",
       "width": 1024,
       "height": 800,
-      "sha256": "d9332bc54029e0cac1342c59b6700a6e978d679a70d2e6b98e9ff6d00143704d",
+      "sha256": "b8bd1c9dbace9e6851834666668859af98510d928fc54ab1e607015c1da7cca1",
       "geometry": {
         "banner": {
           "left": 343.1625061035156,
@@ -724,7 +724,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/desktop/1024x800/settings.png",
       "width": 1024,
       "height": 800,
-      "sha256": "def6d09605cda9107e4702cff344df9a5c89a7bd8ef86f99eb9bb5ebaa672edd",
+      "sha256": "46fd7bbd04ab1b9ef42548756a44391d0a3dbaf3eb76b01e1f1768a143f9e9d3",
       "geometry": {
         "banner": {
           "left": 467.9624938964844,
