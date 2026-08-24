@@ -23,13 +23,10 @@ import {
   buildNsisUninstallArgs,
   createSanitizedFailureSummary,
   createSanitizedSummary,
-  DESKTOP_READINESS_TIMEOUT_MS,
   getOwnedWebViewProcesses,
   InstallerRoundtripError,
-  isPendingWebViewStartupError,
   isStrictPathInside,
   runInstallerRoundtrip,
-  waitForDesktopReadiness,
 } from "./desktop-installer-roundtrip-core.mjs";
 import { hashTauriNsisExecutableVariant } from "./tauri-bundle-executable-identity.mjs";
 
@@ -46,7 +43,6 @@ const markerName = ".speakright-installer-roundtrip.json";
 // uninstall cleanup are unchanged for SpeakRight's no-custom-template config.
 const reviewedTauriCliVersion = "2.11.4";
 const childProcesses = new Map();
-const transientReadErrorCodes = new Set(["EACCES", "EBUSY", "ENOENT", "EPERM"]);
 
 function fail(code, message) {
   throw new InstallerRoundtripError(code, message);
@@ -98,7 +94,7 @@ async function listTargetEntries(targetPath) {
   return entries.length === 0 ? ["<existing-empty-directory>"] : entries;
 }
 
-async function runPowerShell(script, env = {}, timeout = 60_000, signal) {
+async function runPowerShell(script, env = {}, timeout = 60_000) {
   const { stdout } = await execFileAsync(
     "powershell.exe",
     ["-NoProfile", "-NonInteractive", "-Command", script],
@@ -106,7 +102,6 @@ async function runPowerShell(script, env = {}, timeout = 60_000, signal) {
       encoding: "utf8",
       env: { ...process.env, ...env },
       maxBuffer: 4 * 1024 * 1024,
-      signal,
       timeout,
       windowsHide: true,
     },
@@ -294,11 +289,7 @@ if (-not $process) {
   [pscustomobject]@{ exists = $false } | ConvertTo-Json -Compress
   exit 0
 }
-$windowProcess = Get-Process -Id $processId -ErrorAction SilentlyContinue
-if (-not $windowProcess) {
-  [pscustomobject]@{ exists = $false } | ConvertTo-Json -Compress
-  exit 0
-}
+$windowProcess = Get-Process -Id $processId -ErrorAction Stop
 [pscustomobject]@{
   exists = $true
   executablePath = [string]$process.ExecutablePath
@@ -308,15 +299,10 @@ if (-not $windowProcess) {
 `;
 }
 
-async function getProcessState(pid, signal) {
-  const output = await runPowerShell(
-    processStateScript(),
-    {
-      SPEAKRIGHT_RT_PID: String(pid),
-    },
-    60_000,
-    signal,
-  );
+async function getProcessState(pid) {
+  const output = await runPowerShell(processStateScript(), {
+    SPEAKRIGHT_RT_PID: String(pid),
+  });
   return JSON.parse(output);
 }
 
@@ -335,10 +321,8 @@ ConvertTo-Json -Compress -InputObject $records
 `;
 }
 
-async function getProcessTree(signal) {
-  return asArray(
-    JSON.parse(await runPowerShell(processTreeScript(), {}, 60_000, signal)),
-  );
+async function getProcessTree() {
+  return asArray(JSON.parse(await runPowerShell(processTreeScript())));
 }
 
 async function snapshotOwnedWebViewProcesses(pid) {
@@ -608,28 +592,15 @@ function createWindowsAdapter() {
         stdio: "ignore",
         windowsHide: false,
       });
-      const record = {
-        child,
-        exited: null,
-        exitResult: null,
-        ownedWebViews: [],
-        readinessDeadline: null,
-      };
       const spawned = new Promise((resolve, reject) => {
-        child.once("spawn", () => {
-          record.readinessDeadline = Date.now() + DESKTOP_READINESS_TIMEOUT_MS;
-          resolve();
-        });
+        child.once("spawn", resolve);
         child.once("error", reject);
       });
-      record.exited = new Promise((resolve) => {
-        child.once("exit", (code, signal) => {
-          record.exitResult = { code, signal };
-          resolve(record.exitResult);
-        });
+      const exited = new Promise((resolve) => {
+        child.once("exit", (code, signal) => resolve({ code, signal }));
       });
       await spawned;
-      childProcesses.set(child.pid, record);
+      childProcesses.set(child.pid, { child, exited, ownedWebViews: [] });
       return child.pid;
     },
 
@@ -637,130 +608,64 @@ function createWindowsAdapter() {
       await assertOwnedProcess(plan, pid);
     },
 
-    async waitForReadiness(plan, pid) {
-      await assertMarker(plan);
-      const record = childProcesses.get(pid);
-      if (!record) {
-        fail("process-tracking", "installed app process was not tracked");
-      }
-      const exitedObservation = () => ({
-        processAlive: false,
-        exitCode: record.exitResult?.code,
-        exitSignal: record.exitResult?.signal,
-      });
-      const inspectTrackedProcess = async (signal) => {
-        if (record.exitResult) return { exited: exitedObservation() };
-        const state = await getProcessState(pid, signal);
-        if (record.exitResult || !state.exists) {
-          return { exited: exitedObservation() };
-        }
-        if (!sameWindowsPath(state.executablePath, plan.installedExe)) {
-          fail(
-            "process-ownership",
-            "process executable does not match the temporary installed app",
+    async waitForWindow(plan, pid) {
+      await waitForCondition(
+        async () => {
+          const state = await assertOwnedProcess(plan, pid);
+          return (
+            Number(state.mainWindowHandle) > 0 &&
+            state.mainWindowTitle?.includes(productName)
           );
-        }
-        return { state };
-      };
+        },
+        60_000,
+        500,
+        "window-timeout",
+        "installed app did not expose the expected SpeakRight window",
+      );
+    },
+
+    async assertIsolatedWebViewProfile(plan, pid) {
+      await assertMarker(plan);
       const logPath = path.join(plan.logDir, "speakright.log");
+      await waitForCondition(
+        async () => {
+          if ((await pathKind(logPath)) !== "file") return false;
+          return (await readFile(logPath, "utf8")).includes(
+            "SpeakRight desktop runtime initialized",
+          );
+        },
+        30_000,
+        250,
+        "isolated-log-missing",
+        "installed app did not write its isolated runtime log",
+      );
       const webViewDataDir = path.join(plan.webViewProfileDir, "EBWebView");
-      const observePathKind = async (candidate) => {
-        try {
-          return await pathKind(candidate);
-        } catch (error) {
-          if (transientReadErrorCodes.has(error?.code)) return "unavailable";
-          throw error;
-        }
-      };
-      const observation = await waitForDesktopReadiness({
-        observe: async ({ signal }) => {
-          const initialProcess = await inspectTrackedProcess(signal);
-          if (initialProcess.exited) return initialProcess.exited;
-
-          const logKind = await observePathKind(logPath);
-          let logBytes = null;
-          let logReadable = false;
-          let markerPresent = false;
-          if (logKind === "file") {
-            try {
-              const [logInfo, logContent] = await Promise.all([
-                stat(logPath),
-                readFile(logPath, { encoding: "utf8", signal }),
-              ]);
-              logBytes = logInfo.size;
-              logReadable = true;
-              markerPresent = logContent.includes(
-                "SpeakRight desktop runtime initialized",
-              );
-            } catch (error) {
-              if (!transientReadErrorCodes.has(error?.code)) throw error;
-            }
-          }
-
-          const webViewDirKind = await observePathKind(webViewDataDir);
-          let profilePopulated = false;
-          let webViewProfileOwned = false;
-          if (webViewDirKind === "directory") {
-            try {
-              profilePopulated = (await readdir(webViewDataDir)).length > 0;
-            } catch (error) {
-              if (!transientReadErrorCodes.has(error?.code)) throw error;
-            }
-          }
-          if (profilePopulated) {
-            try {
-              const ownedWebViews = assertOwnedWebViewProfile({
-                processes: await getProcessTree(signal),
-                rootPid: pid,
-                expectedProfileDir: webViewDataDir,
-                profilePopulated,
-              });
-              record.ownedWebViews = ownedWebViews.map((process) => ({
-                processId: process.processId,
-                name: process.name,
-              }));
-              webViewProfileOwned = true;
-            } catch (error) {
-              const processAfterTree = await inspectTrackedProcess(signal);
-              if (processAfterTree.exited) return processAfterTree.exited;
-              if (!isPendingWebViewStartupError(error)) throw error;
-            }
-          }
-
-          const finalProcess = await inspectTrackedProcess(signal);
-          if (finalProcess.exited) return finalProcess.exited;
-          const processState = finalProcess.state;
-
-          return {
-            processAlive: true,
-            exitCode: null,
-            exitSignal: null,
-            windowObserved:
-              Number(processState.mainWindowHandle) > 0 &&
-              Boolean(processState.mainWindowTitle?.includes(productName)),
-            logKind,
-            logBytes,
-            logReadable,
-            markerPresent,
-            webViewDirKind,
+      await waitForCondition(
+        async () => {
+          if ((await pathKind(webViewDataDir)) !== "directory") return false;
+          const profilePopulated = (await readdir(webViewDataDir)).length > 0;
+          if (!profilePopulated) return false;
+          const ownedWebViews = assertOwnedWebViewProfile({
+            processes: await getProcessTree(),
+            rootPid: pid,
+            expectedProfileDir: webViewDataDir,
             profilePopulated,
-            webViewProfileOwned,
-          };
+          });
+          const record = childProcesses.get(pid);
+          if (!record) {
+            fail("process-tracking", "installed app process was not tracked");
+          }
+          record.ownedWebViews = ownedWebViews.map((process) => ({
+            processId: process.processId,
+            name: process.name,
+          }));
+          return true;
         },
-        sleep: async (delayMs) => {
-          await Promise.race([
-            new Promise((resolve) => setTimeout(resolve, delayMs)),
-            record.exited,
-          ]);
-        },
-        deadlineMs: record.readinessDeadline,
-      });
-      return {
-        window: observation.windowObserved === true,
-        isolatedWebViewProfile:
-          observation.profilePopulated === true &&
-          observation.webViewProfileOwned === true,
-      };
+        30_000,
+        250,
+        "webview-profile",
+        "isolated WebView2 profile was not populated",
+      );
     },
 
     async assertReleaseDebugTransportDisabled(plan, pid) {
