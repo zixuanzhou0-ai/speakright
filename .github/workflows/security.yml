@@ -55,13 +55,53 @@ jobs:
     name: Secret history scan
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      GITLEAKS_VERSION: "8.24.3"
+      GITLEAKS_LINUX_X64_SHA256: "9991e0b2903da4c8f6122b5c3186448b927a5da4deef1fe45271c3793f4ee29c"
     steps:
       - name: Checkout complete history
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
 
-      - name: Scan the working tree and Git history
-        uses: gitleaks/gitleaks-action@dcedce43c6f43de0b836d1fe38946645c9c638dc # v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Validate narrowly scoped history exceptions
+        run: node scripts/gitleaks-history-policy.contract.mjs
+
+      # Migration note: gitleaks/gitleaks-action@ is intentionally not invoked.
+      # Its event-specific log range cannot satisfy this full-history gate.
+      - name: Download and verify pinned Gitleaks
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive="gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          curl --fail --location --proto '=https' --tlsv1.2 --retry 3 \
+            --output "${RUNNER_TEMP}/${archive}" \
+            "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/${archive}"
+          printf '%s  %s\n' \
+            "${GITLEAKS_LINUX_X64_SHA256}" \
+            "${RUNNER_TEMP}/${archive}" | sha256sum --check -
+          tar --extract --gzip --file "${RUNNER_TEMP}/${archive}" \
+            --directory "${RUNNER_TEMP}" gitleaks
+          "${RUNNER_TEMP}/gitleaks" version
+
+      - name: Scan complete Git history
+        shell: bash
+        run: |
+          set -euo pipefail
+          "${RUNNER_TEMP}/gitleaks" detect \
+            --source=. \
+            --redact \
+            --verbose \
+            --exit-code=2 \
+            --report-format=sarif \
+            --report-path=results.sarif \
+            --log-level=debug
+
+      - name: Preserve redacted scan report
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: gitleaks-results-${{ github.run_id }}-${{ github.job }}
+          path: results.sarif
+          if-no-files-found: error
+          retention-days: 30
