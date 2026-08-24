@@ -20,18 +20,18 @@
   },
   "outputTree": {
     "schemaVersion": 1,
-    "sha256": "ed07947f952f38c6b5b13d5cbd51af04ac0cac7623b74944bf5fddfb138dcca8",
+    "sha256": "c524be89f5ff87934b6e2a23375b46328ebbe4fe0d209da73d0ee3d2c7271dc2",
     "fileCount": 7651,
     "totalBytes": 504288112
   },
-  "sourceCommit": "9ca0e0d9df48134969a7f2e2aac85975d943d298",
+  "sourceCommit": "f465f2150bfa26f853f22f3ca45677e48aeec536",
   "sourceWorktreeClean": true,
   "sourceSnapshot": {
     "schemaVersion": 2,
     "sha256": "f63cbe863519656001b1d7bc4b10158131a1d8dba8375d856afda9cd6ff28c7b",
     "fileCount": 473
   },
-  "buildManifestSha256": "31a7d1e76b74722055dc69386ea9706f412f429ec3ac522e8f0dfcfe0839c621",
+  "buildManifestSha256": "beead465a014f99fcc482d589383e55b215474b891b1c2945b28b2ebe755f594",
   "browserVersion": "151.0.4129.101",
   "blockedExternalOrigins": [],
   "artifacts": [
@@ -42,7 +42,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/1280x800/guided-repeat.png",
       "width": 1280,
       "height": 800,
-      "sha256": "92f715bb172bc81849d5f5536364330f71f6226ed8044ca12622015f350683d4",
+      "sha256": "59dadc17abeefaac6079d2a13d7f16bc5a707f51365d36cbae931e5564e63d24",
       "geometry": {
         "banner": {
           "left": 470.96875,
@@ -55,9 +55,9 @@
         "bannerOccludedPoints": 0,
         "heading": {
           "left": 297,
-          "top": 279.875,
+          "top": 202.625,
           "right": 362.984375,
-          "bottom": 315.875,
+          "bottom": 238.625,
           "width": 65.984375,
           "height": 36
         },
@@ -150,7 +150,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/1280x800/diagnosis-example.png",
       "width": 1280,
       "height": 800,
-      "sha256": "9a597fca2d5b6bdc52af0cf09b04bfd431fd286df3d2b6b856460315302c825c",
+      "sha256": "69e4af526aef3ed00dda774f45c82376fa52fe819004262c7f3664edd180b603",
       "geometry": {
         "banner": {
           "left": 601.75,
@@ -204,7 +204,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/1280x800/settings.png",
       "width": 1280,
       "height": 800,
-      "sha256": "7f0fde632ca80dd9149fccfc6f786bca1692f85314bf2214db626e76e7c05c3a",
+      "sha256": "f4517bd4a68a8bbde44c992478ce64120a7746cc1357a3bb002333b3124fed3b",
       "geometry": {
         "banner": {
           "left": 600.96875,
@@ -366,7 +366,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/390x844/guided-repeat.png",
       "width": 390,
       "height": 844,
-      "sha256": "e5be8291828cf4319298f73552ccf43ef81bddeb4b1dda2708dc830f51ee63ff",
+      "sha256": "02092f21d6a9da7e28f2445765746c49cd6441789c94e367b319ae6e01512121",
       "geometry": {
         "banner": {
           "left": 25.96875,
@@ -379,9 +379,9 @@
         "bannerOccludedPoints": 0,
         "heading": {
           "left": 29,
-          "top": 389.5,
+          "top": 312.25,
           "right": 94.984375,
-          "bottom": 425.5,
+          "bottom": 348.25,
           "width": 65.984375,
           "height": 36
         },
@@ -496,7 +496,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/390x844/diagnosis-example.png",
       "width": 390,
       "height": 844,
-      "sha256": "5647668cb9f296167c050518b533acc4f4862eb74e21c9559480f169db721e01",
+      "sha256": "4d1b331c21ce42586cd19778c57f32fd8f1b65f25dba2350b5c84108a46807a8",
       "geometry": {
         "banner": {
           "left": 26.75,
@@ -842,7 +842,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/browser/360x800/diagnosis-example.png",
       "width": 360,
       "height": 800,
-      "sha256": "d77cbe90d87a685c507287089aaf488de2bcc28cce43105d9dd7dc4bd13abff2",
+      "sha256": "2d4fa9bc0e0c900fc0c81a5c5b24b297420096649fc75905e264995cc0168497",
       "geometry": {
         "banner": {
           "left": 24,
