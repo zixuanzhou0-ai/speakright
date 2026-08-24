@@ -34,7 +34,7 @@ function fixture(edition, draft) {
       state: "uploaded",
       size: localEntries.get(name).length,
       digest: `sha256:${sha256(localEntries.get(name))}`,
-      browser_download_url: `https://github.com/zixuanzhou0-ai/speakright/releases/download/${tag}/${encodeURIComponent(name)}`,
+      browser_download_url: `https://github.com/zixuanzhou0-ai/speakright/releases/download/${draft ? `untagged-${edition}-fixture` : tag}/${encodeURIComponent(name)}`,
     })),
   };
   return {
@@ -109,6 +109,69 @@ assert.throws(
       releaseId: browser.releaseId + 1,
     }),
   /ID mismatch/u,
+);
+
+const draftWithPublishedUrl = structuredClone(browser.release);
+draftWithPublishedUrl.assets[0].browser_download_url = `https://github.com/zixuanzhou0-ai/speakright/releases/download/${browser.tag}/${encodeURIComponent(draftWithPublishedUrl.assets[0].name)}`;
+assert.throws(
+  () =>
+    validateGithubReleaseMetadata({
+      ...browser,
+      release: draftWithPublishedUrl,
+    }),
+  /Draft Release asset download URL mismatch/u,
+);
+
+function assertDraftUrlRejected(url) {
+  const release = structuredClone(browser.release);
+  release.assets[0].browser_download_url = url.replace(
+    "<asset>",
+    encodeURIComponent(release.assets[0].name),
+  );
+  assert.throws(
+    () => validateGithubReleaseMetadata({ ...browser, release }),
+    /Draft Release asset download URL mismatch/u,
+  );
+}
+
+const draftUrlBase =
+  "https://github.com/zixuanzhou0-ai/speakright/releases/download";
+for (const invalidDraftUrl of [
+  `${draftUrlBase}/untagged-x/extra/<asset>`,
+  `${draftUrlBase}/untagged-x%2Fextra/<asset>`,
+  `${draftUrlBase}/untagged-x%5Cextra/<asset>`,
+  `${draftUrlBase}/untagged-/<asset>`,
+  `${draftUrlBase}/untagged-x/../v1.1.0/<asset>`,
+  `${draftUrlBase}/untagged-x/<asset>?download=1`,
+  `${draftUrlBase}/untagged-x/<asset>#fragment`,
+  `${draftUrlBase}/untagged-x/wrong-asset.txt`,
+  "https://github.com/zixuanzhou0-ai/wrong-repository/releases/download/untagged-x/<asset>",
+  "https://example.com/zixuanzhou0-ai/speakright/releases/download/untagged-x/<asset>",
+]) {
+  assertDraftUrlRejected(invalidDraftUrl);
+}
+
+const mixedDraftSlugs = structuredClone(browser.release);
+mixedDraftSlugs.assets[1].browser_download_url = `${draftUrlBase}/untagged-other-fixture/${encodeURIComponent(mixedDraftSlugs.assets[1].name)}`;
+assert.throws(
+  () =>
+    validateGithubReleaseMetadata({
+      ...browser,
+      release: mixedDraftSlugs,
+    }),
+  /Draft Release asset download URL mismatch/u,
+);
+
+const publishedBrowser = fixture("browser", false);
+const publishedWithDraftUrl = structuredClone(publishedBrowser.release);
+publishedWithDraftUrl.assets[0].browser_download_url = `https://github.com/zixuanzhou0-ai/speakright/releases/download/untagged-browser-fixture/${encodeURIComponent(publishedWithDraftUrl.assets[0].name)}`;
+assert.throws(
+  () =>
+    validateGithubReleaseMetadata({
+      ...publishedBrowser,
+      release: publishedWithDraftUrl,
+    }),
+  /published Release asset download URL mismatch/u,
 );
 
 const browserReleaseWorkflow = readFileSync(
