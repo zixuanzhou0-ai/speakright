@@ -106,6 +106,9 @@ export function validateGithubReleaseMetadata({
     );
   }
 
+  const repositoryUri = new URL(repositoryUrl);
+  const draftPathPrefix = `${repositoryUri.pathname}/releases/download/`;
+  let draftDownloadSlug;
   for (const asset of assets) {
     if (!Number.isSafeInteger(asset.id) || asset.id <= 0) {
       throw new Error(`GitHub Release asset ${asset.name} has no valid ID.`);
@@ -126,11 +129,49 @@ export function validateGithubReleaseMetadata({
     if (asset.digest !== expectedDigest) {
       throw new Error(`GitHub Release asset digest mismatch: ${asset.name}.`);
     }
-    const expectedDownloadUrl = `${repositoryUrl}/releases/download/${encodeURIComponent(tag)}/${encodeURIComponent(asset.name)}`;
-    if (asset.browser_download_url !== expectedDownloadUrl) {
-      throw new Error(
-        `GitHub Release asset download URL mismatch: ${asset.name}.`,
-      );
+    const encodedName = encodeURIComponent(asset.name);
+    if (draft) {
+      let downloadUri;
+      try {
+        downloadUri = new URL(asset.browser_download_url);
+      } catch {
+        throw new Error(
+          `GitHub Draft Release asset download URL mismatch: ${asset.name}. Received ${asset.browser_download_url}.`,
+        );
+      }
+      const draftSuffix = `/${encodedName}`;
+      const pathMatches =
+        downloadUri.pathname.startsWith(draftPathPrefix) &&
+        downloadUri.pathname.endsWith(draftSuffix);
+      const slug = pathMatches
+        ? downloadUri.pathname.slice(
+            draftPathPrefix.length,
+            -draftSuffix.length,
+          )
+        : "";
+      const canonicalUrl = `${repositoryUrl}/releases/download/${slug}/${encodedName}`;
+      if (
+        downloadUri.origin !== repositoryUri.origin ||
+        downloadUri.username !== "" ||
+        downloadUri.password !== "" ||
+        downloadUri.search !== "" ||
+        downloadUri.hash !== "" ||
+        !/^untagged-[A-Za-z0-9](?:[A-Za-z0-9._~-]*[A-Za-z0-9])?$/u.test(slug) ||
+        asset.browser_download_url !== canonicalUrl ||
+        (draftDownloadSlug !== undefined && draftDownloadSlug !== slug)
+      ) {
+        throw new Error(
+          `GitHub Draft Release asset download URL mismatch: ${asset.name}. Received ${asset.browser_download_url}.`,
+        );
+      }
+      draftDownloadSlug = slug;
+    } else {
+      const expectedDownloadUrl = `${repositoryUrl}/releases/download/${encodeURIComponent(tag)}/${encodedName}`;
+      if (asset.browser_download_url !== expectedDownloadUrl) {
+        throw new Error(
+          `GitHub published Release asset download URL mismatch: ${asset.name}. Received ${asset.browser_download_url}.`,
+        );
+      }
     }
   }
 
