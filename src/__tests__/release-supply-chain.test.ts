@@ -283,8 +283,19 @@ describe("v1.1.0 release and supply-chain contracts", () => {
       expect(publishJob).toContain(
         "BUILT_COMMIT_SHA: $" + "{{ needs.build.outputs.commit_sha }}",
       );
-      expect(publishJob).toContain(
-        'git fetch --force --no-tags origin "+refs/tags/$env:RELEASE_TAG:refs/tags/$env:RELEASE_TAG"',
+      expect(
+        publishJob.match(/\$tagRef = "refs\/tags\/\$\(\$env:RELEASE_TAG\)"/g) ??
+          [],
+      ).toHaveLength(2);
+      expect(
+        publishJob.match(/\$tagRefSpec = "\+\{0\}:\{0\}" -f \$tagRef/g) ?? [],
+      ).toHaveLength(2);
+      expect(
+        publishJob.match(/git fetch --force --no-tags origin \$tagRefSpec/g) ??
+          [],
+      ).toHaveLength(2);
+      expect(publishJob).not.toContain(
+        "refs/tags/$env:RELEASE_TAG:refs/tags/$env:RELEASE_TAG",
       );
       expect(publishJob).toContain(
         'git rev-parse --verify "$' + '{tagRef}^{commit}"',
