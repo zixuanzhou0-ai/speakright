@@ -40,6 +40,9 @@ These are observations, not completed v1.1.0 claims.
       GitHub Actions update entries.
 - [ ] Confirm the repository homepage, description, and public release links
       describe Browser Stable and unsigned Desktop Preview accurately.
+- [ ] Confirm the stable tag triggers only the Browser workflow and the
+      Desktop Preview tag triggers only the Desktop workflow, with no
+      cross-edition release run.
 - [ ] Open the README, release assets, SBOMs, checksums, validation reports,
       screenshots, demo, and OSS-readiness page in a signed-out browser.
 
