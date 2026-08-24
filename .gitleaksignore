@@ -1,0 +1,11 @@
+# These are exact historical fingerprints, not path/rule wildcards.
+# Each entry is constrained and revalidated by scripts/gitleaks-history-policy.contract.mjs.
+# Four findings are the test-only sentinel revalidated by the policy contract.
+94bd84fa264009eb97c8d914b47dea663dcd7538:apps/browser/src/__tests__/api-client-audio.test.ts:generic-api-key:68
+94bd84fa264009eb97c8d914b47dea663dcd7538:apps/browser/src/__tests__/api-client-audio.test.ts:generic-api-key:80
+8f7c240005cbdf0810edd7360705c8fe7964d8df:src/__tests__/api-client-audio.test.ts:generic-api-key:68
+8f7c240005cbdf0810edd7360705c8fe7964d8df:src/__tests__/api-client-audio.test.ts:generic-api-key:80
+# Three findings are documentation-only `YOUR_*_KEY` cURL placeholders.
+d2db217d8b14f595416aff8d96ee691d2afd7aa5:docs/operations/api-docs.md:curl-auth-header:230
+d2db217d8b14f595416aff8d96ee691d2afd7aa5:docs/operations/api-docs.md:curl-auth-header:328
+d2db217d8b14f595416aff8d96ee691d2afd7aa5:docs/operations/api-docs.md:curl-auth-header:519
