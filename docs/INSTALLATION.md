@@ -1,10 +1,24 @@
 # Installation Guide
 
+## v1.1.0 Download Routes
+
+Both public pages and their release assets were anonymously verified on
+2026-08-24:
+
+- [Browser Stable `v1.1.0`](https://github.com/zixuanzhou0-ai/speakright/releases/tag/v1.1.0)
+- [Unsigned Windows Desktop Preview `v1.1.0-desktop-preview.1`](https://github.com/zixuanzhou0-ai/speakright/releases/tag/v1.1.0-desktop-preview.1)
+
+[`V1.1.0_RELEASE_VERIFICATION.md`](validation/V1.1.0_RELEASE_VERIFICATION.md)
+records the exact Release object, tag commit, workflow run, expected assets,
+checksums, and signed-out download results. The Browser ZIP is the shortest
+cross-platform evaluation path; extract it and serve its contents from
+localhost or HTTPS. The Desktop page is an unsigned community pre-release.
+
 ## Unsigned Community Preview Boundary
 
 SpeakRight may publish a Windows package only as an explicitly labelled
 **unsigned community preview**. It is not the signed Desktop Stable channel.
-Use only the filename named by the current GitHub pre-release, verify its
+Use only the filename named by the verified GitHub pre-release, verify its
 published SHA-256 checksum, and read the release-specific validation report.
 
 An installer is valid only when its release notes name it and its checksum,
@@ -16,7 +30,7 @@ wait for a future signed Desktop Stable release if an unsigned executable is
 not acceptable. Published assets can lag behind `main`, so treat the release
 tag and release notes—not the working branch—as the artifact source of truth.
 
-The planned v1.1.0 preview asset set contains one installer: the versioned NSIS
+The v1.1.0 preview contract contains one installer: the versioned NSIS
 setup that passed the automated install/start/exit/uninstall round-trip. It also
 contains the bare Release EXE for transparent inspection and portable
 evaluation. Exact checksums are populated by the release. Expected binary names
@@ -38,7 +52,9 @@ it as an official v1.1.0 preview installer.
 
 ## Install on Windows
 
-1. Once published, run the `SpeakRight_1.1.0_x64-setup.exe` NSIS installer.
+1. Download
+   `SpeakRight_1.1.0_x64-setup.exe` and `SHA256SUMS.txt` from the same Desktop
+   Preview page, verify the complete SHA-256 digest, then run the NSIS installer.
 2. If Windows SmartScreen appears, stop and confirm this is the expected
    unsigned community-preview build from the project GitHub pre-release before choosing any
    bypass option on a personal/test machine where policy permits it. Do not
@@ -174,7 +190,8 @@ coverage.
 ## v1.1.0 Desktop Preview status
 
 `v1.1.0-desktop-preview.1` is an unsigned community-preview track, not Desktop
-Stable. The release workflow may publish only:
+Stable. It is publicly available and anonymously verified. Its public binary
+scope contains only:
 
 - the bare Release EXE after the production-fixture guard and desktop smoke
 - the NSIS setup whose installed EXE matches that Release EXE by byte count and
@@ -186,14 +203,15 @@ The locally generated MSI is still checked for metadata consistency, but it is
 not part of the v1.1.0 public report, checksum set, workflow artifact, or GitHub
 Pre-release. Do not imply that MSI completed the NSIS round trip.
 
-The final v1.1.0 result belongs in the current release-candidate validation
-record, not in the archived June audit. Files under
+The pre-publication result belongs in the immutable release-candidate record;
+the live Release result belongs in the separate release-verification record.
+Neither should be replaced by the archived June audit. Files under
 `docs/archive/2026-06-desktop-release/` remain historical evidence only and
 must not be quoted as current test totals.
 
-Before publishing the preview, all source, dependency, asset-rights, desktop
-build, Release EXE smoke, NSIS round-trip, report, and preview-gate checks must
-pass from the same clean commit. The round-trip script refuses to mutate a
+The publication workflow required and passed the source, dependency,
+asset-rights, desktop build, Release EXE smoke, NSIS round-trip, report, and
+preview-gate checks from the same clean commit. The round-trip script refuses to mutate a
 machine that already has SpeakRight registration, shortcuts, startup entries,
 default install directories, or a running `speakright.exe`; it does not stop a
 user process for you. Test credentials, WebView data, logs, and settings are

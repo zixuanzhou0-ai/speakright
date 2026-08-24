@@ -7,10 +7,14 @@
 
 SpeakRight is an open-source pronunciation practice project for Chinese-speaking learners. It now has two deliberately separated editions so users can choose the right runtime without guessing which folder matters.
 
-> **Current target: SpeakRight v1.1.0 release candidate.** It is still under
-> final validation and has not been published as `v1.1.0` or
-> `v1.1.0-desktop-preview.1`. The learner-facing product remains Chinese-first;
-> this English README is the public project and contributor entry.
+> **Current public release: SpeakRight v1.1.0.** The
+> [`v1.1.0` Browser Stable](https://github.com/zixuanzhou0-ai/speakright/releases/tag/v1.1.0)
+> and [`v1.1.0-desktop-preview.1` unsigned Desktop Preview](https://github.com/zixuanzhou0-ai/speakright/releases/tag/v1.1.0-desktop-preview.1)
+> were published and anonymously verified on 2026-08-24 from commit
+> `61c506af5c1f0b9b8397c74f69470c0da1e9f382`. See the
+> [release-verification record](docs/validation/V1.1.0_RELEASE_VERIFICATION.md).
+> The learner-facing product remains Chinese-first; this English README is the
+> public project and contributor entry.
 
 [Watch the 90-second overview (74 seconds, silent, with burned-in English captions)](docs/assets/demo/speakright-v1.1.0-overview.mp4)
 · [English WebVTT captions](docs/assets/demo/speakright-v1.1.0-overview.en.vtt)
@@ -18,8 +22,8 @@ SpeakRight is an open-source pronunciation practice project for Chinese-speaking
 
 | Edition | Folder | Best for | Status |
 | --- | --- | --- | --- |
-| Windows Desktop | repository root | Windows users who want the installed Tauri app and Release EXE workflow. | `v1.1.0-desktop-preview.1` candidate; unsigned, not yet published, SmartScreen warning required. |
-| Browser Edition | `apps/browser` | Windows, macOS, and Linux users who want to run SpeakRight in Chrome/Edge from a local server or static export. | `v1.1.0` Stable candidate; not yet published, BYOK, no hosted SaaS account. |
+| Windows Desktop | repository root | Windows users who want the installed Tauri app and Release EXE workflow. | Public `v1.1.0-desktop-preview.1`; unsigned community preview, SmartScreen warning required; not Desktop Stable. |
+| Browser Edition | `apps/browser` | Windows, macOS, and Linux users who want to run SpeakRight in Chrome/Edge from a local server or static export. | Public `v1.1.0` Browser Stable; BYOK, no hosted SaaS account. |
 
 The Browser Edition is not a SaaS product. Users run it locally from source or a static export, then configure their own provider keys in the app. The Windows Desktop edition remains the packaged Tauri release track.
 
@@ -86,7 +90,7 @@ The Windows installer/Release EXE route is documented separately in the desktop 
 
 Browser docs start at [`docs/browser-edition/README.md`](docs/browser-edition/README.md). The cross-platform user entry is [`docs/WEB.md`](docs/WEB.md).
 
-## Browser v1.1.0 Candidate Screenshots
+## Browser v1.1.0 Release-Evidence Screenshots
 
 These screenshots come from the isolated v1.1.0 evidence build. Scored views
 are labelled **Example data — not a live Azure score**; real user scores come from Azure after the learner explicitly starts an assessment with their own
@@ -127,7 +131,7 @@ SpeakRight Desktop is a Tauri + Next.js pronunciation-training app for Chinese l
 
 American English (`en-US`) is the stable baseline. Spanish (`es-ES`), French (`fr-FR`), and Russian (`ru-RU`) are experimental modules: they expose sound-unit practice and free practice, while formal diagnosis, advanced drills, progress archives, and mastery/evidence views remain English-only until each language has its own release evidence gates.
 
-### Desktop v1.1.0 Candidate Screenshots
+### Desktop v1.1.0 Release-Evidence Screenshots
 
 Screenshots below are captured from the isolated packaged Desktop evidence EXE,
 not a browser localhost session. Scored views are labelled **Example data — not
@@ -157,7 +161,13 @@ window; see the
 
 ### Desktop Distribution Status
 
-There is not yet a published `v1.1.0-desktop-preview.1` download in this repository snapshot. The release candidate is intentionally unsigned. Its native acceptance chain has passed locally; GitHub publication remains an owner-controlled step. The bare Release EXE and the NSIS setup may be published only as a GitHub pre-release with checksums, an SBOM, an NSIS install/start/exit/uninstall report, and an explicit SmartScreen warning. MSI is not published in this preview.
+The verified download route is the public
+[`v1.1.0-desktop-preview.1` GitHub pre-release](https://github.com/zixuanzhou0-ai/speakright/releases/tag/v1.1.0-desktop-preview.1),
+published from the exact v1.1.0 release commit. The preview is intentionally
+unsigned. Its 16 public assets and checksums were anonymously verified; the
+public binary scope is limited to the bare Release EXE and NSIS setup, and MSI
+is excluded. See the
+[release-verification record](docs/validation/V1.1.0_RELEASE_VERIFICATION.md).
 
 Users should verify the published checksum and release provenance before evaluating the preview. Do not bypass SmartScreen, antivirus, or enterprise policy on a managed device only to try an unsigned artifact; build from source or wait for a future signed Desktop Stable release instead.
 
@@ -208,7 +218,9 @@ The LLM layer is downstream only. It explains structured evidence and suggests o
 
 ## Install And Run
 
-For Windows installer use, source builds, and first-launch expectations, see `docs/INSTALLATION.md`.
+For Browser release files, Windows installer use, source builds, checksum
+verification, and first-launch expectations, see [`INSTALLATION.md`](INSTALLATION.md)
+and [`docs/INSTALLATION.md`](docs/INSTALLATION.md).
 
 Source build:
 
@@ -235,8 +247,10 @@ cd /d <repository-root>
 npm run desktop:dev
 ```
 
-For the current release state and application-readiness boundary, see
-[`docs/validation/V1.1.0_RELEASE_CANDIDATE.md`](docs/validation/V1.1.0_RELEASE_CANDIDATE.md)
+For the immutable pre-publication candidate record, completed public-release
+verification record, and application-readiness boundary, see
+[`docs/validation/V1.1.0_RELEASE_CANDIDATE.md`](docs/validation/V1.1.0_RELEASE_CANDIDATE.md),
+[`docs/validation/V1.1.0_RELEASE_VERIFICATION.md`](docs/validation/V1.1.0_RELEASE_VERIFICATION.md),
 and
 [`docs/oss/CODEX_FOR_OPEN_SOURCE_READINESS.md`](docs/oss/CODEX_FOR_OPEN_SOURCE_READINESS.md).
 Historical desktop startup and Release Candidate records are retained under
@@ -284,6 +298,7 @@ npm run phonology:audio-policy:check
 - [`docs/oss/README.md`](docs/oss/README.md) indexes public OSS-readiness evidence, including the Codex for Open Source readiness note.
 - [`docs/validation/README.md`](docs/validation/README.md) separates repository checks, runtime/provider validation, maintainer attestation, and any future consented user study.
 - [`docs/validation/USER_TESTING_SUMMARY.md`](docs/validation/USER_TESTING_SUMMARY.md) records the maintainer's report that 20 people tested SpeakRight offline. It is explicitly not independently audited, requests no participant-level proof, and supports no active-user, task-success, retention, satisfaction, or learning-outcome claim.
+- [`docs/validation/V1.1.0_RELEASE_VERIFICATION.md`](docs/validation/V1.1.0_RELEASE_VERIFICATION.md) records the public Release IDs, tag identity, 20 Browser and 16 Desktop assets, SHA-256 agreement, and anonymous access checks.
 - [`CHANGELOG.md`](CHANGELOG.md), [`ROADMAP.md`](ROADMAP.md), and [`MAINTAINERS.md`](MAINTAINERS.md) document change history, planned work, and public ownership without promising dates or response-time guarantees.
 
 ## Current Limitations

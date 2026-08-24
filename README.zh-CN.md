@@ -4,8 +4,11 @@
 
 SpeakRight 是面向中文学习者的开源多语言发音练习项目。仓库包含两个明确分离的版本：Windows Desktop 使用 Tauri 打包；Browser Edition 在 Windows、macOS 和 Linux 的 Chrome/Edge 中从本地服务或静态导出运行。产品界面继续以简体中文为主，英文 README 只是 GitHub 的主入口，不会把中文 UI 英文化。
 
-> **当前目标版本：SpeakRight v1.1.0 Release Candidate。** 该版本仍在完成
-> 最终验收，尚未发布 `v1.1.0` 或 `v1.1.0-desktop-preview.1`。产品默认语言
+> **当前公开版本：SpeakRight v1.1.0。** [`v1.1.0` Browser Stable](https://github.com/zixuanzhou0-ai/speakright/releases/tag/v1.1.0)
+> 和 [`v1.1.0-desktop-preview.1` 未签名 Desktop Preview](https://github.com/zixuanzhou0-ai/speakright/releases/tag/v1.1.0-desktop-preview.1)
+> 已于 2026-08-24 从提交 `61c506af5c1f0b9b8397c74f69470c0da1e9f382`
+> 公开发布，并通过匿名访问、资产与 SHA-256 核验。详见
+> [发行核验记录](docs/validation/V1.1.0_RELEASE_VERIFICATION.md)。产品默认语言
 > 继续保持中文。
 
 [观看 90 秒内概览（实际 74 秒、无声、画面内含英文字幕）](docs/assets/demo/speakright-v1.1.0-overview.mp4)
@@ -16,8 +19,8 @@ SpeakRight 是面向中文学习者的开源多语言发音练习项目。仓库
 
 | 版本 | 目录 | 适用人群 | 状态 |
 | --- | --- | --- | --- |
-| Windows Desktop | 仓库根目录 | 希望使用 Tauri 桌面应用与 Release EXE 流程的 Windows 用户 | `v1.1.0-desktop-preview.1` 候选；未签名、尚未发布，必须提示 SmartScreen 风险 |
-| Browser Edition | `apps/browser` | 希望在 Windows、macOS 或 Linux 浏览器中本地运行的用户 | `v1.1.0` Stable 候选；尚未发布，BYOK，不是托管 SaaS |
+| Windows Desktop | 仓库根目录 | 希望使用 Tauri 桌面应用与 Release EXE 流程的 Windows 用户 | 已公开 `v1.1.0-desktop-preview.1`；未签名社区预览版，必须提示 SmartScreen 风险；不是 Desktop Stable |
+| Browser Edition | `apps/browser` | 希望在 Windows、macOS 或 Linux 浏览器中本地运行的用户 | 已公开 `v1.1.0` Browser Stable；BYOK，不是托管 SaaS |
 
 英语 `en-US` 是稳定基线。西班牙语 `es-ES`、法语 `fr-FR` 和俄语 `ru-RU` 是实验模块；它们可进行音素/发音单位与自由练习，但不能描述为已具备正式 mastery 证据。
 
@@ -49,7 +52,14 @@ npm ci
 npm run desktop:dev
 ```
 
-Windows 安装、源码构建和 Release EXE 验收边界见 [`docs/INSTALLATION.md`](docs/INSTALLATION.md)。`v1.1.0-desktop-preview.1` 是有意保持未签名的社区预览版：本轮只公开裸 Release EXE 与已通过“安装、启动、退出、卸载”往返验收的 NSIS 安装包；MSI 可保留为本地构建和元数据冒烟输入，但不进入公开 Release。本地原生验收链已经通过，GitHub 发布仍须由仓库所有者明确执行。只有在校验和、SBOM、验收报告和 SmartScreen 风险提示齐全时才可作为 GitHub Pre-release 发布，且不得称为 Desktop Stable。不应为了安装而绕过 SmartScreen、杀毒软件或企业安全策略。
+Browser 下载、Windows 安装、源码构建、校验和与 Release EXE 验收边界见
+[`INSTALLATION.md`](INSTALLATION.md) 和 [`docs/INSTALLATION.md`](docs/INSTALLATION.md)。
+`v1.1.0-desktop-preview.1` 是有意保持未签名的社区预览版：公开二进制范围
+仅限裸 Release EXE 与通过“安装、启动、退出、卸载”往返验收的 NSIS
+安装包；MSI 只作为本地构建和元数据冒烟输入，没有进入公开 Release。发行
+核验已确认 16 个 Desktop 资产、校验和、SBOM、验收报告和匿名下载；该版本
+仍不得称为 Desktop Stable。
+不应为了安装而绕过 SmartScreen、杀毒软件或企业安全策略。
 
 ## 仓库结构
 
@@ -83,7 +93,7 @@ Windows 安装、源码构建和 Release EXE 验收边界见 [`docs/INSTALLATION
 
 实验语言的规则、韵律和复合发音单位属于教学与练习证据，不等于正式 mastery 或学习成效结论。
 
-## v1.1.0 候选版截图
+## v1.1.0 发行证据截图
 
 以下画面来自隔离的 v1.1.0 证据构建。含分数的画面都会明确显示
 **Example data — not a live Azure score**；real user scores come from Azure，
@@ -151,6 +161,9 @@ npm run desktop:ui-smoke
 - 维护者与决策边界：[`MAINTAINERS.md`](MAINTAINERS.md)
 - 路线图与非承诺事项：[`ROADMAP.md`](ROADMAP.md)
 - 公开 OSS/Codex readiness 证据：[`docs/oss/README.md`](docs/oss/README.md)
+- v1.1.0 预发布候选证据与发布后核验：
+  [`docs/validation/V1.1.0_RELEASE_CANDIDATE.md`](docs/validation/V1.1.0_RELEASE_CANDIDATE.md)
+  与 [`docs/validation/V1.1.0_RELEASE_VERIFICATION.md`](docs/validation/V1.1.0_RELEASE_VERIFICATION.md)
 
 不要把 API Key、Token、私人录音、学习数据导出、完整诊断包或含个人路径的日志发到公开 Issue/PR。外部服务如何保留和处理请求数据，以用户所选服务商的条款为准。
 
