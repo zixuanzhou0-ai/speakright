@@ -1,18 +1,12 @@
 import { execFile, spawn } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
-import {
-  mkdir,
-  mkdtemp,
-  readFile,
-  rm,
-  stat,
-  writeFile,
-} from "node:fs/promises";
+import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import net from "node:net";
 import os from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
+import { observeDesktopReadinessLog } from "./desktop-readiness-probe.mjs";
 import {
   findConflictingSpeakRightProcesses,
   formatSpeakRightProcessConflicts,
@@ -193,19 +187,19 @@ async function captureRuntimeLogEvidence(smokeStartedAt, smokeProfileRoot) {
   let lastError = null;
   while (Date.now() < deadline) {
     try {
-      const [logStats, contents] = await Promise.all([
-        stat(logPath),
-        readFile(logPath, "utf8"),
-      ]);
+      const observation = await observeDesktopReadinessLog(
+        logPath,
+        expectedRuntimeLogLine,
+      );
       if (
-        logStats.mtimeMs >= smokeStartedAt - 1_000 &&
-        contents.includes(expectedRuntimeLogLine)
+        observation.logModifiedAtMs !== null &&
+        observation.logModifiedAtMs >= smokeStartedAt - 1_000 &&
+        observation.markerPresent
       ) {
-        const lastLine = contents.trim().split(/\r?\n/).at(-1) ?? "";
         return {
           path: logPath,
-          bytes: logStats.size,
-          lastLine,
+          bytes: observation.logBytes,
+          lastLine: observation.logLastLine,
         };
       }
       lastError = new Error(

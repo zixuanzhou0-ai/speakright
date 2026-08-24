@@ -1,4 +1,11 @@
-import { readFileSync } from "node:fs";
+import {
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  symlinkSync,
+  writeFileSync,
+} from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { InstallerRoundtripError } from "./desktop-installer-roundtrip-core.mjs";
@@ -6,6 +13,7 @@ import {
   assertRetainedDesktopReadiness,
   isDesktopReadinessComplete,
   isPendingWebViewStartupError,
+  observeDesktopReadinessLog,
   retainDesktopReadiness,
   waitForDesktopReadiness,
 } from "./desktop-readiness-probe.mjs";
@@ -171,6 +179,50 @@ describe("desktop readiness probe", () => {
     ).toThrowError(/did not return its complete passing result/);
   });
 
+  it("reads the runtime marker through one identity-checked file handle", async () => {
+    const directory = mkdtempSync(join(tmpdir(), "speakright-readiness-log-"));
+    const logPath = join(directory, "speakright.log");
+    try {
+      const contents = "SpeakRight desktop runtime initialized\n";
+      writeFileSync(logPath, contents, "utf8");
+      await expect(
+        observeDesktopReadinessLog(
+          logPath,
+          "SpeakRight desktop runtime initialized",
+        ),
+      ).resolves.toEqual({
+        logKind: "file",
+        logBytes: Buffer.byteLength(contents),
+        logLastLine: "SpeakRight desktop runtime initialized",
+        logModifiedAtMs: expect.any(Number),
+        logReadable: true,
+        markerPresent: true,
+      });
+      await expect(
+        observeDesktopReadinessLog(
+          join(directory, "missing.log"),
+          "SpeakRight desktop runtime initialized",
+        ),
+      ).resolves.toMatchObject({ logKind: "missing" });
+      await expect(
+        observeDesktopReadinessLog(
+          directory,
+          "SpeakRight desktop runtime initialized",
+        ),
+      ).rejects.toMatchObject({ code: "unsafe-log-target" });
+      const symlinkPath = join(directory, "linked.log");
+      symlinkSync(logPath, symlinkPath, "file");
+      await expect(
+        observeDesktopReadinessLog(
+          symlinkPath,
+          "SpeakRight desktop runtime initialized",
+        ),
+      ).rejects.toMatchObject({ code: "unsafe-log-target" });
+    } finally {
+      rmSync(directory, { force: true, recursive: true });
+    }
+  });
+
   it("classifies a missing setup marker at the shared deadline", async () => {
     let elapsedMs = 0;
     const probe = waitForDesktopReadiness({
@@ -258,8 +310,16 @@ describe("desktop readiness probe", () => {
     expect(deadlineAssignment).toBeGreaterThan(spawnHandler);
     expect(spawnResolution).toBeGreaterThan(deadlineAssignment);
     expect(source).toContain("deadlineMs: record.readinessDeadline");
-    expect(source).toContain('readFile(logPath, { encoding: "utf8", signal })');
+    expect(source).toContain("observeDesktopReadinessLog(");
+    expect(source).not.toContain("readFile(logPath");
     expect(source).toContain("getProcessTree(signal)");
+    const smokeSource = readFileSync(
+      join(process.cwd(), "scripts", "desktop-smoke.mjs"),
+      "utf8",
+    );
+    expect(smokeSource).toContain("observeDesktopReadinessLog(");
+    expect(smokeSource).not.toContain("stat(logPath)");
+    expect(smokeSource).not.toContain("readFile(logPath");
     const retainResult = source.indexOf(
       "retainDesktopReadiness(record, observation)",
     );

@@ -32,6 +32,7 @@ import {
   assertRetainedDesktopReadiness,
   DESKTOP_READINESS_TIMEOUT_MS,
   isPendingWebViewStartupError,
+  observeDesktopReadinessLog,
   retainDesktopReadiness,
   waitForDesktopReadiness,
 } from "./desktop-readiness-probe.mjs";
@@ -685,25 +686,12 @@ function createWindowsAdapter() {
           const initialProcess = await inspectTrackedProcess(signal);
           if (initialProcess.exited) return initialProcess.exited;
 
-          const logKind = await observePathKind(logPath);
-          let logBytes = null;
-          let logReadable = false;
-          let markerPresent = false;
-          if (logKind === "file") {
-            try {
-              const [logInfo, logContent] = await Promise.all([
-                stat(logPath),
-                readFile(logPath, { encoding: "utf8", signal }),
-              ]);
-              logBytes = logInfo.size;
-              logReadable = true;
-              markerPresent = logContent.includes(
-                "SpeakRight desktop runtime initialized",
-              );
-            } catch (error) {
-              if (!transientReadErrorCodes.has(error?.code)) throw error;
-            }
-          }
+          const { logKind, logBytes, logReadable, markerPresent } =
+            await observeDesktopReadinessLog(
+              logPath,
+              "SpeakRight desktop runtime initialized",
+              signal,
+            );
 
           const webViewDirKind = await observePathKind(webViewDataDir);
           let profilePopulated = false;

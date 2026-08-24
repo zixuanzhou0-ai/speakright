@@ -1,3 +1,4 @@
+import { lstat, open } from "node:fs/promises";
 import { InstallerRoundtripError } from "./desktop-installer-roundtrip-core.mjs";
 
 export const DESKTOP_READINESS_TIMEOUT_MS = 120_000;
@@ -14,9 +15,105 @@ const SAFE_PATH_KINDS = new Set([
   "symlink",
   "other",
 ]);
+const TRANSIENT_LOG_ERROR_CODES = new Set([
+  "EACCES",
+  "EBUSY",
+  "ENOENT",
+  "EPERM",
+]);
 
 function fail(code, message) {
   throw new InstallerRoundtripError(code, message);
+}
+
+function emptyLogObservation(kind) {
+  return {
+    logKind: kind,
+    logBytes: null,
+    logLastLine: "",
+    logModifiedAtMs: null,
+    logReadable: false,
+    markerPresent: false,
+  };
+}
+
+export async function observeDesktopReadinessLog(filePath, marker, signal) {
+  if (typeof filePath !== "string" || typeof marker !== "string" || !marker) {
+    fail("invalid-readiness-probe", "desktop readiness log probe is invalid");
+  }
+
+  let handle;
+  try {
+    handle = await open(filePath, "r");
+  } catch (error) {
+    if (error?.code === "ENOENT") return emptyLogObservation("missing");
+    if (TRANSIENT_LOG_ERROR_CODES.has(error?.code)) {
+      return emptyLogObservation("unavailable");
+    }
+    if (error?.code === "EISDIR") {
+      fail("unsafe-log-target", "isolated runtime log is not a regular file");
+    }
+    throw error;
+  }
+
+  try {
+    let openedInfo;
+    let pathInfo;
+    try {
+      [openedInfo, pathInfo] = await Promise.all([
+        handle.stat({ bigint: true }),
+        lstat(filePath, { bigint: true }),
+      ]);
+    } catch (error) {
+      if (TRANSIENT_LOG_ERROR_CODES.has(error?.code)) {
+        return emptyLogObservation("unavailable");
+      }
+      throw error;
+    }
+    if (
+      !openedInfo.isFile() ||
+      !pathInfo.isFile() ||
+      pathInfo.isSymbolicLink() ||
+      openedInfo.dev !== pathInfo.dev ||
+      openedInfo.ino !== pathInfo.ino
+    ) {
+      fail(
+        "unsafe-log-target",
+        "isolated runtime log changed identity or is not a regular file",
+      );
+    }
+
+    let contents;
+    try {
+      contents = await handle.readFile({ encoding: "utf8", signal });
+    } catch (error) {
+      if (TRANSIENT_LOG_ERROR_CODES.has(error?.code)) {
+        return emptyLogObservation("unavailable");
+      }
+      throw error;
+    }
+    const logBytes = Number(openedInfo.size);
+    if (!Number.isSafeInteger(logBytes) || logBytes < 0) {
+      fail("unsafe-log-target", "isolated runtime log size is invalid");
+    }
+    const logModifiedAtMs = Number(openedInfo.mtimeMs);
+    if (!Number.isFinite(logModifiedAtMs) || logModifiedAtMs < 0) {
+      fail(
+        "unsafe-log-target",
+        "isolated runtime log modification time is invalid",
+      );
+    }
+    return {
+      logKind: "file",
+      logBytes,
+      logLastLine: contents.trim().split(/\r?\n/).at(-1) ?? "",
+      logModifiedAtMs,
+      logReadable: true,
+      markerPresent: contents.includes(marker),
+    };
+  } finally {
+    await handle.close();
+  }
 }
 
 function readinessStateLabel(observation) {
