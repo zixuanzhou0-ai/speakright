@@ -23,14 +23,14 @@
     "mode": "ephemeral-loopback-cdp",
     "portFile": "WebView2/EBWebView/DevToolsActivePort"
   },
-  "credentialNamespace": "com.speakright.desktop.release-evidence-ff3cb5adf2c0e668",
+  "credentialNamespace": "com.speakright.desktop.release-evidence-0be0632c321608f3",
   "sourceSnapshot": {
     "schemaVersion": 2,
     "sha256": "79ca4d3256a422a57517584cb37d4e2a430bfcbd7e0ab378d8a82165b102f32b",
     "fileCount": 487
   },
   "sourceWorktreeClean": true,
-  "buildManifestSha256": "4cf3d3c73a9c72982bd68e169e0c420160e4c9dc03bf4b5575a57d7fe2540a2d",
+  "buildManifestSha256": "fbb77e832a53bc2e048f93fa0b405d8bdef7cea82b604488ab4a9a8681576480",
   "nativeHttpAttempts": 0,
   "secureStoreSlotsEmpty": true,
   "runtimeIsolation": {
@@ -50,10 +50,10 @@
     "tauriHttpGuardSha256": "912d4cf660188b58989b2422e9dc25ffef4d3bc8c6bae76630e67212392a5e49",
     "rustGuardSha256": "bd85a66a49776c70426ae485a8671f1388fa5649d810495547f344ad5b3fc38b"
   },
-  "sourceCommit": "f465f2150bfa26f853f22f3ca45677e48aeec536",
+  "sourceCommit": "ff77d0e4c1795b4ed49ca36791b395d136d57b6e",
   "executable": {
     "fileName": "speakright.exe",
-    "sha256": "578d8da6a87188cf1a3989be3f362ee17cd20227feba1acf2285fdbb6c8f3211"
+    "sha256": "7632a25d10ad7496b8ba55c1d9d3692e89552f717fffd48bd19d4b1c01a619a0"
   },
   "networkPolicy": {
     "applicationOrigin": "http://tauri.localhost",
@@ -239,12 +239,12 @@
       },
       {
         "origin": "http://tauri.localhost",
-        "pathname": "/_next/static/chunks/2b0kwpkc7675b.js",
+        "pathname": "/_next/static/chunks/2c7qh7qxiuvm0.js",
         "resourceType": "Script"
       },
       {
         "origin": "http://tauri.localhost",
-        "pathname": "/_next/static/chunks/2c7qh7qxiuvm0.js",
+        "pathname": "/_next/static/chunks/2dj616hi98bvd.js",
         "resourceType": "Script"
       },
       {
@@ -535,7 +535,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/desktop/1280x920/guided-repeat.png",
       "width": 1280,
       "height": 920,
-      "sha256": "f17484a5067d88db091a2b5134d4c9abd4d98e0211229009677da04904367abe",
+      "sha256": "2f4857d143bce63f0f4c1e7587aba0c506ad189bc50fffd00563e579261d0aed",
       "geometry": {
         "banner": {
           "left": 471.1625061035156,
@@ -598,7 +598,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/desktop/1280x920/settings.png",
       "width": 1280,
       "height": 920,
-      "sha256": "0bc157542c17141836500c522fb880522370d3f1f74718244084120fa62f4dbc",
+      "sha256": "0625e5615f889f2063d97d88eea00f74d7fcb0861c1a93730533eadbc0303dac",
       "geometry": {
         "banner": {
           "left": 595.9625244140625,
@@ -661,7 +661,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/desktop/1024x800/guided-repeat.png",
       "width": 1024,
       "height": 800,
-      "sha256": "d03ea42e975906bcc10f483ba5add2e6d37c9de2b23e95e1296ea9ae73f1662e",
+      "sha256": "013ed1b1c1aa1f992907a9fd68519e79eeeb075ee1566fd6fb2cac48208bf7d2",
       "geometry": {
         "banner": {
           "left": 343.1625061035156,
@@ -703,7 +703,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/desktop/1024x800/diagnosis-example.png",
       "width": 1024,
       "height": 800,
-      "sha256": "9fe04f51f2c71674e1a0f71626794d3625a5d3aa61b098fc81accf3b36ed682b",
+      "sha256": "fe78ebbb165364c2923cf0533f34d40aa7136fb9d36dfaf88c7f5e321f2ac111",
       "geometry": {
         "banner": {
           "left": 468.75,
@@ -724,7 +724,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/desktop/1024x800/settings.png",
       "width": 1024,
       "height": 800,
-      "sha256": "28710e4f5c30b8660a80cecd5012ff5ee6f5bab829b52f3861aaa05a76de13a0",
+      "sha256": "8e048329435afd260651f8d77ac121953793161f12ba4f5a29b6edde1a96d720",
       "geometry": {
         "banner": {
           "left": 467.9624938964844,
