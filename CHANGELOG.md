@@ -4,9 +4,17 @@ This changelog records user- and contributor-visible changes from the point it w
 
 ## 1.1.0
 
-This entry records the source contents intended for the `v1.1.0` Browser Stable
-and `v1.1.0-desktop-preview.1` unsigned Desktop Preview tags. Publication status
-is authoritative only on the corresponding GitHub Release pages.
+Released: **2026-08-24** from
+`61c506af5c1f0b9b8397c74f69470c0da1e9f382`.
+
+Public release pages:
+
+- [Browser Stable `v1.1.0`](https://github.com/zixuanzhou0-ai/speakright/releases/tag/v1.1.0)
+- [Unsigned Desktop Preview `v1.1.0-desktop-preview.1`](https://github.com/zixuanzhou0-ai/speakright/releases/tag/v1.1.0-desktop-preview.1)
+- [Post-publication verification record](docs/validation/V1.1.0_RELEASE_VERIFICATION.md)
+
+Both Release objects, tag identities, workflow runs, exact asset sets,
+checksums, and signed-out URLs were verified; see the linked record.
 
 ### Practice and feedback
 

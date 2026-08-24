@@ -1,131 +1,132 @@
-# SpeakRight Browser Edition Plan
+# SpeakRight Browser Edition
 
-This folder is the execution guide for turning the old browser prototype into a
-real Browser Edition that matches the current Windows Desktop release without
-mixing platform-specific code.
+The Browser Edition is the cross-platform, browser-runnable SpeakRight app in
+`apps/browser`. It is no longer a migration plan or an `apps/web` prototype.
+It shares pure learning contracts with the Windows Desktop edition while
+keeping browser storage, recording, provider, and release boundaries explicit.
 
-## Goal
+[`v1.1.0` Browser Stable](https://github.com/zixuanzhou0-ai/speakright/releases/tag/v1.1.0)
+is public. Release ID `375494273` was published on 2026-08-24 from commit
+`61c506af5c1f0b9b8397c74f69470c0da1e9f382`. Anonymous verification matched
+all 20 contracted assets, their checksum entries, and the public download URLs;
+the exact observations are recorded in the
+[post-publication record](../validation/V1.1.0_RELEASE_VERIFICATION.md).
 
-Build a browser-runnable, open-source SpeakRight edition for Windows, macOS, and
-Linux users who do not want or cannot run the Windows installer.
+## Product Boundary
 
-The Browser Edition is not a SaaS product. It should be a local/static browser
-app that users can run from source or from exported files served on localhost or
-HTTPS. Users bring their own provider keys. The project must not introduce a
-hosted account system, hosted scoring backend, or hidden cloud storage unless a
-future maintainer explicitly chooses that as a separate product.
+- Runs on Windows, macOS, and Linux in a current Chrome or Edge browser.
+- Runs from a local development server or the static export served on localhost
+  or HTTPS; direct `file://` launch is not supported.
+- Uses a bring-your-own-key model. SpeakRight does not operate a hosted account,
+  scoring backend, recording store, or SaaS user database for this edition.
+- Keeps provider keys in the session by default. Persistent browser storage is
+  used only when the learner explicitly enables it.
+- Sends text, recordings, or prompts only when the learner starts a configured
+  Azure, TTS, dictionary, or LLM action. The data flow is documented in
+  [`PRIVACY.md`](../../PRIVACY.md).
+- Uses Azure Speech as the numeric pronunciation-scoring authority. LLM output
+  remains downstream coaching and cannot replace score evidence.
 
-## Source Of Truth
+## Five-Minute Start
 
-The feature source is the latest settled Windows Desktop app:
+Requirements: Node.js 22 and a current Chrome or Edge browser.
 
-```text
-<repository-root>
+```bat
+cd /d <repository-root>
+npm ci --prefix apps/browser
+npm --prefix apps/browser run dev
 ```
 
-The browser implementation target is this repository, under a clearly separated
-browser app folder:
+Open `http://localhost:3000`.
 
-```text
-<repository-root>\apps\browser
+To build and serve the production-style static export:
+
+```bat
+cd /d <repository-root>
+npm ci
+npm ci --prefix apps/browser
+npm run build:browser
+npm run serve:browser
 ```
 
-The existing old web app can be used as a seed:
+The public `SpeakRight_Browser_1.1.0.zip` contains the production static output.
+Extract it and serve the extracted directory from localhost or HTTPS instead of
+opening `index.html` directly.
 
-```text
-<repository-root>\apps\web
-```
+## Current Scope
 
-Do not treat the old web app as feature-complete. It is a scaffold and asset
-source only. The current feature behavior, UI polish, scoring boundary, release
-evidence, multilingual behavior, and documentation tone come from the latest
-desktop repository.
-
-## Required Final Repository Shape
-
-The finished open-source repository should make platform ownership obvious:
-
-```text
-apps/
-  desktop/            Windows Desktop app. Tauri-only code is allowed here.
-  browser/            Browser Edition app. No Tauri imports are allowed here.
-packages/
-  shared/             Optional pure shared code only: data, types, scoring
-                      helpers, non-platform UI primitives, tests.
-docs/
-  browser-edition/    Browser Edition plan, architecture, validation, release.
-  assets/             Screenshots used by README and release notes.
-```
-
-`apps/web` should not remain as an ambiguous production entry. During migration
-it may exist as a temporary legacy seed, but the final README must explain its
-status or remove it after the Browser Edition is stable.
-
-## Non-Negotiable Boundaries
-
-- Desktop and Browser Edition must live in separate app folders.
-- Browser code must not import from desktop-only Tauri modules.
-- Desktop code must not depend on Browser Edition runtime assumptions.
-- Any shared package must be platform-neutral and must not hide Tauri/browser
-  branching behind vague helpers.
-- Numeric pronunciation scores must come from Azure Speech Pronunciation
-  Assessment, not from LLM-generated guesses.
-- LLM feedback is downstream coaching only. It may explain, summarize, and
-  suggest practice from Azure evidence; it must never overwrite score numbers.
-- Browser Edition must have its own smoke tests and release checklist.
-- GitHub README and release notes must tell users exactly which folder and
-  command belong to each edition.
-
-## Browser Edition Scope
-
-The Browser Edition should sync the current desktop user-facing feature set as
-closely as browser constraints allow.
-
-| Area | Browser Edition target |
+| Area | Browser Edition boundary |
 | --- | --- |
-| Language support | English stable baseline; Spanish, French, Russian experimental sound-unit/free-practice parity with desktop. |
-| Sound practice | Language-specific list, teaching media, local demos, recording, Azure score summary, detailed analysis, Chinese coaching. |
-| Free practice | Text input, standard audio when available, browser recording, Azure scoring, AI coach feedback. |
-| English advanced drills | Word, sentence, contrast, perception/prosody/scenario/spontaneous routes where current desktop supports them. |
-| Assessment | English diagnosis parity first; non-English diagnosis remains experimental/gated exactly like desktop. |
-| Progress | Local browser storage only unless a future backend is explicitly introduced. |
-| Settings | Browser-safe key storage with clear BYOK warnings and no committed credentials. |
-| Media | Bundled/local public assets where legally allowed; missing media must show honest fallback UI. |
+| Language support | American English is the stable baseline. Spanish, French, and Russian sound-unit/free-practice modules are experimental. |
+| Sound practice | Language-specific units, eligible local demos, recording, Azure score summaries, detailed analysis, and Chinese coaching. |
+| Guided repeat | Intensity modes use the full available word set; phase-safe controls and exit summaries do not claim mastery. |
+| Free practice | Text input, standard demonstration audio, browser recording, Azure scoring, AI feedback, replay, and stale-request isolation. |
+| Standard-demo TTS | ElevenLabs can provide word timing. Hermes/xAI and Vertex AI use honest sentence-level playback feedback when no word timeline exists. Local adapters remain machine-configured services. |
+| English advanced routes | Diagnosis, word/sentence/contrast/perception and related drills, progress, and evidence views where the current source exposes them. |
+| Storage | Browser-local settings, progress, caches, and score history; no project-operated cloud sync. |
+| Media | Only registry-approved distributable files enter the Browser mirror. Reference-only Rachel's English videos are not bundled and use an official-source fallback. |
 
-## Current and Historical Documents
+## Desktop Separation
 
-- [Architecture And Separation](ARCHITECTURE_AND_SEPARATION.md): folder rules,
-  allowed imports, platform adapters, storage, provider boundaries.
-- [Implementation Plan](../archive/2026-06-browser-edition/IMPLEMENTATION_PLAN.md): staged migration plan from old
-  web scaffold to current Browser Edition.
-- [Validation And Release](VALIDATION_AND_RELEASE.md): commands, smoke tests,
-  screenshots, GitHub README/release expectations.
-- [Completion Audit](../archive/2026-06-browser-edition/COMPLETION_AUDIT.md): current proof map and remaining
-  blockers for final release.
-- [Release Notes](RELEASE_NOTES.md): Browser Edition release scope,
-  validation status, and known limitations.
-- [Third-Party Notices](THIRD_PARTY_NOTICES.md): API providers, bundled asset
-  boundaries, and reference-source credits.
-- [Next Browser Edition Goals](../archive/2026-06-browser-edition/NEXT_BROWSER_EDITION_GOALS.md):
-  long-running `/goal` prompt for Codex execution.
+Windows Desktop remains at the repository root under `src` and `src-tauri`.
+Browser code must not import Tauri APIs, desktop credential storage, installer
+scripts, or Windows runtime assumptions. Desktop code must not depend on a
+Browser localhost server. Pure shared contracts are checked by the core-parity
+gate rather than hidden behind runtime branching.
 
-## Recommended Execution Order
+The unsigned Desktop Preview has its own tag, workflow, assets, validation
+report, and safety warning. A Browser static smoke result is never a substitute
+for Release EXE or NSIS install/start/exit/uninstall acceptance.
 
-1. Freeze the latest Windows Desktop source state and record the commit SHA.
-2. Create `apps/browser` as a clean Browser Edition app.
-3. Move only browser-safe scaffold/assets from `apps/web`.
-4. Port current desktop features into Browser Edition through explicit browser
-   adapters.
-5. Prove Azure scoring in browser with real pronunciation assessment.
-6. Add browser smoke tests for settings, recording, scoring, multilingual pages,
-   route coverage, and static export.
-7. Update README, docs, screenshots, credits, release notes, and GitHub labels.
-8. Remove or clearly archive ambiguous legacy folders.
+## Validation
 
-## Done Means
+Run from the repository root:
 
-Browser Edition is done only when a new user can clone the repository, choose
-the Browser Edition path from the README, run the documented command, open the
-app in a browser, configure provider keys, record pronunciation, receive a real
-Azure score for the selected language, read Chinese feedback based on that score,
-and understand from GitHub docs how this differs from the Windows Desktop app.
+```bat
+npm run lint:browser
+npm run typecheck:browser
+npm run test:browser
+npm run validate:browser:e2e
+npm run build:browser:production
+npm run assets:sync:browser:check
+npm run browser:smoke:static
+npm run e2e:browser:production-fixture-guard
+npm run docs:check-links
+```
+
+The release-commit main-push Browser E2E run contained 47 tests: 46 passed, one
+intentional production-fixture-guard skip, zero flaky, and zero failed. Its
+unit-test phase also passed 146 files and 788 tests. The Browser release workflow
+[`32696723273`](https://github.com/zixuanzhou0-ai/speakright/actions/runs/32696723273)
+completed successfully, including build job `97340113767` and publish job
+`97343927873`. Public Release identity, assets, checksums, SBOM parsing, and
+anonymous downloads are separately captured in the post-publication record;
+none of these results is treated as learner-outcome evidence.
+
+Automated fixtures do not represent a real Azure learner score, paid-provider
+availability, broad device compatibility, adoption, or learning efficacy.
+Routine release evidence uses deterministic fixtures and makes no paid TTS or
+live scoring call.
+
+## Documentation
+
+- [Architecture and separation](ARCHITECTURE_AND_SEPARATION.md)
+- [Validation and release contract](VALIDATION_AND_RELEASE.md)
+- [v1.1.0 release notes](RELEASE_NOTES.md)
+- [Browser third-party notices](THIRD_PARTY_NOTICES.md)
+- [Cross-platform user guide](../WEB.md)
+- [Immutable v1.1.0 candidate record](../validation/V1.1.0_RELEASE_CANDIDATE.md)
+- [v1.1.0 post-publication verification](../validation/V1.1.0_RELEASE_VERIFICATION.md)
+- [Archived migration documents](../archive/2026-06-browser-edition/)
+
+## Known Limitations
+
+- Microphone access depends on browser, OS, permission, secure-context, and
+  device behavior.
+- External provider availability, account quota, locale behavior, and billing
+  remain outside SpeakRight's control.
+- Spanish, French, and Russian cannot be described as having the same mastery
+  evidence as the English baseline.
+- Missing or reference-only media intentionally shows a bounded fallback; it
+  must not be replaced by an unrelated local clip or an HTML response disguised
+  as media.
