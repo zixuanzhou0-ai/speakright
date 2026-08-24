@@ -157,6 +157,19 @@ for (const [workflowPath, edition] of [
   );
   assert.match(publish, /\$headSha = \(git rev-parse HEAD\)\.Trim\(\)/u);
   assert.match(publish, /\$headSha -cne \$env:BUILT_COMMIT_SHA/u);
+  assert.doesNotMatch(publish, /refs\/tags\/\$env:RELEASE_TAG:/u);
+  assert.ok(
+    (publish.match(/\$tagRef = "refs\/tags\/\$\(\$env:RELEASE_TAG\)"/gu) ?? [])
+      .length >= 2,
+  );
+  assert.ok(
+    (publish.match(/\$tagRefSpec = "\+\{0\}:\{0\}" -f \$tagRef/gu) ?? [])
+      .length >= 2,
+  );
+  assert.ok(
+    (publish.match(/git fetch --force --no-tags origin \$tagRefSpec/gu) ?? [])
+      .length >= 2,
+  );
   assert.match(
     publish,
     /git merge-base --is-ancestor \$tagSha refs\/remotes\/origin\/main/u,

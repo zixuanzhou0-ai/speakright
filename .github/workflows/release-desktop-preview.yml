@@ -288,9 +288,10 @@ jobs:
           }
           git fetch --force --no-tags origin "+refs/heads/main:refs/remotes/origin/main"
           if ($LASTEXITCODE -ne 0) { throw "Could not refresh origin/main." }
-          git fetch --force --no-tags origin "+refs/tags/$env:RELEASE_TAG:refs/tags/$env:RELEASE_TAG"
+          $tagRef = "refs/tags/$($env:RELEASE_TAG)"
+          $tagRefSpec = "+{0}:{0}" -f $tagRef
+          git fetch --force --no-tags origin $tagRefSpec
           if ($LASTEXITCODE -ne 0) { throw "Could not refresh the release tag." }
-          $tagRef = "refs/tags/$env:RELEASE_TAG"
           $tagSha = (git rev-parse --verify "${tagRef}^{commit}").Trim()
           if ($tagSha -cne $env:BUILT_COMMIT_SHA) {
             throw "Release tag does not equal the exact built commit."
@@ -319,9 +320,10 @@ jobs:
           function Assert-RemoteIdentity {
             git fetch --force --no-tags origin "+refs/heads/main:refs/remotes/origin/main"
             if ($LASTEXITCODE -ne 0) { throw "Could not refresh origin/main." }
-            git fetch --force --no-tags origin "+refs/tags/$env:RELEASE_TAG:refs/tags/$env:RELEASE_TAG"
+            $tagRef = "refs/tags/$($env:RELEASE_TAG)"
+            $tagRefSpec = "+{0}:{0}" -f $tagRef
+            git fetch --force --no-tags origin $tagRefSpec
             if ($LASTEXITCODE -ne 0) { throw "Could not refresh the release tag." }
-            $tagRef = "refs/tags/$env:RELEASE_TAG"
             $tagSha = (git rev-parse --verify "${tagRef}^{commit}").Trim()
             if ($tagSha -cne $env:BUILT_COMMIT_SHA) { throw "Release tag moved after validation." }
             git merge-base --is-ancestor $tagSha refs/remotes/origin/main
