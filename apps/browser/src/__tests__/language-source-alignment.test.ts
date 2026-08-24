@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { getAllAssessmentSegmentAudioRegistryEntries } from "@/lib/assessment-segment-audio";
 import { getLanguageAssessmentAudioPolicyRows } from "@/lib/language-assessment-audio-policy";
-import { getLanguagePhonemeBySlug } from "@/lib/language-phonemes";
+import {
+  getLanguagePhonemeBySlug,
+  getLanguagePhonemes,
+} from "@/lib/language-phonemes";
 import {
   getSoundUnitSourceAlignment,
   shouldShowSoundUnitHeaderAudio,
@@ -31,6 +34,13 @@ function adHocEnglishUnit(overrides: Partial<PhonemeData>): PhonemeData {
 }
 
 describe("language source alignment", () => {
+  it("keeps reference-only English teaching videos out of Browser playback", () => {
+    for (const soundUnit of getLanguagePhonemes("en-US")) {
+      expect(soundUnit.video?.status, soundUnit.slug).toBe("planned");
+      expect(soundUnit.video?.localSrc, soundUnit.slug).toBeUndefined();
+    }
+  });
+
   it("keeps English local chart/header audio available", () => {
     expect(shouldShowSoundUnitHeaderAudio("en-US", unit("en-US", "ee"))).toBe(
       true,
@@ -98,9 +108,9 @@ describe("language source alignment", () => {
   it("keeps every exact assessment clip visible as the same sound-unit header audio", () => {
     for (const entry of getAllAssessmentSegmentAudioRegistryEntries()) {
       const soundUnit = unit(entry.languageId, entry.soundUnitSlug);
-      const policyRow = getLanguageAssessmentAudioPolicyRows(entry.languageId).find(
-        (row) => row.slug === entry.soundUnitSlug,
-      );
+      const policyRow = getLanguageAssessmentAudioPolicyRows(
+        entry.languageId,
+      ).find((row) => row.slug === entry.soundUnitSlug);
 
       expect(
         shouldShowSoundUnitHeaderAudio(entry.languageId, soundUnit),
@@ -144,11 +154,16 @@ describe("language source alignment", () => {
   });
 
   it("keeps Russian final-devoicing source guidance connected-speech aware", () => {
-    const alignment = getSoundUnitSourceAlignment("ru-RU", "ru-final-devoicing");
+    const alignment = getSoundUnitSourceAlignment(
+      "ru-RU",
+      "ru-final-devoicing",
+    );
 
     expect(alignment?.ruleSummary).toContain("停顿或清辅音前");
     expect(alignment?.ruleSummary).toContain("浊辅音、响音或元音前");
-    expect(alignment?.ruleSummary).not.toContain("这不是拼写错误，而是词尾规则");
+    expect(alignment?.ruleSummary).not.toContain(
+      "这不是拼写错误，而是词尾规则",
+    );
   });
 
   it("keeps French phrase-final prominence out of English lexical stress logic", () => {
