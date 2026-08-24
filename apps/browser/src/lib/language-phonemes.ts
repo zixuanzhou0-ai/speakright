@@ -1,13 +1,13 @@
-﻿import { PHONEMES } from "@/lib/phoneme-data";
-import { expandLanguageKeywordOptions } from "@/lib/language-keyword-expansions";
-import { attachLanguagePhonemeResources } from "@/lib/language-phoneme-resources";
-import {
+﻿import {
   isKnownEnglishChartAudioStem,
   isPlayableHeaderAudioSrc,
 } from "@/lib/audio-playback-policy";
+import { expandLanguageKeywordOptions } from "@/lib/language-keyword-expansions";
+import { attachLanguagePhonemeResources } from "@/lib/language-phoneme-resources";
 import { FRENCH_PHONEMES } from "@/lib/language-sound-units/french";
 import { RUSSIAN_PHONEMES } from "@/lib/language-sound-units/russian";
 import { SPANISH_PHONEMES } from "@/lib/language-sound-units/spanish";
+import { PHONEMES } from "@/lib/phoneme-data";
 import type { LanguageId } from "@/types/language";
 import type { PhonemeCategory, PhonemeData } from "@/types/phoneme";
 
@@ -18,9 +18,10 @@ const ENGLISH_PHONEMES: PhonemeData[] = attachLanguagePhonemeResources(
     languageId: "en-US",
     soundUnitType: "phoneme",
     video: {
-      localSrc: `/videos/phonemes/${phoneme.slug}.mp4`,
-      status: "ready",
-      label: "Rachel's English 本地教学视频",
+      // The Rachel's English clips are reference-only and are intentionally
+      // absent from the public Browser asset mirror.
+      status: "planned",
+      label: "Rachel's English 视频未随 Browser 发行包提供",
     },
   })),
 );

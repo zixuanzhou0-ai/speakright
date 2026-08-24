@@ -30,6 +30,7 @@ function resolveRequestPath(urlPath) {
   if (existsSync(indexPath)) return indexPath;
   const htmlPath = `${candidate}.html`;
   if (existsSync(htmlPath) && statSync(htmlPath).isFile()) return htmlPath;
+  if (extname(candidate)) return null;
   return join(root, "index.html");
 }
 

@@ -112,15 +112,30 @@ test("active offline ABX makes the task and answer controls obvious", async ({
 
 test("mobile phoneme selector is searchable and grouped", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/phonemes/ih");
-  await page
-    .locator('[data-smoke="phoneme-mobile-selector"]')
-    .getByText("切换发音单位")
-    .click();
-  await settle(page);
-  await expect(page).toHaveScreenshot("phoneme-selector-mobile-390.png", {
-    fullPage: false,
+  const localVideoRequests: string[] = [];
+  page.on("request", (request) => {
+    const pathname = new URL(request.url()).pathname;
+    if (pathname === "/videos/phonemes/ih.mp4") {
+      localVideoRequests.push(pathname);
+    }
   });
+  const missingVideoResponse = await page.request.get(
+    "/videos/phonemes/ih.mp4",
+  );
+  expect(missingVideoResponse.status()).toBe(404);
+  await page.goto("/phonemes/ih");
+  expect(localVideoRequests).toEqual([]);
+  await expect(
+    page.getByText("外部 IPA / 发音教学资源", { exact: true }),
+  ).toBeVisible();
+  const selector = page.locator('[data-smoke="phoneme-mobile-selector"]');
+  await selector.getByText("切换发音单位").click();
+  await expect(selector).toHaveAttribute("open", "");
+  await expect(selector.getByRole("textbox")).toBeVisible();
+  await expect(selector.getByRole("region", { name: "元音" })).toBeVisible();
+  await expect(selector.getByRole("region", { name: "辅音" })).toBeVisible();
+  await settle(page);
+  await expect(selector).toHaveScreenshot("phoneme-selector-mobile-390.png");
 });
 
 test("free practice empty state stays compact", async ({ page }) => {

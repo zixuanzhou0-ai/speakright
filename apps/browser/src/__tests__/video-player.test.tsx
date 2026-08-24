@@ -2,7 +2,6 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import type React from "react";
 import { describe, expect, it, vi } from "vitest";
 import { VideoPlayer } from "@/components/phoneme/video-player";
-import { getLanguagePhonemeBySlug } from "@/lib/language-phonemes";
 import { getTeachingVideosForSoundUnit } from "@/lib/language-teaching-videos";
 import { getSpanishSoundVideoSet } from "@/lib/spanish-sounds-of-speech-videos";
 
@@ -57,12 +56,9 @@ describe("VideoPlayer", () => {
     expect(screen.queryByText(/CC test license/i)).not.toBeInTheDocument();
   });
 
-  it("maps English theta to the local filename and falls back to the official source on media error", () => {
-    const phoneme = getLanguagePhonemeBySlug("en-US", "th");
-    expect(phoneme?.video?.localSrc).toBe("/videos/phonemes/th.mp4");
-
+  it("normalizes an optional English theta clip and falls back to the official source on media error", () => {
     render(
-      <VideoPlayer slug="th" available localSrc={phoneme?.video?.localSrc} />,
+      <VideoPlayer slug="th" available localSrc="/videos/phonemes/th.mp4" />,
     );
 
     const video = document.querySelector("video");
