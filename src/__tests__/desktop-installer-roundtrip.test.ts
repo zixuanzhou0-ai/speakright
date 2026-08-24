@@ -13,9 +13,11 @@ import {
   createSanitizedSummary,
   hasExactPassingRoundtripChecks,
   InstallerRoundtripError,
+  isPendingWebViewStartupError,
   matchesRoundtripArtifactIdentity,
   REQUIRED_ROUNDTRIP_CHECKS,
   runInstallerRoundtrip,
+  waitForDesktopReadiness,
 } from "../../scripts/desktop-installer-roundtrip-core.mjs";
 import {
   hashTauriNsisExecutableVariant,
@@ -84,11 +86,9 @@ function fakeAdapter(overrides: Record<string, unknown> = {}) {
     async assertOwnedProcess(_plan: unknown, pid: unknown) {
       calls.push(["assertOwnedProcess", pid]);
     },
-    async waitForWindow(_plan: unknown, pid: unknown) {
-      calls.push(["waitForWindow", pid]);
-    },
-    async assertIsolatedWebViewProfile(_plan: unknown, pid: unknown) {
-      calls.push(["assertIsolatedWebViewProfile", pid]);
+    async waitForReadiness(_plan: unknown, pid: unknown) {
+      calls.push(["waitForReadiness", pid]);
+      return { window: true, isolatedWebViewProfile: true };
     },
     async assertReleaseDebugTransportDisabled(_plan: unknown, pid: unknown) {
       calls.push(["assertReleaseDebugTransportDisabled", pid]);
@@ -130,6 +130,251 @@ function fakeAdapter(overrides: Record<string, unknown> = {}) {
 }
 
 describe("desktop installer round-trip safety", () => {
+  it("waits for every readiness signal under one shared budget", async () => {
+    let elapsedMs = 0;
+    const readiness = await waitForDesktopReadiness({
+      timeoutMs: 120_000,
+      intervalMs: 1_000,
+      now: () => elapsedMs,
+      sleep: async (delayMs: number) => {
+        elapsedMs += delayMs;
+      },
+      observe: async () => ({
+        processAlive: true,
+        exitCode: null,
+        exitSignal: null,
+        windowObserved: elapsedMs >= 1_000,
+        logKind: elapsedMs >= 40_000 ? "file" : "unavailable",
+        logBytes: elapsedMs >= 45_000 ? 64 : null,
+        logReadable: elapsedMs >= 40_000,
+        markerPresent: elapsedMs >= 45_000,
+        webViewDirKind: elapsedMs >= 50_000 ? "directory" : "missing",
+        profilePopulated: elapsedMs >= 50_000,
+        webViewProfileOwned: elapsedMs >= 50_000,
+      }),
+    });
+
+    expect(elapsedMs).toBe(50_000);
+    expect(readiness).toMatchObject({
+      windowObserved: true,
+      markerPresent: true,
+      profilePopulated: true,
+      webViewProfileOwned: true,
+    });
+  });
+
+  it("does not grant a new polling window after the launch deadline", async () => {
+    let observations = 0;
+    await expect(
+      waitForDesktopReadiness({
+        deadlineMs: 120_000,
+        intervalMs: 1_000,
+        now: () => 120_000,
+        sleep: async () => undefined,
+        observe: async () => {
+          observations += 1;
+          return {
+            processAlive: true,
+            windowObserved: true,
+            logKind: "file",
+            logReadable: true,
+            markerPresent: true,
+            webViewDirKind: "directory",
+            profilePopulated: true,
+            webViewProfileOwned: true,
+          };
+        },
+      }),
+    ).rejects.toMatchObject({ code: "window-timeout" });
+    expect(observations).toBe(0);
+  });
+
+  it("deducts time already spent since launch from the absolute deadline", async () => {
+    let elapsedMs = 40_000;
+    await expect(
+      waitForDesktopReadiness({
+        deadlineMs: 120_000,
+        intervalMs: 1_000,
+        now: () => elapsedMs,
+        sleep: async (delayMs: number) => {
+          elapsedMs += delayMs;
+        },
+        observe: async () => ({
+          processAlive: true,
+          windowObserved: true,
+          logKind: "file",
+          logBytes: 0,
+          logReadable: true,
+          markerPresent: false,
+          webViewDirKind: "directory",
+          profilePopulated: true,
+          webViewProfileOwned: true,
+        }),
+      }),
+    ).rejects.toMatchObject({ code: "isolated-log-missing" });
+    expect(elapsedMs).toBe(120_000);
+  });
+
+  it("aborts an in-flight observation when the absolute deadline arrives", async () => {
+    const startedAt = Date.now();
+    let aborted = false;
+    await expect(
+      waitForDesktopReadiness({
+        deadlineMs: startedAt + 25,
+        intervalMs: 1_000,
+        observe: async ({ signal }: { signal: AbortSignal }) =>
+          new Promise((_, reject) => {
+            signal.addEventListener(
+              "abort",
+              () => {
+                aborted = true;
+                reject(signal.reason);
+              },
+              { once: true },
+            );
+          }),
+      }),
+    ).rejects.toMatchObject({ code: "window-timeout" });
+    expect(aborted).toBe(true);
+    expect(Date.now() - startedAt).toBeLessThan(1_000);
+  });
+
+  it("rejects a ready observation that completes after the launch deadline", async () => {
+    let elapsedMs = 110_000;
+    await expect(
+      waitForDesktopReadiness({
+        deadlineMs: 120_000,
+        intervalMs: 1_000,
+        now: () => elapsedMs,
+        sleep: async () => undefined,
+        observe: async () => {
+          elapsedMs = 120_001;
+          return {
+            processAlive: true,
+            windowObserved: true,
+            logKind: "file",
+            logBytes: 64,
+            logReadable: true,
+            markerPresent: true,
+            webViewDirKind: "directory",
+            profilePopulated: true,
+            webViewProfileOwned: true,
+          };
+        },
+      }),
+    ).rejects.toMatchObject({ code: "readiness-timeout" });
+    expect(elapsedMs).toBe(120_001);
+  });
+
+  it("treats only WebView startup races as retryable", () => {
+    expect(
+      isPendingWebViewStartupError(
+        new InstallerRoundtripError(
+          "webview-profile",
+          "installed app root process is missing from process-tree inspection",
+        ),
+      ),
+    ).toBe(true);
+    expect(
+      isPendingWebViewStartupError(
+        new InstallerRoundtripError(
+          "webview-profile",
+          "owned WebView2 process did not use the isolated profile",
+        ),
+      ),
+    ).toBe(false);
+  });
+
+  it("classifies a missing setup marker at the shared deadline", async () => {
+    let elapsedMs = 0;
+    const probe = waitForDesktopReadiness({
+      timeoutMs: 120_000,
+      intervalMs: 1_000,
+      now: () => elapsedMs,
+      sleep: async (delayMs: number) => {
+        elapsedMs += delayMs;
+      },
+      observe: async () => ({
+        processAlive: true,
+        exitCode: null,
+        exitSignal: null,
+        windowObserved: true,
+        logKind: "file",
+        logBytes: 0,
+        logReadable: true,
+        markerPresent: false,
+        webViewDirKind: "directory",
+        profilePopulated: true,
+        webViewProfileOwned: true,
+      }),
+    });
+
+    await expect(probe).rejects.toMatchObject({
+      code: "isolated-log-missing",
+      message: expect.stringContaining("markerPresent=false"),
+    });
+    expect(elapsedMs).toBe(120_000);
+  });
+
+  it("fails immediately when the installed process exits during readiness", async () => {
+    let elapsedMs = 0;
+    const probe = waitForDesktopReadiness({
+      timeoutMs: 120_000,
+      intervalMs: 1_000,
+      now: () => elapsedMs,
+      sleep: async (delayMs: number) => {
+        elapsedMs += delayMs;
+      },
+      observe: async () => ({
+        processAlive: elapsedMs < 5_000,
+        exitCode: elapsedMs < 5_000 ? null : 23,
+        exitSignal: null,
+        windowObserved: true,
+        logKind: "file",
+        logBytes: 0,
+        logReadable: true,
+        markerPresent: false,
+        webViewDirKind: "missing",
+        profilePopulated: false,
+        webViewProfileOwned: false,
+      }),
+    });
+
+    await expect(probe).rejects.toMatchObject({
+      code: "installed-app-exited",
+      message: expect.stringContaining("exitCode=23"),
+    });
+    expect(elapsedMs).toBe(5_000);
+  });
+
+  it("rejects an unsafe runtime-log file type without waiting", async () => {
+    let elapsedMs = 0;
+    await expect(
+      waitForDesktopReadiness({
+        timeoutMs: 120_000,
+        intervalMs: 1_000,
+        now: () => elapsedMs,
+        sleep: async (delayMs: number) => {
+          elapsedMs += delayMs;
+        },
+        observe: async () => ({
+          processAlive: true,
+          exitCode: null,
+          exitSignal: null,
+          windowObserved: true,
+          logKind: "symlink",
+          logBytes: null,
+          logReadable: false,
+          markerPresent: false,
+          webViewDirKind: "missing",
+          profilePopulated: false,
+          webViewProfileOwned: false,
+        }),
+      }),
+    ).rejects.toMatchObject({ code: "unsafe-log-target" });
+    expect(elapsedMs).toBe(0);
+  });
+
   it("binds an NSIS payload to the reviewed Tauri bundle-marker patch", async () => {
     const directory = mkdtempSync(join(tmpdir(), "speakright-bundle-marker-"));
     const executablePath = join(directory, "speakright.exe");
@@ -333,8 +578,7 @@ describe("desktop installer round-trip safety", () => {
       "verifyInstalled",
       "launchInstalledApp",
       ["assertOwnedProcess", 4242],
-      ["waitForWindow", 4242],
-      ["assertIsolatedWebViewProfile", 4242],
+      ["waitForReadiness", 4242],
       ["assertReleaseDebugTransportDisabled", 4242],
       ["closeAndWait", 4242],
       ["runUninstaller", buildNsisUninstallArgs(plan().installDir)],
@@ -546,8 +790,8 @@ describe("desktop installer round-trip safety", () => {
 
   it("only asks the adapter to terminate the tracked child and still rolls back", async () => {
     const { adapter, calls } = fakeAdapter({
-      async waitForWindow() {
-        calls.push(["waitForWindow", 4242]);
+      async waitForReadiness() {
+        calls.push(["waitForReadiness", 4242]);
         throw new InstallerRoundtripError("window-timeout", "fixture failure");
       },
     });
@@ -562,8 +806,8 @@ describe("desktop installer round-trip safety", () => {
 
   it("preserves the primary failure when PID ownership blocks rollback termination", async () => {
     const { adapter, calls } = fakeAdapter({
-      async waitForWindow() {
-        calls.push(["waitForWindow", 4242]);
+      async waitForReadiness() {
+        calls.push(["waitForReadiness", 4242]);
         throw new InstallerRoundtripError("window-timeout", "fixture failure");
       },
       async terminateOwnedProcess() {
@@ -741,7 +985,24 @@ describe("desktop installer round-trip safety", () => {
     expect(script).toContain('path.join(plan.webViewProfileDir, "EBWebView")');
     expect(script).toContain("SPEAKRIGHT_LOG_DIR");
     expect(script).toContain("SPEAKRIGHT_SETTINGS_STORE_PATH");
-    expect(script).toContain("isolated runtime log");
+    expect(script).toContain("waitForDesktopReadiness");
+    expect(script).toContain("DESKTOP_READINESS_TIMEOUT_MS");
+    expect(script).toContain("readinessDeadline");
+    expect(script).toContain("deadlineMs: record.readinessDeadline");
+    expect(script).not.toContain(
+      "Math.max(1, record.readinessDeadline - Date.now())",
+    );
+    expect(script).toContain("transientReadErrorCodes");
+    const processExitRecheck = script.indexOf(
+      "const processAfterTree = await inspectTrackedProcess(signal)",
+    );
+    const retryableWebViewCheck = script.indexOf(
+      "isPendingWebViewStartupError(error)",
+    );
+    expect(processExitRecheck).toBeGreaterThan(-1);
+    expect(retryableWebViewCheck).toBeGreaterThan(processExitRecheck);
+    expect(core).toContain("isolated runtime log");
+    expect(core).toContain("installed-app-exited");
     expect(script).toContain("releaseExeSha256");
     expect(script).toContain("releaseExeBytes");
     expect(script).toContain("assertReleaseExecutableUnchanged");
