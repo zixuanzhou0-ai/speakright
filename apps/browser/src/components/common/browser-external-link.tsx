@@ -16,6 +16,7 @@ export function BrowserExternalLink({
   href,
   children,
   className,
+  copyMessage: _copyMessage,
   ...props
 }: BrowserExternalLinkProps) {
   return (
