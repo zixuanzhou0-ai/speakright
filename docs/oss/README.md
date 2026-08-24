@@ -17,7 +17,7 @@ This directory collects public, reviewable evidence about SpeakRight as an open-
 | Direction and history | [`ROADMAP.md`](../../ROADMAP.md) and [`CHANGELOG.md`](../../CHANGELOG.md) |
 | Claims and validation | [`docs/validation/README.md`](../validation/README.md) and [`CLAIMS_AND_EVIDENCE.md`](../validation/CLAIMS_AND_EVIDENCE.md) |
 | v1.1.0 candidate gates | [`V1.1.0_RELEASE_CANDIDATE.md`](../validation/V1.1.0_RELEASE_CANDIDATE.md) |
-| v1.1.0 Release objects, tags, workflows, assets, and signed-out checks | [`V1.1.0_RELEASE_VERIFICATION.md`](../validation/V1.1.0_RELEASE_VERIFICATION.md) — public Releases and full-history security follow-up verified; independent documentation review remains pending |
+| v1.1.0 Release objects, tags, workflows, assets, and signed-out checks | [`V1.1.0_RELEASE_VERIFICATION.md`](../validation/V1.1.0_RELEASE_VERIFICATION.md) — public Releases, full-history security follow-up, and independent read-only documentation review verified |
 | Versioned screenshots and overview demo | [`docs/assets/demo/README.md`](../assets/demo/README.md) |
 | Privacy-safe user-testing attestation and claim boundary | [`USER_TESTING_SUMMARY.md`](../validation/USER_TESTING_SUMMARY.md) |
 | Codex program readiness | [`CODEX_FOR_OPEN_SOURCE_READINESS.md`](CODEX_FOR_OPEN_SOURCE_READINESS.md) |

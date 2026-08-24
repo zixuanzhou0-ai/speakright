@@ -3,8 +3,9 @@
 Updated: 2026-08-24
 
 This checklist separates observed repository settings, completed public
-publication/security evidence, and still-pending independent review. A workflow
-definition or local tag alone is not evidence that a public Release exists.
+publication/security evidence, and completed independent read-only review. A
+workflow definition or local tag alone is not evidence that a public Release
+exists.
 
 ## Verified repository-settings snapshot
 
@@ -83,9 +84,10 @@ recheck them immediately before submitting an external application.
       release result.
 
 The exact observations, including all 36 asset rows, are in the verification
-record. Its independent-review checkbox intentionally remains open.
+record. A separate read-only Codex reviewer cross-checked them against public
+GitHub evidence and anonymous-verification outputs.
 
-## Completed security follow-up and pending review
+## Completed security follow-up and independent review
 
 - [x] Resolve and record the final result after full-history Supply Chain workflow
       dispatch
@@ -101,7 +103,7 @@ record. Its independent-review checkbox intentionally remains open.
       with zero unreviewed findings and zero-result redacted SARIF. This
       follow-up is distinct from successful release-commit Supply Chain run
       [`32693926778`](https://github.com/zixuanzhou0-ai/speakright/actions/runs/32693926778).
-- [ ] Independent reviewer confirms the release-verification document against
+- [x] Independent reviewer confirms the release-verification document against
       the public Release APIs, tag objects, workflows, manifests, and downloads.
 
 ## Final branch-protection recheck

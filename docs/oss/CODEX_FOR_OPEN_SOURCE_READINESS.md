@@ -24,7 +24,7 @@ Program details and form fields can change. A maintainer should re-open the offi
 | Distribution boundary | Browser `v1.1.0` is public Stable. Desktop `v1.1.0-desktop-preview.1` is a public unsigned pre-release, not Desktop Stable; its public binaries are the bare EXE and NSIS setup, with no MSI. |
 | Governance | Public contribution, conduct, support, maintainer, privacy, and security documents are linked from the README. |
 | User/adoption evidence | The maintainer reports that 20 people tested SpeakRight offline. This statement is not independently audited and does not establish active-user adoption, task success, retention, satisfaction, or learning efficacy. |
-| Current release boundary | [`v1.1.0` Browser Stable](https://github.com/zixuanzhou0-ai/speakright/releases/tag/v1.1.0) and unsigned [`v1.1.0-desktop-preview.1` Desktop Preview](https://github.com/zixuanzhou0-ai/speakright/releases/tag/v1.1.0-desktop-preview.1) are public and anonymously verified from commit `61c506af5c1f0b9b8397c74f69470c0da1e9f382`. The [release-verification record](../validation/V1.1.0_RELEASE_VERIFICATION.md) retains the dated release-boundary observation, completed security follow-up, and still-pending independent documentation review. |
+| Current release boundary | [`v1.1.0` Browser Stable](https://github.com/zixuanzhou0-ai/speakright/releases/tag/v1.1.0) and unsigned [`v1.1.0-desktop-preview.1` Desktop Preview](https://github.com/zixuanzhou0-ai/speakright/releases/tag/v1.1.0-desktop-preview.1) are public and anonymously verified from commit `61c506af5c1f0b9b8397c74f69470c0da1e9f382`. The [release-verification record](../validation/V1.1.0_RELEASE_VERIFICATION.md) retains the dated release-boundary observation, completed security follow-up, and completed independent read-only documentation review. |
 
 The source for each product statement is mapped in [`docs/validation/CLAIMS_AND_EVIDENCE.md`](../validation/CLAIMS_AND_EVIDENCE.md).
 
@@ -76,14 +76,14 @@ These are intended workflows, not promises of a release date, a specific volume 
       and repeated after merge by green main-push run
       [`32707268266`](https://github.com/zixuanzhou0-ai/speakright/actions/runs/32707268266),
       with complete-history traversal and zero unreviewed findings
-- [ ] Independent documentation reviewer confirms the release-verification
+- [x] Independent documentation reviewer confirms the release-verification
       record against public GitHub evidence
 
-The four checked release/publication/security items are supported by observed GitHub
+The five checked release/publication/security/review items are supported by observed GitHub
 data recorded in
 [`V1.1.0_RELEASE_VERIFICATION.md`](../validation/V1.1.0_RELEASE_VERIFICATION.md).
-The remaining independent-review item is deliberately not inferred from source
-files, a workflow definition, or earlier successful runs.
+The independent-review item was completed by a separate read-only Codex reviewer
+and is not inferred from source files or workflow definitions alone.
 
 Unchecked items are deliberately not inferred from source activity, automated tests, stars, clones, downloads, or synthetic audio.
 

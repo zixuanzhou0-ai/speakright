@@ -69,6 +69,7 @@ place that should certify the observed Browser Stable and unsigned Desktop
 Preview Release objects. The record now contains their exact Release IDs,
 annotated-tag identities, shared peeled commit, successful publication
 workflows, complete 20-asset Browser and 16-asset Desktop inventories,
-checksums/SBOM observations, anonymous public-access results, and the completed
-exact-fingerprint full-history security follow-up. Independent documentation
-review remains visibly pending instead of being inferred from automated checks.
+checksums/SBOM observations, anonymous public-access results, the completed
+exact-fingerprint full-history security follow-up, and a completed independent
+read-only Codex documentation review. This does not turn the maintainer-reported
+user-testing count into an independently audited study.
