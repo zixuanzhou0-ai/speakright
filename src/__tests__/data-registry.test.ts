@@ -181,7 +181,7 @@ describe("data registry", () => {
     const summary = getLocalDataSummary();
 
     expect(summary.configuredApiKeys).toBe(2);
-    expect(summary.apiKeySlots).toBe(3);
+    expect(summary.apiKeySlots).toBe(5);
   });
 
   it("returns a degraded local data summary when storage reads are blocked", async () => {
@@ -200,7 +200,7 @@ describe("data registry", () => {
         learningKeys: 0,
         cacheKeys: 0,
         configuredApiKeys: 0,
-        apiKeySlots: 3,
+        apiKeySlots: 5,
         dataSchemaVersion: 0,
         corruptItems: 0,
         storageUnavailable: true,
@@ -234,20 +234,43 @@ describe("data registry", () => {
     expect(mocks.clearTtsCache).toHaveBeenCalledOnce();
   });
 
+  it("reports TTS cache deletion failures without claiming learning data was cleared", async () => {
+    const { deleteLearningData } = await import("@/lib/data-registry");
+    localStorage.setItem("speakright_mastery_profile_v2", "{}");
+    mocks.clearTtsCache.mockRejectedValueOnce(
+      new Error("tts cache delete failed"),
+    );
+
+    await expect(deleteLearningData()).rejects.toThrow(
+      "tts cache delete failed",
+    );
+    expect(localStorage.getItem("speakright_mastery_profile_v2")).toBe("{}");
+  });
+
   it("deletes API key slots separately", async () => {
     const { deleteApiKeys } = await import("@/lib/data-registry");
     localStorage.setItem("speakright_azure_config", "{}");
     localStorage.setItem("speakright_llm_config", "{}");
+    localStorage.setItem("speakright_minimax_tts_config", "{}");
+    localStorage.setItem("speakright_mimo_tts_config", "{}");
 
     await deleteApiKeys();
 
     expect(localStorage.getItem("speakright_azure_config")).toBeNull();
     expect(localStorage.getItem("speakright_llm_config")).toBeNull();
+    expect(localStorage.getItem("speakright_minimax_tts_config")).toBeNull();
+    expect(localStorage.getItem("speakright_mimo_tts_config")).toBeNull();
     expect(mocks.secureStoreDelete).toHaveBeenCalledWith(
       "speakright_azure_config",
     );
     expect(mocks.secureStoreDelete).toHaveBeenCalledWith(
       "speakright_llm_config",
+    );
+    expect(mocks.secureStoreDelete).toHaveBeenCalledWith(
+      "speakright_minimax_tts_config",
+    );
+    expect(mocks.secureStoreDelete).toHaveBeenCalledWith(
+      "speakright_mimo_tts_config",
     );
     expect(mocks.storeDelete).not.toHaveBeenCalled();
   });

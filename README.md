@@ -85,7 +85,7 @@ The Windows installer/Release EXE route is documented separately in the desktop 
 - English assessment and advanced drill routes ported from the latest desktop app where browser constraints allow.
 - Browser-local progress, score history, and settings.
 - BYOK provider setup with session-first API key storage. Keys are persisted to `localStorage` only when the user explicitly enables local persistence.
-- Standard demonstration TTS can switch among ElevenLabs, a locally configured Hermes Agent using xAI/Grok, and Vertex AI Gemini 3.1 Flash TTS using the machine's gcloud project and ADC. The local Browser Edition launcher starts its own authenticated loopback adapter; it does not require the Windows Desktop app.
+- Standard demonstration TTS can switch among ElevenLabs, MiniMax Speech 2.8, Xiaomi MiMo V2.5 TTS, a locally configured Hermes Agent using xAI/Grok, and Vertex AI Gemini 3.1 Flash TTS using the machine's gcloud project and ADC. MiniMax and MiMo use the learner's own API key. The local Browser Edition launcher starts the authenticated loopback adapter needed by Hermes and Vertex; it does not require the Windows Desktop app.
 - Microphone device selection for Chrome systems with multiple input devices.
 
 Browser docs start at [`docs/browser-edition/README.md`](docs/browser-edition/README.md). The cross-platform user entry is [`docs/WEB.md`](docs/WEB.md).
@@ -211,6 +211,8 @@ The LLM layer is downstream only. It explains structured evidence and suggests o
 
 - **Azure Speech**: real pronunciation scoring and speech analysis. The app sends the active language locale to Azure for assessment.
 - **ElevenLabs**: optional standard-demo TTS and previously approved bundled local language-pack audio. Routine validation queries usage only and does not generate new audio. Do not generate ElevenLabs audio without explicit maintainer approval.
+- **MiniMax Speech**: optional BYOK standard-demo TTS using Speech 2.8. Word subtitles are requested for exact read-along timing; when the provider does not return a usable subtitle file, SpeakRight falls back to honest sentence-level playback.
+- **Xiaomi MiMo TTS**: optional BYOK standard-demo TTS using `mimo-v2.5-tts` and a built-in English voice. The current API does not expose word timing, so SpeakRight presents sentence-level playback rather than estimated word highlighting.
 - **Hermes/xAI**: optional local standard-demo TTS that reuses the Hermes Agent's Grok configuration without exposing its credential to browser code.
 - **Vertex AI Gemini TTS**: optional local standard-demo TTS using `gemini-3.1-flash-tts-preview`, the selected gcloud project, and Application Default Credentials. Status checks do not synthesize audio; generation is user initiated and billable under the configured Google Cloud project.
 - **LLM providers**: OpenAI-compatible providers can be configured for Chinese coaching feedback. They are not the scoring authority.
@@ -307,7 +309,7 @@ npm run phonology:audio-policy:check
 - Browser Edition microphone access should be tested from localhost or HTTPS; direct `file://` launch is not the supported path.
 - Spanish, French, and Russian remain experimental and must not be described as formal mastery or `evidenceMastery`.
 - Some rule, prosody, or composite sound units intentionally do not show speaker buttons until exact local short audio exists.
-- Release validation does not record live learner audio, call Azure live scoring, or generate ElevenLabs TTS in routine smoke.
+- Release validation does not record live learner audio, call Azure live scoring, or generate paid/live provider TTS in routine smoke.
 - Provider availability, Azure locale behavior, browser media-device behavior, and WebView2 behavior can vary by machine, network, and account quota.
 
 ## Credits And Source Notes
@@ -320,7 +322,7 @@ SpeakRight depends on careful third-party educational and provider ecosystems:
 - Seeing Speech / University of Glasgow and related phonetics references inform selected source-ledger decisions and some local articulation media.
 - EasyPronunciation and similar pronunciation resources are used as reference material or source-ledger context where noted; they are not automatically bundled or treated as a redistribution license.
 - Microsoft Fluent Emoji assets are used for English phoneme cards.
-- Azure Speech, ElevenLabs, and user-configured LLM providers power optional credentialed capabilities. Youdao is the credential-free online fallback when requested English word playback has no eligible bundled recording. Each service remains subject to its own terms.
+- Azure Speech, ElevenLabs, MiniMax, Xiaomi MiMo, and user-configured LLM providers power optional credentialed capabilities. Youdao is the credential-free online fallback when requested English word playback has no eligible bundled recording. Each service remains subject to its own terms.
 
 See `THIRD_PARTY_NOTICES.md` and `docs/browser-edition/THIRD_PARTY_NOTICES.md` for the full media and provider boundary.
 

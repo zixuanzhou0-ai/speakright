@@ -139,9 +139,13 @@ declare global {
 globalThis.__SPEAKRIGHT_RELEASE_EVIDENCE_NATIVE_HTTP_GUARD__ = true;
 globalThis.__SPEAKRIGHT_RELEASE_EVIDENCE_NATIVE_HTTP_ATTEMPTS__ ??= [];
 
+export interface ApiFetchOptions extends RequestInit {
+  maxRedirections?: number;
+}
+
 export async function apiFetch(
   url: string,
-  _options?: RequestInit,
+  _options?: ApiFetchOptions,
 ): Promise<Response> {
   globalThis.__SPEAKRIGHT_RELEASE_EVIDENCE_NATIVE_HTTP_ATTEMPTS__?.push(
     String(url),

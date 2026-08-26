@@ -27,15 +27,15 @@
   "scoreDisclosure": "示例数据 / Example data — not a live Azure score",
   "paidApiCalls": false,
   "userData": false,
-  "sourceCommit": "ff77d0e4c1795b4ed49ca36791b395d136d57b6e",
+  "sourceCommit": "202a0ac58d4407c024f68174d26963f44dbbd521",
   "generatorSnapshot": {
     "schemaVersion": 2,
-    "sha256": "b2099e76a527e34c7221795f6bf0bbec29ebb5a802cde39de0bad5422078ea0e",
+    "sha256": "79ecb1d4086777b8778943a18ddeb98e4f5f9b7a2655e49f2d7b6229ea46f1fd",
     "fileCount": 16,
-    "totalBytes": 234299
+    "totalBytes": 234460
   },
   "path": "docs/assets/demo/speakright-v1.1.0-overview.mp4",
-  "sha256": "5eb5507dc49430e2c54137defa81c83690d67cbf4fb08cb67cbb6a2ff300be57",
+  "sha256": "faeb936a4ae0ae3ceb318809a14f5b0187c5c91598ff4f293c0de1393facc533",
   "frames": [
     {
       "edition": "demo",
@@ -97,13 +97,13 @@
       "path": "docs/assets/demo/frames/04-browser-diagnosis.png",
       "width": 1280,
       "height": 720,
-      "sha256": "15d147cb61263e55e105004d4ef29eceec78d811dd79905f5546b51f05385c7d",
+      "sha256": "2805a933a9578f13b7d829b760a4edf5dbc37b40704e5766be13cbfabb64dd1d",
       "scoreDisclosureOverlay": true,
       "sourceEvidence": {
         "edition": "browser",
         "id": "diagnosis-example",
         "path": "docs/assets/screenshots/release/v1.1.0/browser/1280x800/diagnosis-example.png",
-        "sha256": "60fe2c6cd99085e79c97befe3c237ea9f6031b6fdfd0a3c51369dd3c362f52ce",
+        "sha256": "7bf7bd85c41b18a164310ce65e6dd060a84ff9a0ddae98072f166d83815fd5e2",
         "viewport": "1280x800",
         "width": 1280,
         "height": 800
@@ -137,13 +137,13 @@
       "path": "docs/assets/demo/frames/06-browser-settings.png",
       "width": 1280,
       "height": 720,
-      "sha256": "8885cb65584916d688aca7ba9af94c423a33e08b00f6ab9b6d0d3ad7cad2266c",
+      "sha256": "6d1c886f01ea009149db1fd4c600847215e60a6d9076758c4a361e7ec5b211ba",
       "scoreDisclosureOverlay": false,
       "sourceEvidence": {
         "edition": "browser",
         "id": "settings",
         "path": "docs/assets/screenshots/release/v1.1.0/browser/1280x800/settings.png",
-        "sha256": "3aad7d64faaed85f441351061f49c627995c56ca8cf12a9794a078bc6dcb7255",
+        "sha256": "e834ba6eb9b84e2d81e2d6df09d26346479ac4e6d676e311b000b66b861e2e11",
         "viewport": "1280x800",
         "width": 1280,
         "height": 800
@@ -157,13 +157,13 @@
       "path": "docs/assets/demo/frames/07-desktop-guided-repeat.png",
       "width": 1280,
       "height": 720,
-      "sha256": "9a8cb529ece75b68a4d80e4e8a4815fcd2c55dc7b90116f9b3dfc4f5fca686b5",
+      "sha256": "35ed221bff73426f627214a2303e339b36dd23d76fe48ae37a22588a010b2a1e",
       "scoreDisclosureOverlay": false,
       "sourceEvidence": {
         "edition": "desktop",
         "id": "guided-repeat",
         "path": "docs/assets/screenshots/release/v1.1.0/desktop/1280x920/guided-repeat.png",
-        "sha256": "2f4857d143bce63f0f4c1e7587aba0c506ad189bc50fffd00563e579261d0aed",
+        "sha256": "0e652bc552b2f93c1b791f13bdd54834253dd8e3484aee4941efab27c22c1207",
         "viewport": "1280x920",
         "width": 1280,
         "height": 920
@@ -177,13 +177,13 @@
       "path": "docs/assets/demo/frames/08-desktop-diagnosis.png",
       "width": 1280,
       "height": 720,
-      "sha256": "11e36aa883ac1ff4cfbd07fabf3b7f11f78ec68c5a64dba75e5f93a4e631c918",
+      "sha256": "2822ff6c15948a88084a353bfc3748990710e9736200aaa047729d2ac6165031",
       "scoreDisclosureOverlay": true,
       "sourceEvidence": {
         "edition": "desktop",
         "id": "diagnosis-example",
         "path": "docs/assets/screenshots/release/v1.1.0/desktop/1280x920/diagnosis-example.png",
-        "sha256": "07c74258808d6769a8123e84f2226795934fe710cb61a049251285babf3e1331",
+        "sha256": "8760938c614359abb359384018847761053a13ed79002b0e4b22ea6f506dd083",
         "viewport": "1280x920",
         "width": 1280,
         "height": 920
@@ -197,13 +197,13 @@
       "path": "docs/assets/demo/frames/09-desktop-no-key.png",
       "width": 1280,
       "height": 720,
-      "sha256": "336c025301abe1ffe0233c6216f2af0b4461e671fb2cd806286320fa495beeeb",
+      "sha256": "3fa1c4a807d3d896ca3efa0ecd90ed64ebd80b19b73d6ecd947b516097fd78cd",
       "scoreDisclosureOverlay": false,
       "sourceEvidence": {
         "edition": "desktop",
         "id": "no-key",
         "path": "docs/assets/screenshots/release/v1.1.0/desktop/1280x920/no-key.png",
-        "sha256": "17ab8c1e812a2572cafc12d6533bbbe1b920c8dead7b563e0276098256afe023",
+        "sha256": "165d8a8210986c4b9bdc6039643b97563f20f653bb54d1263d2f9473f2db3c94",
         "viewport": "1280x920",
         "width": 1280,
         "height": 920

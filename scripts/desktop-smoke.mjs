@@ -1357,6 +1357,16 @@ async function captureInteractiveEvidence(debuggingPort) {
         speakright_elevenlabs_config: JSON.stringify({
           apiKey: "desktop-smoke-elevenlabs-key",
         }),
+        speakright_minimax_tts_config: JSON.stringify({
+          apiKey: "desktop-smoke-minimax-key",
+          modelId: "speech-2.8-turbo",
+          voiceId: "English_expressive_narrator",
+        }),
+        speakright_mimo_tts_config: JSON.stringify({
+          apiKey: "desktop-smoke-mimo-key",
+          modelId: "mimo-v2.5-tts",
+          voiceId: "Mia",
+        }),
         speakright_llm_config: JSON.stringify({
           provider: "openai",
           apiKey: "desktop-smoke-llm-key",
@@ -1387,6 +1397,8 @@ async function captureInteractiveEvidence(debuggingPort) {
   const keys = [
     "speakright_azure_config",
     "speakright_elevenlabs_config",
+    "speakright_minimax_tts_config",
+    "speakright_mimo_tts_config",
     "speakright_llm_config"
   ];
   const deleteDeadline = Date.now() + 10000;
@@ -1418,6 +1430,8 @@ async function captureInteractiveEvidence(debuggingPort) {
   for (const key of [
     "speakright_azure_config",
     "speakright_elevenlabs_config",
+    "speakright_minimax_tts_config",
+    "speakright_mimo_tts_config",
     "speakright_llm_config"
   ]) {
     localStorage.removeItem(key);

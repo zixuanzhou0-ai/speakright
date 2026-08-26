@@ -6,6 +6,7 @@ import {
   fetchPronunciation,
   hermesXaiStatus,
   hermesXaiTts,
+  hermesXaiTtsAligned,
   testElevenLabs,
   vertexGeminiStatus,
   vertexGeminiTts,
@@ -45,14 +46,21 @@ describe("desktop audio API client errors", () => {
 
   afterEach(() => vi.unstubAllGlobals());
 
-  it("routes Hermes audio through Tauri without exposing credentials", async () => {
+  it("routes aligned Hermes audio through Tauri without exposing credentials", async () => {
     mocks.isTauriEnvironment.mockReturnValue(true);
     mocks.invoke.mockResolvedValueOnce({
-      audioBase64: "AA==",
+      audioBase64: "AQID",
       mimeType: "audio/mpeg",
+      audioTimestamps: {
+        graphChars: ["H", "i"],
+        graphTimes: [
+          [0, 0.08],
+          [0.08, 0.16],
+        ],
+      },
     });
 
-    const audio = await hermesXaiTts("Hello", {
+    const result = await hermesXaiTtsAligned("Hello", {
       languageId: "en-US",
       speed: 0.9,
     });
@@ -62,8 +70,13 @@ describe("desktop audio API client errors", () => {
       languageId: "en-US",
       speed: 0.9,
     });
-    expect(audio).toBeInstanceOf(Blob);
-    expect(audio.size).toBe(1);
+    expect(result.audioBlob).toBeInstanceOf(Blob);
+    expect(result.audioBlob.size).toBe(3);
+    expect(result.alignment).toEqual({
+      characters: ["H", "i"],
+      character_start_times_seconds: [0, 0.08],
+      character_end_times_seconds: [0.08, 0.16],
+    });
   });
 
   it("routes Vertex Gemini status and WAV audio through Tauri", async () => {
@@ -182,6 +195,85 @@ describe("desktop audio API client errors", () => {
       }),
     );
     expect(audio.size).toBe(3);
+  });
+
+  it("reads Hermes JSON audio and character alignment from the localhost bridge", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            available: true,
+            protocolVersion: 1,
+            sessionToken: "aligned-session-token",
+          }),
+          { headers: { "Content-Type": "application/json" } },
+        ),
+      )
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            audio_base64: "AQID",
+            content_type: "audio/mpeg",
+            audio_timestamps: {
+              graph_chars: ["H", "i"],
+              graph_times: [
+                [0, 0.08],
+                [0.08, 0.16],
+              ],
+            },
+          }),
+          { headers: { "Content-Type": "application/json" } },
+        ),
+      );
+    vi.stubGlobal("fetch", fetchMock);
+
+    await hermesXaiStatus();
+    const result = await hermesXaiTtsAligned("Hi", { speed: 1 });
+
+    expect(result.audioBlob.type).toBe("audio/mpeg");
+    expect(result.audioBlob.size).toBe(3);
+    expect(result.alignment).toEqual({
+      characters: ["H", "i"],
+      character_start_times_seconds: [0, 0.08],
+      character_end_times_seconds: [0.08, 0.16],
+    });
+  });
+
+  it("keeps Hermes JSON audio when its alignment is malformed", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            available: true,
+            protocolVersion: 1,
+            sessionToken: "malformed-alignment-token",
+          }),
+          { headers: { "Content-Type": "application/json" } },
+        ),
+      )
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            audioBase64: "AQID",
+            mimeType: "audio/mpeg",
+            alignment: {
+              characters: ["H", "i"],
+              character_start_times_seconds: [0],
+              character_end_times_seconds: [0.08],
+            },
+          }),
+          { headers: { "Content-Type": "application/json" } },
+        ),
+      );
+    vi.stubGlobal("fetch", fetchMock);
+
+    await hermesXaiStatus();
+    const result = await hermesXaiTtsAligned("Hi", { speed: 1 });
+
+    expect(result.audioBlob.size).toBe(3);
+    expect(result.alignment).toBeNull();
   });
 
   it("merges an external abort signal into the Hermes bridge timeout signal", async () => {

@@ -1,4 +1,7 @@
 import assert from "node:assert/strict";
+import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import test from "node:test";
 import {
   buildVertexTtsRequest,
@@ -8,7 +11,9 @@ import {
   inspectVertexGemini,
   isAllowedBridgeHost,
   isAllowedSpeakRightOrigin,
+  normalizeHermesAlignment,
   pcm16leToWav,
+  readStableHermesAudio,
   readVertexAccessToken,
   resolveVertexProjectId,
   startHermesXaiBridge,
@@ -16,6 +21,85 @@ import {
   validateTtsPayload,
   validateVertexTtsPayload,
 } from "./hermes-xai-bridge.mjs";
+
+test("reads the checked Hermes audio through one stable file handle", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "speakright-hermes-read-"));
+  const audioPath = join(directory, "speech.mp3");
+  const expected = Buffer.from([0x49, 0x44, 0x33, 0x04]);
+  try {
+    await writeFile(audioPath, expected);
+    assert.deepEqual(await readStableHermesAudio(audioPath), expected);
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test("rejects a Hermes audio file that changes while its handle is read", async () => {
+  const stable = {
+    isFile: () => true,
+    dev: 1n,
+    ino: 2n,
+    mode: 3n,
+    nlink: 1n,
+    size: 3n,
+    mtimeNs: 4n,
+    ctimeNs: 5n,
+  };
+  let statCalls = 0;
+  let closed = false;
+  const handle = {
+    stat: async () => {
+      statCalls += 1;
+      return statCalls === 1 ? stable : { ...stable, mtimeNs: 6n };
+    },
+    read: async (buffer, offset, length) => {
+      const source = Buffer.from("ID3");
+      const bytesRead = Math.min(source.length, length);
+      source.copy(buffer, offset, 0, bytesRead);
+      return { bytesRead };
+    },
+    close: async () => {
+      closed = true;
+    },
+  };
+
+  await assert.rejects(
+    readStableHermesAudio("ignored", {
+      openImpl: async () => handle,
+    }),
+    /HERMES_AUDIO_CHANGED/u,
+  );
+  assert.equal(closed, true);
+});
+
+test("normalizes xAI graph timestamps without inventing missing alignment", () => {
+  assert.deepEqual(
+    normalizeHermesAlignment({
+      audio_timestamps: {
+        graph_chars: ["H", "i"],
+        graph_times: [
+          [0, 0.08],
+          [0.08, 0.2],
+        ],
+      },
+    }),
+    {
+      characters: ["H", "i"],
+      character_start_times_seconds: [0, 0.08],
+      character_end_times_seconds: [0.08, 0.2],
+    },
+  );
+  assert.equal(
+    normalizeHermesAlignment({
+      audio_timestamps: {
+        graph_chars: ["H", "i"],
+        graph_times: [[0, 0.08]],
+      },
+    }),
+    null,
+  );
+  assert.equal(normalizeHermesAlignment({ alignment: null }), null);
+});
 
 test("accepts only exact SpeakRight loopback origins and bridge hosts", () => {
   assert.equal(isAllowedSpeakRightOrigin("http://127.0.0.1:3000"), true);
@@ -258,11 +342,25 @@ test("limits requests inside one sliding window", () => {
   assert.equal(limiter.take(2101), true);
 });
 
-test("serves token-protected loopback endpoints without generating audio", async (context) => {
+test("serves token-protected loopback endpoints with mocked audio", async (context) => {
   const origin = "http://127.0.0.1:3000";
+  let hermesGenerationCalls = 0;
   let vertexGenerationCalls = 0;
   const bridge = await startHermesXaiBridge({
     additionalOrigins: [origin],
+    hermesAudioGenerator: async () => {
+      hermesGenerationCalls += 1;
+      return {
+        audio: Buffer.from([0x49, 0x44, 0x33]),
+        mimeType: "audio/mpeg",
+        duration: 0.2,
+        alignment: {
+          characters: ["H", "i"],
+          character_start_times_seconds: [0, 0.08],
+          character_end_times_seconds: [0.08, 0.2],
+        },
+      };
+    },
     vertexInspector: async () => ({
       available: true,
       provider: "vertex-gemini",
@@ -328,6 +426,35 @@ test("serves token-protected loopback endpoints without generating audio", async
       }),
     });
     assert.equal(unauthenticated.status, 401);
+
+    const hermesAudio = await fetch("http://127.0.0.1:17831/tts", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Origin: origin,
+        "X-SpeakRight-Bridge-Token": status.sessionToken,
+      },
+      body: JSON.stringify({
+        text: "Hi",
+        languageId: "en-US",
+        speed: 1,
+      }),
+    });
+    assert.equal(hermesAudio.status, 200);
+    assert.match(
+      hermesAudio.headers.get("content-type") ?? "",
+      /^application\/json/u,
+    );
+    const hermesPayload = await hermesAudio.json();
+    assert.equal(hermesPayload.audioBase64, "SUQz");
+    assert.equal(hermesPayload.mimeType, "audio/mpeg");
+    assert.equal(hermesPayload.duration, 0.2);
+    assert.deepEqual(hermesPayload.alignment, {
+      characters: ["H", "i"],
+      character_start_times_seconds: [0, 0.08],
+      character_end_times_seconds: [0.08, 0.2],
+    });
+    assert.equal(hermesGenerationCalls, 1);
 
     const vertexAudio = await fetch("http://127.0.0.1:17831/vertex/tts", {
       method: "POST",

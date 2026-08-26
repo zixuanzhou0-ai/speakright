@@ -1,7 +1,7 @@
 import { spawn } from "node:child_process";
 import { randomBytes, timingSafeEqual } from "node:crypto";
 import { existsSync } from "node:fs";
-import { mkdtemp, readFile, rm, stat } from "node:fs/promises";
+import { mkdtemp, open, rm } from "node:fs/promises";
 import { createServer, request as httpRequest } from "node:http";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
@@ -88,19 +88,192 @@ except Exception:
 `;
 
 const TTS_SCRIPT = `
+import base64
 import copy
+import json
+import math
 import sys
 try:
     from tools import tts_tool
+    from tools.xai_http import resolve_xai_http_credentials
+    import requests
+
     text = sys.stdin.read()
     output_path, language, speed_text = sys.argv[1], sys.argv[2], sys.argv[3]
     config = copy.deepcopy(tts_tool._load_tts_config())
     xai = copy.deepcopy(config.get("xai") or {})
-    xai["language"] = language
-    xai["speed"] = float(speed_text)
-    config["xai"] = xai
-    config["provider"] = "xai"
-    tts_tool._generate_xai_tts(text, output_path, config)
+    credentials = resolve_xai_http_credentials()
+    api_key = str(credentials.get("api_key") or "").strip()
+    if not api_key:
+        raise ValueError("No xAI credentials found")
+
+    voice_id = str(
+        xai.get("voice_id") or tts_tool.DEFAULT_XAI_VOICE_ID
+    ).strip() or tts_tool.DEFAULT_XAI_VOICE_ID
+    base_url = str(
+        xai.get("base_url")
+        or credentials.get("base_url")
+        or tts_tool.DEFAULT_XAI_BASE_URL
+    ).strip().rstrip("/")
+    speed = max(
+        tts_tool.DEFAULT_XAI_SPEED_MIN,
+        min(tts_tool.DEFAULT_XAI_SPEED_MAX, float(speed_text)),
+    )
+    sample_rate = int(
+        xai.get("sample_rate", tts_tool.DEFAULT_XAI_SAMPLE_RATE)
+    )
+    bit_rate = int(xai.get("bit_rate", tts_tool.DEFAULT_XAI_BIT_RATE))
+
+    # SpeakRight needs the graphemes to match the visible practice text exactly,
+    # so this bridge intentionally does not apply Hermes' optional speech-tag
+    # rewrite before asking xAI for timestamps.
+    payload = {
+        "text": text,
+        "voice_id": voice_id,
+        "language": language,
+        "with_timestamps": True,
+    }
+    if (
+        sample_rate != tts_tool.DEFAULT_XAI_SAMPLE_RATE
+        or bit_rate != tts_tool.DEFAULT_XAI_BIT_RATE
+    ):
+        payload["output_format"] = {
+            "codec": "mp3",
+            "sample_rate": sample_rate,
+            "bit_rate": bit_rate,
+        }
+    if speed != tts_tool.DEFAULT_XAI_SPEED_DEFAULT:
+        payload["speed"] = speed
+
+    optimize_latency = xai.get(
+        "optimize_streaming_latency",
+        config.get("optimize_streaming_latency"),
+    )
+    if optimize_latency is not None and optimize_latency != "":
+        try:
+            optimize_latency = max(0, min(2, int(optimize_latency)))
+        except (TypeError, ValueError):
+            optimize_latency = 0
+        if optimize_latency != tts_tool.DEFAULT_XAI_OPTIMIZE_STREAMING_LATENCY_DEFAULT:
+            payload["optimize_streaming_latency"] = optimize_latency
+
+    user_agent = getattr(tts_tool, "hermes_xai_user_agent", None)
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+        "User-Agent": user_agent() if callable(user_agent) else "SpeakRight",
+    }
+    response = requests.post(
+        f"{base_url}/tts",
+        headers=headers,
+        json=payload,
+        timeout=60,
+    )
+
+    # Some older xAI-compatible endpoints reject the timestamp flag. Preserve
+    # their previous audio-only behavior without changing the Hermes install.
+    if response.status_code in (400, 422):
+        xai["language"] = language
+        xai["speed"] = speed
+        config["xai"] = xai
+        config["provider"] = "xai"
+        tts_tool._generate_xai_tts(text, output_path, config)
+        print(json.dumps({
+            "mimeType": "audio/mpeg",
+            "duration": None,
+            "alignment": None,
+        }))
+        sys.exit(0)
+
+    response.raise_for_status()
+    content_type = str(response.headers.get("Content-Type") or "").split(";", 1)[0].strip()
+    response_data = None
+    try:
+        response_data = response.json()
+    except (ValueError, json.JSONDecodeError):
+        response_data = None
+
+    if isinstance(response_data, dict) and isinstance(response_data.get("audio"), str):
+        audio = base64.b64decode(response_data["audio"], validate=True)
+        if not audio:
+            raise ValueError("xAI returned empty audio")
+        with open(output_path, "wb") as audio_file:
+            audio_file.write(audio)
+
+        alignment = None
+        timestamp_data = response_data.get("audio_timestamps")
+        if not isinstance(timestamp_data, dict):
+            timestamp_data = response_data.get("audioTimestamps")
+        if isinstance(timestamp_data, dict):
+            characters = timestamp_data.get("graph_chars")
+            if not isinstance(characters, list):
+                characters = timestamp_data.get("graphChars")
+            graph_times = timestamp_data.get("graph_times")
+            if not isinstance(graph_times, list):
+                graph_times = timestamp_data.get("graphTimes")
+            if (
+                isinstance(characters, list)
+                and isinstance(graph_times, list)
+                and len(characters) > 0
+                and len(characters) == len(graph_times)
+            ):
+                starts = []
+                ends = []
+                valid = True
+                previous_start = -1.0
+                for character, time_range in zip(characters, graph_times):
+                    if (
+                        not isinstance(character, str)
+                        or not isinstance(time_range, (list, tuple))
+                        or len(time_range) != 2
+                    ):
+                        valid = False
+                        break
+                    try:
+                        start = float(time_range[0])
+                        end = float(time_range[1])
+                    except (TypeError, ValueError):
+                        valid = False
+                        break
+                    if (
+                        not math.isfinite(start)
+                        or not math.isfinite(end)
+                        or start < 0
+                        or end < start
+                        or start < previous_start
+                    ):
+                        valid = False
+                        break
+                    starts.append(start)
+                    ends.append(end)
+                    previous_start = start
+                if valid:
+                    alignment = {
+                        "characters": characters,
+                        "character_start_times_seconds": starts,
+                        "character_end_times_seconds": ends,
+                    }
+
+        duration = response_data.get("duration")
+        if not isinstance(duration, (int, float)) or not math.isfinite(float(duration)) or duration <= 0:
+            duration = None
+        print(json.dumps({
+            "mimeType": response_data.get("content_type") or response_data.get("contentType") or content_type or "audio/mpeg",
+            "duration": duration,
+            "alignment": alignment,
+        }, ensure_ascii=False))
+    else:
+        # A successful legacy endpoint may still return raw audio even when it
+        # ignores the timestamp flag. Keep it playable and report no alignment.
+        if not response.content:
+            raise ValueError("xAI returned empty audio")
+        with open(output_path, "wb") as audio_file:
+            audio_file.write(response.content)
+        print(json.dumps({
+            "mimeType": content_type or "audio/mpeg",
+            "duration": None,
+            "alignment": None,
+        }))
 except Exception as exc:
     message = str(exc).lower()
     status = getattr(getattr(exc, "response", None), "status_code", None)
@@ -398,6 +571,153 @@ async function inspectHermes() {
   }
 }
 
+export function normalizeHermesAlignment(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const record = value;
+  const nested =
+    record.alignment ?? record.audioTimestamps ?? record.audio_timestamps;
+  if (!nested || typeof nested !== "object" || Array.isArray(nested)) {
+    return null;
+  }
+
+  const characters = Array.isArray(nested.characters)
+    ? nested.characters
+    : Array.isArray(nested.graphChars)
+      ? nested.graphChars
+      : nested.graph_chars;
+  if (!Array.isArray(characters) || characters.length === 0) return null;
+
+  let starts = nested.character_start_times_seconds;
+  let ends = nested.character_end_times_seconds;
+  const graphTimes = Array.isArray(nested.graphTimes)
+    ? nested.graphTimes
+    : nested.graph_times;
+  if (
+    (!Array.isArray(starts) || !Array.isArray(ends)) &&
+    Array.isArray(graphTimes)
+  ) {
+    starts = graphTimes.map((timeRange) =>
+      Array.isArray(timeRange) ? timeRange[0] : undefined,
+    );
+    ends = graphTimes.map((timeRange) =>
+      Array.isArray(timeRange) ? timeRange[1] : undefined,
+    );
+  }
+  if (
+    !Array.isArray(starts) ||
+    !Array.isArray(ends) ||
+    characters.length !== starts.length ||
+    characters.length !== ends.length ||
+    characters.length > 2_000
+  ) {
+    return null;
+  }
+
+  let previousStart = -1;
+  for (let index = 0; index < characters.length; index += 1) {
+    const character = characters[index];
+    const start = starts[index];
+    const end = ends[index];
+    if (
+      typeof character !== "string" ||
+      typeof start !== "number" ||
+      !Number.isFinite(start) ||
+      typeof end !== "number" ||
+      !Number.isFinite(end) ||
+      start < 0 ||
+      end < start ||
+      start < previousStart
+    ) {
+      return null;
+    }
+    previousStart = start;
+  }
+
+  return {
+    characters: [...characters],
+    character_start_times_seconds: [...starts],
+    character_end_times_seconds: [...ends],
+  };
+}
+
+function parseHermesMetadata(stdout) {
+  const lastLine = stdout.trim().split(/\r?\n/).at(-1);
+  if (!lastLine) return {};
+  try {
+    const value = JSON.parse(lastLine);
+    if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+    const mimeType =
+      typeof value.mimeType === "string" &&
+      /^audio\/[a-z0-9.+-]+(?:\s*;[^\r\n]*)?$/iu.test(value.mimeType) &&
+      value.mimeType.length <= 128
+        ? value.mimeType
+        : "audio/mpeg";
+    const duration =
+      typeof value.duration === "number" &&
+      Number.isFinite(value.duration) &&
+      value.duration > 0
+        ? value.duration
+        : undefined;
+    return {
+      mimeType,
+      duration,
+      alignment: normalizeHermesAlignment(value),
+    };
+  } catch {
+    return {};
+  }
+}
+
+const HERMES_AUDIO_STABLE_FIELDS = [
+  "dev",
+  "ino",
+  "mode",
+  "nlink",
+  "size",
+  "mtimeNs",
+  "ctimeNs",
+];
+
+export async function readStableHermesAudio(
+  outputPath,
+  { openImpl = open } = {},
+) {
+  const handle = await openImpl(outputPath, "r");
+  try {
+    const before = await handle.stat({ bigint: true });
+    if (!before.isFile()) throw new Error("HERMES_AUDIO_NOT_REGULAR");
+    if (before.size <= 0n) throw new Error("HERMES_EMPTY_AUDIO");
+    if (before.size > BigInt(MAX_AUDIO_BYTES)) {
+      throw new Error("HERMES_AUDIO_TOO_LARGE");
+    }
+
+    const expectedLength = Number(before.size);
+    const audio = Buffer.allocUnsafe(expectedLength);
+    let offset = 0;
+    while (offset < expectedLength) {
+      const { bytesRead } = await handle.read(
+        audio,
+        offset,
+        expectedLength - offset,
+        offset,
+      );
+      if (bytesRead === 0) break;
+      offset += bytesRead;
+    }
+    const after = await handle.stat({ bigint: true });
+    if (
+      !after.isFile() ||
+      offset !== expectedLength ||
+      HERMES_AUDIO_STABLE_FIELDS.some((field) => before[field] !== after[field])
+    ) {
+      throw new Error("HERMES_AUDIO_CHANGED");
+    }
+    return audio;
+  } finally {
+    await handle.close();
+  }
+}
+
 async function generateHermesAudio({ text, language, speed }) {
   const tempPrefix = join(tmpdir(), "speakright-hermes-");
   const tempDirectory = await mkdtemp(tempPrefix);
@@ -408,17 +728,21 @@ async function generateHermesAudio({ text, language, speed }) {
       args: [outputPath, language, String(speed)],
       input: text,
       timeoutMs: PYTHON_TIMEOUT_MS,
+      captureStdout: true,
     });
     if (result.code !== 0) {
       const error = new Error("HERMES_TTS_FAILED");
       error.exitCode = result.code;
       throw error;
     }
-    const metadata = await stat(outputPath);
-    if (metadata.size <= 0) throw new Error("HERMES_EMPTY_AUDIO");
-    if (metadata.size > MAX_AUDIO_BYTES)
-      throw new Error("HERMES_AUDIO_TOO_LARGE");
-    return await readFile(outputPath);
+    const audio = await readStableHermesAudio(outputPath);
+    const generationMetadata = parseHermesMetadata(result.stdout);
+    return {
+      audio,
+      mimeType: generationMetadata.mimeType ?? "audio/mpeg",
+      alignment: generationMetadata.alignment ?? null,
+      duration: generationMetadata.duration,
+    };
   } finally {
     const resolvedTemp = resolve(tempDirectory);
     const resolvedPrefix = resolve(tmpdir(), "speakright-hermes-");
@@ -1043,6 +1367,7 @@ async function probeCompatibleBridge(origin) {
 
 export async function startHermesXaiBridge({
   additionalOrigins = [],
+  hermesAudioGenerator = generateHermesAudio,
   vertexInspector = inspectVertexGemini,
   vertexAudioGenerator = generateVertexAudio,
 } = {}) {
@@ -1269,15 +1594,51 @@ export async function startHermesXaiBridge({
 
     activeTts += 1;
     try {
-      const audio = isVertexTts
-        ? await vertexAudioGenerator(validation.value)
-        : await generateHermesAudio(validation.value);
-      response.writeHead(200, {
-        ...headers,
-        "Content-Length": String(audio.length),
-        "Content-Type": isVertexTts ? "audio/wav" : "audio/mpeg",
-      });
-      response.end(audio);
+      if (isVertexTts) {
+        const audio = await vertexAudioGenerator(validation.value);
+        response.writeHead(200, {
+          ...headers,
+          "Content-Length": String(audio.length),
+          "Content-Type": "audio/wav",
+        });
+        response.end(audio);
+      } else {
+        const generated = await hermesAudioGenerator(validation.value);
+        const audio = Buffer.isBuffer(generated) ? generated : generated.audio;
+        if (!Buffer.isBuffer(audio) || audio.length === 0) {
+          throw new Error("HERMES_EMPTY_AUDIO");
+        }
+        if (audio.length > MAX_AUDIO_BYTES) {
+          throw new Error("HERMES_AUDIO_TOO_LARGE");
+        }
+        const mimeType =
+          !Buffer.isBuffer(generated) &&
+          typeof generated.mimeType === "string" &&
+          /^audio\/[a-z0-9.+-]+(?:\s*;[^\r\n]*)?$/iu.test(generated.mimeType)
+            ? generated.mimeType
+            : "audio/mpeg";
+        const alignment = Buffer.isBuffer(generated)
+          ? null
+          : normalizeHermesAlignment({ alignment: generated.alignment });
+        const duration =
+          !Buffer.isBuffer(generated) &&
+          typeof generated.duration === "number" &&
+          Number.isFinite(generated.duration) &&
+          generated.duration > 0
+            ? generated.duration
+            : undefined;
+        sendJson(
+          response,
+          200,
+          {
+            audioBase64: audio.toString("base64"),
+            mimeType,
+            alignment,
+            ...(duration === undefined ? {} : { duration }),
+          },
+          headers,
+        );
+      }
     } catch (error) {
       const failure = isVertexTts ? vertexTtsFailure(error) : ttsFailure(error);
       sendJson(response, failure.status, { error: failure.message }, headers);

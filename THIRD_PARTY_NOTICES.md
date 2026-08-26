@@ -44,8 +44,8 @@ every listed Commons digest against the corresponding packaged audio file.
 
 ## API providers and references
 
-Azure Speech, ElevenLabs, Vertex AI, Hermes, and LLM providers are optional
-user-configured services governed by their own terms. Youdao is an automatic,
+Azure Speech, ElevenLabs, MiniMax, Xiaomi MiMo, Vertex AI, Hermes, and LLM
+providers are optional user-configured services governed by their own terms. Youdao is an automatic,
 credential-free word-pronunciation fallback when a user requests playback and
 no eligible bundled English recording is available; it is also governed by its
 own terms.

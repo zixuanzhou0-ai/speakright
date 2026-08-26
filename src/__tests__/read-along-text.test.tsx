@@ -29,8 +29,8 @@ afterEach(() => {
 });
 
 describe("ReadAlongText playback feedback", () => {
-  it("keeps precise word timing states without showing the untimed indicator", () => {
-    render(
+  it("advances precise word timing with color-only emphasis", () => {
+    const view = render(
       <ReadAlongText
         text="echo echo now"
         wordTimings={wordTimings}
@@ -42,6 +42,7 @@ describe("ReadAlongText playback feedback", () => {
     const root = document.querySelector('[data-smoke="read-along-text"]');
     expect(root).toHaveAttribute("data-playback-mode", "word-timed");
     expect(root).toHaveAttribute("data-playing", "true");
+    expect(root).toHaveAttribute("data-layout-motion", "static");
     expect(screen.queryByText("整句播放中")).not.toBeInTheDocument();
 
     const repeatedWords = screen.getAllByText("echo");
@@ -49,9 +50,33 @@ describe("ReadAlongText playback feedback", () => {
     expect(repeatedWords[0]).toHaveAttribute("data-word-state", "past");
     expect(repeatedWords[1]).toHaveAttribute("data-word-index", "1");
     expect(repeatedWords[1]).toHaveAttribute("data-word-state", "current");
+    expect(repeatedWords[1]).toHaveAttribute("data-word-motion", "color-only");
+    expect(repeatedWords[1]).toHaveClass("bg-primary/20", "text-primary");
     expect(screen.getByText("now")).toHaveAttribute(
       "data-word-state",
       "future",
+    );
+
+    view.rerender(
+      <ReadAlongText
+        text="echo echo now"
+        wordTimings={wordTimings}
+        isPlaying
+        currentTime={1.25}
+      />,
+    );
+
+    expect(screen.getAllByText("echo")[1]).toHaveAttribute(
+      "data-word-state",
+      "past",
+    );
+    expect(screen.getByText("now")).toHaveAttribute(
+      "data-word-state",
+      "current",
+    );
+    expect(screen.getByText("now")).toHaveClass(
+      "bg-primary/20",
+      "text-primary",
     );
   });
 
@@ -70,6 +95,7 @@ describe("ReadAlongText playback feedback", () => {
     const root = document.querySelector('[data-smoke="read-along-text"]');
     expect(root).toHaveAttribute("data-playback-mode", "sentence-untimed");
     expect(root).toHaveAttribute("data-playing", "true");
+    expect(root).toHaveAttribute("data-layout-motion", "static");
     expect(root).toHaveAttribute("data-motion", "full");
     expect(root).toHaveClass("border-primary/30", "bg-primary/5");
     expect(screen.getByRole("status")).toHaveTextContent("整句播放中");
@@ -86,7 +112,11 @@ describe("ReadAlongText playback feedback", () => {
     expect(repeatedWords[0]).toHaveAttribute("data-word-index", "0");
     expect(repeatedWords[1]).toHaveAttribute("data-word-index", "1");
     expect(repeatedWords[0]).toHaveAttribute("data-word-state", "speaking");
-    expect(repeatedWords[0]).toHaveClass("text-primary");
+    expect(repeatedWords[0]).toHaveAttribute("data-word-motion", "color-only");
+    expect(repeatedWords[0]).toHaveClass("text-foreground");
+    expect(
+      document.querySelector('[data-word-state="current"]'),
+    ).not.toBeInTheDocument();
     const hasDuplicateKeyWarning = errorSpy.mock.calls.some((call) =>
       call.some((value) => String(value).includes("same key")),
     );

@@ -1,14 +1,18 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { LanguageAvailabilityCard } from "@/components/settings/language-availability-card";
 
 const mocks = vi.hoisted(() => ({
   azureConfig: null as { subscriptionKey: string; region: string } | null,
   elevenLabsConfig: null as { apiKey: string } | null,
+  miniMaxConfig: null as { apiKey: string } | null,
+  mimoConfig: null as { apiKey: string } | null,
   standardTtsProvider: "elevenlabs" as
     | "elevenlabs"
     | "hermes-grok"
-    | "vertex-gemini",
+    | "vertex-gemini"
+    | "minimax"
+    | "mimo",
   languageId: "fr-FR",
   llmConfig: null as { apiKey: string } | null,
   getStaticLanguageAudioPackSummary: vi.fn(),
@@ -17,6 +21,8 @@ const mocks = vi.hoisted(() => ({
 vi.mock("@/hooks/use-api-keys", () => ({
   useAzureConfig: () => mocks.azureConfig,
   useElevenLabsConfig: () => mocks.elevenLabsConfig,
+  useMiniMaxTtsConfig: () => mocks.miniMaxConfig,
+  useMimoTtsConfig: () => mocks.mimoConfig,
   useStandardTtsConfig: () => ({ provider: mocks.standardTtsProvider }),
   useLanguageConfig: () => ({ languageId: mocks.languageId }),
   useLlmConfig: () => mocks.llmConfig,
@@ -31,6 +37,8 @@ describe("language availability card", () => {
     vi.clearAllMocks();
     mocks.azureConfig = { subscriptionKey: "azure-key", region: "eastus" };
     mocks.elevenLabsConfig = null;
+    mocks.miniMaxConfig = null;
+    mocks.mimoConfig = null;
     mocks.standardTtsProvider = "elevenlabs";
     mocks.languageId = "fr-FR";
     mocks.llmConfig = null;
@@ -108,5 +116,81 @@ describe("language availability card", () => {
     expect(document.body.textContent).not.toMatch(
       /exact|speaker|音系清单|待补|mastery|evidenceMastery/,
     );
+  });
+
+  it("recognizes a configured MiniMax standard-demo provider", () => {
+    mocks.languageId = "en-US";
+    mocks.standardTtsProvider = "minimax";
+    mocks.miniMaxConfig = { apiKey: "minimax-key" };
+
+    render(<LanguageAvailabilityCard />);
+
+    expect(screen.getByText("MiniMax 已配置")).toBeInTheDocument();
+    expect(screen.getByText(/真实逐词高亮/)).toBeInTheDocument();
+  });
+
+  it("recognizes configured MiMo while describing sentence-level playback", () => {
+    mocks.languageId = "en-US";
+    mocks.standardTtsProvider = "mimo";
+    mocks.mimoConfig = { apiKey: "mimo-key" };
+
+    render(<LanguageAvailabilityCard />);
+
+    expect(screen.getByText("小米 MiMo 已配置")).toBeInTheDocument();
+    expect(screen.getByText(/整句播放反馈/)).toBeInTheDocument();
+  });
+
+  it.each([
+    "fr-FR",
+    "es-ES",
+    "ru-RU",
+  ])("shows a MiMo compatibility warning for %s", async (languageId) => {
+    mocks.languageId = languageId;
+    mocks.standardTtsProvider = "mimo";
+    mocks.mimoConfig = languageId === "fr-FR" ? null : { apiKey: "mimo-key" };
+    mocks.getStaticLanguageAudioPackSummary.mockResolvedValue(null);
+
+    render(<LanguageAvailabilityCard />);
+
+    const demoAudioRow = document.querySelector(
+      '[data-smoke="language-availability-demo-audio"]',
+    );
+    expect(demoAudioRow).not.toBeNull();
+    await waitFor(() => {
+      expect(
+        within(demoAudioRow as HTMLElement).getByText("MiMo 仅支持英语"),
+      ).toBeInTheDocument();
+    });
+    expect(screen.queryByText("小米 MiMo 已配置")).not.toBeInTheDocument();
+    expect(screen.getByText(/MiMo 英文预置音色仅用于英语/)).toBeInTheDocument();
+  });
+
+  it("keeps the MiMo compatibility warning when bundled audio is available", async () => {
+    mocks.languageId = "fr-FR";
+    mocks.standardTtsProvider = "mimo";
+    mocks.mimoConfig = { apiKey: "mimo-key" };
+    mocks.getStaticLanguageAudioPackSummary.mockResolvedValue({
+      languageId: "fr-FR",
+      itemCount: 545,
+      modelId: "eleven_multilingual_v2",
+      voiceName: "Clément",
+      voiceSlots: ["blue", "pink"],
+    });
+
+    render(<LanguageAvailabilityCard />);
+
+    const demoAudioRow = document.querySelector(
+      '[data-smoke="language-availability-demo-audio"]',
+    );
+    expect(demoAudioRow).not.toBeNull();
+    await waitFor(() => {
+      expect(
+        within(demoAudioRow as HTMLElement).getByText("MiMo 仅支持英语"),
+      ).toBeInTheDocument();
+    });
+    expect(
+      screen.getByText(/随浏览器版提供的单词和短语示范音频仍可使用/),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/为当前语言改选支持的 TTS/)).toBeInTheDocument();
   });
 });

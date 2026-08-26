@@ -10,8 +10,22 @@ export interface ElevenLabsConfig {
   modelId: string;
 }
 
+export interface MiniMaxTtsConfig {
+  apiKey: string;
+  modelId: string;
+  voiceId: string;
+}
+
+export interface MimoTtsConfig {
+  apiKey: string;
+  modelId: string;
+  voiceId: string;
+}
+
 export type StandardTtsProvider =
   | "elevenlabs"
+  | "minimax"
+  | "mimo"
   | "hermes-grok"
   | "vertex-gemini";
 

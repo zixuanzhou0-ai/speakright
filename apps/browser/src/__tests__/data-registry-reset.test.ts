@@ -1,5 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+const mocks = vi.hoisted(() => ({
+  clearTtsCache: vi.fn(async () => {}),
+}));
+
 vi.mock("@/lib/benchmark-archive", () => ({
   clearBenchmarkRecordings: vi.fn(async () => {}),
   exportBenchmarkRecordings: vi.fn(async () => ({
@@ -11,7 +15,7 @@ vi.mock("@/lib/benchmark-archive", () => ({
 }));
 
 vi.mock("@/lib/tts-cache", () => ({
-  clearTtsCache: vi.fn(async () => {}),
+  clearTtsCache: mocks.clearTtsCache,
 }));
 
 vi.mock("@/lib/language-audio-pack-cache", () => ({
@@ -22,6 +26,8 @@ describe("Browser Edition full local reset", () => {
   beforeEach(() => {
     localStorage.clear();
     sessionStorage.clear();
+    vi.clearAllMocks();
+    mocks.clearTtsCache.mockResolvedValue(undefined);
   });
 
   it("removes current and future SpeakRight data while preserving keys on request", async () => {
@@ -54,5 +60,18 @@ describe("Browser Edition full local reset", () => {
 
     expect(sessionStorage.getItem("speakright_azure_config")).toBeNull();
     expect(localStorage.getItem("speakright_llm_config")).toBeNull();
+  });
+
+  it("reports a TTS cache deletion failure and leaves local learning data intact", async () => {
+    const { deleteLearningData } = await import("@/lib/data-registry");
+    localStorage.setItem("speakright_mastery_profile_v2", "{}");
+    mocks.clearTtsCache.mockRejectedValueOnce(
+      new Error("tts cache delete failed"),
+    );
+
+    await expect(deleteLearningData()).rejects.toThrow(
+      "tts cache delete failed",
+    );
+    expect(localStorage.getItem("speakright_mastery_profile_v2")).toBe("{}");
   });
 });

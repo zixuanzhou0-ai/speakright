@@ -6,13 +6,19 @@
 
 import { isTauriEnvironment } from "@/lib/tauri-runtime";
 
+export interface ApiFetchOptions extends RequestInit {
+  /** Tauri plugin-http redirect cap; omitted before native browser fetch. */
+  maxRedirections?: number;
+}
+
 export async function apiFetch(
   url: string,
-  options?: RequestInit,
+  options?: ApiFetchOptions,
 ): Promise<Response> {
   if (isTauriEnvironment()) {
     const { fetch: tauriFetch } = await import("@tauri-apps/plugin-http");
     return tauriFetch(url, options as Parameters<typeof tauriFetch>[1]);
   }
-  return fetch(url, options);
+  const { maxRedirections: _maxRedirections, ...nativeOptions } = options ?? {};
+  return fetch(url, nativeOptions);
 }

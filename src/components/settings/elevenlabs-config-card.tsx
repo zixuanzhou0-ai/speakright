@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,12 +21,16 @@ import {
 } from "@/components/ui/select";
 import {
   useElevenLabsConfig,
+  useMimoTtsConfig,
+  useMiniMaxTtsConfig,
   useStandardTtsConfig,
   useVertexGeminiTtsConfig,
 } from "@/hooks/use-api-keys";
 import {
   hermesXaiStatus,
   hermesXaiTts,
+  mimoTts,
+  miniMaxTtsAligned,
   testElevenLabs,
   type VertexGeminiStatus,
   vertexGeminiStatus,
@@ -34,6 +38,8 @@ import {
 } from "@/lib/api-client";
 import {
   setElevenLabsConfig,
+  setMimoTtsConfig,
+  setMiniMaxTtsConfig,
   setStandardTtsConfig,
   setVertexGeminiTtsConfig,
 } from "@/lib/api-keys";
@@ -62,16 +68,96 @@ const ELEVENLABS_MODELS = [
 
 const VERTEX_GEMINI_VOICES = ["Kore", "Charon", "Aoede", "Callirrhoe"];
 
+const MINIMAX_MODELS = [
+  { id: "speech-2.8-turbo", label: "Speech 2.8 Turbo — 推荐 / 更省" },
+  { id: "speech-2.8-hd", label: "Speech 2.8 HD — 更高质量" },
+];
+
+const MINIMAX_VOICES = [
+  { id: "English_expressive_narrator", label: "Expressive Narrator（默认）" },
+  { id: "English_radiant_girl", label: "Radiant Girl" },
+  { id: "English_magnetic_voiced_man", label: "Magnetic-voiced Man" },
+  { id: "English_CalmWoman", label: "Calm Woman" },
+  { id: "English_PatientMan", label: "Patient Man" },
+];
+
+const MIMO_MODELS = [
+  { id: "mimo-v2.5-tts", label: "MiMo V2.5 TTS — 预置精品音色" },
+];
+
+const MIMO_VOICES = ["Mia", "Chloe", "Milo", "Dean"];
+
+async function playSettingsPreview(
+  audioBlob: Blob,
+  signal?: AbortSignal,
+  onPlaybackSettled?: () => void,
+): Promise<boolean> {
+  if (audioBlob.size === 0) throw new Error("服务返回了空音频");
+  signal?.throwIfAborted();
+  const audioUrl = URL.createObjectURL(audioBlob);
+  const audio = new Audio(audioUrl);
+  let released = false;
+  const releaseAudioUrl = () => {
+    if (released) return;
+    released = true;
+    signal?.removeEventListener("abort", stopPlayback);
+    URL.revokeObjectURL(audioUrl);
+    onPlaybackSettled?.();
+  };
+  const stopPlayback = () => {
+    audio.pause();
+    releaseAudioUrl();
+  };
+  signal?.addEventListener("abort", stopPlayback, { once: true });
+  audio.addEventListener("ended", releaseAudioUrl, { once: true });
+  audio.addEventListener("error", releaseAudioUrl, { once: true });
+  try {
+    await audio.play();
+    signal?.throwIfAborted();
+    return true;
+  } catch (error) {
+    releaseAudioUrl();
+    if (signal?.aborted) throw error;
+    return false;
+  }
+}
+
 export function ElevenLabsConfigCard() {
   const [apiKey, setApiKey] = useState("");
   const [voiceId, setVoiceId] = useState("");
   const [modelId, setModelId] = useState("eleven_flash_v2_5");
   const saved = useElevenLabsConfig();
+  const savedMiniMax = useMiniMaxTtsConfig();
+  const savedMimo = useMimoTtsConfig();
   const standardTts = useStandardTtsConfig();
   const vertexConfig = useVertexGeminiTtsConfig();
   const [hermesVoiceId, setHermesVoiceId] = useState<string | null>(null);
   const [vertexStatusInfo, setVertexStatusInfo] =
     useState<VertexGeminiStatus | null>(null);
+  const [miniMaxApiKey, setMiniMaxApiKey] = useState("");
+  const [miniMaxModelId, setMiniMaxModelId] = useState("speech-2.8-turbo");
+  const [miniMaxVoiceId, setMiniMaxVoiceId] = useState(
+    "English_expressive_narrator",
+  );
+  const [mimoApiKey, setMimoApiKey] = useState("");
+  const [mimoModelId, setMimoModelId] = useState("mimo-v2.5-tts");
+  const [mimoVoiceId, setMimoVoiceId] = useState("Mia");
+  const [status, setStatus] = useState<ConnectionState>("idle");
+  const [statusMsg, setStatusMsg] = useState("");
+  const [previewingProvider, setPreviewingProvider] = useState<
+    "minimax" | "mimo" | null
+  >(null);
+  const previewAbortRef = useRef<AbortController | null>(null);
+  const previewRequestIdRef = useRef(0);
+
+  const cancelDomesticPreview = useCallback(() => {
+    previewRequestIdRef.current += 1;
+    previewAbortRef.current?.abort();
+    previewAbortRef.current = null;
+    setPreviewingProvider(null);
+    setStatus("idle");
+    setStatusMsg("");
+  }, []);
 
   useEffect(() => {
     if (saved) {
@@ -84,11 +170,28 @@ export function ElevenLabsConfigCard() {
       setModelId("eleven_flash_v2_5");
     }
   }, [saved]);
-  const [status, setStatus] = useState<ConnectionState>("idle");
-  const [statusMsg, setStatusMsg] = useState("");
-
+  useEffect(() => {
+    cancelDomesticPreview();
+    setMiniMaxApiKey(savedMiniMax?.apiKey ?? "");
+    setMiniMaxModelId(savedMiniMax?.modelId || "speech-2.8-turbo");
+    setMiniMaxVoiceId(savedMiniMax?.voiceId || "English_expressive_narrator");
+  }, [cancelDomesticPreview, savedMiniMax]);
+  useEffect(() => {
+    cancelDomesticPreview();
+    setMimoApiKey(savedMimo?.apiKey ?? "");
+    setMimoModelId(savedMimo?.modelId || "mimo-v2.5-tts");
+    setMimoVoiceId(savedMimo?.voiceId || "Mia");
+  }, [cancelDomesticPreview, savedMimo]);
+  useEffect(
+    () => () => {
+      previewRequestIdRef.current += 1;
+      previewAbortRef.current?.abort();
+    },
+    [],
+  );
   const handleProviderChange = (provider: StandardTtsProvider) => {
     if (provider === standardTts.provider) return;
+    cancelDomesticPreview();
     setStandardTtsConfig({ provider });
     setStatus("idle");
     setStatusMsg("");
@@ -97,7 +200,11 @@ export function ElevenLabsConfigCard() {
         ? "爱马仕 Grok TTS"
         : provider === "vertex-gemini"
           ? "Vertex AI · Gemini 3.1 Flash TTS"
-          : "ElevenLabs";
+          : provider === "minimax"
+            ? "MiniMax Speech 2.8"
+            : provider === "mimo"
+              ? "小米 MiMo V2.5 TTS"
+              : "ElevenLabs";
     toast.success(`标准示范已切换为${providerName}`);
   };
 
@@ -155,6 +262,208 @@ export function ElevenLabsConfigCard() {
           "ElevenLabs 连接测试失败，请检查网络、代理或 API Key 后重试。",
         ),
       );
+    }
+  };
+
+  const handleMiniMaxSave = () => {
+    if (!miniMaxApiKey.trim()) {
+      const message = "请填写 MiniMax API Key 后再保存配置";
+      toast.error(message);
+      setStatus("error");
+      setStatusMsg(message);
+      return;
+    }
+    setMiniMaxTtsConfig({
+      apiKey: miniMaxApiKey.trim(),
+      modelId: miniMaxModelId,
+      voiceId: miniMaxVoiceId,
+    });
+    toast.success("MiniMax TTS 配置已保存到本机安全存储");
+    setStatus("success");
+    setStatusMsg("MiniMax 配置已保存，逐词时间轴将在生成时同步缓存。");
+  };
+
+  const handleMiniMaxTest = async () => {
+    if (!miniMaxApiKey.trim()) {
+      setStatus("error");
+      setStatusMsg("请先填写 MiniMax API Key 后再试听");
+      return;
+    }
+    setStatus("testing");
+    setStatusMsg("");
+    previewAbortRef.current?.abort();
+    const controller = new AbortController();
+    previewAbortRef.current = controller;
+    const requestId = previewRequestIdRef.current + 1;
+    previewRequestIdRef.current = requestId;
+    setPreviewingProvider("minimax");
+    let playbackStarted = false;
+    try {
+      const result = await miniMaxTtsAligned(
+        miniMaxApiKey.trim(),
+        "Hello, this is SpeakRight.",
+        {
+          languageId: "en-US",
+          speed: 0.9,
+          modelId: miniMaxModelId,
+          voiceId: miniMaxVoiceId,
+          signal: controller.signal,
+        },
+      );
+      if (
+        controller.signal.aborted ||
+        requestId !== previewRequestIdRef.current
+      ) {
+        return;
+      }
+      const started = await playSettingsPreview(
+        result.audioBlob,
+        controller.signal,
+        () => {
+          if (
+            requestId === previewRequestIdRef.current &&
+            previewAbortRef.current === controller
+          ) {
+            previewAbortRef.current = null;
+          }
+        },
+      );
+      playbackStarted = started;
+      if (
+        controller.signal.aborted ||
+        requestId !== previewRequestIdRef.current
+      ) {
+        return;
+      }
+      setStatus("success");
+      const timelineMessage =
+        result.alignmentOutcome === "matched"
+          ? `收到 ${result.wordTimings.length} 个真实词时间点`
+          : result.alignmentOutcome === "transient-unavailable"
+            ? "本次字幕服务暂时不可用；自由练习会在下次生成时重试词时间轴"
+            : "本次字幕与原文不完全匹配，将使用整句播放模式";
+      setStatusMsg(
+        started
+          ? `MiniMax 短句已播放；${timelineMessage}`
+          : "短句已生成；系统阻止了自动播放，请再次点击试听",
+      );
+    } catch (error) {
+      if (
+        controller.signal.aborted ||
+        requestId !== previewRequestIdRef.current
+      ) {
+        return;
+      }
+      setStatus("error");
+      setStatusMsg(
+        getSettingsUserFacingError(
+          error,
+          "MiniMax TTS 试听失败，请检查 API Key、模型、额度和网络。",
+        ),
+      );
+    } finally {
+      if (requestId === previewRequestIdRef.current) {
+        if (!playbackStarted && previewAbortRef.current === controller) {
+          previewAbortRef.current = null;
+        }
+        setPreviewingProvider(null);
+      }
+    }
+  };
+
+  const handleMimoSave = () => {
+    if (!mimoApiKey.trim()) {
+      const message = "请填写小米 MiMo API Key 后再保存配置";
+      toast.error(message);
+      setStatus("error");
+      setStatusMsg(message);
+      return;
+    }
+    setMimoTtsConfig({
+      apiKey: mimoApiKey.trim(),
+      modelId: mimoModelId,
+      voiceId: mimoVoiceId,
+    });
+    toast.success("小米 MiMo TTS 配置已保存到本机安全存储");
+    setStatus("success");
+    setStatusMsg("MiMo 配置已保存；播放时使用真实整句状态，不伪造逐词时间轴。");
+  };
+
+  const handleMimoTest = async () => {
+    if (!mimoApiKey.trim()) {
+      setStatus("error");
+      setStatusMsg("请先填写小米 MiMo API Key 后再试听");
+      return;
+    }
+    setStatus("testing");
+    setStatusMsg("");
+    previewAbortRef.current?.abort();
+    const controller = new AbortController();
+    previewAbortRef.current = controller;
+    const requestId = previewRequestIdRef.current + 1;
+    previewRequestIdRef.current = requestId;
+    setPreviewingProvider("mimo");
+    let playbackStarted = false;
+    try {
+      const blob = await mimoTts(
+        mimoApiKey.trim(),
+        "Hello, this is SpeakRight.",
+        {
+          languageId: "en-US",
+          speed: 0.9,
+          modelId: mimoModelId,
+          voiceId: mimoVoiceId,
+          signal: controller.signal,
+        },
+      );
+      if (
+        controller.signal.aborted ||
+        requestId !== previewRequestIdRef.current
+      ) {
+        return;
+      }
+      const started = await playSettingsPreview(blob, controller.signal, () => {
+        if (
+          requestId === previewRequestIdRef.current &&
+          previewAbortRef.current === controller
+        ) {
+          previewAbortRef.current = null;
+        }
+      });
+      playbackStarted = started;
+      if (
+        controller.signal.aborted ||
+        requestId !== previewRequestIdRef.current
+      ) {
+        return;
+      }
+      setStatus("success");
+      setStatusMsg(
+        started
+          ? "小米 MiMo 短句已生成并开始播放"
+          : "短句已生成；系统阻止了自动播放，请再次点击试听",
+      );
+    } catch (error) {
+      if (
+        controller.signal.aborted ||
+        requestId !== previewRequestIdRef.current
+      ) {
+        return;
+      }
+      setStatus("error");
+      setStatusMsg(
+        getSettingsUserFacingError(
+          error,
+          "小米 MiMo TTS 试听失败，请检查 API Key、模型和网络。",
+        ),
+      );
+    } finally {
+      if (requestId === previewRequestIdRef.current) {
+        if (!playbackStarted && previewAbortRef.current === controller) {
+          previewAbortRef.current = null;
+        }
+        setPreviewingProvider(null);
+      }
     }
   };
 
@@ -262,14 +571,11 @@ export function ElevenLabsConfigCard() {
     setStatus("testing");
     setStatusMsg("");
     try {
-      const audioBlob = await vertexGeminiTts(
-        "Hello, this is SpeakRight.",
-        {
-          languageId: "en-US",
-          speed: 1,
-          voiceName: vertexConfig.voiceName,
-        },
-      );
+      const audioBlob = await vertexGeminiTts("Hello, this is SpeakRight.", {
+        languageId: "en-US",
+        speed: 1,
+        voiceName: vertexConfig.voiceName,
+      });
       if (audioBlob.size === 0) {
         throw new Error("Vertex Gemini 返回了空音频");
       }
@@ -305,13 +611,12 @@ export function ElevenLabsConfigCard() {
       <CardHeader>
         <CardTitle>标准示范 TTS</CardTitle>
         <CardDescription>
-          在 ElevenLabs、爱马仕 Grok 与本机 Vertex Gemini TTS
-          间切换；单词词典发音在下方单独配置。
+          在国际、本机与中国大陆可用的云端服务之间切换；单词词典发音在下方单独配置。
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <fieldset
-          className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
+          className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5"
           data-smoke="tts-provider-selector"
         >
           <legend className="sr-only">选择标准示范 TTS</legend>
@@ -329,6 +634,38 @@ export function ElevenLabsConfigCard() {
             <span className="block font-semibold">ElevenLabs</span>
             <span className="mt-1 block text-sm leading-6 text-muted-foreground">
               云端高质量语音，支持精准逐词高亮
+            </span>
+          </button>
+          <button
+            aria-pressed={standardTts.provider === "minimax"}
+            className={`min-h-24 rounded-xl border p-4 text-left transition-colors ${
+              standardTts.provider === "minimax"
+                ? "border-primary bg-primary/10 ring-1 ring-primary/20"
+                : "border-border bg-muted/20 hover:border-primary/40 hover:bg-muted/40"
+            }`}
+            data-smoke="tts-provider-minimax"
+            onClick={() => handleProviderChange("minimax")}
+            type="button"
+          >
+            <span className="block font-semibold">MiniMax</span>
+            <span className="mt-1 block text-sm leading-6 text-muted-foreground">
+              大陆云端 · 原生真实逐词时间轴
+            </span>
+          </button>
+          <button
+            aria-pressed={standardTts.provider === "mimo"}
+            className={`min-h-24 rounded-xl border p-4 text-left transition-colors ${
+              standardTts.provider === "mimo"
+                ? "border-primary bg-primary/10 ring-1 ring-primary/20"
+                : "border-border bg-muted/20 hover:border-primary/40 hover:bg-muted/40"
+            }`}
+            data-smoke="tts-provider-mimo"
+            onClick={() => handleProviderChange("mimo")}
+            type="button"
+          >
+            <span className="block font-semibold">小米 MiMo</span>
+            <span className="mt-1 block text-sm leading-6 text-muted-foreground">
+              大陆云端 · 英文精品音色 · 整句播放
             </span>
           </button>
           <button
@@ -358,9 +695,7 @@ export function ElevenLabsConfigCard() {
             onClick={() => handleProviderChange("vertex-gemini")}
             type="button"
           >
-            <span className="block font-semibold">
-              Vertex AI · Gemini 3.1
-            </span>
+            <span className="block font-semibold">Vertex AI · Gemini 3.1</span>
             <span className="mt-1 block text-sm leading-6 text-muted-foreground">
               Flash TTS（预览）· 复用本机 gcloud；暂不提供逐词时间轴
             </span>
@@ -441,6 +776,209 @@ export function ElevenLabsConfigCard() {
               <ConnectionStatus state={status} message={statusMsg} />
             </div>
           </div>
+        ) : standardTts.provider === "minimax" ? (
+          <div className="space-y-4" data-smoke="tts-provider-panel-minimax">
+            {!miniMaxApiKey.trim() && (
+              <div
+                className="rounded-lg border border-amber-500/25 bg-amber-500/10 p-3 text-sm text-amber-900 dark:text-amber-200"
+                data-smoke="minimax-missing-key-guidance"
+                role="status"
+              >
+                MiniMax
+                适合需要真实逐词高亮的大陆网络环境。请使用你自己的开放平台 API
+                Key；密钥只进入本机安全存储。
+              </div>
+            )}
+            <div className="space-y-2">
+              <Label htmlFor="minimax-key">MiniMax API Key</Label>
+              <Input
+                id="minimax-key"
+                type="password"
+                autoComplete="off"
+                placeholder="输入 MiniMax 开放平台密钥"
+                value={miniMaxApiKey}
+                onChange={(event) => {
+                  cancelDomesticPreview();
+                  setMiniMaxApiKey(event.target.value);
+                }}
+              />
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="minimax-model">MiniMax 模型</Label>
+                <Select
+                  value={miniMaxModelId}
+                  onValueChange={(value) => {
+                    if (!value) return;
+                    cancelDomesticPreview();
+                    setMiniMaxModelId(value);
+                  }}
+                >
+                  <SelectTrigger
+                    id="minimax-model"
+                    data-smoke="minimax-model-select"
+                  >
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {MINIMAX_MODELS.map((model) => (
+                      <SelectItem key={model.id} value={model.id}>
+                        {model.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="minimax-voice">MiniMax 英文音色</Label>
+                <Select
+                  value={miniMaxVoiceId}
+                  onValueChange={(value) => {
+                    if (!value) return;
+                    cancelDomesticPreview();
+                    setMiniMaxVoiceId(value);
+                  }}
+                >
+                  <SelectTrigger
+                    id="minimax-voice"
+                    data-smoke="minimax-voice-select"
+                  >
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {MINIMAX_VOICES.map((voice) => (
+                      <SelectItem key={voice.id} value={voice.id}>
+                        {voice.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <p className="text-sm leading-6 text-muted-foreground">
+              SpeakRight
+              请求官方词级字幕并与原文逐词核对；若服务未返回字幕或文本被规范化，
+              会自动退回整句播放，不会估算或伪造高亮。
+            </p>
+            <div
+              className="flex flex-wrap items-center gap-3"
+              data-smoke="minimax-config-actions"
+            >
+              <Button
+                className={WRAP_SAFE_SETTINGS_ACTION_BUTTON_CLASS}
+                onClick={handleMiniMaxSave}
+              >
+                保存
+              </Button>
+              <Button
+                className={WRAP_SAFE_SETTINGS_ACTION_BUTTON_CLASS}
+                disabled={previewingProvider !== null}
+                onClick={handleMiniMaxTest}
+                variant="outline"
+              >
+                试听短句（会产生用量）
+              </Button>
+              <ConnectionStatus state={status} message={statusMsg} />
+            </div>
+          </div>
+        ) : standardTts.provider === "mimo" ? (
+          <div className="space-y-4" data-smoke="tts-provider-panel-mimo">
+            {!mimoApiKey.trim() && (
+              <div
+                className="rounded-lg border border-amber-500/25 bg-amber-500/10 p-3 text-sm text-amber-900 dark:text-amber-200"
+                data-smoke="mimo-missing-key-guidance"
+                role="status"
+              >
+                小米 MiMo
+                目前提供英文预置音色，但官方接口没有词级时间轴；播放时使用真实的
+                “整句播放中”反馈。
+              </div>
+            )}
+            <div className="space-y-2">
+              <Label htmlFor="mimo-key">小米 MiMo API Key</Label>
+              <Input
+                id="mimo-key"
+                type="password"
+                autoComplete="off"
+                placeholder="输入 Xiaomi MiMo 开放平台密钥"
+                value={mimoApiKey}
+                onChange={(event) => {
+                  cancelDomesticPreview();
+                  setMimoApiKey(event.target.value);
+                }}
+              />
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="mimo-model">MiMo 模型</Label>
+                <Select
+                  value={mimoModelId}
+                  onValueChange={(value) => {
+                    if (!value) return;
+                    cancelDomesticPreview();
+                    setMimoModelId(value);
+                  }}
+                >
+                  <SelectTrigger id="mimo-model" data-smoke="mimo-model-select">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {MIMO_MODELS.map((model) => (
+                      <SelectItem key={model.id} value={model.id}>
+                        {model.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="mimo-voice">MiMo 英文音色</Label>
+                <Select
+                  value={mimoVoiceId}
+                  onValueChange={(value) => {
+                    if (!value) return;
+                    cancelDomesticPreview();
+                    setMimoVoiceId(value);
+                  }}
+                >
+                  <SelectTrigger id="mimo-voice" data-smoke="mimo-voice-select">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {MIMO_VOICES.map((voice) => (
+                      <SelectItem key={voice} value={voice}>
+                        {voice}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <p className="text-sm leading-6 text-muted-foreground">
+              当前只用于英语标准示范。语速滑块会转换成清晰的教学语速指令；重听复用本机缓存，
+              不会再次请求服务。
+            </p>
+            <div
+              className="flex flex-wrap items-center gap-3"
+              data-smoke="mimo-config-actions"
+            >
+              <Button
+                className={WRAP_SAFE_SETTINGS_ACTION_BUTTON_CLASS}
+                onClick={handleMimoSave}
+              >
+                保存
+              </Button>
+              <Button
+                className={WRAP_SAFE_SETTINGS_ACTION_BUTTON_CLASS}
+                disabled={previewingProvider !== null}
+                onClick={handleMimoTest}
+                variant="outline"
+              >
+                试听短句（会产生用量）
+              </Button>
+              <ConnectionStatus state={status} message={statusMsg} />
+            </div>
+          </div>
         ) : standardTts.provider === "hermes-grok" ? (
           <div
             className="space-y-4"
@@ -455,7 +993,8 @@ export function ElevenLabsConfigCard() {
                 <p className="mt-1 text-sm leading-6 text-muted-foreground">
                   无需在 SpeakRight 配置或持久化 Grok
                   密钥；调用由本机爱马仕子进程完成，授权和声音仍由爱马仕管理。
-                  Browser Edition 通过本机启动器运行时会自动启动桥接，无需同时打开桌面端。
+                  Browser Edition
+                  通过本机启动器运行时会自动启动桥接，无需同时打开桌面端。
                 </p>
               </div>
               <div className="grid gap-3 text-sm sm:grid-cols-2">
@@ -507,8 +1046,9 @@ export function ElevenLabsConfigCard() {
               <div>
                 <p className="font-medium">直接沿用本机 Vertex AI 授权</p>
                 <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                  SpeakRight 不保存 Google 密钥；需要本机 gcloud 已选择项目，并完成
-                  Application Default Credentials（ADC）登录。状态检测不会生成语音，试听才会产生
+                  SpeakRight 不保存 Google 密钥；需要本机 gcloud
+                  已选择项目，并完成 Application Default
+                  Credentials（ADC）登录。状态检测不会生成语音，试听才会产生
                   Vertex AI 用量。
                 </p>
               </div>
@@ -518,8 +1058,7 @@ export function ElevenLabsConfigCard() {
                     模型
                   </span>
                   <span className="mt-1 block break-all font-medium">
-                    {vertexStatusInfo?.model ||
-                      "gemini-3.1-flash-tts-preview"}
+                    {vertexStatusInfo?.model || "gemini-3.1-flash-tts-preview"}
                   </span>
                 </div>
                 <div className="rounded-lg border bg-background/70 px-3 py-2.5">

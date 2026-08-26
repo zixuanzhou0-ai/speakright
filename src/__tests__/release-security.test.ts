@@ -66,7 +66,7 @@ describe("release security configuration", () => {
     expect(urls.every((url) => !url.startsWith("http://"))).toBe(true);
   });
 
-  it("keeps current verified LLM origins in desktop network policy only", () => {
+  it("keeps current verified LLM and TTS origins precisely scoped", () => {
     const capability = readJson<{
       permissions: Array<
         | string
@@ -88,8 +88,15 @@ describe("release security configuration", () => {
     expect(urls).toContain("https://api.z.ai/**");
     expect(connectSrc).toContain("https://api.moonshot.ai");
     expect(connectSrc).toContain("https://api.z.ai");
-    expect(urls.join("\n")).not.toMatch(/minimax|mimo|xiaomi/i);
-    expect(connectSrc).not.toMatch(/minimax|mimo|xiaomi/i);
+    expect(urls).toContain("https://api.minimaxi.com/**");
+    expect(urls).toContain("https://filecdn.minimax.chat/**");
+    expect(urls).toContain("https://api.xiaomimimo.com/**");
+    expect(connectSrc).toContain("https://api.minimaxi.com");
+    expect(connectSrc).toContain("https://filecdn.minimax.chat");
+    expect(connectSrc).toContain("https://api.xiaomimimo.com");
+    expect(urls).not.toContain("https://*.minimax.chat/**");
+    expect(urls).not.toContain("https://*.minimaxi.com/**");
+    expect(urls).not.toContain("https://*.xiaomimimo.com/**");
   });
 
   it("keeps Tauri HTTP permission scoped to the allowlisted default object", () => {

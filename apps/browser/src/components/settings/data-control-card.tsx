@@ -61,7 +61,7 @@ const COPY: Record<
   "api-keys": {
     title: "删除所有 API keys？",
     description:
-      "会删除 Azure、ElevenLabs 和 LLM 的本机密钥。删除后需要重新配置才能继续调用服务。",
+      "会删除 Azure、ElevenLabs、MiniMax、小米 MiMo 和 LLM 的本机密钥。删除后需要重新配置才能继续调用服务。",
     button: "删除 API keys",
   },
   "benchmark-audio": {
@@ -296,8 +296,9 @@ export function DataControlCard() {
             <div id="privacy-details" className="space-y-2">
               <p>
                 录音评分会发送音频与参考文本到 Azure
-                Speech；标准示范会把练习文本发送到你选择的 ElevenLabs，或经本机桥接交给爱马仕
-                Grok TTS / Vertex AI Gemini TTS；AI
+                Speech；标准示范会把练习文本发送到你选择的
+                ElevenLabs、MiniMax、小米 MiMo，或经本机桥接交给爱马仕 Grok TTS / Vertex AI
+                Gemini TTS；AI
                 教练会把文本、分数和错误摘要发送到你配置的 LLM provider。
               </p>
               <p>
@@ -421,7 +422,7 @@ export function DataControlCard() {
               <div className="min-w-0 break-words [overflow-wrap:anywhere]">
                 <p className="text-sm font-medium">同时删除 API keys</p>
                 <p className="text-xs text-muted-foreground">
-                  关闭时会保留 Azure、ElevenLabs、LLM
+                  关闭时会保留 Azure、ElevenLabs、MiniMax、小米 MiMo、LLM
                   和词典密钥，便于重置后继续使用。
                 </p>
               </div>

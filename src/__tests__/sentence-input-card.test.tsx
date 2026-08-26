@@ -15,6 +15,7 @@ function renderCard({
   ttsWordTimings = [],
   targetPreview = null,
   hasPlayedWord = false,
+  wordAudioIsPlaying = false,
 }: {
   isWordMode?: boolean;
   sentence?: string;
@@ -26,6 +27,7 @@ function renderCard({
   ttsWordTimings?: { word: string; start: number; end: number }[];
   targetPreview?: FreePracticeTargetPreview | null;
   hasPlayedWord?: boolean;
+  wordAudioIsPlaying?: boolean;
 } = {}) {
   return render(
     <SentenceInputCard
@@ -38,7 +40,7 @@ function renderCard({
       trimmedText={sentence}
       wordIpa={isWordMode ? "/ˈpræktɪs/" : null}
       hasPlayedWord={hasPlayedWord}
-      wordAudioIsPlaying={false}
+      wordAudioIsPlaying={wordAudioIsPlaying}
       wordAudioIsLoading={false}
       onWordAudioPlay={vi.fn()}
       ttsIsPlaying={ttsIsPlaying}
@@ -209,6 +211,22 @@ describe("SentenceInputCard narrow layout", () => {
       "data-smoke",
       "free-practice-word-replay",
     );
+  });
+
+  it("shows word playback with color only and keeps the card geometry static", () => {
+    renderCard({
+      isWordMode: true,
+      sentence: "practice",
+      wordAudioIsPlaying: true,
+    });
+
+    const wordCard = document.querySelector(
+      '[data-smoke="free-practice-word-card"]',
+    );
+    expect(wordCard).toHaveAttribute("data-playing", "true");
+    expect(wordCard).toHaveClass("border-primary/30", "bg-primary/10");
+    expect(wordCard).toHaveClass("transition-colors");
+    expect(wordCard?.getAttribute("style") ?? "").not.toContain("transform");
   });
 
   it("does not advertise online dictionary fallback for experimental languages", () => {

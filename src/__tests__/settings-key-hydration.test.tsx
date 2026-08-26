@@ -373,14 +373,14 @@ describe("settings key hydration", () => {
     render(<DataControlCard />);
 
     expect(screen.getByText("已配置密钥")).toBeInTheDocument();
-    expect(screen.getByText("0/3")).toBeInTheDocument();
+    expect(screen.getByText("0/5")).toBeInTheDocument();
 
     await act(async () => {
       await hydrateKeys();
     });
 
     await waitFor(() => {
-      expect(screen.getByText("2/3")).toBeInTheDocument();
+      expect(screen.getByText("2/5")).toBeInTheDocument();
     });
   });
 
@@ -400,7 +400,7 @@ describe("settings key hydration", () => {
       learningKeys: 0,
       cacheKeys: 0,
       configuredApiKeys: 0,
-      apiKeySlots: 3,
+      apiKeySlots: 5,
       corruptItems: 0,
     });
   });

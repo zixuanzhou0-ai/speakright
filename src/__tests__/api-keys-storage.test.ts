@@ -87,11 +87,55 @@ describe("api key storage in Tauri", () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
     expect(getStandardTtsConfig()).toEqual({ provider: "vertex-gemini" });
 
+    setStandardTtsConfig({ provider: "minimax" });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(getStandardTtsConfig()).toEqual({ provider: "minimax" });
+
+    setStandardTtsConfig({ provider: "mimo" });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(getStandardTtsConfig()).toEqual({ provider: "mimo" });
+
     mocks.store.set("speakright_standard_tts_config", { provider: "broken" });
     vi.resetModules();
     const reloaded = await import("@/lib/api-keys");
     await reloaded.hydrateKeys();
     expect(reloaded.getStandardTtsConfig()).toEqual({ provider: "elevenlabs" });
+  });
+
+  it("keeps MiniMax and MiMo API keys in OS-backed secure storage", async () => {
+    const {
+      getApiKeySummary,
+      getMimoTtsConfig,
+      getMiniMaxTtsConfig,
+      setMimoTtsConfig,
+      setMiniMaxTtsConfig,
+    } = await import("@/lib/api-keys");
+
+    setMiniMaxTtsConfig({
+      apiKey: "minimax-secret",
+      modelId: "speech-2.8-turbo",
+      voiceId: "English_expressive_narrator",
+    });
+    setMimoTtsConfig({
+      apiKey: "mimo-secret",
+      modelId: "mimo-v2.5-tts",
+      voiceId: "Mia",
+    });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(getMiniMaxTtsConfig()?.apiKey).toBe("minimax-secret");
+    expect(getMimoTtsConfig()?.apiKey).toBe("mimo-secret");
+    expect(localStorage.getItem("speakright_minimax_tts_config")).toBeNull();
+    expect(localStorage.getItem("speakright_mimo_tts_config")).toBeNull();
+    expect(
+      mocks.secureStore.get("speakright_minimax_tts_config"),
+    ).toMatchObject({
+      apiKey: "minimax-secret",
+    });
+    expect(mocks.secureStore.get("speakright_mimo_tts_config")).toMatchObject({
+      apiKey: "mimo-secret",
+    });
+    expect(getApiKeySummary()).toEqual({ configured: 2, totalSlots: 5 });
   });
 
   it("stores the Vertex voice as a non-secret preference", async () => {

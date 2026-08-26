@@ -1,7 +1,7 @@
 const CJK_TEXT_PATTERN = /[\u3400-\u9fff]/;
 
 export const STANDARD_TTS_UNAVAILABLE_MESSAGE =
-  "无法播放标准示范：请先在设置页选择并完成一个标准示范 TTS（ElevenLabs、爱马仕 Grok 或 Vertex Gemini），或改用随应用提供示范音频的练习内容。单词词典发音只负责单词复读。";
+  "无法播放标准示范：请先在设置页选择并完成一个标准示范 TTS（ElevenLabs、MiniMax、小米 MiMo、爱马仕 Grok 或 Vertex Gemini），或改用随应用提供示范音频的练习内容。单词词典发音只负责单词复读。";
 
 function truncateTtsDetail(text: string): string {
   return text.replace(/\s+/g, " ").trim().slice(0, 180);

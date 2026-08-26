@@ -24,12 +24,14 @@ import {
   useElevenLabsConfig,
   useLanguageConfig,
   useLlmConfig,
+  useMimoTtsConfig,
+  useMiniMaxTtsConfig,
   useStandardTtsConfig,
 } from "@/hooks/use-api-keys";
 import { isAzureConfigReady } from "@/lib/azure-config";
 import {
-  isElevenLabsPackLanguageId,
   type ElevenLabsPackLanguageId,
+  isElevenLabsPackLanguageId,
 } from "@/lib/elevenlabs-language-packs";
 import { getLanguageProfile } from "@/lib/language-profiles";
 import {
@@ -82,6 +84,9 @@ function recommendation(rows: AvailabilityRow[], languageId: string): string {
       : "可以直接开始音标/发音单位练习或自由练习；刻意练习和发音诊断仍在建设中。";
   }
   if (missing.id === "demo-audio") {
+    if (missing.status === "MiMo 仅支持英语") {
+      return "下一步：为当前语言改选支持的 TTS；随应用提供的示范音频仍可继续使用。";
+    }
     return "当前构建缺少随浏览器版提供的示范音频，请确认静态资源已构建/部署。";
   }
   return "下一步：配置 AI 教练 LLM；没有它仍可评分训练。";
@@ -91,6 +96,8 @@ export function LanguageAvailabilityCard() {
   const languageConfig = useLanguageConfig();
   const azureConfig = useAzureConfig();
   const elevenLabsConfig = useElevenLabsConfig();
+  const miniMaxConfig = useMiniMaxTtsConfig();
+  const mimoConfig = useMimoTtsConfig();
   const standardTtsConfig = useStandardTtsConfig();
   const llmConfig = useLlmConfig();
   const profile = getLanguageProfile(languageConfig.languageId);
@@ -162,8 +169,25 @@ export function LanguageAvailabilityCard() {
     const azureReady = isAzureConfigReady(azureConfig);
     const usesHermes = standardTtsConfig.provider === "hermes-grok";
     const usesVertex = standardTtsConfig.provider === "vertex-gemini";
+    const usesMiniMax = standardTtsConfig.provider === "minimax";
+    const usesMimo = standardTtsConfig.provider === "mimo";
+    const mimoSupportsLanguage = languageConfig.languageId === "en-US";
+    const mimoConfiguredForLanguage =
+      usesMimo && mimoSupportsLanguage && hasSecret(mimoConfig?.apiKey);
+    const unsupportedMimoLanguage = usesMimo && !mimoSupportsLanguage;
     const ttsConfigured =
-      usesHermes || usesVertex || hasSecret(elevenLabsConfig?.apiKey);
+      usesHermes ||
+      usesVertex ||
+      (usesMiniMax
+        ? hasSecret(miniMaxConfig?.apiKey)
+        : usesMimo
+          ? mimoConfiguredForLanguage
+          : hasSecret(elevenLabsConfig?.apiKey));
+    const selectedCloudStatus = usesMiniMax
+      ? "MiniMax 已配置"
+      : usesMimo
+        ? "小米 MiMo 已配置"
+        : "ElevenLabs 已配置";
     const localPackReady =
       languageConfig.languageId === "en-US" ||
       effectiveStaticPack.status === "ready";
@@ -183,33 +207,46 @@ export function LanguageAvailabilityCard() {
       {
         id: "demo-audio",
         label: "示范音频",
-        status: ttsConfigured
-          ? usesHermes
-            ? "爱马仕 · Grok 已选择"
-            : usesVertex
-              ? "Vertex Gemini 已选择"
-              : "ElevenLabs 已配置"
-          : localPackReady
-            ? "内置资源可用"
-            : packIsLoading
-              ? "检查中"
-              : "未配置",
-        detail: packIsLoading
-          ? "正在确认随应用提供的单词和短语示范音频。"
+        status: unsupportedMimoLanguage
+          ? "MiMo 仅支持英语"
           : ttsConfigured
             ? usesHermes
-              ? "自定义长句将通过本机爱马仕桥接朗读；Browser Edition 本机启动器会自动启动桥接。"
+              ? "爱马仕 · Grok 已选择"
               : usesVertex
-                ? "自定义长句将通过本机 Vertex AI 项目朗读；需要 gcloud 项目和 ADC 授权。"
-                : "可以播放随应用提供的示范音频；自定义长句也可使用在线 TTS。"
+                ? "Vertex Gemini 已选择"
+                : selectedCloudStatus
             : localPackReady
-              ? languageConfig.languageId === "en-US"
-                ? "常用示范音频随浏览器版静态资源提供；自定义长句可能需要在线 TTS。"
-                : "单词和短语示范已随浏览器版静态资源提供；部分单个音标没有已核验短音频时，小喇叭会保持不可点击。"
-              : "没有读到浏览器版提供的示范音频；请确认静态资源已构建/部署，或反馈 Browser Edition 资源问题。",
-        ready: ttsConfigured || localPackReady,
-        statusKind:
-          ttsConfigured || localPackReady
+              ? "内置资源可用"
+              : packIsLoading
+                ? "检查中"
+                : "未配置",
+        detail: unsupportedMimoLanguage
+          ? localPackReady
+            ? "小米 MiMo 英文预置音色不支持当前语言；随浏览器版提供的单词和短语示范音频仍可使用。"
+            : packIsLoading
+              ? "小米 MiMo 英文预置音色仅用于英语；正在确认当前语言随应用提供的示范音频。"
+              : "小米 MiMo 英文预置音色仅用于英语，不能为当前语言提供标准示范；请改选支持当前语言的 TTS，或确认浏览器版静态资源已部署。"
+          : packIsLoading
+            ? "正在确认随应用提供的单词和短语示范音频。"
+            : ttsConfigured
+              ? usesHermes
+                ? "自定义长句将通过本机爱马仕桥接朗读；Browser Edition 本机启动器会自动启动桥接。"
+                : usesVertex
+                  ? "自定义长句将通过本机 Vertex AI 项目朗读；需要 gcloud 项目和 ADC 授权。"
+                  : usesMiniMax
+                    ? "自定义长句将使用 MiniMax Speech 2.8，并在字幕可核对时显示真实逐词高亮。"
+                    : usesMimo
+                      ? "英语自定义长句将使用小米 MiMo；当前采用整句播放反馈。"
+                      : "可以播放随应用提供的示范音频；自定义长句也可使用在线 TTS。"
+              : localPackReady
+                ? languageConfig.languageId === "en-US"
+                  ? "常用示范音频随浏览器版静态资源提供；自定义长句可能需要在线 TTS。"
+                  : "单词和短语示范已随浏览器版静态资源提供；部分单个音标没有已核验短音频时，小喇叭会保持不可点击。"
+                : "没有读到浏览器版提供的示范音频；请确认静态资源已构建/部署，或反馈 Browser Edition 资源问题。",
+        ready: !unsupportedMimoLanguage && (ttsConfigured || localPackReady),
+        statusKind: unsupportedMimoLanguage
+          ? "warning"
+          : ttsConfigured || localPackReady
             ? "ready"
             : packIsLoading
               ? "pending"
@@ -229,6 +266,8 @@ export function LanguageAvailabilityCard() {
   }, [
     azureConfig,
     elevenLabsConfig,
+    miniMaxConfig,
+    mimoConfig,
     standardTtsConfig,
     effectiveStaticPack,
     languageConfig.languageId,

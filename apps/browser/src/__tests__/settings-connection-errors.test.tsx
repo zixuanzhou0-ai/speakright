@@ -5,7 +5,7 @@ import {
   screen,
   waitFor,
 } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { AzureConfigCard } from "@/components/settings/azure-config-card";
 import { ConnectionStatus } from "@/components/settings/connection-status";
 import { ElevenLabsConfigCard } from "@/components/settings/elevenlabs-config-card";
@@ -17,13 +17,29 @@ const mocks = vi.hoisted(() => ({
   fetchPronunciation: vi.fn(),
   hermesXaiStatus: vi.fn(),
   hermesXaiTts: vi.fn(),
+  mimoTts: vi.fn(),
+  miniMaxTtsAligned: vi.fn(),
+  mimoConfig: null as {
+    apiKey: string;
+    modelId: string;
+    voiceId: string;
+  } | null,
+  miniMaxConfig: null as {
+    apiKey: string;
+    modelId: string;
+    voiceId: string;
+  } | null,
   standardTtsProvider: "elevenlabs" as
     | "elevenlabs"
+    | "minimax"
+    | "mimo"
     | "hermes-grok"
     | "vertex-gemini",
   setAzureConfig: vi.fn(),
   setElevenLabsConfig: vi.fn(),
   setLlmConfig: vi.fn(),
+  setMimoTtsConfig: vi.fn(),
+  setMiniMaxTtsConfig: vi.fn(),
   setStandardTtsConfig: vi.fn(),
   setVertexGeminiTtsConfig: vi.fn(),
   testAzure: vi.fn(),
@@ -40,6 +56,8 @@ vi.mock("@/hooks/use-api-keys", () => ({
   useElevenLabsConfig: () => null,
   useLanguageConfig: () => ({ languageId: "en-US" }),
   useLlmConfig: () => null,
+  useMimoTtsConfig: () => mocks.mimoConfig,
+  useMiniMaxTtsConfig: () => mocks.miniMaxConfig,
   useStandardTtsConfig: () => ({ provider: mocks.standardTtsProvider }),
   useVertexGeminiTtsConfig: () => ({ voiceName: "Kore" }),
 }));
@@ -48,6 +66,8 @@ vi.mock("@/lib/api-client", () => ({
   fetchPronunciation: mocks.fetchPronunciation,
   hermesXaiStatus: mocks.hermesXaiStatus,
   hermesXaiTts: mocks.hermesXaiTts,
+  mimoTts: mocks.mimoTts,
+  miniMaxTtsAligned: mocks.miniMaxTtsAligned,
   vertexGeminiStatus: mocks.vertexGeminiStatus,
   vertexGeminiTts: mocks.vertexGeminiTts,
   testAzure: mocks.testAzure,
@@ -60,6 +80,8 @@ vi.mock("@/lib/api-keys", () => ({
   API_KEY_STORAGE_KEYS: [
     "speakright_azure_config",
     "speakright_elevenlabs_config",
+    "speakright_minimax_tts_config",
+    "speakright_mimo_tts_config",
     "speakright_llm_config",
   ],
   APP_PREFERENCE_STORAGE_KEYS: [
@@ -70,6 +92,8 @@ vi.mock("@/lib/api-keys", () => ({
   setAzureConfig: mocks.setAzureConfig,
   setElevenLabsConfig: mocks.setElevenLabsConfig,
   setLlmConfig: mocks.setLlmConfig,
+  setMimoTtsConfig: mocks.setMimoTtsConfig,
+  setMiniMaxTtsConfig: mocks.setMiniMaxTtsConfig,
   setStandardTtsConfig: mocks.setStandardTtsConfig,
   setVertexGeminiTtsConfig: mocks.setVertexGeminiTtsConfig,
 }));
@@ -81,11 +105,25 @@ vi.mock("sonner", () => ({
   },
 }));
 
+function deferred<T>() {
+  let resolve!: (value: T) => void;
+  let reject!: (error: unknown) => void;
+  const promise = new Promise<T>((resolvePromise, rejectPromise) => {
+    resolve = resolvePromise;
+    reject = rejectPromise;
+  });
+  return { promise, reject, resolve };
+}
+
 describe("settings connection errors", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.standardTtsProvider = "elevenlabs";
+    mocks.miniMaxConfig = null;
+    mocks.mimoConfig = null;
   });
+
+  afterEach(() => vi.unstubAllGlobals());
 
   it("keeps Azure connection-test provider errors actionable in Chinese", async () => {
     mocks.testAzure.mockRejectedValueOnce(
@@ -205,15 +243,172 @@ describe("settings connection errors", () => {
     expect(mocks.vertexGeminiStatus).not.toHaveBeenCalled();
     expect(mocks.vertexGeminiTts).not.toHaveBeenCalled();
 
-    fireEvent.click(
-      screen.getByRole("button", { name: "检测 Vertex 状态" }),
-    );
+    fireEvent.click(screen.getByRole("button", { name: "检测 Vertex 状态" }));
     expect(
       await screen.findByText("本机 Vertex AI 项目与 ADC 授权已就绪"),
     ).toBeInTheDocument();
     expect(screen.getByText("项目：已配置")).toBeInTheDocument();
     expect(screen.getByText("ADC：已就绪")).toBeInTheDocument();
     expect(mocks.vertexGeminiTts).not.toHaveBeenCalled();
+  });
+
+  it("shows MiniMax and MiMo as honest BYOK provider choices", () => {
+    const view = render(<ElevenLabsConfigCard />);
+
+    expect(
+      screen.getByRole("button", { name: /MiniMax Speech 2.8/ }),
+    ).toHaveAttribute("data-smoke", "tts-provider-minimax");
+    expect(
+      screen.getByRole("button", { name: /小米 MiMo V2.5/ }),
+    ).toHaveAttribute("data-smoke", "tts-provider-mimo");
+    view.unmount();
+
+    mocks.standardTtsProvider = "minimax";
+    const miniMaxView = render(<ElevenLabsConfigCard />);
+    expect(screen.getByText(/官方词级字幕/)).toBeInTheDocument();
+    expect(screen.getByLabelText("API Key")).toHaveAttribute(
+      "placeholder",
+      "输入 MiniMax API Key",
+    );
+    miniMaxView.unmount();
+
+    mocks.standardTtsProvider = "mimo";
+    render(<ElevenLabsConfigCard />);
+    expect(screen.getByText(/不提供词级时间轴/)).toBeInTheDocument();
+    expect(screen.getByLabelText("API Key")).toHaveAttribute(
+      "placeholder",
+      "输入 小米 MiMo API Key",
+    );
+  });
+
+  it("cancels stale domestic TTS previews on provider change and unmount", async () => {
+    const miniMaxPending = deferred<{
+      audioBlob: Blob;
+      wordTimings: Array<{ word: string; start: number; end: number }>;
+      alignmentOutcome: "matched";
+    }>();
+    const mimoPending = deferred<Blob>();
+    mocks.miniMaxTtsAligned.mockReturnValueOnce(miniMaxPending.promise);
+    mocks.mimoTts.mockReturnValueOnce(mimoPending.promise);
+    const createObjectURL = vi.fn(() => "blob:preview");
+    const revokeObjectURL = vi.fn();
+    const audioPlay = vi.fn().mockResolvedValue(undefined);
+    const audioPause = vi.fn();
+    const AudioMock = vi.fn().mockImplementation(() => ({
+      addEventListener: vi.fn(),
+      pause: audioPause,
+      play: audioPlay,
+      removeAttribute: vi.fn(),
+    }));
+    vi.stubGlobal("URL", { createObjectURL, revokeObjectURL });
+    vi.stubGlobal("Audio", AudioMock);
+
+    mocks.standardTtsProvider = "minimax";
+    const view = render(<ElevenLabsConfigCard />);
+    fireEvent.change(screen.getByLabelText("API Key"), {
+      target: { value: "mini-key" },
+    });
+    const miniMaxPreview = screen.getByRole("button", {
+      name: "试听短句（会产生用量）",
+    });
+    fireEvent.click(miniMaxPreview);
+    fireEvent.click(miniMaxPreview);
+
+    await waitFor(() => {
+      expect(mocks.miniMaxTtsAligned).toHaveBeenCalledTimes(1);
+      expect(miniMaxPreview).toBeDisabled();
+    });
+    const miniMaxSignal = mocks.miniMaxTtsAligned.mock.calls[0]?.[2]
+      ?.signal as AbortSignal;
+
+    mocks.standardTtsProvider = "mimo";
+    view.rerender(<ElevenLabsConfigCard />);
+    await waitFor(() => expect(miniMaxSignal.aborted).toBe(true));
+
+    await act(async () => {
+      miniMaxPending.resolve({
+        audioBlob: new Blob([new Uint8Array([1])], { type: "audio/mpeg" }),
+        wordTimings: [{ word: "Hello", start: 0, end: 0.4 }],
+        alignmentOutcome: "matched",
+      });
+      await miniMaxPending.promise;
+    });
+    expect(createObjectURL).not.toHaveBeenCalled();
+    expect(audioPlay).not.toHaveBeenCalled();
+
+    fireEvent.change(screen.getByLabelText("API Key"), {
+      target: { value: "mimo-key" },
+    });
+    const mimoPreview = screen.getByRole("button", {
+      name: "试听短句（会产生用量）",
+    });
+    fireEvent.click(mimoPreview);
+    await waitFor(() => {
+      expect(mocks.mimoTts).toHaveBeenCalledTimes(1);
+      expect(mimoPreview).toBeDisabled();
+    });
+    const mimoSignal = mocks.mimoTts.mock.calls[0]?.[2]?.signal as AbortSignal;
+
+    view.unmount();
+    expect(mimoSignal.aborted).toBe(true);
+    await act(async () => {
+      mimoPending.resolve(
+        new Blob([new Uint8Array([2])], { type: "audio/wav" }),
+      );
+      await mimoPending.promise;
+    });
+    expect(createObjectURL).not.toHaveBeenCalled();
+    expect(audioPlay).not.toHaveBeenCalled();
+  });
+
+  it("resets a pending preview when its saved domestic key is cleared", async () => {
+    const pending = deferred<{
+      audioBlob: Blob;
+      wordTimings: Array<{ word: string; start: number; end: number }>;
+      alignmentOutcome: "matched";
+    }>();
+    mocks.standardTtsProvider = "minimax";
+    mocks.miniMaxConfig = {
+      apiKey: "mini-key",
+      modelId: "speech-2.8-turbo",
+      voiceId: "English_expressive_narrator",
+    };
+    mocks.miniMaxTtsAligned.mockReturnValueOnce(pending.promise);
+
+    const view = render(<ElevenLabsConfigCard />);
+    await waitFor(() => {
+      expect(screen.getByLabelText("API Key")).toHaveValue("mini-key");
+    });
+    const preview = screen.getByRole("button", {
+      name: "试听短句（会产生用量）",
+    });
+    fireEvent.click(preview);
+    await waitFor(() => {
+      expect(mocks.miniMaxTtsAligned).toHaveBeenCalledTimes(1);
+      expect(preview).toBeDisabled();
+    });
+    const signal = mocks.miniMaxTtsAligned.mock.calls[0]?.[2]
+      ?.signal as AbortSignal;
+
+    mocks.miniMaxConfig = null;
+    view.rerender(<ElevenLabsConfigCard />);
+
+    await waitFor(() => {
+      expect(signal.aborted).toBe(true);
+      expect(screen.getByLabelText("API Key")).toHaveValue("");
+      expect(preview).toBeEnabled();
+    });
+    expect(screen.queryByText("测试中...")).not.toBeInTheDocument();
+
+    await act(async () => {
+      pending.resolve({
+        audioBlob: new Blob([new Uint8Array([1])], { type: "audio/mpeg" }),
+        wordTimings: [{ word: "Hello", start: 0, end: 0.4 }],
+        alignmentOutcome: "matched",
+      });
+      await pending.promise;
+    });
+    expect(screen.queryByText(/短句已生成/)).not.toBeInTheDocument();
   });
 
   it("shows a persistent Settings alert when local key storage fails", () => {

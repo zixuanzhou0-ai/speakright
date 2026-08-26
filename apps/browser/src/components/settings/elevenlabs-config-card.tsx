@@ -39,6 +39,7 @@ import {
 } from "@/lib/api-keys";
 import type { StandardTtsProvider } from "@/types/api-keys";
 import { type ConnectionState, ConnectionStatus } from "./connection-status";
+import { DomesticTtsConfigPanel } from "./domestic-tts-config-panel";
 import { getSettingsUserFacingError } from "./user-facing-error";
 
 const WRAP_SAFE_SETTINGS_ACTION_BUTTON_CLASS =
@@ -93,11 +94,15 @@ export function ElevenLabsConfigCard() {
     setStatus("idle");
     setStatusMsg("");
     const providerName =
-      provider === "hermes-grok"
-        ? "爱马仕 Grok TTS"
-        : provider === "vertex-gemini"
-          ? "Vertex AI · Gemini 3.1 Flash TTS"
-          : "ElevenLabs";
+      provider === "minimax"
+        ? "MiniMax Speech 2.8"
+        : provider === "mimo"
+          ? "小米 MiMo V2.5 TTS"
+          : provider === "hermes-grok"
+            ? "爱马仕 Grok TTS"
+            : provider === "vertex-gemini"
+              ? "Vertex AI · Gemini 3.1 Flash TTS"
+              : "ElevenLabs";
     toast.success(`标准示范已切换为${providerName}`);
   };
 
@@ -262,14 +267,11 @@ export function ElevenLabsConfigCard() {
     setStatus("testing");
     setStatusMsg("");
     try {
-      const audioBlob = await vertexGeminiTts(
-        "Hello, this is SpeakRight.",
-        {
-          languageId: "en-US",
-          speed: 1,
-          voiceName: vertexConfig.voiceName,
-        },
-      );
+      const audioBlob = await vertexGeminiTts("Hello, this is SpeakRight.", {
+        languageId: "en-US",
+        speed: 1,
+        voiceName: vertexConfig.voiceName,
+      });
       if (audioBlob.size === 0) {
         throw new Error("Vertex Gemini 返回了空音频");
       }
@@ -305,8 +307,8 @@ export function ElevenLabsConfigCard() {
       <CardHeader>
         <CardTitle>标准示范 TTS</CardTitle>
         <CardDescription>
-          在 ElevenLabs、爱马仕 Grok 与本机 Vertex Gemini TTS
-          间切换；单词词典发音在下方单独配置。
+          在 ElevenLabs、MiniMax、小米 MiMo、爱马仕 Grok 与本机 Vertex Gemini
+          TTS 间切换；单词词典发音在下方单独配置。
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -332,6 +334,38 @@ export function ElevenLabsConfigCard() {
             </span>
           </button>
           <button
+            aria-pressed={standardTts.provider === "minimax"}
+            className={`min-h-24 rounded-xl border p-4 text-left transition-colors ${
+              standardTts.provider === "minimax"
+                ? "border-primary bg-primary/10 ring-1 ring-primary/20"
+                : "border-border bg-muted/20 hover:border-primary/40 hover:bg-muted/40"
+            }`}
+            data-smoke="tts-provider-minimax"
+            onClick={() => handleProviderChange("minimax")}
+            type="button"
+          >
+            <span className="block font-semibold">MiniMax Speech 2.8</span>
+            <span className="mt-1 block text-sm leading-6 text-muted-foreground">
+              中国大陆 BYOK · 官方真实词级时间轴
+            </span>
+          </button>
+          <button
+            aria-pressed={standardTts.provider === "mimo"}
+            className={`min-h-24 rounded-xl border p-4 text-left transition-colors ${
+              standardTts.provider === "mimo"
+                ? "border-primary bg-primary/10 ring-1 ring-primary/20"
+                : "border-border bg-muted/20 hover:border-primary/40 hover:bg-muted/40"
+            }`}
+            data-smoke="tts-provider-mimo"
+            onClick={() => handleProviderChange("mimo")}
+            type="button"
+          >
+            <span className="block font-semibold">小米 MiMo V2.5</span>
+            <span className="mt-1 block text-sm leading-6 text-muted-foreground">
+              中国大陆 BYOK · 英文音色 · 整句播放反馈
+            </span>
+          </button>
+          <button
             aria-pressed={standardTts.provider === "hermes-grok"}
             className={`min-h-24 rounded-xl border p-4 text-left transition-colors ${
               standardTts.provider === "hermes-grok"
@@ -349,7 +383,7 @@ export function ElevenLabsConfigCard() {
           </button>
           <button
             aria-pressed={standardTts.provider === "vertex-gemini"}
-            className={`min-h-24 rounded-xl border p-4 text-left transition-colors sm:col-span-2 lg:col-span-1 ${
+            className={`min-h-24 rounded-xl border p-4 text-left transition-colors ${
               standardTts.provider === "vertex-gemini"
                 ? "border-primary bg-primary/10 ring-1 ring-primary/20"
                 : "border-border bg-muted/20 hover:border-primary/40 hover:bg-muted/40"
@@ -358,9 +392,7 @@ export function ElevenLabsConfigCard() {
             onClick={() => handleProviderChange("vertex-gemini")}
             type="button"
           >
-            <span className="block font-semibold">
-              Vertex AI · Gemini 3.1
-            </span>
+            <span className="block font-semibold">Vertex AI · Gemini 3.1</span>
             <span className="mt-1 block text-sm leading-6 text-muted-foreground">
               Flash TTS（预览）· 复用本机 gcloud；暂不提供逐词时间轴
             </span>
@@ -441,6 +473,10 @@ export function ElevenLabsConfigCard() {
               <ConnectionStatus state={status} message={statusMsg} />
             </div>
           </div>
+        ) : standardTts.provider === "minimax" ? (
+          <DomesticTtsConfigPanel provider="minimax" />
+        ) : standardTts.provider === "mimo" ? (
+          <DomesticTtsConfigPanel provider="mimo" />
         ) : standardTts.provider === "hermes-grok" ? (
           <div
             className="space-y-4"
@@ -455,7 +491,8 @@ export function ElevenLabsConfigCard() {
                 <p className="mt-1 text-sm leading-6 text-muted-foreground">
                   无需在 SpeakRight 配置或持久化 Grok
                   密钥；调用由本机爱马仕子进程完成，授权和声音仍由爱马仕管理。
-                  Browser Edition 通过本机启动器运行时会自动启动桥接，无需同时打开桌面端。
+                  Browser Edition
+                  通过本机启动器运行时会自动启动桥接，无需同时打开桌面端。
                 </p>
               </div>
               <div className="grid gap-3 text-sm sm:grid-cols-2">
@@ -507,8 +544,9 @@ export function ElevenLabsConfigCard() {
               <div>
                 <p className="font-medium">直接沿用本机 Vertex AI 授权</p>
                 <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                  SpeakRight 不保存 Google 密钥；需要本机 gcloud 已选择项目，并完成
-                  Application Default Credentials（ADC）登录。状态检测不会生成语音，试听才会产生
+                  SpeakRight 不保存 Google 密钥；需要本机 gcloud
+                  已选择项目，并完成 Application Default
+                  Credentials（ADC）登录。状态检测不会生成语音，试听才会产生
                   Vertex AI 用量。
                 </p>
               </div>
@@ -518,8 +556,7 @@ export function ElevenLabsConfigCard() {
                     模型
                   </span>
                   <span className="mt-1 block break-all font-medium">
-                    {vertexStatusInfo?.model ||
-                      "gemini-3.1-flash-tts-preview"}
+                    {vertexStatusInfo?.model || "gemini-3.1-flash-tts-preview"}
                   </span>
                 </div>
                 <div className="rounded-lg border bg-background/70 px-3 py-2.5">
