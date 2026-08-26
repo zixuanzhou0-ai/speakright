@@ -1,4 +1,7 @@
 import assert from "node:assert/strict";
+import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import test from "node:test";
 import {
   buildVertexTtsRequest,
@@ -10,6 +13,7 @@ import {
   isAllowedSpeakRightOrigin,
   normalizeHermesAlignment,
   pcm16leToWav,
+  readStableHermesAudio,
   readVertexAccessToken,
   resolveVertexProjectId,
   startHermesXaiBridge,
@@ -17,6 +21,56 @@ import {
   validateTtsPayload,
   validateVertexTtsPayload,
 } from "./hermes-xai-bridge.mjs";
+
+test("reads the checked Hermes audio through one stable file handle", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "speakright-hermes-read-"));
+  const audioPath = join(directory, "speech.mp3");
+  const expected = Buffer.from([0x49, 0x44, 0x33, 0x04]);
+  try {
+    await writeFile(audioPath, expected);
+    assert.deepEqual(await readStableHermesAudio(audioPath), expected);
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test("rejects a Hermes audio file that changes while its handle is read", async () => {
+  const stable = {
+    isFile: () => true,
+    dev: 1n,
+    ino: 2n,
+    mode: 3n,
+    nlink: 1n,
+    size: 3n,
+    mtimeNs: 4n,
+    ctimeNs: 5n,
+  };
+  let statCalls = 0;
+  let closed = false;
+  const handle = {
+    stat: async () => {
+      statCalls += 1;
+      return statCalls === 1 ? stable : { ...stable, mtimeNs: 6n };
+    },
+    read: async (buffer, offset, length) => {
+      const source = Buffer.from("ID3");
+      const bytesRead = Math.min(source.length, length);
+      source.copy(buffer, offset, 0, bytesRead);
+      return { bytesRead };
+    },
+    close: async () => {
+      closed = true;
+    },
+  };
+
+  await assert.rejects(
+    readStableHermesAudio("ignored", {
+      openImpl: async () => handle,
+    }),
+    /HERMES_AUDIO_CHANGED/u,
+  );
+  assert.equal(closed, true);
+});
 
 test("normalizes xAI graph timestamps without inventing missing alignment", () => {
   assert.deepEqual(

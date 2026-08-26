@@ -1,7 +1,7 @@
 import { spawn } from "node:child_process";
 import { randomBytes, timingSafeEqual } from "node:crypto";
 import { existsSync } from "node:fs";
-import { mkdtemp, readFile, rm, stat } from "node:fs/promises";
+import { mkdtemp, open, rm } from "node:fs/promises";
 import { createServer, request as httpRequest } from "node:http";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
@@ -668,6 +668,56 @@ function parseHermesMetadata(stdout) {
   }
 }
 
+const HERMES_AUDIO_STABLE_FIELDS = [
+  "dev",
+  "ino",
+  "mode",
+  "nlink",
+  "size",
+  "mtimeNs",
+  "ctimeNs",
+];
+
+export async function readStableHermesAudio(
+  outputPath,
+  { openImpl = open } = {},
+) {
+  const handle = await openImpl(outputPath, "r");
+  try {
+    const before = await handle.stat({ bigint: true });
+    if (!before.isFile()) throw new Error("HERMES_AUDIO_NOT_REGULAR");
+    if (before.size <= 0n) throw new Error("HERMES_EMPTY_AUDIO");
+    if (before.size > BigInt(MAX_AUDIO_BYTES)) {
+      throw new Error("HERMES_AUDIO_TOO_LARGE");
+    }
+
+    const expectedLength = Number(before.size);
+    const audio = Buffer.allocUnsafe(expectedLength);
+    let offset = 0;
+    while (offset < expectedLength) {
+      const { bytesRead } = await handle.read(
+        audio,
+        offset,
+        expectedLength - offset,
+        offset,
+      );
+      if (bytesRead === 0) break;
+      offset += bytesRead;
+    }
+    const after = await handle.stat({ bigint: true });
+    if (
+      !after.isFile() ||
+      offset !== expectedLength ||
+      HERMES_AUDIO_STABLE_FIELDS.some((field) => before[field] !== after[field])
+    ) {
+      throw new Error("HERMES_AUDIO_CHANGED");
+    }
+    return audio;
+  } finally {
+    await handle.close();
+  }
+}
+
 async function generateHermesAudio({ text, language, speed }) {
   const tempPrefix = join(tmpdir(), "speakright-hermes-");
   const tempDirectory = await mkdtemp(tempPrefix);
@@ -685,11 +735,7 @@ async function generateHermesAudio({ text, language, speed }) {
       error.exitCode = result.code;
       throw error;
     }
-    const metadata = await stat(outputPath);
-    if (metadata.size <= 0) throw new Error("HERMES_EMPTY_AUDIO");
-    if (metadata.size > MAX_AUDIO_BYTES)
-      throw new Error("HERMES_AUDIO_TOO_LARGE");
-    const audio = await readFile(outputPath);
+    const audio = await readStableHermesAudio(outputPath);
     const generationMetadata = parseHermesMetadata(result.stdout);
     return {
       audio,
