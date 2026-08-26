@@ -84,7 +84,7 @@ interface ElevenLabsData {
 }
 
 const ELEVENLABS_USAGE_NOT_CONFIGURED_MESSAGE =
-  "未配置 ElevenLabs API Key，因此无法显示其用量；本地单词音频和已内置语言包仍可使用。如果已选择爱马仕 · Grok 或 Vertex Gemini，标准示范仍可通过本机桥接使用。";
+  "未配置 ElevenLabs API Key，因此无法显示其用量；本地单词音频和已内置语言包仍可使用。如果已选择 MiniMax、小米 MiMo、爱马仕 · Grok 或 Vertex Gemini，标准示范仍可使用所选服务。";
 
 const ELEVENLABS_USAGE_QUERY_FAILED_MESSAGE =
   "ElevenLabs 用量查询失败，请检查网络、代理或 API Key 后重试；本地单词音频和已内置语言包音频可继续使用。";
@@ -149,8 +149,7 @@ function ElevenLabsUsageCard() {
   }, [fetchUsage]);
 
   const percent = data ? (data.characterCount / data.characterLimit) * 100 : 0;
-  const isNotConfigured =
-    error === ELEVENLABS_USAGE_NOT_CONFIGURED_MESSAGE;
+  const isNotConfigured = error === ELEVENLABS_USAGE_NOT_CONFIGURED_MESSAGE;
   const resetDays = data?.nextResetUnix
     ? Math.max(
         0,

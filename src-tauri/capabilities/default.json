@@ -26,6 +26,15 @@
           "url": "https://api.elevenlabs.io/**"
         },
         {
+          "url": "https://api.minimaxi.com/**"
+        },
+        {
+          "url": "https://filecdn.minimax.chat/**"
+        },
+        {
+          "url": "https://api.xiaomimimo.com/**"
+        },
+        {
           "url": "https://api.openai.com/**"
         },
         {

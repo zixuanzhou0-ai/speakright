@@ -682,6 +682,8 @@ async function inspectRuntimeBoundary(cdp, canonicalSettingsDirectory) {
   const keys = [
     "speakright_azure_config",
     "speakright_elevenlabs_config",
+    "speakright_minimax_tts_config",
+    "speakright_mimo_tts_config",
     "speakright_llm_config"
   ];
   const secureValues = await Promise.all(

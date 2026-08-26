@@ -17,14 +17,30 @@ const mocks = vi.hoisted(() => ({
   fetchPronunciation: vi.fn(),
   hermesXaiStatus: vi.fn(),
   hermesXaiTts: vi.fn(),
+  mimoTts: vi.fn(),
+  miniMaxTtsAligned: vi.fn(),
+  mimoConfig: null as {
+    apiKey: string;
+    modelId: string;
+    voiceId: string;
+  } | null,
+  miniMaxConfig: null as {
+    apiKey: string;
+    modelId: string;
+    voiceId: string;
+  } | null,
   isTauriEnvironment: vi.fn(() => true),
   standardTtsProvider: "elevenlabs" as
     | "elevenlabs"
     | "hermes-grok"
-    | "vertex-gemini",
+    | "vertex-gemini"
+    | "minimax"
+    | "mimo",
   setAzureConfig: vi.fn(),
   setElevenLabsConfig: vi.fn(),
   setLlmConfig: vi.fn(),
+  setMimoTtsConfig: vi.fn(),
+  setMiniMaxTtsConfig: vi.fn(),
   setStandardTtsConfig: vi.fn(),
   setVertexGeminiTtsConfig: vi.fn(),
   testAzure: vi.fn(),
@@ -41,6 +57,8 @@ vi.mock("@/hooks/use-api-keys", () => ({
   useElevenLabsConfig: () => null,
   useLanguageConfig: () => ({ languageId: "en-US" }),
   useLlmConfig: () => null,
+  useMimoTtsConfig: () => mocks.mimoConfig,
+  useMiniMaxTtsConfig: () => mocks.miniMaxConfig,
   useStandardTtsConfig: () => ({ provider: mocks.standardTtsProvider }),
   useVertexGeminiTtsConfig: () => ({ voiceName: "Kore" }),
 }));
@@ -49,6 +67,8 @@ vi.mock("@/lib/api-client", () => ({
   fetchPronunciation: mocks.fetchPronunciation,
   hermesXaiStatus: mocks.hermesXaiStatus,
   hermesXaiTts: mocks.hermesXaiTts,
+  mimoTts: mocks.mimoTts,
+  miniMaxTtsAligned: mocks.miniMaxTtsAligned,
   vertexGeminiStatus: mocks.vertexGeminiStatus,
   vertexGeminiTts: mocks.vertexGeminiTts,
   testAzure: mocks.testAzure,
@@ -61,6 +81,8 @@ vi.mock("@/lib/api-keys", () => ({
   API_KEY_STORAGE_KEYS: [
     "speakright_azure_config",
     "speakright_elevenlabs_config",
+    "speakright_minimax_tts_config",
+    "speakright_mimo_tts_config",
     "speakright_llm_config",
   ],
   APP_PREFERENCE_STORAGE_KEYS: [
@@ -71,6 +93,8 @@ vi.mock("@/lib/api-keys", () => ({
   setAzureConfig: mocks.setAzureConfig,
   setElevenLabsConfig: mocks.setElevenLabsConfig,
   setLlmConfig: mocks.setLlmConfig,
+  setMimoTtsConfig: mocks.setMimoTtsConfig,
+  setMiniMaxTtsConfig: mocks.setMiniMaxTtsConfig,
   setStandardTtsConfig: mocks.setStandardTtsConfig,
   setVertexGeminiTtsConfig: mocks.setVertexGeminiTtsConfig,
 }));
@@ -91,6 +115,8 @@ describe("settings connection errors", () => {
     vi.clearAllMocks();
     mocks.isTauriEnvironment.mockReturnValue(true);
     mocks.standardTtsProvider = "elevenlabs";
+    mocks.miniMaxConfig = null;
+    mocks.mimoConfig = null;
   });
 
   it("keeps Azure connection-test provider errors actionable in Chinese", async () => {
@@ -211,15 +237,179 @@ describe("settings connection errors", () => {
     expect(mocks.vertexGeminiStatus).not.toHaveBeenCalled();
     expect(mocks.vertexGeminiTts).not.toHaveBeenCalled();
 
-    fireEvent.click(
-      screen.getByRole("button", { name: "检测 Vertex 状态" }),
-    );
+    fireEvent.click(screen.getByRole("button", { name: "检测 Vertex 状态" }));
     expect(
       await screen.findByText("本机 Vertex AI 项目与 ADC 授权已就绪"),
     ).toBeInTheDocument();
     expect(screen.getByText("项目：已配置")).toBeInTheDocument();
     expect(screen.getByText("ADC：已就绪")).toBeInTheDocument();
     expect(mocks.vertexGeminiTts).not.toHaveBeenCalled();
+  });
+
+  it("offers mainland MiniMax and Xiaomi MiMo providers with local-only key storage", () => {
+    const selectorView = render(<ElevenLabsConfigCard />);
+    const miniMaxButton = screen.getByRole("button", { name: /MiniMax/ });
+    const mimoButton = screen.getByRole("button", { name: /小米 MiMo/ });
+    expect(miniMaxButton).toHaveAttribute("data-smoke", "tts-provider-minimax");
+    expect(mimoButton).toHaveAttribute("data-smoke", "tts-provider-mimo");
+
+    fireEvent.click(miniMaxButton);
+    expect(mocks.setStandardTtsConfig).toHaveBeenCalledWith({
+      provider: "minimax",
+    });
+    selectorView.unmount();
+
+    mocks.standardTtsProvider = "minimax";
+    const miniMaxView = render(<ElevenLabsConfigCard />);
+    fireEvent.change(screen.getByLabelText("MiniMax API Key"), {
+      target: { value: "minimax-secret" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "保存" }));
+    expect(mocks.setMiniMaxTtsConfig).toHaveBeenCalledWith({
+      apiKey: "minimax-secret",
+      modelId: "speech-2.8-turbo",
+      voiceId: "English_expressive_narrator",
+    });
+    expect(screen.getByText(/不会估算或伪造高亮/)).toBeInTheDocument();
+    miniMaxView.unmount();
+
+    mocks.standardTtsProvider = "mimo";
+    render(<ElevenLabsConfigCard />);
+    fireEvent.change(screen.getByLabelText("小米 MiMo API Key"), {
+      target: { value: "mimo-secret" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "保存" }));
+    expect(mocks.setMimoTtsConfig).toHaveBeenCalledWith({
+      apiKey: "mimo-secret",
+      modelId: "mimo-v2.5-tts",
+      voiceId: "Mia",
+    });
+    expect(screen.getByText(/当前只用于英语标准示范/)).toBeInTheDocument();
+  });
+
+  it("cancels an in-flight MiniMax preview when the provider changes", async () => {
+    mocks.standardTtsProvider = "minimax";
+    let resolvePreview!: (value: {
+      audioBlob: Blob;
+      wordTimings: never[];
+      alignmentOutcome: "transient-unavailable";
+    }) => void;
+    mocks.miniMaxTtsAligned.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          resolvePreview = resolve;
+        }),
+    );
+
+    render(<ElevenLabsConfigCard />);
+    fireEvent.change(screen.getByLabelText("MiniMax API Key"), {
+      target: { value: "minimax-secret" },
+    });
+    const previewButton = screen.getByRole("button", {
+      name: "试听短句（会产生用量）",
+    });
+    fireEvent.click(previewButton);
+
+    await waitFor(() => {
+      expect(mocks.miniMaxTtsAligned).toHaveBeenCalledTimes(1);
+    });
+    const options = mocks.miniMaxTtsAligned.mock.calls[0]?.[2] as {
+      signal: AbortSignal;
+    };
+    expect(previewButton).toBeDisabled();
+    expect(options.signal.aborted).toBe(false);
+
+    fireEvent.click(screen.getByRole("button", { name: /小米 MiMo/ }));
+    expect(options.signal.aborted).toBe(true);
+    expect(previewButton).not.toBeDisabled();
+
+    await act(async () => {
+      resolvePreview({
+        audioBlob: new Blob([new Uint8Array([1])], { type: "audio/mpeg" }),
+        wordTimings: [],
+        alignmentOutcome: "transient-unavailable",
+      });
+      await Promise.resolve();
+    });
+    expect(screen.queryByText(/MiniMax 短句已播放/)).not.toBeInTheDocument();
+  });
+
+  it("stops an already-playing domestic preview when the provider changes", async () => {
+    mocks.standardTtsProvider = "minimax";
+    const audio = {
+      addEventListener: vi.fn(),
+      pause: vi.fn(),
+      play: vi.fn().mockResolvedValue(undefined),
+    };
+    const createObjectURL = vi.fn(() => "blob:settings-preview");
+    const revokeObjectURL = vi.fn();
+    vi.stubGlobal("Audio", function MockAudio() {
+      return audio;
+    });
+    vi.stubGlobal("URL", { createObjectURL, revokeObjectURL });
+    mocks.miniMaxTtsAligned.mockResolvedValueOnce({
+      audioBlob: new Blob([new Uint8Array([1])], { type: "audio/mpeg" }),
+      wordTimings: [],
+      alignmentOutcome: "transcript-mismatch",
+    });
+
+    try {
+      render(<ElevenLabsConfigCard />);
+      fireEvent.change(screen.getByLabelText("MiniMax API Key"), {
+        target: { value: "minimax-secret" },
+      });
+      fireEvent.click(
+        screen.getByRole("button", {
+          name: "试听短句（会产生用量）",
+        }),
+      );
+
+      expect(
+        await screen.findByText(/字幕与原文不完全匹配/),
+      ).toBeInTheDocument();
+      expect(audio.play).toHaveBeenCalledTimes(1);
+
+      fireEvent.click(screen.getByRole("button", { name: /小米 MiMo/ }));
+      expect(audio.pause).toHaveBeenCalledTimes(1);
+      expect(revokeObjectURL).toHaveBeenCalledWith("blob:settings-preview");
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it("cancels a domestic preview when its saved key is cleared", async () => {
+    mocks.standardTtsProvider = "minimax";
+    mocks.miniMaxConfig = {
+      apiKey: "minimax-secret",
+      modelId: "speech-2.8-turbo",
+      voiceId: "English_expressive_narrator",
+    };
+    mocks.miniMaxTtsAligned.mockImplementationOnce(() => new Promise(() => {}));
+
+    const view = render(<ElevenLabsConfigCard />);
+    await waitFor(() => {
+      expect(screen.getByLabelText("MiniMax API Key")).toHaveValue(
+        "minimax-secret",
+      );
+    });
+    fireEvent.click(
+      screen.getByRole("button", { name: "试听短句（会产生用量）" }),
+    );
+    await waitFor(() => {
+      expect(mocks.miniMaxTtsAligned).toHaveBeenCalledTimes(1);
+    });
+    const options = mocks.miniMaxTtsAligned.mock.calls[0]?.[2] as {
+      signal: AbortSignal;
+    };
+
+    mocks.miniMaxConfig = null;
+    view.rerender(<ElevenLabsConfigCard />);
+
+    await waitFor(() => {
+      expect(options.signal.aborted).toBe(true);
+      expect(screen.getByLabelText("MiniMax API Key")).toHaveValue("");
+    });
+    expect(screen.queryByText("测试中...")).not.toBeInTheDocument();
   });
 
   it("shows a persistent Settings alert when local key storage fails", () => {

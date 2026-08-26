@@ -1,10 +1,10 @@
 # Privacy
 
-Last updated: 2026-08-17
+Last updated: 2026-08-25
 
 SpeakRight is a local-first, bring-your-own-key pronunciation practice project. The open-source editions documented in this repository do not include a SpeakRight-operated user account, cloud-sync, or analytics backend. Some learning features deliberately contact external providers when the user invokes a network-backed action. Credentialed routes are configured by the user; the credential-free Youdao fallback may be contacted after the user requests word playback and no eligible bundled English recording is available.
 
-This document describes the repository's current behavior. It is not a substitute for the privacy terms of Microsoft Azure, ElevenLabs, Google Cloud, xAI, a configured LLM provider, Youdao, an operating system, or a browser.
+This document describes the repository's current behavior. It is not a substitute for the privacy terms of Microsoft Azure, ElevenLabs, MiniMax, Xiaomi MiMo, Google Cloud, xAI, a configured LLM provider, Youdao, an operating system, or a browser.
 
 ## Data kept on the device
 
@@ -27,7 +27,7 @@ External requests occur only when a user invokes a network-backed feature or a m
 | Feature | Typical recipient | Data needed for the request |
 | --- | --- | --- |
 | Pronunciation assessment | Microsoft Azure Speech | target text, selected locale, and recorded audio |
-| Standard demonstration TTS | ElevenLabs, or a configured local bridge to xAI/Grok or Vertex AI Gemini TTS | text, voice/settings, and provider authentication handled by the selected route |
+| Standard demonstration TTS | ElevenLabs, MiniMax, Xiaomi MiMo, or a configured local bridge to xAI/Grok or Vertex AI Gemini TTS | text, selected language, voice/model/settings, and provider authentication handled by the selected route |
 | Chinese coaching feedback | the configured LLM provider | target text and structured pronunciation evidence needed to explain the result |
 | Word-pronunciation fallback | Youdao, automatically after requested playback when eligible bundled English audio is unavailable | the requested word |
 

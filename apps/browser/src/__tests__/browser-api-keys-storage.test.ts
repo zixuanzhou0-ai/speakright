@@ -4,9 +4,12 @@ import {
   APP_PREFERENCE_STORAGE_KEYS,
   clearItem,
   getApiKeyPersistence,
+  getApiKeySummary,
   getAzureConfig,
   getElevenLabsConfig,
   getLlmConfig,
+  getMimoTtsConfig,
+  getMiniMaxTtsConfig,
   getPronunciationConfig,
   getStandardTtsConfig,
   getVertexGeminiTtsConfig,
@@ -15,6 +18,8 @@ import {
   setAzureConfig,
   setElevenLabsConfig,
   setLlmConfig,
+  setMimoTtsConfig,
+  setMiniMaxTtsConfig,
   setPronunciationConfig,
   setStandardTtsConfig,
   setVertexGeminiTtsConfig,
@@ -70,6 +75,29 @@ describe("browser API key storage", () => {
     expect(localStorage.getItem("speakright_azure_config")).toBeNull();
   });
 
+  it("treats MiniMax and MiMo as BYOK secrets across all five key slots", () => {
+    setMiniMaxTtsConfig({
+      apiKey: "mini-key",
+      modelId: "speech-2.8-turbo",
+      voiceId: "English_expressive_narrator",
+    });
+    setMimoTtsConfig({
+      apiKey: "mimo-key",
+      modelId: "mimo-v2.5-tts",
+      voiceId: "Mia",
+    });
+
+    expect(sessionStorage.getItem("speakright_minimax_tts_config")).toContain(
+      "mini-key",
+    );
+    expect(sessionStorage.getItem("speakright_mimo_tts_config")).toContain(
+      "mimo-key",
+    );
+    expect(localStorage.getItem("speakright_minimax_tts_config")).toBeNull();
+    expect(localStorage.getItem("speakright_mimo_tts_config")).toBeNull();
+    expect(getApiKeySummary()).toEqual({ configured: 2, totalSlots: 5 });
+  });
+
   it("returns stable snapshots for saved configs", () => {
     setAzureConfig({
       subscriptionKey: "azure-key",
@@ -87,11 +115,23 @@ describe("browser API key storage", () => {
       baseUrl: "https://example.test/v1",
       model: "gpt-test",
     });
+    setMiniMaxTtsConfig({
+      apiKey: "mini-key",
+      modelId: "speech-2.8-turbo",
+      voiceId: "English_expressive_narrator",
+    });
+    setMimoTtsConfig({
+      apiKey: "mimo-key",
+      modelId: "mimo-v2.5-tts",
+      voiceId: "Mia",
+    });
     setPronunciationConfig({ source: "youdao" });
 
     expect(getAzureConfig()).toBe(getAzureConfig());
     expect(getElevenLabsConfig()).toBe(getElevenLabsConfig());
     expect(getLlmConfig()).toBe(getLlmConfig());
+    expect(getMiniMaxTtsConfig()).toBe(getMiniMaxTtsConfig());
+    expect(getMimoTtsConfig()).toBe(getMimoTtsConfig());
     expect(getPronunciationConfig()).toBe(getPronunciationConfig());
   });
 
@@ -153,6 +193,41 @@ describe("browser API key storage", () => {
     expect(getAzureConfig()).toBeNull();
   });
 
+  it("reports an API-key deletion failure and still tries both browser stores", async () => {
+    const key = "speakright_minimax_tts_config";
+    const value = JSON.stringify({ apiKey: "mini-key" });
+    sessionStorage.setItem(key, value);
+    localStorage.setItem(key, value);
+    const listener = vi.fn();
+    window.addEventListener(API_KEY_STORAGE_ERROR_EVENT, listener);
+    const originalRemoveItem = Storage.prototype.removeItem;
+    const removeSpy = vi
+      .spyOn(Storage.prototype, "removeItem")
+      .mockImplementation(function removeItem(
+        this: Storage,
+        storageKey: string,
+      ) {
+        if (this === sessionStorage && storageKey === key) {
+          throw new Error("session delete blocked");
+        }
+        return originalRemoveItem.call(this, storageKey);
+      });
+
+    try {
+      await expect(clearItem(key)).rejects.toThrow("session delete blocked");
+      expect(sessionStorage.getItem(key)).toBe(value);
+      expect(localStorage.getItem(key)).toBeNull();
+      expect(listener).toHaveBeenCalledWith(
+        expect.objectContaining({
+          detail: expect.objectContaining({ key, operation: "delete" }),
+        }),
+      );
+    } finally {
+      removeSpy.mockRestore();
+      window.removeEventListener(API_KEY_STORAGE_ERROR_EVENT, listener);
+    }
+  });
+
   it("keeps non-secret browser preferences in localStorage", () => {
     expect(getPronunciationConfig()).toEqual({ source: "youdao" });
 
@@ -180,6 +255,12 @@ describe("browser API key storage", () => {
 
     setStandardTtsConfig({ provider: "vertex-gemini" });
     expect(getStandardTtsConfig()).toEqual({ provider: "vertex-gemini" });
+
+    setStandardTtsConfig({ provider: "minimax" });
+    expect(getStandardTtsConfig()).toEqual({ provider: "minimax" });
+
+    setStandardTtsConfig({ provider: "mimo" });
+    expect(getStandardTtsConfig()).toEqual({ provider: "mimo" });
 
     localStorage.setItem(
       "speakright_standard_tts_config",

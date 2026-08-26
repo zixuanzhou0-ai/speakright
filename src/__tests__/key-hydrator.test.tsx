@@ -14,6 +14,8 @@ vi.mock("@/lib/api-keys", () => ({
   API_KEY_STORAGE_KEYS: [
     "speakright_azure_config",
     "speakright_elevenlabs_config",
+    "speakright_minimax_tts_config",
+    "speakright_mimo_tts_config",
     "speakright_llm_config",
   ],
   APP_PREFERENCE_STORAGE_KEYS: ["speakright_coach_mode"],

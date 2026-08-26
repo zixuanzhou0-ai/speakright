@@ -4,10 +4,14 @@ import { useCallback, useState } from "react";
 import {
   elevenLabsTts,
   hermesXaiTts,
+  mimoTts,
+  miniMaxTtsAligned,
   vertexGeminiTts,
 } from "@/lib/api-client";
 import {
   getElevenLabsConfig,
+  getMimoTtsConfig,
+  getMiniMaxTtsConfig,
   getStandardTtsConfig,
   getVertexGeminiTtsConfig,
 } from "@/lib/api-keys";
@@ -34,7 +38,14 @@ export function useTts(): UseTtsReturn {
       const provider = getStandardTtsConfig().provider;
       const elevenLabsConfig =
         provider === "elevenlabs" ? getElevenLabsConfig() : null;
-      if (provider === "elevenlabs" && !elevenLabsConfig) {
+      const miniMaxConfig =
+        provider === "minimax" ? getMiniMaxTtsConfig() : null;
+      const mimoConfig = provider === "mimo" ? getMimoTtsConfig() : null;
+      if (
+        (provider === "elevenlabs" && !elevenLabsConfig) ||
+        (provider === "minimax" && !miniMaxConfig) ||
+        (provider === "mimo" && !mimoConfig)
+      ) {
         setError(STANDARD_TTS_UNAVAILABLE_MESSAGE);
         return;
       }
@@ -49,6 +60,28 @@ export function useTts(): UseTtsReturn {
         } else if (provider === "vertex-gemini") {
           blob = await vertexGeminiTts(text, {
             voiceName: getVertexGeminiTtsConfig().voiceName,
+          });
+        } else if (provider === "minimax") {
+          if (!miniMaxConfig) {
+            throw new Error(STANDARD_TTS_UNAVAILABLE_MESSAGE);
+          }
+          blob = (
+            await miniMaxTtsAligned(miniMaxConfig.apiKey, text, {
+              modelId: miniMaxConfig.modelId,
+              voiceId: miniMaxConfig.voiceId,
+              languageId: "en-US",
+              speed: 1,
+            })
+          ).audioBlob;
+        } else if (provider === "mimo") {
+          if (!mimoConfig) {
+            throw new Error(STANDARD_TTS_UNAVAILABLE_MESSAGE);
+          }
+          blob = await mimoTts(mimoConfig.apiKey, text, {
+            modelId: mimoConfig.modelId,
+            voiceId: mimoConfig.voiceId,
+            languageId: "en-US",
+            speed: 1,
           });
         } else {
           if (!elevenLabsConfig) {

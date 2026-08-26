@@ -4,11 +4,16 @@ import { Howl, Howler } from "howler";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   elevenLabsTtsAligned,
-  hermesXaiTts,
+  hermesXaiTtsAligned,
+  type MiniMaxWordTiming,
+  mimoTts,
+  miniMaxTtsAligned,
   vertexGeminiTts,
 } from "@/lib/api-client";
 import {
   getElevenLabsConfig,
+  getMimoTtsConfig,
+  getMiniMaxTtsConfig,
   getStandardTtsConfig,
   getVertexGeminiTtsConfig,
   subscribeToStorage,
@@ -20,7 +25,15 @@ import {
 } from "@/lib/elevenlabs-language-packs";
 import { getLanguageAudioPackEntry } from "@/lib/language-audio-pack-cache";
 import { getStaticLanguageAudioPackEntry } from "@/lib/static-language-audio-pack";
-import { getTtsFromCache, setTtsToCache } from "@/lib/tts-cache";
+import {
+  buildCacheKey,
+  captureTtsCacheEpoch,
+  deleteTtsFromCache,
+  getTtsFromCache,
+  setTtsToCache,
+  subscribeToTtsCacheInvalidation,
+  type TtsCacheEpochToken,
+} from "@/lib/tts-cache";
 import {
   normalizeStandardTtsError,
   STANDARD_TTS_UNAVAILABLE_MESSAGE,
@@ -60,10 +73,26 @@ interface TtsPlaybackOptions {
   sourceUrl?: string;
 }
 
+interface TtsPlaybackCacheContext {
+  cacheKey: string;
+  text: string;
+  voiceIdentity: string;
+  speed: number;
+  languageId: LanguageId;
+  alignment: unknown;
+  persistOnLoad: boolean;
+  cacheEpochToken: TtsCacheEpochToken;
+}
+
 interface AlignmentData {
   characters: string[];
   character_start_times_seconds: number[];
   character_end_times_seconds: number[];
+}
+
+interface CachedWordTimingData {
+  kind: "word-timings";
+  items: WordTiming[];
 }
 
 function resumeHowlerAudioContext(): void {
@@ -125,6 +154,91 @@ function aggregateToWordTimings(
   return timings;
 }
 
+function normalizeWordToken(value: string): string {
+  return value
+    .normalize("NFKC")
+    .toLocaleLowerCase("en-US")
+    .replace(/[^\p{L}\p{N}'’]+/gu, "")
+    .replace(/’/g, "'");
+}
+
+/**
+ * MiniMax subtitles are word-granular but punctuation and contractions may be
+ * split differently from the UI's whitespace tokens. Merge adjacent official
+ * timings only when they can be matched deterministically; otherwise return an
+ * empty timeline so the UI honestly falls back to sentence playback.
+ */
+function alignProviderWordTimings(
+  text: string,
+  providerTimings: MiniMaxWordTiming[],
+): WordTiming[] {
+  const sourceWords = text.split(/\s+/).filter(Boolean);
+  if (sourceWords.length === 0 || providerTimings.length === 0) return [];
+
+  const result: WordTiming[] = [];
+  let providerIndex = 0;
+  for (const sourceWord of sourceWords) {
+    const target = normalizeWordToken(sourceWord);
+    if (!target) return [];
+
+    let combined = "";
+    let start = -1;
+    let end = -1;
+    while (providerIndex < providerTimings.length) {
+      const timing = providerTimings[providerIndex];
+      providerIndex += 1;
+      const token = normalizeWordToken(timing.word);
+      if (!token) continue;
+      if (start < 0) start = timing.start;
+      end = timing.end;
+      combined += token;
+      if (combined === target) break;
+      if (!target.startsWith(combined)) return [];
+    }
+
+    if (combined !== target || start < 0 || end <= start) return [];
+    result.push({ word: sourceWord, start, end });
+  }
+
+  const remainingText = providerTimings
+    .slice(providerIndex)
+    .map((timing) => normalizeWordToken(timing.word))
+    .join("");
+  return remainingText ? [] : result;
+}
+
+function isCachedWordTimingData(value: unknown): value is CachedWordTimingData {
+  if (!value || typeof value !== "object") return false;
+  const record = value as { kind?: unknown; items?: unknown };
+  return (
+    record.kind === "word-timings" &&
+    Array.isArray(record.items) &&
+    record.items.every((item) => {
+      if (!item || typeof item !== "object") return false;
+      const timing = item as Partial<WordTiming>;
+      return (
+        typeof timing.word === "string" &&
+        typeof timing.start === "number" &&
+        Number.isFinite(timing.start) &&
+        typeof timing.end === "number" &&
+        Number.isFinite(timing.end) &&
+        timing.start >= 0 &&
+        timing.end > timing.start
+      );
+    })
+  );
+}
+
+function timingsFromCachedAlignment(
+  text: string,
+  value: unknown,
+): WordTiming[] {
+  if (isCachedWordTimingData(value)) {
+    return alignProviderWordTimings(text, value.items);
+  }
+  return value ? aggregateToWordTimings(text, value as AlignmentData) : [];
+}
+
 function resolveSpeakOptions(speedOrOptions?: number | TtsAlignedSpeakOptions) {
   const languageId =
     typeof speedOrOptions === "object"
@@ -184,6 +298,7 @@ export function useTtsAligned(): UseTtsAlignedReturn {
   const requestIdRef = useRef(0);
   const activeRequestControllerRef = useRef<AbortController | null>(null);
   const playbackGenerationRef = useRef(0);
+  const invalidCacheKeysRef = useRef(new Set<string>());
 
   const clearReplayAudio = useCallback(() => {
     lastAudioBlobRef.current = null;
@@ -244,7 +359,12 @@ export function useTtsAligned(): UseTtsAlignedReturn {
   }, []);
 
   const playBlob = useCallback(
-    (blob: Blob, timings: WordTiming[], options: TtsPlaybackOptions = {}) => {
+    (
+      blob: Blob,
+      timings: WordTiming[],
+      options: TtsPlaybackOptions = {},
+      cacheContext?: TtsPlaybackCacheContext,
+    ) => {
       cleanupPlayback();
       const generation = playbackGenerationRef.current;
 
@@ -262,12 +382,46 @@ export function useTtsAligned(): UseTtsAlignedReturn {
       const isCurrentPlayback = () =>
         playbackGenerationRef.current === generation &&
         howlRef.current === howl;
+      let audioReady = false;
+      let cacheWriteStarted = false;
       const markAudioReady = () => {
-        if (!isCurrentPlayback()) return;
+        if (!isCurrentPlayback() || audioReady) return;
+        audioReady = true;
         lastAudioBlobRef.current = blob;
         lastWordTimingsRef.current = timings;
         lastPlaybackOptionsRef.current = options;
         setHasAudio(true);
+      };
+      const persistDecodedAudio = () => {
+        if (
+          !isCurrentPlayback() ||
+          !cacheContext?.persistOnLoad ||
+          cacheWriteStarted
+        ) {
+          return;
+        }
+        cacheWriteStarted = true;
+        void setTtsToCache(
+          cacheContext.text,
+          cacheContext.voiceIdentity,
+          cacheContext.speed,
+          blob,
+          cacheContext.alignment,
+          cacheContext.languageId,
+          cacheContext.cacheEpochToken,
+        ).then(() => {
+          invalidCacheKeysRef.current.delete(cacheContext.cacheKey);
+        });
+      };
+      const evictUndecodableAudio = () => {
+        if (!cacheContext) return;
+        invalidCacheKeysRef.current.add(cacheContext.cacheKey);
+        void deleteTtsFromCache(
+          cacheContext.text,
+          cacheContext.voiceIdentity,
+          cacheContext.speed,
+          cacheContext.languageId,
+        );
       };
       const stopTimeTracking = () => {
         if (rafRef.current !== null) {
@@ -282,7 +436,11 @@ export function useTtsAligned(): UseTtsAlignedReturn {
           format: getHowlerFormat(blob),
           html5: options.html5 ?? true,
           volume: options.volume ?? 1,
-          onload: markAudioReady,
+          onload: () => {
+            if (!isCurrentPlayback()) return;
+            markAudioReady();
+            persistDecodedAudio();
+          },
           onplay: () => {
             if (!isCurrentPlayback()) return;
             markAudioReady();
@@ -307,6 +465,7 @@ export function useTtsAligned(): UseTtsAlignedReturn {
           },
           onloaderror: () => {
             if (!isCurrentPlayback()) return;
+            evictUndecodableAudio();
             cleanupPlayback();
             clearReplayAudio();
             setIsLoading(false);
@@ -334,6 +493,7 @@ export function useTtsAligned(): UseTtsAlignedReturn {
         howl.play();
       } catch {
         if (playbackGenerationRef.current !== generation) return;
+        evictUndecodableAudio();
         cleanupPlayback();
         clearReplayAudio();
         setIsLoading(false);
@@ -370,6 +530,8 @@ export function useTtsAligned(): UseTtsAlignedReturn {
 
   useEffect(() => subscribeToStorage(reset), [reset]);
 
+  useEffect(() => subscribeToTtsCacheInvalidation(reset), [reset]);
+
   useEffect(
     () => () => {
       cancelActiveRequest();
@@ -382,6 +544,7 @@ export function useTtsAligned(): UseTtsAlignedReturn {
   const speak = useCallback(
     async (text: string, speedOrOptions?: number | TtsAlignedSpeakOptions) => {
       const { controller, requestId } = beginRequest();
+      const cacheEpochToken = captureTtsCacheEpoch();
       const { signal } = controller;
       resumeHowlerAudioContext();
       cleanupPlayback();
@@ -399,6 +562,9 @@ export function useTtsAligned(): UseTtsAlignedReturn {
         const provider = getStandardTtsConfig().provider;
         const elevenLabsConfig =
           provider === "elevenlabs" ? getElevenLabsConfig() : null;
+        const miniMaxConfig =
+          provider === "minimax" ? getMiniMaxTtsConfig() : null;
+        const mimoConfig = provider === "mimo" ? getMimoTtsConfig() : null;
 
         const localBlob = await loadLocalLanguagePackBlob(
           languageId,
@@ -418,45 +584,117 @@ export function useTtsAligned(): UseTtsAlignedReturn {
           return;
         }
 
-        if (provider === "elevenlabs" && !elevenLabsConfig) {
+        if (
+          (provider === "elevenlabs" && !elevenLabsConfig) ||
+          (provider === "minimax" && !miniMaxConfig) ||
+          (provider === "mimo" && !mimoConfig)
+        ) {
           setIsLoading(false);
           setError(STANDARD_TTS_UNAVAILABLE_MESSAGE);
           return;
         }
 
-        const modelId =
+        const elevenLabsModelId =
           languagePack?.modelId ||
           elevenLabsConfig?.modelId ||
           "eleven_flash_v2_5";
-        const voiceIdentity = `elevenlabs:${elevenLabsConfig?.voiceId ?? "unconfigured"}:${modelId}`;
+        const voiceIdentity =
+          provider === "minimax"
+            ? `minimax:${miniMaxConfig?.voiceId ?? "unconfigured"}:${miniMaxConfig?.modelId ?? "unconfigured"}`
+            : provider === "mimo"
+              ? `mimo:${mimoConfig?.voiceId ?? "unconfigured"}:${mimoConfig?.modelId ?? "unconfigured"}:prompt-v1`
+              : `elevenlabs:${elevenLabsConfig?.voiceId ?? "unconfigured"}:${elevenLabsModelId}`;
+        const usesPersistentCache =
+          provider === "elevenlabs" ||
+          provider === "minimax" ||
+          provider === "mimo";
 
         // Local bridge providers can change voice/auth configuration outside
         // the persistent audio cache. Keep those results in memory only so the
         // next generation always reflects the current local settings.
+        const persistentCacheKey = usesPersistentCache
+          ? buildCacheKey(text, voiceIdentity, speed, languageId)
+          : null;
         const cached =
-          provider === "elevenlabs"
+          usesPersistentCache &&
+          persistentCacheKey &&
+          !invalidCacheKeysRef.current.has(persistentCacheKey)
             ? await getTtsFromCache(text, voiceIdentity, speed, languageId)
             : null;
         if (requestIdRef.current !== requestId) return;
-        if (cached) {
+        const cacheEpochIsCurrent = captureTtsCacheEpoch() === cacheEpochToken;
+        if (cached && persistentCacheKey && cacheEpochIsCurrent) {
           const blob = cached.audioBlob;
-          const alignment = cached.alignment as AlignmentData | null;
-          const timings = alignment
-            ? aggregateToWordTimings(text, alignment)
-            : [];
-          playBlob(blob, timings);
+          const timings = timingsFromCachedAlignment(text, cached.alignment);
+          playBlob(
+            blob,
+            timings,
+            {},
+            {
+              cacheKey: persistentCacheKey,
+              text,
+              voiceIdentity,
+              speed,
+              languageId,
+              alignment: cached.alignment,
+              persistOnLoad: false,
+              cacheEpochToken,
+            },
+          );
           return;
         }
 
         let blob: Blob;
         let alignment: unknown = null;
+        let timings: WordTiming[] = [];
+        let persistGeneratedAudio = usesPersistentCache;
         if (provider === "hermes-grok") {
-          blob = await hermesXaiTts(text, { languageId, speed, signal });
+          const result = await hermesXaiTtsAligned(text, {
+            languageId,
+            speed,
+            signal,
+          });
+          blob = result.audioBlob;
+          alignment = result.alignment;
+          timings = alignment
+            ? aggregateToWordTimings(text, alignment as AlignmentData)
+            : [];
         } else if (provider === "vertex-gemini") {
           blob = await vertexGeminiTts(text, {
             languageId,
             speed,
             voiceName: getVertexGeminiTtsConfig().voiceName,
+            signal,
+          });
+        } else if (provider === "minimax") {
+          if (!miniMaxConfig) {
+            throw new Error(STANDARD_TTS_UNAVAILABLE_MESSAGE);
+          }
+          const result = await miniMaxTtsAligned(miniMaxConfig.apiKey, text, {
+            modelId: miniMaxConfig.modelId,
+            voiceId: miniMaxConfig.voiceId,
+            languageId,
+            speed,
+            signal,
+          });
+          blob = result.audioBlob;
+          timings = alignProviderWordTimings(text, result.wordTimings);
+          if (result.alignmentOutcome === "transient-unavailable") {
+            persistGeneratedAudio = false;
+          }
+          alignment = {
+            kind: "word-timings",
+            items: timings,
+          } satisfies CachedWordTimingData;
+        } else if (provider === "mimo") {
+          if (!mimoConfig) {
+            throw new Error(STANDARD_TTS_UNAVAILABLE_MESSAGE);
+          }
+          blob = await mimoTts(mimoConfig.apiKey, text, {
+            modelId: mimoConfig.modelId,
+            voiceId: mimoConfig.voiceId,
+            languageId,
+            speed,
             signal,
           });
         } else {
@@ -467,7 +705,7 @@ export function useTtsAligned(): UseTtsAlignedReturn {
             elevenLabsConfig.apiKey,
             elevenLabsConfig.voiceId,
             text,
-            modelId,
+            elevenLabsModelId,
             languagePack
               ? {
                   speed,
@@ -480,28 +718,13 @@ export function useTtsAligned(): UseTtsAlignedReturn {
             throw new Error("当前标准示范服务没有返回可播放音频，请稍后重试。");
           }
           alignment = data.alignment;
+          timings = alignment
+            ? aggregateToWordTimings(text, alignment as AlignmentData)
+            : [];
           const audioBytes = Uint8Array.from(atob(data.audio_base64), (c) =>
             c.charCodeAt(0),
           );
           blob = new Blob([audioBytes], { type: "audio/mpeg" });
-        }
-        if (requestIdRef.current !== requestId) return;
-
-        const timings = alignment
-          ? aggregateToWordTimings(text, alignment as AlignmentData)
-          : [];
-
-        // ElevenLabs has a stable voice/model identity. Local bridge provider
-        // results stay in memory for replay only.
-        if (provider === "elevenlabs") {
-          await setTtsToCache(
-            text,
-            voiceIdentity,
-            speed,
-            blob,
-            alignment,
-            languageId,
-          );
         }
         if (requestIdRef.current !== requestId) return;
 
@@ -512,7 +735,19 @@ export function useTtsAligned(): UseTtsAlignedReturn {
           );
         }
 
-        playBlob(blob, timings);
+        const cacheContext = persistentCacheKey
+          ? {
+              cacheKey: persistentCacheKey,
+              text,
+              voiceIdentity,
+              speed,
+              languageId,
+              alignment,
+              persistOnLoad: persistGeneratedAudio,
+              cacheEpochToken,
+            }
+          : undefined;
+        playBlob(blob, timings, {}, cacheContext);
       } catch (e) {
         if (requestIdRef.current !== requestId) return;
         console.error("[Standard TTS]", e);

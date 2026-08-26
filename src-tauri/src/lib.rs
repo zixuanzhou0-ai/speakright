@@ -36,6 +36,7 @@ const LOG_TAIL_MAX_LINE_CHARS: usize = 500;
 const HERMES_BRIDGE_ADDRESS: &str = "127.0.0.1:17831";
 const HERMES_TTS_MAX_CHARS: usize = 500;
 const HERMES_TTS_MAX_AUDIO_BYTES: u64 = 8 * 1024 * 1024;
+const HERMES_TTS_MAX_ALIGNMENT_ITEMS: usize = 4_000;
 const HERMES_TTS_TIMEOUT_SECONDS: u64 = 75;
 const HERMES_STATUS_TIMEOUT_SECONDS: u64 = 20;
 const HERMES_BRIDGE_RATE_LIMIT: usize = 60;
@@ -84,13 +85,16 @@ const VERTEX_VOICES: [&str; 30] = [
     "Zephyr",
     "Zubenelgenubi",
 ];
-const ALLOWED_SECURE_STORE_KEYS: [&str; 3] = [
+const ALLOWED_SECURE_STORE_KEYS: [&str; 5] = [
     "speakright_azure_config",
     "speakright_elevenlabs_config",
+    "speakright_minimax_tts_config",
+    "speakright_mimo_tts_config",
     "speakright_llm_config",
 ];
 
 const HERMES_PYTHON_BRIDGE: &str = r#"
+import base64
 import json
 import logging
 import os
@@ -99,7 +103,10 @@ import sys
 logging.disable(logging.CRITICAL)
 
 try:
-    from tools.tts_tool import _generate_xai_tts, _get_provider, _load_tts_config
+    import requests
+
+    from tools.tts_tool import _get_provider, _load_tts_config
+    from tools.xai_http import hermes_xai_user_agent, resolve_xai_http_credentials
 
     mode = sys.argv[1]
     config = _load_tts_config()
@@ -108,8 +115,6 @@ try:
     voice_id = str(xai_config.get("voice_id") or "eve")
 
     if mode == "status":
-        from tools.xai_http import resolve_xai_http_credentials
-
         credentials = resolve_xai_http_credentials()
         available = provider == "xai" and bool(str(credentials.get("api_key") or "").strip())
         message = (
@@ -136,16 +141,97 @@ try:
     speed = float(sys.argv[4])
     text = sys.stdin.read()
 
-    request_config = dict(config)
-    xai_config["language"] = language
-    xai_config["speed"] = speed
-    request_config["xai"] = xai_config
-    _generate_xai_tts(text, output_path, request_config)
+    credentials = resolve_xai_http_credentials()
+    api_key = str(credentials.get("api_key") or "").strip()
+    if not api_key:
+        raise RuntimeError("No xAI credentials found")
+
+    base_url = str(
+        xai_config.get("base_url")
+        or credentials.get("base_url")
+        or os.environ.get("XAI_BASE_URL")
+        or "https://api.x.ai/v1"
+    ).strip().rstrip("/")
+    if not base_url:
+        raise RuntimeError("No xAI base URL found")
+
+    # Keep the educational transcript exact: Hermes' optional automatic speech
+    # tags would change the character stream and break displayed-word alignment.
+    payload = {
+        "text": text,
+        "voice_id": voice_id,
+        "language": language,
+        "with_timestamps": True,
+    }
+    sample_rate = int(xai_config.get("sample_rate", 24000))
+    bit_rate = int(xai_config.get("bit_rate", 128000))
+    if sample_rate != 24000 or bit_rate != 128000:
+        payload["output_format"] = {
+            "codec": "mp3",
+            "sample_rate": sample_rate,
+            "bit_rate": bit_rate,
+        }
+    if speed != 1.0:
+        payload["speed"] = speed
+
+    optimize_streaming_latency = xai_config.get(
+        "optimize_streaming_latency",
+        config.get("optimize_streaming_latency"),
+    )
+    if optimize_streaming_latency not in (None, ""):
+        try:
+            optimize_streaming_latency = max(0, min(2, int(optimize_streaming_latency)))
+        except (TypeError, ValueError):
+            optimize_streaming_latency = 0
+        if optimize_streaming_latency:
+            payload["optimize_streaming_latency"] = optimize_streaming_latency
+
+    response = requests.post(
+        f"{base_url}/tts",
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+            "User-Agent": hermes_xai_user_agent(),
+        },
+        json=payload,
+        timeout=60,
+    )
+    response.raise_for_status()
+
+    content_type = str(response.headers.get("Content-Type") or "").split(";", 1)[0].strip().lower()
+    response_payload = None
+    if content_type == "application/json" or response.content.lstrip().startswith(b"{"):
+        response_payload = response.json()
+
+    # Official timestamp responses are JSON. Accept raw audio from an older
+    # xAI-compatible endpoint and omit alignment rather than breaking playback.
+    if isinstance(response_payload, dict):
+        encoded_audio = response_payload.get("audio")
+        if not isinstance(encoded_audio, str) or not encoded_audio:
+            raise RuntimeError("xAI TTS response did not include audio")
+        audio = base64.b64decode(encoded_audio, validate=True)
+        content_type = str(response_payload.get("content_type") or "audio/mpeg")
+        duration = response_payload.get("duration")
+        audio_timestamps = response_payload.get("audio_timestamps")
+    else:
+        audio = response.content
+        content_type = content_type or "audio/mpeg"
+        duration = None
+        audio_timestamps = None
+
+    if not audio or len(audio) > 8 * 1024 * 1024:
+        raise RuntimeError("xAI TTS returned an invalid audio payload")
+    with open(output_path, "wb") as output_file:
+        output_file.write(audio)
+
     print(json.dumps({
         "ok": True,
         "available": True,
         "provider": "xai",
         "voiceId": voice_id,
+        "mimeType": content_type,
+        "durationSeconds": duration,
+        "audioTimestamps": audio_timestamps,
         "message": "音频生成成功",
     }, ensure_ascii=False))
 except SystemExit:
@@ -185,6 +271,21 @@ struct HermesXaiAudio {
     mime_type: &'static str,
     provider: String,
     voice_id: Option<String>,
+    duration_seconds: Option<f64>,
+    alignment: Option<HermesCharacterAlignment>,
+}
+
+#[derive(Debug, Serialize, PartialEq)]
+struct HermesCharacterAlignment {
+    characters: Vec<String>,
+    character_start_times_seconds: Vec<f64>,
+    character_end_times_seconds: Vec<f64>,
+}
+
+#[derive(Debug, Deserialize)]
+struct HermesPythonAudioTimestamps {
+    graph_chars: Vec<String>,
+    graph_times: Vec<Vec<f64>>,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -251,6 +352,9 @@ struct HermesPythonResult {
     voice_id: Option<String>,
     message: Option<String>,
     error: Option<String>,
+    mime_type: Option<String>,
+    duration_seconds: Option<f64>,
+    audio_timestamps: Option<serde_json::Value>,
 }
 
 #[derive(Clone)]
@@ -706,6 +810,72 @@ fn validate_hermes_text(text: &str) -> Result<String, String> {
     Ok(text.to_string())
 }
 
+fn normalize_hermes_mime_type(mime_type: Option<&str>) -> &'static str {
+    match mime_type
+        .unwrap_or_default()
+        .split(';')
+        .next()
+        .unwrap_or_default()
+        .trim()
+        .to_ascii_lowercase()
+        .as_str()
+    {
+        "audio/wav" | "audio/x-wav" => "audio/wav",
+        "audio/ogg" => "audio/ogg",
+        "audio/webm" => "audio/webm",
+        _ => "audio/mpeg",
+    }
+}
+
+fn normalize_hermes_duration(duration_seconds: Option<f64>) -> Option<f64> {
+    duration_seconds.filter(|duration| duration.is_finite() && *duration >= 0.0)
+}
+
+fn normalize_hermes_alignment(
+    timestamps: Option<serde_json::Value>,
+) -> Option<HermesCharacterAlignment> {
+    let timestamps = serde_json::from_value::<HermesPythonAudioTimestamps>(timestamps?).ok()?;
+    let count = timestamps.graph_chars.len();
+    if count == 0
+        || count > HERMES_TTS_MAX_ALIGNMENT_ITEMS
+        || timestamps.graph_times.len() != count
+        || timestamps
+            .graph_chars
+            .iter()
+            .any(|character| character.is_empty())
+    {
+        return None;
+    }
+
+    let mut starts = Vec::with_capacity(count);
+    let mut ends = Vec::with_capacity(count);
+    let mut previous_start = 0.0;
+    for (index, range) in timestamps.graph_times.iter().enumerate() {
+        if range.len() != 2 {
+            return None;
+        }
+        let start = range[0];
+        let end = range[1];
+        if !start.is_finite()
+            || !end.is_finite()
+            || start < 0.0
+            || end < start
+            || (index > 0 && start < previous_start)
+        {
+            return None;
+        }
+        starts.push(start);
+        ends.push(end);
+        previous_start = start;
+    }
+
+    Some(HermesCharacterAlignment {
+        characters: timestamps.graph_chars,
+        character_start_times_seconds: starts,
+        character_end_times_seconds: ends,
+    })
+}
+
 #[cfg(windows)]
 fn configure_hidden_process(command: &mut Command) {
     use std::os::windows::process::CommandExt;
@@ -970,11 +1140,16 @@ fn synthesize_hermes_xai(
         }
         let audio =
             fs::read(&output_path).map_err(|_| "无法读取爱马仕生成的音频，请重试。".to_string())?;
+        let mime_type = normalize_hermes_mime_type(python_result.mime_type.as_deref());
+        let duration_seconds = normalize_hermes_duration(python_result.duration_seconds);
+        let alignment = normalize_hermes_alignment(python_result.audio_timestamps);
         Ok(HermesXaiAudio {
             audio_base64: BASE64_STANDARD.encode(audio),
-            mime_type: "audio/mpeg",
+            mime_type,
             provider: python_result.provider.unwrap_or_else(|| "xai".to_string()),
             voice_id: python_result.voice_id,
+            duration_seconds,
+            alignment,
         })
     })();
 
@@ -2009,6 +2184,69 @@ mod tests {
         assert!(validate_hermes_text("  ").is_err());
         assert_eq!(validate_hermes_text("  hello  ").unwrap(), "hello");
         assert!(validate_hermes_text(&"x".repeat(HERMES_TTS_MAX_CHARS + 1)).is_err());
+    }
+
+    #[test]
+    fn hermes_timestamp_response_maps_to_elevenlabs_compatible_alignment() {
+        let stdout = br#"{"ok":true,"available":true,"provider":"xai","voiceId":"eve","mimeType":"audio/mpeg","durationSeconds":0.42,"audioTimestamps":{"graph_chars":["H","i"],"graph_times":[[0.0,0.2],[0.2,0.42]]}}"#;
+        let result = parse_hermes_python_result(stdout).expect("timestamp response should parse");
+        let alignment = normalize_hermes_alignment(result.audio_timestamps)
+            .expect("valid timestamps should produce alignment");
+
+        assert_eq!(alignment.characters, vec!["H", "i"]);
+        assert_eq!(alignment.character_start_times_seconds, vec![0.0, 0.2]);
+        assert_eq!(alignment.character_end_times_seconds, vec![0.2, 0.42]);
+        assert_eq!(
+            normalize_hermes_duration(result.duration_seconds),
+            Some(0.42)
+        );
+        assert_eq!(
+            normalize_hermes_mime_type(result.mime_type.as_deref()),
+            "audio/mpeg"
+        );
+
+        let serialized = serde_json::to_value(HermesXaiAudio {
+            audio_base64: "dGVzdA==".to_string(),
+            mime_type: "audio/mpeg",
+            provider: "xai".to_string(),
+            voice_id: result.voice_id,
+            duration_seconds: Some(0.42),
+            alignment: Some(alignment),
+        })
+        .expect("audio response should serialize");
+        assert_eq!(
+            serialized["alignment"]["character_start_times_seconds"],
+            json!([0.0, 0.2])
+        );
+        assert_eq!(serialized["durationSeconds"], json!(0.42));
+    }
+
+    #[test]
+    fn hermes_timestamp_response_drops_invalid_alignment_without_breaking_audio() {
+        let mismatched = json!({
+            "graph_chars": ["H", "i"],
+            "graph_times": [[0.0, 0.2]],
+        });
+        assert!(normalize_hermes_alignment(Some(mismatched)).is_none());
+
+        let reversed = json!({
+            "graph_chars": ["H"],
+            "graph_times": [[0.2, 0.1]],
+        });
+        assert!(normalize_hermes_alignment(Some(reversed)).is_none());
+        assert_eq!(normalize_hermes_duration(Some(f64::NAN)), None);
+    }
+
+    #[test]
+    fn hermes_malformed_timestamp_metadata_does_not_invalidate_audio_result() {
+        let stdout = br#"{"ok":true,"provider":"xai","voiceId":"eve","mimeType":"audio/mpeg","durationSeconds":0.42,"audioTimestamps":{"graph_chars":"not-an-array","graph_times":null}}"#;
+        let result = parse_hermes_python_result(stdout)
+            .expect("malformed optional timestamps must not hide a successful audio result");
+
+        assert!(result.ok);
+        assert_eq!(result.provider.as_deref(), Some("xai"));
+        assert_eq!(result.mime_type.as_deref(), Some("audio/mpeg"));
+        assert!(normalize_hermes_alignment(result.audio_timestamps).is_none());
     }
 
     #[test]

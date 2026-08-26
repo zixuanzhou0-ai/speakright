@@ -7,6 +7,8 @@ import {
   getElevenLabsConfig,
   getLanguageConfig,
   getLlmConfig,
+  getMimoTtsConfig,
+  getMiniMaxTtsConfig,
   getPronunciationConfig,
   getStandardTtsConfig,
   getVertexGeminiTtsConfig,
@@ -31,8 +33,7 @@ const standardTtsServerSnapshot = () => STANDARD_TTS_SERVER_SNAPSHOT;
 const VERTEX_GEMINI_TTS_SERVER_SNAPSHOT: VertexGeminiTtsConfig = {
   voiceName: "Kore",
 };
-const vertexGeminiTtsServerSnapshot = () =>
-  VERTEX_GEMINI_TTS_SERVER_SNAPSHOT;
+const vertexGeminiTtsServerSnapshot = () => VERTEX_GEMINI_TTS_SERVER_SNAPSHOT;
 const languageServerSnapshot = () => DEFAULT_LANGUAGE_CONFIG;
 const coachModeServerSnapshot = () => "normal" as const;
 
@@ -48,6 +49,22 @@ export function useElevenLabsConfig() {
   return useSyncExternalStore(
     typeof window !== "undefined" ? subscribeToStorage : emptySubscribe,
     getElevenLabsConfig,
+    () => serverSnapshot(),
+  );
+}
+
+export function useMiniMaxTtsConfig() {
+  return useSyncExternalStore(
+    typeof window !== "undefined" ? subscribeToStorage : emptySubscribe,
+    getMiniMaxTtsConfig,
+    () => serverSnapshot(),
+  );
+}
+
+export function useMimoTtsConfig() {
+  return useSyncExternalStore(
+    typeof window !== "undefined" ? subscribeToStorage : emptySubscribe,
+    getMimoTtsConfig,
     () => serverSnapshot(),
   );
 }

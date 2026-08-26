@@ -1047,6 +1047,113 @@ async function assertSettings(cdp) {
     direct: true,
   });
   await seedSettingsSmokeData(cdp);
+  for (const provider of ["minimax", "mimo"]) {
+    const clickResult = await evaluate(
+      cdp,
+      `
+(() => {
+  for (const panel of document.querySelectorAll('[role="tabpanel"]')) {
+    panel.hidden = false;
+  }
+  const button = document.querySelector('[data-smoke="tts-provider-${provider}"]');
+  button?.dispatchEvent(
+    new MouseEvent("click", { bubbles: true, cancelable: true, view: window })
+  );
+  return { ok: Boolean(button) };
+})()
+`,
+    );
+    if (!clickResult?.ok) {
+      throw new Error(`Missing ${provider} TTS provider selector in Settings smoke.`);
+    }
+    await waitForCondition(
+      cdp,
+      `
+(() => ({
+  ok:
+    document.querySelector('[data-smoke="tts-provider-${provider}"]')?.getAttribute("aria-pressed") === "true" &&
+    Boolean(document.querySelector('[data-smoke="tts-provider-panel-${provider}"]'))
+}))()
+`,
+      `${provider} TTS settings panel`,
+    );
+    const providerGeometry = await evaluate(
+      cdp,
+      `
+(() => {
+  for (const panel of document.querySelectorAll('[role="tabpanel"]')) {
+    panel.hidden = false;
+  }
+  const panel = document.querySelector('[data-smoke="tts-provider-panel-${provider}"]');
+  const selector = document.querySelector('[data-smoke="tts-provider-selector"]');
+  const selects = panel
+    ? [...panel.querySelectorAll('[data-smoke$="-model-select"], [data-smoke$="-voice-select"]')]
+    : [];
+  const actions = panel?.querySelector('[data-smoke="${provider}-config-actions"]');
+  const childrenDoNotOverlap = (element) => {
+    const children = [...element.children].filter((child) => {
+      const rect = child.getBoundingClientRect();
+      return rect.width > 0 && rect.height > 0;
+    });
+    return children.every((child, index) => {
+      const rect = child.getBoundingClientRect();
+      return children.every((other, otherIndex) => {
+        if (index >= otherIndex) return true;
+        const otherRect = other.getBoundingClientRect();
+        return (
+          rect.right <= otherRect.left ||
+          otherRect.right <= rect.left ||
+          rect.bottom <= otherRect.top ||
+          otherRect.bottom <= rect.top
+        );
+      });
+    });
+  };
+  return {
+    ok:
+      Boolean(panel) &&
+      Boolean(selector) &&
+      selects.length === 2 &&
+      selects.every((element) => element.scrollWidth <= element.clientWidth + 2) &&
+      panel.scrollWidth <= panel.clientWidth + 2 &&
+      selector.scrollWidth <= selector.clientWidth + 2 &&
+      Boolean(actions) &&
+      actions.scrollWidth <= actions.clientWidth + 2 &&
+      childrenDoNotOverlap(actions),
+    selectCount: selects.length,
+    panelWidth: panel?.clientWidth ?? 0,
+    panelScrollWidth: panel?.scrollWidth ?? 0,
+    selectorWidth: selector?.clientWidth ?? 0,
+    selectorScrollWidth: selector?.scrollWidth ?? 0,
+    actionWidth: actions?.clientWidth ?? 0,
+    actionScrollWidth: actions?.scrollWidth ?? 0,
+  };
+})()
+`,
+    );
+    if (!providerGeometry?.ok) {
+      throw new Error(
+        `${provider} TTS Settings geometry failed: ${JSON.stringify(providerGeometry)}`,
+      );
+    }
+  }
+  await evaluate(
+    cdp,
+    `
+(() => {
+  const button = document.querySelector('[data-smoke="tts-provider-elevenlabs"]');
+  button?.dispatchEvent(
+    new MouseEvent("click", { bubbles: true, cancelable: true, view: window })
+  );
+  return { ok: Boolean(button) };
+})()
+`,
+  );
+  await waitForCondition(
+    cdp,
+    `(() => ({ ok: document.querySelector('[data-smoke="tts-provider-elevenlabs"]')?.getAttribute("aria-pressed") === "true" }))()`,
+    "ElevenLabs Settings panel restore",
+  );
   const result = await evaluate(
     cdp,
     `
@@ -1079,21 +1186,33 @@ async function assertSettings(cdp) {
     .filter((element) => hasVisibleRect(element) && element.innerText.trim().length > 0);
   const ttsSelects = [
     ...document.querySelectorAll(
-      '[data-smoke="tts-voice-select"], [data-smoke="tts-model-select"], [data-smoke="vertex-gemini-voice-select"]'
+      '[data-smoke="tts-voice-select"], [data-smoke="tts-model-select"], [data-smoke="minimax-model-select"], [data-smoke="minimax-voice-select"], [data-smoke="mimo-model-select"], [data-smoke="mimo-voice-select"], [data-smoke="vertex-gemini-voice-select"]'
     ),
   ];
-  const activeTtsProvider = [...document.querySelectorAll('[data-smoke^="tts-provider-"]')]
+  const ttsProviderButtons = [...document.querySelectorAll('[data-smoke^="tts-provider-"]')]
+    .filter((element) => element.matches("button[aria-pressed]"));
+  const ttsProviderIds = ttsProviderButtons.map((element) => element.getAttribute("data-smoke"));
+  const ttsProviderSelectorComplete = [
+    "tts-provider-elevenlabs",
+    "tts-provider-minimax",
+    "tts-provider-mimo",
+    "tts-provider-hermes-grok",
+    "tts-provider-vertex-gemini",
+  ].every((id) => ttsProviderIds.includes(id));
+  const activeTtsProvider = ttsProviderButtons
     .find((element) => element.getAttribute("aria-pressed") === "true")
     ?.getAttribute("data-smoke") ?? "";
   const expectedTtsSelectCount =
-    activeTtsProvider === "tts-provider-elevenlabs"
+    activeTtsProvider === "tts-provider-elevenlabs" ||
+    activeTtsProvider === "tts-provider-minimax" ||
+    activeTtsProvider === "tts-provider-mimo"
       ? 2
       : activeTtsProvider === "tts-provider-vertex-gemini"
         ? 1
         : 0;
   const settingsActionRows = [
     ...document.querySelectorAll(
-      '[data-smoke="azure-config-actions"], [data-smoke="tts-config-actions"], [data-smoke="hermes-grok-config-actions"], [data-smoke="vertex-gemini-config-actions"], [data-smoke="llm-config-actions"]'
+      '[data-smoke="azure-config-actions"], [data-smoke="tts-config-actions"], [data-smoke="minimax-config-actions"], [data-smoke="mimo-config-actions"], [data-smoke="hermes-grok-config-actions"], [data-smoke="vertex-gemini-config-actions"], [data-smoke="llm-config-actions"]'
     ),
   ];
   const corruptWarning = document.querySelector('[data-smoke="data-control-corrupt-data-warning"]');
@@ -1173,6 +1292,7 @@ async function assertSettings(cdp) {
       pronunciationRowsWrap &&
       settingsBadgesWrap &&
       settingsTextButtonsWrap &&
+      ttsProviderSelectorComplete &&
       ttsSelectsWrap &&
       settingsActionRowsWrap &&
       Boolean(corruptWarning) &&
@@ -1195,6 +1315,8 @@ async function assertSettings(cdp) {
     settingsBadgesWrap,
     settingsTextButtonCount: settingsTextButtons.length,
     settingsTextButtonsWrap,
+    ttsProviderIds,
+    ttsProviderSelectorComplete,
     ttsSelectCount: ttsSelects.length,
     activeTtsProvider,
     expectedTtsSelectCount,

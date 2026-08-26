@@ -439,6 +439,455 @@ export async function elevenLabsTtsAligned(
   return responsePayload;
 }
 
+// ─── MiniMax Speech 2.8 TTS ────────────────────────────
+
+const MINIMAX_TTS_ENDPOINT = "https://api.minimaxi.com/v1/t2a_v2";
+const MIMO_TTS_ENDPOINT = "https://api.xiaomimimo.com/v1/chat/completions";
+const MAX_STANDARD_TTS_AUDIO_BYTES = 8 * 1024 * 1024;
+const MINIMAX_SUBTITLE_HOSTS = new Set(["filecdn.minimax.chat"]);
+const MINIMAX_MODELS = new Set(["speech-2.8-turbo", "speech-2.8-hd"]);
+const MINIMAX_VOICES = new Set([
+  "English_expressive_narrator",
+  "English_radiant_girl",
+  "English_magnetic_voiced_man",
+  "English_CalmWoman",
+  "English_PatientMan",
+]);
+const MIMO_MODELS = new Set(["mimo-v2.5-tts"]);
+const MIMO_VOICES = new Set(["Mia", "Chloe", "Milo", "Dean"]);
+
+export interface MiniMaxWordTiming {
+  word: string;
+  start: number;
+  end: number;
+}
+
+export type MiniMaxAlignmentOutcome =
+  | "matched"
+  | "transcript-mismatch"
+  | "transient-unavailable";
+
+export interface MiniMaxTtsResult {
+  audioBlob: Blob;
+  wordTimings: MiniMaxWordTiming[];
+  alignmentOutcome: MiniMaxAlignmentOutcome;
+}
+
+export interface MiniMaxTtsOptions {
+  modelId?: string;
+  voiceId?: string;
+  languageId?: LanguageId;
+  speed?: number;
+  signal?: AbortSignal;
+}
+
+export interface MimoTtsOptions extends MiniMaxTtsOptions {}
+
+function assertDomesticTtsInput(
+  provider: "MiniMax" | "小米 MiMo",
+  apiKey: string,
+  text: string,
+  modelId: string,
+  voiceId: string,
+): void {
+  if (!apiKey.trim()) {
+    throw new Error(`${provider} API Key 尚未配置，请先在设置页保存密钥。`);
+  }
+  if (!text.trim()) throw new Error("请输入需要生成标准示范的文本。");
+  if (text.length > 500) {
+    throw new Error("标准示范文本过长，请控制在 500 个字符以内。");
+  }
+  if (!modelId.trim() || !voiceId.trim()) {
+    throw new Error(`${provider} 模型或音色无效，请在设置页重新选择。`);
+  }
+}
+
+function miniMaxLanguageBoost(languageId: LanguageId | undefined): string {
+  switch (languageId) {
+    case "es-ES":
+      return "Spanish";
+    case "fr-FR":
+      return "French";
+    case "ru-RU":
+      return "Russian";
+    default:
+      return "English";
+  }
+}
+
+function buildDomesticTtsHttpErrorMessage(
+  provider: "MiniMax" | "小米 MiMo",
+  status: number,
+  detail: string,
+): string {
+  const suffix = truncateServiceDetail(detail);
+  if (status === 401 || status === 403) {
+    return `${provider} 认证失败，请检查设置页里的 API Key。`;
+  }
+  if (status === 408 || status === 504) {
+    return `${provider} 请求超时，请检查网络后重试。`;
+  }
+  if (status === 429) {
+    return `${provider} 请求过于频繁或额度不足，请稍后重试并检查用量。`;
+  }
+  if (status >= 500) {
+    return `${provider} 服务暂时不可用，请稍后重试。${suffix ? `（${suffix}）` : ""}`;
+  }
+  if (status === 400 || status === 404 || status === 422) {
+    return `${provider} 请求配置无效，请检查模型、音色和文本。${suffix ? `（${suffix}）` : ""}`;
+  }
+  return `${provider} 标准示范生成失败（HTTP ${status}）。${suffix ? `（${suffix}）` : ""}`;
+}
+
+function buildDomesticTtsNetworkErrorMessage(
+  provider: "MiniMax" | "小米 MiMo",
+  error: unknown,
+): string {
+  if (error instanceof DOMException && error.name === "AbortError") {
+    return `${provider} 请求已取消，请重试。`;
+  }
+  const detail = error instanceof Error ? error.message : String(error);
+  if (
+    error instanceof TypeError ||
+    /fetch|network|dns|timeout|timed out|connection|offline|refused/i.test(
+      detail,
+    )
+  ) {
+    return `无法连接${provider}，请检查网络、代理或服务配置后重试。`;
+  }
+  return `${provider} 请求失败：${truncateServiceDetail(detail) || "未知错误"}`;
+}
+
+function audioBlobFromHex(value: unknown): Blob {
+  if (typeof value !== "string") {
+    throw new Error("MiniMax 没有返回可播放音频，请稍后重试。");
+  }
+  const hex = value.trim();
+  if (
+    !hex ||
+    hex.length % 2 !== 0 ||
+    hex.length / 2 > MAX_STANDARD_TTS_AUDIO_BYTES ||
+    !/^[0-9a-f]+$/i.test(hex)
+  ) {
+    throw new Error("MiniMax 返回了无效的音频数据，请重试。");
+  }
+  const bytes = new Uint8Array(hex.length / 2);
+  for (let index = 0; index < bytes.length; index += 1) {
+    bytes[index] = Number.parseInt(hex.slice(index * 2, index * 2 + 2), 16);
+  }
+  return new Blob([bytes], { type: "audio/mpeg" });
+}
+
+function audioBlobFromBase64(value: unknown, mimeType: string): Blob {
+  if (typeof value !== "string" || !value.trim()) {
+    throw new Error("小米 MiMo 没有返回可播放音频，请稍后重试。");
+  }
+  const normalized = value.includes(",")
+    ? (value.split(",").pop() ?? "")
+    : value;
+  try {
+    if (
+      !normalized ||
+      normalized.length > Math.ceil((MAX_STANDARD_TTS_AUDIO_BYTES * 4) / 3) + 8
+    ) {
+      throw new Error("audio too large");
+    }
+    const bytes = Uint8Array.from(atob(normalized), (character) =>
+      character.charCodeAt(0),
+    );
+    if (bytes.length === 0 || bytes.length > MAX_STANDARD_TTS_AUDIO_BYTES) {
+      throw new Error("invalid audio size");
+    }
+    return new Blob([bytes], { type: mimeType });
+  } catch {
+    throw new Error("小米 MiMo 返回了无效的音频数据，请重试。");
+  }
+}
+
+function parseMiniMaxWordTimings(value: unknown): MiniMaxWordTiming[] {
+  if (!Array.isArray(value)) return [];
+  const timings: MiniMaxWordTiming[] = [];
+  let previousStart = -1;
+  let previousEnd = -1;
+  for (const item of value) {
+    if (!item || typeof item !== "object") return [];
+    const record = item as Record<string, unknown>;
+    const word = typeof record.text === "string" ? record.text.trim() : "";
+    const beginMs = record.time_begin;
+    const endMs = record.time_end;
+    if (
+      !word ||
+      typeof beginMs !== "number" ||
+      typeof endMs !== "number" ||
+      !Number.isFinite(beginMs) ||
+      !Number.isFinite(endMs) ||
+      beginMs < 0 ||
+      endMs <= beginMs ||
+      beginMs < previousStart ||
+      beginMs < previousEnd ||
+      endMs < previousEnd
+    ) {
+      return [];
+    }
+    timings.push({ word, start: beginMs / 1000, end: endMs / 1000 });
+    previousStart = beginMs;
+    previousEnd = endMs;
+  }
+  return timings;
+}
+
+function normalizeMiniMaxWordToken(value: string): string {
+  return value
+    .normalize("NFKC")
+    .toLocaleLowerCase("en-US")
+    .replace(/[^\p{L}\p{N}'’]+/gu, "")
+    .replace(/’/g, "'");
+}
+
+function alignMiniMaxWordTimings(
+  text: string,
+  providerTimings: MiniMaxWordTiming[],
+): MiniMaxWordTiming[] {
+  const sourceWords = text.split(/\s+/).filter(Boolean);
+  if (sourceWords.length === 0 || providerTimings.length === 0) return [];
+
+  const result: MiniMaxWordTiming[] = [];
+  let providerIndex = 0;
+  for (const sourceWord of sourceWords) {
+    const target = normalizeMiniMaxWordToken(sourceWord);
+    if (!target) return [];
+    let combined = "";
+    let start = -1;
+    let end = -1;
+    while (providerIndex < providerTimings.length) {
+      const timing = providerTimings[providerIndex];
+      providerIndex += 1;
+      const token = normalizeMiniMaxWordToken(timing.word);
+      if (!token) continue;
+      if (start < 0) start = timing.start;
+      end = timing.end;
+      combined += token;
+      if (combined === target) break;
+      if (!target.startsWith(combined)) return [];
+    }
+    if (combined !== target || start < 0 || end <= start) return [];
+    result.push({ word: sourceWord, start, end });
+  }
+
+  const remainingText = providerTimings
+    .slice(providerIndex)
+    .map((timing) => normalizeMiniMaxWordToken(timing.word))
+    .join("");
+  return remainingText ? [] : result;
+}
+
+async function fetchMiniMaxWordTimings(
+  subtitleUrl: unknown,
+  text: string,
+  signal?: AbortSignal,
+): Promise<{
+  wordTimings: MiniMaxWordTiming[];
+  alignmentOutcome: MiniMaxAlignmentOutcome;
+}> {
+  if (typeof subtitleUrl !== "string" || !subtitleUrl.trim()) {
+    return { wordTimings: [], alignmentOutcome: "transient-unavailable" };
+  }
+  try {
+    const url = new URL(subtitleUrl);
+    if (
+      url.protocol !== "https:" ||
+      !MINIMAX_SUBTITLE_HOSTS.has(url.hostname.toLowerCase())
+    ) {
+      return { wordTimings: [], alignmentOutcome: "transient-unavailable" };
+    }
+    const response = await apiFetch(url, { redirect: "error", signal });
+    const finalUrl = new URL(response.url || url.toString());
+    if (
+      !response.ok ||
+      finalUrl.protocol !== "https:" ||
+      !MINIMAX_SUBTITLE_HOSTS.has(finalUrl.hostname.toLowerCase())
+    ) {
+      return { wordTimings: [], alignmentOutcome: "transient-unavailable" };
+    }
+    const wordTimings = alignMiniMaxWordTimings(
+      text,
+      parseMiniMaxWordTimings(await response.json()),
+    );
+    return {
+      wordTimings,
+      alignmentOutcome:
+        wordTimings.length > 0 ? "matched" : "transcript-mismatch",
+    };
+  } catch {
+    signal?.throwIfAborted();
+    // Subtitle delivery is an enhancement. Audio remains valid and falls back
+    // to the honest sentence-level playback state when the signed URL expires
+    // or its CDN cannot be reached from the browser.
+    return { wordTimings: [], alignmentOutcome: "transient-unavailable" };
+  }
+}
+
+/** Generate MiniMax audio and normalize its official word subtitle timestamps. */
+export async function miniMaxTtsAligned(
+  apiKey: string,
+  text: string,
+  options: MiniMaxTtsOptions = {},
+): Promise<MiniMaxTtsResult> {
+  const modelId = options.modelId ?? "speech-2.8-turbo";
+  const voiceId = options.voiceId ?? "English_expressive_narrator";
+  assertDomesticTtsInput("MiniMax", apiKey, text, modelId, voiceId);
+  if (!MINIMAX_MODELS.has(modelId)) {
+    throw new Error("请选择受支持的 MiniMax Speech 2.8 模型。");
+  }
+  if (!MINIMAX_VOICES.has(voiceId)) {
+    throw new Error("请选择受支持的 MiniMax 英文系统音色。");
+  }
+  const normalizedText = text.trim();
+  let response: Response;
+  try {
+    response = await apiFetch(MINIMAX_TTS_ENDPOINT, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey.trim()}`,
+        "Content-Type": "application/json",
+      },
+      signal: options.signal,
+      body: JSON.stringify({
+        model: modelId,
+        text: normalizedText,
+        stream: false,
+        voice_setting: {
+          voice_id: voiceId,
+          speed: Math.min(1.2, Math.max(0.7, options.speed ?? 0.85)),
+          vol: 1,
+          pitch: 0,
+        },
+        audio_setting: {
+          sample_rate: 32000,
+          bitrate: 128000,
+          format: "mp3",
+          channel: 1,
+        },
+        language_boost: miniMaxLanguageBoost(options.languageId),
+        subtitle_enable: true,
+        subtitle_type: "word",
+        output_format: "hex",
+      }),
+    });
+  } catch (error) {
+    options.signal?.throwIfAborted();
+    throw new Error(buildDomesticTtsNetworkErrorMessage("MiniMax", error));
+  }
+
+  if (!response.ok) {
+    const detail = await response.text();
+    options.signal?.throwIfAborted();
+    throw new Error(
+      buildDomesticTtsHttpErrorMessage("MiniMax", response.status, detail),
+    );
+  }
+  const payload = (await response.json()) as {
+    data?: { audio?: unknown; subtitle_file?: unknown };
+    base_resp?: { status_code?: unknown; status_msg?: string };
+  };
+  options.signal?.throwIfAborted();
+  const serviceCode = Number(payload.base_resp?.status_code ?? 0);
+  if (!Number.isFinite(serviceCode) || serviceCode !== 0) {
+    const detail = truncateServiceDetail(
+      payload.base_resp?.status_msg ?? "服务返回未知错误",
+    );
+    if (serviceCode === 1004) {
+      throw new Error("MiniMax 认证失败，请检查设置页里的 API Key。");
+    }
+    if (serviceCode === 1002 || serviceCode === 1008) {
+      throw new Error("MiniMax 请求过于频繁或额度不足，请稍后重试并检查用量。");
+    }
+    throw new Error(
+      `MiniMax 标准示范生成失败${Number.isFinite(serviceCode) ? `（服务码 ${serviceCode}）` : ""}：${detail}`,
+    );
+  }
+  const audioBlob = audioBlobFromHex(payload.data?.audio);
+  const { wordTimings, alignmentOutcome } = await fetchMiniMaxWordTimings(
+    payload.data?.subtitle_file,
+    normalizedText,
+    options.signal,
+  );
+  options.signal?.throwIfAborted();
+  return { audioBlob, wordTimings, alignmentOutcome };
+}
+
+function mimoPaceInstruction(speed: number): string {
+  if (speed <= 0.75) return "at a deliberately slow teaching pace";
+  if (speed <= 0.9) return "at a clear, slightly slow teaching pace";
+  if (speed >= 1.15) return "at a brisk but clearly articulated pace";
+  if (speed >= 1.05) return "at a natural, slightly brisk pace";
+  return "at a natural teaching pace";
+}
+
+/** Generate Xiaomi MiMo audio. The current API does not expose word timing. */
+export async function mimoTts(
+  apiKey: string,
+  text: string,
+  options: MimoTtsOptions = {},
+): Promise<Blob> {
+  const modelId = options.modelId ?? "mimo-v2.5-tts";
+  const voiceId = options.voiceId ?? "Mia";
+  assertDomesticTtsInput("小米 MiMo", apiKey, text, modelId, voiceId);
+  if (!MIMO_MODELS.has(modelId)) {
+    throw new Error("请选择受支持的小米 MiMo V2.5 TTS 模型。");
+  }
+  if (!MIMO_VOICES.has(voiceId)) {
+    throw new Error("请选择受支持的小米 MiMo 英文预置音色。");
+  }
+  if (options.languageId && options.languageId !== "en-US") {
+    throw new Error(
+      "小米 MiMo 在 SpeakRight 当前仅开放英语预置音色，请切换到英语或选择支持目标语言的 TTS。",
+    );
+  }
+  const speed = Math.min(1.2, Math.max(0.7, options.speed ?? 0.85));
+  let response: Response;
+  try {
+    response = await apiFetch(MIMO_TTS_ENDPOINT, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey.trim()}`,
+        "Content-Type": "application/json",
+      },
+      signal: options.signal,
+      body: JSON.stringify({
+        model: modelId,
+        messages: [
+          {
+            role: "user",
+            content: `Read the assistant message exactly in neutral American English ${mimoPaceInstruction(speed)}. Pronounce every word clearly. Do not add, omit, or repeat any words.`,
+          },
+          { role: "assistant", content: text.trim() },
+        ],
+        audio: { format: "wav", voice: voiceId },
+      }),
+    });
+  } catch (error) {
+    options.signal?.throwIfAborted();
+    throw new Error(buildDomesticTtsNetworkErrorMessage("小米 MiMo", error));
+  }
+
+  if (!response.ok) {
+    const detail = await response.text();
+    options.signal?.throwIfAborted();
+    throw new Error(
+      buildDomesticTtsHttpErrorMessage("小米 MiMo", response.status, detail),
+    );
+  }
+  const payload = (await response.json()) as {
+    choices?: Array<{ message?: { audio?: { data?: unknown } } }>;
+  };
+  options.signal?.throwIfAborted();
+  return audioBlobFromBase64(
+    payload.choices?.[0]?.message?.audio?.data,
+    "audio/wav",
+  );
+}
+
 // ─── Hermes Grok TTS ───────────────────────────────────
 
 const HERMES_XAI_BRIDGE_URL = "http://127.0.0.1:17831";
@@ -460,6 +909,17 @@ export interface HermesXaiTtsOptions {
   languageId?: LanguageId;
   speed?: number;
   signal?: AbortSignal;
+}
+
+export interface HermesXaiAlignment {
+  characters: string[];
+  character_start_times_seconds: number[];
+  character_end_times_seconds: number[];
+}
+
+export interface HermesXaiTtsResult {
+  audioBlob: Blob;
+  alignment: HermesXaiAlignment | null;
 }
 
 function getRecordString(
@@ -514,22 +974,111 @@ function decodeBase64Audio(base64: string, mimeType = "audio/mpeg"): Blob {
   }
 }
 
-function hermesAudioBlobFromPayload(payload: unknown): Blob {
-  if (payload instanceof Blob) return payload;
+function normalizeHermesXaiAlignment(
+  payload: unknown,
+): HermesXaiAlignment | null {
+  if (!payload || typeof payload !== "object") return null;
+
+  const record = payload as Record<string, unknown>;
+  const nested =
+    record.alignment ?? record.audioTimestamps ?? record.audio_timestamps;
+  const timingRecord =
+    nested && typeof nested === "object"
+      ? (nested as Record<string, unknown>)
+      : record;
+  const characters =
+    timingRecord.characters ??
+    timingRecord.graphChars ??
+    timingRecord.graph_chars;
+  if (
+    !Array.isArray(characters) ||
+    characters.length === 0 ||
+    characters.length > 2_000 ||
+    !characters.every(
+      (character) => typeof character === "string" && character.length > 0,
+    )
+  ) {
+    return null;
+  }
+
+  let starts =
+    timingRecord.characterStartTimesSeconds ??
+    timingRecord.character_start_times_seconds;
+  let ends =
+    timingRecord.characterEndTimesSeconds ??
+    timingRecord.character_end_times_seconds;
+  const graphTimes = timingRecord.graphTimes ?? timingRecord.graph_times;
+  if (
+    (!Array.isArray(starts) || !Array.isArray(ends)) &&
+    Array.isArray(graphTimes) &&
+    graphTimes.every(
+      (time) =>
+        Array.isArray(time) &&
+        time.length === 2 &&
+        typeof time[0] === "number" &&
+        typeof time[1] === "number",
+    )
+  ) {
+    starts = graphTimes.map((time) => time[0]);
+    ends = graphTimes.map((time) => time[1]);
+  }
+
+  if (
+    !Array.isArray(starts) ||
+    !Array.isArray(ends) ||
+    starts.length !== characters.length ||
+    ends.length !== characters.length
+  ) {
+    return null;
+  }
+
+  let previousStart = -1;
+  for (let index = 0; index < characters.length; index++) {
+    const start = starts[index];
+    const end = ends[index];
+    if (
+      typeof start !== "number" ||
+      typeof end !== "number" ||
+      !Number.isFinite(start) ||
+      !Number.isFinite(end) ||
+      start < 0 ||
+      end < start ||
+      start < previousStart
+    ) {
+      return null;
+    }
+    previousStart = start;
+  }
+
+  return {
+    characters: [...characters],
+    character_start_times_seconds: starts.map((start) => start as number),
+    character_end_times_seconds: ends.map((end) => end as number),
+  };
+}
+
+function hermesAudioResultFromPayload(payload: unknown): HermesXaiTtsResult {
+  if (payload instanceof Blob) {
+    return { audioBlob: payload, alignment: null };
+  }
 
   if (typeof payload === "string") {
-    return decodeBase64Audio(payload);
+    return { audioBlob: decodeBase64Audio(payload), alignment: null };
   }
 
   if (
     Array.isArray(payload) &&
     payload.every((value) => typeof value === "number")
   ) {
-    return new Blob([Uint8Array.from(payload)], { type: "audio/mpeg" });
+    return {
+      audioBlob: new Blob([Uint8Array.from(payload)], { type: "audio/mpeg" }),
+      alignment: null,
+    };
   }
 
   if (payload && typeof payload === "object") {
     const record = payload as Record<string, unknown>;
+    const alignment = normalizeHermesXaiAlignment(record);
     const base64 = getRecordString(
       record,
       "audioBase64",
@@ -538,18 +1087,29 @@ function hermesAudioBlobFromPayload(payload: unknown): Blob {
       "data",
     );
     if (base64) {
-      return decodeBase64Audio(
-        base64,
-        getRecordString(record, "mimeType", "mime_type", "contentType") ??
-          "audio/mpeg",
-      );
+      return {
+        audioBlob: decodeBase64Audio(
+          base64,
+          getRecordString(
+            record,
+            "mimeType",
+            "mime_type",
+            "contentType",
+            "content_type",
+          ) ?? "audio/mpeg",
+        ),
+        alignment,
+      };
     }
     const bytes = record.bytes;
     if (
       Array.isArray(bytes) &&
       bytes.every((value) => typeof value === "number")
     ) {
-      return new Blob([Uint8Array.from(bytes)], { type: "audio/mpeg" });
+      return {
+        audioBlob: new Blob([Uint8Array.from(bytes)], { type: "audio/mpeg" }),
+        alignment,
+      };
     }
   }
 
@@ -652,10 +1212,10 @@ export async function hermesXaiStatus(
 }
 
 /** Generate audio through Hermes' existing xAI credentials. */
-export async function hermesXaiTts(
+export async function hermesXaiTtsAligned(
   text: string,
   options: HermesXaiTtsOptions = {},
-): Promise<Blob> {
+): Promise<HermesXaiTtsResult> {
   const normalizedText = text.trim();
   if (!normalizedText) {
     throw new Error("请输入需要朗读的文字。");
@@ -725,13 +1285,16 @@ export async function hermesXaiTts(
     ) {
       const audioBuffer = await response.arrayBuffer();
       options.signal?.throwIfAborted();
-      return new Blob([audioBuffer], {
-        type: contentType.split(";")[0] || "audio/mpeg",
-      });
+      return {
+        audioBlob: new Blob([audioBuffer], {
+          type: contentType.split(";")[0] || "audio/mpeg",
+        }),
+        alignment: null,
+      };
     }
     const responsePayload = await response.json();
     options.signal?.throwIfAborted();
-    return hermesAudioBlobFromPayload(responsePayload);
+    return hermesAudioResultFromPayload(responsePayload);
   } catch (error) {
     options.signal?.throwIfAborted();
     const message =
@@ -747,6 +1310,15 @@ export async function hermesXaiTts(
       "无法连接本机爱马仕 Grok TTS。请确认爱马仕已配置 xAI，并已启动 SpeakRight 本机桥接服务。",
     );
   }
+}
+
+/** Generate Hermes/xAI audio without exposing alignment to simple players. */
+export async function hermesXaiTts(
+  text: string,
+  options: HermesXaiTtsOptions = {},
+): Promise<Blob> {
+  const result = await hermesXaiTtsAligned(text, options);
+  return result.audioBlob;
 }
 
 // ─── Vertex AI Gemini 3.1 Flash TTS ────────────────────

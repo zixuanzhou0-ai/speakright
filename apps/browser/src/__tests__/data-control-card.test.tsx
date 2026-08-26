@@ -34,7 +34,7 @@ describe("DataControlCard hydration", () => {
       learningKeys: 0,
       cacheKeys: 0,
       configuredApiKeys: 0,
-      apiKeySlots: 3,
+      apiKeySlots: 5,
       corruptItems: 0,
     });
   });

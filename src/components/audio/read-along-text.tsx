@@ -16,12 +16,6 @@ interface ReadAlongTextProps {
   reserveReplaySpace?: boolean;
 }
 
-const springTransition = {
-  type: "spring",
-  stiffness: 300,
-  damping: 20,
-} as const;
-
 const waveformBars = [
   { id: "soft", height: 8 },
   { id: "high", height: 14 },
@@ -50,24 +44,7 @@ export function ReadAlongText({
   const playbackMode = hasWordTimings ? "word-timed" : "sentence-untimed";
 
   return (
-    <motion.div
-      animate={
-        isUntimedPlayback && !reducedMotion
-          ? {
-              scale: [1, 1.006, 1],
-              y: [0, -2, 0],
-            }
-          : { scale: 1, y: 0 }
-      }
-      transition={
-        isUntimedPlayback && !reducedMotion
-          ? {
-              duration: 1.8,
-              ease: "easeInOut",
-              repeat: Number.POSITIVE_INFINITY,
-            }
-          : { duration: reducedMotion ? 0.12 : 0.24, ease: "easeOut" }
-      }
+    <div
       className={cn(
         "flex min-h-[80px] flex-col items-center justify-center rounded-lg border bg-muted/20 px-5 py-4 font-mono transition-[background-color,border-color] duration-300",
         isUntimedPlayback && "border-primary/30 bg-primary/5",
@@ -77,6 +54,7 @@ export function ReadAlongText({
       data-smoke="read-along-text"
       data-playback-mode={playbackMode}
       data-playing={isPlaying ? "true" : "false"}
+      data-layout-motion="static"
       data-motion={reducedMotion ? "reduced" : "full"}
       data-replay-space={reserveReplaySpace ? "reserved" : "none"}
     >
@@ -94,15 +72,11 @@ export function ReadAlongText({
           }
 
           return (
-            <motion.span
+            <span
               key={`${word}-${occurrence}-${timing?.start ?? "untimed"}-${timing?.end ?? "untimed"}`}
-              animate={{
-                scale: state === "current" && !reducedMotion ? 1.05 : 1,
-              }}
-              transition={springTransition}
               className={cn(
                 "inline-flex max-w-full justify-center rounded px-1 py-0.5 text-center transition-colors duration-200 [overflow-wrap:anywhere]",
-                isUntimedPlayback && "font-semibold text-primary",
+                isUntimedPlayback && "text-foreground",
                 !isUntimedPlayback &&
                   state === "current" &&
                   "bg-primary/20 font-semibold text-primary",
@@ -113,9 +87,10 @@ export function ReadAlongText({
               )}
               data-word-index={i}
               data-word-state={isUntimedPlayback ? "speaking" : state}
+              data-word-motion="color-only"
             >
               {word}
-            </motion.span>
+            </span>
           );
         })}
       </div>
@@ -125,9 +100,9 @@ export function ReadAlongText({
           <motion.div
             role="status"
             aria-live="polite"
-            initial={{ opacity: 0, y: reducedMotion ? 0 : 2 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: reducedMotion ? 0 : -2 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             transition={{ duration: reducedMotion ? 0.12 : 0.2 }}
             className="mt-2 flex items-center gap-2 rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-semibold text-primary"
             data-smoke="read-along-untimed-status"
@@ -168,6 +143,6 @@ export function ReadAlongText({
           </motion.div>
         )}
       </AnimatePresence>
-    </motion.div>
+    </div>
   );
 }

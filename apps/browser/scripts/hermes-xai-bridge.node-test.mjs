@@ -8,6 +8,7 @@ import {
   inspectVertexGemini,
   isAllowedBridgeHost,
   isAllowedSpeakRightOrigin,
+  normalizeHermesAlignment,
   pcm16leToWav,
   readVertexAccessToken,
   resolveVertexProjectId,
@@ -16,6 +17,35 @@ import {
   validateTtsPayload,
   validateVertexTtsPayload,
 } from "./hermes-xai-bridge.mjs";
+
+test("normalizes xAI graph timestamps without inventing missing alignment", () => {
+  assert.deepEqual(
+    normalizeHermesAlignment({
+      audio_timestamps: {
+        graph_chars: ["H", "i"],
+        graph_times: [
+          [0, 0.08],
+          [0.08, 0.2],
+        ],
+      },
+    }),
+    {
+      characters: ["H", "i"],
+      character_start_times_seconds: [0, 0.08],
+      character_end_times_seconds: [0.08, 0.2],
+    },
+  );
+  assert.equal(
+    normalizeHermesAlignment({
+      audio_timestamps: {
+        graph_chars: ["H", "i"],
+        graph_times: [[0, 0.08]],
+      },
+    }),
+    null,
+  );
+  assert.equal(normalizeHermesAlignment({ alignment: null }), null);
+});
 
 test("accepts only exact SpeakRight loopback origins and bridge hosts", () => {
   assert.equal(isAllowedSpeakRightOrigin("http://127.0.0.1:3000"), true);
@@ -258,11 +288,25 @@ test("limits requests inside one sliding window", () => {
   assert.equal(limiter.take(2101), true);
 });
 
-test("serves token-protected loopback endpoints without generating audio", async (context) => {
+test("serves token-protected loopback endpoints with mocked audio", async (context) => {
   const origin = "http://127.0.0.1:3000";
+  let hermesGenerationCalls = 0;
   let vertexGenerationCalls = 0;
   const bridge = await startHermesXaiBridge({
     additionalOrigins: [origin],
+    hermesAudioGenerator: async () => {
+      hermesGenerationCalls += 1;
+      return {
+        audio: Buffer.from([0x49, 0x44, 0x33]),
+        mimeType: "audio/mpeg",
+        duration: 0.2,
+        alignment: {
+          characters: ["H", "i"],
+          character_start_times_seconds: [0, 0.08],
+          character_end_times_seconds: [0.08, 0.2],
+        },
+      };
+    },
     vertexInspector: async () => ({
       available: true,
       provider: "vertex-gemini",
@@ -328,6 +372,35 @@ test("serves token-protected loopback endpoints without generating audio", async
       }),
     });
     assert.equal(unauthenticated.status, 401);
+
+    const hermesAudio = await fetch("http://127.0.0.1:17831/tts", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Origin: origin,
+        "X-SpeakRight-Bridge-Token": status.sessionToken,
+      },
+      body: JSON.stringify({
+        text: "Hi",
+        languageId: "en-US",
+        speed: 1,
+      }),
+    });
+    assert.equal(hermesAudio.status, 200);
+    assert.match(
+      hermesAudio.headers.get("content-type") ?? "",
+      /^application\/json/u,
+    );
+    const hermesPayload = await hermesAudio.json();
+    assert.equal(hermesPayload.audioBase64, "SUQz");
+    assert.equal(hermesPayload.mimeType, "audio/mpeg");
+    assert.equal(hermesPayload.duration, 0.2);
+    assert.deepEqual(hermesPayload.alignment, {
+      characters: ["H", "i"],
+      character_start_times_seconds: [0, 0.08],
+      character_end_times_seconds: [0.08, 0.2],
+    });
+    assert.equal(hermesGenerationCalls, 1);
 
     const vertexAudio = await fetch("http://127.0.0.1:17831/vertex/tts", {
       method: "POST",

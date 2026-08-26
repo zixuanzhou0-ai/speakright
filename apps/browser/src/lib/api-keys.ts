@@ -4,6 +4,8 @@ import type {
   ElevenLabsConfig,
   LanguageConfig,
   LLMConfig,
+  MimoTtsConfig,
+  MiniMaxTtsConfig,
   PronunciationConfig,
   StandardTtsConfig,
   VertexGeminiTtsConfig,
@@ -14,6 +16,8 @@ export type CoachMode = "easy" | "normal" | "hard" | "strict";
 const STORAGE_KEYS = {
   azure: "speakright_azure_config",
   elevenlabs: "speakright_elevenlabs_config",
+  minimaxTts: "speakright_minimax_tts_config",
+  mimoTts: "speakright_mimo_tts_config",
   standardTts: "speakright_standard_tts_config",
   vertexGeminiTts: "speakright_vertex_gemini_tts_config",
   llm: "speakright_llm_config",
@@ -26,6 +30,8 @@ const ALL_STORAGE_KEYS = Object.values(STORAGE_KEYS);
 export const API_KEY_STORAGE_KEYS = [
   STORAGE_KEYS.azure,
   STORAGE_KEYS.elevenlabs,
+  STORAGE_KEYS.minimaxTts,
+  STORAGE_KEYS.mimoTts,
   STORAGE_KEYS.llm,
 ] as const;
 export const APP_PREFERENCE_STORAGE_KEYS = [
@@ -176,11 +182,17 @@ function removeFromStorage(
   storage: Storage | null,
   kind: ApiKeyPersistence,
   key: string,
+  strict = false,
 ): void {
   try {
-    storage?.removeItem(key);
-  } catch {
-    // Best effort cleanup only.
+    if (!storage) {
+      if (strict) throw new Error("浏览器本机存储暂时不可用");
+      return;
+    }
+    storage.removeItem(key);
+  } catch (error) {
+    if (strict) throw error;
+    // Persistence migration cleanup remains best effort.
   } finally {
     clearSnapshotCache(kind, key);
   }
@@ -275,9 +287,16 @@ function setItem<T>(key: string, value: T): void {
 export async function clearItem(key: string): Promise<void> {
   if (typeof window === "undefined") return;
   try {
-    removeFromStorage(getBrowserStorage("session"), "session", key);
-    removeFromStorage(getBrowserStorage("local"), "local", key);
+    let deletionError: unknown = null;
+    for (const kind of ["session", "local"] as const) {
+      try {
+        removeFromStorage(getBrowserStorage(kind), kind, key, true);
+      } catch (error) {
+        deletionError ??= error;
+      }
+    }
     dispatchKeyStorageEvent(key);
+    if (deletionError) throw deletionError;
   } catch (error) {
     dispatchStorageError(key, "delete", error);
     throw error;
@@ -325,11 +344,31 @@ export function setElevenLabsConfig(config: ElevenLabsConfig): void {
   setItem(STORAGE_KEYS.elevenlabs, config);
 }
 
+// MiniMax Speech TTS (BYOK)
+export function getMiniMaxTtsConfig(): MiniMaxTtsConfig | null {
+  return getItem<MiniMaxTtsConfig>(STORAGE_KEYS.minimaxTts);
+}
+
+export function setMiniMaxTtsConfig(config: MiniMaxTtsConfig): void {
+  setItem(STORAGE_KEYS.minimaxTts, config);
+}
+
+// Xiaomi MiMo TTS (BYOK)
+export function getMimoTtsConfig(): MimoTtsConfig | null {
+  return getItem<MimoTtsConfig>(STORAGE_KEYS.mimoTts);
+}
+
+export function setMimoTtsConfig(config: MimoTtsConfig): void {
+  setItem(STORAGE_KEYS.mimoTts, config);
+}
+
 // Standard demonstration TTS provider (non-sensitive preference)
 export function getStandardTtsConfig(): StandardTtsConfig {
   const saved = getItem<{ provider?: unknown }>(STORAGE_KEYS.standardTts);
   if (
     saved?.provider === "elevenlabs" ||
+    saved?.provider === "minimax" ||
+    saved?.provider === "mimo" ||
     saved?.provider === "hermes-grok" ||
     saved?.provider === "vertex-gemini"
   ) {
@@ -340,10 +379,15 @@ export function getStandardTtsConfig(): StandardTtsConfig {
 
 export function setStandardTtsConfig(config: StandardTtsConfig): void {
   setItem(STORAGE_KEYS.standardTts, {
-    provider:
-      config.provider === "hermes-grok" || config.provider === "vertex-gemini"
-        ? config.provider
-        : "elevenlabs",
+    provider: [
+      "elevenlabs",
+      "minimax",
+      "mimo",
+      "hermes-grok",
+      "vertex-gemini",
+    ].includes(config.provider)
+      ? config.provider
+      : "elevenlabs",
   });
 }
 
@@ -358,11 +402,10 @@ export function getVertexGeminiTtsConfig(): VertexGeminiTtsConfig {
   return vertexGeminiTtsSnapshot;
 }
 
-export function setVertexGeminiTtsConfig(
-  config: VertexGeminiTtsConfig,
-): void {
+export function setVertexGeminiTtsConfig(config: VertexGeminiTtsConfig): void {
   setItem(STORAGE_KEYS.vertexGeminiTts, {
-    voiceName: config.voiceName.trim() || DEFAULT_VERTEX_GEMINI_TTS_CONFIG.voiceName,
+    voiceName:
+      config.voiceName.trim() || DEFAULT_VERTEX_GEMINI_TTS_CONFIG.voiceName,
   });
 }
 
@@ -379,6 +422,8 @@ export function getApiKeySummary(): ApiKeySummary {
   const configs = [
     hasTextSecret(getAzureConfig()?.subscriptionKey),
     hasTextSecret(getElevenLabsConfig()?.apiKey),
+    hasTextSecret(getMiniMaxTtsConfig()?.apiKey),
+    hasTextSecret(getMimoTtsConfig()?.apiKey),
     hasTextSecret(getLlmConfig()?.apiKey),
   ];
   return {
@@ -431,6 +476,8 @@ export function subscribeToStorage(callback: () => void): () => void {
       e.key === null ||
       e.key === STORAGE_KEYS.azure ||
       e.key === STORAGE_KEYS.elevenlabs ||
+      e.key === STORAGE_KEYS.minimaxTts ||
+      e.key === STORAGE_KEYS.mimoTts ||
       e.key === STORAGE_KEYS.standardTts ||
       e.key === STORAGE_KEYS.vertexGeminiTts ||
       e.key === STORAGE_KEYS.llm ||

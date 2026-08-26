@@ -9,6 +9,8 @@ This document applies the repository-wide media boundary in
 | --- | --- |
 | Azure Speech | User-configured Pronunciation Assessment provider and the only source of numeric pronunciation scores. |
 | ElevenLabs | Optional user-configured standard-demonstration TTS provider. |
+| MiniMax Speech | Optional user-configured standard-demonstration TTS provider with word-level subtitle timing when returned by the service. |
+| Xiaomi MiMo TTS | Optional user-configured standard-demonstration TTS provider; the current integration uses honest sentence-level playback because the API does not return word timing. |
 | LLM providers | Optional Chinese coaching explanation generated from Azure evidence; not an independent scoring source. |
 | Youdao | Dictionary-pronunciation fallback used when a bundled local word recording is unavailable. |
 | Hermes and Vertex AI local bridges | Loopback-only development/local-browser integrations. They are not a capability of a remotely hosted static build. |

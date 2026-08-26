@@ -61,7 +61,7 @@ opening `index.html` directly.
 | Sound practice | Language-specific units, eligible local demos, recording, Azure score summaries, detailed analysis, and Chinese coaching. |
 | Guided repeat | Intensity modes use the full available word set; phase-safe controls and exit summaries do not claim mastery. |
 | Free practice | Text input, standard demonstration audio, browser recording, Azure scoring, AI feedback, replay, and stale-request isolation. |
-| Standard-demo TTS | ElevenLabs can provide word timing. Hermes/xAI and Vertex AI use honest sentence-level playback feedback when no word timeline exists. Local adapters remain machine-configured services. |
+| Standard-demo TTS | ElevenLabs and MiniMax can provide real word timing. MiniMax falls back to sentence-level playback if its separate subtitle file is unavailable. Xiaomi MiMo, Hermes/xAI, and Vertex AI use honest sentence-level playback when no word timeline exists. MiniMax and MiMo are direct BYOK providers; local adapters remain machine-configured services. |
 | English advanced routes | Diagnosis, word/sentence/contrast/perception and related drills, progress, and evidence views where the current source exposes them. |
 | Storage | Browser-local settings, progress, caches, and score history; no project-operated cloud sync. |
 | Media | Only registry-approved distributable files enter the Browser mirror. Reference-only Rachel's English videos are not bundled and use an official-source fallback. |

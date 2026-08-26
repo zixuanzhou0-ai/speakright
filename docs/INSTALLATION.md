@@ -129,6 +129,16 @@ audio. Free-form read-along TTS can still use ElevenLabs after the user enters a
 key, but bundled word and language-pack audio should work without spending
 additional ElevenLabs credits.
 
+### MiniMax Speech and Xiaomi MiMo TTS
+
+Both are optional bring-your-own-key providers for free-form standard
+demonstrations. Configure the provider, model, voice, and its own API key in
+Settings. MiniMax Speech 2.8 requests a real word-level subtitle timeline and
+falls back to sentence-level playback if that subtitle cannot be retrieved.
+Xiaomi MiMo V2.5 TTS currently returns audio without a word timeline, so the app
+uses sentence-level playback feedback. No live synthesis call is made by normal
+release validation.
+
 ### LLM Provider
 
 Used for Chinese AI coach feedback.
@@ -302,11 +312,11 @@ If AI coach feedback fails:
 If TTS fails:
 
 - Read the in-app Chinese error message first. It distinguishes missing
-  ElevenLabs configuration, invalid key, unavailable voice/model, network/proxy
+  provider configuration, invalid key, unavailable voice/model, network/proxy
   failure, timeout, quota/rate-limit, service failure, and too-long text.
 - The Settings test button preserves actionable Chinese provider errors; raw
   English fetch exceptions are replaced with a Chinese network/proxy hint.
-- Confirm ElevenLabs key.
+- Confirm the selected TTS provider and its own API key or local authorization.
 - Check quota/usage in Settings.
 - Confirm the installed desktop build includes `audio/words` and
   `audio/language-packs` assets.

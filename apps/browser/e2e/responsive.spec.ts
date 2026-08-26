@@ -28,7 +28,10 @@ async function expectNoHorizontalOverflow(page: Page) {
         if (style.display === "none" || style.visibility === "hidden")
           return false;
         const rect = element.getBoundingClientRect();
-        if (rect.width === 0 && rect.height === 0) return false;
+        // Fixed toast viewports and other portals can keep a zero-height
+        // measurement node outside the content box. They cannot cover or
+        // widen visible content, so only positive-area elements are offenders.
+        if (rect.width <= 0 || rect.height <= 0) return false;
         return rect.left < -1 || rect.right > viewportWidth + 1;
       })
       .slice(0, 8)
@@ -134,4 +137,29 @@ test("200 percent zoom equivalent remains usable", async ({ page }) => {
   await page.goto("/settings");
   await expect(page.getByRole("tab", { name: "基础设置" })).toBeVisible();
   await expectNoHorizontalOverflow(page);
+});
+
+test("mobile settings keeps all five TTS providers and domestic panels usable", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/settings?section=services#standard-tts");
+
+  const selector = page.locator('[data-smoke="tts-provider-selector"]');
+  await expect(selector).toBeVisible();
+  await expect(selector.locator('button[aria-pressed]')).toHaveCount(5);
+
+  for (const provider of ["minimax", "mimo"] as const) {
+    await page.locator(`[data-smoke="tts-provider-${provider}"]`).click();
+    const panel = page.locator(
+      `[data-smoke="tts-provider-panel-${provider}"]`,
+    );
+    await expect(panel).toBeVisible();
+    await expect(panel.locator('[data-smoke$="-model-select"]')).toHaveCount(1);
+    await expect(panel.locator('[data-smoke$="-voice-select"]')).toHaveCount(1);
+    await expect(
+      panel.locator(`[data-smoke="${provider}-config-actions"]`),
+    ).toBeVisible();
+    await expectNoHorizontalOverflow(page);
+  }
 });

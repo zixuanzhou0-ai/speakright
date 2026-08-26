@@ -80,7 +80,11 @@ export function SentenceInputCard({
       ? "爱马仕 Grok TTS"
       : standardTts.provider === "vertex-gemini"
         ? "Vertex Gemini TTS"
-        : "ElevenLabs";
+        : standardTts.provider === "minimax"
+          ? "MiniMax Speech 2.8"
+          : standardTts.provider === "mimo"
+            ? "小米 MiMo V2.5 TTS"
+            : "ElevenLabs";
 
   const charCount = sentence.length;
   const trimmedTextDensity = getPracticeTextDensity(
@@ -317,13 +321,13 @@ export function SentenceInputCard({
               transition={{ duration: 0.2 }}
             >
               <motion.div
-                animate={
+                data-smoke="free-practice-word-card"
+                data-playing={wordAudioIsPlaying ? "true" : "false"}
+                className={`relative flex flex-col items-center gap-1 rounded-lg border px-6 py-5 transition-colors duration-300 ${
                   wordAudioIsPlaying
-                    ? { scale: 1.02, backgroundColor: "var(--primary-bg)" }
-                    : { scale: 1, backgroundColor: "rgba(0, 0, 0, 0)" }
-                }
-                transition={{ duration: 0.3 }}
-                className="relative flex flex-col items-center gap-1 rounded-lg border bg-muted/30 px-6 py-5"
+                    ? "border-primary/30 bg-primary/10"
+                    : "bg-muted/30"
+                }`}
               >
                 <span
                   className={`${getCenteredReadableTextClassName(

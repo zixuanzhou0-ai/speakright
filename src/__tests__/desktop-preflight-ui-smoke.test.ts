@@ -483,9 +483,13 @@ describe("desktop preflight and UI smoke", () => {
     expect(releaseSmoke).toContain("SPEAKRIGHT_SECURE_STORE_SERVICE");
     expect(releaseSmoke).toContain("SPEAKRIGHT_LOG_DIR");
     expect(releaseSmoke).toContain("SPEAKRIGHT_SETTINGS_STORE_PATH");
+    expect(releaseSmoke).toContain("speakright_minimax_tts_config");
+    expect(releaseSmoke).toContain("speakright_mimo_tts_config");
     expect(releaseSmoke).toContain("release-smoke-$" + "{randomUUID()}");
     expect(releaseSmoke).toContain("findConflictingSpeakRightProcesses");
     expect(evidenceCapture).toContain("SPEAKRIGHT_SECURE_STORE_SERVICE");
+    expect(evidenceCapture).toContain("speakright_minimax_tts_config");
+    expect(evidenceCapture).toContain("speakright_mimo_tts_config");
     expect(evidenceCapture).toContain("findConflictingSpeakRightProcesses");
     expect(evidenceCapture).toContain(
       "snapshotOwnedWebViewProcesses(child.pid)",
