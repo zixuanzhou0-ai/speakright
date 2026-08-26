@@ -14,23 +14,23 @@
   },
   "generatorSnapshot": {
     "schemaVersion": 2,
-    "sha256": "b2099e76a527e34c7221795f6bf0bbec29ebb5a802cde39de0bad5422078ea0e",
+    "sha256": "79ecb1d4086777b8778943a18ddeb98e4f5f9b7a2655e49f2d7b6229ea46f1fd",
     "fileCount": 16,
-    "totalBytes": 234299
+    "totalBytes": 234460
   },
   "captureTransport": {
     "additionalBrowserArgsSha256": "422deba0edb5bebce82abe55f41191198e210ee406b862753208667d52de6d0b",
     "mode": "ephemeral-loopback-cdp",
     "portFile": "WebView2/EBWebView/DevToolsActivePort"
   },
-  "credentialNamespace": "com.speakright.desktop.release-evidence-0be0632c321608f3",
+  "credentialNamespace": "com.speakright.desktop.release-evidence-fa1549608fe7e3b6",
   "sourceSnapshot": {
     "schemaVersion": 2,
-    "sha256": "79ca4d3256a422a57517584cb37d4e2a430bfcbd7e0ab378d8a82165b102f32b",
-    "fileCount": 487
+    "sha256": "a2218ad7a56b3280d60fb86bbb4e0897f3bb80a6bd33e7455efc287065f01052",
+    "fileCount": 488
   },
   "sourceWorktreeClean": true,
-  "buildManifestSha256": "fbb77e832a53bc2e048f93fa0b405d8bdef7cea82b604488ab4a9a8681576480",
+  "buildManifestSha256": "7a6b5f6b515f7d3e94971dfc33771dac568779870fb456d68e62479bf4aeabcf",
   "nativeHttpAttempts": 0,
   "secureStoreSlotsEmpty": true,
   "runtimeIsolation": {
@@ -47,13 +47,13 @@
     "nativeHttpCapability": false,
     "externalConnectCsp": false,
     "rustExternalProviders": "fail-closed",
-    "tauriHttpGuardSha256": "912d4cf660188b58989b2422e9dc25ffef4d3bc8c6bae76630e67212392a5e49",
-    "rustGuardSha256": "bd85a66a49776c70426ae485a8671f1388fa5649d810495547f344ad5b3fc38b"
+    "tauriHttpGuardSha256": "d51db54a3998ac9c064de6ff10cabc4df066e64d41970bbc94e9f95fe4e3aa4e",
+    "rustGuardSha256": "b8fac215c19b8095c17fbf8cc86561bd7ee61c5ce7bf2d5df586f4bb389fb953"
   },
-  "sourceCommit": "ff77d0e4c1795b4ed49ca36791b395d136d57b6e",
+  "sourceCommit": "202a0ac58d4407c024f68174d26963f44dbbd521",
   "executable": {
     "fileName": "speakright.exe",
-    "sha256": "7632a25d10ad7496b8ba55c1d9d3692e89552f717fffd48bd19d4b1c01a619a0"
+    "sha256": "8099bad9fbf690284419e23bd063ec37a17050ecd8ce2d0883a4db79316bd43f"
   },
   "networkPolicy": {
     "applicationOrigin": "http://tauri.localhost",
@@ -149,6 +149,11 @@
       },
       {
         "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/0bw_j5-yisksh.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
         "pathname": "/_next/static/chunks/0fafnyeixyfkd.js",
         "resourceType": "Script"
       },
@@ -174,8 +179,13 @@
       },
       {
         "origin": "http://tauri.localhost",
-        "pathname": "/_next/static/chunks/182s8xdqf2u03.js",
+        "pathname": "/_next/static/chunks/1-7km-ztgu9it.js",
         "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/11b_0gphwesno.css",
+        "resourceType": "Stylesheet"
       },
       {
         "origin": "http://tauri.localhost",
@@ -189,17 +199,17 @@
       },
       {
         "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/1p4nm-50hlocn.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
         "pathname": "/_next/static/chunks/1pa2xgfodc627.js",
         "resourceType": "Script"
       },
       {
         "origin": "http://tauri.localhost",
         "pathname": "/_next/static/chunks/1yafvq7bn-xww.js",
-        "resourceType": "Script"
-      },
-      {
-        "origin": "http://tauri.localhost",
-        "pathname": "/_next/static/chunks/2-cjah879e-qx.js",
         "resourceType": "Script"
       },
       {
@@ -234,17 +244,17 @@
       },
       {
         "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/2a8-1iazih73z.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
         "pathname": "/_next/static/chunks/2ag7f51m5ecig.js",
         "resourceType": "Script"
       },
       {
         "origin": "http://tauri.localhost",
         "pathname": "/_next/static/chunks/2c7qh7qxiuvm0.js",
-        "resourceType": "Script"
-      },
-      {
-        "origin": "http://tauri.localhost",
-        "pathname": "/_next/static/chunks/2dj616hi98bvd.js",
         "resourceType": "Script"
       },
       {
@@ -260,11 +270,6 @@
       {
         "origin": "http://tauri.localhost",
         "pathname": "/_next/static/chunks/2kxl9t1x22lcg.js",
-        "resourceType": "Script"
-      },
-      {
-        "origin": "http://tauri.localhost",
-        "pathname": "/_next/static/chunks/2lpnrt5g-c0z9.js",
         "resourceType": "Script"
       },
       {
@@ -289,12 +294,22 @@
       },
       {
         "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/316ijx9q8jked.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
         "pathname": "/_next/static/chunks/32zoun16_x8r2.js",
         "resourceType": "Script"
       },
       {
         "origin": "http://tauri.localhost",
-        "pathname": "/_next/static/chunks/3_qbr84btzzhv.js",
+        "pathname": "/_next/static/chunks/338b7_tuyhqb_.js",
+        "resourceType": "Script"
+      },
+      {
+        "origin": "http://tauri.localhost",
+        "pathname": "/_next/static/chunks/35kk_tyskv_-v.js",
         "resourceType": "Script"
       },
       {
@@ -309,17 +324,12 @@
       },
       {
         "origin": "http://tauri.localhost",
-        "pathname": "/_next/static/chunks/3g4bf0n4gi5k0.js",
-        "resourceType": "Script"
-      },
-      {
-        "origin": "http://tauri.localhost",
         "pathname": "/_next/static/chunks/3ig9pyb6skyig.js",
         "resourceType": "Script"
       },
       {
         "origin": "http://tauri.localhost",
-        "pathname": "/_next/static/chunks/3q-h9ybtf1fly.js",
+        "pathname": "/_next/static/chunks/3jl81owmxlbm6.js",
         "resourceType": "Script"
       },
       {
@@ -341,11 +351,6 @@
         "origin": "http://tauri.localhost",
         "pathname": "/_next/static/chunks/3z6fdgqgwiylu.js",
         "resourceType": "Script"
-      },
-      {
-        "origin": "http://tauri.localhost",
-        "pathname": "/_next/static/chunks/40wc9rfv_-upb.css",
-        "resourceType": "Stylesheet"
       },
       {
         "origin": "http://tauri.localhost",
@@ -535,7 +540,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/desktop/1280x920/guided-repeat.png",
       "width": 1280,
       "height": 920,
-      "sha256": "2f4857d143bce63f0f4c1e7587aba0c506ad189bc50fffd00563e579261d0aed",
+      "sha256": "0e652bc552b2f93c1b791f13bdd54834253dd8e3484aee4941efab27c22c1207",
       "geometry": {
         "banner": {
           "left": 471.1625061035156,
@@ -577,7 +582,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/desktop/1280x920/diagnosis-example.png",
       "width": 1280,
       "height": 920,
-      "sha256": "07c74258808d6769a8123e84f2226795934fe710cb61a049251285babf3e1331",
+      "sha256": "8760938c614359abb359384018847761053a13ed79002b0e4b22ea6f506dd083",
       "geometry": {
         "banner": {
           "left": 596.75,
@@ -598,7 +603,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/desktop/1280x920/settings.png",
       "width": 1280,
       "height": 920,
-      "sha256": "0625e5615f889f2063d97d88eea00f74d7fcb0861c1a93730533eadbc0303dac",
+      "sha256": "a895648ff32523ebd642c7f2faefffdf25f78db71b7c036413eefbaaf8159967",
       "geometry": {
         "banner": {
           "left": 595.9625244140625,
@@ -640,7 +645,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/desktop/1280x920/no-key.png",
       "width": 1280,
       "height": 920,
-      "sha256": "17ab8c1e812a2572cafc12d6533bbbe1b920c8dead7b563e0276098256afe023",
+      "sha256": "165d8a8210986c4b9bdc6039643b97563f20f653bb54d1263d2f9473f2db3c94",
       "geometry": {
         "banner": {
           "left": 560.375,
@@ -661,7 +666,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/desktop/1024x800/guided-repeat.png",
       "width": 1024,
       "height": 800,
-      "sha256": "013ed1b1c1aa1f992907a9fd68519e79eeeb075ee1566fd6fb2cac48208bf7d2",
+      "sha256": "b8bd1c9dbace9e6851834666668859af98510d928fc54ab1e607015c1da7cca1",
       "geometry": {
         "banner": {
           "left": 343.1625061035156,
@@ -724,7 +729,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/desktop/1024x800/settings.png",
       "width": 1024,
       "height": 800,
-      "sha256": "8e048329435afd260651f8d77ac121953793161f12ba4f5a29b6edde1a96d720",
+      "sha256": "ce7b4bd3051a11a0d4af89c5e6b261a44f5c9d8eab6262182f4f743ba273b1f4",
       "geometry": {
         "banner": {
           "left": 467.9624938964844,
@@ -766,7 +771,7 @@
       "path": "docs/assets/screenshots/release/v1.1.0/desktop/1024x800/no-key.png",
       "width": 1024,
       "height": 800,
-      "sha256": "5e181c7d4c8139063c81d7f5ba847ace7d7e32641939d5619d2cb9a32f8789dd",
+      "sha256": "a4f9b8932b7f7a514e4bc128de2112fcd78397a5613e9062f462c3f54ce7c128",
       "geometry": {
         "banner": {
           "left": 432.375,
