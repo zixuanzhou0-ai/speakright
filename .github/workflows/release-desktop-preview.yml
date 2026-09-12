@@ -300,7 +300,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw "Release commit is not on origin/main." }
 
       - name: Download verified Desktop Preview assets
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: speakright-desktop-unsigned-preview-release-assets
           path: outputs/release/staging
