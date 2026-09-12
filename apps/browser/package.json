@@ -43,7 +43,7 @@
     "howler": "^2.2.4",
     "lucide-react": "^1.0.1",
     "microsoft-cognitiveservices-speech-sdk": "^1.51.0",
-    "motion": "^12.38.0",
+    "motion": "^13.1.1",
     "next": "16.3.1",
     "react": "19.2.4",
     "react-dom": "19.2.4",
